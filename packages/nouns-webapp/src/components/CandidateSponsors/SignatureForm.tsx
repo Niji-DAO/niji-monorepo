@@ -1,20 +1,20 @@
-import { ReactNode, useCallback, useEffect, useState } from 'react';
-import classes from './CandidateSponsors.module.css';
-import dayjs from 'dayjs';
-import { Trans } from '@lingui/macro';
-import { TransactionStatus, useEthers } from '@usedapp/core';
-import { ethers } from 'ethers';
-import config, { CHAIN_ID } from '../../config';
-import { useAddSignature, ProposalCandidate } from '../../wrappers/nounsData';
-import clsx from 'clsx';
 import { faCircleCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Trans } from '@lingui/macro';
+import { TransactionStatus, useEthers } from '@usedapp/core';
+import clsx from 'clsx';
+import dayjs from 'dayjs';
+import { ethers } from 'ethers';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
-import { buildEtherscanTxLink } from '../../utils/etherscan';
 import link from '../../assets/icons/Link.svg';
+import config, { CHAIN_ID } from '../../config';
+import { buildEtherscanTxLink } from '../../utils/etherscan';
+import { ProposalCandidate, useAddSignature } from '../../wrappers/nounsData';
+import classes from './CandidateSponsors.module.css';
 
 const domain = {
-  name: 'Nouns DAO',
+  name: 'Niji DAO',
   chainId: CHAIN_ID,
   verifyingContract: config.addresses.nounsDAOProxy,
 };
@@ -318,7 +318,7 @@ function SignatureForm(props: Props) {
             <span
               className={clsx(
                 (isWaiting || isGetSignatureWaiting || isLoading || isGetSignaturePending) &&
-                classes.loadingButton,
+                  classes.loadingButton,
               )}
             >
               {(isWaiting || isGetSignatureWaiting || isLoading || isGetSignaturePending) && (

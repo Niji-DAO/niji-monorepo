@@ -1,11 +1,16 @@
-import React, { useMemo } from 'react';
-import { useEffect } from 'react';
+import { i18n } from '@lingui/core';
+import { Trans } from '@lingui/macro';
 import { useBlockNumber } from '@usedapp/core';
+import clsx from 'clsx';
+import React, { useEffect, useMemo } from 'react';
 import { Alert, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import ProposalStatus from '../ProposalStatus';
-import classes from './ProposalHeader.module.css';
-import navBarButtonClasses from '../NavBarButton/NavBarButton.module.css';
+import { useActiveLocale } from '../../hooks/useActivateLocale';
+import { useBlockTimestamp } from '../../hooks/useBlockTimestamp';
+import { Locales } from '../../i18n/locales';
+import { buildEtherscanAddressLink } from '../../utils/etherscan';
+import { isMobileScreen } from '../../utils/isMobile';
+import { relativeTimestamp } from '../../utils/timeUtils';
 import {
   Proposal,
   ProposalVersion,
@@ -13,20 +18,14 @@ import {
   useIsDaoGteV3,
   useProposalVote,
 } from '../../wrappers/nounsDao';
-import clsx from 'clsx';
-import { isMobileScreen } from '../../utils/isMobile';
 import { useUserVotesAsOfBlock } from '../../wrappers/nounToken';
-import { useBlockTimestamp } from '../../hooks/useBlockTimestamp';
-import { Trans } from '@lingui/macro';
-import { i18n } from '@lingui/core';
-import { buildEtherscanAddressLink } from '../../utils/etherscan';
-import { transactionIconLink } from '../ProposalContent';
-import ShortAddress from '../ShortAddress';
-import { useActiveLocale } from '../../hooks/useActivateLocale';
-import { Locales } from '../../i18n/locales';
-import HoverCard from '../HoverCard';
 import ByLineHoverCard from '../ByLineHoverCard';
-import { relativeTimestamp } from '../../utils/timeUtils';
+import HoverCard from '../HoverCard';
+import navBarButtonClasses from '../NavBarButton/NavBarButton.module.css';
+import { transactionIconLink } from '../ProposalContent';
+import ProposalStatus from '../ProposalStatus';
+import ShortAddress from '../ShortAddress';
+import classes from './ProposalHeader.module.css';
 
 interface ProposalHeaderProps {
   title?: string;
@@ -67,9 +66,9 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = props => {
   const [createdTimestamp, setCreatedTimestamp] = React.useState<number | null>(null);
   const isMobile = isMobileScreen();
   const currentBlock = useBlockNumber();
-  const currentOrSnapshotBlock = useMemo(() =>
-    Math.min(proposal?.voteSnapshotBlock, (currentBlock ? currentBlock - 1 : 0)) || undefined,
-    [proposal, currentBlock]
+  const currentOrSnapshotBlock = useMemo(
+    () => Math.min(proposal?.voteSnapshotBlock, currentBlock ? currentBlock - 1 : 0) || undefined,
+    [proposal, currentBlock],
   );
   const availableVotes = useUserVotesAsOfBlock(currentOrSnapshotBlock) ?? 0;
   const hasVoted = useHasVotedOnProposal(proposal?.id);
@@ -154,10 +153,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = props => {
                   <Trans>Proposal {i18n.number(parseInt(proposal.id || '0'))}</Trans>
                 </div>
                 <div>
-                  <ProposalStatus
-                    status={proposal?.status}
-                    className={classes.proposalStatus}
-                  />
+                  <ProposalStatus status={proposal?.status} className={classes.proposalStatus} />
                 </div>
               </div>
             </span>
@@ -286,7 +282,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = props => {
       {proposal && isActiveForVoting && proposalCreationTimestamp && !!availableVotes && !hasVoted && (
         <Alert variant="success" className={classes.voterIneligibleAlert}>
           <Trans>
-            Only Nouns you owned or were delegated to you before{' '}
+            Only Niji you owned or were delegated to you before{' '}
             {i18n.date(new Date(proposalCreationTimestamp * 1000), {
               dateStyle: 'long',
               timeStyle: 'long',

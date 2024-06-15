@@ -1,11 +1,6 @@
-import React from 'react';
-import classes from './Fork.module.css';
-import { EscrowDeposit, EscrowWithdrawal, Fork, useProposalTitles } from '../../wrappers/nounsDao';
-import { Trans } from '@lingui/macro';
-import { Link } from 'react-router-dom';
-import ShortAddress from '../../components/ShortAddress';
-import { buildEtherscanAddressLink } from '../../utils/etherscan';
 import dayjs from 'dayjs';
+import { Fork } from '../../wrappers/nounsDao';
+import classes from './Fork.module.css';
 
 type Props = {
   forkDetails: Fork;
@@ -15,7 +10,7 @@ type Props = {
 const ForkCycleEvent = ({ forkDetails }: Props) => {
   const actionLabel = 'Fork deployed';
   const nounCount = forkDetails?.tokensInEscrowCount;
-  const nounLabel = nounCount > 1 ? 'Nouns' : 'Noun';
+  const nounLabel = nounCount > 1 ? 'Niji' : 'Niji';
   const timestamp = dayjs(
     forkDetails?.forkingPeriodEndTimestamp && +forkDetails?.forkingPeriodEndTimestamp * 1000,
   ).fromNow();

@@ -1,7 +1,7 @@
-import classes from './Noun.module.css';
 import React from 'react';
-import loadingNoun from '../../assets/loading-skull-noun.gif';
 import Image from 'react-bootstrap/Image';
+import loadingNoun from '../../assets/loading-skull-noun.gif';
+import classes from './Niji.module.css';
 
 export const LoadingNoun = () => {
   return (
@@ -11,7 +11,7 @@ export const LoadingNoun = () => {
   );
 };
 
-const Noun: React.FC<{
+const Niji: React.FC<{
   imgPath: string;
   alt: string;
   className?: string;
@@ -30,4 +30,4 @@ const Noun: React.FC<{
   );
 };
 
-export default Noun;
+export default Niji;

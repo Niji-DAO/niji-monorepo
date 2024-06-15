@@ -1,25 +1,25 @@
+import { i18n } from '@lingui/core';
+import { Trans } from '@lingui/macro';
+import { getNounData, getRandomNounSeed, ImageData } from '@nouns/assets';
+import { buildSVG, EncodedImage, PNGCollectionEncoder } from '@nouns/sdk';
+import { PNG } from 'pngjs';
+import React, { ChangeEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import {
-  Container,
-  Col,
   Button,
-  Image,
-  Row,
+  Col,
+  Container,
   FloatingLabel,
   Form,
+  Image,
   OverlayTrigger,
   Popover,
+  Row,
 } from 'react-bootstrap';
-import classes from './Playground.module.css';
-import React, { ChangeEvent, ReactNode, useEffect, useRef, useState } from 'react';
-import Link from '../../components/Link';
-import { ImageData, getNounData, getRandomNounSeed } from '@nouns/assets';
-import { buildSVG, EncodedImage, PNGCollectionEncoder } from '@nouns/sdk';
 import InfoIcon from '../../assets/icons/Info.svg';
-import Noun from '../../components/Noun';
+import Link from '../../components/Link';
+import Niji from '../../components/Niji';
 import NounModal from './NounModal';
-import { PNG } from 'pngjs';
-import { Trans } from '@lingui/macro';
-import { i18n } from '@lingui/core';
+import classes from './Playground.module.css';
 
 interface Trait {
   title: string;
@@ -34,8 +34,8 @@ interface PendingCustomTrait {
 
 const nounsProtocolLink = (
   <Link
-    text={<Trans>Nouns Protocol</Trans>}
-    url="https://www.notion.so/Noun-Protocol-32e4f0bf74fe433e927e2ea35e52a507"
+    text={<Trans>Niji Protocol</Trans>}
+    url="https://www.notion.so/Niji-Protocol-32e4f0bf74fe433e927e2ea35e52a507"
     leavesPage={true}
   />
 );
@@ -270,8 +270,8 @@ const Playground: React.FC = () => {
             </h1>
             <p>
               <Trans>
-                The playground was built using the {nounsProtocolLink}. Noun's traits are determined
-                by the Noun Seed. The seed was generated using {nounsAssetsLink} and rendered using
+                The playground was built using the {nounsProtocolLink}. Niji's traits are determined
+                by the Niji Seed. The seed was generated using {nounsAssetsLink} and rendered using
                 the {nounsSDKLink}.
               </Trans>
             </p>
@@ -286,7 +286,7 @@ const Playground: React.FC = () => {
                 }}
                 className={classes.primaryBtn}
               >
-                <Trans>Generate Nouns</Trans>
+                <Trans>Generate Niji</Trans>
               </Button>
             </Col>
             <Row>
@@ -376,7 +376,7 @@ const Playground: React.FC = () => {
               <Trans>
                 You've generated{' '}
                 {i18n.number(parseInt(nounSvgs ? (nounSvgs.length / 365).toFixed(2) : '0'))} years
-                worth of Nouns
+                worth of Niji
               </Trans>
             </p>
           </Col>
@@ -392,7 +392,7 @@ const Playground: React.FC = () => {
                           setDisplayNoun(true);
                         }}
                       >
-                        <Noun
+                        <Niji
                           imgPath={`data:image/svg+xml;base64,${btoa(svg)}`}
                           alt="noun"
                           className={classes.nounImg}

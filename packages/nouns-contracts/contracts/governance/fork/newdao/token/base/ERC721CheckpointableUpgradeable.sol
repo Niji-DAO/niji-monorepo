@@ -26,11 +26,11 @@
 // Additional conditions of BSD-3-Clause can be found here: https://opensource.org/licenses/BSD-3-Clause
 //
 // ERC721CheckpointableUpgradeable.sol MODIFICATIONS:
-// - Inherits from OpenZeppelin's ERC721EnumerableUpgradeable.sol, removing the original modification Nouns made to
+// - Inherits from OpenZeppelin's ERC721EnumerableUpgradeable.sol, removing the original modification Niji made to
 //   ERC721.sol, where for each mint two Transfer events were emitted; this modified implementation sticks with the
 //   OpenZeppelin standard.
 // - More importantly, this inheritance change makes the token upgradable, which we deemed important in the context of
-//   forks, in order to give new Nouns forks enough of a chance to modify their contracts to the new DAO's needs.
+//   forks, in order to give new Niji forks enough of a chance to modify their contracts to the new DAO's needs.
 // - Fixes a critical bug in `delegateBySig`, where the previous version allowed delegating to address zero, which then
 //   reverts whenever that owner tries to delegate anew or transfer their tokens. The fix is simply to revert on any
 //   attempt to delegate to address zero.

@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
-import classes from './ExploreNav.module.css';
+import { faSortDown } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/macro';
 import { motion } from 'framer-motion/dist/framer-motion';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSortDown } from '@fortawesome/free-solid-svg-icons';
+import React, { useEffect } from 'react';
+import classes from './ExploreNav.module.css';
 
 interface ExploreNavProps {
   nounCount: number;
@@ -15,11 +15,11 @@ interface ExploreNavProps {
 const ExploreNav: React.FC<ExploreNavProps> = props => {
   const sortOptions = [
     {
-      label: 'Latest Nouns',
+      label: 'Latest Niji',
       value: 'date-descending',
     },
     {
-      label: 'Oldest Nouns',
+      label: 'Oldest Niji',
       value: 'date-ascending',
     },
   ];
@@ -37,7 +37,7 @@ const ExploreNav: React.FC<ExploreNavProps> = props => {
         </span>{' '}
         {props.nounCount >= 0 && (
           <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <strong>{props.nounCount}</strong> Nouns
+            <strong>{props.nounCount}</strong> Niji
           </motion.span>
         )}
       </h3>

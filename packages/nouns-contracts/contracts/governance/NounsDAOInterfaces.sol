@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-/// @title Nouns DAO Logic interfaces and events
+/// @title Niji DAO Logic interfaces and events
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -25,7 +25,7 @@
 // Additional conditions of BSD-3-Clause can be found here: https://opensource.org/licenses/BSD-3-Clause
 //
 // MODIFICATIONS
-// NounsDAOEvents, NounsDAOProxyStorage, NounsDAOStorageV1 add support for changes made by Nouns DAO to GovernorBravo.sol
+// NounsDAOEvents, NounsDAOProxyStorage, NounsDAOStorageV1 add support for changes made by Niji DAO to GovernorBravo.sol
 // See NounsDAOLogicV1.sol for more details.
 // NounsDAOStorageV1Adjusted and NounsDAOStorageV2 add support for a dynamic vote quorum.
 // See NounsDAOLogicV2.sol for more details.
@@ -296,10 +296,10 @@ contract NounsDAOStorageV1 is NounsDAOProxyStorage {
     /// @notice The total number of proposals
     uint256 public proposalCount;
 
-    /// @notice The address of the Nouns DAO Executor NounsDAOExecutor
+    /// @notice The address of the Niji DAO Executor NounsDAOExecutor
     INounsDAOExecutor public timelock;
 
-    /// @notice The address of the Nouns tokens
+    /// @notice The address of the Niji tokens
     NounsTokenLike public nouns;
 
     /// @notice The official record of all proposals ever proposed
@@ -396,10 +396,10 @@ contract NounsDAOStorageV1Adjusted is NounsDAOProxyStorage {
     /// @notice The total number of proposals
     uint256 public proposalCount;
 
-    /// @notice The address of the Nouns DAO Executor NounsDAOExecutor
+    /// @notice The address of the Niji DAO Executor NounsDAOExecutor
     INounsDAOExecutor public timelock;
 
-    /// @notice The address of the Nouns tokens
+    /// @notice The address of the Niji tokens
     NounsTokenLike public nouns;
 
     /// @notice The official record of all proposals ever proposed
@@ -671,9 +671,9 @@ contract NounsDAOStorageV3 {
         uint256 quorumVotesBPS;
         /// @notice The total number of proposals
         uint256 proposalCount;
-        /// @notice The address of the Nouns DAO Executor NounsDAOExecutor
+        /// @notice The address of the Niji DAO Executor NounsDAOExecutor
         INounsDAOExecutorV2 timelock;
-        /// @notice The address of the Nouns tokens
+        /// @notice The address of the Niji tokens
         NounsTokenLike nouns;
         /// @notice The official record of all proposals ever proposed
         mapping(uint256 => Proposal) _proposals;

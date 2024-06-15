@@ -8,9 +8,9 @@ import { ContractName } from './types';
 
 type LocalContractName =
   | Exclude<
-    ContractName,
-    'NounsDAOLogicV1' | 'NounsDAOProxy' | 'NounsDAOLogicV2' | 'NounsDAOExecutor'
-  >
+      ContractName,
+      'NounsDAOLogicV1' | 'NounsDAOProxy' | 'NounsDAOLogicV2' | 'NounsDAOExecutor'
+    >
   | 'NounsDAOLogicV3'
   | 'NounsDAOProxyV3'
   | 'NounsDAOV3Admin'

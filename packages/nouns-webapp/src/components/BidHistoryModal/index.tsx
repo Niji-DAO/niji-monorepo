@@ -1,13 +1,13 @@
-import classes from './BidHistoryModal.module.css';
-import ReactDOM from 'react-dom';
-import React from 'react';
 import { XIcon } from '@heroicons/react/solid';
-import { Auction } from '../../wrappers/nounsAuction';
-import { StandaloneNounRoundedCorners } from '../StandaloneNoun';
-import { useAuctionBids } from '../../wrappers/onDisplayAuction';
-import { Bid } from '../../utils/types';
-import BidHistoryModalRow from '../BidHistoryModalRow';
 import { Trans } from '@lingui/macro';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Bid } from '../../utils/types';
+import { Auction } from '../../wrappers/nounsAuction';
+import { useAuctionBids } from '../../wrappers/onDisplayAuction';
+import BidHistoryModalRow from '../BidHistoryModalRow';
+import { StandaloneNounRoundedCorners } from '../StandaloneNoun';
+import classes from './BidHistoryModal.module.css';
 
 export const Backdrop: React.FC<{ onDismiss: () => void }> = props => {
   return <div className={classes.backdrop} onClick={props.onDismiss} />;
@@ -40,7 +40,7 @@ const BidHistoryModalOverlay: React.FC<{
               <h2>
                 <Trans>Bids for</Trans>
               </h2>
-              <h1>Noun {auction && auction.nounId.toString()}</h1>
+              <h1>Niji {auction && auction.nounId.toString()}</h1>
             </div>
           </div>
           <div className={classes.bidWrapper}>

@@ -2,14 +2,14 @@ import { BigNumber } from '@ethersproject/bignumber';
 import React from 'react';
 import { isNounderNoun } from '../../utils/nounderNoun';
 
-import classes from './NounInfoRowBirthday.module.css';
 import _BirthdayIcon from '../../assets/icons/Birthday.svg';
+import classes from './NounInfoRowBirthday.module.css';
 
+import { i18n } from '@lingui/core';
+import { Trans } from '@lingui/macro';
 import { Image } from 'react-bootstrap';
 import { useAppSelector } from '../../hooks';
 import { AuctionState } from '../../state/slices/auction';
-import { Trans } from '@lingui/macro';
-import { i18n } from '@lingui/core';
 
 interface NounInfoRowBirthdayProps {
   nounId: number;
@@ -39,7 +39,7 @@ const NounInfoRowBirthday: React.FC<NounInfoRowBirthdayProps> = props => {
 
   const startTime = getNounBirthday(nounIdForQuery, pastAuctions);
   if (!startTime) {
-    return <Trans>Error fetching Noun birthday</Trans>;
+    return <Trans>Error fetching Niji birthday</Trans>;
   }
 
   const birthday = new Date(Number(startTime._hex) * 1000);

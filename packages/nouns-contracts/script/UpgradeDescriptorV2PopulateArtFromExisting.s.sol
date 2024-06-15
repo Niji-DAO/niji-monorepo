@@ -9,7 +9,8 @@ import { INounsArt } from '../contracts/interfaces/INounsArt.sol';
 import { NounsArt } from '../contracts/NounsArt.sol';
 
 contract UpgradeDescriptorV2PopulateArtFromExisting is Script {
-    NounsDescriptorV2 public constant EXISTING_DESCRIPTOR = NounsDescriptorV2(0x6229c811D04501523C6058bfAAc29c91bb586268);
+    NounsDescriptorV2 public constant EXISTING_DESCRIPTOR =
+        NounsDescriptorV2(0x6229c811D04501523C6058bfAAc29c91bb586268);
     ISVGRenderer public constant EXISTING_RENDERER = ISVGRenderer(0x81d94554A4b072BFcd850205f0c79e97c92aab56);
     IInflator public constant EXISTING_INFLATOR = IInflator(0xa2acee85Cd81c42BcAa1FeFA8eD2516b68872Dbe);
     NounsArt public constant EXISTING_ART = NounsArt(0x48A7C62e2560d1336869D6550841222942768C49);

@@ -27,7 +27,7 @@ contract NounsTokenTest is Test, DeployUtils {
     }
 
     function testName() public {
-        assertEq(nounsToken.name(), 'Nouns');
+        assertEq(nounsToken.name(), 'Niji');
     }
 
     function testMintANounToSelfAndRewardsNoundersDao() public {

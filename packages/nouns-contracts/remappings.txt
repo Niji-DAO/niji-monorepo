@@ -1,2 +1,9 @@
 ds-test/=lib/forge-std/lib/ds-test/src/
 forge-std/=lib/forge-std/src/
+@ensdomains/=../../node_modules/@ensdomains/
+@openzeppelin/=../../node_modules/@openzeppelin/
+base64-sol/=../../node_modules/base64-sol/
+eth-gas-reporter/=../../node_modules/eth-gas-reporter/
+hardhat/=../../node_modules/hardhat/
+abdk-libraries-solidity/=lib/abdk-libraries-solidity/
+abdk-lib/=lib/abdk-libraries-solidity/

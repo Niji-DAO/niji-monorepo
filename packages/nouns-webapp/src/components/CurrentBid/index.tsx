@@ -1,19 +1,19 @@
-import BigNumber from 'bignumber.js';
-import classes from './CurrentBid.module.css';
-import TruncatedAmount from '../TruncatedAmount';
-import { Row, Col } from 'react-bootstrap';
-import { useAppSelector } from '../../hooks';
-import clsx from 'clsx';
 import { Trans } from '@lingui/macro';
+import BigNumber from 'bignumber.js';
+import clsx from 'clsx';
+import { Col, Row } from 'react-bootstrap';
+import { useAppSelector } from '../../hooks';
+import TruncatedAmount from '../TruncatedAmount';
+import classes from './CurrentBid.module.css';
 
 /**
  * Passible to CurrentBid as `currentBid` prop to indicate that
- * the bid amount is not applicable to this auction. (Nounder Noun)
+ * the bid amount is not applicable to this auction. (Nounder Niji)
  */
 export const BID_N_A = 'n/a';
 
 /**
- * Special Bid type for not applicable auctions (Nounder Nouns)
+ * Special Bid type for not applicable auctions (Nounder Niji)
  */
 type BidNa = typeof BID_N_A;
 

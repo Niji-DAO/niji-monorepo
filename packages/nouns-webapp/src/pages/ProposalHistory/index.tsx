@@ -111,7 +111,11 @@ const ProposalHistory = ({
                       />
                     </div>
                   ) : (
-                    <h1>{proposalVersions && activeVersion && proposalVersions[activeVersion - 1].title} </h1>
+                    <h1>
+                      {proposalVersions &&
+                        activeVersion &&
+                        proposalVersions[activeVersion - 1].title}{' '}
+                    </h1>
                   )}
                 </div>
               </div>
@@ -124,13 +128,13 @@ const ProposalHistory = ({
           <Col lg={8} md={12}>
             {((!isDiffsVisible && proposalVersions && activeVersion) ||
               (isDiffsVisible && proposalVersions && activeVersion < 2)) && (
-                <ProposalContent
-                  description={proposalVersions[activeVersion - 1].description}
-                  title={proposalVersions[activeVersion - 1].title}
-                  details={proposalVersions[activeVersion - 1].details}
-                  hasSidebar={true}
-                />
-              )}
+              <ProposalContent
+                description={proposalVersions[activeVersion - 1].description}
+                title={proposalVersions[activeVersion - 1].title}
+                details={proposalVersions[activeVersion - 1].details}
+                hasSidebar={true}
+              />
+            )}
             {isDiffsVisible && proposalVersions && activeVersion >= 2 && (
               <div className={classes.diffsWrapper}>
                 <Col className={clsx(classes.section, 'm-0 p-0')}>

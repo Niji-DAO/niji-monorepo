@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title The Nouns ERC-721 token, adjusted for forks
+/// @title The Niji ERC-721 token, adjusted for forks
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -31,7 +31,7 @@ import { INounsDAOForkEscrow } from '../../../NounsDAOInterfaces.sol';
  * - Added upgradeablity via UUPSUpgradeable.
  * - Inheriting from an unmodified ERC721, so that the double Transfer event emission that
  *   NounsToken performs is gone, in favor of the standard single event.
- * - Added functions to claim tokens from a Nouns Fork escrow, or during the forking period.
+ * - Added functions to claim tokens from a Niji Fork escrow, or during the forking period.
  * - Removed the proxyRegistry feature that whitelisted OpenSea.
  * - Removed `noundersDAO` and the founder reward every 10 mints.
  * For additional context see `ERC721CheckpointableUpgradeable`.
@@ -45,22 +45,22 @@ contract NounsTokenFork is INounsTokenFork, OwnableUpgradeable, ERC721Checkpoint
 
     string public constant NAME = 'NounsTokenFork';
 
-    /// @notice  An address who has permissions to mint Nouns
+    /// @notice  An address who has permissions to mint Niji
     address public minter;
 
-    /// @notice The Nouns token URI descriptor
+    /// @notice The Niji token URI descriptor
     INounsDescriptorMinimal public descriptor;
 
-    /// @notice The Nouns token seeder
+    /// @notice The Niji token seeder
     INounsSeeder public seeder;
 
-    /// @notice The escrow contract used to verify ownership of the original Nouns in the post-fork claiming process
+    /// @notice The escrow contract used to verify ownership of the original Niji in the post-fork claiming process
     INounsDAOForkEscrow public escrow;
 
     /// @notice The fork ID, used when querying the escrow for token ownership
     uint32 public forkId;
 
-    /// @notice How many tokens are still available to be claimed by Nouners who put their original Nouns in escrow
+    /// @notice How many tokens are still available to be claimed by Nouners who put their original Niji in escrow
     uint256 public remainingTokensToClaim;
 
     /// @notice The forking period expiration timestamp, after which new tokens cannot be claimed by the original DAO
@@ -127,7 +127,7 @@ contract NounsTokenFork is INounsTokenFork, OwnableUpgradeable, ERC721Checkpoint
         uint256 tokensToClaim,
         uint256 _forkingPeriodEndTimestamp
     ) external initializer {
-        __ERC721_init('Nouns', 'NOUN');
+        __ERC721_init('Niji', 'NOUN');
         _transferOwnership(_owner);
         minter = _minter;
         escrow = _escrow;
@@ -142,7 +142,7 @@ contract NounsTokenFork is INounsTokenFork, OwnableUpgradeable, ERC721Checkpoint
     }
 
     /**
-     * @notice Claim new tokens if you escrowed original Nouns and forked into a new DAO governed by holders of this
+     * @notice Claim new tokens if you escrowed original Niji and forked into a new DAO governed by holders of this
      * token.
      * @dev Reverts if the sender is not the owner of the escrowed token.
      * @param tokenIds The token IDs to claim
@@ -179,7 +179,7 @@ contract NounsTokenFork is INounsTokenFork, OwnableUpgradeable, ERC721Checkpoint
         }
 
         // This treats an important case:
-        // During a forking period, people can buy new Nouns on auction, with a higher ID than the auction ID at forking
+        // During a forking period, people can buy new Niji on auction, with a higher ID than the auction ID at forking
         // They can then join the fork with those IDs
         // If we don't increment currentNounId, unpausing the fork auction house would revert
         // Since it would attempt to mint a noun with an ID that already exists
@@ -202,7 +202,7 @@ contract NounsTokenFork is INounsTokenFork, OwnableUpgradeable, ERC721Checkpoint
     }
 
     /**
-     * @notice Mint a Noun to the minter
+     * @notice Mint a Niji to the minter
      * @dev Call _mintTo with the to address(es).
      */
     function mint() public override onlyMinter returns (uint256) {
@@ -296,7 +296,7 @@ contract NounsTokenFork is INounsTokenFork, OwnableUpgradeable, ERC721Checkpoint
     }
 
     /**
-     * @notice Mint a Noun with `nounId` to the provided `to` address.
+     * @notice Mint a Niji with `nounId` to the provided `to` address.
      */
     function _mintTo(address to, uint256 nounId) internal returns (uint256) {
         INounsSeeder.Seed memory seed = seeds[nounId] = seeder.generateSeed(nounId, descriptor);
@@ -308,13 +308,37 @@ contract NounsTokenFork is INounsTokenFork, OwnableUpgradeable, ERC721Checkpoint
     }
 
     /**
-     * @notice Mint a new token using the original Nouns seed.
+     * @notice Mint a new token using the original Niji seed.
      */
     function _mintWithOriginalSeed(address to, uint256 nounId) internal {
-        (uint48 background, uint48 body, uint48 accessory, uint48 head, uint48 glasses) = NounsTokenFork(
-            address(escrow.nounsToken())
-        ).seeds(nounId);
-        INounsSeeder.Seed memory seed = INounsSeeder.Seed(background, body, accessory, head, glasses);
+        (
+            uint48 background,
+            uint48 backgroundDecoration,
+            uint48 special,
+            uint48 leftHand,
+            uint48 back,
+            uint48 ear,
+            uint48 choker,
+            uint48 clothe,
+            uint48 hair,
+            uint48 headphone,
+            uint48 hat,
+            uint48 backDecoration
+        ) = NounsTokenFork(address(escrow.nounsToken())).seeds(nounId);
+        INounsSeeder.Seed memory seed = INounsSeeder.Seed(
+            background,
+            backgroundDecoration,
+            special,
+            leftHand,
+            back,
+            ear,
+            choker,
+            clothe,
+            hair,
+            headphone,
+            hat,
+            backDecoration
+        );
 
         seeds[nounId] = seed;
         _mint(to, nounId);
@@ -323,7 +347,7 @@ contract NounsTokenFork is INounsTokenFork, OwnableUpgradeable, ERC721Checkpoint
     }
 
     /**
-     * @dev Reverts when `msg.sender` is not the owner of this contract; in the case of Noun DAOs it should be the
+     * @dev Reverts when `msg.sender` is not the owner of this contract; in the case of Niji DAOs it should be the
      * DAO's treasury contract.
      */
     function _authorizeUpgrade(address) internal view override onlyOwner {}

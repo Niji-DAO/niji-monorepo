@@ -175,7 +175,7 @@ function captureProposalCandidateVersion(
   encodedProposalHash: Bytes,
   block: ethereum.Block,
   proposer: Bytes,
-  updateMessage: string = '',
+  updateMessage = '',
 ): ProposalCandidateVersion {
   const content = getOrCreateProposalCandidateContent(encodedProposalHash.toHexString());
   content.targets = targets;

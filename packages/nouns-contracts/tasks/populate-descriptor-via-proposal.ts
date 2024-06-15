@@ -1,11 +1,11 @@
+import { readFileSync } from 'fs';
 import { task } from 'hardhat/config';
 import { dataToDescriptorInput } from './utils';
-import { readFileSync } from 'fs';
 
 // see image-data-example-for-populate-via-proposal.json for an example input file
 task(
   'populate-descriptor-via-proposal',
-  'Populates the descriptor with color palettes and Noun parts; accepts an input JSON with missing properies.',
+  'Populates the descriptor with color palettes and Niji parts; accepts an input JSON with missing properies.',
 )
   .addParam('nounsDescriptor', 'The `NounsDescriptor` contract address')
   .addParam('daoAddress', 'The `NounsDAOProxy` contract address')

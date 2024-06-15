@@ -1,14 +1,14 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import classes from './VoteSignals.module.css';
 import { Trans } from '@lingui/macro';
-import clsx from 'clsx';
-import VoteSignalGroup from './VoteSignalGroup';
-import { VoteSignalDetail, useSendFeedback } from '../../wrappers/nounsData';
-import { AlertModal, setAlertModal } from '../../state/slices/application';
-import { useAppDispatch } from '../../hooks';
 import { useEthers } from '@usedapp/core';
+import clsx from 'clsx';
 import dayjs from 'dayjs';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FormControl, Spinner } from 'react-bootstrap';
+import { useAppDispatch } from '../../hooks';
+import { AlertModal, setAlertModal } from '../../state/slices/application';
+import { VoteSignalDetail, useSendFeedback } from '../../wrappers/nounsData';
+import VoteSignalGroup from './VoteSignalGroup';
+import classes from './VoteSignals.module.css';
 
 type Props = {
   proposalId?: string;
@@ -174,8 +174,8 @@ function VoteSignals(props: Props) {
             {!props.isCandidate && (
               <p>
                 <Trans>
-                  Nouns voters can cast voting signals to give proposers of pending proposals an
-                  idea of how they intend to vote and helpful guidance on proposal changes to change
+                  Niji voters can cast voting signals to give proposers of pending proposals an idea
+                  of how they intend to vote and helpful guidance on proposal changes to change
                   their vote.
                 </Trans>
               </p>
@@ -328,7 +328,7 @@ function VoteSignals(props: Props) {
           {props.isCandidate && (
             <p className={classes.descriptionBelow}>
               <Trans>
-                Nouns voters can cast voting signals to give proposers of pending proposals an idea
+                Niji voters can cast voting signals to give proposers of pending proposals an idea
                 of how they intend to vote and helpful guidance on proposal changes to change their
                 vote.
               </Trans>

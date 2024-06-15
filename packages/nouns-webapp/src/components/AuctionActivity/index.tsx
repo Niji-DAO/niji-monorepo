@@ -1,29 +1,29 @@
-import { Auction } from '../../wrappers/nounsAuction';
-import React, { useState, useEffect } from 'react';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Trans } from '@lingui/macro';
 import BigNumber from 'bignumber.js';
-import { Row, Col } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Col, Row } from 'react-bootstrap';
+import config from '../../config';
+import { useAppSelector } from '../../hooks';
+import { buildEtherscanAddressLink } from '../../utils/etherscan';
+import { Auction } from '../../wrappers/nounsAuction';
+import AuctionActivityDateHeadline from '../AuctionActivityDateHeadline';
+import AuctionActivityNounTitle from '../AuctionActivityNounTitle';
+import AuctionActivityWrapper from '../AuctionActivityWrapper';
+import AuctionNavigation from '../AuctionNavigation';
+import AuctionTimer from '../AuctionTimer';
+import AuctionTitleAndNavWrapper from '../AuctionTitleAndNavWrapper';
+import Bid from '../Bid';
+import BidHistory from '../BidHistory';
+import BidHistoryBtn from '../BidHistoryBtn';
+import BidHistoryModal from '../BidHistoryModal';
+import CurrentBid from '../CurrentBid';
+import Holder from '../Holder';
+import NounInfoCard from '../NounInfoCard';
+import Winner from '../Winner';
 import classes from './AuctionActivity.module.css';
 import bidHistoryClasses from './BidHistory.module.css';
-import Bid from '../Bid';
-import AuctionTimer from '../AuctionTimer';
-import CurrentBid from '../CurrentBid';
-import Winner from '../Winner';
-import BidHistory from '../BidHistory';
-import AuctionNavigation from '../AuctionNavigation';
-import AuctionActivityWrapper from '../AuctionActivityWrapper';
-import AuctionTitleAndNavWrapper from '../AuctionTitleAndNavWrapper';
-import AuctionActivityNounTitle from '../AuctionActivityNounTitle';
-import AuctionActivityDateHeadline from '../AuctionActivityDateHeadline';
-import BidHistoryBtn from '../BidHistoryBtn';
-import config from '../../config';
-import { buildEtherscanAddressLink } from '../../utils/etherscan';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import NounInfoCard from '../NounInfoCard';
-import { useAppSelector } from '../../hooks';
-import BidHistoryModal from '../BidHistoryModal';
-import { Trans } from '@lingui/macro';
-import Holder from '../Holder';
 
 const openEtherscanBidHistory = () => {
   const url = buildEtherscanAddressLink(config.addresses.nounsAuctionHouseProxy);
@@ -136,7 +136,7 @@ const AuctionActivity: React.FC<AuctionActivityProps> = (props: AuctionActivityP
             <Col lg={12} className={classes.fomoNounsLink}>
               <FontAwesomeIcon icon={faInfoCircle} />
               <a href={'https://fomonouns.wtf'} target={'_blank'} rel="noreferrer">
-                <Trans>Help mint the next Noun</Trans>
+                <Trans>Help mint the next Niji</Trans>
               </a>
             </Col>
           </Row>

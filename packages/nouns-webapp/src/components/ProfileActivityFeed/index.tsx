@@ -4,11 +4,11 @@ import Section from '../../layout/Section';
 import classes from './ProfileActivityFeed.module.css';
 
 import { Trans } from '@lingui/macro';
-import { useNounActivity } from '../../wrappers/nounActivity';
 import responsiveUiUtilsClasses from '../../utils/ResponsiveUIUtils.module.css';
-import ProfileActivityFeedToggle from '../ProfileActivityFeedToggle';
+import { useNounActivity } from '../../wrappers/nounActivity';
 import DesktopProfileActivityFeed from '../DesktopProfileActivityFeed';
 import MobileProfileActivityFeed from '../MobileProfileActivityFeed';
+import ProfileActivityFeedToggle from '../ProfileActivityFeedToggle';
 
 interface ProfileActivityFeedProps {
   nounId: number;
@@ -55,7 +55,7 @@ const ProfileActivityFeed: React.FC<ProfileActivityFeedProps> = props => {
   if (error) {
     return (
       <div>
-        <Trans>Failed to fetch Noun activity history</Trans>
+        <Trans>Failed to fetch Niji activity history</Trans>
       </div>
     );
   }
@@ -70,7 +70,7 @@ const ProfileActivityFeed: React.FC<ProfileActivityFeedProps> = props => {
         </div>
         {data && data.length === 0 ? (
           <div className={classes.nullStateCopy}>
-            <Trans>This Noun has no activity, since it was just created. Check back soon!</Trans>
+            <Trans>This Niji has no activity, since it was just created. Check back soon!</Trans>
           </div>
         ) : (
           <>

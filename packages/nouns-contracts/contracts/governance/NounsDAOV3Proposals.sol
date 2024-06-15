@@ -771,7 +771,7 @@ library NounsDAOV3Proposals {
     }
 
     /**
-     * @notice Current proposal threshold using Noun Total Supply
+     * @notice Current proposal threshold using Niji Total Supply
      * Differs from `GovernerBravo` which uses fixed amount
      */
     function proposalThreshold(NounsDAOStorageV3.StorageV3 storage ds, uint256 adjustedTotalSupply)
@@ -1006,7 +1006,7 @@ library NounsDAOV3Proposals {
         bytes32 structHash = keccak256(abi.encodePacked(typehash, proposalEncodeData, expirationTimestamp));
 
         bytes32 domainSeparator = keccak256(
-            abi.encode(DOMAIN_TYPEHASH, keccak256(bytes('Nouns DAO')), block.chainid, verifyingContract)
+            abi.encode(DOMAIN_TYPEHASH, keccak256(bytes('Niji DAO')), block.chainid, verifyingContract)
         );
 
         return ECDSA.toTypedDataHash(domainSeparator, structHash);

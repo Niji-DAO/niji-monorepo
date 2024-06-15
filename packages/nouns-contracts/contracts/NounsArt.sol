@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title The Nouns art storage contract
+/// @title The Niji art storage contract
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -22,29 +22,50 @@ import { SSTORE2 } from './libs/SSTORE2.sol';
 import { IInflator } from './interfaces/IInflator.sol';
 
 contract NounsArt is INounsArt {
-    /// @notice Current Nouns Descriptor address
+    /// @notice Current Niji Descriptor address
     address public override descriptor;
 
     /// @notice Current inflator address
     IInflator public override inflator;
 
-    /// @notice Noun Backgrounds (Hex Colors)
+    /// @notice Niji Backgrounds (Hex Colors)
     string[] public override backgrounds;
 
-    /// @notice Noun Color Palettes (Index => Hex Colors, stored as a contract using SSTORE2)
+    /// @notice Niji Color Palettes (Index => Hex Colors, stored as a contract using SSTORE2)
     mapping(uint8 => address) public palettesPointers;
 
-    /// @notice Noun Bodies Trait
-    Trait public bodiesTrait;
+    /// @notice Nigi Background Decorations Trait
+    Trait public backgroundDecorationsTrait;
 
-    /// @notice Noun Accessories Trait
-    Trait public accessoriesTrait;
+    /// @notice Nigi Specials Trait
+    Trait public specialsTrait;
 
-    /// @notice Noun Heads Trait
-    Trait public headsTrait;
+    /// @notice Nigi Left Hands Trait
+    Trait public leftHandsTrait;
 
-    /// @notice Noun Glasses Trait
-    Trait public glassesTrait;
+    /// @notice Nigi Backs Trait
+    Trait public backsTrait;
+
+    /// @notice Nigi Ears Trait
+    Trait public earsTrait;
+
+    /// @notice Nigi Chokers Trait
+    Trait public chokersTrait;
+
+    /// @notice Nigi Clothes Trait
+    Trait public clothesTrait;
+
+    /// @notice Nigi Hairs Trait
+    Trait public hairsTrait;
+
+    /// @notice Nigi Headphones Trait
+    Trait public headphonesTrait;
+
+    /// @notice Nigi Hats Trait
+    Trait public hatsTrait;
+
+    /// @notice Nigi Back Decorations Trait
+    Trait public backDecorationsTrait;
 
     /**
      * @notice Require that the sender is the descriptor.
@@ -84,47 +105,117 @@ contract NounsArt is INounsArt {
     }
 
     /**
-     * @notice Get the Trait struct for bodies.
+     * @notice Get the Trait struct for background decorations.
      * @dev This explicit getter is needed because implicit getters for structs aren't fully supported yet:
      * https://github.com/ethereum/solidity/issues/11826
      * @return Trait the struct, including a total image count, and an array of storage pages.
      */
-    function getBodiesTrait() external view override returns (Trait memory) {
-        return bodiesTrait;
+    function getBackgroundDecorationsTrait() external view override returns (Trait memory) {
+        return backgroundDecorationsTrait;
     }
 
     /**
-     * @notice Get the Trait struct for accessories.
+     * @notice Get the Trait struct for specials.
      * @dev This explicit getter is needed because implicit getters for structs aren't fully supported yet:
      * https://github.com/ethereum/solidity/issues/11826
      * @return Trait the struct, including a total image count, and an array of storage pages.
      */
-    function getAccessoriesTrait() external view override returns (Trait memory) {
-        return accessoriesTrait;
+    function getSpecialsTrait() external view override returns (Trait memory) {
+        return specialsTrait;
     }
 
     /**
-     * @notice Get the Trait struct for heads.
+     * @notice Get the Trait struct for left hands.
      * @dev This explicit getter is needed because implicit getters for structs aren't fully supported yet:
      * https://github.com/ethereum/solidity/issues/11826
      * @return Trait the struct, including a total image count, and an array of storage pages.
      */
-    function getHeadsTrait() external view override returns (Trait memory) {
-        return headsTrait;
+    function getLeftHandsTrait() external view override returns (Trait memory) {
+        return leftHandsTrait;
     }
 
     /**
-     * @notice Get the Trait struct for glasses.
+     * @notice Get the Trait struct for backs.
      * @dev This explicit getter is needed because implicit getters for structs aren't fully supported yet:
      * https://github.com/ethereum/solidity/issues/11826
      * @return Trait the struct, including a total image count, and an array of storage pages.
      */
-    function getGlassesTrait() external view override returns (Trait memory) {
-        return glassesTrait;
+    function getBacksTrait() external view override returns (Trait memory) {
+        return backsTrait;
     }
 
     /**
-     * @notice Batch add Noun backgrounds.
+     * @notice Get the Trait struct for ears.
+     * @dev This explicit getter is needed because implicit getters for structs aren't fully supported yet:
+     * https://github.com/ethereum/solidity/issues/11826
+     * @return Trait the struct, including a total image count, and an array of storage pages.
+     */
+    function getEarsTrait() external view override returns (Trait memory) {
+        return earsTrait;
+    }
+
+    /**
+     * @notice Get the Trait struct for chokers.
+     * @dev This explicit getter is needed because implicit getters for structs aren't fully supported yet:
+     * https://github.com/ethereum/solidity/issues/11826
+     * @return Trait the struct, including a total image count, and an array of storage pages.
+     */
+    function getChokersTrait() external view override returns (Trait memory) {
+        return chokersTrait;
+    }
+
+    /**
+     * @notice Get the Trait struct for clothes.
+     * @dev This explicit getter is needed because implicit getters for structs aren't fully supported yet:
+     * https://github.com/ethereum/solidity/issues/11826
+     * @return Trait the struct, including a total image count, and an array of storage pages.
+     */
+    function getClothesTrait() external view override returns (Trait memory) {
+        return clothesTrait;
+    }
+
+    /**
+     * @notice Get the Trait struct for hairs.
+     * @dev This explicit getter is needed because implicit getters for structs aren't fully supported yet:
+     * https://github.com/ethereum/solidity/issues/11826
+     * @return Trait the struct, including a total image count, and an array of storage pages.
+     */
+    function getHairsTrait() external view override returns (Trait memory) {
+        return hairsTrait;
+    }
+
+    /**
+     * @notice Get the Trait struct for headphones.
+     * @dev This explicit getter is needed because implicit getters for structs aren't fully supported yet:
+     * https://github.com/ethereum/solidity/issues/11826
+     * @return Trait the struct, including a total image count, and an array of storage pages.
+     */
+    function getHeadphonesTrait() external view override returns (Trait memory) {
+        return headphonesTrait;
+    }
+
+    /**
+     * @notice Get the Trait struct for hats.
+     * @dev This explicit getter is needed because implicit getters for structs aren't fully supported yet:
+     * https://github.com/ethereum/solidity/issues/11826
+     * @return Trait the struct, including a total image count, and an array of storage pages.
+     */
+    function getHatsTrait() external view override returns (Trait memory) {
+        return hatsTrait;
+    }
+
+    /**
+     * @notice Get the Trait struct for back decorations.
+     * @dev This explicit getter is needed because implicit getters for structs aren't fully supported yet:
+     * https://github.com/ethereum/solidity/issues/11826
+     * @return Trait the struct, including a total image count, and an array of storage pages.
+     */
+    function getBackDecorationsTrait() external view override returns (Trait memory) {
+        return backDecorationsTrait;
+    }
+
+    /**
+     * @notice Batch add Niji backgrounds.
      * @dev This function can only be called by the descriptor.
      */
     function addManyBackgrounds(string[] calldata _backgrounds) external override onlyDescriptor {
@@ -136,7 +227,7 @@ contract NounsArt is INounsArt {
     }
 
     /**
-     * @notice Add a Noun background.
+     * @notice Add a Niji background.
      * @dev This function can only be called by the descriptor.
      */
     function addBackground(string calldata _background) external override onlyDescriptor {
@@ -165,75 +256,201 @@ contract NounsArt is INounsArt {
     }
 
     /**
-     * @notice Add a batch of body images.
+     * @notice Add a batch of background decoration images.
      * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
      * and finally compressing it using deflate.
      * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the descriptor.
      */
-    function addBodies(
+    function addBackgroundDecorations(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyDescriptor {
-        addPage(bodiesTrait, encodedCompressed, decompressedLength, imageCount);
+        addPage(backgroundDecorationsTrait, encodedCompressed, decompressedLength, imageCount);
 
-        emit BodiesAdded(imageCount);
+        emit BackgroundDecorationsAdded(imageCount);
     }
 
     /**
-     * @notice Add a batch of accessory images.
+     * @notice Add a batch of special images.
      * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
      * and finally compressing it using deflate.
      * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the descriptor.
      */
-    function addAccessories(
+    function addSpecials(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyDescriptor {
-        addPage(accessoriesTrait, encodedCompressed, decompressedLength, imageCount);
+        addPage(specialsTrait, encodedCompressed, decompressedLength, imageCount);
 
-        emit AccessoriesAdded(imageCount);
+        emit SpecialsAdded(imageCount);
     }
 
     /**
-     * @notice Add a batch of head images.
+     * @notice Add a batch of left hand images.
      * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
      * and finally compressing it using deflate.
      * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the descriptor.
      */
-    function addHeads(
+    function addLeftHands(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyDescriptor {
-        addPage(headsTrait, encodedCompressed, decompressedLength, imageCount);
+        addPage(leftHandsTrait, encodedCompressed, decompressedLength, imageCount);
 
-        emit HeadsAdded(imageCount);
+        emit LeftHandsAdded(imageCount);
     }
 
     /**
-     * @notice Add a batch of glasses images.
+     * @notice Add a batch of back images.
      * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
      * and finally compressing it using deflate.
      * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the descriptor.
      */
-    function addGlasses(
+    function addBacks(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyDescriptor {
-        addPage(glassesTrait, encodedCompressed, decompressedLength, imageCount);
+        addPage(backsTrait, encodedCompressed, decompressedLength, imageCount);
 
-        emit GlassesAdded(imageCount);
+        emit BacksAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of ear images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addEars(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(earsTrait, encodedCompressed, decompressedLength, imageCount);
+
+        emit EarsAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of choker images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addChokers(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(chokersTrait, encodedCompressed, decompressedLength, imageCount);
+
+        emit ChokersAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of clothe images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addClothes(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(clothesTrait, encodedCompressed, decompressedLength, imageCount);
+
+        emit ClothesAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of hair images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addHairs(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(hairsTrait, encodedCompressed, decompressedLength, imageCount);
+
+        emit HairsAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of headphone images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addHeadphones(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(headphonesTrait, encodedCompressed, decompressedLength, imageCount);
+
+        emit HeadphonesAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of hat images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addHats(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(hatsTrait, encodedCompressed, decompressedLength, imageCount);
+
+        emit HatsAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of back decoration images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addBackDecorations(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(backDecorationsTrait, encodedCompressed, decompressedLength, imageCount);
+
+        emit BackDecorationsAdded(imageCount);
     }
 
     /**
@@ -252,7 +469,7 @@ contract NounsArt is INounsArt {
     }
 
     /**
-     * @notice Add a batch of body images from an existing storage contract.
+     * @notice Add a batch of background decoration images from an existing storage contract.
      * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
      * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
      * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
@@ -260,18 +477,18 @@ contract NounsArt is INounsArt {
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the descriptor.
      */
-    function addBodiesFromPointer(
+    function addBackgroundDecorationsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyDescriptor {
-        addPage(bodiesTrait, pointer, decompressedLength, imageCount);
+        addPage(backgroundDecorationsTrait, pointer, decompressedLength, imageCount);
 
-        emit BodiesAdded(imageCount);
+        emit BackgroundDecorationsAdded(imageCount);
     }
 
     /**
-     * @notice Add a batch of accessory images from an existing storage contract.
+     * @notice Add a batch of special images from an existing storage contract.
      * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
      * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
      * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
@@ -279,37 +496,18 @@ contract NounsArt is INounsArt {
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the descriptor.
      */
-    function addAccessoriesFromPointer(
+    function addSpecialsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyDescriptor {
-        addPage(accessoriesTrait, pointer, decompressedLength, imageCount);
+        addPage(specialsTrait, pointer, decompressedLength, imageCount);
 
-        emit AccessoriesAdded(imageCount);
+        emit SpecialsAdded(imageCount);
     }
 
     /**
-     * @notice Add a batch of head images from an existing storage contract.
-     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
-     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
-     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
-     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
-     * @param imageCount the number of images in this batch; used when searching for images among batches
-     * @dev This function can only be called by the descriptor..
-     */
-    function addHeadsFromPointer(
-        address pointer,
-        uint80 decompressedLength,
-        uint16 imageCount
-    ) external override onlyDescriptor {
-        addPage(headsTrait, pointer, decompressedLength, imageCount);
-
-        emit HeadsAdded(imageCount);
-    }
-
-    /**
-     * @notice Add a batch of glasses images from an existing storage contract.
+     * @notice Add a batch of left hand images from an existing storage contract.
      * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
      * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
      * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
@@ -317,77 +515,327 @@ contract NounsArt is INounsArt {
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the descriptor.
      */
-    function addGlassesFromPointer(
+    function addLeftHandsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyDescriptor {
-        addPage(glassesTrait, pointer, decompressedLength, imageCount);
+        addPage(leftHandsTrait, pointer, decompressedLength, imageCount);
 
-        emit GlassesAdded(imageCount);
+        emit LeftHandsAdded(imageCount);
     }
 
     /**
-     * @notice Get the number of available Noun `backgrounds`.
+     * @notice Add a batch of back images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addBacksFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(backsTrait, pointer, decompressedLength, imageCount);
+
+        emit BacksAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of ear images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addEarsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(earsTrait, pointer, decompressedLength, imageCount);
+
+        emit EarsAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of choker images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addChokersFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(chokersTrait, pointer, decompressedLength, imageCount);
+
+        emit ChokersAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of clothe images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addClothesFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(clothesTrait, pointer, decompressedLength, imageCount);
+
+        emit ClothesAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of hair images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addHairsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(hairsTrait, pointer, decompressedLength, imageCount);
+
+        emit HairsAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of headphone images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addHeadphonesFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(headphonesTrait, pointer, decompressedLength, imageCount);
+
+        emit HeadphonesAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of hat images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addHatsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(hatsTrait, pointer, decompressedLength, imageCount);
+
+        emit HatsAdded(imageCount);
+    }
+
+    /**
+     * @notice Add a batch of back decoration images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the descriptor.
+     */
+    function addBackDecorationsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyDescriptor {
+        addPage(backDecorationsTrait, pointer, decompressedLength, imageCount);
+
+        emit BackDecorationsAdded(imageCount);
+    }
+
+    /**
+     * @notice Get the number of available Niji `backgrounds`.
      */
     function backgroundCount() external view returns (uint256) {
         return backgrounds.length;
     }
 
     /**
-     * @notice Get the number of available Noun `bodies`.
+     * @notice Get the number of available Niji `background decorations`.
      */
-    function bodyCount() external view returns (uint256) {
-        return bodiesTrait.storedImagesCount;
+    function backgroundDecorationCount() external view returns (uint256) {
+        return backgroundDecorationsTrait.storedImagesCount;
     }
 
     /**
-     * @notice Get the number of available Noun `accessories`.
+     * @notice Get the number of available Niji `specials`.
      */
-    function accessoryCount() external view returns (uint256) {
-        return accessoriesTrait.storedImagesCount;
+    function specialCount() external view returns (uint256) {
+        return specialsTrait.storedImagesCount;
     }
 
     /**
-     * @notice Get the number of available Noun `heads`.
+     * @notice Get the number of available Niji `left hands`.
      */
-    function headCount() external view returns (uint256) {
-        return headsTrait.storedImagesCount;
+    function leftHandCount() external view returns (uint256) {
+        return leftHandsTrait.storedImagesCount;
     }
 
     /**
-     * @notice Get the number of available Noun `glasses`.
+     * @notice Get the number of available Niji `backs`.
      */
-    function glassesCount() external view returns (uint256) {
-        return glassesTrait.storedImagesCount;
+    function backCount() external view returns (uint256) {
+        return backsTrait.storedImagesCount;
     }
 
     /**
-     * @notice Get a head image bytes (RLE-encoded).
+     * @notice Get the number of available Niji `ears`.
      */
-    function heads(uint256 index) public view override returns (bytes memory) {
-        return imageByIndex(headsTrait, index);
+    function earCount() external view returns (uint256) {
+        return earsTrait.storedImagesCount;
     }
 
     /**
-     * @notice Get a body image bytes (RLE-encoded).
+     * @notice Get the number of available Niji `chokers`.
      */
-    function bodies(uint256 index) public view override returns (bytes memory) {
-        return imageByIndex(bodiesTrait, index);
+    function chokerCount() external view returns (uint256) {
+        return chokersTrait.storedImagesCount;
     }
 
     /**
-     * @notice Get a accessory image bytes (RLE-encoded).
+     * @notice Get the number of available Niji `clothes`.
      */
-    function accessories(uint256 index) public view override returns (bytes memory) {
-        return imageByIndex(accessoriesTrait, index);
+    function clotheCount() external view returns (uint256) {
+        return clothesTrait.storedImagesCount;
     }
 
     /**
-     * @notice Get a glasses image bytes (RLE-encoded).
+     * @notice Get the number of available Niji `hairs`.
      */
-    function glasses(uint256 index) public view override returns (bytes memory) {
-        return imageByIndex(glassesTrait, index);
+    function hairCount() external view returns (uint256) {
+        return hairsTrait.storedImagesCount;
+    }
+
+    /**
+     * @notice Get the number of available Niji `headphones`.
+     */
+    function headphoneCount() external view returns (uint256) {
+        return headphonesTrait.storedImagesCount;
+    }
+
+    /**
+     * @notice Get the number of available Niji `hats`.
+     */
+    function hatCount() external view returns (uint256) {
+        return hatsTrait.storedImagesCount;
+    }
+
+    /**
+     * @notice Get the number of available Niji `back decorations`.
+     */
+    function backDecorationCount() external view returns (uint256) {
+        return backDecorationsTrait.storedImagesCount;
+    }
+
+    /**
+     * @notice Get a background decoration image bytes (RLE-encoded).
+     */
+    function backgroundDecorations(uint256 index) public view override returns (bytes memory) {
+        return imageByIndex(backgroundDecorationsTrait, index);
+    }
+
+    /**
+     * @notice Get a special image bytes (RLE-encoded).
+     */
+    function specials(uint256 index) public view override returns (bytes memory) {
+        return imageByIndex(specialsTrait, index);
+    }
+
+    /**
+     * @notice Get a left hand image bytes (RLE-encoded).
+     */
+    function leftHands(uint256 index) public view override returns (bytes memory) {
+        return imageByIndex(leftHandsTrait, index);
+    }
+
+    /**
+     * @notice Get a back image bytes (RLE-encoded).
+     */
+    function backs(uint256 index) public view override returns (bytes memory) {
+        return imageByIndex(backsTrait, index);
+    }
+
+    /**
+     * @notice Get a ear image bytes (RLE-encoded).
+     */
+    function ears(uint256 index) public view override returns (bytes memory) {
+        return imageByIndex(earsTrait, index);
+    }
+
+    /**
+     * @notice Get a choker image bytes (RLE-encoded).
+     */
+    function chokers(uint256 index) public view override returns (bytes memory) {
+        return imageByIndex(chokersTrait, index);
+    }
+
+    /**
+     * @notice Get a clothe image bytes (RLE-encoded).
+     */
+    function clothes(uint256 index) public view override returns (bytes memory) {
+        return imageByIndex(clothesTrait, index);
+    }
+
+    /**
+     * @notice Get a hair image bytes (RLE-encoded).
+     */
+    function hairs(uint256 index) public view override returns (bytes memory) {
+        return imageByIndex(hairsTrait, index);
+    }
+
+    /**
+     * @notice Get a headphone image bytes (RLE-encoded).
+     */
+    function headphones(uint256 index) public view override returns (bytes memory) {
+        return imageByIndex(headphonesTrait, index);
+    }
+
+    /**
+     * @notice Get a hat image bytes (RLE-encoded).
+     */
+    function hats(uint256 index) public view override returns (bytes memory) {
+        return imageByIndex(hatsTrait, index);
+    }
+
+    /**
+     * @notice Get a back decoration image bytes (RLE-encoded).
+     */
+    function backDecorations(uint256 index) public view override returns (bytes memory) {
+        return imageByIndex(backDecorationsTrait, index);
     }
 
     /**

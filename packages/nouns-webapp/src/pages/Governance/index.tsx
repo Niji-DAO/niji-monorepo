@@ -1,13 +1,13 @@
+import { i18n } from '@lingui/core';
+import { Trans } from '@lingui/macro';
+import clsx from 'clsx';
+import { utils } from 'ethers/lib/ethers';
 import { Col, Row } from 'react-bootstrap';
+import Proposals from '../../components/Proposals';
+import { useTreasuryBalance, useTreasuryUSDValue } from '../../hooks/useTreasuryBalance';
 import Section from '../../layout/Section';
 import { useAllProposals, useProposalThreshold } from '../../wrappers/nounsDao';
-import Proposals from '../../components/Proposals';
 import classes from './Governance.module.css';
-import { utils } from 'ethers/lib/ethers';
-import clsx from 'clsx';
-import { useTreasuryBalance, useTreasuryUSDValue } from '../../hooks/useTreasuryBalance';
-import { Trans } from '@lingui/macro';
-import { i18n } from '@lingui/core';
 
 const GovernancePage = () => {
   const { data: proposals } = useAllProposals();
@@ -18,12 +18,12 @@ const GovernancePage = () => {
   const treasuryBalanceUSD = useTreasuryUSDValue();
 
   // Note: We have to extract this copy out of the <span> otherwise the Lingui macro gets confused
-  const nounSingular = <Trans>Noun</Trans>;
-  const nounPlural = <Trans>Nouns</Trans>;
+  const nounSingular = <Trans>Niji</Trans>;
+  const nounPlural = <Trans>Niji</Trans>;
   const subHeading = (
     <Trans>
-      Nouns govern <span className={classes.boldText}>Nouns DAO</span>. Nouns can vote on proposals
-      or delegate their vote to a third party. A minimum of{' '}
+      Niji govern <span className={classes.boldText}>Niji DAO</span>. Niji can vote on proposals or
+      delegate their vote to a third party. A minimum of{' '}
       <span className={classes.boldText}>
         {nounsRequired ? (
           <>
@@ -46,7 +46,7 @@ const GovernancePage = () => {
               <Trans>Governance</Trans>
             </span>
             <h1>
-              <Trans>Nouns DAO</Trans>
+              <Trans>Niji DAO</Trans>
             </h1>
           </Row>
           <p className={classes.subheading}>{subHeading}</p>
@@ -79,9 +79,9 @@ const GovernancePage = () => {
             </Col>
             <Col className={classes.treasuryInfoText}>
               <Trans>
-                This treasury exists for <span className={classes.boldText}>Nouns DAO</span>{' '}
+                This treasury exists for <span className={classes.boldText}>Niji DAO</span>{' '}
                 participants to allocate resources for the long-term growth and prosperity of the
-                Nouns project.
+                Niji project.
               </Trans>
             </Col>
           </Row>

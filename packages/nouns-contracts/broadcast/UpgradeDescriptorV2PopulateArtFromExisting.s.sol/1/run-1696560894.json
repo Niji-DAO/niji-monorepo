@@ -68,10 +68,7 @@
       "contractName": "NounsDescriptorV2",
       "contractAddress": "0x25fF2FdE7df1A433E09749C952f7e09aD3C27951",
       "function": "setPalettePointer(uint8,address)",
-      "arguments": [
-        "0",
-        "0x8Af724552FC1394eEFa3178C4c4671A75eebb0b0"
-      ],
+      "arguments": ["0", "0x8Af724552FC1394eEFa3178C4c4671A75eebb0b0"],
       "transaction": {
         "type": "0x02",
         "from": "0xfd987985df942b5412e55bf10b612bc4a5191aa0",
@@ -91,9 +88,7 @@
       "contractName": "NounsDescriptorV2",
       "contractAddress": "0x25fF2FdE7df1A433E09749C952f7e09aD3C27951",
       "function": "addManyBackgrounds(string[])",
-      "arguments": [
-        "[d5d7e1, e1d7d5]"
-      ],
+      "arguments": ["[d5d7e1, e1d7d5]"],
       "transaction": {
         "type": "0x02",
         "from": "0xfd987985df942b5412e55bf10b612bc4a5191aa0",
@@ -113,11 +108,7 @@
       "contractName": "NounsDescriptorV2",
       "contractAddress": "0x25fF2FdE7df1A433E09749C952f7e09aD3C27951",
       "function": "addBodiesFromPointer(address,uint80,uint16)",
-      "arguments": [
-        "0x43baF99B8D976eDC19278F33f4DD8D554A651aB0",
-        "3904",
-        "30"
-      ],
+      "arguments": ["0x43baF99B8D976eDC19278F33f4DD8D554A651aB0", "3904", "30"],
       "transaction": {
         "type": "0x02",
         "from": "0xfd987985df942b5412e55bf10b612bc4a5191aa0",
@@ -137,11 +128,7 @@
       "contractName": "NounsDescriptorV2",
       "contractAddress": "0x25fF2FdE7df1A433E09749C952f7e09aD3C27951",
       "function": "addAccessoriesFromPointer(address,uint80,uint16)",
-      "arguments": [
-        "0xf614F9405ce1C6D13Ac3B066f0fa1233A2a00c3a",
-        "19104",
-        "137"
-      ],
+      "arguments": ["0xf614F9405ce1C6D13Ac3B066f0fa1233A2a00c3a", "19104", "137"],
       "transaction": {
         "type": "0x02",
         "from": "0xfd987985df942b5412e55bf10b612bc4a5191aa0",
@@ -161,11 +148,7 @@
       "contractName": "NounsDescriptorV2",
       "contractAddress": "0x25fF2FdE7df1A433E09749C952f7e09aD3C27951",
       "function": "addAccessoriesFromPointer(address,uint80,uint16)",
-      "arguments": [
-        "0x11fb1e00a27D080Ab1506Ca50AFf316e2107082c",
-        "672",
-        "3"
-      ],
+      "arguments": ["0x11fb1e00a27D080Ab1506Ca50AFf316e2107082c", "672", "3"],
       "transaction": {
         "type": "0x02",
         "from": "0xfd987985df942b5412e55bf10b612bc4a5191aa0",
@@ -185,11 +168,7 @@
       "contractName": "NounsDescriptorV2",
       "contractAddress": "0x25fF2FdE7df1A433E09749C952f7e09aD3C27951",
       "function": "addAccessoriesFromPointer(address,uint80,uint16)",
-      "arguments": [
-        "0x3f47Dbc40c86Cb184dFe8885670fe2D48C5497a8",
-        "352",
-        "2"
-      ],
+      "arguments": ["0x3f47Dbc40c86Cb184dFe8885670fe2D48C5497a8", "352", "2"],
       "transaction": {
         "type": "0x02",
         "from": "0xfd987985df942b5412e55bf10b612bc4a5191aa0",
@@ -209,11 +188,7 @@
       "contractName": "NounsDescriptorV2",
       "contractAddress": "0x25fF2FdE7df1A433E09749C952f7e09aD3C27951",
       "function": "addHeadsFromPointer(address,uint80,uint16)",
-      "arguments": [
-        "0x457852249b25075A6966859227DF58d4483c43F5",
-        "60352",
-        "234"
-      ],
+      "arguments": ["0x457852249b25075A6966859227DF58d4483c43F5", "60352", "234"],
       "transaction": {
         "type": "0x02",
         "from": "0xfd987985df942b5412e55bf10b612bc4a5191aa0",
@@ -233,11 +208,7 @@
       "contractName": "NounsDescriptorV2",
       "contractAddress": "0x25fF2FdE7df1A433E09749C952f7e09aD3C27951",
       "function": "addHeadsFromPointer(address,uint80,uint16)",
-      "arguments": [
-        "0x880799829d13b87bDeDAaDB7eEAE43a780319295",
-        "1952",
-        "8"
-      ],
+      "arguments": ["0x880799829d13b87bDeDAaDB7eEAE43a780319295", "1952", "8"],
       "transaction": {
         "type": "0x02",
         "from": "0xfd987985df942b5412e55bf10b612bc4a5191aa0",
@@ -257,11 +228,7 @@
       "contractName": "NounsDescriptorV2",
       "contractAddress": "0x25fF2FdE7df1A433E09749C952f7e09aD3C27951",
       "function": "addHeadsFromPointer(address,uint80,uint16)",
-      "arguments": [
-        "0x4074B6fe88754B7Ec7386c8B14b3C74909e97502",
-        "2112",
-        "8"
-      ],
+      "arguments": ["0x4074B6fe88754B7Ec7386c8B14b3C74909e97502", "2112", "8"],
       "transaction": {
         "type": "0x02",
         "from": "0xfd987985df942b5412e55bf10b612bc4a5191aa0",
@@ -281,11 +248,7 @@
       "contractName": "NounsDescriptorV2",
       "contractAddress": "0x25fF2FdE7df1A433E09749C952f7e09aD3C27951",
       "function": "addGlassesFromPointer(address,uint80,uint16)",
-      "arguments": [
-        "0x6169438064D1C866B1F236C6e1e185FA74df8234",
-        "3488",
-        "21"
-      ],
+      "arguments": ["0x6169438064D1C866B1F236C6e1e185FA74df8234", "3488", "21"],
       "transaction": {
         "type": "0x02",
         "from": "0xfd987985df942b5412e55bf10b612bc4a5191aa0",
@@ -305,11 +268,7 @@
       "contractName": "NounsDescriptorV2",
       "contractAddress": "0x25fF2FdE7df1A433E09749C952f7e09aD3C27951",
       "function": "addGlassesFromPointer(address,uint80,uint16)",
-      "arguments": [
-        "0xBD3325d0f7102e71C1F80e8d7eb4AF590Be4d810",
-        "384",
-        "2"
-      ],
+      "arguments": ["0xBD3325d0f7102e71C1F80e8d7eb4AF590Be4d810", "384", "2"],
       "transaction": {
         "type": "0x02",
         "from": "0xfd987985df942b5412e55bf10b612bc4a5191aa0",
@@ -402,9 +361,7 @@
       "logs": [
         {
           "address": "0x921687c7A40a7F209100Db16AA95f787f6B4E677",
-          "topics": [
-            "0x3469f6a12aa5e5edc4ea6e284300f2621e073fce4374d4673ded8f2ea7c18b4f"
-          ],
+          "topics": ["0x3469f6a12aa5e5edc4ea6e284300f2621e073fce4374d4673ded8f2ea7c18b4f"],
           "data": "0x0000000000000000000000000000000000000000000000000000000000000000",
           "blockHash": "0xb56056b62ee71f8f4cdd54809b366bcdaa216fe2ef6c14b3adb5010a85649a43",
           "blockNumber": "0x1170fe3",
@@ -432,9 +389,7 @@
       "logs": [
         {
           "address": "0x921687c7A40a7F209100Db16AA95f787f6B4E677",
-          "topics": [
-            "0x379976e1287af3c12aafa34c6a1a61b0cbcb9dce67b3b220ece3b474a4a74276"
-          ],
+          "topics": ["0x379976e1287af3c12aafa34c6a1a61b0cbcb9dce67b3b220ece3b474a4a74276"],
           "data": "0x0000000000000000000000000000000000000000000000000000000000000002",
           "blockHash": "0xb56056b62ee71f8f4cdd54809b366bcdaa216fe2ef6c14b3adb5010a85649a43",
           "blockNumber": "0x1170fe3",
@@ -462,9 +417,7 @@
       "logs": [
         {
           "address": "0x921687c7A40a7F209100Db16AA95f787f6B4E677",
-          "topics": [
-            "0xeb09489df35ba64745f59c5a7efc6df50d432df8cfc3708deb7075e3c8a4f76a"
-          ],
+          "topics": ["0xeb09489df35ba64745f59c5a7efc6df50d432df8cfc3708deb7075e3c8a4f76a"],
           "data": "0x000000000000000000000000000000000000000000000000000000000000001e",
           "blockHash": "0xb56056b62ee71f8f4cdd54809b366bcdaa216fe2ef6c14b3adb5010a85649a43",
           "blockNumber": "0x1170fe3",
@@ -492,9 +445,7 @@
       "logs": [
         {
           "address": "0x921687c7A40a7F209100Db16AA95f787f6B4E677",
-          "topics": [
-            "0x2d0f2274b911553cd85de198b828dfe7ef8309c67e0b7674c045bcb0e5b5ba2e"
-          ],
+          "topics": ["0x2d0f2274b911553cd85de198b828dfe7ef8309c67e0b7674c045bcb0e5b5ba2e"],
           "data": "0x0000000000000000000000000000000000000000000000000000000000000089",
           "blockHash": "0xb56056b62ee71f8f4cdd54809b366bcdaa216fe2ef6c14b3adb5010a85649a43",
           "blockNumber": "0x1170fe3",
@@ -522,9 +473,7 @@
       "logs": [
         {
           "address": "0x921687c7A40a7F209100Db16AA95f787f6B4E677",
-          "topics": [
-            "0x2d0f2274b911553cd85de198b828dfe7ef8309c67e0b7674c045bcb0e5b5ba2e"
-          ],
+          "topics": ["0x2d0f2274b911553cd85de198b828dfe7ef8309c67e0b7674c045bcb0e5b5ba2e"],
           "data": "0x0000000000000000000000000000000000000000000000000000000000000003",
           "blockHash": "0xb56056b62ee71f8f4cdd54809b366bcdaa216fe2ef6c14b3adb5010a85649a43",
           "blockNumber": "0x1170fe3",
@@ -552,9 +501,7 @@
       "logs": [
         {
           "address": "0x921687c7A40a7F209100Db16AA95f787f6B4E677",
-          "topics": [
-            "0x2d0f2274b911553cd85de198b828dfe7ef8309c67e0b7674c045bcb0e5b5ba2e"
-          ],
+          "topics": ["0x2d0f2274b911553cd85de198b828dfe7ef8309c67e0b7674c045bcb0e5b5ba2e"],
           "data": "0x0000000000000000000000000000000000000000000000000000000000000002",
           "blockHash": "0xb56056b62ee71f8f4cdd54809b366bcdaa216fe2ef6c14b3adb5010a85649a43",
           "blockNumber": "0x1170fe3",
@@ -582,9 +529,7 @@
       "logs": [
         {
           "address": "0x921687c7A40a7F209100Db16AA95f787f6B4E677",
-          "topics": [
-            "0xe74953497d5d03198c809f0f4a324019e503e87fef8e2081636487743ae29d62"
-          ],
+          "topics": ["0xe74953497d5d03198c809f0f4a324019e503e87fef8e2081636487743ae29d62"],
           "data": "0x00000000000000000000000000000000000000000000000000000000000000ea",
           "blockHash": "0xb56056b62ee71f8f4cdd54809b366bcdaa216fe2ef6c14b3adb5010a85649a43",
           "blockNumber": "0x1170fe3",
@@ -612,9 +557,7 @@
       "logs": [
         {
           "address": "0x921687c7A40a7F209100Db16AA95f787f6B4E677",
-          "topics": [
-            "0xe74953497d5d03198c809f0f4a324019e503e87fef8e2081636487743ae29d62"
-          ],
+          "topics": ["0xe74953497d5d03198c809f0f4a324019e503e87fef8e2081636487743ae29d62"],
           "data": "0x0000000000000000000000000000000000000000000000000000000000000008",
           "blockHash": "0xb56056b62ee71f8f4cdd54809b366bcdaa216fe2ef6c14b3adb5010a85649a43",
           "blockNumber": "0x1170fe3",
@@ -642,9 +585,7 @@
       "logs": [
         {
           "address": "0x921687c7A40a7F209100Db16AA95f787f6B4E677",
-          "topics": [
-            "0xe74953497d5d03198c809f0f4a324019e503e87fef8e2081636487743ae29d62"
-          ],
+          "topics": ["0xe74953497d5d03198c809f0f4a324019e503e87fef8e2081636487743ae29d62"],
           "data": "0x0000000000000000000000000000000000000000000000000000000000000008",
           "blockHash": "0xb56056b62ee71f8f4cdd54809b366bcdaa216fe2ef6c14b3adb5010a85649a43",
           "blockNumber": "0x1170fe3",
@@ -672,9 +613,7 @@
       "logs": [
         {
           "address": "0x921687c7A40a7F209100Db16AA95f787f6B4E677",
-          "topics": [
-            "0xfbb56d0e73d76edc5867b20b68684b671a625696e50d8c985c2830fd1566aaec"
-          ],
+          "topics": ["0xfbb56d0e73d76edc5867b20b68684b671a625696e50d8c985c2830fd1566aaec"],
           "data": "0x0000000000000000000000000000000000000000000000000000000000000015",
           "blockHash": "0xb56056b62ee71f8f4cdd54809b366bcdaa216fe2ef6c14b3adb5010a85649a43",
           "blockNumber": "0x1170fe3",
@@ -702,9 +641,7 @@
       "logs": [
         {
           "address": "0x921687c7A40a7F209100Db16AA95f787f6B4E677",
-          "topics": [
-            "0xfbb56d0e73d76edc5867b20b68684b671a625696e50d8c985c2830fd1566aaec"
-          ],
+          "topics": ["0xfbb56d0e73d76edc5867b20b68684b671a625696e50d8c985c2830fd1566aaec"],
           "data": "0x0000000000000000000000000000000000000000000000000000000000000002",
           "blockHash": "0xb56056b62ee71f8f4cdd54809b366bcdaa216fe2ef6c14b3adb5010a85649a43",
           "blockNumber": "0x1170fe3",

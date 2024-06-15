@@ -1,10 +1,10 @@
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import chai from 'chai';
-import { ethers } from 'hardhat';
-import { BigNumber as EthersBN, constants } from 'ethers';
 import { solidity } from 'ethereum-waffle';
+import { BigNumber as EthersBN, constants } from 'ethers';
+import { ethers } from 'hardhat';
 import { NounsDescriptorV2__factory as NounsDescriptorV2Factory, NounsToken } from '../typechain';
 import { deployNounsToken, populateDescriptorV2 } from './utils';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 chai.use(solidity);
 const { expect } = chai;
@@ -63,7 +63,7 @@ describe('NounsToken', () => {
   });
 
   it('should set name', async () => {
-    expect(await nounsToken.name()).to.eq('Nouns');
+    expect(await nounsToken.name()).to.eq('Niji');
   });
 
   it('should allow minter to mint a noun to itself', async () => {
@@ -75,7 +75,7 @@ describe('NounsToken', () => {
     expect(await nounsToken.ownerOf(2)).to.eq(deployer.address);
     expect(nounCreated?.event).to.eq('NounCreated');
     expect(nounCreated?.args?.tokenId).to.eq(2);
-    expect(nounCreated?.args?.seed.length).to.equal(5);
+    expect(nounCreated?.args?.seed.length).to.equal(12);
 
     nounCreated?.args?.seed.forEach((item: EthersBN | number) => {
       const value = typeof item !== 'number' ? item?.toNumber() : item;

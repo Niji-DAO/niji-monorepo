@@ -1,14 +1,14 @@
 import { ImageData as data, getNounData } from '@nouns/assets';
 import { buildSVG } from '@nouns/sdk';
 import { BigNumber as EthersBN } from 'ethers';
-import { INounSeed, useNounSeed } from '../../wrappers/nounToken';
-import Noun from '../Noun';
-import { Link } from 'react-router-dom';
-import classes from './StandaloneNoun.module.css';
-import { useDispatch } from 'react-redux';
-import { setOnDisplayAuctionNounId } from '../../state/slices/onDisplayAuction';
-import nounClasses from '../Noun/Noun.module.css';
 import Image from 'react-bootstrap/Image';
+import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { setOnDisplayAuctionNounId } from '../../state/slices/onDisplayAuction';
+import { INounSeed, useNounSeed } from '../../wrappers/nounToken';
+import Niji from '../Niji';
+import nounClasses from '../Niji/Niji.module.css';
+import classes from './StandaloneNoun.module.css';
 
 interface StandaloneNounProps {
   nounId: EthersBN;
@@ -26,8 +26,8 @@ interface StandaloneNounWithSeedProps {
 
 export const getNoun = (nounId: string | EthersBN, seed: INounSeed) => {
   const id = nounId.toString();
-  const name = `Noun ${id}`;
-  const description = `Noun ${id} is a member of the Nouns DAO`;
+  const name = `Niji ${id}`;
+  const description = `Niji ${id} is a member of the Niji DAO`;
   const { parts, background } = getNounData(seed);
   const image = `data:image/svg+xml;base64,${btoa(buildSVG(parts, data.palette, background))}`;
 
@@ -63,7 +63,7 @@ const StandaloneNoun: React.FC<StandaloneNounProps> = (props: StandaloneNounProp
       className={classes.clickableNoun}
       onClick={onClickHandler}
     >
-      <Noun imgPath={noun ? noun.image : ''} alt={noun ? noun.description : 'Noun'} />
+      <Niji imgPath={noun ? noun.image : ''} alt={noun ? noun.description : 'Niji'} />
     </Link>
   );
 };
@@ -80,7 +80,8 @@ export const StandaloneNounCircular: React.FC<StandaloneCircularNounProps> = (
     dispatch(setOnDisplayAuctionNounId(nounId.toNumber()));
   };
 
-  if (!seed || !nounId) return <Noun imgPath="" alt="Noun" wrapperClassName={nounClasses.circularNounWrapper} />;
+  if (!seed || !nounId)
+    return <Niji imgPath="" alt="Niji" wrapperClassName={nounClasses.circularNounWrapper} />;
 
   return (
     <Link
@@ -88,9 +89,9 @@ export const StandaloneNounCircular: React.FC<StandaloneCircularNounProps> = (
       className={classes.clickableNoun}
       onClick={onClickHandler}
     >
-      <Noun
+      <Niji
         imgPath={noun ? noun.image : ''}
-        alt={noun ? noun.description : 'Noun'}
+        alt={noun ? noun.description : 'Niji'}
         wrapperClassName={nounClasses.circularNounWrapper}
         className={border ? nounClasses.circleWithBorder : nounClasses.circular}
       />
@@ -116,9 +117,9 @@ export const StandaloneNounRoundedCorners: React.FC<StandaloneNounProps> = (
       className={classes.clickableNoun}
       onClick={onClickHandler}
     >
-      <Noun
+      <Niji
         imgPath={noun ? noun.image : ''}
-        alt={noun ? noun.description : 'Noun'}
+        alt={noun ? noun.description : 'Niji'}
         className={nounClasses.rounded}
       />
     </Link>
@@ -134,7 +135,7 @@ export const StandaloneNounWithSeed: React.FC<StandaloneNounWithSeedProps> = (
   const seed = useNounSeed(nounId);
   const seedIsInvalid = Object.values(seed || {}).every(v => v === 0);
 
-  if (!seed || seedIsInvalid || !nounId || !onLoadSeed) return <Noun imgPath="" alt="Noun" />;
+  if (!seed || seedIsInvalid || !nounId || !onLoadSeed) return <Niji imgPath="" alt="Niji" />;
 
   onLoadSeed(seed);
 
@@ -144,7 +145,7 @@ export const StandaloneNounWithSeed: React.FC<StandaloneNounWithSeedProps> = (
 
   const { image, description } = getNoun(nounId, seed);
 
-  const noun = <Noun imgPath={image} alt={description} />;
+  const noun = <Niji imgPath={image} alt={description} />;
   const nounWithLink = (
     <Link
       to={'/noun/' + nounId.toString()}

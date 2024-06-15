@@ -1,18 +1,18 @@
 import { useQuery } from '@apollo/client';
 import { BigNumber } from '@ethersproject/bignumber';
+import { CakeIcon, HeartIcon } from '@heroicons/react/solid';
+import { i18n } from '@lingui/core';
 import { Trans } from '@lingui/macro';
+import clsx from 'clsx';
 import React from 'react';
 import { Spinner } from 'react-bootstrap';
+import { useAppSelector } from '../../hooks';
+import { isNounderNoun } from '../../utils/nounderNoun';
 import { nounQuery } from '../../wrappers/subgraph';
+import { getNounBirthday } from '../NounInfoRowBirthday';
 import ShortAddress from '../ShortAddress';
 import { StandaloneNounCircular } from '../StandaloneNoun';
 import classes from './NounHoverCard.module.css';
-import { HeartIcon, CakeIcon } from '@heroicons/react/solid';
-import { isNounderNoun } from '../../utils/nounderNoun';
-import { useAppSelector } from '../../hooks';
-import { i18n } from '@lingui/core';
-import { getNounBirthday } from '../NounInfoRowBirthday';
-import clsx from 'clsx';
 
 interface NounHoverCardProps {
   nounId: string;
@@ -56,11 +56,11 @@ const NounHoverCard: React.FC<NounHoverCardProps> = props => {
           <StandaloneNounCircular nounId={BigNumber.from(nounId)} />
         </div>
         <div>
-          <h1>Noun {nounId}</h1>
+          <h1>Niji {nounId}</h1>
         </div>
       </div>
 
-      {/* Noun birthday */}
+      {/* Niji birthday */}
       <div className={classes.nounInfoWrapper}>
         <CakeIcon height={20} width={20} className={classes.icon} />
         <Trans>Born</Trans> <span className={classes.bold}>{i18n.date(birthday)}</span>

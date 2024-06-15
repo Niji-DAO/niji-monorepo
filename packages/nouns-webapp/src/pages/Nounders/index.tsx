@@ -1,18 +1,18 @@
+import { Trans } from '@lingui/macro';
 import React from 'react';
-import classes from './NoundersPage.module.css';
-import Section from '../../layout/Section';
-import { Col, Row, Card } from 'react-bootstrap';
+import { Card, Col, Row } from 'react-bootstrap';
 import pfp4156 from '../../assets/nounder-pfps/4156.png';
 import pfp9999 from '../../assets/nounder-pfps/9999.png';
 import pfpCryptoseneca from '../../assets/nounder-pfps/cryptoseneca.png';
 import pfpDevcarrot from '../../assets/nounder-pfps/devcarrot.png';
 import pfpDom from '../../assets/nounder-pfps/dom.png';
+import pfpGremplin from '../../assets/nounder-pfps/gremplin.png';
 import pfpKai from '../../assets/nounder-pfps/kai.png';
 import pfpSolimander from '../../assets/nounder-pfps/solimander.png';
-import pfpGremplin from '../../assets/nounder-pfps/gremplin.png';
 import pfpTimpers from '../../assets/nounder-pfps/timpers.png';
 import pfpVapeape from '../../assets/nounder-pfps/vapeape.png';
-import { Trans } from '@lingui/macro';
+import Section from '../../layout/Section';
+import classes from './NoundersPage.module.css';
 
 const bios = [
   {
@@ -145,10 +145,10 @@ const NoundersPage = () => {
         </h3>
         <p style={{ textAlign: 'justify' }}>
           <Trans>
-            All Noun auction proceeds are sent to the Nouns DAO. For this reason, we, the project's
-            founders (‘Nounders’) have chosen to compensate ourselves with Nouns. Every 10th noun
-            for the first 5 years of the project will be sent to our multisig (5/10), where it will
-            be vested and distributed to individual Nounders.
+            All Niji auction proceeds are sent to the Niji DAO. For this reason, we, the project's
+            founders (‘Nounders’) have chosen to compensate ourselves with Niji. Every 10th noun for
+            the first 5 years of the project will be sent to our multisig (5/10), where it will be
+            vested and distributed to individual Nounders.
           </Trans>
         </p>
         <p style={{ textAlign: 'justify' }}>
@@ -156,7 +156,7 @@ const NoundersPage = () => {
             The Nounders reward is intended as compensation for our pre and post-launch
             contributions to the project, and to help us participate meaningfully in governance as
             the project matures. Since there are 10 Nounders, after 5 years each Nounder could
-            receive up to 1% of the Noun supply.
+            receive up to 1% of the Niji supply.
           </Trans>
         </p>
       </Col>

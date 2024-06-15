@@ -1,11 +1,11 @@
+import { constants } from 'ethers';
+import { Interface, parseUnits } from 'ethers/lib/utils';
+import { task, types } from 'hardhat/config';
+import promptjs from 'prompt';
 import { default as NounsAuctionHouseABI } from '../abi/contracts/NounsAuctionHouse.sol/NounsAuctionHouse.json';
 import { default as NounsDAOExecutorV2ABI } from '../abi/contracts/governance/NounsDAOExecutorV2.sol/NounsDAOExecutorV2.json';
 import { default as NounsDaoDataABI } from '../abi/contracts/governance/data/NounsDAOData.sol/NounsDAOData.json';
 import { ChainId, ContractDeployment, ContractNamesDAOV3, DeployedContract } from './types';
-import { Interface, parseUnits } from 'ethers/lib/utils';
-import { task, types } from 'hardhat/config';
-import { constants } from 'ethers';
-import promptjs from 'prompt';
 
 promptjs.colors = false;
 promptjs.message = '> ';
@@ -28,7 +28,7 @@ const NOUNS_ART_NONCE_OFFSET = 4;
 const AUCTION_HOUSE_PROXY_NONCE_OFFSET = 9;
 const GOVERNOR_N_DELEGATOR_NONCE_OFFSET = 23;
 
-task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov times for testing')
+task('deploy-short-times-dao-v3', 'Deploy all Niji contracts with short gov times for testing')
   .addFlag('autoDeploy', 'Deploy all contracts without user interaction')
   .addOptionalParam('weth', 'The WETH contract address', undefined, types.string)
   .addOptionalParam('noundersdao', 'The nounders DAO contract address', undefined, types.string)
@@ -263,7 +263,7 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
           const actual = deployment.NounsDAOProxyV3.address.toLowerCase();
           if (expected !== actual) {
             throw new Error(
-              `Unexpected Nouns DAO proxy address. Expected: ${expected}. Actual: ${actual}.`,
+              `Unexpected Niji DAO proxy address. Expected: ${expected}. Actual: ${actual}.`,
             );
           }
         },

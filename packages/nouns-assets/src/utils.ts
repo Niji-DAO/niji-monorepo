@@ -1,39 +1,65 @@
-import { keccak256 as solidityKeccak256 } from '@ethersproject/solidity';
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber';
-import { NounSeed, NounData } from './types';
-import { images, bgcolors } from './image-data.json';
+import { keccak256 as solidityKeccak256 } from '@ethersproject/solidity';
+import { bgcolors, images } from './image-s3.json';
+import { NounData, NounSeed } from './types';
 
-const { bodies, accessories, heads, glasses } = images;
+const {
+  backgroundDecorations,
+  specials,
+  leftHands,
+  backs,
+  ears,
+  chokers,
+  clothes,
+  hairs,
+  headphones,
+  hats,
+  backDecorations,
+} = images;
 
 type ObjectKey = keyof typeof images;
 
 /**
- * Get encoded part and background information using a Noun seed
- * @param seed The Noun seed
+ * Get encoded part and background information using a Niji seed
+ * @param seed The Niji seed
  */
 export const getNounData = (seed: NounSeed): NounData => {
   return {
     parts: [
-      bodies[seed.body],
-      accessories[seed.accessory],
-      heads[seed.head],
-      glasses[seed.glasses],
+      backgroundDecorations[seed.backgroundDecoration],
+      specials[seed.special],
+      leftHands[seed.leftHand],
+      backs[seed.back],
+      ears[seed.ear],
+      chokers[seed.choker],
+      clothes[seed.clothe],
+      hairs[seed.hair],
+      headphones[seed.headphone],
+      hats[seed.hat],
+      backDecorations[seed.backDecoration],
     ],
     background: bgcolors[seed.background],
   };
 };
 
 /**
- * Generate a random Noun seed
- * @param seed The Noun seed
+ * Generate a random Niji seed
+ * @param seed The Niji seed
  */
 export const getRandomNounSeed = (): NounSeed => {
   return {
     background: Math.floor(Math.random() * bgcolors.length),
-    body: Math.floor(Math.random() * bodies.length),
-    accessory: Math.floor(Math.random() * accessories.length),
-    head: Math.floor(Math.random() * heads.length),
-    glasses: Math.floor(Math.random() * glasses.length),
+    backgroundDecoration: Math.floor(Math.random() * backgroundDecorations.length),
+    special: Math.floor(Math.random() * specials.length),
+    leftHand: Math.floor(Math.random() * leftHands.length),
+    back: Math.floor(Math.random() * ears.length),
+    ear: Math.floor(Math.random() * backs.length),
+    choker: Math.floor(Math.random() * chokers.length),
+    clothe: Math.floor(Math.random() * clothes.length),
+    hair: Math.floor(Math.random() * hairs.length),
+    headphone: Math.floor(Math.random() * headphones.length),
+    hat: Math.floor(Math.random() * hats.length),
+    backDecoration: Math.floor(Math.random() * backDecorations.length),
   };
 };
 
@@ -70,18 +96,25 @@ export const getPseudorandomPart = (
 };
 
 /**
- * Emulates the NounsSeeder.sol methodology for generating a Noun seed
- * @param nounId The Noun tokenId used to create pseudorandomness
+ * Emulates the NounsSeeder.sol methodology for generating a Niji seed
+ * @param nounId The Niji tokenId used to create pseudorandomness
  * @param blockHash The block hash use to create pseudorandomness
  */
 export const getNounSeedFromBlockHash = (nounId: BigNumberish, blockHash: string): NounSeed => {
   const pseudorandomness = solidityKeccak256(['bytes32', 'uint256'], [blockHash, nounId]);
   return {
     background: getPseudorandomPart(pseudorandomness, bgcolors.length, 0),
-    body: getPseudorandomPart(pseudorandomness, bodies.length, 48),
-    accessory: getPseudorandomPart(pseudorandomness, accessories.length, 96),
-    head: getPseudorandomPart(pseudorandomness, heads.length, 144),
-    glasses: getPseudorandomPart(pseudorandomness, glasses.length, 192),
+    backgroundDecoration: getPseudorandomPart(pseudorandomness, backDecorations.length, 48),
+    special: getPseudorandomPart(pseudorandomness, specials.length, 96),
+    leftHand: getPseudorandomPart(pseudorandomness, leftHands.length, 144),
+    back: getPseudorandomPart(pseudorandomness, backs.length, 192),
+    ear: getPseudorandomPart(pseudorandomness, ears.length, 240),
+    choker: getPseudorandomPart(pseudorandomness, chokers.length, 288),
+    clothe: getPseudorandomPart(pseudorandomness, clothes.length, 336),
+    hair: getPseudorandomPart(pseudorandomness, hairs.length, 384),
+    headphone: getPseudorandomPart(pseudorandomness, headphones.length, 432),
+    hat: getPseudorandomPart(pseudorandomness, hats.length, 480),
+    backDecoration: getPseudorandomPart(pseudorandomness, backDecorations.length, 528),
   };
 };
 

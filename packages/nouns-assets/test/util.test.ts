@@ -1,18 +1,13 @@
-import { expect } from 'chai';
 import { keccak256 as solidityKeccak256 } from '@ethersproject/solidity';
-import {
-  shiftRightAndCast,
-  getPseudorandomPart,
-  getNounSeedFromBlockHash,
-  getNounData,
-} from '../src/index';
+import { expect } from 'chai';
 import { images } from '../src/image-data.json';
+import { getNounSeedFromBlockHash, getPseudorandomPart, shiftRightAndCast } from '../src/index';
 import { NounSeed } from '../src/types';
 
 const { bodies, accessories, heads, glasses } = images;
 
 describe('@noun/assets utils', () => {
-  // Test against Noun 116, created at block 13661786
+  // Test against Niji 116, created at block 13661786
   const NOUN116_ID = 116;
   const NOUN116_SEED: NounSeed = {
     background: 1,
@@ -46,7 +41,7 @@ describe('@noun/assets utils', () => {
   });
 
   describe('getNounSeedFromBlockHash', () => {
-    it('should match NounsSeeder.sol implementation for generating a Noun seed', () => {
+    it('should match NounsSeeder.sol implementation for generating a Niji seed', () => {
       expect(getNounSeedFromBlockHash(NOUN116_ID, NOUN116_PREV_BLOCKHASH)).to.deep.equal(
         NOUN116_SEED,
       );

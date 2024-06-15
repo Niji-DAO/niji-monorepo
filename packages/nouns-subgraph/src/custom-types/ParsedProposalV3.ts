@@ -7,10 +7,10 @@ import {
 import { BIGINT_ZERO, STATUS_ACTIVE, STATUS_PENDING } from '../utils/constants';
 
 export class ParsedProposalV3 {
-  id: string = '';
-  proposer: string = '';
-  txHash: string = '';
-  logIndex: string = '';
+  id = '';
+  proposer = '';
+  txHash = '';
+  logIndex = '';
   targets: Bytes[] = [];
   values: BigInt[] = [];
   signatures: string[] = [];
@@ -23,9 +23,9 @@ export class ParsedProposalV3 {
   updatePeriodEndBlock: BigInt = BIGINT_ZERO;
   proposalThreshold: BigInt = BIGINT_ZERO;
   quorumVotes: BigInt = BIGINT_ZERO;
-  description: string = '';
-  title: string = '';
-  status: string = '';
+  description = '';
+  title = '';
+  status = '';
   signers: string[] = [];
   adjustedTotalSupply: BigInt = BIGINT_ZERO;
 
@@ -95,7 +95,7 @@ export class ParsedProposalV3 {
  */
 export function extractTitle(description: string): string {
   // Extract a markdown title from a proposal body that uses the `# Title` or `Title\n===` formats
-  let splitDescription = description.split('#', 3);
+  const splitDescription = description.split('#', 3);
   if (splitDescription.length > 1) {
     splitDescription.shift(); // Remove any characters before `#`
   }

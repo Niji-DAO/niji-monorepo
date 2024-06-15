@@ -1,60 +1,60 @@
-import { Bytes, log, ethereum, store, BigInt } from '@graphprotocol/graph-ts';
-import {
-  ProposalCreatedWithRequirements,
-  ProposalCreatedWithRequirements1,
-  ProposalCanceled,
-  ProposalQueued,
-  ProposalExecuted,
-  VoteCast,
-  ProposalVetoed,
-  MinQuorumVotesBPSSet,
-  MaxQuorumVotesBPSSet,
-  QuorumCoefficientSet,
-  ProposalUpdated,
-  ProposalObjectionPeriodSet,
-  ProposalDescriptionUpdated,
-  ProposalTransactionsUpdated,
-  SignatureCancelled,
-  EscrowedToFork,
-  WithdrawFromForkEscrow,
-  ExecuteFork,
-  JoinFork,
-  ProposalCreatedOnTimelockV1,
-  VoteSnapshotBlockSwitchProposalIdSet,
-} from './types/NounsDAO/NounsDAO';
-import {
-  getOrCreateDelegate,
-  getOrCreateProposal,
-  getOrCreateVote,
-  getGovernanceEntity,
-  getOrCreateDelegateWithNullOption,
-  getOrCreateDynamicQuorumParams,
-  getOrCreateProposalVersion,
-  getOrCreateFork,
-  calcEncodedProposalHash,
-} from './utils/helpers';
-import {
-  BIGINT_ONE,
-  STATUS_ACTIVE,
-  STATUS_QUEUED,
-  STATUS_PENDING,
-  STATUS_EXECUTED,
-  STATUS_CANCELLED,
-  STATUS_VETOED,
-  BIGINT_ZERO,
-} from './utils/constants';
-import { dynamicQuorumVotes } from './utils/dynamicQuorum';
+import { BigInt, Bytes, ethereum, log, store } from '@graphprotocol/graph-ts';
 import { ParsedProposalV3, extractTitle } from './custom-types/ParsedProposalV3';
 import {
-  Proposal,
-  ProposalCandidateSignature,
+  EscrowedToFork,
+  ExecuteFork,
+  JoinFork,
+  MaxQuorumVotesBPSSet,
+  MinQuorumVotesBPSSet,
+  ProposalCanceled,
+  ProposalCreatedOnTimelockV1,
+  ProposalCreatedWithRequirements,
+  ProposalCreatedWithRequirements1,
+  ProposalDescriptionUpdated,
+  ProposalExecuted,
+  ProposalObjectionPeriodSet,
+  ProposalQueued,
+  ProposalTransactionsUpdated,
+  ProposalUpdated,
+  ProposalVetoed,
+  QuorumCoefficientSet,
+  SignatureCancelled,
+  VoteCast,
+  VoteSnapshotBlockSwitchProposalIdSet,
+  WithdrawFromForkEscrow,
+} from './types/NounsDAO/NounsDAO';
+import {
   EscrowDeposit,
   EscrowWithdrawal,
+  EscrowedNoun,
   ForkJoin,
   ForkJoinedNoun,
-  EscrowedNoun,
+  Proposal,
   ProposalCandidateContent,
+  ProposalCandidateSignature,
 } from './types/schema';
+import {
+  BIGINT_ONE,
+  BIGINT_ZERO,
+  STATUS_ACTIVE,
+  STATUS_CANCELLED,
+  STATUS_EXECUTED,
+  STATUS_PENDING,
+  STATUS_QUEUED,
+  STATUS_VETOED,
+} from './utils/constants';
+import { dynamicQuorumVotes } from './utils/dynamicQuorum';
+import {
+  calcEncodedProposalHash,
+  getGovernanceEntity,
+  getOrCreateDelegate,
+  getOrCreateDelegateWithNullOption,
+  getOrCreateDynamicQuorumParams,
+  getOrCreateFork,
+  getOrCreateProposal,
+  getOrCreateProposalVersion,
+  getOrCreateVote,
+} from './utils/helpers';
 
 export function handleProposalCreatedWithRequirements(
   event: ProposalCreatedWithRequirements1,
@@ -69,14 +69,14 @@ export function handleProposalCreatedWithRequirementsV3(
 }
 
 export function handleProposalCreatedOnTimelockV1(event: ProposalCreatedOnTimelockV1): void {
-  let proposal = getOrCreateProposal(event.params.id.toString());
+  const proposal = getOrCreateProposal(event.params.id.toString());
   proposal.onTimelockV1 = true;
   proposal.save();
 }
 
 export function handleProposalCreated(parsedProposal: ParsedProposalV3): void {
-  let proposal = getOrCreateProposal(parsedProposal.id);
-  let proposerResult = getOrCreateDelegateWithNullOption(parsedProposal.proposer);
+  const proposal = getOrCreateProposal(parsedProposal.id);
+  const proposerResult = getOrCreateDelegateWithNullOption(parsedProposal.proposer);
 
   // Check if the proposer was a delegate already accounted for, if not we should log an error
   // since it shouldn't be possible for a delegate to propose anything without first being 'created'
@@ -87,7 +87,7 @@ export function handleProposalCreated(parsedProposal: ParsedProposalV3): void {
     ]);
   }
 
-  // Create it anyway, which supports V3 cases of proposers not having any Nouns
+  // Create it anyway, which supports V3 cases of proposers not having any Niji
   proposal.proposer = proposerResult.entity!.id;
   proposal.targets = parsedProposal.targets;
   proposal.values = parsedProposal.values;
@@ -216,7 +216,7 @@ export function handleProposalTransactionsUpdated(event: ProposalTransactionsUpd
 }
 
 export function handleProposalCanceled(event: ProposalCanceled): void {
-  let proposal = getOrCreateProposal(event.params.id.toString());
+  const proposal = getOrCreateProposal(event.params.id.toString());
 
   proposal.status = STATUS_CANCELLED;
   proposal.canceledBlock = event.block.number;
@@ -225,7 +225,7 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 }
 
 export function handleProposalVetoed(event: ProposalVetoed): void {
-  let proposal = getOrCreateProposal(event.params.id.toString());
+  const proposal = getOrCreateProposal(event.params.id.toString());
 
   proposal.status = STATUS_VETOED;
   proposal.vetoedBlock = event.block.number;
@@ -234,8 +234,8 @@ export function handleProposalVetoed(event: ProposalVetoed): void {
 }
 
 export function handleProposalQueued(event: ProposalQueued): void {
-  let governance = getGovernanceEntity();
-  let proposal = getOrCreateProposal(event.params.id.toString());
+  const governance = getGovernanceEntity();
+  const proposal = getOrCreateProposal(event.params.id.toString());
 
   proposal.status = STATUS_QUEUED;
   proposal.executionETA = event.params.eta;
@@ -248,8 +248,8 @@ export function handleProposalQueued(event: ProposalQueued): void {
 }
 
 export function handleProposalExecuted(event: ProposalExecuted): void {
-  let governance = getGovernanceEntity();
-  let proposal = getOrCreateProposal(event.params.id.toString());
+  const governance = getGovernanceEntity();
+  const proposal = getOrCreateProposal(event.params.id.toString());
 
   proposal.status = STATUS_EXECUTED;
   proposal.executionETA = null;
@@ -262,13 +262,13 @@ export function handleProposalExecuted(event: ProposalExecuted): void {
 }
 
 export function handleVoteCast(event: VoteCast): void {
-  let proposal = getOrCreateProposal(event.params.proposalId.toString());
-  let voteId = event.params.voter
+  const proposal = getOrCreateProposal(event.params.proposalId.toString());
+  const voteId = event.params.voter
     .toHexString()
     .concat('-')
     .concat(event.params.proposalId.toString());
-  let vote = getOrCreateVote(voteId);
-  let voterResult = getOrCreateDelegateWithNullOption(event.params.voter.toHexString());
+  const vote = getOrCreateVote(voteId);
+  const voterResult = getOrCreateDelegateWithNullOption(event.params.voter.toHexString());
 
   // Check if the voter was a delegate already accounted for, if not we should log an error
   // since it shouldn't be possible for a delegate to vote without first being 'created'
@@ -374,7 +374,7 @@ function captureProposalVersion(
   logIndex: string,
   proposal: Proposal,
   isUpdate: boolean,
-  updateMessage: string = '',
+  updateMessage = '',
 ): void {
   const versionId = txHash.concat('-').concat(logIndex);
   const previousVersion = getOrCreateProposalVersion(versionId);
@@ -416,8 +416,8 @@ export function handleEscrowedToFork(event: EscrowedToFork): void {
   deposit.save();
 
   fork.tokensInEscrowCount += event.params.tokenIds.length;
-  // Add escrowed Nouns to the list of Nouns connected to their escrow event
-  // Using an entity rather than just Noun IDs thinking it's helpful in creating the UI timeline view
+  // Add escrowed Niji to the list of Niji connected to their escrow event
+  // Using an entity rather than just Niji IDs thinking it's helpful in creating the UI timeline view
   for (let i = 0; i < event.params.tokenIds.length; i++) {
     const id = fork.id.toString().concat('-').concat(event.params.tokenIds[i].toString());
     const noun = new EscrowedNoun(id);
@@ -443,7 +443,7 @@ export function handleWithdrawFromForkEscrow(event: WithdrawFromForkEscrow): voi
 
   fork.tokensInEscrowCount -= event.params.tokenIds.length;
 
-  // Remove escrowed Nouns from the list
+  // Remove escrowed Niji from the list
   for (let i = 0; i < event.params.tokenIds.length; i++) {
     const id = fork.id.toString().concat('-').concat(event.params.tokenIds[i].toString());
     store.remove('EscrowedNoun', id);
@@ -487,8 +487,8 @@ export function handleJoinFork(event: JoinFork): void {
 
   fork.tokensForkingCount += event.params.tokenIds.length;
 
-  // Add newly joined Nouns to the list of joined Nouns
-  // Using an entity rather than just Noun IDs thinking it's helpful in creating the UI timeline view
+  // Add newly joined Niji to the list of joined Niji
+  // Using an entity rather than just Niji IDs thinking it's helpful in creating the UI timeline view
   for (let i = 0; i < event.params.tokenIds.length; i++) {
     const id = fork.id.toString().concat('-').concat(event.params.tokenIds[i].toString());
     const noun = new ForkJoinedNoun(id);

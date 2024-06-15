@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title Escrow contract for Nouns to be used to trigger a fork
+/// @title Escrow contract for Niji to be used to trigger a fork
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -37,10 +37,10 @@ contract NounsDAOForkEscrow is IERC721Receiver {
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
      */
 
-    /// @notice Nouns governance contract
+    /// @notice Niji governance contract
     address public immutable dao;
 
-    /// @notice Nouns token contract
+    /// @notice Niji token contract
     NounsTokenLike public immutable nounsToken;
 
     /**
@@ -86,7 +86,7 @@ contract NounsDAOForkEscrow is IERC721Receiver {
 
     /**
      * @notice Escrows nouns tokens
-     * @dev Can only be called by the Nouns token contract, and initiated by the DAO contract
+     * @dev Can only be called by the Niji token contract, and initiated by the DAO contract
      * @param operator The address which called the `safeTransferFrom` function, can only be the DAO contract
      * @param from The address which previously owned the token
      * @param tokenId The id of the token being escrowed
