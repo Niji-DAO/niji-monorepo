@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { BigNumber } from 'ethers';
-import classes from './Explore.module.css';
 import cx from 'classnames';
+import { BigNumber } from 'ethers';
+import { AnimatePresence, motion } from 'framer-motion/dist/framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import ExploreGrid from '../../components/ExploreGrid';
+import ExploreNav from '../../components/ExploreGrid/ExploreNav';
 import ExploreNounDetail from '../../components/ExploreGrid/ExploreNounDetail';
-import { motion, AnimatePresence } from 'framer-motion/dist/framer-motion';
-import { Auction as IAuction } from '../../wrappers/nounsAuction';
 import { useAppSelector } from '../../hooks';
 import { useKeyPress } from '../../hooks/useKeyPress';
-import ExploreNav from '../../components/ExploreGrid/ExploreNav';
-import ExploreGrid from '../../components/ExploreGrid';
+import { Auction as IAuction } from '../../wrappers/nounsAuction';
+import classes from './Explore.module.css';
 
 interface ExplorePageProps {}
 
-type Noun = {
+type Niji = {
   id: number | null;
   imgSrc: string | undefined;
 };
@@ -31,7 +31,7 @@ const ExplorePage: React.FC<ExplorePageProps> = props => {
 
   // Set state
   const [isSidebarVisible, setIsSidebarVisible] = useState<boolean>(!isMobile && true);
-  const [nounsList, setNounsList] = useState<Noun[]>([]);
+  const [nounsList, setNounsList] = useState<Niji[]>([]);
   const [selectedNoun, setSelectedNoun] = useState<number | undefined>(undefined);
   const [activeNoun, setActiveNoun] = useState<number>(-1);
   const [isNounHoverDisabled, setIsNounHoverDisabled] = useState<boolean>(false);

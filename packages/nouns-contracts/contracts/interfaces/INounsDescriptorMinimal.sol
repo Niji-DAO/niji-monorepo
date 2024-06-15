@@ -34,11 +34,25 @@ interface INounsDescriptorMinimal {
 
     function backgroundCount() external view returns (uint256);
 
-    function bodyCount() external view returns (uint256);
+    function backgroundDecorationCount() external view returns (uint256);
 
-    function accessoryCount() external view returns (uint256);
+    function specialCount() external view returns (uint256);
 
-    function headCount() external view returns (uint256);
+    function leftHandCount() external view returns (uint256);
 
-    function glassesCount() external view returns (uint256);
+    function backCount() external view returns (uint256);
+
+    function earCount() external view returns (uint256);
+
+    function chokerCount() external view returns (uint256);
+
+    function clotheCount() external view returns (uint256);
+
+    function hairCount() external view returns (uint256);
+
+    function hatCount() external view returns (uint256);
+
+    function headphoneCount() external view returns (uint256);
+
+    function backDecorationCount() external view returns (uint256);
 }

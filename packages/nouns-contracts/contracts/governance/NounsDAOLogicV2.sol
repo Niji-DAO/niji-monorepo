@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-/// @title The Nouns DAO logic version 2
+/// @title The Niji DAO logic version 2
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -38,7 +38,7 @@
 //    - `_setMaxQuorumVotesBPS(uint16 newMaxQuorumVotesBPS)`
 //    - `_setQuorumCoefficient(uint32 newQuorumCoefficient)`
 // - `minQuorumVotes` and `maxQuorumVotes`, which returns the current min and
-// max quorum votes using the current Noun supply.
+// max quorum votes using the current Niji supply.
 // - New `Proposal` struct member:
 //    - `totalSupply` used in dynamic quorum calculation.
 //    - `creationBlock` used for retrieving checkpoints of votes and dynamic quorum params. This now
@@ -56,7 +56,7 @@ import './NounsDAOInterfaces.sol';
 
 contract NounsDAOLogicV2 is NounsDAOStorageV2, NounsDAOEventsV2 {
     /// @notice The name of this contract
-    string public constant name = 'Nouns DAO';
+    string public constant name = 'Niji DAO';
 
     /// @notice The minimum setable proposal threshold
     uint256 public constant MIN_PROPOSAL_THRESHOLD_BPS = 1; // 1 basis point or 0.01%
@@ -915,7 +915,7 @@ contract NounsDAOLogicV2 is NounsDAOStorageV2, NounsDAOEventsV2 {
     }
 
     /**
-     * @notice Current proposal threshold using Noun Total Supply
+     * @notice Current proposal threshold using Niji Total Supply
      * Differs from `GovernerBravo` which uses fixed amount
      */
     function proposalThreshold() public view returns (uint256) {
@@ -955,7 +955,7 @@ contract NounsDAOLogicV2 is NounsDAOStorageV2, NounsDAOEventsV2 {
      *       quorumCoefficient * againstVotesBPS
      * @dev Note the coefficient is a fixed point integer with 6 decimals
      * @param againstVotes Number of against-votes in the proposal
-     * @param totalSupply The total supply of Nouns at the time of proposal creation
+     * @param totalSupply The total supply of Niji at the time of proposal creation
      * @param params Configurable parameters for calculating the quorum based on againstVotes. See `DynamicQuorumParams` definition for additional details.
      * @return quorumVotes The required quorum
      */
@@ -1050,14 +1050,14 @@ contract NounsDAOLogicV2 is NounsDAOStorageV2, NounsDAOEventsV2 {
     }
 
     /**
-     * @notice Current min quorum votes using Noun total supply
+     * @notice Current min quorum votes using Niji total supply
      */
     function minQuorumVotes() public view returns (uint256) {
         return bps2Uint(getDynamicQuorumParamsAt(block.number).minQuorumVotesBPS, nouns.totalSupply());
     }
 
     /**
-     * @notice Current max quorum votes using Noun total supply
+     * @notice Current max quorum votes using Niji total supply
      */
     function maxQuorumVotes() public view returns (uint256) {
         return bps2Uint(getDynamicQuorumParamsAt(block.number).maxQuorumVotesBPS, nouns.totalSupply());

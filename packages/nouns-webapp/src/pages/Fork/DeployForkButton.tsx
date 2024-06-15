@@ -1,12 +1,12 @@
-import { ReactNode, useCallback, useEffect, useState } from 'react';
-import clsx from 'clsx';
-import classes from './Fork.module.css';
-import { useExecuteFork } from '../../wrappers/nounsDao';
 import { Trans } from '@lingui/macro';
 import { TransactionStatus } from '@usedapp/core';
+import clsx from 'clsx';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { Spinner } from 'react-bootstrap';
 import SolidColorBackgroundModal from '../../components/SolidColorBackgroundModal';
 import { buildEtherscanTxLink } from '../../utils/etherscan';
-import { Spinner } from 'react-bootstrap';
+import { useExecuteFork } from '../../wrappers/nounsDao';
+import classes from './Fork.module.css';
 
 type Props = {
   isDeployModalOpen: boolean;
@@ -85,7 +85,7 @@ function DeployForkButton(props: Props) {
         <Trans>Deploy Fork</Trans>
       </h2>
       <p>
-        <Trans>Deploying Nouns fork and beginning the forking period</Trans>
+        <Trans>Deploying Niji fork and beginning the forking period</Trans>
       </p>
       <p
         className={clsx(
@@ -151,7 +151,7 @@ function DeployForkButton(props: Props) {
               <Spinner animation="border" />
             </div>
           ) : (
-            <Trans>Deploy Nouns fork</Trans>
+            <Trans>Deploy Niji fork</Trans>
           )}
         </button>
       )}

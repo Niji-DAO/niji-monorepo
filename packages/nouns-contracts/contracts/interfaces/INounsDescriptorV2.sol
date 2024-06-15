@@ -47,23 +47,51 @@ interface INounsDescriptorV2 is INounsDescriptorMinimal {
 
     function backgrounds(uint256 index) external view returns (string memory);
 
-    function bodies(uint256 index) external view returns (bytes memory);
+    function backgroundDecorations(uint256 index) external view returns (bytes memory);
 
-    function accessories(uint256 index) external view returns (bytes memory);
+    function specials(uint256 index) external view returns (bytes memory);
 
-    function heads(uint256 index) external view returns (bytes memory);
+    function leftHands(uint256 index) external view returns (bytes memory);
 
-    function glasses(uint256 index) external view returns (bytes memory);
+    function backs(uint256 index) external view returns (bytes memory);
+
+    function ears(uint256 index) external view returns (bytes memory);
+
+    function chokers(uint256 index) external view returns (bytes memory);
+
+    function clothes(uint256 index) external view returns (bytes memory);
+
+    function hairs(uint256 index) external view returns (bytes memory);
+
+    function headphones(uint256 index) external view returns (bytes memory);
+
+    function hats(uint256 index) external view returns (bytes memory);
+
+    function backDecorations(uint256 index) external view returns (bytes memory);
 
     function backgroundCount() external view override returns (uint256);
 
-    function bodyCount() external view override returns (uint256);
+    function backgroundDecorationCount() external view override returns (uint256);
 
-    function accessoryCount() external view override returns (uint256);
+    function specialCount() external view override returns (uint256);
 
-    function headCount() external view override returns (uint256);
+    function leftHandCount() external view override returns (uint256);
 
-    function glassesCount() external view override returns (uint256);
+    function backCount() external view override returns (uint256);
+
+    function earCount() external view override returns (uint256);
+
+    function chokerCount() external view override returns (uint256);
+
+    function clotheCount() external view override returns (uint256);
+
+    function hairCount() external view override returns (uint256);
+
+    function headphoneCount() external view override returns (uint256);
+
+    function hatCount() external view override returns (uint256);
+
+    function backDecorationCount() external view override returns (uint256);
 
     function addManyBackgrounds(string[] calldata backgrounds) external;
 
@@ -71,25 +99,67 @@ interface INounsDescriptorV2 is INounsDescriptorMinimal {
 
     function setPalette(uint8 paletteIndex, bytes calldata palette) external;
 
-    function addBodies(
+    function addBackgroundDecorations(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
-    function addAccessories(
+    function addSpecials(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
-    function addHeads(
+    function addLeftHands(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
-    function addGlasses(
+    function addBacks(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addEars(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addChokers(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addClothes(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addHairs(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addHeadphones(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addHats(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addBackDecorations(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
@@ -97,25 +167,67 @@ interface INounsDescriptorV2 is INounsDescriptorMinimal {
 
     function setPalettePointer(uint8 paletteIndex, address pointer) external;
 
-    function addBodiesFromPointer(
+    function addBackgroundDecorationsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
-    function addAccessoriesFromPointer(
+    function addSpecialsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
-    function addHeadsFromPointer(
+    function addLeftHandsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
-    function addGlassesFromPointer(
+    function addBacksFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addEarsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addChokersFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addClothesFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addHairsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addHeadphonesFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addHatsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addBackDecorationsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount

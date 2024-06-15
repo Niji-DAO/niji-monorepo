@@ -1,11 +1,11 @@
-import { BigNumber, BigNumberish } from 'ethers';
-import Section from '../../layout/Section';
-import classes from './HistoryCollection.module.css';
 import clsx from 'clsx';
-import StandaloneNoun from '../StandaloneNoun';
-import { LoadingNoun } from '../Noun';
-import config from '../../config';
+import { BigNumber, BigNumberish } from 'ethers';
 import { Container, Row } from 'react-bootstrap';
+import config from '../../config';
+import Section from '../../layout/Section';
+import { LoadingNoun } from '../Niji';
+import StandaloneNoun from '../StandaloneNoun';
+import classes from './HistoryCollection.module.css';
 
 interface HistoryCollectionProps {
   historyCount: number;

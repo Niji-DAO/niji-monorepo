@@ -1,17 +1,17 @@
+import { i18n } from '@lingui/core';
+import { Trans } from '@lingui/macro';
+import { TransactionStatus } from '@usedapp/core';
+import clsx from 'clsx';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Button, FloatingLabel, FormControl, Spinner } from 'react-bootstrap';
-import classes from './VoteModal.module.css';
 import {
   useCastRefundableVote,
   useCastRefundableVoteWithReason,
   Vote,
 } from '../../wrappers/nounsDao';
-import { ReactNode, useCallback, useEffect, useState } from 'react';
-import { TransactionStatus } from '@usedapp/core';
 import NavBarButton, { NavBarButtonStyle } from '../NavBarButton';
-import clsx from 'clsx';
-import { Trans } from '@lingui/macro';
-import { i18n } from '@lingui/core';
 import SolidColorBackgroundModal from '../SolidColorBackgroundModal';
+import classes from './VoteModal.module.css';
 
 interface VoteModalProps {
   show: boolean;
@@ -111,11 +111,11 @@ const VoteModal = ({
       <div className={classes.voteModalSubtitle}>
         {availableVotes === 1 ? (
           <Trans>
-            Voting with <span className={classes.bold}>{i18n.number(availableVotes)}</span> Noun
+            Voting with <span className={classes.bold}>{i18n.number(availableVotes)}</span> Niji
           </Trans>
         ) : (
           <Trans>
-            Voting with <span className={classes.bold}>{i18n.number(availableVotes)}</span> Nouns
+            Voting with <span className={classes.bold}>{i18n.number(availableVotes)}</span> Niji
           </Trans>
         )}
       </div>

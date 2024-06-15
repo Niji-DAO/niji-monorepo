@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-/// @title The Nouns DAO executor and treasury, supporting DAO fork
+/// @title The Niji DAO executor and treasury, supporting DAO fork
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -29,7 +29,7 @@
 //
 // NounsDAOExecutor.sol modifications:
 // NounsDAOExecutor.sol modifies Timelock to use Solidity 0.8.x receive(), fallback(), and built-in over/underflow protection
-// This contract acts as executor of Nouns DAO governance and its treasury, so it has been modified to accept ETH.
+// This contract acts as executor of Niji DAO governance and its treasury, so it has been modified to accept ETH.
 //
 //
 // NounsDAOExecutor2.sol modifications:

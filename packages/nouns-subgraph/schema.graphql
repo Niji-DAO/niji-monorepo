@@ -2,8 +2,8 @@ type DelegationEvent @entity {
   "The txn hash of this event + nounId"
   id: ID!
 
-  "The Noun being delegated"
-  noun: Noun!
+  "The Niji being delegated"
+  noun: Niji!
 
   "Current delegator address"
   delegator: Account!
@@ -25,8 +25,8 @@ type TransferEvent @entity {
   "The txn hash of this event"
   id: ID!
 
-  "The Noun being transfered"
-  noun: Noun!
+  "The Niji being transfered"
+  noun: Niji!
 
   "Previous holder address"
   previousHolder: Account!
@@ -42,7 +42,7 @@ type TransferEvent @entity {
 }
 
 type Seed @entity {
-  "The Noun's ERC721 token id"
+  "The Niji's ERC721 token id"
   id: ID!
 
   "The background index"
@@ -61,17 +61,17 @@ type Seed @entity {
   glasses: BigInt!
 }
 
-type Noun @entity {
-  "The Noun's ERC721 token id"
+type Niji @entity {
+  "The Niji's ERC721 token id"
   id: ID!
 
-  "The seed used to determine the Noun's traits"
+  "The seed used to determine the Niji's traits"
   seed: Seed
 
-  "The owner of the Noun"
+  "The owner of the Niji"
   owner: Account!
 
-  "Historical votes for the Noun"
+  "Historical votes for the Niji"
   votes: [Vote!]! @derivedFrom(field: "nouns")
 }
 
@@ -79,8 +79,8 @@ type Bid @entity {
   "Bid transaction hash"
   id: ID!
 
-  "The Noun being bid on"
-  noun: Noun!
+  "The Niji being bid on"
+  noun: Niji!
 
   "Bid amount"
   amount: BigInt!
@@ -102,11 +102,11 @@ type Bid @entity {
 }
 
 type Auction @entity {
-  "The Noun's ERC721 token id"
+  "The Niji's ERC721 token id"
   id: ID!
 
-  "The Noun"
-  noun: Noun!
+  "The Niji"
+  noun: Niji!
 
   "The current highest bid amount"
   amount: BigInt!
@@ -137,36 +137,36 @@ enum ProposalStatus {
 }
 
 type Account @entity {
-  "An Account is any address that holds any amount of Nouns, the id used is the blockchain address."
+  "An Account is any address that holds any amount of Niji, the id used is the blockchain address."
   id: ID!
 
   "Delegate address of the token holder which will participate in votings. Delegates don't need to hold any tokens and can even be the token holder itself."
   delegate: Delegate
 
-  "Noun balance of this address expressed in the smallest unit of the Nouns ERC721 Token"
+  "Niji balance of this address expressed in the smallest unit of the Niji ERC721 Token"
   tokenBalanceRaw: BigInt!
 
-  "Noun balance of this address expressed as a BigInt normalized value for the Nouns ERC721 Token"
+  "Niji balance of this address expressed as a BigInt normalized value for the Niji ERC721 Token"
   tokenBalance: BigInt!
 
-  "Total amount of Nouns ever held by this address expressed in the smallest unit of the Nouns ERC721 Token"
+  "Total amount of Niji ever held by this address expressed in the smallest unit of the Niji ERC721 Token"
   totalTokensHeldRaw: BigInt!
 
-  "Total amount of Nouns ever held by this address expressed as a BigInt normalized value for the Nouns ERC721 Token"
+  "Total amount of Niji ever held by this address expressed as a BigInt normalized value for the Niji ERC721 Token"
   totalTokensHeld: BigInt!
 
-  "The Nouns owned by this account"
-  nouns: [Noun!]!
+  "The Niji owned by this account"
+  nouns: [Niji!]!
 }
 
 type Delegate @entity {
   "A Delegate is any address that has been delegated with voting tokens by a token holder, id is the blockchain address of said delegate"
   id: ID!
 
-  "Amount of votes delegated to this delegate to be used on proposal votings expressed in the smallest unit of the Nouns ERC721 Token"
+  "Amount of votes delegated to this delegate to be used on proposal votings expressed in the smallest unit of the Niji ERC721 Token"
   delegatedVotesRaw: BigInt!
 
-  "Amount of votes delegated to this delegate to be used on proposal votings expressed as a BigInt normalized value for the Nouns ERC721 Token"
+  "Amount of votes delegated to this delegate to be used on proposal votings expressed as a BigInt normalized value for the Niji ERC721 Token"
   delegatedVotes: BigInt!
 
   tokenHoldersRepresentedAmount: Int!
@@ -174,8 +174,8 @@ type Delegate @entity {
   "Token holders that this delegate represents"
   tokenHoldersRepresented: [Account!]! @derivedFrom(field: "delegate")
 
-  "Nouns that this delegate represents"
-  nounsRepresented: [Noun!]!
+  "Niji that this delegate represents"
+  nounsRepresented: [Niji!]!
 
   "Votes that a delegate has made in different proposals"
   votes: [Vote!]! @derivedFrom(field: "voter")
@@ -356,10 +356,10 @@ type Vote @entity {
   "The integer support value: against (0), for (1), or abstain (2)"
   supportDetailed: Int!
 
-  "Amount of votes in favour or against expressed in the smallest unit of the Nouns ERC721 Token"
+  "Amount of votes in favour or against expressed in the smallest unit of the Niji ERC721 Token"
   votesRaw: BigInt!
 
-  "Amount of votes in favour or against expressed as a BigInt normalized value for the Nouns ERC721 Token"
+  "Amount of votes in favour or against expressed as a BigInt normalized value for the Niji ERC721 Token"
   votes: BigInt!
 
   "The optional vote reason"
@@ -368,8 +368,8 @@ type Vote @entity {
   "Delegate that emitted the vote"
   voter: Delegate!
 
-  "The Nouns used to vote"
-  nouns: [Noun!]
+  "The Niji used to vote"
+  nouns: [Niji!]
 
   "Proposal that is being voted on"
   proposal: Proposal!
@@ -400,10 +400,10 @@ type Governance @entity {
   "Total number of delegates that held delegated votes"
   totalDelegates: BigInt!
 
-  "Total number of votes delegated expressed in the smallest unit of the Nouns ERC721 Token"
+  "Total number of votes delegated expressed in the smallest unit of the Niji ERC721 Token"
   delegatedVotesRaw: BigInt!
 
-  "Total number of votes delegated expressed as a BigInt normalized value for the Nouns ERC721 Token"
+  "Total number of votes delegated expressed as a BigInt normalized value for the Niji ERC721 Token"
   delegatedVotes: BigInt!
 
   "Number of proposals currently queued for execution"
@@ -701,7 +701,7 @@ type EscrowedNoun @entity {
 
   fork: Fork!
 
-  noun: Noun!
+  noun: Niji!
 
   owner: Delegate!
 
@@ -713,7 +713,7 @@ type ForkJoinedNoun @entity(immutable: true) {
 
   fork: Fork!
 
-  noun: Noun!
+  noun: Niji!
 
   owner: Delegate!
 

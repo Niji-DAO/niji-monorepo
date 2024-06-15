@@ -1,32 +1,32 @@
-import { useEffect, useState } from 'react';
-import classes from './Fork.module.css';
 import { Trans } from '@lingui/macro';
+import { useEthers } from '@usedapp/core';
 import clsx from 'clsx';
-import Section from '../../layout/Section';
+import dayjs from 'dayjs';
+import { utils } from 'ethers/lib/ethers';
+import { useEffect, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
+import { Link, RouteComponentProps } from 'react-router-dom';
 import AddNounsToForkModal from '../../components/AddNounsToForkModal';
 import ForkingPeriodTimer from '../../components/ForkingPeriodTimer';
+import useForkTreasuryBalance from '../../hooks/useForkTreasuryBalance';
+import { useScrollToLocation } from '../../hooks/useScrollToLocation';
+import Section from '../../layout/Section';
+import { buildEtherscanAddressLink } from '../../utils/etherscan';
 import {
+  useAdjustedTotalSupply,
   useEscrowEvents,
   useForkDetails,
   useForkThreshold,
+  useForkThresholdBPS,
   useForks,
   useNumTokensInForkEscrow,
-  useAdjustedTotalSupply,
-  useForkThresholdBPS,
 } from '../../wrappers/nounsDao';
-import { useEthers } from '@usedapp/core';
 import { useUserEscrowedNounIds, useUserOwnedNounIds } from '../../wrappers/nounToken';
-import ForkEvent from './ForkEvent';
-import DeployForkButton from './DeployForkButton';
-import WithdrawNounsButton from './WithdrawNounsButton';
-import { useScrollToLocation } from '../../hooks/useScrollToLocation';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { buildEtherscanAddressLink } from '../../utils/etherscan';
-import dayjs from 'dayjs';
 import NotFoundPage from '../NotFound';
-import useForkTreasuryBalance from '../../hooks/useForkTreasuryBalance';
-import { utils } from 'ethers/lib/ethers';
+import DeployForkButton from './DeployForkButton';
+import classes from './Fork.module.css';
+import ForkEvent from './ForkEvent';
+import WithdrawNounsButton from './WithdrawNounsButton';
 
 const now = new Date();
 
@@ -48,7 +48,7 @@ const ForkPage = ({
   const [currentEscrowPercentage, setCurrentEscrowPercentage] = useState(0);
   const [dataFetchPollInterval, setDataFetchPollInterval] = useState(0);
   const [forkStatusLabel, setForkStatusLabel] = useState('Escrow');
-  const [addNounsButtonLabel, setAddNounsButtonLabel] = useState('Add Nouns to escrow');
+  const [addNounsButtonLabel, setAddNounsButtonLabel] = useState('Add Niji to escrow');
   const adjustedTotalSupply = useAdjustedTotalSupply();
   const forkThreshold = useForkThreshold();
   const forkThresholdBPS = useForkThresholdBPS();
@@ -110,11 +110,11 @@ const ForkPage = ({
     ) {
       // 'escrow'
       setForkStatusLabel('Escrow');
-      setAddNounsButtonLabel('Add Nouns to escrow');
+      setAddNounsButtonLabel('Add Niji to escrow');
     } else {
       // 'pre-escrow'
       setForkStatusLabel('Pre-escrow');
-      setAddNounsButtonLabel('Add Nouns to Start Escrow Period');
+      setAddNounsButtonLabel('Add Niji to Start Escrow Period');
     }
     // threshold
     if (
@@ -188,7 +188,7 @@ const ForkPage = ({
                     <div className={classes.spacer} />
                   </div>
                   <h1>
-                    <Trans>Fork Nouns DAO</Trans>
+                    <Trans>Fork Niji DAO</Trans>
                   </h1>
                   <p className="mb-4">
                     <Trans>
@@ -227,12 +227,12 @@ const ForkPage = ({
                   <div className={classes.spacer} />
                 </div>
                 <h1>
-                  <Trans>Nouns DAO Fork{isForked ? ` #${id}` : ''}</Trans>
+                  <Trans>Niji DAO Fork{isForked ? ` #${id}` : ''}</Trans>
                 </h1>
                 {!isForked && !isForkPeriodActive && (
                   <p className={classes.note}>
                     <Trans>
-                      More than {forkThreshold === undefined ? '...' : forkThreshold} Nouns{' '}
+                      More than {forkThreshold === undefined ? '...' : forkThreshold} Niji{' '}
                       {`(${forkThresholdBPS && forkThresholdBPS / 100}% of the DAO)`} are required
                       to pass the threshold
                     </Trans>
@@ -284,12 +284,11 @@ const ForkPage = ({
                       endTime={+forkDetails.data.forkingPeriodEndTimestamp}
                       isPeriodEnded={
                         forkDetails?.data?.executed &&
-                          +forkDetails.data.forkingPeriodEndTimestamp < now.getTime() / 1000
+                        +forkDetails.data.forkingPeriodEndTimestamp < now.getTime() / 1000
                           ? true
                           : false
                       }
                     />
-
                   </div>
                 )}
               <div className={clsx(classes.isForked)}>
@@ -297,9 +296,7 @@ const ForkPage = ({
                   <p>
                     <strong>
                       This fork was executed on{' '}
-                      {dayjs
-                        .unix(+forkDetails.data.executedAt)
-                        .format('MMM D, YYYY')}
+                      {dayjs.unix(+forkDetails.data.executedAt).format('MMM D, YYYY')}
                     </strong>
                   </p>
                 )}
@@ -362,14 +359,14 @@ const ForkPage = ({
                     ) : (
                       <>{numTokensInForkEscrow !== undefined ? numTokensInForkEscrow : '...'}</>
                     )}{' '}
-                    Noun
+                    Niji
                     {isForkPeriodActive || isForked
                       ? forkDetails.data?.tokensForkingCount === 1
                         ? ''
                         : 's'
                       : numTokensInForkEscrow === 1
-                        ? ''
-                        : 's'}
+                      ? ''
+                      : 's'}
                   </strong>
                   {isForkPeriodActive || isForked ? null : (
                     <span className={classes.thresholdCount}>
@@ -412,9 +409,9 @@ const ForkPage = ({
                 {!isForked && userEscrowedNounIds.data && userEscrowedNounIds.data.length > 0 && (
                   <div className={clsx(classes.userNouns, classes.callout)}>
                     <p>
-                      Your Noun{userEscrowedNounIds.data.length > 1 && 's'} in escrow:{' '}
+                      Your Niji{userEscrowedNounIds.data.length > 1 && 's'} in escrow:{' '}
                       <strong>
-                        {userEscrowedNounIds.data.map(nounId => `Noun ${nounId}`).join(', ')}
+                        {userEscrowedNounIds.data.map(nounId => `Niji ${nounId}`).join(', ')}
                       </strong>
                     </p>
                   </div>
@@ -449,13 +446,13 @@ const ForkPage = ({
             isModalOpen={isModalOpen}
             isConfirmModalOpen={isConfirmModalOpen}
             isForkingPeriod={isForkPeriodActive}
-            title={'Add Nouns to escrow'}
+            title={'Add Niji to escrow'}
             description={
-              "Nouners can withdraw their tokens from escrow as long as the forking period hasn't started. Nouns in escrow are not eligible to vote or submit proposals."
+              "Nouners can withdraw their tokens from escrow as long as the forking period hasn't started. Niji in escrow are not eligible to vote or submit proposals."
             }
-            selectLabel={'Select Nouns to escrow'}
+            selectLabel={'Select Niji to escrow'}
             selectDescription={
-              'Add as many or as few of your Nouns as you’d like.  Additional Nouns can be added during the escrow period.'
+              'Add as many or as few of your Niji as you’d like.  Additional Niji can be added during the escrow period.'
             }
             account={account}
             ownedNouns={userOwnedNounIds.data}

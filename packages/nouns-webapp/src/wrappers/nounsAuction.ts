@@ -1,11 +1,11 @@
-import { useContractCall } from '@usedapp/core';
-import { BigNumber as EthersBN, utils } from 'ethers';
 import { NounsAuctionHouseABI } from '@nouns/sdk';
-import config from '../config';
+import { useContractCall } from '@usedapp/core';
 import BigNumber from 'bignumber.js';
-import { isNounderNoun } from '../utils/nounderNoun';
+import { BigNumber as EthersBN, utils } from 'ethers';
+import config from '../config';
 import { useAppSelector } from '../hooks';
 import { AuctionState } from '../state/slices/auction';
+import { isNounderNoun } from '../utils/nounderNoun';
 
 export enum AuctionHouseContractFunction {
   auction = 'auction',
@@ -53,9 +53,9 @@ export const useAuctionMinBidIncPercentage = () => {
 };
 
 /**
- * Computes timestamp after which a Noun could vote
- * @param nounId TokenId of Noun
- * @returns Unix timestamp after which Noun could vote
+ * Computes timestamp after which a Niji could vote
+ * @param nounId TokenId of Niji
+ * @returns Unix timestamp after which Niji could vote
  */
 export const useNounCanVoteTimestamp = (nounId: number) => {
   const nextNounId = nounId + 1;

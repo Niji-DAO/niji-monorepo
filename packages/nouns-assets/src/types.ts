@@ -1,9 +1,16 @@
 export interface NounSeed {
   background: number;
-  body: number;
-  accessory: number;
-  head: number;
-  glasses: number;
+  backgroundDecoration: number;
+  special: number;
+  leftHand: number;
+  back: number;
+  ear: number;
+  choker: number;
+  clothe: number;
+  hair: number;
+  headphone: number;
+  hat: number;
+  backDecoration: number;
 }
 
 export interface EncodedImage {

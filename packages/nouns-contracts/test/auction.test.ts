@@ -28,7 +28,7 @@ describe('NounsAuctionHouse', () => {
   const TIME_BUFFER = 15 * 60;
   const RESERVE_PRICE = 2;
   const MIN_INCREMENT_BID_PERCENTAGE = 5;
-  const DURATION = 60 * 60 * 24;
+  const BASE_DURATION = 60 * 60 * 24;
 
   async function deploy(deployer?: SignerWithAddress) {
     const auctionHouseFactory = await ethers.getContractFactory('NounsAuctionHouse', deployer);
@@ -38,7 +38,7 @@ describe('NounsAuctionHouse', () => {
       TIME_BUFFER,
       RESERVE_PRICE,
       MIN_INCREMENT_BID_PERCENTAGE,
-      DURATION,
+      BASE_DURATION,
     ]) as Promise<NounsAuctionHouse>;
   }
 
@@ -71,7 +71,7 @@ describe('NounsAuctionHouse', () => {
       TIME_BUFFER,
       RESERVE_PRICE,
       MIN_INCREMENT_BID_PERCENTAGE,
-      DURATION,
+      BASE_DURATION,
     );
     await expect(tx).to.be.revertedWith('Initializable: contract is already initialized');
   });
@@ -92,7 +92,7 @@ describe('NounsAuctionHouse', () => {
       value: RESERVE_PRICE,
     });
 
-    await expect(tx).to.be.revertedWith('Noun not up for auction');
+    await expect(tx).to.be.revertedWith('Niji not up for auction');
   });
 
   it('should revert if a user creates a bid for an expired auction', async () => {
@@ -243,7 +243,7 @@ describe('NounsAuctionHouse', () => {
 
     expect(createdEvent?.args?.nounId).to.equal(nounId.add(1));
     expect(createdEvent?.args?.startTime).to.equal(timestamp);
-    expect(createdEvent?.args?.endTime).to.equal(timestamp + DURATION);
+    expect(createdEvent?.args?.endTime).to.equal(timestamp + BASE_DURATION);
   });
 
   it('should not create a new auction if the auction house is paused and unpaused while an auction is ongoing', async () => {
@@ -285,7 +285,7 @@ describe('NounsAuctionHouse', () => {
 
     expect(createdEvent?.args?.nounId).to.equal(nounId.add(1));
     expect(createdEvent?.args?.startTime).to.equal(timestamp);
-    expect(createdEvent?.args?.endTime).to.equal(timestamp + DURATION);
+    expect(createdEvent?.args?.endTime).to.equal(timestamp + BASE_DURATION);
   });
 
   it('should settle the current auction and pause the contract if the minter is updated while the auction house is unpaused', async () => {
@@ -312,7 +312,7 @@ describe('NounsAuctionHouse', () => {
     expect(paused).to.equal(true);
   });
 
-  it('should burn a Noun on auction settlement if no bids are received', async () => {
+  it('should burn a Niji on auction settlement if no bids are received', async () => {
     await (await nounsAuctionHouse.unpause()).wait();
 
     const { nounId } = await nounsAuctionHouse.auction();

@@ -1,21 +1,21 @@
-import { Col, Row } from 'react-bootstrap';
+import { Trans } from '@lingui/macro';
 import { BigNumber } from 'ethers';
+import { Col, Row } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import auctionActivityClasses from '../AuctionActivity/AuctionActivity.module.css';
+import auctionBidClasses from '../AuctionActivity/BidHistory.module.css';
+import AuctionActivityDateHeadline from '../AuctionActivityDateHeadline';
+import AuctionActivityNounTitle from '../AuctionActivityNounTitle';
 import AuctionActivityWrapper from '../AuctionActivityWrapper';
 import AuctionNavigation from '../AuctionNavigation';
-import AuctionActivityNounTitle from '../AuctionActivityNounTitle';
-import AuctionActivityDateHeadline from '../AuctionActivityDateHeadline';
 import AuctionTitleAndNavWrapper from '../AuctionTitleAndNavWrapper';
-import { Link } from 'react-router-dom';
-import nounContentClasses from './NounderNounContent.module.css';
-import auctionBidClasses from '../AuctionActivity/BidHistory.module.css';
 import bidBtnClasses from '../BidHistoryBtn/BidHistoryBtn.module.css';
-import auctionActivityClasses from '../AuctionActivity/AuctionActivity.module.css';
 import CurrentBid, { BID_N_A } from '../CurrentBid';
 import Winner from '../Winner';
-import { Trans } from '@lingui/macro';
+import nounContentClasses from './NounderNounContent.module.css';
 
-import { useAppSelector } from '../../hooks';
 import { useCallback, useEffect } from 'react';
+import { useAppSelector } from '../../hooks';
 
 const NounderNounContent: React.FC<{
   mintTimestamp: BigNumber;
@@ -36,7 +36,7 @@ const NounderNounContent: React.FC<{
 
   const isCool = useAppSelector(state => state.application.isCoolBackground);
 
-  // Page through Nouns via keyboard
+  // Page through Niji via keyboard
   // handle what happens on key press
   const handleKeyPress = useCallback(
     event => {
@@ -100,14 +100,14 @@ const NounderNounContent: React.FC<{
                 ` ${nounContentClasses.bidRow}`
               }
             >
-              <Trans>All Noun auction proceeds are sent to the</Trans>{' '}
+              <Trans>All Niji auction proceeds are sent to the</Trans>{' '}
               <Link to="/vote" className={nounContentClasses.link}>
-                <Trans>Nouns DAO</Trans>
+                <Trans>Niji DAO</Trans>
               </Link>
               .{' '}
               <Trans>
                 For this reason, we, the project's founders (‘Nounders’) have chosen to compensate
-                ourselves with Nouns. Every 10th Noun for the first 5 years of the project will be
+                ourselves with Niji. Every 10th Niji for the first 5 years of the project will be
                 sent to our multisig (5/10), where it will be vested and distributed to individual
                 Nounders.
               </Trans>

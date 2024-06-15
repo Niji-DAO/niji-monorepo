@@ -211,7 +211,7 @@ const CandidatePage = ({
             isCandidate={true}
             isWalletConnected={isWalletConnected}
             isUpdateToProposal={isUpdateToProposal}
-            submitButtonClickHandler={() => { }}
+            submitButtonClickHandler={() => {}}
           />
         )}
       </Col>
@@ -256,7 +256,9 @@ const CandidatePage = ({
       {candidate.data && (
         <Row>
           <Col lg={12}>
-            <a className={classes.jump} href="#feedback">Jump to Sponsored Votes and Feedback</a>
+            <a className={classes.jump} href="#feedback">
+              Jump to Sponsored Votes and Feedback
+            </a>
           </Col>
           <Col lg={8} className={clsx(classes.proposal, classes.wrapper)}>
             <ProposalCandidateContent proposal={candidate.data} />

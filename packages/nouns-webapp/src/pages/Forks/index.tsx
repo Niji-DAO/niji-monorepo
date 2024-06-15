@@ -1,12 +1,12 @@
-import React from 'react';
-import { Fork, ForkState, useForks } from '../../wrappers/nounsDao';
-import { Link } from 'react-router-dom';
-import Section from '../../layout/Section';
-import { Col, Row } from 'react-bootstrap';
 import { Trans } from '@lingui/macro';
-import classes from './Forks.module.css';
 import clsx from 'clsx';
+import React from 'react';
+import { Col, Row } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import ForkStatus from '../../components/ForkStatus';
+import Section from '../../layout/Section';
+import { Fork, ForkState, useForks } from '../../wrappers/nounsDao';
+import classes from './Forks.module.css';
 
 type Props = {};
 
@@ -44,7 +44,7 @@ const ForksPage: React.FC<Props> = props => {
               target="_blank"
               rel="noreferrer"
             >
-              Learn more about Nouns Fork
+              Learn more about Niji Fork
             </a>
           </p>
         </Col>
@@ -69,7 +69,7 @@ const ForksPage: React.FC<Props> = props => {
 
                   return (
                     <Link to={`/fork/${fork.id}`} className={classes.forkCard} key={i}>
-                      <div className={classes.title}>Nouns DAO Fork #{fork.id}</div>
+                      <div className={classes.title}>Niji DAO Fork #{fork.id}</div>
                       <div className={clsx(classes.proposalStatusWrapper, classes.votePillWrapper)}>
                         {/* <ForkStatus status={
                       fork.executed ? ForkState.EXECUTED : ForkState.ACTIVE} /> */}

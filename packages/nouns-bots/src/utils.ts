@@ -35,8 +35,8 @@ export async function resolveEnsOrFormatAddress(address: string) {
  */
 export function formatAuctionStartedTweetText(auctionId: number) {
   return `＊Bleep Bloop Blop＊
-        
- An auction has started for Noun #${auctionId}
+
+ An auction has started for Niji #${auctionId}
  Learn more at https://nouns.wtf`;
 }
 
@@ -48,7 +48,7 @@ export function formatAuctionStartedTweetText(auctionId: number) {
  */
 export async function formatBidMessageText(id: number, bid: Bid) {
   const bidder = await resolveEnsOrFormatAddress(bid.bidder.id);
-  return `Noun ${id} has received a bid of Ξ${ethers.utils.formatEther(bid.amount)} from ${bidder}`;
+  return `Niji ${id} has received a bid of Ξ${ethers.utils.formatEther(bid.amount)} from ${bidder}`;
 }
 
 /**
@@ -66,13 +66,13 @@ export function formatNewGovernanceProposalText(proposal: Proposal) {
 }
 
 export function formatUpdatedGovernanceProposalStatusText(proposal: Proposal) {
-  return `Nouns DAO proposal #${proposal.id} (${extractProposalTitle(
+  return `Niji DAO proposal #${proposal.id} (${extractProposalTitle(
     proposal,
   )}) has changed to status: ${proposal.status.toLocaleLowerCase()}`;
 }
 
 export function formatProposalAtRiskOfExpiryText(proposal: Proposal) {
-  return `Nouns DAO proposal #${proposal.id} (${extractProposalTitle(
+  return `Niji DAO proposal #${proposal.id} (${extractProposalTitle(
     proposal,
   )}) expires in less than two days. Please execute it immediately!`;
 }
@@ -86,9 +86,9 @@ export async function formatNewGovernanceVoteText(proposal: Proposal, vote: Vote
 }
 
 /**
- * Get the PNG buffer data of a Noun
+ * Get the PNG buffer data of a Niji
  * @param tokenId The ERC721 token id
- * @returns The png buffer of the Noun or undefined
+ * @returns The png buffer of the Niji or undefined
  */
 export async function getNounPngBuffer(tokenId: string): Promise<Buffer | undefined> {
   const dataURI = await tryF(() => nounsTokenContract.dataURI(tokenId));

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-/// @title The Nouns DAO logic version 3
+/// @title The Niji DAO logic version 3
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -42,7 +42,7 @@
 // - Votes snapshot after voting delay: moving votes snapshot up, to provide Nouners with reaction time per proposal,
 // to get their votes ready (e.g. some might want to move their delegations around).
 // In NounsDAOLogicV2 the vote snapshot block is the proposal creation block.
-// - Nouns fork: any token holder can signal to fork (exit) in response to a governance proposal.
+// - Niji fork: any token holder can signal to fork (exit) in response to a governance proposal.
 // If a quorum of a configured threshold amount of tokens signals to exit, the fork will succeed.
 // This will deploy a new DAO and send part of the treasury to the new DAO.
 //
@@ -450,7 +450,7 @@ contract NounsDAOLogicV3 is NounsDAOStorageV3, NounsDAOEventsV3 {
     }
 
     /**
-     * @notice Current proposal threshold using Noun Total Supply
+     * @notice Current proposal threshold using Niji Total Supply
      * Differs from `GovernerBravo` which uses fixed amount
      */
     function proposalThreshold() public view returns (uint256) {
@@ -464,7 +464,7 @@ contract NounsDAOLogicV3 is NounsDAOStorageV3, NounsDAOEventsV3 {
      */
 
     /**
-     * @notice Escrow Nouns to contribute to the fork threshold
+     * @notice Escrow Niji to contribute to the fork threshold
      * @dev Requires approving the tokenIds or the entire noun token to the DAO contract
      * @param tokenIds the tokenIds to escrow. They will be sent to the DAO once the fork threshold is reached and the escrow is closed.
      * @param proposalIds array of proposal ids which are the reason for wanting to fork. This will only be used to emit event.
@@ -479,7 +479,7 @@ contract NounsDAOLogicV3 is NounsDAOStorageV3, NounsDAOEventsV3 {
     }
 
     /**
-     * @notice Withdraw Nouns from the fork escrow. Only possible if the fork has not been executed.
+     * @notice Withdraw Niji from the fork escrow. Only possible if the fork has not been executed.
      * Only allowed to withdraw tokens that the sender has escrowed.
      * @param tokenIds the tokenIds to withdraw
      */
@@ -891,7 +891,7 @@ contract NounsDAOLogicV3 is NounsDAOStorageV3, NounsDAOEventsV3 {
      *       quorumCoefficient * againstVotesBPS
      * @dev Note the coefficient is a fixed point integer with 6 decimals
      * @param againstVotes Number of against-votes in the proposal
-     * @param adjustedTotalSupply_ The adjusted total supply of Nouns at the time of proposal creation
+     * @param adjustedTotalSupply_ The adjusted total supply of Niji at the time of proposal creation
      * @param params Configurable parameters for calculating the quorum based on againstVotes. See `DynamicQuorumParams` definition for additional details.
      * @return quorumVotes The required quorum
      */
@@ -915,14 +915,14 @@ contract NounsDAOLogicV3 is NounsDAOStorageV3, NounsDAOEventsV3 {
     }
 
     /**
-     * @notice Current min quorum votes using Nouns adjusted total supply
+     * @notice Current min quorum votes using Niji adjusted total supply
      */
     function minQuorumVotes() public view returns (uint256) {
         return ds.minQuorumVotes(ds.adjustedTotalSupply());
     }
 
     /**
-     * @notice Current max quorum votes using Nouns adjusted total supply
+     * @notice Current max quorum votes using Niji adjusted total supply
      */
     function maxQuorumVotes() public view returns (uint256) {
         return ds.maxQuorumVotes(ds.adjustedTotalSupply());

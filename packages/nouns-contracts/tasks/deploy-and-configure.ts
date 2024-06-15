@@ -25,7 +25,7 @@ task('deploy-and-configure', 'Deploy and configure all contracts')
   .addOptionalParam('proposalThresholdBps', 'The proposal threshold (basis points)')
   .addOptionalParam('quorumVotesBps', 'Votes required for quorum (basis points)')
   .setAction(async (args, { run }) => {
-    // Deploy the Nouns DAO contracts and return deployment information
+    // Deploy the Niji DAO contracts and return deployment information
     const contracts = await run('deploy', args);
 
     // Verify the contracts on Etherscan
@@ -50,7 +50,7 @@ task('deploy-and-configure', 'Deploy and configure all contracts')
     );
 
     // Optionally kick off the first auction and transfer ownership of the auction house
-    // to the Nouns DAO executor.
+    // to the Niji DAO executor.
     if (args.startAuction) {
       const auctionHouse = contracts.NounsAuctionHouse.instance.attach(
         contracts.NounsAuctionHouseProxy.address,

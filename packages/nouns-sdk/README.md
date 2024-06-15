@@ -16,7 +16,7 @@ yarn test
 
 ## Usage
 
-The Nouns SDK contains useful tooling for interacting with the Nouns protocol.
+The Niji SDK contains useful tooling for interacting with the Niji protocol.
 
 ### Contracts
 

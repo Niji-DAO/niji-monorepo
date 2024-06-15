@@ -65,7 +65,7 @@ library NounsDAOV3Fork {
     event DAONounsSupplyIncreasedFromEscrow(uint256 numTokens, address to);
 
     /**
-     * @notice Escrow Nouns to contribute to the fork threshold
+     * @notice Escrow Niji to contribute to the fork threshold
      * @dev Requires approving the tokenIds or the entire noun token to the DAO contract
      * @param tokenIds the tokenIds to escrow. They will be sent to the DAO once the fork threshold is reached and the escrow is closed.
      * @param proposalIds array of proposal ids which are the reason for wanting to fork. This will only be used to emit event.
@@ -88,7 +88,7 @@ library NounsDAOV3Fork {
     }
 
     /**
-     * @notice Withdraw Nouns from the fork escrow. Only possible if the fork has not been executed.
+     * @notice Withdraw Niji from the fork escrow. Only possible if the fork has not been executed.
      * Only allowed to withdraw tokens that the sender has escrowed.
      * @param tokenIds the tokenIds to withdraw
      */

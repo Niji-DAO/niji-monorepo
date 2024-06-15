@@ -1,8 +1,8 @@
-import { task, types } from 'hardhat/config';
-import { ContractNamesDAOV3, DeployedContract } from './types';
-import { readFileSync, writeFileSync } from 'fs';
 import { execSync } from 'child_process';
+import { readFileSync, writeFileSync } from 'fs';
+import { task, types } from 'hardhat/config';
 import { join } from 'path';
+import { ContractNamesDAOV3, DeployedContract } from './types';
 
 task('update-configs-dao-v3', 'Write the deployed addresses to the SDK and subgraph configs')
   .addParam('contracts', 'Contract objects from the deployment', undefined, types.json)
@@ -38,7 +38,7 @@ task('update-configs-dao-v3', 'Write the deployed addresses to the SDK and subgr
       } catch {
         console.log('Failed to re-build `@nouns/sdk`. Please rebuild manually.');
       }
-      console.log('Addresses written to the Nouns SDK.');
+      console.log('Addresses written to the Niji SDK.');
 
       // Generate subgraph config
       const configName = `${network}-fork`;

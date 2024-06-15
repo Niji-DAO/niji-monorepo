@@ -1,12 +1,12 @@
+import { CakeIcon } from '@heroicons/react/solid';
+import { Trans } from '@lingui/macro';
 import React from 'react';
 import { buildEtherscanTxLink } from '../../../../utils/etherscan';
 import { NounWinEvent } from '../../../../wrappers/nounActivity';
-import classes from './MobileNounWinEvent.module.css';
-import MobileNounActivityRow from '../../activityRow/MobileNounActivityRow';
-import { CakeIcon } from '@heroicons/react/solid';
 import ShortAddress from '../../../ShortAddress';
+import MobileNounActivityRow from '../../activityRow/MobileNounActivityRow';
 import TransactionHashPill from '../../eventData/infoPills/TransactionHashPill';
-import { Trans } from '@lingui/macro';
+import classes from './MobileNounWinEvent.module.css';
 
 interface MobileNounWinEventProps {
   event: NounWinEvent;
@@ -28,7 +28,7 @@ const MobileNounWinEvent: React.FC<MobileNounWinEventProps> = props => {
         <>
           {isNounderNoun ? (
             <Trans>
-              <span className={classes.bold}> Noun {event.nounId} </span> sent to{' '}
+              <span className={classes.bold}> Niji {event.nounId} </span> sent to{' '}
               <span className={classes.bold}>
                 {' '}
                 <ShortAddress address={event.winner} />
@@ -36,7 +36,7 @@ const MobileNounWinEvent: React.FC<MobileNounWinEventProps> = props => {
             </Trans>
           ) : (
             <Trans>
-              <span className={classes.bold}> Noun {event.nounId} </span> won by{' '}
+              <span className={classes.bold}> Niji {event.nounId} </span> won by{' '}
               <span className={classes.bold}>
                 {' '}
                 <ShortAddress address={event.winner} />

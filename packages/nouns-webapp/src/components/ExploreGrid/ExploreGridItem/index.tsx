@@ -1,6 +1,6 @@
+import { BigNumber } from 'ethers';
 import React, { useState } from 'react';
 import Placeholder from 'react-bootstrap/Placeholder';
-import { BigNumber } from 'ethers';
 import { StandaloneNounImage } from '../../StandaloneNoun';
 
 interface ExploreGridItemProps {
@@ -20,7 +20,7 @@ const ExploreGridItem: React.FC<ExploreGridItemProps> = React.forwardRef(
           style={isImageLoaded ? {} : { display: 'none' }}
           onLoad={() => setIsImageLoaded(true)}
           onError={() => setIsImageError(true)}
-          alt={`Noun #${props.nounId}`}
+          alt={`Niji #${props.nounId}`}
         />
 
         {/* Show placeholder until image is loaded */}
@@ -34,7 +34,7 @@ const ExploreGridItem: React.FC<ExploreGridItemProps> = React.forwardRef(
           <Placeholder xs={12} animation="glow" />
         </div>
 
-        {/* If image can't be loaded, fetch Noun image internally */}
+        {/* If image can't be loaded, fetch Niji image internally */}
         {isImageError && props.nounId && (
           <StandaloneNounImage nounId={BigNumber.from(props.nounId)} />
         )}

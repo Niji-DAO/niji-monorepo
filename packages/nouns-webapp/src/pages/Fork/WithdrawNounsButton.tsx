@@ -1,11 +1,11 @@
-import { ReactNode, useCallback, useEffect, useState } from 'react';
-import clsx from 'clsx';
-import classes from './Fork.module.css';
-import { useWithdrawFromForkEscrow } from '../../wrappers/nounsDao';
 import { Trans } from '@lingui/macro';
 import { TransactionStatus } from '@usedapp/core';
+import clsx from 'clsx';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import SolidColorBackgroundModal from '../../components/SolidColorBackgroundModal';
 import { buildEtherscanTxLink } from '../../utils/etherscan';
+import { useWithdrawFromForkEscrow } from '../../wrappers/nounsDao';
+import classes from './Fork.module.css';
 
 type Props = {
   tokenIds: number[];
@@ -73,9 +73,9 @@ function WithdrawNounsButton(props: Props) {
   const modalContent = (
     <div className={classes.transactionModal}>
       <h2 className={classes.transactionModalTitle}>
-        <Trans>Withdraw Nouns from escrow</Trans>
+        <Trans>Withdraw Niji from escrow</Trans>
       </h2>
-      <p>Withdrawing {props.tokenIds.map(nounId => `Noun ${nounId}`).join(', ')}</p>
+      <p>Withdrawing {props.tokenIds.map(nounId => `Niji ${nounId}`).join(', ')}</p>
       <p
         className={clsx(
           classes.transactionStatus,
@@ -107,7 +107,7 @@ function WithdrawNounsButton(props: Props) {
         )}
         {isTxSuccessful && (
           <>
-            Success! Your Nouns have been withdrawn.
+            Success! Your Niji have been withdrawn.
             {withdrawFromForkEscrowState.transaction && (
               <a
                 href={`${buildEtherscanTxLink(withdrawFromForkEscrowState.transaction.hash)}`}
@@ -136,7 +136,7 @@ function WithdrawNounsButton(props: Props) {
         }}
         disabled={isLoading || isWaiting}
       >
-        <Trans>Withdraw Nouns from escrow</Trans>
+        <Trans>Withdraw Niji from escrow</Trans>
       </button>
       <SolidColorBackgroundModal
         show={props.isWithdrawModalOpen}

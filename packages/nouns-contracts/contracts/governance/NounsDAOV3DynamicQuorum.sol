@@ -51,7 +51,7 @@ library NounsDAOV3DynamicQuorum {
      *       quorumCoefficient * againstVotesBPS
      * @dev Note the coefficient is a fixed point integer with 6 decimals
      * @param againstVotes Number of against-votes in the proposal
-     * @param totalSupply The total supply of Nouns at the time of proposal creation
+     * @param totalSupply The total supply of Niji at the time of proposal creation
      * @param params Configurable parameters for calculating the quorum based on againstVotes. See `DynamicQuorumParams` definition for additional details.
      * @return quorumVotes The required quorum
      */
@@ -121,7 +121,7 @@ library NounsDAOV3DynamicQuorum {
     }
 
     /**
-     * @notice Current min quorum votes using Nouns adjusted total supply
+     * @notice Current min quorum votes using Niji adjusted total supply
      */
     function minQuorumVotes(NounsDAOStorageV3.StorageV3 storage ds, uint256 adjustedTotalSupply)
         internal
@@ -132,7 +132,7 @@ library NounsDAOV3DynamicQuorum {
     }
 
     /**
-     * @notice Current max quorum votes using Nouns adjusted total supply
+     * @notice Current max quorum votes using Niji adjusted total supply
      */
     function maxQuorumVotes(NounsDAOStorageV3.StorageV3 storage ds, uint256 adjustedTotalSupply)
         internal

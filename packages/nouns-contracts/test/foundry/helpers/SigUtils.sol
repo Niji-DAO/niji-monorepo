@@ -43,7 +43,7 @@ contract SigUtils is Test {
                 expirationTimestamps,
                 proposalParams,
                 verifyingContract,
-                'Nouns DAO'
+                'Niji DAO'
             );
     }
 
@@ -103,7 +103,7 @@ contract SigUtils is Test {
         uint256 expirationTimestamp,
         address verifyingContract
     ) public returns (bytes memory) {
-        return signProposal(proposer, signerPK, txs, description, expirationTimestamp, verifyingContract, 'Nouns DAO');
+        return signProposal(proposer, signerPK, txs, description, expirationTimestamp, verifyingContract, 'Niji DAO');
     }
 
     function signProposal(

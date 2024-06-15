@@ -1,35 +1,34 @@
+import { ClockIcon } from '@heroicons/react/solid';
+import { i18n } from '@lingui/core';
+import { Trans } from '@lingui/macro';
+import { useBlockNumber, useEthers } from '@usedapp/core';
+import clsx from 'clsx';
+import dayjs from 'dayjs';
+import en from 'dayjs/locale/en';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { useEffect, useState } from 'react';
+import { Alert, Button, Col, Container, Row, Spinner } from 'react-bootstrap';
+import { Link, useHistory, useLocation } from 'react-router-dom';
+import config from '../../config';
+import { useActiveLocale } from '../../hooks/useActivateLocale';
+import { SUPPORTED_LOCALE_TO_DAYSJS_LOCALE, SupportedLocale } from '../../i18n/locales';
+import Section from '../../layout/Section';
+import { AVERAGE_BLOCK_TIME_IN_SECS } from '../../utils/constants';
+import { isMobileScreen } from '../../utils/isMobile';
+import { isProposalUpdatable } from '../../utils/proposals';
 import {
   PartialProposal,
   ProposalState,
   useIsDaoGteV3,
   useProposalThreshold,
 } from '../../wrappers/nounsDao';
-import { Alert, Button, Col, Container, Row, Spinner } from 'react-bootstrap';
-import ProposalStatus from '../ProposalStatus';
-import classes from './Proposals.module.css';
-import { useHistory, useLocation } from 'react-router-dom';
-import { useBlockNumber, useEthers } from '@usedapp/core';
-import { isMobileScreen } from '../../utils/isMobile';
-import clsx from 'clsx';
-import { useNounTokenBalance, useUserVotes } from '../../wrappers/nounToken';
-import { Trans } from '@lingui/macro';
-import { ClockIcon } from '@heroicons/react/solid';
-import proposalStatusClasses from '../ProposalStatus/ProposalStatus.module.css';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import { useActiveLocale } from '../../hooks/useActivateLocale';
-import { SUPPORTED_LOCALE_TO_DAYSJS_LOCALE, SupportedLocale } from '../../i18n/locales';
-import { useEffect, useState } from 'react';
-import DelegationModal from '../DelegationModal';
-import { i18n } from '@lingui/core';
-import en from 'dayjs/locale/en';
-import { AVERAGE_BLOCK_TIME_IN_SECS } from '../../utils/constants';
-import Section from '../../layout/Section';
-import CandidateCard from '../CandidateCard';
-import { Link } from 'react-router-dom';
 import { useCandidateProposals } from '../../wrappers/nounsData';
-import { isProposalUpdatable } from '../../utils/proposals';
-import config from '../../config';
+import { useNounTokenBalance, useUserVotes } from '../../wrappers/nounToken';
+import CandidateCard from '../CandidateCard';
+import DelegationModal from '../DelegationModal';
+import ProposalStatus from '../ProposalStatus';
+import proposalStatusClasses from '../ProposalStatus/ProposalStatus.module.css';
+import classes from './Proposals.module.css';
 
 dayjs.extend(relativeTime);
 
@@ -42,17 +41,17 @@ const getCountdownCopy = (
   const startDate =
     proposal && timestamp && currentBlock
       ? dayjs(timestamp).add(
-        AVERAGE_BLOCK_TIME_IN_SECS * (proposal.startBlock - currentBlock),
-        'seconds',
-      )
+          AVERAGE_BLOCK_TIME_IN_SECS * (proposal.startBlock - currentBlock),
+          'seconds',
+        )
       : undefined;
 
   const endDate =
     proposal && timestamp && currentBlock
       ? dayjs(timestamp).add(
-        AVERAGE_BLOCK_TIME_IN_SECS * (proposal.endBlock - currentBlock),
-        'seconds',
-      )
+          AVERAGE_BLOCK_TIME_IN_SECS * (proposal.endBlock - currentBlock),
+          'seconds',
+        )
       : undefined;
 
   const expiresDate = proposal && dayjs(proposal.eta).add(14, 'days');
@@ -334,8 +333,8 @@ const Proposals = ({
                         );
                         let isOriginalPropUpdatable =
                           prop &&
-                            blockNumber &&
-                            isProposalUpdatable(prop?.status, prop?.updatePeriodEndBlock, blockNumber)
+                          blockNumber &&
+                          isProposalUpdatable(prop?.status, prop?.updatePeriodEndBlock, blockNumber)
                             ? true
                             : false;
                         if (!isOriginalPropUpdatable) return null;
@@ -382,7 +381,7 @@ const Proposals = ({
                 <p>
                   <Trans>
                     Proposal candidates can be created by anyone. If a candidate receives enough
-                    signatures by Nouns voters, it can be promoted to a proposal.
+                    signatures by Niji voters, it can be promoted to a proposal.
                   </Trans>
                 </p>
                 <Link to="/create-candidate" className={clsx(classes.button)}>

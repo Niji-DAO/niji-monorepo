@@ -1,10 +1,10 @@
-import { config } from './config';
+import { NounsTokenABI } from '@nouns/contracts';
+import axios from 'axios';
+import Discord from 'discord.js';
+import { Contract, providers } from 'ethers';
 import Redis from 'ioredis';
 import TwitterApi from 'twitter-api-v2';
-import { Contract, providers } from 'ethers';
-import { NounsTokenABI } from '@nouns/contracts';
-import Discord from 'discord.js';
-import axios from 'axios';
+import { config } from './config';
 
 /**
  * Redis Client
@@ -30,7 +30,7 @@ export const twitter = new TwitterApi({
 export const jsonRpcProvider = new providers.JsonRpcProvider(config.jsonRpcUrl);
 
 /**
- * Nouns ERC721 Token Contract
+ * Niji ERC721 Token Contract
  */
 export const nounsTokenContract = new Contract(
   config.nounsTokenAddress,
@@ -57,7 +57,7 @@ export const publicDiscordWebhook = new Discord.WebhookClient(
 );
 
 /**
- * Increment one of the Nouns infra counters
+ * Increment one of the Niji infra counters
  * @param counterName counter name to increment
  * @returns
  */

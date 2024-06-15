@@ -1,34 +1,38 @@
-import { useAppSelector } from '../../hooks';
-import classes from './NavBar.module.css';
-import noggles from '../../assets/noggles.svg';
+import {
+  faBookOpen,
+  faCodeFork,
+  faComments,
+  faFile,
+  faPenToSquare,
+  faPlay,
+  faUsers,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Trans } from '@lingui/macro';
+import clsx from 'clsx';
+import { utils } from 'ethers';
+import { useState } from 'react';
+import { Container, Dropdown, Nav, Navbar } from 'react-bootstrap';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
-import { Nav, Navbar, Container } from 'react-bootstrap';
+import { ReactComponent as Noggles } from '../../assets/icons/Noggles.svg';
+import noggles from '../../assets/noggles.svg';
 import testnetNoun from '../../assets/testnet-noun.png';
 import config, { CHAIN_ID } from '../../config';
-import { utils } from 'ethers';
-import { buildEtherscanHoldingsLink } from '../../utils/etherscan';
-import { ExternalURL, externalURL } from '../../utils/externalURL';
-import NavBarButton, { NavBarButtonStyle } from '../NavBarButton';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBookOpen, faCodeFork, faFile, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
-import { faUsers } from '@fortawesome/free-solid-svg-icons';
-import { faComments } from '@fortawesome/free-solid-svg-icons';
-import { faPlay } from '@fortawesome/free-solid-svg-icons';
-import NavBarTreasury from '../NavBarTreasury';
-import NavWallet from '../NavWallet';
-import { Trans } from '@lingui/macro';
-import { useState } from 'react';
-import NavLocaleSwitcher from '../NavLocaleSwitcher';
-import NavDropdown from '../NavDropdown';
-import { Dropdown } from 'react-bootstrap';
-import navDropdownClasses from '../NavWallet/NavBarDropdown.module.css';
+import { useAppSelector } from '../../hooks';
+import { useTreasuryBalance } from '../../hooks/useTreasuryBalance';
 import responsiveUiUtilsClasses from '../../utils/ResponsiveUIUtils.module.css';
 import { usePickByState } from '../../utils/colorResponsiveUIUtils';
-import { ReactComponent as Noggles } from '../../assets/icons/Noggles.svg';
-import { useTreasuryBalance } from '../../hooks/useTreasuryBalance';
-import clsx from 'clsx';
+import { buildEtherscanHoldingsLink } from '../../utils/etherscan';
+import { ExternalURL, externalURL } from '../../utils/externalURL';
 import { useIsDaoGteV3 } from '../../wrappers/nounsDao';
+import NavBarButton, { NavBarButtonStyle } from '../NavBarButton';
+import NavBarTreasury from '../NavBarTreasury';
+import NavDropdown from '../NavDropdown';
+import NavLocaleSwitcher from '../NavLocaleSwitcher';
+import NavWallet from '../NavWallet';
+import navDropdownClasses from '../NavWallet/NavBarDropdown.module.css';
+import classes from './NavBar.module.css';
 
 const NavBar = () => {
   const isDaoGteV3 = useIsDaoGteV3();
@@ -50,8 +54,8 @@ const NavBar = () => {
   const nonWalletButtonStyle = !useStateBg
     ? NavBarButtonStyle.WHITE_INFO
     : isCool
-      ? NavBarButtonStyle.COOL_INFO
-      : NavBarButtonStyle.WARM_INFO;
+    ? NavBarButtonStyle.COOL_INFO
+    : NavBarButtonStyle.WARM_INFO;
 
   const closeNav = () => setIsNavExpanded(false);
   const buttonClasses = usePickByState(
@@ -106,7 +110,7 @@ const NavBar = () => {
         <Container style={{ maxWidth: 'unset' }}>
           <div className={classes.brandAndTreasuryWrapper}>
             <Navbar.Brand as={Link} to="/" className={classes.navBarBrand}>
-              <img src={noggles} className={classes.navBarLogo} alt="Nouns DAO noggles" />
+              <img src={noggles} className={classes.navBarLogo} alt="Niji DAO noggles" />
             </Navbar.Brand>
             {Number(CHAIN_ID) !== 1 && (
               <Nav.Item>
@@ -236,7 +240,7 @@ const NavBar = () => {
                 onClick={closeNav}
               >
                 <NavBarButton
-                  buttonText={<Trans>Nouns &amp; Traits</Trans>}
+                  buttonText={<Trans>Niji &amp; Traits</Trans>}
                   buttonIcon={<Noggles />}
                   buttonStyle={nonWalletButtonStyle}
                 />
@@ -259,7 +263,7 @@ const NavBar = () => {
                   )}
                   href="/explore"
                 >
-                  Nouns &amp; Traits
+                  Niji &amp; Traits
                 </Dropdown.Item>
                 <Dropdown.Item
                   className={clsx(

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title The Nouns DAO auction house, supporting UUPS upgrades
+/// @title The Niji DAO auction house, supporting UUPS upgrades
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -47,7 +47,7 @@ contract NounsAuctionHouseFork is
 {
     string public constant NAME = 'NounsAuctionHouseFork';
 
-    // The Nouns ERC721 token contract
+    // The Niji ERC721 token contract
     INounsToken public nouns;
 
     // The address of the WETH contract
@@ -99,7 +99,7 @@ contract NounsAuctionHouseFork is
     }
 
     /**
-     * @notice Settle the current auction, mint a new Noun, and put it up for auction.
+     * @notice Settle the current auction, mint a new Niji, and put it up for auction.
      */
     function settleCurrentAndCreateNewAuction() external override nonReentrant whenNotPaused {
         _settleAuction();
@@ -115,13 +115,13 @@ contract NounsAuctionHouseFork is
     }
 
     /**
-     * @notice Create a bid for a Noun, with a given amount.
+     * @notice Create a bid for a Niji, with a given amount.
      * @dev This contract only accepts payment in ETH.
      */
     function createBid(uint256 nounId) external payable override nonReentrant {
         INounsAuctionHouse.Auction memory _auction = auction;
 
-        require(_auction.nounId == nounId, 'Noun not up for auction');
+        require(_auction.nounId == nounId, 'Niji not up for auction');
         require(block.timestamp < _auction.endTime, 'Auction expired');
         require(msg.value >= reservePrice, 'Must send at least reservePrice');
         require(
@@ -153,7 +153,7 @@ contract NounsAuctionHouseFork is
     }
 
     /**
-     * @notice Pause the Nouns auction house.
+     * @notice Pause the Niji auction house.
      * @dev This function can only be called by the owner when the
      * contract is unpaused. While no new auctions can be started when paused,
      * anyone can settle an ongoing auction.
@@ -163,7 +163,7 @@ contract NounsAuctionHouseFork is
     }
 
     /**
-     * @notice Unpause the Nouns auction house.
+     * @notice Unpause the Niji auction house.
      * @dev This function can only be called by the owner when the
      * contract is paused. If required, this function will start a new auction.
      */
@@ -233,7 +233,7 @@ contract NounsAuctionHouseFork is
 
     /**
      * @notice Settle an auction, finalizing the bid and paying out to the owner.
-     * @dev If there are no bids, the Noun is burned.
+     * @dev If there are no bids, the Niji is burned.
      */
     function _settleAuction() internal {
         INounsAuctionHouse.Auction memory _auction = auction;
@@ -277,7 +277,7 @@ contract NounsAuctionHouseFork is
     }
 
     /**
-     * @dev Reverts when `msg.sender` is not the owner of this contract; in the case of Noun DAOs it should be the
+     * @dev Reverts when `msg.sender` is not the owner of this contract; in the case of Niji DAOs it should be the
      * DAO's treasury contract.
      */
     function _authorizeUpgrade(address) internal view override onlyOwner {}

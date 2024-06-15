@@ -1,9 +1,9 @@
-import { default as NounsAuctionHouseABI } from '../abi/contracts/NounsAuctionHouse.sol/NounsAuctionHouse.json';
-import { ChainId, ContractDeployment, ContractName, DeployedContract } from './types';
+import { constants } from 'ethers';
 import { Interface } from 'ethers/lib/utils';
 import { task, types } from 'hardhat/config';
-import { constants } from 'ethers';
 import promptjs from 'prompt';
+import { default as NounsAuctionHouseABI } from '../abi/contracts/NounsAuctionHouse.sol/NounsAuctionHouse.json';
+import { ChainId, ContractDeployment, ContractName, DeployedContract } from './types';
 
 promptjs.colors = false;
 promptjs.message = '> ';
@@ -197,7 +197,7 @@ task('deploy', 'Deploys NFTDescriptor, NounsDescriptor, NounsSeeder, and NounsTo
           const actual = deployment.NounsDAOProxy.address.toLowerCase();
           if (expected !== actual) {
             throw new Error(
-              `Unexpected Nouns DAO proxy address. Expected: ${expected}. Actual: ${actual}.`,
+              `Unexpected Niji DAO proxy address. Expected: ${expected}. Actual: ${actual}.`,
             );
           }
         },

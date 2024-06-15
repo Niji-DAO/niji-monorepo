@@ -1,43 +1,44 @@
-import { ethers, network } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { ethers, network } from 'hardhat';
 import {
+  Inflator__factory,
+  NounsArt__factory as NounsArtFactory,
+  NounsDAOExecutor,
+  NounsDAOExecutor__factory as NounsDaoExecutorFactory,
+  NounsDAOForkEscrow__factory as NounsDAOForkEscrowFactory,
+  NounsDAOLogicV1,
+  NounsDAOLogicV1__factory as NounsDaoLogicV1Factory,
+  NounsDAOLogicV1Harness,
+  NounsDAOLogicV1Harness__factory as NounsDaoLogicV1HarnessFactory,
+  NounsDAOLogicV2,
+  NounsDAOLogicV2__factory as NounsDaoLogicV2Factory,
+  NounsDAOLogicV3,
+  NounsDAOLogicV3__factory as NounsDaoLogicV3Factory,
+  NounsDAOProxy__factory as NounsDaoProxyFactory,
+  NounsDAOProxyV2__factory as NounsDaoProxyV2Factory,
+  NounsDAOProxyV3__factory as NounsDaoProxyV3Factory,
+  NounsDAOStorageV2,
   NounsDescriptor,
   NounsDescriptor__factory as NounsDescriptorFactory,
   NounsDescriptorV2,
   NounsDescriptorV2__factory as NounsDescriptorV2Factory,
-  NounsToken,
-  NounsToken__factory as NounsTokenFactory,
   NounsSeeder,
   NounsSeeder__factory as NounsSeederFactory,
+  NounsToken,
+  NounsToken__factory as NounsTokenFactory,
+  SVGRenderer__factory as SVGRendererFactory,
   WETH,
   WETH__factory as WethFactory,
-  NounsDAOLogicV1,
-  NounsDAOLogicV1Harness__factory as NounsDaoLogicV1HarnessFactory,
-  NounsDAOLogicV2,
-  NounsDAOLogicV2__factory as NounsDaoLogicV2Factory,
-  NounsDAOProxy__factory as NounsDaoProxyFactory,
-  NounsDAOLogicV1Harness,
-  NounsDAOProxyV2__factory as NounsDaoProxyV2Factory,
-  NounsArt__factory as NounsArtFactory,
-  SVGRenderer__factory as SVGRendererFactory,
-  NounsDAOExecutor__factory as NounsDaoExecutorFactory,
-  NounsDAOLogicV1__factory as NounsDaoLogicV1Factory,
-  NounsDAOExecutor,
-  Inflator__factory,
-  NounsDAOStorageV2,
-  NounsDAOLogicV3,
-  NounsDAOLogicV3__factory as NounsDaoLogicV3Factory,
-  NounsDAOProxyV3__factory as NounsDaoProxyV3Factory,
-  NounsDAOForkEscrow__factory as NounsDAOForkEscrowFactory,
 } from '../typechain';
-import ImageData from '../files/image-data-v1.json';
-import ImageDataV2 from '../files/image-data-v2.json';
+// import ImageData from '../files/image-data-v1.json';
+// import ImageDataV2 from '../files/image-data-v2.json';
 import { Block } from '@ethersproject/abstract-provider';
+import { BigNumber } from 'ethers';
 import { deflateRawSync } from 'zlib';
+import { default as ImageData, default as ImageDataV2 } from '../files/image-data-v32.json';
 import { chunkArray } from '../utils';
 import { MAX_QUORUM_VOTES_BPS, MIN_QUORUM_VOTES_BPS } from './constants';
 import { DynamicQuorumParams } from './types';
-import { BigNumber } from 'ethers';
 
 export type TestSigners = {
   deployer: SignerWithAddress;
@@ -133,52 +134,143 @@ export const deployWeth = async (deployer?: SignerWithAddress): Promise<WETH> =>
 
 export const populateDescriptor = async (nounsDescriptor: NounsDescriptor): Promise<void> => {
   const { bgcolors, palette, images } = ImageData;
-  const { bodies, accessories, heads, glasses } = images;
+  const {
+    backgroundDecorations,
+    specials,
+    leftHands,
+    backs,
+    ears,
+    chokers,
+    clothes,
+    hairs,
+    headphones,
+    hats,
+    backDecorations,
+  } = images;
 
   // Split up head and accessory population due to high gas usage
   await Promise.all([
     nounsDescriptor.addManyBackgrounds(bgcolors),
     nounsDescriptor.addManyColorsToPalette(0, palette),
-    nounsDescriptor.addManyBodies(bodies.map(({ data }) => data)),
-    chunkArray(accessories, 10).map(chunk =>
-      nounsDescriptor.addManyAccessories(chunk.map(({ data }) => data)),
+    nounsDescriptor.addManyBackgroundDecorations(backgroundDecorations.map(({ data }) => data)),
+    chunkArray(specials, 10).map(chunk =>
+      nounsDescriptor.addManySpecials(chunk.map(({ data }) => data)),
     ),
-    chunkArray(heads, 10).map(chunk => nounsDescriptor.addManyHeads(chunk.map(({ data }) => data))),
-    nounsDescriptor.addManyGlasses(glasses.map(({ data }) => data)),
+    chunkArray(leftHands, 10).map(chunk =>
+      nounsDescriptor.addManyLeftHands(chunk.map(({ data }) => data)),
+    ),
+    chunkArray(backs, 10).map(chunk => nounsDescriptor.addManyBacks(chunk.map(({ data }) => data))),
+    chunkArray(ears, 10).map(chunk => nounsDescriptor.addManyEars(chunk.map(({ data }) => data))),
+    chunkArray(chokers, 10).map(chunk =>
+      nounsDescriptor.addManyChokers(chunk.map(({ data }) => data)),
+    ),
+    chunkArray(clothes, 10).map(chunk =>
+      nounsDescriptor.addManyClothes(chunk.map(({ data }) => data)),
+    ),
+    chunkArray(hairs, 10).map(chunk => nounsDescriptor.addManyHairs(chunk.map(({ data }) => data))),
+    chunkArray(headphones, 10).map(chunk =>
+      nounsDescriptor.addManyHeadphones(chunk.map(({ data }) => data)),
+    ),
+    chunkArray(hats, 10).map(chunk => nounsDescriptor.addManyHats(chunk.map(({ data }) => data))),
+    chunkArray(backDecorations, 10).map(chunk =>
+      nounsDescriptor.addManyBackDecorations(chunk.map(({ data }) => data)),
+    ),
   ]);
 };
 
 export const populateDescriptorV2 = async (nounsDescriptor: NounsDescriptorV2): Promise<void> => {
   const { bgcolors, palette, images } = ImageDataV2;
-  const { bodies, accessories, heads, glasses } = images;
+  const {
+    backgroundDecorations,
+    specials,
+    leftHands,
+    backs,
+    ears,
+    chokers,
+    clothes,
+    hairs,
+    headphones,
+    hats,
+    backDecorations,
+  } = images;
 
   const {
-    encodedCompressed: bodiesCompressed,
-    originalLength: bodiesLength,
-    itemCount: bodiesCount,
-  } = dataToDescriptorInput(bodies.map(({ data }) => data));
+    encodedCompressed: backgroundDecorationsCompressed,
+    originalLength: backgroundDecorationsLength,
+    itemCount: backgroundDecorationsCount,
+  } = dataToDescriptorInput(backgroundDecorations.map(({ data }) => data));
   const {
-    encodedCompressed: accessoriesCompressed,
-    originalLength: accessoriesLength,
-    itemCount: accessoriesCount,
-  } = dataToDescriptorInput(accessories.map(({ data }) => data));
+    encodedCompressed: specialsCompressed,
+    originalLength: specialsLength,
+    itemCount: specialsCount,
+  } = dataToDescriptorInput(specials.map(({ data }) => data));
   const {
-    encodedCompressed: headsCompressed,
-    originalLength: headsLength,
-    itemCount: headsCount,
-  } = dataToDescriptorInput(heads.map(({ data }) => data));
+    encodedCompressed: leftHandsCompressed,
+    originalLength: leftHandsLength,
+    itemCount: leftHandsCount,
+  } = dataToDescriptorInput(leftHands.map(({ data }) => data));
   const {
-    encodedCompressed: glassesCompressed,
-    originalLength: glassesLength,
-    itemCount: glassesCount,
-  } = dataToDescriptorInput(glasses.map(({ data }) => data));
+    encodedCompressed: backsCompressed,
+    originalLength: backsLength,
+    itemCount: backsCount,
+  } = dataToDescriptorInput(backs.map(({ data }) => data));
+  const {
+    encodedCompressed: earsCompressed,
+    originalLength: earsLength,
+    itemCount: earsCount,
+  } = dataToDescriptorInput(ears.map(({ data }) => data));
+  const {
+    encodedCompressed: chokersCompressed,
+    originalLength: chokersLength,
+    itemCount: chokersCount,
+  } = dataToDescriptorInput(chokers.map(({ data }) => data));
+  const {
+    encodedCompressed: clothesCompressed,
+    originalLength: clothesLength,
+    itemCount: clothesCount,
+  } = dataToDescriptorInput(clothes.map(({ data }) => data));
+  const {
+    encodedCompressed: hairsCompressed,
+    originalLength: hairsLength,
+    itemCount: hairsCount,
+  } = dataToDescriptorInput(hairs.map(({ data }) => data));
+  const {
+    encodedCompressed: headphonesCompressed,
+    originalLength: headphonesLength,
+    itemCount: headphonesCount,
+  } = dataToDescriptorInput(headphones.map(({ data }) => data));
+  const {
+    encodedCompressed: hatsCompressed,
+    originalLength: hatsLength,
+    itemCount: hatsCount,
+  } = dataToDescriptorInput(hats.map(({ data }) => data));
+  const {
+    encodedCompressed: backDecorationsCompressed,
+    originalLength: backDecorationsLength,
+    itemCount: backDecorationsCount,
+  } = dataToDescriptorInput(backDecorations.map(({ data }) => data));
 
   await nounsDescriptor.addManyBackgrounds(bgcolors);
   await nounsDescriptor.setPalette(0, `0x000000${palette.join('')}`);
-  await nounsDescriptor.addBodies(bodiesCompressed, bodiesLength, bodiesCount);
-  await nounsDescriptor.addAccessories(accessoriesCompressed, accessoriesLength, accessoriesCount);
-  await nounsDescriptor.addHeads(headsCompressed, headsLength, headsCount);
-  await nounsDescriptor.addGlasses(glassesCompressed, glassesLength, glassesCount);
+  await nounsDescriptor.addBackgroundDecorations(
+    backgroundDecorationsCompressed,
+    backgroundDecorationsLength,
+    backgroundDecorationsCount,
+  );
+  await nounsDescriptor.addSpecials(specialsCompressed, specialsLength, specialsCount);
+  await nounsDescriptor.addLeftHands(leftHandsCompressed, leftHandsLength, leftHandsCount);
+  await nounsDescriptor.addBacks(backsCompressed, backsLength, backsCount);
+  await nounsDescriptor.addEars(earsCompressed, earsLength, earsCount);
+  await nounsDescriptor.addChokers(chokersCompressed, chokersLength, chokersCount);
+  await nounsDescriptor.addClothes(clothesCompressed, clothesLength, clothesCount);
+  await nounsDescriptor.addHairs(hairsCompressed, hairsLength, hairsCount);
+  await nounsDescriptor.addHeadphones(headphonesCompressed, headphonesLength, headphonesCount);
+  await nounsDescriptor.addHats(hatsCompressed, hatsLength, hatsCount);
+  await nounsDescriptor.addBackDecorations(
+    backDecorationsCompressed,
+    backDecorationsLength,
+    backDecorationsCount,
+  );
 };
 
 export const deployGovAndToken = async (
@@ -214,7 +306,7 @@ export const deployGovAndToken = async (
 
   // Deploy Delegate
   const { address: govDelegateAddress } = await new NounsDaoLogicV1Factory(deployer).deploy();
-  // Deploy Nouns token
+  // Deploy Niji token
   const token = await deployNounsToken(deployer);
 
   // Deploy Delegator
@@ -258,7 +350,7 @@ export const deployGovV2AndToken = async (
 
   // Deploy Delegate
   const { address: govDelegateAddress } = await new NounsDaoLogicV2Factory(deployer).deploy();
-  // Deploy Nouns token
+  // Deploy Niji token
   const token = await deployNounsToken(deployer);
 
   // Deploy Delegator
@@ -283,9 +375,9 @@ export const deployGovV2AndToken = async (
 };
 
 /**
- * Return a function used to mint `amount` Nouns on the provided `token`
- * @param token The Nouns ERC721 token
- * @param amount The number of Nouns to mint
+ * Return a function used to mint `amount` Niji on the provided `token`
+ * @param token The Niji ERC721 token
+ * @param amount The number of Niji to mint
  */
 export const MintNouns = (
   token: NounsToken,

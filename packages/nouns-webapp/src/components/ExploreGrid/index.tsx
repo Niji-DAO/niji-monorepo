@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import classes from './ExploreGrid.module.css';
 import cx from 'classnames';
-import ExploreGridItem from './ExploreGridItem';
+import React, { useEffect, useState } from 'react';
 import Placeholder from 'react-bootstrap/esm/Placeholder';
+import classes from './ExploreGrid.module.css';
+import ExploreGridItem from './ExploreGridItem';
 
 interface ExploreGridProps {
   nounCount: number;
@@ -13,7 +13,7 @@ interface ExploreGridProps {
   setNounsList: Function;
   handleFocusNoun: Function;
   isNounHoverDisabled: boolean;
-  nounsList: Noun[];
+  nounsList: Niji[];
   sortOrder: string;
   buttonsRef: React.MutableRefObject<(HTMLButtonElement | null)[]>;
 }
@@ -24,21 +24,21 @@ type NounPic = {
   svg: string | undefined;
 };
 
-type Noun = {
+type Niji = {
   id: number | null;
   imgSrc: string | undefined;
 };
 
 const ExploreGrid: React.FC<ExploreGridProps> = props => {
-  const [individualNouns, setIndividualNouns] = useState<Noun[]>([]);
-  const placeholderNoun: Noun = { id: null, imgSrc: undefined };
+  const [individualNouns, setIndividualNouns] = useState<Niji[]>([]);
+  const placeholderNoun: Niji = { id: null, imgSrc: undefined };
 
   // Handle events
   const getInitialNouns = (individualCount: number) => {
     // Fetch initial nouns by url
     const nouns = new Array(individualCount)
       .fill(placeholderNoun)
-      .map((x, i): Noun => {
+      .map((x, i): Niji => {
         return {
           id: i + (props.nounCount - individualCount),
           imgSrc: `https://noun.pics/${i + (props.nounCount - individualCount)}.svg`,
@@ -51,13 +51,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = props => {
     rangeCalls(props.nounCount, nouns);
 
     // Add initial nouns to end of placeholder array to display them first on load
-    props.setNounsList((arr: Noun[]) => [...nouns, ...arr]);
+    props.setNounsList((arr: Niji[]) => [...nouns, ...arr]);
   };
 
   // Range calls
   const initialChunkSize = 10;
   const rangeChunkSize = 100;
-  const rangeCalls = async (nounCount: number, individualNouns: Noun[]) => {
+  const rangeCalls = async (nounCount: number, individualNouns: Niji[]) => {
     if (nounCount >= 0) {
       for (let i = nounCount - individualNouns.length; i >= 0; i -= rangeChunkSize) {
         const start = i - rangeChunkSize < 0 ? 0 : i - rangeChunkSize;
@@ -74,14 +74,14 @@ const ExploreGrid: React.FC<ExploreGridProps> = props => {
       const response = await fetch(url);
       const json = await response.json();
       // Convert noun.pic svg key to generic imgSrc key
-      const rangeNouns: Noun[] = json.reverse().map((noun: NounPic, i: number) => {
+      const rangeNouns: Niji[] = json.reverse().map((noun: NounPic, i: number) => {
         return {
           id: noun.id,
           imgSrc: noun.svg,
         };
       });
 
-      props.setNounsList((arr: Noun[]) => {
+      props.setNounsList((arr: Niji[]) => {
         let sliced = arr.slice(0, props.nounCount - 1 - end).concat(rangeNouns);
         // if list is only individual nouns + placeholders
         // keep individual nouns, clear others and replace with ranges
@@ -101,7 +101,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = props => {
   useEffect(() => {
     const placeholderNounsData = new Array(rangeChunkSize)
       .fill(placeholderNoun)
-      .map((x, i): Noun => {
+      .map((x, i): Niji => {
         return {
           id: null,
           imgSrc: undefined,

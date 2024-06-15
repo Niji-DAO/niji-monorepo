@@ -1,16 +1,15 @@
-import Modal from '../Modal';
-import WalletButton from '../WalletButton';
-import { WALLET_TYPE } from '../WalletButton';
-import { useEthers } from '@usedapp/core';
-import clsx from 'clsx';
-import { InjectedConnector } from '@web3-react/injected-connector';
-import { WalletLinkConnector } from '@web3-react/walletlink-connector';
-import { WalletConnectV2Connector } from '../../utils/walletconnectV2Connector';
-import { TrezorConnector } from '@web3-react/trezor-connector';
-import { FortmaticConnector } from '@web3-react/fortmatic-connector';
-import config, { CHAIN_ID, WALLET_CONNECT_V2_PROJECT_ID } from '../../config';
-import classes from './WalletConnectModal.module.css';
 import { Trans } from '@lingui/macro';
+import { useEthers } from '@usedapp/core';
+import { FortmaticConnector } from '@web3-react/fortmatic-connector';
+import { InjectedConnector } from '@web3-react/injected-connector';
+import { TrezorConnector } from '@web3-react/trezor-connector';
+import { WalletLinkConnector } from '@web3-react/walletlink-connector';
+import clsx from 'clsx';
+import config, { CHAIN_ID, WALLET_CONNECT_V2_PROJECT_ID } from '../../config';
+import { WalletConnectV2Connector } from '../../utils/walletconnectV2Connector';
+import Modal from '../Modal';
+import WalletButton, { WALLET_TYPE } from '../WalletButton';
+import classes from './WalletConnectModal.module.css';
 
 const WalletConnectModal: React.FC<{ onDismiss: () => void }> = props => {
   const { onDismiss } = props;
@@ -56,7 +55,7 @@ const WalletConnectModal: React.FC<{ onDismiss: () => void }> = props => {
       <WalletButton
         onClick={() => {
           const walletlink = new WalletLinkConnector({
-            appName: 'Nouns.WTF',
+            appName: 'Niji.WTF',
             appLogoUrl: 'https://nouns.wtf/static/media/logo.cdea1650.svg',
             url: config.app.jsonRpcUri,
             supportedChainIds,

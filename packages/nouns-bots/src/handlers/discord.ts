@@ -1,4 +1,5 @@
 import Discord from 'discord.js';
+import { Bid, IAuctionLifecycleHandler, Proposal, Vote } from '../types';
 import {
   formatBidMessageText,
   formatNewGovernanceProposalText,
@@ -7,7 +8,6 @@ import {
   formatUpdatedGovernanceProposalStatusText,
   getNounPngBuffer,
 } from '../utils';
-import { Bid, IAuctionLifecycleHandler, Proposal, Vote } from '../types';
 
 export class DiscordAuctionLifecycleHandler implements IAuctionLifecycleHandler {
   constructor(public readonly discordClients: Discord.WebhookClient[]) {}
@@ -23,9 +23,9 @@ export class DiscordAuctionLifecycleHandler implements IAuctionLifecycleHandler 
       const attachment = new Discord.MessageAttachment(png, attachmentName);
       const message = new Discord.MessageEmbed()
         .setTitle(`New Auction Discovered`)
-        .setDescription(`An auction has started for Noun #${auctionId}`)
+        .setDescription(`An auction has started for Niji #${auctionId}`)
         .setURL('https://nouns.wtf')
-        .addField('Noun ID', auctionId, true)
+        .addField('Niji ID', auctionId, true)
         .attachFiles([attachment])
         .setImage(`attachment://${attachmentName}`)
         .setTimestamp();
@@ -36,7 +36,7 @@ export class DiscordAuctionLifecycleHandler implements IAuctionLifecycleHandler 
 
   /**
    * Send Discord message with new bid event data
-   * @param auctionId Noun auction number
+   * @param auctionId Niji auction number
    * @param bid Bid amount and ID
    */
   async handleNewBid(auctionId: number, bid: Bid) {

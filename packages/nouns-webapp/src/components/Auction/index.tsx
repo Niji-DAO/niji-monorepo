@@ -1,21 +1,20 @@
-import { Col } from 'react-bootstrap';
-import { StandaloneNounWithSeed } from '../StandaloneNoun';
-import AuctionActivity from '../AuctionActivity';
-import { Row, Container } from 'react-bootstrap';
-import { setStateBackgroundColor } from '../../state/slices/application';
-import { LoadingNoun } from '../Noun';
-import { Auction as IAuction } from '../../wrappers/nounsAuction';
-import classes from './Auction.module.css';
-import { INounSeed } from '../../wrappers/nounToken';
-import NounderNounContent from '../NounderNounContent';
+import { Col, Container, Row } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { isNounderNoun } from '../../utils/nounderNoun';
+import { setStateBackgroundColor } from '../../state/slices/application';
 import {
   setNextOnDisplayAuctionNounId,
   setPrevOnDisplayAuctionNounId,
 } from '../../state/slices/onDisplayAuction';
 import { beige, grey } from '../../utils/nounBgColors';
+import { isNounderNoun } from '../../utils/nounderNoun';
+import { Auction as IAuction } from '../../wrappers/nounsAuction';
+import { INounSeed } from '../../wrappers/nounToken';
+import AuctionActivity from '../AuctionActivity';
+import { LoadingNoun } from '../Niji';
+import NounderNounContent from '../NounderNounContent';
+import { StandaloneNounWithSeed } from '../StandaloneNoun';
+import classes from './Auction.module.css';
 
 interface AuctionProps {
   auction?: IAuction;

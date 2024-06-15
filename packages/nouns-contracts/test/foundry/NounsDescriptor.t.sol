@@ -30,8 +30,8 @@ contract NounsDescriptorWithRealArtTest is DeployUtils {
         string memory imageDecoded = string(removeDataTypePrefix(json.readString('.image')).decode());
         strings.slice memory imageSlice = imageDecoded.toSlice();
 
-        assertEq(json.readString('.name'), 'Noun 0');
-        assertEq(json.readString('.description'), 'Noun 0 is a member of the Nouns DAO');
+        assertEq(json.readString('.name'), 'Niji 0');
+        assertEq(json.readString('.description'), 'Niji 0 is a member of the Niji DAO');
         assertEq(bytes(imageDecoded).length, 6849);
         assertTrue(
             imageSlice.startsWith(

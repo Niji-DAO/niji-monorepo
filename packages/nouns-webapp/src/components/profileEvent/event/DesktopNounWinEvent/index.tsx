@@ -1,13 +1,13 @@
+import { CakeIcon } from '@heroicons/react/solid';
+import { Trans } from '@lingui/macro';
 import React from 'react';
+import ReactTooltip from 'react-tooltip';
 import { buildEtherscanAddressLink, buildEtherscanTxLink } from '../../../../utils/etherscan';
 import { NounWinEvent } from '../../../../wrappers/nounActivity';
-import classes from './DesktopNounWinEvent.module.css';
-import DesktopNounActivityRow from '../../activityRow/DesktopNounActivityRow';
-import { CakeIcon } from '@heroicons/react/solid';
-import ReactTooltip from 'react-tooltip';
 import ShortAddress from '../../../ShortAddress';
+import DesktopNounActivityRow from '../../activityRow/DesktopNounActivityRow';
 import TransactionHashPill from '../../eventData/infoPills/TransactionHashPill';
-import { Trans } from '@lingui/macro';
+import classes from './DesktopNounWinEvent.module.css';
 
 interface DesktopNounWinEventProps {
   event: NounWinEvent;
@@ -36,7 +36,7 @@ const DesktopNounWinEvent: React.FC<DesktopNounWinEventProps> = props => {
           />
           {isNounderNoun ? (
             <Trans>
-              <span className={classes.bold}> Noun {event.nounId} </span> sent to{' '}
+              <span className={classes.bold}> Niji {event.nounId} </span> sent to{' '}
               <span
                 data-tip={`View on Etherscan`}
                 onClick={() => window.open(buildEtherscanAddressLink(event.winner), '_blank')}
@@ -49,7 +49,7 @@ const DesktopNounWinEvent: React.FC<DesktopNounWinEventProps> = props => {
             </Trans>
           ) : (
             <Trans>
-              <span className={classes.bold}> Noun {event.nounId} </span> won by{' '}
+              <span className={classes.bold}> Niji {event.nounId} </span> won by{' '}
               <span
                 data-tip={`View on Etherscan`}
                 onClick={() => window.open(buildEtherscanAddressLink(event.winner), '_blank')}

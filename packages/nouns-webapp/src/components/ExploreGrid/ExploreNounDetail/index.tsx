@@ -1,26 +1,26 @@
-import React, { ReactNode, useEffect, useState } from 'react';
-import { useNounSeed } from '../../../wrappers/nounToken';
+import { XIcon } from '@heroicons/react/solid';
+import { Trans } from '@lingui/macro';
+import { ImageData } from '@nouns/assets';
+import cx from 'classnames';
 import { BigNumber } from 'ethers';
+import { AnimatePresence, motion } from 'framer-motion/dist/framer-motion';
+import React, { ReactNode, useEffect, useState } from 'react';
+import Image from 'react-bootstrap/Image';
+import Placeholder from 'react-bootstrap/Placeholder';
+import { useSwipeable } from 'react-swipeable';
+import loadingNoun from '../../../assets/loading-skull-noun.gif';
+import { useNounSeed } from '../../../wrappers/nounToken';
+import NounInfoRowBirthday from '../../NounInfoRowBirthday';
 import { StandalonePart } from '../../StandalonePart';
 import classes from './ExploreNounDetail.module.css';
-import { ImageData } from '@nouns/assets';
-import { Trans } from '@lingui/macro';
-import { AnimatePresence, motion } from 'framer-motion/dist/framer-motion';
-import { XIcon } from '@heroicons/react/solid';
-import NounInfoRowBirthday from '../../NounInfoRowBirthday';
-import loadingNoun from '../../../assets/loading-skull-noun.gif';
-import Placeholder from 'react-bootstrap/Placeholder';
-import Image from 'react-bootstrap/Image';
-import cx from 'classnames';
-import { useSwipeable } from 'react-swipeable';
 
-type Noun = {
+type Niji = {
   id: number | null;
   imgSrc: string | undefined;
 };
 interface ExploreNounDetailProps {
   nounId: number;
-  noun: Noun;
+  noun: Niji;
   nounCount: number;
   handleCloseDetail: Function;
   handleNounNavigation: Function;
@@ -253,7 +253,7 @@ const ExploreNounDetail: React.FC<ExploreNounDetailProps> = props => {
             {nounId !== null && seed ? (
               <Image
                 src={props.noun.imgSrc || `https://noun.pics/${nounId}.svg`}
-                alt={`Noun ${nounId}`}
+                alt={`Niji ${nounId}`}
               />
             ) : (
               <Image src={loadingNoun} alt="Loading noun" />
@@ -275,7 +275,7 @@ const ExploreNounDetail: React.FC<ExploreNounDetailProps> = props => {
               <div className={classes.nounBirthday}>
                 {nounId !== null && seed ? (
                   <>
-                    <h2>Noun {nounId}</h2>
+                    <h2>Niji {nounId}</h2>
                     <NounInfoRowBirthday nounId={nounId} />
                   </>
                 ) : (

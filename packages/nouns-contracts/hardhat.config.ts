@@ -16,6 +16,7 @@ const config: HardhatUserConfig = {
   solidity: {
     version: '0.8.19',
     settings: {
+      viaIR: true,
       optimizer: {
         enabled: true,
         runs: 200,
@@ -27,14 +28,8 @@ const config: HardhatUserConfig = {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
       accounts: [process.env.WALLET_PRIVATE_KEY!].filter(Boolean),
     },
-    rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-      accounts: process.env.MNEMONIC
-        ? { mnemonic: process.env.MNEMONIC }
-        : [process.env.WALLET_PRIVATE_KEY!].filter(Boolean),
-    },
-    goerli: {
-      url: `https://goerli.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
+    z_kyoto: {
+      url: 'https://rpc.startale.com/zkyoto',
       accounts: process.env.MNEMONIC
         ? { mnemonic: process.env.MNEMONIC }
         : [process.env.WALLET_PRIVATE_KEY!].filter(Boolean),
@@ -50,7 +45,19 @@ const config: HardhatUserConfig = {
     },
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      z_kyoto: process.env.ETHERSCAN_API_KEY || '',
+    },
+    customChains: [
+      {
+        network: 'z_kyoto',
+        chainId: 6038361,
+        urls: {
+          apiURL: 'https://zkyoto.explorer.startale.com/api',
+          browserURL: 'https://zkyoto.explorer.startale.com/',
+        },
+      },
+    ],
   },
   abiExporter: {
     path: './abi',

@@ -1,10 +1,10 @@
-import classes from './NounsIntroSection.module.css';
-import Section from '../../layout/Section';
-import { Col, Nav } from 'react-bootstrap';
 import { Trans } from '@lingui/macro';
+import { Col, Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import nounsIosGif from '../../assets/nouns-ios.gif';
 import dlFromAppStoreImg from '../../assets/download-on-app-store.svg';
+import nounsIosGif from '../../assets/nouns-ios.gif';
+import Section from '../../layout/Section';
+import classes from './NounsIntroSection.module.css';
 
 const NounsIntroSection = () => {
   const prophouseLink = (
@@ -24,13 +24,13 @@ const NounsIntroSection = () => {
         <Col lg={6}>
           <div className={classes.textWrapper}>
             <h1>
-              <Trans>One Noun, Every Day, Forever.</Trans>
+              <Trans>One Niji, Every Day, Forever.</Trans>
             </h1>
             <p>
               <Trans>
-                Behold, an infinite work of art! Nouns is a community-owned brand that makes a
+                Behold, an infinite work of art! Niji is a community-owned brand that makes a
                 positive impact by funding ideas and fostering collaboration. From collectors and
-                technologists, to non-profits and brands, Nouns is for everyone.
+                technologists, to non-profits and brands, Niji is for everyone.
               </Trans>
             </p>
           </div>
@@ -79,13 +79,13 @@ const NounsIntroSection = () => {
         <Col lg={6} className={`order-lg-2 order-1`}>
           <div className={`${classes.textWrapper} ${classes.youtubeSectionText}`}>
             <h1>
-              <Trans>Build With Nouns. Get Funded.</Trans>
+              <Trans>Build With Niji. Get Funded.</Trans>
             </h1>
             <p>
               <Trans>
-                There's a way for everyone to get involved with Nouns. From whimsical endeavors like
+                There's a way for everyone to get involved with Niji. From whimsical endeavors like
                 naming a frog, to ambitious projects like constructing a giant float for the Rose
-                Parade, or even crypto infrastructure like {prophouseLink}. Nouns funds projects of
+                Parade, or even crypto infrastructure like {prophouseLink}. Niji funds projects of
                 all sizes and domains.
               </Trans>
             </p>
@@ -101,8 +101,8 @@ const NounsIntroSection = () => {
             </h1>
             <p>
               <Trans>
-                Every new Noun pushed right to your pocket! View the current auction, remix your own
-                Noun, and explore the entire history directly from the app.
+                Every new Niji pushed right to your pocket! View the current auction, remix your own
+                Niji, and explore the entire history directly from the app.
               </Trans>
               <br />
               <a

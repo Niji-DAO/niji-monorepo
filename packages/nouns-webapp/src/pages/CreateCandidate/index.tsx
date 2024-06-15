@@ -1,24 +1,24 @@
-import { Col, Alert, Button } from 'react-bootstrap';
-import Section from '../../layout/Section';
-import { ProposalTransaction, useProposalThreshold } from '../../wrappers/nounsDao';
-import { useUserVotes } from '../../wrappers/nounToken';
-import classes from '../CreateProposal/CreateProposal.module.css';
-import { Link } from 'react-router-dom';
-import { AlertModal, setAlertModal } from '../../state/slices/application';
-import { withStepProgress } from 'react-stepz';
-import ProposalEditor from '../../components/ProposalEditor';
-import ProposalTransactions from '../../components/ProposalTransactions';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAppDispatch } from '../../hooks';
 import { Trans } from '@lingui/macro';
 import clsx from 'clsx';
+import { ethers } from 'ethers';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Alert, Button, Col } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import { withStepProgress } from 'react-stepz';
+import CreateCandidateButton from '../../components/CreateCandidateButton';
 import navBarButtonClasses from '../../components/NavBarButton/NavBarButton.module.css';
 import ProposalActionModal from '../../components/ProposalActionsModal';
+import ProposalEditor from '../../components/ProposalEditor';
+import ProposalTransactions from '../../components/ProposalTransactions';
 import config from '../../config';
+import { useAppDispatch } from '../../hooks';
+import Section from '../../layout/Section';
+import { AlertModal, setAlertModal } from '../../state/slices/application';
 import { useEthNeeded } from '../../utils/tokenBuyerContractUtils/tokenBuyer';
-import { useGetCreateCandidateCost, useCreateProposalCandidate } from '../../wrappers/nounsData';
-import { ethers } from 'ethers';
-import CreateCandidateButton from '../../components/CreateCandidateButton';
+import { ProposalTransaction, useProposalThreshold } from '../../wrappers/nounsDao';
+import { useCreateProposalCandidate, useGetCreateCandidateCost } from '../../wrappers/nounsData';
+import { useUserVotes } from '../../wrappers/nounToken';
+import classes from '../CreateProposal/CreateProposal.module.css';
 
 const CreateCandidatePage = () => {
   const [proposalTransactions, setProposalTransactions] = useState<ProposalTransaction[]>([]);
@@ -208,14 +208,14 @@ const CreateCandidatePage = () => {
         <Alert variant="secondary" className={classes.voterIneligibleAlert}>
           <Trans>
             Proposal candidates can be created by anyone. If a candidate receives enough signatures
-            by Nouns voters, it can be promoted to a proposal.{' '}
+            by Niji voters, it can be promoted to a proposal.{' '}
           </Trans>
           <br />
           <br />
 
           <strong>
             <Trans>
-              Submissions are free for Nouns voters. Non-voters can submit for a{' '}
+              Submissions are free for Niji voters. Non-voters can submit for a{' '}
               {createCandidateCost && ethers.utils.formatEther(createCandidateCost)} ETH fee.
             </Trans>
           </strong>

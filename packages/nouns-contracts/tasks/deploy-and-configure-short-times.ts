@@ -57,7 +57,7 @@ task(
   ) // Default: 40%
   .addOptionalParam('quorumCoefficient', 'Dynamic quorum coefficient (float)', 1, types.float)
   .setAction(async (args, { run }) => {
-    // Deploy the Nouns DAO contracts and return deployment information
+    // Deploy the Niji DAO contracts and return deployment information
     const contracts = await run('deploy-short-times', args);
 
     // Verify the contracts on Etherscan
@@ -82,7 +82,7 @@ task(
     );
 
     // Optionally kick off the first auction and transfer ownership of the auction house
-    // to the Nouns DAO executor.
+    // to the Niji DAO executor.
     if (args.startAuction) {
       const auctionHouse = contracts.NounsAuctionHouse.instance.attach(
         contracts.NounsAuctionHouseProxy.address,

@@ -56,12 +56,12 @@ task(
 
   console.table(accounts);
   console.log(
-    `Noun contracts deployed to local node at http://localhost:8545 (Chain ID: ${chainId})`,
+    `Niji contracts deployed to local node at http://localhost:8545 (Chain ID: ${chainId})`,
   );
   console.log(`Auction House Proxy address: ${contracts.NounsAuctionHouseProxy.instance.address}`);
-  console.log(`Nouns ERC721 address: ${contracts.NounsToken.instance.address}`);
-  console.log(`Nouns DAO Executor address: ${contracts.NounsDAOExecutor.instance.address}`);
-  console.log(`Nouns DAO Proxy address: ${contracts.NounsDAOProxyV2.instance.address}`);
+  console.log(`Niji ERC721 address: ${contracts.NounsToken.instance.address}`);
+  console.log(`Niji DAO Executor address: ${contracts.NounsDAOExecutor.instance.address}`);
+  console.log(`Niji DAO Proxy address: ${contracts.NounsDAOProxyV2.instance.address}`);
 
   await ethers.provider.send('evm_setIntervalMining', [12_000]);
 

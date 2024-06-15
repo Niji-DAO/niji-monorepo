@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect } from 'react';
-import classes from './AuctionNavigation.module.css';
-import { useAppSelector } from '../../hooks';
 import { useHistory } from 'react-router';
+import { useAppSelector } from '../../hooks';
 import useOnDisplayAuction from '../../wrappers/onDisplayAuction';
+import classes from './AuctionNavigation.module.css';
 
 const AuctionNavigation: React.FC<{
   isFirstAuction: boolean;
@@ -17,7 +17,7 @@ const AuctionNavigation: React.FC<{
   const lastAuctionNounId = useAppSelector(state => state.onDisplayAuction.lastAuctionNounId);
   const onDisplayAuctionNounId = onDisplayAuction?.nounId.toNumber();
 
-  // Page through Nouns via keyboard
+  // Page through Niji via keyboard
   // handle what happens on key press
   const handleKeyPress = useCallback(
     event => {
