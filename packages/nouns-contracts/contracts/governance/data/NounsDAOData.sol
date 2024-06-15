@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title Nouns DAO Data Contract
+/// @title Niji DAO Data Contract
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -61,9 +61,9 @@ contract NounsDAOData is OwnableUpgradeable, UUPSUpgradeable, NounsDAODataEvents
     /// @notice The number of blocks before the current block where account votes are counted.
     uint256 public constant PRIOR_VOTES_BLOCKS_AGO = 1;
 
-    /// @notice The Nouns token contract.
+    /// @notice The Niji token contract.
     NounsTokenLike public immutable nounsToken;
-    /// @notice The Nouns DAO contract.
+    /// @notice The Niji DAO contract.
     address public immutable nounsDao;
     /// @notice The cost non-Nouners must pay in ETH in order to emit a new proposal candidate event from this contract.
     uint256 public createCandidateCost;

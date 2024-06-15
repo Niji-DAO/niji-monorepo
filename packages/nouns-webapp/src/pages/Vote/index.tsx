@@ -1,5 +1,37 @@
-import { Row, Col, Button, Card, Spinner } from 'react-bootstrap';
+import { useQuery } from '@apollo/client';
+import { SearchIcon } from '@heroicons/react/solid';
+import { i18n } from '@lingui/core';
+import { Trans } from '@lingui/macro';
+import { TransactionStatus, useBlockNumber, useEthers } from '@usedapp/core';
+import clsx from 'clsx';
+import dayjs from 'dayjs';
+import en from 'dayjs/locale/en';
+import advanced from 'dayjs/plugin/advancedFormat';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, Card, Col, Row, Spinner } from 'react-bootstrap';
+import { ReactNode } from 'react-markdown/lib/react-markdown';
+import { Link, RouteComponentProps } from 'react-router-dom';
+import ReactTooltip from 'react-tooltip';
+import DynamicQuorumInfoModal from '../../components/DynamicQuorumInfoModal';
+import ProposalContent from '../../components/ProposalContent';
+import ProposalHeader from '../../components/ProposalHeader';
+import ShortAddress from '../../components/ShortAddress';
+import StreamWithdrawModal from '../../components/StreamWithdrawModal';
+import VoteCard, { VoteCardVariant } from '../../components/VoteCard';
+import VoteModal from '../../components/VoteModal';
+import VoteSignals from '../../components/VoteSignals/VoteSignals';
+import config from '../../config';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { useActiveLocale } from '../../hooks/useActivateLocale';
+import { SUPPORTED_LOCALE_TO_DAYSJS_LOCALE, SupportedLocale } from '../../i18n/locales';
 import Section from '../../layout/Section';
+import { AlertModal, setAlertModal } from '../../state/slices/application';
+import { AVERAGE_BLOCK_TIME_IN_SECS } from '../../utils/constants';
+import { getNounVotes } from '../../utils/getNounsVotes';
+import { isProposalUpdatable } from '../../utils/proposals';
+import { parseStreamCreationCallData } from '../../utils/streamingPaymentUtils/streamingPaymentUtils';
 import {
   PartialProposal,
   ProposalState,
@@ -10,53 +42,21 @@ import {
   useExecuteProposalOnTimelockV1,
   useHasVotedOnProposal,
   useIsDaoGteV3,
+  useIsForkActive,
   useProposal,
   useProposalVersions,
   useQueueProposal,
-  useIsForkActive
 } from '../../wrappers/nounsDao';
+import { useProposalFeedback } from '../../wrappers/nounsData';
 import { useUserVotes, useUserVotesAsOfBlock } from '../../wrappers/nounToken';
-import classes from './Vote.module.css';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { TransactionStatus, useBlockNumber, useEthers } from '@usedapp/core';
-import { AlertModal, setAlertModal } from '../../state/slices/application';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-import advanced from 'dayjs/plugin/advancedFormat';
-import en from 'dayjs/locale/en';
-import VoteModal from '../../components/VoteModal';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks';
-import clsx from 'clsx';
-import ProposalHeader from '../../components/ProposalHeader';
-import ProposalContent from '../../components/ProposalContent';
-import VoteCard, { VoteCardVariant } from '../../components/VoteCard';
-import { useQuery } from '@apollo/client';
 import {
-  proposalVotesQuery,
   delegateNounsAtBlockQuery,
-  ProposalVotes,
   Delegates,
+  ProposalVotes,
+  proposalVotesQuery,
   propUsingDynamicQuorum,
 } from '../../wrappers/subgraph';
-import { getNounVotes } from '../../utils/getNounsVotes';
-import { Trans } from '@lingui/macro';
-import { i18n } from '@lingui/core';
-import { ReactNode } from 'react-markdown/lib/react-markdown';
-import { AVERAGE_BLOCK_TIME_IN_SECS } from '../../utils/constants';
-import { SearchIcon } from '@heroicons/react/solid';
-import ReactTooltip from 'react-tooltip';
-import DynamicQuorumInfoModal from '../../components/DynamicQuorumInfoModal';
-import config from '../../config';
-import ShortAddress from '../../components/ShortAddress';
-import StreamWithdrawModal from '../../components/StreamWithdrawModal';
-import { parseStreamCreationCallData } from '../../utils/streamingPaymentUtils/streamingPaymentUtils';
-import VoteSignals from '../../components/VoteSignals/VoteSignals';
-import { useActiveLocale } from '../../hooks/useActivateLocale';
-import { SUPPORTED_LOCALE_TO_DAYSJS_LOCALE, SupportedLocale } from '../../i18n/locales';
-import { isProposalUpdatable } from '../../utils/proposals';
-import { useProposalFeedback } from '../../wrappers/nounsData';
+import classes from './Vote.module.css';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -71,9 +71,9 @@ const getUpdatableCountdownCopy = (
   const endDate =
     proposal && timestamp && currentBlock
       ? dayjs(timestamp).add(
-        AVERAGE_BLOCK_TIME_IN_SECS * (proposal.updatePeriodEndBlock - currentBlock),
-        'seconds',
-      )
+          AVERAGE_BLOCK_TIME_IN_SECS * (proposal.updatePeriodEndBlock - currentBlock),
+          'seconds',
+        )
       : undefined;
 
   return (
@@ -92,7 +92,7 @@ const VotePage = ({
 }: RouteComponentProps<{ id: string }>) => {
   const [showVoteModal, setShowVoteModal] = useState<boolean>(false);
   const [showDynamicQuorumInfoModal, setShowDynamicQuorumInfoModal] = useState<boolean>(false);
-  // Toggle between Noun centric view and delegate view
+  // Toggle between Niji centric view and delegate view
   const [isDelegateView, setIsDelegateView] = useState(false);
   const [isQueuePending, setQueuePending] = useState<boolean>(false);
   const [isExecutePending, setExecutePending] = useState<boolean>(false);
@@ -137,9 +137,9 @@ const VotePage = ({
   const startDate =
     proposal && timestamp && currentBlock
       ? dayjs(timestamp).add(
-        AVERAGE_BLOCK_TIME_IN_SECS * (proposal.startBlock - currentBlock),
-        'seconds',
-      )
+          AVERAGE_BLOCK_TIME_IN_SECS * (proposal.startBlock - currentBlock),
+          'seconds',
+        )
       : undefined;
 
   const endBlock =
@@ -161,9 +161,10 @@ const VotePage = ({
   const abstainPercentage = proposal && totalVotes ? (proposal.abstainCount * 100) / totalVotes : 0;
 
   // Use user votes as of the current or proposal snapshot block
-  const currentOrSnapshotBlock = useMemo(() =>
-    Math.min(proposal?.voteSnapshotBlock ?? 0, (currentBlock ? currentBlock - 1 : 0)) || undefined,
-    [proposal, currentBlock]
+  const currentOrSnapshotBlock = useMemo(
+    () =>
+      Math.min(proposal?.voteSnapshotBlock ?? 0, currentBlock ? currentBlock - 1 : 0) || undefined,
+    [proposal, currentBlock],
   );
   const userVotes = useUserVotesAsOfBlock(currentOrSnapshotBlock);
 
@@ -263,9 +264,9 @@ const VotePage = ({
     const time =
       proposal && timestamp && currentBlock
         ? dayjs(timestamp).add(
-          AVERAGE_BLOCK_TIME_IN_SECS * (proposal.objectionPeriodEndBlock! - currentBlock),
-          'seconds',
-        )
+            AVERAGE_BLOCK_TIME_IN_SECS * (proposal.objectionPeriodEndBlock! - currentBlock),
+            'seconds',
+          )
         : undefined;
     return time;
   };
@@ -451,7 +452,8 @@ const VotePage = ({
 
   useEffect(() => {
     if (
-      isDaoGteV3 && proposal &&
+      isDaoGteV3 &&
+      proposal &&
       currentBlock &&
       proposal?.objectionPeriodEndBlock > 0 &&
       currentBlock > proposal?.endBlock &&
@@ -463,10 +465,13 @@ const VotePage = ({
     }
   }, [currentBlock, proposal?.status, proposal, isDaoGteV3]);
 
-
   useEffect(() => {
     if (proposal?.status === ProposalState.QUEUED && isForkActive) {
-      setForkPeriodMessage(<p><Trans>Proposals cannot be executed during a forking period</Trans></p>);
+      setForkPeriodMessage(
+        <p>
+          <Trans>Proposals cannot be executed during a forking period</Trans>
+        </p>,
+      );
       setIsExecutable(false);
     } else if (proposal?.status === ProposalState.QUEUED && !isForkActive) {
       setIsExecutable(true);
@@ -660,7 +665,7 @@ const VotePage = ({
               className={classes.toggleDelegateVoteView}
             >
               {isDelegateView ? (
-                <Trans>Switch to Noun view</Trans>
+                <Trans>Switch to Niji view</Trans>
               ) : (
                 <Trans>Switch to delegate view</Trans>
               )}
@@ -780,9 +785,7 @@ const VotePage = ({
                   </div>
                   <div className={classes.snapshotBlock}>
                     <span>Taken at block</span>
-                    <h3>
-                      {proposal?.voteSnapshotBlock}
-                    </h3>
+                    <h3>{proposal?.voteSnapshotBlock}</h3>
                   </div>
                 </div>
               </Card.Body>

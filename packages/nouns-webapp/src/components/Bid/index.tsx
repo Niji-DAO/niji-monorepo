@@ -1,22 +1,24 @@
-import { Auction, AuctionHouseContractFunction } from '../../wrappers/nounsAuction';
-import { useEthers, useContractFunction } from '@usedapp/core';
-import { connectContractToSigner } from '@usedapp/core/dist/cjs/src/hooks';
-import { useAppSelector } from '../../hooks';
-import React, { useEffect, useState, useRef, ChangeEvent, useCallback } from 'react';
-import { utils, BigNumber as EthersBN } from 'ethers';
-import BigNumber from 'bignumber.js';
-import classes from './Bid.module.css';
-import { Spinner, InputGroup, FormControl, Button, Col } from 'react-bootstrap';
-import { useAuctionMinBidIncPercentage } from '../../wrappers/nounsAuction';
-import { useAppDispatch } from '../../hooks';
-import { AlertModal, setAlertModal } from '../../state/slices/application';
-import { NounsAuctionHouseFactory } from '@nouns/sdk';
-import config from '../../config';
-import WalletConnectModal from '../WalletConnectModal';
-import SettleManuallyBtn from '../SettleManuallyBtn';
 import { Trans } from '@lingui/macro';
+import { NounsAuctionHouseFactory } from '@nouns/sdk';
+import { useContractFunction, useEthers } from '@usedapp/core';
+import { connectContractToSigner } from '@usedapp/core/dist/cjs/src/hooks';
+import BigNumber from 'bignumber.js';
+import { BigNumber as EthersBN, utils } from 'ethers';
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { Button, Col, FormControl, InputGroup, Spinner } from 'react-bootstrap';
+import config from '../../config';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 import { useActiveLocale } from '../../hooks/useActivateLocale';
+import { AlertModal, setAlertModal } from '../../state/slices/application';
 import responsiveUiUtilsClasses from '../../utils/ResponsiveUIUtils.module.css';
+import {
+  Auction,
+  AuctionHouseContractFunction,
+  useAuctionMinBidIncPercentage,
+} from '../../wrappers/nounsAuction';
+import SettleManuallyBtn from '../SettleManuallyBtn';
+import WalletConnectModal from '../WalletConnectModal';
+import classes from './Bid.module.css';
 
 const computeMinimumNextBid = (
   currentBid: BigNumber,
@@ -241,7 +243,7 @@ const Bid: React.FC<{
     placeBidState.status === 'Mining' || settleAuctionState.status === 'Mining' || !activeAccount;
 
   const fomoNounsBtnOnClickHandler = () => {
-    // Open Fomo Nouns in a new tab
+    // Open Fomo Niji in a new tab
     window.open('https://fomonouns.wtf', '_blank')?.focus();
   };
 
@@ -293,7 +295,7 @@ const Bid: React.FC<{
           <>
             <Col lg={12} className={classes.voteForNextNounBtnWrapper}>
               <Button className={classes.bidBtnAuctionEnded} onClick={fomoNounsBtnOnClickHandler}>
-                <Trans>Vote for the next Noun</Trans> ⌐◧-◧
+                <Trans>Vote for the next Niji</Trans> ⌐◧-◧
               </Button>
             </Col>
             {/* Only show force settle button if wallet connected */}

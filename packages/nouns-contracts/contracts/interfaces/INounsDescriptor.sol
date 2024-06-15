@@ -37,47 +37,101 @@ interface INounsDescriptor is INounsDescriptorMinimal {
 
     function backgrounds(uint256 index) external view returns (string memory);
 
-    function bodies(uint256 index) external view returns (bytes memory);
+    function backgroundDecorations(uint256 index) external view returns (bytes memory);
 
-    function accessories(uint256 index) external view returns (bytes memory);
+    function specials(uint256 index) external view returns (bytes memory);
 
-    function heads(uint256 index) external view returns (bytes memory);
+    function leftHands(uint256 index) external view returns (bytes memory);
 
-    function glasses(uint256 index) external view returns (bytes memory);
+    function backs(uint256 index) external view returns (bytes memory);
+
+    function ears(uint256 index) external view returns (bytes memory);
+
+    function chokers(uint256 index) external view returns (bytes memory);
+
+    function clothes(uint256 index) external view returns (bytes memory);
+
+    function hairs(uint256 index) external view returns (bytes memory);
+
+    function headphones(uint256 index) external view returns (bytes memory);
+
+    function hats(uint256 index) external view returns (bytes memory);
+
+    function backDecorations(uint256 index) external view returns (bytes memory);
 
     function backgroundCount() external view override returns (uint256);
 
-    function bodyCount() external view override returns (uint256);
+    function backgroundDecorationCount() external view override returns (uint256);
 
-    function accessoryCount() external view override returns (uint256);
+    function specialCount() external view override returns (uint256);
 
-    function headCount() external view override returns (uint256);
+    function leftHandCount() external view override returns (uint256);
 
-    function glassesCount() external view override returns (uint256);
+    function backCount() external view override returns (uint256);
+
+    function earCount() external view override returns (uint256);
+
+    function chokerCount() external view override returns (uint256);
+
+    function clotheCount() external view override returns (uint256);
+
+    function hairCount() external view override returns (uint256);
+
+    function headphoneCount() external view override returns (uint256);
+
+    function hatCount() external view override returns (uint256);
 
     function addManyColorsToPalette(uint8 paletteIndex, string[] calldata newColors) external;
 
     function addManyBackgrounds(string[] calldata backgrounds) external;
 
-    function addManyBodies(bytes[] calldata bodies) external;
+    function addManyBackgroundDecorations(bytes[] calldata bodies) external;
 
-    function addManyAccessories(bytes[] calldata accessories) external;
+    function addManySpecials(bytes[] calldata bodies) external;
 
-    function addManyHeads(bytes[] calldata heads) external;
+    function addManyLeftHands(bytes[] calldata bodies) external;
 
-    function addManyGlasses(bytes[] calldata glasses) external;
+    function addManyBacks(bytes[] calldata bodies) external;
+
+    function addManyEars(bytes[] calldata bodies) external;
+
+    function addManyChokers(bytes[] calldata bodies) external;
+
+    function addManyClothes(bytes[] calldata bodies) external;
+
+    function addManyHairs(bytes[] calldata bodies) external;
+
+    function addManyHeadphones(bytes[] calldata bodies) external;
+
+    function addManyHats(bytes[] calldata bodies) external;
+
+    function addManyBackDecorations(bytes[] calldata bodies) external;
 
     function addColorToPalette(uint8 paletteIndex, string calldata color) external;
 
     function addBackground(string calldata background) external;
 
-    function addBody(bytes calldata body) external;
+    function addBackgroundDecoration(bytes calldata body) external;
 
-    function addAccessory(bytes calldata accessory) external;
+    function addSpecial(bytes calldata body) external;
 
-    function addHead(bytes calldata head) external;
+    function addLeftHand(bytes calldata body) external;
 
-    function addGlasses(bytes calldata glasses) external;
+    function addBack(bytes calldata body) external;
+
+    function addEar(bytes calldata body) external;
+
+    function addChoker(bytes calldata body) external;
+
+    function addClothes(bytes calldata body) external;
+
+    function addHair(bytes calldata body) external;
+
+    function addHeadphone(bytes calldata body) external;
+
+    function addHat(bytes calldata body) external;
+
+    function addBackDecoration(bytes calldata body) external;
 
     function lockParts() external;
 

@@ -1,6 +1,6 @@
-# Nouns Serverless API
+# Niji Serverless API
 
-`nouns.wtf` provides a serverless API to make fetching data about the Nouns ecosystem easier. [An Insomnia manifest is provided for example.](./docs/insomnia.json)
+`nouns.wtf` provides a serverless API to make fetching data about the Niji ecosystem easier. [An Insomnia manifest is provided for example.](./docs/insomnia.json)
 
 ## API Convention
 

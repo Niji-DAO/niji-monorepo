@@ -159,12 +159,12 @@ contract DAOForkSignaledUnderThresholdStateTest is DAOForkSignaledUnderThreshold
     }
 
     function test_unsignalForkWithDifferentTokens_reverts() public {
-        // move Noun #7 to tokenHolder2
+        // move Niji #7 to tokenHolder2
         vm.prank(tokenHolder);
         nounsToken.transferFrom(tokenHolder, tokenHolder2, 7);
         assertEq(dao.nouns().ownerOf(7), tokenHolder2);
 
-        // tokenHolder2 signals fork with Noun #7
+        // tokenHolder2 signals fork with Niji #7
         vm.startPrank(tokenHolder2);
         nounsToken.approve(address(dao), 7);
         tokenIds = [7];
@@ -516,7 +516,7 @@ contract DAOSecondForkSignaledOverThresholdTest is DAOSecondForkSignaledOverThre
         dao.executeFork();
 
         // OG DAO should retain 73.333% of its funds
-        // Since we have 4 Nouns in escrow out of 15
+        // Since we have 4 Niji in escrow out of 15
         // 1 - (4/15) = 0.73333333
         assertEq(address(timelock).balance, 550 ether);
         assertEq(address(forkDAODeployer.mockTreasury()).balance, 450 ether);

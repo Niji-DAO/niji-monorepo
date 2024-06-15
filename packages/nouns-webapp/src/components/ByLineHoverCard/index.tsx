@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client';
+import { ScaleIcon } from '@heroicons/react/solid';
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import { Spinner } from 'react-bootstrap';
@@ -6,7 +7,6 @@ import { currentlyDelegatedNouns } from '../../wrappers/subgraph';
 import HorizontalStackedNouns from '../HorizontalStackedNouns';
 import ShortAddress from '../ShortAddress';
 import classes from './ByLineHoverCard.module.css';
-import { ScaleIcon } from '@heroicons/react/solid';
 
 interface ByLineHoverCardProps {
   proposerAddress: string;
@@ -57,11 +57,11 @@ const ByLineHoverCard: React.FC<ByLineHoverCardProps> = props => {
           <ScaleIcon height={15} width={15} className={classes.icon} />
           {sortedNounIds.length === 1 ? (
             <Trans>
-              <span>Delegated Noun: </span>
+              <span>Delegated Niji: </span>
             </Trans>
           ) : (
             <Trans>
-              <span>Delegated Nouns: </span>
+              <span>Delegated Niji: </span>
             </Trans>
           )}
 

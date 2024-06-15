@@ -1,10 +1,10 @@
-import { Button } from 'react-bootstrap';
-import classes from './NounModal.module.css';
 import React, { useEffect, useState } from 'react';
+import { Button } from 'react-bootstrap';
 import ReactDOM from 'react-dom';
-import Noun from '../../../components/Noun';
-import { svg2png } from '../../../utils/svg2png';
 import { Backdrop } from '../../../components/Modal';
+import Niji from '../../../components/Niji';
+import { svg2png } from '../../../utils/svg2png';
+import classes from './NounModal.module.css';
 
 const downloadNounPNG = (png: string) => {
   const downloadEl = document.createElement('a');
@@ -51,7 +51,7 @@ const NounModal: React.FC<{ onDismiss: () => void; svg: string }> = props => {
       {ReactDOM.createPortal(
         <div className={classes.modal}>
           {png && (
-            <Noun
+            <Niji
               imgPath={png}
               alt="noun"
               className={classes.nounImg}
@@ -59,7 +59,7 @@ const NounModal: React.FC<{ onDismiss: () => void; svg: string }> = props => {
             />
           )}
           <div className={classes.displayNounFooter}>
-            <span>Use this Noun as your profile picture!</span>
+            <span>Use this Niji as your profile picture!</span>
             {!isMobile && png && (
               <Button
                 onClick={() => {

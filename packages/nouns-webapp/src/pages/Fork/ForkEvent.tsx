@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useState } from 'react';
-import classes from './Fork.module.css';
-import {
-  EscrowDeposit,
-  EscrowWithdrawal,
-  useProposalTitles,
-  ForkCycleEvent,
-} from '../../wrappers/nounsDao';
 import { Trans } from '@lingui/macro';
+import clsx from 'clsx';
+import dayjs from 'dayjs';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ShortAddress from '../../components/ShortAddress';
 import { buildEtherscanAddressLink } from '../../utils/etherscan';
-import dayjs from 'dayjs';
-import clsx from 'clsx';
+import {
+  EscrowDeposit,
+  EscrowWithdrawal,
+  ForkCycleEvent,
+  useProposalTitles,
+} from '../../wrappers/nounsDao';
+import classes from './Fork.module.css';
 
 type Props = {
   event: EscrowDeposit | EscrowWithdrawal | ForkCycleEvent;
@@ -45,8 +45,8 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
           setActionLabel('added');
           setNounCount(
             event.tokenIDs?.length > 1
-              ? `${event.tokenIDs?.length} Nouns`
-              : `Noun ${event.tokenIDs?.[0]}`,
+              ? `${event.tokenIDs?.length} Niji`
+              : `Niji ${event.tokenIDs?.[0]}`,
           );
           setNounsInEvent(
             event.tokenIDs?.map((tokenId, i) => {
@@ -54,7 +54,7 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
                 <Link key={i} to={`/noun/${tokenId}`}>
                   <img
                     src={`https://noun.pics/${tokenId}`}
-                    alt={`Noun ${tokenId}`}
+                    alt={`Niji ${tokenId}`}
                     className={classes.nounImage}
                   />
                 </Link>
@@ -76,8 +76,8 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
           setActionLabel('joined with');
           setNounCount(
             event.tokenIDs?.length > 1
-              ? `${event.tokenIDs?.length} Nouns`
-              : `Noun ${event.tokenIDs?.[0]}`,
+              ? `${event.tokenIDs?.length} Niji`
+              : `Niji ${event.tokenIDs?.[0]}`,
           );
           setNounsInEvent(
             event.tokenIDs?.map((tokenId, i) => {
@@ -85,7 +85,7 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
                 <Link key={i} to={`/noun/${tokenId}`}>
                   <img
                     src={`https://noun.pics/${tokenId}`}
-                    alt={`Noun ${tokenId}`}
+                    alt={`Niji ${tokenId}`}
                     className={classes.nounImage}
                   />
                 </Link>
@@ -107,8 +107,8 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
           setActionLabel('removed');
           setNounCount(
             event.tokenIDs?.length > 1
-              ? `${event.tokenIDs?.length} Nouns`
-              : `Noun ${event.tokenIDs?.[0]}`,
+              ? `${event.tokenIDs?.length} Niji`
+              : `Niji ${event.tokenIDs?.[0]}`,
           );
           setNounsInEvent(
             event.tokenIDs?.map((tokenId, i) => {
@@ -116,7 +116,7 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
                 <Link key={i} to={`/noun/${tokenId}`}>
                   <img
                     src={`https://noun.pics/${tokenId}`}
-                    alt={`Noun ${tokenId}`}
+                    alt={`Niji ${tokenId}`}
                     className={classes.nounImage}
                   />
                 </Link>
@@ -188,9 +188,8 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
             </>
           )}
         </h3>
-        {(event.eventType === 'EscrowDeposit' || event.eventType === 'ForkJoin') && event.reason && (
-          <p className={classes.message}>{event.reason}</p>
-        )}
+        {(event.eventType === 'EscrowDeposit' || event.eventType === 'ForkJoin') &&
+          event.reason && <p className={classes.message}>{event.reason}</p>}
         <div className={classes.nounsList}>{nounsInEvent}</div>
         {(event.eventType === 'EscrowDeposit' || event.eventType === 'ForkJoin') &&
           proposalsList &&

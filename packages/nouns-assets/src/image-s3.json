@@ -1,0 +1,372 @@
+{
+  "bgcolors": ["2287", "2286", "2285", "2284", "2283"],
+  "palette": ["", "ccb4d3", "463d47", "211e23", "848a91", "dc7772", "476f4c", "b2d8ad", "6f81df"],
+  "images": {
+    "backgroundDecorations": [
+      {
+        "filename": "2378",
+        "data": "2378"
+      },
+      {
+        "filename": "2374",
+        "data": "2374"
+      },
+      {
+        "filename": "2365",
+        "data": "2365"
+      },
+      {
+        "filename": "2370",
+        "data": "2370"
+      },
+      {
+        "filename": "2364",
+        "data": "2364"
+      },
+      {
+        "filename": "2363",
+        "data": "2363"
+      },
+      {
+        "filename": "2362",
+        "data": "2362"
+      },
+      {
+        "filename": "0000",
+        "data": "0000"
+      }
+    ],
+    "specials": [
+      {
+        "filename": "2216",
+        "data": "2216"
+      },
+      {
+        "filename": "2215",
+        "data": "2215"
+      },
+      {
+        "filename": "0000",
+        "data": "0000"
+      }
+    ],
+    "leftHands": [
+      {
+        "filename": "2263",
+        "data": "2263"
+      },
+      {
+        "filename": "2238",
+        "data": "2238"
+      },
+      {
+        "filename": "2225",
+        "data": "2225"
+      },
+      {
+        "filename": "2230",
+        "data": "2230"
+      },
+      {
+        "filename": "0000",
+        "data": "0000"
+      }
+    ],
+    "backs": [
+      {
+        "filename": "1955",
+        "data": "1955"
+      },
+      {
+        "filename": "1954",
+        "data": "1954"
+      },
+      {
+        "filename": "0000",
+        "data": "0000"
+      }
+    ],
+    "ears": [
+      {
+        "filename": "1964",
+        "data": "1964"
+      },
+      {
+        "filename": "1960",
+        "data": "1960"
+      },
+      {
+        "filename": "1956",
+        "data": "1956"
+      },
+      {
+        "filename": "0000",
+        "data": "0000"
+      }
+    ],
+    "chokers": [
+      {
+        "filename": "2160",
+        "data": "2160"
+      },
+      {
+        "filename": "2161",
+        "data": "2161"
+      },
+      {
+        "filename": "2162",
+        "data": "2162"
+      },
+      {
+        "filename": "2159",
+        "data": "2159"
+      },
+      {
+        "filename": "0000",
+        "data": "0000"
+      }
+    ],
+    "clothes": [
+      {
+        "filename": "2156",
+        "data": "2156"
+      },
+      {
+        "filename": "2148",
+        "data": "2148"
+      },
+      {
+        "filename": "2077",
+        "data": "2077"
+      },
+      {
+        "filename": "2107",
+        "data": "2107"
+      },
+      {
+        "filename": "2071",
+        "data": "2071"
+      },
+      {
+        "filename": "2099",
+        "data": "2099"
+      },
+      {
+        "filename": "2035",
+        "data": "2035"
+      },
+      {
+        "filename": "2058",
+        "data": "2058"
+      },
+      {
+        "filename": "2030",
+        "data": "2030"
+      },
+      {
+        "filename": "2046",
+        "data": "2046"
+      },
+      {
+        "filename": "2015",
+        "data": "2015"
+      },
+      {
+        "filename": "2023",
+        "data": "2023"
+      },
+      {
+        "filename": "2006",
+        "data": "2006"
+      },
+      {
+        "filename": "1999",
+        "data": "1999"
+      },
+      {
+        "filename": "1989",
+        "data": "1989"
+      },
+      {
+        "filename": "0000",
+        "data": "0000"
+      }
+    ],
+    "hairs": [
+      {
+        "filename": "1928",
+        "data": "1928"
+      },
+      {
+        "filename": "1892",
+        "data": "1892"
+      },
+      {
+        "filename": "1861",
+        "data": "1861"
+      },
+      {
+        "filename": "1850",
+        "data": "1850"
+      },
+      {
+        "filename": "1832",
+        "data": "1832"
+      },
+      {
+        "filename": "1813",
+        "data": "1813"
+      },
+      {
+        "filename": "1791",
+        "data": "1791"
+      },
+      {
+        "filename": "1777",
+        "data": "1777"
+      },
+      {
+        "filename": "1770",
+        "data": "1770"
+      },
+      {
+        "filename": "1758",
+        "data": "1758"
+      },
+      {
+        "filename": "1747",
+        "data": "1747"
+      },
+      {
+        "filename": "1733",
+        "data": "1733"
+      },
+      {
+        "filename": "1728",
+        "data": "1728"
+      },
+      {
+        "filename": "1723",
+        "data": "1723"
+      },
+      {
+        "filename": "1698",
+        "data": "1698"
+      },
+      {
+        "filename": "1704",
+        "data": "1704"
+      },
+      {
+        "filename": "1712",
+        "data": "1712"
+      },
+      {
+        "filename": "0000",
+        "data": "0000"
+      }
+    ],
+    "headphones": [
+      {
+        "filename": "1977",
+        "data": "1977"
+      },
+      {
+        "filename": "1983",
+        "data": "1983"
+      },
+      {
+        "filename": "1971",
+        "data": "1971"
+      },
+      {
+        "filename": "1973",
+        "data": "1973"
+      },
+      {
+        "filename": "1970",
+        "data": "1970"
+      },
+      {
+        "filename": "1965",
+        "data": "1965"
+      },
+      {
+        "filename": "0000",
+        "data": "0000"
+      }
+    ],
+    "hats": [
+      {
+        "filename": "2201",
+        "data": "22201"
+      },
+      {
+        "filename": "2194",
+        "data": "2194"
+      },
+      {
+        "filename": "2189",
+        "data": "2189"
+      },
+      {
+        "filename": "2179",
+        "data": "2179"
+      },
+      {
+        "filename": "2176",
+        "data": "2176"
+      },
+      {
+        "filename": "2174",
+        "data": "2174"
+      },
+      {
+        "filename": "2170",
+        "data": "2170"
+      },
+      {
+        "filename": "2165",
+        "data": "2165"
+      },
+      {
+        "filename": "0000",
+        "data": "0000"
+      }
+    ],
+    "backDecorations": [
+      {
+        "filename": "2214",
+        "data": "2214"
+      },
+      {
+        "filename": "2212",
+        "data": "22212"
+      },
+      {
+        "filename": "2210",
+        "data": "2210"
+      },
+      {
+        "filename": "2208",
+        "data": "2208"
+      },
+      {
+        "filename": "2204",
+        "data": "2204"
+      },
+      {
+        "filename": "2203",
+        "data": "2203"
+      },
+      {
+        "filename": "2205",
+        "data": "2205"
+      },
+      {
+        "filename": "0000",
+        "data": "0000"
+      }
+    ]
+  }
+}

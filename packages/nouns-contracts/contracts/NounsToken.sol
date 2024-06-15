@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title The Nouns ERC-721 token
+/// @title The Niji ERC-721 token
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -30,13 +30,13 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
     // The nounders DAO address (creators org)
     address public noundersDAO;
 
-    // An address who has permissions to mint Nouns
+    // An address who has permissions to mint Niji
     address public minter;
 
-    // The Nouns token URI descriptor
+    // The Niji token URI descriptor
     INounsDescriptorMinimal public descriptor;
 
-    // The Nouns token seeder
+    // The Niji token seeder
     INounsSeeder public seeder;
 
     // Whether the minter can be updated
@@ -106,7 +106,7 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
         INounsDescriptorMinimal _descriptor,
         INounsSeeder _seeder,
         IProxyRegistry _proxyRegistry
-    ) ERC721('Nouns', 'NOUN') {
+    ) ERC721('Niji', 'NJN') {
         noundersDAO = _noundersDAO;
         minter = _minter;
         descriptor = _descriptor;
@@ -141,9 +141,9 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
     }
 
     /**
-     * @notice Mint a Noun to the minter, along with a possible nounders reward
-     * Noun. Nounders reward Nouns are minted every 10 Nouns, starting at 0,
-     * until 183 nounder Nouns have been minted (5 years w/ 24 hour auctions).
+     * @notice Mint a Niji to the minter, along with a possible nounders reward
+     * Niji. Nounders reward Niji are minted every 10 Niji, starting at 0,
+     * until 183 nounder Niji have been minted (5 years w/ 24 hour auctions).
      * @dev Call _mintTo with the to address(es).
      */
     function mint() public override onlyMinter returns (uint256) {
@@ -250,7 +250,7 @@ contract NounsToken is INounsToken, Ownable, ERC721Checkpointable {
     }
 
     /**
-     * @notice Mint a Noun with `nounId` to the provided `to` address.
+     * @notice Mint a Niji with `nounId` to the provided `to` address.
      */
     function _mintTo(address to, uint256 nounId) internal returns (uint256) {
         INounsSeeder.Seed memory seed = seeds[nounId] = seeder.generateSeed(nounId, descriptor);

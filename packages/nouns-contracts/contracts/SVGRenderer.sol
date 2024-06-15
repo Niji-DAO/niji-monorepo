@@ -18,8 +18,10 @@
 pragma solidity ^0.8.6;
 
 import { ISVGRenderer } from './interfaces/ISVGRenderer.sol';
+import { Strings } from '@openzeppelin/contracts/utils/Strings.sol';
 
 contract SVGRenderer is ISVGRenderer {
+    using Strings for uint256;
     bytes16 private constant _HEX_SYMBOLS = '0123456789abcdef';
     uint256 private constant _INDEX_TO_BYTES3_FACTOR = 3;
 
@@ -89,12 +91,17 @@ contract SVGRenderer is ISVGRenderer {
         returns (string memory svg)
     {
         string[33] memory lookup = [
-            '0', '10', '20', '30', '40', '50', '60', '70', 
-            '80', '90', '100', '110', '120', '130', '140', '150', 
-            '160', '170', '180', '190', '200', '210', '220', '230', 
+            '0', '10', '20', '30', '40', '50', '60', '70',
+            '80', '90', '100', '110', '120', '130', '140', '150',
+            '160', '170', '180', '190', '200', '210', '220', '230',
             '240', '250', '260', '270', '280', '290', '300', '310',
             '320'
         ];
+        // string[49] memory lookup;
+        // for (uint i = 0; i < 48; i++) {
+        //     lookup[i] = Strings.toString(i * 7); // 320 / 48 = 6.6667, ここでは約7ピクセルごとに設定
+        // }
+
         string memory rects;
         string[] memory cache;
         for (uint8 p = 0; p < params.parts.length; p++) {

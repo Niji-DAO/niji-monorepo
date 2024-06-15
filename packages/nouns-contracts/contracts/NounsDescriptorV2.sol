@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title The Nouns NFT descriptor
+/// @title The Niji NFT descriptor
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -33,13 +33,13 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
     // https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt
     bytes32 constant COPYRIGHT_CC0_1_0_UNIVERSAL_LICENSE = 0xa2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499;
 
-    /// @notice The contract responsible for holding compressed Noun art
+    /// @notice The contract responsible for holding compressed Niji art
     INounsArt public art;
 
     /// @notice The contract responsible for constructing SVGs
     ISVGRenderer public renderer;
 
-    /// @notice Whether or not new Noun parts can be added
+    /// @notice Whether or not new Niji parts can be added
     bool public override arePartsLocked;
 
     /// @notice Whether or not `tokenURI` should be returned as a data URI (Default: true)
@@ -62,7 +62,7 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
     }
 
     /**
-     * @notice Set the Noun's art contract.
+     * @notice Set the Niji's art contract.
      * @dev Only callable by the owner when not locked.
      */
     function setArt(INounsArt _art) external onlyOwner whenPartsNotLocked {
@@ -100,42 +100,91 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
     }
 
     /**
-     * @notice Get the number of available Noun `backgrounds`.
+     * @notice Get the number of available Niji `backgrounds`.
      */
     function backgroundCount() external view override returns (uint256) {
         return art.backgroundCount();
     }
 
     /**
-     * @notice Get the number of available Noun `bodies`.
+     * @notice Get the number of available Niji `background decorations`.
      */
-    function bodyCount() external view override returns (uint256) {
-        return art.bodyCount();
+    function backgroundDecorationCount() external view override returns (uint256) {
+        return art.backgroundDecorationCount();
     }
 
     /**
-     * @notice Get the number of available Noun `accessories`.
+     * @notice Get the number of available Niji `special`.
      */
-    function accessoryCount() external view override returns (uint256) {
-        return art.accessoryCount();
+    function specialCount() external view override returns (uint256) {
+        return art.specialCount();
     }
 
     /**
-     * @notice Get the number of available Noun `heads`.
+     * @notice Get the number of available Niji `left hand`.
      */
-    function headCount() external view override returns (uint256) {
-        return art.headCount();
+    function leftHandCount() external view override returns (uint256) {
+        return art.leftHandCount();
     }
 
     /**
-     * @notice Get the number of available Noun `glasses`.
+     * @notice Get the number of available Niji `back`.
      */
-    function glassesCount() external view override returns (uint256) {
-        return art.glassesCount();
+    function backCount() external view override returns (uint256) {
+        return art.backCount();
     }
 
     /**
-     * @notice Batch add Noun backgrounds.
+     * @notice Get the number of available Niji `ears`.
+     */
+    function earCount() external view override returns (uint256) {
+        return art.earCount();
+    }
+
+    /**
+     * @notice Get the number of available Niji `choker`.
+     */
+    function chokerCount() external view override returns (uint256) {
+        return art.chokerCount();
+    }
+
+    /**
+     * @notice Get the number of available Niji `clothe`.
+     */
+    function clotheCount() external view override returns (uint256) {
+        return art.clotheCount();
+    }
+
+    /**
+     * @notice Get the number of available Niji `hair`.
+     */
+    function hairCount() external view override returns (uint256) {
+        return art.hairCount();
+    }
+
+    /**
+     * @notice Get the number of available Niji `headphones`.
+     */
+    function headphoneCount() external view override returns (uint256) {
+        return art.headphoneCount();
+    }
+
+    /**
+     * @notice Get the number of available Niji `hat`.
+     */
+    function hatCount() external view override returns (uint256) {
+        return art.hatCount();
+    }
+
+    /**
+     * @notice Get the number of available Niji `back decoration`.
+     */
+    function backDecorationCount() external view override returns (uint256) {
+        return art.backDecorationCount();
+    }
+
+    /**
+     * @notice Batch add Niji backgrounds.
      * @dev This function can only be called by the owner when not locked.
      */
     function addManyBackgrounds(string[] calldata _backgrounds) external override onlyOwner whenPartsNotLocked {
@@ -143,7 +192,7 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
     }
 
     /**
-     * @notice Add a Noun background.
+     * @notice Add a Niji background.
      * @dev This function can only be called by the owner when not locked.
      */
     function addBackground(string calldata _background) external override onlyOwner whenPartsNotLocked {
@@ -162,67 +211,179 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
     }
 
     /**
-     * @notice Add a batch of body images.
+     * @notice Add a batch of background decoration images.
      * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
      * and finally compressing it using deflate.
      * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addBodies(
+    function addBackgroundDecorations(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyOwner whenPartsNotLocked {
-        art.addBodies(encodedCompressed, decompressedLength, imageCount);
+        art.addBackgroundDecorations(encodedCompressed, decompressedLength, imageCount);
     }
 
     /**
-     * @notice Add a batch of accessory images.
+     * @notice Add a batch of special images.
      * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
      * and finally compressing it using deflate.
      * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addAccessories(
+    function addSpecials(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyOwner whenPartsNotLocked {
-        art.addAccessories(encodedCompressed, decompressedLength, imageCount);
+        art.addSpecials(encodedCompressed, decompressedLength, imageCount);
     }
 
     /**
-     * @notice Add a batch of head images.
+     * @notice Add a batch of left hand images.
      * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
      * and finally compressing it using deflate.
      * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addHeads(
+    function addLeftHands(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyOwner whenPartsNotLocked {
-        art.addHeads(encodedCompressed, decompressedLength, imageCount);
+        art.addLeftHands(encodedCompressed, decompressedLength, imageCount);
     }
 
     /**
-     * @notice Add a batch of glasses images.
+     * @notice Add a batch of left back images.
      * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
      * and finally compressing it using deflate.
      * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addGlasses(
+    function addBacks(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyOwner whenPartsNotLocked {
-        art.addGlasses(encodedCompressed, decompressedLength, imageCount);
+        art.addBacks(encodedCompressed, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of ear images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addEars(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addEars(encodedCompressed, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of choker images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addChokers(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addChokers(encodedCompressed, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of clothe images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addClothes(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addClothes(encodedCompressed, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of hair images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addHairs(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addHairs(encodedCompressed, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of headphone images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addHeadphones(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addHeadphones(encodedCompressed, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of hat images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addHats(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addHats(encodedCompressed, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of back decoration images.
+     * @param encodedCompressed bytes created by taking a string array of RLE-encoded images, abi encoding it as a bytes array,
+     * and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addBackDecorations(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addBackDecorations(encodedCompressed, decompressedLength, imageCount);
     }
 
     /**
@@ -239,7 +400,7 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
     }
 
     /**
-     * @notice Add a batch of body images from an existing storage contract.
+     * @notice Add a batch of background decoration images from an existing storage contract.
      * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
      * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
      * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
@@ -247,16 +408,16 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addBodiesFromPointer(
+    function addBackgroundDecorationsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyOwner whenPartsNotLocked {
-        art.addBodiesFromPointer(pointer, decompressedLength, imageCount);
+        art.addBackgroundDecorationsFromPointer(pointer, decompressedLength, imageCount);
     }
 
     /**
-     * @notice Add a batch of accessory images from an existing storage contract.
+     * @notice Add a batch of special images from an existing storage contract.
      * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
      * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
      * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
@@ -264,16 +425,16 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addAccessoriesFromPointer(
+    function addSpecialsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyOwner whenPartsNotLocked {
-        art.addAccessoriesFromPointer(pointer, decompressedLength, imageCount);
+        art.addSpecialsFromPointer(pointer, decompressedLength, imageCount);
     }
 
     /**
-     * @notice Add a batch of head images from an existing storage contract.
+     * @notice Add a batch of left hand images from an existing storage contract.
      * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
      * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
      * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
@@ -281,16 +442,16 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addHeadsFromPointer(
+    function addLeftHandsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyOwner whenPartsNotLocked {
-        art.addHeadsFromPointer(pointer, decompressedLength, imageCount);
+        art.addLeftHandsFromPointer(pointer, decompressedLength, imageCount);
     }
 
     /**
-     * @notice Add a batch of glasses images from an existing storage contract.
+     * @notice Add a batch of back images from an existing storage contract.
      * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
      * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
      * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
@@ -298,12 +459,131 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
      * @param imageCount the number of images in this batch; used when searching for images among batches.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addGlassesFromPointer(
+    function addBacksFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
     ) external override onlyOwner whenPartsNotLocked {
-        art.addGlassesFromPointer(pointer, decompressedLength, imageCount);
+        art.addBacksFromPointer(pointer, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of ear images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addEarsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addEarsFromPointer(pointer, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of choker images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addChokersFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addChokersFromPointer(pointer, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of clothe images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addClothesFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addClothesFromPointer(pointer, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of hair images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addHairsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addHairsFromPointer(pointer, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of headphone images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addHeadphonesFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addHeadphonesFromPointer(pointer, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of hat images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addHatsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addHatsFromPointer(pointer, decompressedLength, imageCount);
+    }
+
+    /**
+     * @notice Add a batch of back decoration images from an existing storage contract.
+     * @param pointer the address of a contract where the image batch was stored using SSTORE2. The data
+     * format is expected to be like {encodedCompressed}: bytes created by taking a string array of
+     * RLE-encoded images, abi encoding it as a bytes array, and finally compressing it using deflate.
+     * @param decompressedLength the size in bytes the images bytes were prior to compression; required input for Inflate.
+     * @param imageCount the number of images in this batch; used when searching for images among batches.
+     * @dev This function can only be called by the owner when not locked.
+     */
+    function addBackDecorationsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external override onlyOwner whenPartsNotLocked {
+        art.addBackDecorationsFromPointer(pointer, decompressedLength, imageCount);
     }
 
     /**
@@ -316,39 +596,102 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
     }
 
     /**
-     * @notice Get a head image by ID.
-     * @param index the index of the head.
+     * @notice Get a background decorations image by ID.
+     * @param index the index of the background decoration.
      * @return bytes the RLE-encoded bytes of the image.
      */
-    function heads(uint256 index) public view override returns (bytes memory) {
-        return art.heads(index);
+    function backgroundDecorations(uint256 index) public view override returns (bytes memory) {
+        return art.backgroundDecorations(index);
     }
 
     /**
-     * @notice Get a body image by ID.
-     * @param index the index of the body.
+     * @notice Get a specials image by ID.
+     * @param index the index of the special.
      * @return bytes the RLE-encoded bytes of the image.
      */
-    function bodies(uint256 index) public view override returns (bytes memory) {
-        return art.bodies(index);
+    function specials(uint256 index) public view override returns (bytes memory) {
+        return art.specials(index);
     }
 
     /**
-     * @notice Get an accessory image by ID.
-     * @param index the index of the accessory.
+     * @notice Get a left hands image by ID.
+     * @param index the index of the left hand.
      * @return bytes the RLE-encoded bytes of the image.
      */
-    function accessories(uint256 index) public view override returns (bytes memory) {
-        return art.accessories(index);
+    function leftHands(uint256 index) public view override returns (bytes memory) {
+        return art.leftHands(index);
     }
 
     /**
-     * @notice Get a glasses image by ID.
-     * @param index the index of the glasses.
+     * @notice Get a backs image by ID.
+     * @param index the index of the back.
      * @return bytes the RLE-encoded bytes of the image.
      */
-    function glasses(uint256 index) public view override returns (bytes memory) {
-        return art.glasses(index);
+    function backs(uint256 index) public view override returns (bytes memory) {
+        return art.backs(index);
+    }
+
+    /**
+     * @notice Get a ears image by ID.
+     * @param index the index of the ear.
+     * @return bytes the RLE-encoded bytes of the image.
+     */
+    function ears(uint256 index) public view override returns (bytes memory) {
+        return art.ears(index);
+    }
+
+    /**
+     * @notice Get a chokers image by ID.
+     * @param index the index of the choker.
+     * @return bytes the RLE-encoded bytes of the image.
+     */
+    function chokers(uint256 index) public view override returns (bytes memory) {
+        return art.chokers(index);
+    }
+
+    /**
+     * @notice Get a clothes image by ID.
+     * @param index the index of the clothe.
+     * @return bytes the RLE-encoded bytes of the image.
+     */
+    function clothes(uint256 index) public view override returns (bytes memory) {
+        return art.clothes(index);
+    }
+
+    /**
+     * @notice Get a hairs image by ID.
+     * @param index the index of the hair.
+     * @return bytes the RLE-encoded bytes of the image.
+     */
+    function hairs(uint256 index) public view override returns (bytes memory) {
+        return art.hairs(index);
+    }
+
+    /**
+     * @notice Get a headphones image by ID.
+     * @param index the index of the headphones.
+     * @return bytes the RLE-encoded bytes of the image.
+     */
+    function headphones(uint256 index) public view override returns (bytes memory) {
+        return art.headphones(index);
+    }
+
+    /**
+     * @notice Get a hats image by ID.
+     * @param index the index of the hat.
+     * @return bytes the RLE-encoded bytes of the image.
+     */
+    function hats(uint256 index) public view override returns (bytes memory) {
+        return art.hats(index);
+    }
+
+    /**
+     * @notice Get a back decorations image by ID.
+     * @param index the index of the back decoration.
+     * @return bytes the RLE-encoded bytes of the image.
+     */
+    function backDecorations(uint256 index) public view override returns (bytes memory) {
+        return art.backDecorations(index);
     }
 
     /**
@@ -361,7 +704,7 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
     }
 
     /**
-     * @notice Lock all Noun parts.
+     * @notice Lock all Niji parts.
      * @dev This cannot be reversed and can only be called by the owner when not locked.
      */
     function lockParts() external override onlyOwner whenPartsNotLocked {
@@ -395,7 +738,7 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
     }
 
     /**
-     * @notice Given a token ID and seed, construct a token URI for an official Nouns DAO noun.
+     * @notice Given a token ID and seed, construct a token URI for an official Niji DAO noun.
      * @dev The returned value may be a base64 encoded data URI or an API URL.
      */
     function tokenURI(uint256 tokenId, INounsSeeder.Seed memory seed) external view override returns (string memory) {
@@ -406,12 +749,12 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
     }
 
     /**
-     * @notice Given a token ID and seed, construct a base64 encoded data URI for an official Nouns DAO noun.
+     * @notice Given a token ID and seed, construct a base64 encoded data URI for an official Niji DAO noun.
      */
     function dataURI(uint256 tokenId, INounsSeeder.Seed memory seed) public view override returns (string memory) {
         string memory nounId = tokenId.toString();
-        string memory name = string(abi.encodePacked('Noun ', nounId));
-        string memory description = string(abi.encodePacked('Noun ', nounId, ' is a member of the Nouns DAO'));
+        string memory name = string(abi.encodePacked('Niji ', nounId));
+        string memory description = string(abi.encodePacked('Niji ', nounId, ' is a member of the Niji DAO'));
 
         return genericDataURI(name, description, seed);
     }
@@ -445,19 +788,56 @@ contract NounsDescriptorV2 is INounsDescriptorV2, Ownable {
     }
 
     /**
-     * @notice Get all Noun parts for the passed `seed`.
+     * @notice Get all Niji parts for the passed `seed`.
      */
     function getPartsForSeed(INounsSeeder.Seed memory seed) public view returns (ISVGRenderer.Part[] memory) {
-        bytes memory body = art.bodies(seed.body);
-        bytes memory accessory = art.accessories(seed.accessory);
-        bytes memory head = art.heads(seed.head);
-        bytes memory glasses_ = art.glasses(seed.glasses);
+        ISVGRenderer.Part[] memory parts = new ISVGRenderer.Part[](11);
 
-        ISVGRenderer.Part[] memory parts = new ISVGRenderer.Part[](4);
-        parts[0] = ISVGRenderer.Part({ image: body, palette: _getPalette(body) });
-        parts[1] = ISVGRenderer.Part({ image: accessory, palette: _getPalette(accessory) });
-        parts[2] = ISVGRenderer.Part({ image: head, palette: _getPalette(head) });
-        parts[3] = ISVGRenderer.Part({ image: glasses_, palette: _getPalette(glasses_) });
+        {
+            bytes memory backgroundDecoration = art.backgroundDecorations(seed.backgroundDecoration);
+            parts[0] = ISVGRenderer.Part({ image: backgroundDecoration, palette: _getPalette(backgroundDecoration) });
+        }
+        {
+            bytes memory special = art.specials(seed.special);
+            parts[1] = ISVGRenderer.Part({ image: special, palette: _getPalette(special) });
+        }
+        {
+            bytes memory leftHand = art.leftHands(seed.leftHand);
+            parts[2] = ISVGRenderer.Part({ image: leftHand, palette: _getPalette(leftHand) });
+        }
+        {
+            bytes memory back = art.backs(seed.back);
+            parts[3] = ISVGRenderer.Part({ image: back, palette: _getPalette(back) });
+        }
+        {
+            bytes memory ear = art.ears(seed.ear);
+            parts[4] = ISVGRenderer.Part({ image: ear, palette: _getPalette(ear) });
+        }
+        {
+            bytes memory choker = art.chokers(seed.choker);
+            parts[5] = ISVGRenderer.Part({ image: choker, palette: _getPalette(choker) });
+        }
+        {
+            bytes memory clothe = art.clothes(seed.clothe);
+            parts[6] = ISVGRenderer.Part({ image: clothe, palette: _getPalette(clothe) });
+        }
+        {
+            bytes memory hair = art.hairs(seed.hair);
+            parts[7] = ISVGRenderer.Part({ image: hair, palette: _getPalette(hair) });
+        }
+        {
+            bytes memory headphone = art.headphones(seed.headphone);
+            parts[8] = ISVGRenderer.Part({ image: headphone, palette: _getPalette(headphone) });
+        }
+        {
+            bytes memory hat = art.hats(seed.hat);
+            parts[9] = ISVGRenderer.Part({ image: hat, palette: _getPalette(hat) });
+        }
+        {
+            bytes memory backDecoration = art.backDecorations(seed.backDecoration);
+            parts[10] = ISVGRenderer.Part({ image: backDecoration, palette: _getPalette(backDecoration) });
+        }
+
         return parts;
     }
 

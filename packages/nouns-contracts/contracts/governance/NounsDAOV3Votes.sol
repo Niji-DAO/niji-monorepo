@@ -41,7 +41,7 @@ library NounsDAOV3Votes {
     event ProposalObjectionPeriodSet(uint256 indexed id, uint256 objectionPeriodEndBlock);
 
     /// @notice The name of this contract
-    string public constant name = 'Nouns DAO';
+    string public constant name = 'Niji DAO';
 
     /// @notice The EIP-712 typehash for the contract's domain
     bytes32 public constant DOMAIN_TYPEHASH =

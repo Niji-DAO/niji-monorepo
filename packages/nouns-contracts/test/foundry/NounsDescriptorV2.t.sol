@@ -115,9 +115,9 @@ contract NounsDescriptorV2Test is Test {
                         bytes(
                             abi.encodePacked(
                                 '{"name":"',
-                                'Noun 42',
+                                'Niji 42',
                                 '", "description":"',
-                                'Noun 42 is a member of the Nouns DAO',
+                                'Niji 42 is a member of the Niji DAO',
                                 '", "image": "',
                                 'data:image/svg+xml;base64,',
                                 Base64.encode(bytes('mock svg')),
@@ -492,8 +492,8 @@ contract NounsDescriptorV2WithRealArtTest is DeployUtils {
         string memory imageDecoded = string(removeDataTypePrefix(json.readString('.image')).decode());
         strings.slice memory imageSlice = imageDecoded.toSlice();
 
-        assertEq(json.readString('.name'), 'Noun 0');
-        assertEq(json.readString('.description'), 'Noun 0 is a member of the Nouns DAO');
+        assertEq(json.readString('.name'), 'Niji 0');
+        assertEq(json.readString('.description'), 'Niji 0 is a member of the Niji DAO');
         assertEq(bytes(imageDecoded).length, 6849);
         assertTrue(
             imageSlice.startsWith(

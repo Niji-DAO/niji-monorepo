@@ -642,7 +642,7 @@ contract NounsDAOData_AddSignatureTest is NounsDAODataBaseTest {
             description,
             expiration,
             verifyingContract,
-            'Nouns DAO'
+            'Niji DAO'
         );
         bytes memory encodedProp = NounsDAOV3Proposals.calcProposalEncodeData(address(this), txs, description);
 
@@ -677,7 +677,7 @@ contract NounsDAOData_AddSignatureTest is NounsDAODataBaseTest {
             description,
             expiration,
             verifyingContract,
-            'Nouns DAO'
+            'Niji DAO'
         );
         bytes memory encodedProp = NounsDAOV3Proposals.calcProposalEncodeData(address(this), txs, description);
         bytes32 sigDigest = NounsDAOV3Proposals.sigDigest(

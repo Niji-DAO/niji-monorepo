@@ -10,7 +10,7 @@ yarn
 
 ## Usage
 
-**Access Noun RLE Image Data**
+**Access Niji RLE Image Data**
 
 ```ts
 import { ImageData } from '@nouns/assets';
@@ -19,7 +19,7 @@ const { bgcolors, palette, images } = ImageData;
 const { bodies, accessories, heads, glasses } = images;
 ```
 
-**Get Noun Part & Background Data**
+**Get Niji Part & Background Data**
 
 ```ts
 import { getNounData } from '@nouns/assets';
@@ -56,15 +56,15 @@ const seed = getNounSeedFromBlockHash(nounId, blockHash);
 
 ## Examples
 
-**Almost off-chain Noun Crystal Ball**
-Generate a Noun using only a block hash, which saves calls to `NounSeeder` and `NounDescriptor` contracts. This can be used for a faster crystal ball.
+**Almost off-chain Niji Crystal Ball**
+Generate a Niji using only a block hash, which saves calls to `NounSeeder` and `NounDescriptor` contracts. This can be used for a faster crystal ball.
 
 ```ts
 /**
  * For you to implement:
    - hook up providers with ether/web3.js
-   - get currently auctioned Noun Id from the NounsAuctionHouse contract
-   - add 1 to the current Noun Id to get the next Noun Id (named `nextNounId` below)
+   - get currently auctioned Niji Id from the NounsAuctionHouse contract
+   - add 1 to the current Niji Id to get the next Niji Id (named `nextNounId` below)
    - get the latest block hash from your provider (named `latestBlockHash` below)
 */
 
@@ -84,7 +84,7 @@ const { palette } = ImageData; // Used with `buildSVG``
 */
 const seed = getNounSeedFromBlockHash(nextNounId, latestBlockHash);
 
-/** 
+/**
  * OUTPUT:
    {
      parts: [
@@ -114,7 +114,7 @@ const svgBinary = buildSVG(parts, palette, background);
 const svgBase64 = btoa(svgBinary);
 ```
 
-The Noun SVG can then be displayed. Here's a dummy example using React
+The Niji SVG can then be displayed. Here's a dummy example using React
 
 ```ts
 function SVG({ svgBase64 }) {

@@ -1,28 +1,28 @@
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import chai from 'chai';
 import { solidity } from 'ethereum-waffle';
 import { ethers } from 'hardhat';
 import {
-  NounsToken,
   NounsDescriptorV2__factory as NounsDescriptorV2Factory,
+  NounsToken,
 } from '../../typechain';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
+  address,
+  chainId,
   deployNounsToken,
   getSigners,
-  TestSigners,
-  setTotalSupply,
-  populateDescriptorV2,
+  mineBlock,
   minerStart,
   minerStop,
-  mineBlock,
-  chainId,
-  address,
+  populateDescriptorV2,
+  setTotalSupply,
+  TestSigners,
 } from '../utils';
 
 chai.use(solidity);
 const { expect } = chai;
 
-describe('Nouns Governance', () => {
+describe('Niji Governance', () => {
   let snapshotId: number;
   let token: NounsToken;
   let tokenCallFromGuy: NounsToken;
@@ -66,7 +66,7 @@ describe('Nouns Governance', () => {
       NounsDescriptorV2Factory.connect(await token.descriptor(), signers.deployer),
     );
 
-    domain = Domain('Nouns', token.address, await chainId());
+    domain = Domain('Niji', token.address, await chainId());
 
     tokenCallFromGuy = token.connect(signers.account0);
     tokenCallFromDeployer = token;

@@ -1,14 +1,14 @@
-import { Row, Col } from 'react-bootstrap';
-import { useAppSelector } from '../../hooks';
-import classes from './Holder.module.css';
-import ShortAddress from '../ShortAddress';
-import clsx from 'clsx';
-import { Trans } from '@lingui/macro';
 import { useQuery } from '@apollo/client';
-import { nounQuery } from '../../wrappers/subgraph';
-import { buildEtherscanAddressLink } from '../../utils/etherscan';
+import { Trans } from '@lingui/macro';
+import clsx from 'clsx';
 import React from 'react';
+import { Col, Row } from 'react-bootstrap';
+import { useAppSelector } from '../../hooks';
+import { buildEtherscanAddressLink } from '../../utils/etherscan';
+import { nounQuery } from '../../wrappers/subgraph';
+import ShortAddress from '../ShortAddress';
 import Tooltip from '../Tooltip';
+import classes from './Holder.module.css';
 
 interface HolderProps {
   nounId: number;
@@ -27,7 +27,7 @@ const Holder: React.FC<HolderProps> = props => {
   } else if (error) {
     return (
       <div>
-        <Trans>Failed to fetch Noun info</Trans>
+        <Trans>Failed to fetch Niji info</Trans>
       </div>
     );
   }

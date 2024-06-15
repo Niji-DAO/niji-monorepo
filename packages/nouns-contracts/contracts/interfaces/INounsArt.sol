@@ -44,13 +44,27 @@ interface INounsArt {
 
     event PaletteSet(uint8 paletteIndex);
 
-    event BodiesAdded(uint16 count);
+    event BackgroundDecorationsAdded(uint16 count);
 
-    event AccessoriesAdded(uint16 count);
+    event SpecialsAdded(uint16 count);
 
-    event HeadsAdded(uint16 count);
+    event LeftHandsAdded(uint16 count);
 
-    event GlassesAdded(uint16 count);
+    event BacksAdded(uint16 count);
+
+    event EarsAdded(uint16 count);
+
+    event ChokersAdded(uint16 count);
+
+    event ClothesAdded(uint16 count);
+
+    event HairsAdded(uint16 count);
+
+    event HeadphonesAdded(uint16 count);
+
+    event HatsAdded(uint16 count);
+
+    event BackDecorationsAdded(uint16 count);
 
     struct NounArtStoragePage {
         uint16 imageCount;
@@ -79,51 +93,135 @@ interface INounsArt {
 
     function setPalette(uint8 paletteIndex, bytes calldata palette) external;
 
-    function addBodies(
+    function addBackgroundDecorations(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
-    function addAccessories(
+    function addSpecials(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
-    function addHeads(
+    function addLeftHands(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
-    function addGlasses(
+    function addBacks(
         bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
-    function addBodiesFromPointer(
-        address pointer,
+    function addEars(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addChokers(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addClothes(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addHairs(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addHeadphones(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addHats(
+        bytes calldata encodedCompressed,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addBackDecorations(
+        bytes calldata encodedCompressed,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
     function setPalettePointer(uint8 paletteIndex, address pointer) external;
 
-    function addAccessoriesFromPointer(
+    function addBackgroundDecorationsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
-    function addHeadsFromPointer(
+    function addSpecialsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
     ) external;
 
-    function addGlassesFromPointer(
+    function addLeftHandsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addBacksFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addEarsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addChokersFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addClothesFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addHairsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addHeadphonesFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addHatsFromPointer(
+        address pointer,
+        uint80 decompressedLength,
+        uint16 imageCount
+    ) external;
+
+    function addBackDecorationsFromPointer(
         address pointer,
         uint80 decompressedLength,
         uint16 imageCount
@@ -131,29 +229,71 @@ interface INounsArt {
 
     function backgroundCount() external view returns (uint256);
 
-    function bodyCount() external view returns (uint256);
+    function backgroundDecorationCount() external view returns (uint256);
 
-    function accessoryCount() external view returns (uint256);
+    function specialCount() external view returns (uint256);
 
-    function headCount() external view returns (uint256);
+    function leftHandCount() external view returns (uint256);
 
-    function glassesCount() external view returns (uint256);
+    function backCount() external view returns (uint256);
+
+    function earCount() external view returns (uint256);
+
+    function chokerCount() external view returns (uint256);
+
+    function clotheCount() external view returns (uint256);
+
+    function hairCount() external view returns (uint256);
+
+    function headphoneCount() external view returns (uint256);
+
+    function hatCount() external view returns (uint256);
+
+    function backDecorationCount() external view returns (uint256);
 
     function backgrounds(uint256 index) external view returns (string memory);
 
-    function heads(uint256 index) external view returns (bytes memory);
+    function backgroundDecorations(uint256 index) external view returns (bytes memory);
 
-    function bodies(uint256 index) external view returns (bytes memory);
+    function specials(uint256 index) external view returns (bytes memory);
 
-    function accessories(uint256 index) external view returns (bytes memory);
+    function leftHands(uint256 index) external view returns (bytes memory);
 
-    function glasses(uint256 index) external view returns (bytes memory);
+    function backs(uint256 index) external view returns (bytes memory);
 
-    function getBodiesTrait() external view returns (Trait memory);
+    function ears(uint256 index) external view returns (bytes memory);
 
-    function getAccessoriesTrait() external view returns (Trait memory);
+    function chokers(uint256 index) external view returns (bytes memory);
 
-    function getHeadsTrait() external view returns (Trait memory);
+    function clothes(uint256 index) external view returns (bytes memory);
 
-    function getGlassesTrait() external view returns (Trait memory);
+    function hairs(uint256 index) external view returns (bytes memory);
+
+    function headphones(uint256 index) external view returns (bytes memory);
+
+    function hats(uint256 index) external view returns (bytes memory);
+
+    function backDecorations(uint256 index) external view returns (bytes memory);
+
+    function getBackgroundDecorationsTrait() external view returns (Trait memory);
+
+    function getSpecialsTrait() external view returns (Trait memory);
+
+    function getLeftHandsTrait() external view returns (Trait memory);
+
+    function getBacksTrait() external view returns (Trait memory);
+
+    function getEarsTrait() external view returns (Trait memory);
+
+    function getChokersTrait() external view returns (Trait memory);
+
+    function getClothesTrait() external view returns (Trait memory);
+
+    function getHairsTrait() external view returns (Trait memory);
+
+    function getHeadphonesTrait() external view returns (Trait memory);
+
+    function getHatsTrait() external view returns (Trait memory);
+
+    function getBackDecorationsTrait() external view returns (Trait memory);
 }

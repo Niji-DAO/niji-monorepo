@@ -50,7 +50,7 @@ contract ForkingHappyFlowTest is DeployUtilsFork {
         forkDAO = NounsDAOLogicV1Fork(forkTreasury.admin());
 
         // Assert the fork treasury has the expected balance, which is the pro rata ETH of the two Nouner accounts that
-        // escrowed above. They have 4 Nouns out of a total supply of 12, so a third. DAO balance was 24 ETH, a third
+        // escrowed above. They have 4 Niji out of a total supply of 12, so a third. DAO balance was 24 ETH, a third
         // of that is 8 ETH.
         assertEqUint(forkTreasuryAddress.balance, 8 ether);
 
@@ -72,7 +72,7 @@ contract ForkingHappyFlowTest is DeployUtilsFork {
         vm.expectRevert(NounsDAOLogicV1Fork.WaitingForTokensToClaimOrExpiration.selector);
         proposeToFork(makeAddr('target'), 0, 'signature', 'data');
 
-        // Asserting the expected ETH amount was sent. We're now at two thirds of OG Nouns forking, so we expect
+        // Asserting the expected ETH amount was sent. We're now at two thirds of OG Niji forking, so we expect
         // two thirds of the ETH to be sent, which is 16 out of the original 24.
         assertEqUint(forkTreasuryAddress.balance, 16 ether);
 
@@ -80,7 +80,7 @@ contract ForkingHappyFlowTest is DeployUtilsFork {
         // so the next balance assertion is clearly new ETH they received from quitting the fork DAO.
         assertEqUint(nounerInEscrow1.balance, 0);
 
-        // The Nouners that originally escrowed their Nouns, now claiming their new fork tokens.
+        // The Nouners that originally escrowed their Niji, now claiming their new fork tokens.
         vm.prank(nounerInEscrow1);
         forkToken.claimFromEscrow(tokensInEscrow1);
         vm.prank(nounerInEscrow2);

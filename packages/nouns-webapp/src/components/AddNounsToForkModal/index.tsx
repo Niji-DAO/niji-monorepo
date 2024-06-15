@@ -1,18 +1,18 @@
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import classes from './AddNounsToForkModal.module.css';
-import SolidColorBackgroundModal from '../SolidColorBackgroundModal';
-import { InputGroup, FormText, FormControl, FormSelect, Spinner } from 'react-bootstrap';
-import { useAllProposals, useEscrowToFork, useJoinFork } from '../../wrappers/nounsDao';
-import clsx from 'clsx';
+import { faCircleCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MinusCircleIcon } from '@heroicons/react/solid';
 import { Trans } from '@lingui/macro';
 import { TransactionStatus } from '@usedapp/core';
-import config from '../../config';
-import { useSetApprovalForAll, useIsApprovedForAll } from '../../wrappers/nounToken';
-import { faCircleCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { buildEtherscanTxLink } from '../../utils/etherscan';
+import clsx from 'clsx';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import { FormControl, FormSelect, FormText, InputGroup, Spinner } from 'react-bootstrap';
 import link from '../../assets/icons/Link.svg';
+import config from '../../config';
+import { buildEtherscanTxLink } from '../../utils/etherscan';
+import { useAllProposals, useEscrowToFork, useJoinFork } from '../../wrappers/nounsDao';
+import { useIsApprovedForAll, useSetApprovalForAll } from '../../wrappers/nounToken';
+import SolidColorBackgroundModal from '../SolidColorBackgroundModal';
+import classes from './AddNounsToForkModal.module.css';
 
 type Props = {
   setIsModalOpen: Function;
@@ -149,7 +149,8 @@ export default function AddNounsToForkModal(props: Props) {
           break;
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [],
+    },
+    [],
   );
 
   const handleAddToForkStateChange = useCallback((state: TransactionStatus) => {
@@ -206,7 +207,7 @@ export default function AddNounsToForkModal(props: Props) {
     <div className={classes.confirmModalContent}>
       <h2 className={classes.modalTitle}>Confirm</h2>
       <p className={classes.modalDescription}>
-        By joining this fork you are giving up your Nouns to be retrieved in the new fork. This
+        By joining this fork you are giving up your Niji to be retrieved in the new fork. This
         cannot be undone.
       </p>
       <button
@@ -232,18 +233,18 @@ export default function AddNounsToForkModal(props: Props) {
   const modalContent = (
     <div className={classes.modalContent}>
       <h2 className={classes.modalTitle}>
-        {props.isForkingPeriod ? 'Join fork' : 'Add Nouns to escrow'}
+        {props.isForkingPeriod ? 'Join fork' : 'Add Niji to escrow'}
       </h2>
 
       <p className={classes.modalDescription}>
         {!props.isForkingPeriod ? (
           <>
             Nouners can withdraw their tokens from escrow as long as the forking period hasn't
-            started. Nouns in escrow are not eligible to vote or submit proposals.
+            started. Niji in escrow are not eligible to vote or submit proposals.
           </>
         ) : (
           <>
-            By joining this fork you are giving up your Nouns to be retrieved in the new fork. This
+            By joining this fork you are giving up your Niji to be retrieved in the new fork. This
             cannot be undone.
           </>
         )}
@@ -308,12 +309,12 @@ export default function AddNounsToForkModal(props: Props) {
       <div className={classes.sectionHeader}>
         <div className={classes.sectionLabel}>
           <p>
-            <strong>Select Nouns to {props.isForkingPeriod ? 'join fork' : 'to escrow'}</strong>
+            <strong>Select Niji to {props.isForkingPeriod ? 'join fork' : 'to escrow'}</strong>
           </p>
           <p>
             <Trans>
-              Add as many or as few of your Nouns as you’d like. Additional Nouns can be added
-              during the escrow and forking periods.
+              Add as many or as few of your Niji as you’d like. Additional Niji can be added during
+              the escrow and forking periods.
             </Trans>
           </p>
         </div>
@@ -365,7 +366,7 @@ export default function AddNounsToForkModal(props: Props) {
                     alt="noun"
                     className={classes.nounImage}
                   />
-                  Noun {nounId}
+                  Niji {nounId}
                 </div>
                 {props.userEscrowedNouns?.includes(nounId) && (
                   <span className={classes.escrowedNounLabel}>
@@ -383,7 +384,7 @@ export default function AddNounsToForkModal(props: Props) {
               classes.button,
               classes.primaryButton,
               (isWaiting || isApprovalWaiting || isLoading || isApprovalLoading) &&
-              classes.loadingButton,
+                classes.loadingButton,
             )}
             disabled={
               selectedNouns.length === 0 ||
@@ -398,7 +399,7 @@ export default function AddNounsToForkModal(props: Props) {
           >
             {!isWaiting && !isLoading && !isApprovalWaiting && !isApprovalLoading && (
               <>
-                Add {selectedNouns.length > 0 && selectedNouns.length} Noun
+                Add {selectedNouns.length > 0 && selectedNouns.length} Niji
                 {selectedNouns.length === 1 ? '' : 's'} to{' '}
                 {props.isForkingPeriod ? 'fork' : 'escrow'}
               </>
@@ -441,7 +442,7 @@ export default function AddNounsToForkModal(props: Props) {
                 target="_blank"
                 rel="noreferrer"
               >
-                Your Nouns have been added to {props.isForkingPeriod ? 'the fork' : 'escrow'}
+                Your Niji have been added to {props.isForkingPeriod ? 'the fork' : 'escrow'}
                 {escrowToForkState.transaction && <img src={link} width={16} alt="link symbol" />}
               </a>
               {props.userEscrowedNouns &&
@@ -452,7 +453,7 @@ export default function AddNounsToForkModal(props: Props) {
                       clearTransactionState();
                     }}
                   >
-                    Add additional Nouns
+                    Add additional Niji
                   </button>
                 )}
             </p>
@@ -509,7 +510,7 @@ export default function AddNounsToForkModal(props: Props) {
         {selectedNouns.length > 0 && !isTxSuccessful && (
           <>
             <p className={classes.selectedNouns}>
-              Adding {selectedNouns.map(nounId => `Noun ${nounId}`).join(', ')}
+              Adding {selectedNouns.map(nounId => `Niji ${nounId}`).join(', ')}
             </p>
           </>
         )}

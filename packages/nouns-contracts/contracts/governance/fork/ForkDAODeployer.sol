@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title The deployer of new Nouns DAO forks
+/// @title The deployer of new Niji DAO forks
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -81,7 +81,7 @@ contract ForkDAODeployer is IForkDAODeployer {
     }
 
     /**
-     * @notice Deploys a new Nouns DAO fork, including a new token, auction house, governor, and treasury.
+     * @notice Deploys a new Niji DAO fork, including a new token, auction house, governor, and treasury.
      * All contracts are upgradable, and are almost entirely initialized with the same parameters as the original DAO.
      * @param forkingPeriodEndTimestamp The timestamp at which the forking period ends
      * @param forkEscrow The address of the fork escrow contract, used for claiming tokens that were escrowed in the original DAO
@@ -118,7 +118,7 @@ contract ForkDAODeployer is IForkDAODeployer {
             originalAuction.timeBuffer(),
             originalAuction.reservePrice(),
             originalAuction.minBidIncrementPercentage(),
-            originalAuction.duration()
+            originalAuction.baseDuration()
         );
 
         initDAO(governor, treasury, token, originalTimelock);

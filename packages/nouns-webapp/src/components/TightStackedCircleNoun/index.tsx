@@ -1,7 +1,7 @@
-import { useNounSeed } from '../../wrappers/nounToken';
 import { BigNumber } from 'ethers';
+import { useNounSeed } from '../../wrappers/nounToken';
+import { LoadingNoun } from '../Niji';
 import { getNoun } from '../StandaloneNoun';
-import { LoadingNoun } from '../Noun';
 
 interface TightStackedCircleNounProps {
   nounId: number;

@@ -1,8 +1,8 @@
-import { config } from './config';
-import { Contract, providers } from 'ethers';
-import { NFTStorage } from 'nft.storage';
 import { NounsTokenABI } from '@nouns/contracts';
+import { Contract, providers } from 'ethers';
 import Redis from 'ioredis';
+import { NFTStorage } from 'nft.storage';
+import { config } from './config';
 
 /**
  * IFPS Storage Client
@@ -20,7 +20,7 @@ export const redis = new Redis(config.redisPort, config.redisHost);
 export const jsonRpcProvider = new providers.JsonRpcProvider(config.jsonRpcUrl);
 
 /**
- * Nouns ERC721 Token Contract
+ * Niji ERC721 Token Contract
  */
 export const nounsTokenContract = new Contract(
   config.nounsTokenAddress,
