@@ -5,11 +5,11 @@
 /// @notice Deterministically generates trait combinations based on token ID and block data
 /// @dev Uses keccak256 hashing with block properties for pseudo-randomness
 
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.20;
 
 import { INijiSeeder } from './interfaces/INijiSeeder.sol';
 import { NijiArt } from './NijiArt.sol';
-import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
+import { Ownable } from '@openzeppelin/contracts-v5/access/Ownable.sol';
 
 contract NijiSeeder is INijiSeeder, Ownable {
     // =============================================================
@@ -41,10 +41,9 @@ contract NijiSeeder is INijiSeeder, Ownable {
 
     /// @notice Creates a new NijiSeeder contract
     /// @param _art The art storage contract address
-    constructor(address _art) {
+    constructor(address _art) Ownable(msg.sender) {
         if (_art == address(0)) revert InvalidArtAddress();
         art = NijiArt(_art);
-        // Owner is automatically set to msg.sender by OpenZeppelin Ownable
     }
 
     // =============================================================

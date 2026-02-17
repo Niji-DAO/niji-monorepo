@@ -177,7 +177,7 @@ describe('NijiSeeder', () => {
     it('should revert if caller is not owner', async () => {
       await expect(
         seeder.connect(other).setArt(other.address)
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWith('OwnableUnauthorizedAccount');
     });
 
     it('should revert if art is zero address', async () => {

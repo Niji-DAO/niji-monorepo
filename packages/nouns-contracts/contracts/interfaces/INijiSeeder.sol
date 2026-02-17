@@ -3,7 +3,7 @@
 /// @title Interface for NijiSeeder
 /// @author Niji DAO
 
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.20;
 
 interface INijiSeeder {
     /// @notice Seed struct containing trait indices for each category

@@ -5,12 +5,12 @@
 /// @notice Composes trait layers as PNG <image> tags inside an SVG for high-quality on-chain art
 /// @dev This contract generates tokenURI with embedded SVG containing base64-encoded PNG layers
 
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.20;
 
 import { Base64 } from 'base64-sol/base64.sol';
 import { NijiArt } from './NijiArt.sol';
-import { Strings } from '@openzeppelin/contracts/utils/Strings.sol';
-import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
+import { Strings } from '@openzeppelin/contracts-v5/utils/Strings.sol';
+import { Ownable } from '@openzeppelin/contracts-v5/access/Ownable.sol';
 
 contract NijiDescriptor is Ownable {
     using Strings for uint256;
@@ -82,14 +82,13 @@ contract NijiDescriptor is Ownable {
         address _art,
         uint256 _resolution,
         uint256[] memory _compositeOrder
-    ) {
+    ) Ownable(msg.sender) {
         if (_art == address(0)) revert EmptyArtAddress();
         if (_resolution == 0) revert InvalidResolution();
 
         art = NijiArt(_art);
         resolution = _resolution;
         compositeOrder = _compositeOrder;
-        // Owner is automatically set to msg.sender by OpenZeppelin Ownable
     }
 
     // =============================================================
