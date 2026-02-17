@@ -11,6 +11,7 @@ import 'hardhat-gas-reporter';
 import './tasks';
 
 dotenv.config();
+dotenv.config({ path: '../nouns-assets/.env' });
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -45,12 +46,31 @@ const config: HardhatUserConfig = {
         ? { mnemonic: process.env.MNEMONIC }
         : [process.env.WALLET_PRIVATE_KEY!].filter(Boolean),
     },
+    baseSepolia: {
+      url: 'https://sepolia.base.org',
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 84532,
+    },
     hardhat: {
       initialBaseFeePerGas: 0,
     },
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_API_KEY!,
+      sepolia: process.env.ETHERSCAN_API_KEY!,
+      baseSepolia: process.env.BASESCAN_API_KEY!,
+    },
+    customChains: [
+      {
+        network: 'baseSepolia',
+        chainId: 84532,
+        urls: {
+          apiURL: 'https://api-sepolia.basescan.org/api',
+          browserURL: 'https://sepolia.basescan.org',
+        },
+      },
+    ],
   },
   abiExporter: {
     path: './abi',
