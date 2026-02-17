@@ -5,12 +5,12 @@
 /// @notice ERC721 implementation for minting and managing Niji NFTs
 /// @dev Integrates with NijiDescriptor for on-chain SVG generation and NijiSeeder for trait randomization
 
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.20;
 
-import { ERC721 } from '@openzeppelin/contracts/token/ERC721/ERC721.sol';
-import { ERC721Enumerable } from '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
-import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
-import { ReentrancyGuard } from '@openzeppelin/contracts/security/ReentrancyGuard.sol';
+import { ERC721 } from '@openzeppelin/contracts-v5/token/ERC721/ERC721.sol';
+import { ERC721Enumerable } from '@openzeppelin/contracts-v5/token/ERC721/extensions/ERC721Enumerable.sol';
+import { Ownable } from '@openzeppelin/contracts-v5/access/Ownable.sol';
+import { ReentrancyGuard } from '@openzeppelin/contracts-v5/utils/ReentrancyGuard.sol';
 import { NijiDescriptor } from './NijiDescriptor.sol';
 import { INijiSeeder } from './interfaces/INijiSeeder.sol';
 
@@ -120,14 +120,14 @@ contract NijiToken is ERC721Enumerable, Ownable, ReentrancyGuard {
         address _descriptor,
         address _seeder,
         uint256 _maxSupply
-    ) ERC721(_name, _symbol) {
+    ) ERC721(_name, _symbol) Ownable(msg.sender) {
         if (_descriptor == address(0)) revert DescriptorNotSet();
         if (_seeder == address(0)) revert SeederNotSet();
 
         descriptor = NijiDescriptor(_descriptor);
         seeder = INijiSeeder(_seeder);
         maxSupply = _maxSupply;
-        minter = msg.sender;  // Owner is set by Ownable to msg.sender
+        minter = msg.sender;
         isMintingActive = false;
     }
 
@@ -190,7 +190,7 @@ contract NijiToken is ERC721Enumerable, Ownable, ReentrancyGuard {
     /// @param tokenId The token ID
     /// @return The token URI
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        if (!_exists(tokenId)) revert TokenDoesNotExist();
+        if (_ownerOf(tokenId) == address(0)) revert TokenDoesNotExist();
 
         INijiSeeder.Seed memory seed = seeds[tokenId];
         uint256[] memory traitIndices = _seedToTraitIndices(seed);
@@ -224,7 +224,7 @@ contract NijiToken is ERC721Enumerable, Ownable, ReentrancyGuard {
     /// @param tokenId The token ID
     /// @return The seed struct
     function getSeed(uint256 tokenId) external view returns (INijiSeeder.Seed memory) {
-        if (!_exists(tokenId)) revert TokenDoesNotExist();
+        if (_ownerOf(tokenId) == address(0)) revert TokenDoesNotExist();
         return seeds[tokenId];
     }
 
@@ -232,7 +232,7 @@ contract NijiToken is ERC721Enumerable, Ownable, ReentrancyGuard {
     /// @param tokenId The token ID
     /// @return Array of trait indices
     function getTraitIndices(uint256 tokenId) external view returns (uint256[] memory) {
-        if (!_exists(tokenId)) revert TokenDoesNotExist();
+        if (_ownerOf(tokenId) == address(0)) revert TokenDoesNotExist();
         return _seedToTraitIndices(seeds[tokenId]);
     }
 
@@ -300,7 +300,7 @@ contract NijiToken is ERC721Enumerable, Ownable, ReentrancyGuard {
     /// @param tokenId The token ID to check
     /// @return Whether the token exists
     function exists(uint256 tokenId) external view returns (bool) {
-        return _exists(tokenId);
+        return _ownerOf(tokenId) != address(0);
     }
 
     /// @notice Get the remaining supply (if max supply is set)

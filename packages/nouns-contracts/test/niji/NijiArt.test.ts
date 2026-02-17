@@ -145,7 +145,7 @@ describe('NijiArt', () => {
     it('should revert if caller is not owner', async () => {
       await expect(
         art.connect(other).transferDescriptor(other.address)
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWith('OwnableUnauthorizedAccount');
     });
   });
 

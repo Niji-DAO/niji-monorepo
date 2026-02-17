@@ -5,13 +5,12 @@
 /// @notice Each trait is stored as raw PNG bytes in contract bytecode using SSTORE2
 /// @dev This contract manages PNG image storage for the Niji generative art system
 
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.20;
 
 import { SSTORE2 } from './libs/SSTORE2.sol';
-import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
+import { Ownable } from '@openzeppelin/contracts-v5/access/Ownable.sol';
 
 contract NijiArt is Ownable {
-    // Note: Using OpenZeppelin 4.x compatible Ownable (no constructor args)
     // =============================================================
     //                           ERRORS
     // =============================================================
@@ -88,13 +87,12 @@ contract NijiArt is Ownable {
     constructor(
         address _descriptor,
         string[] memory _traitNames
-    ) {
+    ) Ownable(msg.sender) {
         if (_descriptor == address(0)) revert EmptyDescriptorAddress();
 
         descriptor = _descriptor;
         traitNames = _traitNames;
         traitCount = _traitNames.length;
-        // Owner is automatically set to msg.sender by OpenZeppelin Ownable
     }
 
     // =============================================================

@@ -243,7 +243,7 @@ describe('NijiToken', () => {
     it('should revert if caller is not owner', async () => {
       await expect(
         token.connect(other).setDescriptor(other.address)
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWith('OwnableUnauthorizedAccount');
     });
   });
 
