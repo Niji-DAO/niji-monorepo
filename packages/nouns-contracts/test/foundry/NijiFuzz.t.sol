@@ -22,7 +22,6 @@ contract NijiFuzzTest is Test {
         hex'0a49444154789c63000100000500010d0a2db40000000049454e44ae426082';
 
     string[] traitNames;
-    uint256[] compositeOrder;
 
     function setUp() public {
         // Build trait names
@@ -41,7 +40,7 @@ contract NijiFuzzTest is Test {
         traitNames[11] = 'hair';
 
         // Composite order (bottom to top)
-        compositeOrder = new uint256[](TRAIT_COUNT);
+        uint256[] memory compositeOrder = new uint256[](TRAIT_COUNT);
         compositeOrder[0] = 10;
         compositeOrder[1] = 9;
         compositeOrder[2] = 8;

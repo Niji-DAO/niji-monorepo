@@ -13,6 +13,33 @@ import {
   decodeTokenURI,
 } from './helpers';
 
+/** Hash a seed struct into a single keccak256 digest for comparison. */
+function hashSeed(seed: {
+  special: bigint;
+  choker: bigint;
+  headphone: bigint;
+  leftHand: bigint;
+  hat: bigint;
+  clothing: bigint;
+  ear: bigint;
+  back: bigint;
+  backDecoration: bigint;
+  background: bigint;
+  solidBackground: bigint;
+  hair: bigint;
+}): string {
+  return ethers.keccak256(
+    ethers.AbiCoder.defaultAbiCoder().encode(
+      Array(TRAIT_COUNT).fill('uint48'),
+      [
+        seed.special, seed.choker, seed.headphone, seed.leftHand,
+        seed.hat, seed.clothing, seed.ear, seed.back,
+        seed.backDecoration, seed.background, seed.solidBackground, seed.hair,
+      ],
+    ),
+  );
+}
+
 describe('NijiIntegration', () => {
   let art: NijiArt;
   let descriptor: NijiDescriptor;
@@ -150,27 +177,7 @@ describe('NijiIntegration', () => {
 
       const seedHashes = new Set<string>();
       for (let i = 0; i < 10; i++) {
-        const seed = await token.getSeed(i);
-        const hash = ethers.keccak256(
-          ethers.AbiCoder.defaultAbiCoder().encode(
-            Array(TRAIT_COUNT).fill('uint48'),
-            [
-              seed.special,
-              seed.choker,
-              seed.headphone,
-              seed.leftHand,
-              seed.hat,
-              seed.clothing,
-              seed.ear,
-              seed.back,
-              seed.backDecoration,
-              seed.background,
-              seed.solidBackground,
-              seed.hair,
-            ],
-          ),
-        );
-        seedHashes.add(hash);
+        seedHashes.add(hashSeed(await token.getSeed(i)));
       }
 
       // With 3 images per trait and pseudo-random seeds, all 10 should be different
