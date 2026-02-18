@@ -291,4 +291,108 @@ describe('NijiDescriptor', () => {
       expect(skipLayer).to.equal(ethers.MaxUint256);
     });
   });
+
+  // =========================================================================
+  //  JSON Escape Tests (#33)
+  // =========================================================================
+
+  /** Helper: decode data-URI → parsed JSON */
+  function decodeTokenURI(uri: string): any {
+    const jsonB64 = uri.replace('data:application/json;base64,', '');
+    return JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+  }
+
+  describe('JSON escape – tokenURIWithMetadata', () => {
+    beforeEach(async () => {
+      await art.transferDescriptor(owner.address);
+      await art.addTraitImage(10, samplePng);
+    });
+
+    const traitIndices = () => {
+      const t = Array(12).fill(ethers.MaxUint256);
+      t[10] = 0;
+      return t;
+    };
+
+    it('should escape double quotes in name and JSON.parse succeeds', async () => {
+      const uri = await descriptor.tokenURIWithMetadata(
+        0, traitIndices(), 'My "Cool" Art', 'A description'
+      );
+      // JSON.parse succeeds = escaping is correct (would throw on unescaped ")
+      const json = decodeTokenURI(uri);
+      expect(json.name).to.equal('My "Cool" Art #0');
+      expect(json.description).to.equal('A description');
+    });
+
+    it('should escape backslash in name and JSON.parse succeeds', async () => {
+      const uri = await descriptor.tokenURIWithMetadata(
+        0, traitIndices(), 'path\\to\\art', 'A description'
+      );
+      const json = decodeTokenURI(uri);
+      expect(json.name).to.equal('path\\to\\art #0');
+    });
+
+    it('should escape newline in description and JSON.parse succeeds', async () => {
+      const uri = await descriptor.tokenURIWithMetadata(
+        0, traitIndices(), 'Art', 'Line1\nLine2'
+      );
+      const json = decodeTokenURI(uri);
+      // JSON.parse converts \n back to actual newline
+      expect(json.description).to.equal('Line1\nLine2');
+    });
+
+    it('should escape control characters in description and JSON.parse succeeds', async () => {
+      const uri = await descriptor.tokenURIWithMetadata(
+        0, traitIndices(), 'Art', 'before\x01after'
+      );
+      const json = decodeTokenURI(uri);
+      // JSON.parse converts \u0001 back to actual control char
+      expect(json.description).to.equal('before\x01after');
+    });
+
+    it('should handle mixed special characters', async () => {
+      const uri = await descriptor.tokenURIWithMetadata(
+        0, traitIndices(), 'He said "hi"\\wow', 'tab\there\nnewline'
+      );
+      const json = decodeTokenURI(uri);
+      expect(json.name).to.equal('He said "hi"\\wow #0');
+      expect(json.description).to.equal('tab\there\nnewline');
+    });
+
+    it('should not alter safe strings', async () => {
+      const uri = await descriptor.tokenURIWithMetadata(
+        0, traitIndices(), 'SafeName', 'Safe description with spaces and 123'
+      );
+      const json = decodeTokenURI(uri);
+      expect(json.name).to.equal('SafeName #0');
+      expect(json.description).to.equal('Safe description with spaces and 123');
+    });
+  });
+
+  describe('JSON escape – attributes with special trait names', () => {
+    it('should escape double quote in trait name', async () => {
+      const [signer] = await ethers.getSigners();
+
+      // Deploy new art with a trait name containing a double quote
+      const specialTraitNames = ['my"trait'];
+      const NijiArtFactory = await ethers.getContractFactory('NijiArt');
+      const specialArt = (await NijiArtFactory.deploy(signer.address, specialTraitNames)) as unknown as NijiArt;
+
+      const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
+      const specialDescriptor = (await NijiDescriptorFactory.deploy(
+        await specialArt.getAddress(), RESOLUTION, [0]
+      )) as unknown as NijiDescriptor;
+
+      await specialArt.setDescriptor(await specialDescriptor.getAddress());
+      await specialArt.transferDescriptor(signer.address);
+      await specialArt.addTraitImage(0, samplePng);
+
+      const uri = await specialDescriptor.tokenURI(0, [0]);
+      const json = decodeTokenURI(uri);
+
+      expect(json.attributes).to.be.an('array');
+      expect(json.attributes.length).to.equal(1);
+      expect(json.attributes[0].trait_type).to.equal('my"trait');
+    });
+  });
 });
