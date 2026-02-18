@@ -2,6 +2,17 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { NijiArt, NijiDescriptor } from '../../typechain';
+import {
+  TRAIT_NAMES,
+  SAMPLE_PNG,
+  RESOLUTION,
+  COMPOSITE_ORDER,
+  deployNijiArt,
+  deployNijiDescriptor,
+  populateAllTraits,
+  decodeTokenURI,
+  shouldBehaveLikeOwnable2Step,
+} from './helpers';
 
 describe('NijiDescriptor', () => {
   let art: NijiArt;
@@ -9,33 +20,14 @@ describe('NijiDescriptor', () => {
   let owner: SignerWithAddress;
   let other: SignerWithAddress;
 
-  const traitNames = ['special', 'choker', 'headphone', 'leftHand', 'hat', 'clothing', 'ear', 'back', 'backDecoration', 'background', 'solidBackground', 'hair'];
-  const RESOLUTION = 320;
-  const COMPOSITE_ORDER = [10, 9, 8, 0, 3, 7, 5, 1, 6, 11, 4, 2];
-
-  // Sample PNG data (minimal valid PNG)
-  const samplePng = Buffer.from([
-    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
-    0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
-    0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-    0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
-    0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41,
-    0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-    0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00,
-    0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
-    0x42, 0x60, 0x82
-  ]);
-
   beforeEach(async () => {
     [owner, other] = await ethers.getSigners();
 
     // Deploy NijiArt first (with owner as descriptor initially)
-    const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-    art = (await NijiArtFactory.deploy(owner.address, traitNames)) as unknown as NijiArt;
+    art = await deployNijiArt(owner.address);
 
     // Deploy NijiDescriptor
-    const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
-    descriptor = (await NijiDescriptorFactory.deploy(await art.getAddress(), RESOLUTION, COMPOSITE_ORDER)) as unknown as NijiDescriptor;
+    descriptor = await deployNijiDescriptor(await art.getAddress());
 
     // Set descriptor as art's descriptor
     await art.setDescriptor(await descriptor.getAddress());
@@ -78,8 +70,8 @@ describe('NijiDescriptor', () => {
     beforeEach(async () => {
       // Add sample images to art (need owner as descriptor first)
       await art.transferDescriptor(owner.address);
-      await art.addTraitImage(10, samplePng); // solidBackground
-      await art.addTraitImage(9, samplePng);  // background
+      await art.addTraitImage(10, SAMPLE_PNG); // solidBackground
+      await art.addTraitImage(9, SAMPLE_PNG);  // background
     });
 
     it('should generate valid SVG', async () => {
@@ -110,7 +102,7 @@ describe('NijiDescriptor', () => {
   describe('tokenURI', () => {
     beforeEach(async () => {
       await art.transferDescriptor(owner.address);
-      await art.addTraitImage(10, samplePng);
+      await art.addTraitImage(10, SAMPLE_PNG);
     });
 
     it('should generate valid tokenURI', async () => {
@@ -122,8 +114,7 @@ describe('NijiDescriptor', () => {
       expect(uri).to.include('data:application/json;base64,');
 
       // Decode and check JSON
-      const jsonB64 = uri.replace('data:application/json;base64,', '');
-      const json = JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+      const json = decodeTokenURI(uri);
 
       expect(json.name).to.equal('Niji #0');
       expect(json.description).to.include('Niji');
@@ -138,9 +129,7 @@ describe('NijiDescriptor', () => {
   describe('tokenURI attributes', () => {
     beforeEach(async () => {
       await art.transferDescriptor(owner.address);
-      for (let i = 0; i < 12; i++) {
-        await art.addTraitImages(i, [samplePng, samplePng, samplePng]);
-      }
+      await populateAllTraits(art, SAMPLE_PNG);
     });
 
     it('should include attributes array in JSON', async () => {
@@ -149,8 +138,7 @@ describe('NijiDescriptor', () => {
       traitIndices[11] = 2; // hair
 
       const uri = await descriptor.tokenURI(0, traitIndices);
-      const jsonB64 = uri.replace('data:application/json;base64,', '');
-      const json = JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+      const json = decodeTokenURI(uri);
 
       expect(json.attributes).to.be.an('array');
       expect(json.attributes.length).to.equal(2);
@@ -162,8 +150,7 @@ describe('NijiDescriptor', () => {
       traitIndices[11] = 2; // hair
 
       const uri = await descriptor.tokenURI(0, traitIndices);
-      const jsonB64 = uri.replace('data:application/json;base64,', '');
-      const json = JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+      const json = decodeTokenURI(uri);
 
       const specialAttr = json.attributes.find((a: any) => a.trait_type === 'special');
       const hairAttr = json.attributes.find((a: any) => a.trait_type === 'hair');
@@ -179,8 +166,7 @@ describe('NijiDescriptor', () => {
       traitIndices[0] = 1; // only special is set
 
       const uri = await descriptor.tokenURI(0, traitIndices);
-      const jsonB64 = uri.replace('data:application/json;base64,', '');
-      const json = JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+      const json = decodeTokenURI(uri);
 
       expect(json.attributes.length).to.equal(1);
       expect(json.attributes[0].trait_type).to.equal('special');
@@ -191,8 +177,7 @@ describe('NijiDescriptor', () => {
       const traitIndices = Array(12).fill(ethers.MaxUint256);
 
       const uri = await descriptor.tokenURI(0, traitIndices);
-      const jsonB64 = uri.replace('data:application/json;base64,', '');
-      const json = JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+      const json = decodeTokenURI(uri);
 
       expect(json.attributes).to.be.an('array');
       expect(json.attributes.length).to.equal(0);
@@ -201,8 +186,7 @@ describe('NijiDescriptor', () => {
 
   describe('setArt', () => {
     it('should allow owner to update art', async () => {
-      const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-      const newArt = await NijiArtFactory.deploy(owner.address, traitNames);
+      const newArt = await deployNijiArt(owner.address);
       const artAddr = await art.getAddress();
       const newArtAddr = await newArt.getAddress();
 
@@ -247,37 +231,12 @@ describe('NijiDescriptor', () => {
     });
   });
 
-  describe('Ownable2Step', () => {
-    it('transferOwnership should not change owner immediately', async () => {
-      await descriptor.transferOwnership(other.address);
-      expect(await descriptor.owner()).to.equal(owner.address);
-    });
-
-    it('transferOwnership should set pendingOwner', async () => {
-      await descriptor.transferOwnership(other.address);
-      expect(await descriptor.pendingOwner()).to.equal(other.address);
-    });
-
-    it('transferOwnership should emit OwnershipTransferStarted', async () => {
-      await expect(descriptor.transferOwnership(other.address))
-        .to.emit(descriptor, 'OwnershipTransferStarted')
-        .withArgs(owner.address, other.address);
-    });
-
-    it('acceptOwnership should transfer ownership to pendingOwner', async () => {
-      await descriptor.transferOwnership(other.address);
-      await descriptor.connect(other).acceptOwnership();
-      expect(await descriptor.owner()).to.equal(other.address);
-    });
-
-    it('acceptOwnership should revert if caller is not pendingOwner', async () => {
-      await descriptor.transferOwnership(other.address);
-      // owner is not the pendingOwner, so this should revert
-      await expect(
-        descriptor.acceptOwnership()
-      ).to.be.revertedWithCustomError(descriptor, 'OwnableUnauthorizedAccount');
-    });
-  });
+  shouldBehaveLikeOwnable2Step(
+    () => descriptor,
+    () => owner,
+    () => other,
+    () => owner,
+  );
 
   describe('isConfigured', () => {
     it('should return true when properly configured', async () => {
@@ -296,16 +255,10 @@ describe('NijiDescriptor', () => {
   //  JSON Escape Tests (#33)
   // =========================================================================
 
-  /** Helper: decode data-URI → parsed JSON */
-  function decodeTokenURI(uri: string): any {
-    const jsonB64 = uri.replace('data:application/json;base64,', '');
-    return JSON.parse(Buffer.from(jsonB64, 'base64').toString());
-  }
-
   describe('JSON escape – tokenURIWithMetadata', () => {
     beforeEach(async () => {
       await art.transferDescriptor(owner.address);
-      await art.addTraitImage(10, samplePng);
+      await art.addTraitImage(10, SAMPLE_PNG);
     });
 
     const traitIndices = () => {
@@ -375,8 +328,7 @@ describe('NijiDescriptor', () => {
 
       // Deploy new art with a trait name containing a double quote
       const specialTraitNames = ['my"trait'];
-      const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-      const specialArt = (await NijiArtFactory.deploy(signer.address, specialTraitNames)) as unknown as NijiArt;
+      const specialArt = await deployNijiArt(signer.address, specialTraitNames);
 
       const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
       const specialDescriptor = (await NijiDescriptorFactory.deploy(
@@ -385,7 +337,7 @@ describe('NijiDescriptor', () => {
 
       await specialArt.setDescriptor(await specialDescriptor.getAddress());
       await specialArt.transferDescriptor(signer.address);
-      await specialArt.addTraitImage(0, samplePng);
+      await specialArt.addTraitImage(0, SAMPLE_PNG);
 
       const uri = await specialDescriptor.tokenURI(0, [0]);
       const json = decodeTokenURI(uri);

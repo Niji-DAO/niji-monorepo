@@ -12,7 +12,7 @@
   - `fixtures.ts`: populateAllTraits, buildTraitIndices
   - `utils.ts`: decodeTokenURI
   - `behaviors.ts`: shouldBehaveLikeOwnable2Step（Mocha shared behavior パターン）
-  - 対象テスト: NijiArt, NijiDescriptor, NijiSeeder, NijiToken, NijiGas（全134テスト維持）
+  - 対象テスト: NijiArt, NijiDescriptor, NijiSeeder, NijiToken, NijiGas（全134テスト維持、テスト名変更なし）
   - 重複削減: Ownable2Step テスト 100行以上、定数定義 60行以上、デプロイコード 40行以上
 
 #### 追加
