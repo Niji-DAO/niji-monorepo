@@ -1,15 +1,12 @@
-import chai from 'chai';
-import { solidity } from 'ethereum-waffle';
+import { expect } from 'chai';
 import hardhat from 'hardhat';
 
 const { ethers } = hardhat;
 
-import { BigNumber as EthersBN } from 'ethers';
-
 import {
   NounsToken,
   NounsDescriptorV3__factory as NounsDescriptorV3Factory,
-  NounsDAOLogicV4,
+  INounsDAOLogic,
 } from '../../typechain';
 import {
   deployNounsToken,
@@ -22,10 +19,7 @@ import {
   mineBlock,
 } from '../utils';
 
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-
-chai.use(solidity);
-const { expect } = chai;
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 
 let snapshotId: number;
 
@@ -37,7 +31,7 @@ let account2: SignerWithAddress;
 let signers: TestSigners;
 
 let gov: INounsDAOLogic;
-let proposalId: EthersBN;
+let proposalId: bigint;
 
 async function reset() {
   if (snapshotId) {
@@ -53,7 +47,7 @@ async function reset() {
 
   await setTotalSupply(token, 10);
 
-  gov = await deployGovernorV3WithV3Proxy(deployer, token.address);
+  gov = await deployGovernorV3WithV3Proxy(deployer, await token.getAddress());
   snapshotId = await ethers.provider.send('evm_snapshot', []);
 }
 
@@ -123,9 +117,9 @@ describe('NounsDAOV2#castVote/2', () => {
 
         const afterFors = (await gov.proposals(proposalId)).forVotes;
 
-        const balance = (await token.balanceOf(actor.address)).toString();
+        const balance = await token.balanceOf(actor.address);
 
-        expect(afterFors).to.equal(beforeFors.add(balance));
+        expect(afterFors).to.equal(beforeFors + balance);
       });
 
       it("or AgainstVotes corresponding to the caller's support flag.", async () => {
@@ -142,9 +136,9 @@ describe('NounsDAOV2#castVote/2', () => {
 
         const afterAgainst = (await gov.proposals(proposalId)).againstVotes;
 
-        const balance = (await token.balanceOf(actor.address)).toString();
+        const balance = await token.balanceOf(actor.address);
 
-        expect(afterAgainst).to.equal(beforeAgainst.add(balance));
+        expect(afterAgainst).to.equal(beforeAgainst + balance);
       });
     });
   });

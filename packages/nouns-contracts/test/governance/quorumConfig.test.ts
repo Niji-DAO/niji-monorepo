@@ -1,7 +1,6 @@
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import chai from 'chai';
-import { solidity } from 'ethereum-waffle';
-import { parseUnits } from 'ethers/lib/utils';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { expect } from 'chai';
+import { parseUnits } from 'ethers';
 import hardhat from 'hardhat';
 
 import {
@@ -9,6 +8,7 @@ import {
   NounsDescriptorV2__factory as NounsDescriptorV3Factory,
   INounsDAOLogic,
   NounsDAOLogicV4__factory,
+  NounsDAOAdmin__factory,
 } from '../../typechain';
 import { DynamicQuorumParams } from '../types';
 import {
@@ -22,8 +22,6 @@ import {
   deployGovernorV3WithV3Proxy,
 } from '../utils';
 
-chai.use(solidity);
-const { expect } = chai;
 const { ethers } = hardhat;
 
 let token: NounsToken;
@@ -31,6 +29,7 @@ let deployer: SignerWithAddress;
 let account0: SignerWithAddress;
 let signers: TestSigners;
 let gov: INounsDAOLogic;
+let govAdmin: ReturnType<typeof NounsDAOAdmin__factory.connect>;
 let snapshotId: number;
 
 async function setup() {
@@ -42,7 +41,8 @@ async function setup() {
 
   await setTotalSupply(token, 100);
 
-  gov = await deployGovernorV3WithV3Proxy(deployer, token.address);
+  gov = await deployGovernorV3WithV3Proxy(deployer, await token.getAddress());
+  govAdmin = NounsDAOAdmin__factory.connect(await gov.getAddress(), deployer);
 }
 
 describe('NounsDAO#_setDynamicQuorumParams', () => {
@@ -64,32 +64,36 @@ describe('NounsDAO#_setDynamicQuorumParams', () => {
 
   describe('allowed values', () => {
     it('reverts when sender is not admin [ @skip-on-coverage ]', async () => {
-      await expect(gov.connect(account0)._setDynamicQuorumParams(0, 0, 0)).to.be.revertedWith(
-        'AdminOnly()',
-      );
+      await expect(
+        gov.connect(account0)._setDynamicQuorumParams(0, 0, 0),
+      ).to.be.revertedWithCustomError(govAdmin, 'AdminOnly');
     });
 
     it('reverts given minQuorum input below lower bound [ @skip-on-coverage ]', async () => {
-      await expect(gov._setDynamicQuorumParams(199, 0, 0)).to.be.revertedWith(
-        'InvalidMinQuorumVotesBPS()',
+      await expect(gov._setDynamicQuorumParams(199, 0, 0)).to.be.revertedWithCustomError(
+        govAdmin,
+        'InvalidMinQuorumVotesBPS',
       );
     });
 
     it('reverts given minQuorum input above upper bound [ @skip-on-coverage ]', async () => {
-      await expect(gov._setDynamicQuorumParams(2001, 0, 0)).to.be.revertedWith(
-        'InvalidMinQuorumVotesBPS()',
+      await expect(gov._setDynamicQuorumParams(2001, 0, 0)).to.be.revertedWithCustomError(
+        govAdmin,
+        'InvalidMinQuorumVotesBPS',
       );
     });
 
     it('reverts given minQuorum input above maxQuorum BPs [ @skip-on-coverage ]', async () => {
-      await expect(gov._setDynamicQuorumParams(202, 201, 0)).to.be.revertedWith(
-        'MinQuorumBPSGreaterThanMaxQuorumBPS()',
+      await expect(gov._setDynamicQuorumParams(202, 201, 0)).to.be.revertedWithCustomError(
+        govAdmin,
+        'MinQuorumBPSGreaterThanMaxQuorumBPS',
       );
     });
 
     it('reverts when maxQuorum input above upper bound [ @skip-on-coverage ]', async () => {
-      await expect(gov._setDynamicQuorumParams(200, 6001, 0)).to.be.revertedWith(
-        'InvalidMaxQuorumVotesBPS()',
+      await expect(gov._setDynamicQuorumParams(200, 6001, 0)).to.be.revertedWithCustomError(
+        govAdmin,
+        'InvalidMaxQuorumVotesBPS',
       );
     });
   });
@@ -106,7 +110,7 @@ describe('NounsDAO#_setDynamicQuorumParams', () => {
     expect(actualParams.maxQuorumVotesBPS).to.equal(2222);
     expect(actualParams.quorumCoefficient).to.equal(quorumCoefficient);
 
-    const govWithEvents = NounsDAOLogicV4__factory.connect(gov.address, gov.signer);
+    const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
 
     await expect(tx).to.emit(govWithEvents, 'MinQuorumVotesBPSSet').withArgs(200, 222);
     await expect(tx).to.emit(govWithEvents, 'MaxQuorumVotesBPSSet').withArgs(2000, 2222);
@@ -200,14 +204,14 @@ describe('NounsDAO#_setDynamicQuorumParams', () => {
         const params = await gov.getDynamicQuorumParamsAt(await blockNumber());
 
         expect(params.minQuorumVotesBPS).to.equal(222);
-        const govWithEvents = NounsDAOLogicV4__factory.connect(gov.address, gov.signer);
+        const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
         await expect(tx).to.emit(govWithEvents, 'MinQuorumVotesBPSSet').withArgs(200, 222);
       });
 
       it('reverts when sender is not admin [ @skip-on-coverage ]', async () => {
-        await expect(gov.connect(account0)._setMinQuorumVotesBPS(222)).to.be.revertedWith(
-          'AdminOnly()',
-        );
+        await expect(
+          gov.connect(account0)._setMinQuorumVotesBPS(222),
+        ).to.be.revertedWithCustomError(govAdmin, 'AdminOnly');
       });
 
       it('reverts given input below lower bound', async () => {
@@ -237,14 +241,14 @@ describe('NounsDAO#_setDynamicQuorumParams', () => {
         const params = await gov.getDynamicQuorumParamsAt(await blockNumber());
 
         expect(params.maxQuorumVotesBPS).to.equal(3333);
-        const govWithEvents = NounsDAOLogicV4__factory.connect(gov.address, gov.signer);
+        const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
         await expect(tx).to.emit(govWithEvents, 'MaxQuorumVotesBPSSet').withArgs(3000, 3333);
       });
 
       it('reverts when sender is not admin [ @skip-on-coverage ]', async () => {
-        await expect(gov.connect(account0)._setMaxQuorumVotesBPS(3333)).to.be.revertedWith(
-          'AdminOnly()',
-        );
+        await expect(
+          gov.connect(account0)._setMaxQuorumVotesBPS(3333),
+        ).to.be.revertedWithCustomError(govAdmin, 'AdminOnly');
       });
 
       it('reverts given input above upper bound', async () => {
@@ -266,14 +270,14 @@ describe('NounsDAO#_setDynamicQuorumParams', () => {
         const params = await gov.getDynamicQuorumParamsAt(await blockNumber());
 
         expect(params.quorumCoefficient).to.equal(111);
-        const govWithEvents = NounsDAOLogicV4__factory.connect(gov.address, gov.signer);
+        const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
         await expect(tx).to.emit(govWithEvents, 'QuorumCoefficientSet').withArgs(1, 111);
       });
 
       it('reverts when sender is not admin [ @skip-on-coverage ]', async () => {
-        await expect(gov.connect(account0)._setQuorumCoefficient(111)).to.be.revertedWith(
-          'AdminOnly()',
-        );
+        await expect(
+          gov.connect(account0)._setQuorumCoefficient(111),
+        ).to.be.revertedWithCustomError(govAdmin, 'AdminOnly');
       });
     });
   });
