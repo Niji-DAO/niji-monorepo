@@ -24,7 +24,9 @@ task('deploy-test-token', 'Deploy NounsTokenHarness given a descriptor')
       seederAddress,
       proxyRegistryAddress,
     );
-    console.log(`NounsTokenHarness deployed to: ${token.address}`);
+    await token.waitForDeployment();
+    const tokenAddress = await token.getAddress();
+    console.log(`NounsTokenHarness deployed to: ${tokenAddress}`);
 
     if (network.name !== 'localhost') {
       console.log('Waiting 1 minute before verifying contracts on Etherscan');
@@ -35,7 +37,7 @@ task('deploy-test-token', 'Deploy NounsTokenHarness given a descriptor')
 
       contracts.NounsTokenHarness = {
         name: 'NounsTokenHarness',
-        address: token.address,
+        address: tokenAddress,
         constructorArguments: [
           deployer.address,
           deployer.address,

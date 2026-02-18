@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs';
 
+import { AbiCoder } from 'ethers';
 import { task } from 'hardhat/config';
 
 import { dataToDescriptorInput } from './utils';
@@ -27,7 +28,7 @@ task(
         targets.push(nounsDescriptor);
         values.push(0);
         signatures.push('addManyBackgrounds(string[])');
-        calldatas.push(ethers.utils.defaultAbiCoder.encode(['string[]'], [ImageData.bgcolors]));
+        calldatas.push(AbiCoder.defaultAbiCoder().encode(['string[]'], [ImageData.bgcolors]));
       }
 
       if (ImageData.palettes) {
@@ -36,7 +37,7 @@ task(
           values.push(0);
           signatures.push('setPalette(uint8,bytes)');
           calldatas.push(
-            ethers.utils.defaultAbiCoder.encode(
+            AbiCoder.defaultAbiCoder().encode(
               ['uint8', 'bytes'],
               [parseInt(index), `0x000000${(colors as string[]).join('')}`],
             ),
@@ -56,7 +57,7 @@ task(
           values.push(0);
           signatures.push('addBodies(bytes,uint80,uint16)');
           calldatas.push(
-            ethers.utils.defaultAbiCoder.encode(
+            AbiCoder.defaultAbiCoder().encode(
               ['bytes', 'uint80', 'uint16'],
               [bodiesPage.encodedCompressed, bodiesPage.originalLength, bodiesPage.itemCount],
             ),
@@ -72,7 +73,7 @@ task(
           values.push(0);
           signatures.push('addHeads(bytes,uint80,uint16)');
           calldatas.push(
-            ethers.utils.defaultAbiCoder.encode(
+            AbiCoder.defaultAbiCoder().encode(
               ['bytes', 'uint80', 'uint16'],
               [headsPage.encodedCompressed, headsPage.originalLength, headsPage.itemCount],
             ),
@@ -88,7 +89,7 @@ task(
           values.push(0);
           signatures.push('addGlasses(bytes,uint80,uint16)');
           calldatas.push(
-            ethers.utils.defaultAbiCoder.encode(
+            AbiCoder.defaultAbiCoder().encode(
               ['bytes', 'uint80', 'uint16'],
               [glassesPage.encodedCompressed, glassesPage.originalLength, glassesPage.itemCount],
             ),
@@ -104,7 +105,7 @@ task(
           values.push(0);
           signatures.push('addAccessories(bytes,uint80,uint16)');
           calldatas.push(
-            ethers.utils.defaultAbiCoder.encode(
+            AbiCoder.defaultAbiCoder().encode(
               ['bytes', 'uint80', 'uint16'],
               [
                 accessoriesPage.encodedCompressed,

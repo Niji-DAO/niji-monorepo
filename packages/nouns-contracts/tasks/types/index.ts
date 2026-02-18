@@ -1,4 +1,4 @@
-import { Contract } from 'ethers';
+import { BaseContract } from 'ethers';
 
 export enum ChainId {
   Mainnet = 1,
@@ -47,7 +47,7 @@ export interface ContractDeployment {
 export interface DeployedContract {
   name: string;
   address: string;
-  instance: Contract;
+  instance: BaseContract;
   constructorArguments: (string | number)[];
   libraries: Record<string, string>;
 }

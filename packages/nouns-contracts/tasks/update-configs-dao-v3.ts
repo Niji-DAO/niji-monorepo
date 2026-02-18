@@ -45,23 +45,33 @@ task('update-configs-dao-v3', 'Write the deployed addresses to the SDK and subgr
       // Generate subgraph config
       const configName = `${network}-fork`;
       const subgraphConfigPath = join(__dirname, `../../nouns-subgraph/config/${configName}.json`);
+
+      const getDeployBlockNumber = async (contract: DeployedContract) => {
+        const deployTx = contract.instance.deploymentTransaction();
+        if (deployTx) {
+          const receipt = await deployTx.wait();
+          return receipt?.blockNumber;
+        }
+        return undefined;
+      };
+
       const subgraphConfig = {
         network,
         nounsToken: {
           address: contracts.NounsToken.address,
-          startBlock: contracts.NounsToken.instance.deployTransaction.blockNumber,
+          startBlock: await getDeployBlockNumber(contracts.NounsToken),
         },
         nounsAuctionHouse: {
           address: contracts.NounsAuctionHouseProxy.address,
-          startBlock: contracts.NounsAuctionHouseProxy.instance.deployTransaction.blockNumber,
+          startBlock: await getDeployBlockNumber(contracts.NounsAuctionHouseProxy),
         },
         nounsDAO: {
           address: contracts.NounsDAOProxyV3.address,
-          startBlock: contracts.NounsDAOProxyV3.instance.deployTransaction.blockNumber,
+          startBlock: await getDeployBlockNumber(contracts.NounsDAOProxyV3),
         },
         nounsDAOData: {
           address: contracts.NounsDAODataProxy.address,
-          startBlock: contracts.NounsDAODataProxy.instance.deployTransaction.blockNumber,
+          startBlock: await getDeployBlockNumber(contracts.NounsDAODataProxy),
         },
       };
       writeFileSync(subgraphConfigPath, JSON.stringify(subgraphConfig, null, 2));

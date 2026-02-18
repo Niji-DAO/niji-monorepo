@@ -1,5 +1,4 @@
-import { constants } from 'ethers';
-import { Interface, parseUnits } from 'ethers/lib/utils';
+import { ethers as ethersLib, Interface, parseUnits } from 'ethers';
 import { task, types } from 'hardhat/config';
 import promptjs from 'prompt';
 
@@ -102,7 +101,7 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
     const [deployer] = await ethers.getSigners();
 
     // prettier-ignore
-    const proxyRegistryAddress = proxyRegistries[network.chainId] ?? constants.AddressZero;
+    const proxyRegistryAddress = proxyRegistries[Number(network.chainId)] ?? ethersLib.ZeroAddress;
 
     if (!args.noundersdao) {
       console.log(
@@ -111,7 +110,7 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
       args.noundersdao = deployer.address;
     }
     if (!args.weth) {
-      const deployedWETHContract = wethContracts[network.chainId];
+      const deployedWETHContract = wethContracts[Number(network.chainId)];
       if (!deployedWETHContract) {
         throw new Error(
           `Can not auto-detect WETH contract on chain ${network.name}. Provide it with the --weth arg.`,
@@ -120,16 +119,16 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
       args.weth = deployedWETHContract;
     }
 
-    const nonce = await deployer.getTransactionCount();
-    const expectedNounsArtAddress = ethers.utils.getContractAddress({
+    const nonce = await ethers.provider.getTransactionCount(deployer.address);
+    const expectedNounsArtAddress = ethersLib.getCreateAddress({
       from: deployer.address,
       nonce: nonce + NOUNS_ART_NONCE_OFFSET,
     });
-    const expectedAuctionHouseProxyAddress = ethers.utils.getContractAddress({
+    const expectedAuctionHouseProxyAddress = ethersLib.getCreateAddress({
       from: deployer.address,
       nonce: nonce + AUCTION_HOUSE_PROXY_NONCE_OFFSET,
     });
-    const expectedNounsDAOProxyAddress = ethers.utils.getContractAddress({
+    const expectedNounsDAOProxyAddress = ethersLib.getCreateAddress({
       from: deployer.address,
       nonce: nonce + GOVERNOR_N_DELEGATOR_NONCE_OFFSET,
     });
@@ -303,7 +302,7 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
       }
       if (!args.autoDeploy) {
         const gasInGwei = Math.round(
-          Number(ethers.utils.formatUnits(gasOptions.gasPrice!, 'gwei')),
+          Number(ethersLib.formatUnits(gasOptions.gasPrice!, 'gwei')),
         );
 
         promptjs.start();
@@ -320,7 +319,7 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
             },
           },
         ]);
-        gasOptions.gasPrice = ethers.utils.parseUnits(result.gasPrice.toString(), 'gwei');
+        gasOptions.gasPrice = ethersLib.parseUnits(result.gasPrice.toString(), 'gwei');
       }
 
       let nameForFactory: string;
@@ -340,18 +339,17 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
         libraries: contract?.libraries?.(),
       });
 
-      const deploymentGas = await factory.signer.estimateGas(
-        factory.getDeployTransaction(
-          ...(contract.args?.map(a => (typeof a === 'function' ? a() : a)) ?? []),
-          gasOptions,
-        ),
+      const deployTx = await factory.getDeployTransaction(
+        ...(contract.args?.map(a => (typeof a === 'function' ? a() : a)) ?? []),
+        gasOptions,
       );
+      const deploymentGas = await deployer.estimateGas(deployTx);
 
       if (!args.autoDeploy) {
-        const deploymentCost = deploymentGas.mul(gasOptions.gasPrice!);
+        const deploymentCost = deploymentGas * gasOptions.gasPrice!;
 
         console.log(
-          `Estimated cost to deploy ${name}: ${ethers.utils.formatUnits(
+          `Estimated cost to deploy ${name}: ${ethersLib.formatUnits(
             deploymentCost,
             'ether',
           )} ETH`,
@@ -385,20 +383,21 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
       );
 
       if (contract.waitForConfirmation) {
-        await deployedContract.deployed();
+        await deployedContract.waitForDeployment();
       }
 
+      const deployedAddress = await deployedContract.getAddress();
       deployment[name as ContractNamesDAOV3] = {
         name: nameForFactory,
         instance: deployedContract,
-        address: deployedContract.address,
+        address: deployedAddress,
         constructorArguments: contract.args?.map(a => (typeof a === 'function' ? a() : a)) ?? [],
         libraries: contract?.libraries?.() ?? {},
       };
 
       contract.validateDeployment?.();
 
-      console.log(`${name} contract deployed to ${deployedContract.address}`);
+      console.log(`${name} contract deployed to ${deployedAddress}`);
     }
 
     return deployment;

@@ -1,7 +1,7 @@
 import { writeFileSync } from 'fs';
 import path from 'path';
 
-import { ethers } from 'ethers';
+import { AbiCoder } from 'ethers';
 import { task, types } from 'hardhat/config';
 
 import ImageData from '../files/image-data-v2.json';
@@ -12,7 +12,7 @@ const saveToFileAbiEncoded = (
   filepath: string,
   traitPage: { encodedCompressed: string; originalLength: number; itemCount: number },
 ) => {
-  const abiEncoded = ethers.utils.defaultAbiCoder.encode(
+  const abiEncoded = AbiCoder.defaultAbiCoder().encode(
     ['bytes', 'uint80', 'uint16'],
     [traitPage.encodedCompressed, traitPage.originalLength, traitPage.itemCount],
   );
@@ -36,7 +36,7 @@ task(
     'Where to save abi encoded files to be used in forge tests',
     path.join(__dirname, '../test/foundry/files/descriptor_v2/'),
   )
-  .setAction(async ({ count, start, exportPath }, { ethers }) => {
+  .setAction(async ({ count, start, exportPath }) => {
     const { bgcolors, palette, images } = ImageData;
     let { bodies, accessories, heads, glasses } = images;
 
@@ -57,7 +57,7 @@ task(
 
     writeFileSync(
       path.join(exportPath, 'paletteAndBackgrounds.abi'),
-      ethers.utils.defaultAbiCoder.encode(['bytes', 'string[]'], [paletteValue, bgcolors]),
+      AbiCoder.defaultAbiCoder().encode(['bytes', 'string[]'], [paletteValue, bgcolors]),
     );
 
     console.log('=== PALETTE ===\n');

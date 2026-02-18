@@ -91,7 +91,7 @@ task(
 
     // Transfer ownership of all contract except for the auction house.
     // We must maintain ownership of the auction house to kick off the first auction.
-    const executorAddress = contracts.NounsDAOExecutorProxy.instance.address;
+    const executorAddress = contracts.NounsDAOExecutorProxy.address;
     await contracts.NounsDescriptorV3.instance.transferOwnership(executorAddress);
     await contracts.NounsToken.instance.transferOwnership(executorAddress);
     await contracts.NounsAuctionHouseProxyAdmin.instance.transferOwnership(executorAddress);
@@ -101,7 +101,7 @@ task(
 
     // Optionally kick off the first auction and transfer ownership of the auction house
     // to the Nouns DAO executor.
-    const auctionHouse = contracts.NounsAuctionHouse.instance.attach(
+    const auctionHouse = (contracts.NounsAuctionHouse.instance as any).attach(
       contracts.NounsAuctionHouseProxy.address,
     );
     if (args.startAuction) {
