@@ -5,6 +5,15 @@
 ### nouns-contracts
 
 #### 追加
+- **NijiDescriptor: JSON エスケープ処理追加** (#33)
+  - `JsonEscape` ライブラリを新規作成（`contracts/libs/JsonEscape.sol`）。JSON 文字列内の特殊文字を安全にエスケープ
+  - 対象文字: `"` → `\"`, `\` → `\\`, `\n` → `\n`, `\r` → `\r`, `\t` → `\t`, 制御文字 (0x00-0x1F) → `\uXXXX`
+  - 2-pass アルゴリズム（長さ計算 + 書き込み）でメモリ効率を最大化。エスケープ不要な文字列は即リターンでガス最小化
+  - `tokenURIWithMetadata()` の `name`, `description` パラメータにエスケープを適用（ユーザー制御可能な入力）
+  - `_generateAttributes()` の `traitName` にエスケープを適用（防御的対応）
+  - `tokenURI()` は固定文字列のみのためエスケープ不適用（ガスコスト追加なし）
+  - テスト 7 件追加（合計 122 Niji テストすべてパス）
+
 - **NijiToken: Provenance Hash 機能追加** (#38)
   - `string public provenanceHash` ストレージを追加。全画像データの結合ハッシュを保持し、NFTコレクションの公平性証明に使用
   - `bool public isProvenanceHashLocked` ストレージを追加。ハッシュのロック状態を管理
