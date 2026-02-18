@@ -9,11 +9,13 @@ pragma solidity ^0.8.20;
 
 import { Base64 } from 'base64-sol/base64.sol';
 import { NijiArt } from './NijiArt.sol';
+import { JsonEscape } from './libs/JsonEscape.sol';
 import { Strings } from '@openzeppelin/contracts-v5/utils/Strings.sol';
 import { Ownable2Step, Ownable } from '@openzeppelin/contracts-v5/access/Ownable2Step.sol';
 
 contract NijiDescriptor is Ownable2Step {
     using Strings for uint256;
+    using JsonEscape for string;
 
     // =============================================================
     //                           ERRORS
@@ -149,11 +151,11 @@ contract NijiDescriptor is Ownable2Step {
                     bytes(
                         abi.encodePacked(
                             '{"name":"',
-                            name,
+                            name.escape(),
                             ' #',
                             tokenId.toString(),
                             '", "description":"',
-                            description,
+                            description.escape(),
                             '", "image": "data:image/svg+xml;base64,',
                             svgBase64,
                             '", "attributes":',
@@ -179,10 +181,11 @@ contract NijiDescriptor is Ownable2Step {
         for (uint256 i = 0; i < traitIndices.length; ) {
             if (traitIndices[i] != SKIP_LAYER) {
                 if (!first) attrs = abi.encodePacked(attrs, ',');
+                string memory traitName = art.getTraitName(i).escape();
                 attrs = abi.encodePacked(
                     attrs,
                     '{"trait_type":"',
-                    art.getTraitName(i),
+                    traitName,
                     '","value":"',
                     traitIndices[i].toString(),
                     '"}'
