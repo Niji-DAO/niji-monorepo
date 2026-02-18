@@ -8,7 +8,7 @@ import { NijiSeeder } from '../../contracts/NijiSeeder.sol';
 import { NijiToken } from '../../contracts/NijiToken.sol';
 import { INijiSeeder } from '../../contracts/interfaces/INijiSeeder.sol';
 
-contract NijiFuzzTest is Test {
+contract NijiFuzz is Test {
     NijiArt art;
     NijiDescriptor descriptor;
     NijiSeeder seeder;
