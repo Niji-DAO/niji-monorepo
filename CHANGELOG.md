@@ -5,6 +5,14 @@
 ### nouns-contracts
 
 #### 追加
+- **NijiGas: 本番サイズ PNG ガスベンチマーク** (#73)
+  - `test/niji/NijiGas.test.ts` を新規作成。5KB/10KB/15KB/20KB の合成 PNG データを使用したガス計測テスト 12 件
+  - tokenURI ガス計測: 5KB×12layers (26.1M, 30M以内) / 10KB (59.9M) / 15KB (102.0M) / 20KB (152.4M)
+  - ストレージ ガス計測: addTraitImage (1.2M〜4.6M) / addTraitImages バッチ (7.0M)
+  - サブオペレーション: generateSVG 10KB×12 (19.2M, 30M以内) / generateSVGBase64 (33.6M)
+  - 主要発見: 5KB×12layers のみが Ethereum 30M ブロックガスリミット以内。Base64 エンコードとメモリ拡張がボトルネック
+  - hardhat.config.ts: hardfork を `cancun` に固定、blockGasLimit を 300M に引き上げ（Fusaka EIP-7825 ガスキャップ回避）
+
 - **NijiDescriptor: JSON エスケープ処理追加** (#33)
   - `JsonEscape` ライブラリを新規作成（`contracts/libs/JsonEscape.sol`）。JSON 文字列内の特殊文字を安全にエスケープ
   - 対象文字: `"` → `\"`, `\` → `\\`, `\n` → `\n`, `\r` → `\r`, `\t` → `\t`, 制御文字 (0x00-0x1F) → `\uXXXX`
