@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { NijiArt, NijiSeeder } from '../../typechain';
 
 describe('NijiSeeder', () => {
@@ -29,13 +29,11 @@ describe('NijiSeeder', () => {
 
     // Deploy NijiArt
     const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-    art = (await NijiArtFactory.deploy(owner.address, traitNames)) as NijiArt;
-    await art.deployed();
+    art = (await NijiArtFactory.deploy(owner.address, traitNames)) as unknown as NijiArt;
 
     // Deploy NijiSeeder
     const NijiSeederFactory = await ethers.getContractFactory('NijiSeeder');
-    seeder = (await NijiSeederFactory.deploy(art.address)) as NijiSeeder;
-    await seeder.deployed();
+    seeder = (await NijiSeederFactory.deploy(await art.getAddress())) as unknown as NijiSeeder;
 
     // Add some images for testing
     for (let i = 0; i < 12; i++) {
@@ -45,7 +43,7 @@ describe('NijiSeeder', () => {
 
   describe('constructor', () => {
     it('should set art correctly', async () => {
-      expect(await seeder.art()).to.equal(art.address);
+      expect(await seeder.art()).to.equal(await art.getAddress());
     });
 
     it('should set owner to deployer', async () => {
@@ -55,14 +53,14 @@ describe('NijiSeeder', () => {
     it('should revert if art is zero address', async () => {
       const NijiSeederFactory = await ethers.getContractFactory('NijiSeeder');
       await expect(
-        NijiSeederFactory.deploy(ethers.constants.AddressZero)
-      ).to.be.revertedWith('InvalidArtAddress');
+        NijiSeederFactory.deploy(ethers.ZeroAddress)
+      ).to.be.revertedWithCustomError(NijiSeederFactory, 'InvalidArtAddress');
     });
   });
 
   describe('generateSeed', () => {
     it('should generate a seed with all 12 traits', async () => {
-      const seed = await seeder.generateSeed(0, ethers.constants.AddressZero);
+      const seed = await seeder.generateSeed(0, ethers.ZeroAddress);
 
       // Check that all traits are set (they should be 0, 1, or 2 since we have 3 images per trait)
       expect(seed.special).to.be.at.least(0);
@@ -92,22 +90,22 @@ describe('NijiSeeder', () => {
     });
 
     it('should generate different seeds for different token IDs (in different blocks)', async () => {
-      const seed1 = await seeder.generateSeed(0, ethers.constants.AddressZero);
+      const seed1 = await seeder.generateSeed(0, ethers.ZeroAddress);
 
       // Mine a new block
       await ethers.provider.send('evm_mine', []);
 
-      const seed2 = await seeder.generateSeed(1, ethers.constants.AddressZero);
+      const seed2 = await seeder.generateSeed(1, ethers.ZeroAddress);
 
       // Seeds should be different (very unlikely to be the same)
-      const seed1Hash = ethers.utils.keccak256(
-        ethers.utils.defaultAbiCoder.encode(
+      const seed1Hash = ethers.keccak256(
+        ethers.AbiCoder.defaultAbiCoder().encode(
           ['uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48'],
           [seed1.special, seed1.choker, seed1.headphone, seed1.leftHand, seed1.hat, seed1.clothing, seed1.ear, seed1.back, seed1.backDecoration, seed1.background, seed1.solidBackground, seed1.hair]
         )
       );
-      const seed2Hash = ethers.utils.keccak256(
-        ethers.utils.defaultAbiCoder.encode(
+      const seed2Hash = ethers.keccak256(
+        ethers.AbiCoder.defaultAbiCoder().encode(
           ['uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48'],
           [seed2.special, seed2.choker, seed2.headphone, seed2.leftHand, seed2.hat, seed2.clothing, seed2.ear, seed2.back, seed2.backDecoration, seed2.background, seed2.solidBackground, seed2.hair]
         )
@@ -119,7 +117,7 @@ describe('NijiSeeder', () => {
 
   describe('generateSeedFromSource', () => {
     it('should generate deterministic seed from source', async () => {
-      const source = ethers.BigNumber.from('0x123456789abcdef');
+      const source = BigInt('0x123456789abcdef');
 
       const seed1 = await seeder.generateSeedFromSource(source);
       const seed2 = await seeder.generateSeedFromSource(source);
@@ -131,8 +129,8 @@ describe('NijiSeeder', () => {
     });
 
     it('should generate different seeds for different sources', async () => {
-      const seed1 = await seeder.generateSeedFromSource(ethers.BigNumber.from(1));
-      const seed2 = await seeder.generateSeedFromSource(ethers.BigNumber.from(2));
+      const seed1 = await seeder.generateSeedFromSource(1n);
+      const seed2 = await seeder.generateSeedFromSource(2n);
 
       // Different sources should (very likely) produce different seeds
       expect(
@@ -165,25 +163,26 @@ describe('NijiSeeder', () => {
     it('should allow owner to update art', async () => {
       const NijiArtFactory = await ethers.getContractFactory('NijiArt');
       const newArt = await NijiArtFactory.deploy(owner.address, traitNames);
-      await newArt.deployed();
+      const artAddr = await art.getAddress();
+      const newArtAddr = await newArt.getAddress();
 
-      await expect(seeder.connect(owner).setArt(newArt.address))
+      await expect(seeder.connect(owner).setArt(newArtAddr))
         .to.emit(seeder, 'ArtUpdated')
-        .withArgs(art.address, newArt.address);
+        .withArgs(artAddr, newArtAddr);
 
-      expect(await seeder.art()).to.equal(newArt.address);
+      expect(await seeder.art()).to.equal(newArtAddr);
     });
 
     it('should revert if caller is not owner', async () => {
       await expect(
         seeder.connect(other).setArt(other.address)
-      ).to.be.revertedWith('OwnableUnauthorizedAccount');
+      ).to.be.revertedWithCustomError(seeder, 'OwnableUnauthorizedAccount');
     });
 
     it('should revert if art is zero address', async () => {
       await expect(
-        seeder.setArt(ethers.constants.AddressZero)
-      ).to.be.revertedWith('InvalidArtAddress');
+        seeder.setArt(ethers.ZeroAddress)
+      ).to.be.revertedWithCustomError(seeder, 'InvalidArtAddress');
     });
   });
 });

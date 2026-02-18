@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { NijiArt, NijiDescriptor } from '../../typechain';
 
 describe('NijiDescriptor', () => {
@@ -31,21 +31,19 @@ describe('NijiDescriptor', () => {
 
     // Deploy NijiArt first (with owner as descriptor initially)
     const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-    art = (await NijiArtFactory.deploy(owner.address, traitNames)) as NijiArt;
-    await art.deployed();
+    art = (await NijiArtFactory.deploy(owner.address, traitNames)) as unknown as NijiArt;
 
     // Deploy NijiDescriptor
     const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
-    descriptor = (await NijiDescriptorFactory.deploy(art.address, RESOLUTION, COMPOSITE_ORDER)) as NijiDescriptor;
-    await descriptor.deployed();
+    descriptor = (await NijiDescriptorFactory.deploy(await art.getAddress(), RESOLUTION, COMPOSITE_ORDER)) as unknown as NijiDescriptor;
 
     // Set descriptor as art's descriptor
-    await art.setDescriptor(descriptor.address);
+    await art.setDescriptor(await descriptor.getAddress());
   });
 
   describe('constructor', () => {
     it('should set art correctly', async () => {
-      expect(await descriptor.art()).to.equal(art.address);
+      expect(await descriptor.art()).to.equal(await art.getAddress());
     });
 
     it('should set resolution correctly', async () => {
@@ -54,7 +52,7 @@ describe('NijiDescriptor', () => {
 
     it('should set composite order correctly', async () => {
       const order = await descriptor.getCompositeOrder();
-      expect(order.map(n => n.toNumber())).to.deep.equal(COMPOSITE_ORDER);
+      expect(order.map(n => Number(n))).to.deep.equal(COMPOSITE_ORDER);
     });
 
     it('should set owner to deployer', async () => {
@@ -64,15 +62,15 @@ describe('NijiDescriptor', () => {
     it('should revert if art is zero address', async () => {
       const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
       await expect(
-        NijiDescriptorFactory.deploy(ethers.constants.AddressZero, RESOLUTION, COMPOSITE_ORDER)
-      ).to.be.revertedWith('EmptyArtAddress');
+        NijiDescriptorFactory.deploy(ethers.ZeroAddress, RESOLUTION, COMPOSITE_ORDER)
+      ).to.be.revertedWithCustomError(NijiDescriptorFactory, 'EmptyArtAddress');
     });
 
     it('should revert if resolution is zero', async () => {
       const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
       await expect(
-        NijiDescriptorFactory.deploy(art.address, 0, COMPOSITE_ORDER)
-      ).to.be.revertedWith('InvalidResolution');
+        NijiDescriptorFactory.deploy(await art.getAddress(), 0, COMPOSITE_ORDER)
+      ).to.be.revertedWithCustomError(NijiDescriptorFactory, 'InvalidResolution');
     });
   });
 
@@ -86,7 +84,7 @@ describe('NijiDescriptor', () => {
 
     it('should generate valid SVG', async () => {
       // Skip traits without images
-      const traitIndices = Array(12).fill(ethers.constants.MaxUint256);
+      const traitIndices = Array(12).fill(ethers.MaxUint256);
       traitIndices[10] = 0; // solidBackground
       traitIndices[9] = 0;  // background
 
@@ -99,7 +97,7 @@ describe('NijiDescriptor', () => {
     });
 
     it('should include PNG as base64 <image> tag', async () => {
-      const traitIndices = Array(12).fill(ethers.constants.MaxUint256);
+      const traitIndices = Array(12).fill(ethers.MaxUint256);
       traitIndices[10] = 0;
 
       const svg = await descriptor.generateSVG(traitIndices);
@@ -116,7 +114,7 @@ describe('NijiDescriptor', () => {
     });
 
     it('should generate valid tokenURI', async () => {
-      const traitIndices = Array(12).fill(ethers.constants.MaxUint256);
+      const traitIndices = Array(12).fill(ethers.MaxUint256);
       traitIndices[10] = 0;
 
       const uri = await descriptor.tokenURI(0, traitIndices);
@@ -133,7 +131,7 @@ describe('NijiDescriptor', () => {
     });
 
     it('should revert for empty trait indices', async () => {
-      await expect(descriptor.tokenURI(0, [])).to.be.revertedWith('EmptyTraitIndices');
+      await expect(descriptor.tokenURI(0, [])).to.be.revertedWithCustomError(descriptor, 'EmptyTraitIndices');
     });
   });
 
@@ -141,19 +139,20 @@ describe('NijiDescriptor', () => {
     it('should allow owner to update art', async () => {
       const NijiArtFactory = await ethers.getContractFactory('NijiArt');
       const newArt = await NijiArtFactory.deploy(owner.address, traitNames);
-      await newArt.deployed();
+      const artAddr = await art.getAddress();
+      const newArtAddr = await newArt.getAddress();
 
-      await expect(descriptor.connect(owner).setArt(newArt.address))
+      await expect(descriptor.connect(owner).setArt(newArtAddr))
         .to.emit(descriptor, 'ArtUpdated')
-        .withArgs(art.address, newArt.address);
+        .withArgs(artAddr, newArtAddr);
 
-      expect(await descriptor.art()).to.equal(newArt.address);
+      expect(await descriptor.art()).to.equal(newArtAddr);
     });
 
     it('should revert if caller is not owner', async () => {
       await expect(
         descriptor.connect(other).setArt(other.address)
-      ).to.be.revertedWith('OwnableUnauthorizedAccount');
+      ).to.be.revertedWithCustomError(descriptor, 'OwnableUnauthorizedAccount');
     });
   });
 
@@ -167,7 +166,7 @@ describe('NijiDescriptor', () => {
     });
 
     it('should revert for zero resolution', async () => {
-      await expect(descriptor.setResolution(0)).to.be.revertedWith('InvalidResolution');
+      await expect(descriptor.setResolution(0)).to.be.revertedWithCustomError(descriptor, 'InvalidResolution');
     });
   });
 
@@ -180,7 +179,7 @@ describe('NijiDescriptor', () => {
         .withArgs(newOrder);
 
       const order = await descriptor.getCompositeOrder();
-      expect(order.map(n => n.toNumber())).to.deep.equal(newOrder);
+      expect(order.map(n => Number(n))).to.deep.equal(newOrder);
     });
   });
 
@@ -193,7 +192,7 @@ describe('NijiDescriptor', () => {
   describe('SKIP_LAYER constant', () => {
     it('should equal type(uint256).max', async () => {
       const skipLayer = await descriptor.SKIP_LAYER();
-      expect(skipLayer).to.equal(ethers.constants.MaxUint256);
+      expect(skipLayer).to.equal(ethers.MaxUint256);
     });
   });
 });

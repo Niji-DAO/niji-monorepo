@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { NijiArt } from '../../typechain';
 
 describe('NijiArt', () => {
@@ -28,8 +28,7 @@ describe('NijiArt', () => {
     [owner, descriptor, other] = await ethers.getSigners();
 
     const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-    art = (await NijiArtFactory.deploy(descriptor.address, traitNames)) as NijiArt;
-    await art.deployed();
+    art = (await NijiArtFactory.deploy(descriptor.address, traitNames)) as unknown as NijiArt;
   });
 
   describe('constructor', () => {
@@ -51,8 +50,8 @@ describe('NijiArt', () => {
     it('should revert if descriptor is zero address', async () => {
       const NijiArtFactory = await ethers.getContractFactory('NijiArt');
       await expect(
-        NijiArtFactory.deploy(ethers.constants.AddressZero, traitNames)
-      ).to.be.revertedWith('EmptyDescriptorAddress');
+        NijiArtFactory.deploy(ethers.ZeroAddress, traitNames)
+      ).to.be.revertedWithCustomError(NijiArtFactory, 'EmptyDescriptorAddress');
     });
   });
 
@@ -65,25 +64,25 @@ describe('NijiArt', () => {
 
       // Verify pointer was stored
       const pointer = await art.getTraitPointer(0, 0);
-      expect(pointer).to.not.equal(ethers.constants.AddressZero);
+      expect(pointer).to.not.equal(ethers.ZeroAddress);
     });
 
     it('should revert if caller is not descriptor', async () => {
       await expect(
         art.connect(other).addTraitImage(0, samplePng)
-      ).to.be.revertedWith('SenderIsNotDescriptor');
+      ).to.be.revertedWithCustomError(art, 'SenderIsNotDescriptor');
     });
 
     it('should revert for invalid trait ID', async () => {
       await expect(
         art.connect(descriptor).addTraitImage(99, samplePng)
-      ).to.be.revertedWith('InvalidTraitId');
+      ).to.be.revertedWithCustomError(art, 'InvalidTraitId');
     });
 
     it('should revert for empty PNG data', async () => {
       await expect(
-        art.connect(descriptor).addTraitImage(0, [])
-      ).to.be.revertedWith('EmptyPngData');
+        art.connect(descriptor).addTraitImage(0, "0x")
+      ).to.be.revertedWithCustomError(art, 'EmptyPngData');
     });
   });
 
@@ -109,11 +108,11 @@ describe('NijiArt', () => {
     });
 
     it('should revert for invalid trait ID', async () => {
-      await expect(art.getTraitImage(99, 0)).to.be.revertedWith('InvalidTraitId');
+      await expect(art.getTraitImage(99, 0)).to.be.revertedWithCustomError(art, 'InvalidTraitId');
     });
 
     it('should revert for invalid image index', async () => {
-      await expect(art.getTraitImage(0, 99)).to.be.revertedWith('InvalidImageIndex');
+      await expect(art.getTraitImage(0, 99)).to.be.revertedWithCustomError(art, 'InvalidImageIndex');
     });
   });
 
@@ -129,7 +128,7 @@ describe('NijiArt', () => {
     it('should revert if caller is not descriptor', async () => {
       await expect(
         art.connect(other).setDescriptor(other.address)
-      ).to.be.revertedWith('SenderIsNotDescriptor');
+      ).to.be.revertedWithCustomError(art, 'SenderIsNotDescriptor');
     });
   });
 
@@ -145,7 +144,7 @@ describe('NijiArt', () => {
     it('should revert if caller is not owner', async () => {
       await expect(
         art.connect(other).transferDescriptor(other.address)
-      ).to.be.revertedWith('OwnableUnauthorizedAccount');
+      ).to.be.revertedWithCustomError(art, 'OwnableUnauthorizedAccount');
     });
   });
 
@@ -163,7 +162,7 @@ describe('NijiArt', () => {
     });
 
     it('should revert for invalid trait ID', async () => {
-      await expect(art.getTraitName(99)).to.be.revertedWith('InvalidTraitId');
+      await expect(art.getTraitName(99)).to.be.revertedWithCustomError(art, 'InvalidTraitId');
     });
   });
 });
