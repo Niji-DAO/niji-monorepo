@@ -103,6 +103,7 @@ contract NijiDescriptor is Ownable2Step {
         if (traitIndices.length == 0) revert EmptyTraitIndices();
 
         string memory svgBase64 = generateSVGBase64(traitIndices);
+        string memory attributes = _generateAttributes(traitIndices);
 
         return string(
             abi.encodePacked(
@@ -114,7 +115,9 @@ contract NijiDescriptor is Ownable2Step {
                             tokenId.toString(),
                             '", "description":"Niji is a fully on-chain generative art collection featuring high-quality PNG images.", "image": "data:image/svg+xml;base64,',
                             svgBase64,
-                            '"}'
+                            '", "attributes":',
+                            attributes,
+                            '}'
                         )
                     )
                 )
@@ -137,6 +140,7 @@ contract NijiDescriptor is Ownable2Step {
         if (traitIndices.length == 0) revert EmptyTraitIndices();
 
         string memory svgBase64 = generateSVGBase64(traitIndices);
+        string memory attributes = _generateAttributes(traitIndices);
 
         return string(
             abi.encodePacked(
@@ -152,12 +156,42 @@ contract NijiDescriptor is Ownable2Step {
                             description,
                             '", "image": "data:image/svg+xml;base64,',
                             svgBase64,
-                            '"}'
+                            '", "attributes":',
+                            attributes,
+                            '}'
                         )
                     )
                 )
             )
         );
+    }
+
+    // =============================================================
+    //                      ATTRIBUTES GENERATION
+    // =============================================================
+
+    /// @notice Generate JSON attributes array from trait indices
+    /// @param traitIndices Array of trait indices for each category
+    /// @return JSON attributes array string (e.g., [{"trait_type":"hair","value":"2"},…])
+    function _generateAttributes(uint256[] memory traitIndices) internal view returns (string memory) {
+        bytes memory attrs = bytes('[');
+        bool first = true;
+        for (uint256 i = 0; i < traitIndices.length; ) {
+            if (traitIndices[i] != SKIP_LAYER) {
+                if (!first) attrs = abi.encodePacked(attrs, ',');
+                attrs = abi.encodePacked(
+                    attrs,
+                    '{"trait_type":"',
+                    art.getTraitName(i),
+                    '","value":"',
+                    traitIndices[i].toString(),
+                    '"}'
+                );
+                first = false;
+            }
+            unchecked { ++i; }
+        }
+        return string(abi.encodePacked(attrs, ']'));
     }
 
     // =============================================================

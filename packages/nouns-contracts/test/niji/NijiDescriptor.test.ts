@@ -135,6 +135,70 @@ describe('NijiDescriptor', () => {
     });
   });
 
+  describe('tokenURI attributes', () => {
+    beforeEach(async () => {
+      await art.transferDescriptor(owner.address);
+      for (let i = 0; i < 12; i++) {
+        await art.addTraitImages(i, [samplePng, samplePng, samplePng]);
+      }
+    });
+
+    it('should include attributes array in JSON', async () => {
+      const traitIndices = Array(12).fill(ethers.MaxUint256);
+      traitIndices[0] = 0; // special
+      traitIndices[11] = 2; // hair
+
+      const uri = await descriptor.tokenURI(0, traitIndices);
+      const jsonB64 = uri.replace('data:application/json;base64,', '');
+      const json = JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+
+      expect(json.attributes).to.be.an('array');
+      expect(json.attributes.length).to.equal(2);
+    });
+
+    it('should have trait_type matching art.getTraitName', async () => {
+      const traitIndices = Array(12).fill(ethers.MaxUint256);
+      traitIndices[0] = 0; // special
+      traitIndices[11] = 2; // hair
+
+      const uri = await descriptor.tokenURI(0, traitIndices);
+      const jsonB64 = uri.replace('data:application/json;base64,', '');
+      const json = JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+
+      const specialAttr = json.attributes.find((a: any) => a.trait_type === 'special');
+      const hairAttr = json.attributes.find((a: any) => a.trait_type === 'hair');
+
+      expect(specialAttr).to.exist;
+      expect(specialAttr.value).to.equal('0');
+      expect(hairAttr).to.exist;
+      expect(hairAttr.value).to.equal('2');
+    });
+
+    it('should exclude SKIP_LAYER traits from attributes', async () => {
+      const traitIndices = Array(12).fill(ethers.MaxUint256);
+      traitIndices[0] = 1; // only special is set
+
+      const uri = await descriptor.tokenURI(0, traitIndices);
+      const jsonB64 = uri.replace('data:application/json;base64,', '');
+      const json = JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+
+      expect(json.attributes.length).to.equal(1);
+      expect(json.attributes[0].trait_type).to.equal('special');
+      expect(json.attributes[0].value).to.equal('1');
+    });
+
+    it('should return empty array when all traits are SKIP_LAYER', async () => {
+      const traitIndices = Array(12).fill(ethers.MaxUint256);
+
+      const uri = await descriptor.tokenURI(0, traitIndices);
+      const jsonB64 = uri.replace('data:application/json;base64,', '');
+      const json = JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+
+      expect(json.attributes).to.be.an('array');
+      expect(json.attributes.length).to.equal(0);
+    });
+  });
+
   describe('setArt', () => {
     it('should allow owner to update art', async () => {
       const NijiArtFactory = await ethers.getContractFactory('NijiArt');
