@@ -69,6 +69,10 @@ contract NijiToken is ERC721Enumerable, Ownable2Step, ReentrancyGuard {
     /// @param isActive Whether minting is now active
     event MintingToggled(bool isActive);
 
+    /// @notice Emitted when the contract URI hash is updated
+    /// @param newContractURIHash The new IPFS hash for contract metadata
+    event ContractURIHashUpdated(string newContractURIHash);
+
     // =============================================================
     //                           STORAGE
     // =============================================================
@@ -93,6 +97,9 @@ contract NijiToken is ERC721Enumerable, Ownable2Step, ReentrancyGuard {
 
     /// @notice Mapping from token ID to seed
     mapping(uint256 => INijiSeeder.Seed) public seeds;
+
+    /// @notice The IPFS hash for the contract-level metadata
+    string private _contractURIHash;
 
     // =============================================================
     //                           MODIFIERS
@@ -286,9 +293,23 @@ contract NijiToken is ERC721Enumerable, Ownable2Step, ReentrancyGuard {
         emit MintingToggled(_isActive);
     }
 
+    /// @notice Set the contract-level metadata IPFS hash
+    /// @param newContractURIHash The new IPFS hash
+    function setContractURIHash(string memory newContractURIHash) external onlyOwner {
+        _contractURIHash = newContractURIHash;
+        emit ContractURIHashUpdated(newContractURIHash);
+    }
+
     // =============================================================
     //                      VIEW FUNCTIONS
     // =============================================================
+
+    /// @notice The IPFS URI of contract-level metadata (used by marketplaces)
+    /// @return The contract URI
+    function contractURI() public view returns (string memory) {
+        return string(abi.encodePacked('ipfs://', _contractURIHash));
+    }
+
 
     /// @notice Get the current token ID counter
     /// @return Current token ID
