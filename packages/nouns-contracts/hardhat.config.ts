@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { HardhatUserConfig } from 'hardhat/config';
 import dotenv from 'dotenv';
-import '@nomiclabs/hardhat-waffle';
+import '@nomicfoundation/hardhat-chai-matchers';
+import '@nomicfoundation/hardhat-ethers';
 import '@nomicfoundation/hardhat-verify';
 import 'solidity-coverage';
 import '@typechain/hardhat';
@@ -78,6 +79,7 @@ const config: HardhatUserConfig = {
   },
   typechain: {
     outDir: './typechain',
+    target: 'ethers-v6',
   },
   gasReporter: {
     enabled: !process.env.CI,
