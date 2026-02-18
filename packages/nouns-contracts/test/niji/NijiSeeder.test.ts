@@ -185,4 +185,36 @@ describe('NijiSeeder', () => {
       ).to.be.revertedWithCustomError(seeder, 'InvalidArtAddress');
     });
   });
+
+  describe('Ownable2Step', () => {
+    it('transferOwnership should not change owner immediately', async () => {
+      await seeder.transferOwnership(other.address);
+      expect(await seeder.owner()).to.equal(owner.address);
+    });
+
+    it('transferOwnership should set pendingOwner', async () => {
+      await seeder.transferOwnership(other.address);
+      expect(await seeder.pendingOwner()).to.equal(other.address);
+    });
+
+    it('transferOwnership should emit OwnershipTransferStarted', async () => {
+      await expect(seeder.transferOwnership(other.address))
+        .to.emit(seeder, 'OwnershipTransferStarted')
+        .withArgs(owner.address, other.address);
+    });
+
+    it('acceptOwnership should transfer ownership to pendingOwner', async () => {
+      await seeder.transferOwnership(other.address);
+      await seeder.connect(other).acceptOwnership();
+      expect(await seeder.owner()).to.equal(other.address);
+    });
+
+    it('acceptOwnership should revert if caller is not pendingOwner', async () => {
+      await seeder.transferOwnership(other.address);
+      // owner is not the pendingOwner, so this should revert
+      await expect(
+        seeder.acceptOwnership()
+      ).to.be.revertedWithCustomError(seeder, 'OwnableUnauthorizedAccount');
+    });
+  });
 });

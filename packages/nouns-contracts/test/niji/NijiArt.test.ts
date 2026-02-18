@@ -148,6 +148,37 @@ describe('NijiArt', () => {
     });
   });
 
+  describe('Ownable2Step', () => {
+    it('transferOwnership should not change owner immediately', async () => {
+      await art.transferOwnership(other.address);
+      expect(await art.owner()).to.equal(owner.address);
+    });
+
+    it('transferOwnership should set pendingOwner', async () => {
+      await art.transferOwnership(other.address);
+      expect(await art.pendingOwner()).to.equal(other.address);
+    });
+
+    it('transferOwnership should emit OwnershipTransferStarted', async () => {
+      await expect(art.transferOwnership(other.address))
+        .to.emit(art, 'OwnershipTransferStarted')
+        .withArgs(owner.address, other.address);
+    });
+
+    it('acceptOwnership should transfer ownership to pendingOwner', async () => {
+      await art.transferOwnership(other.address);
+      await art.connect(other).acceptOwnership();
+      expect(await art.owner()).to.equal(other.address);
+    });
+
+    it('acceptOwnership should revert if caller is not pendingOwner', async () => {
+      await art.transferOwnership(other.address);
+      await expect(
+        art.connect(descriptor).acceptOwnership()
+      ).to.be.revertedWithCustomError(art, 'OwnableUnauthorizedAccount');
+    });
+  });
+
   describe('getTraitNames', () => {
     it('should return all trait names', async () => {
       const names = await art.getTraitNames();

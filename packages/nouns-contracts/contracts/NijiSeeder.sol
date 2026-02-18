@@ -9,9 +9,9 @@ pragma solidity ^0.8.20;
 
 import { INijiSeeder } from './interfaces/INijiSeeder.sol';
 import { NijiArt } from './NijiArt.sol';
-import { Ownable } from '@openzeppelin/contracts-v5/access/Ownable.sol';
+import { Ownable2Step, Ownable } from '@openzeppelin/contracts-v5/access/Ownable2Step.sol';
 
-contract NijiSeeder is INijiSeeder, Ownable {
+contract NijiSeeder is INijiSeeder, Ownable2Step {
     // =============================================================
     //                           ERRORS
     // =============================================================

@@ -183,6 +183,38 @@ describe('NijiDescriptor', () => {
     });
   });
 
+  describe('Ownable2Step', () => {
+    it('transferOwnership should not change owner immediately', async () => {
+      await descriptor.transferOwnership(other.address);
+      expect(await descriptor.owner()).to.equal(owner.address);
+    });
+
+    it('transferOwnership should set pendingOwner', async () => {
+      await descriptor.transferOwnership(other.address);
+      expect(await descriptor.pendingOwner()).to.equal(other.address);
+    });
+
+    it('transferOwnership should emit OwnershipTransferStarted', async () => {
+      await expect(descriptor.transferOwnership(other.address))
+        .to.emit(descriptor, 'OwnershipTransferStarted')
+        .withArgs(owner.address, other.address);
+    });
+
+    it('acceptOwnership should transfer ownership to pendingOwner', async () => {
+      await descriptor.transferOwnership(other.address);
+      await descriptor.connect(other).acceptOwnership();
+      expect(await descriptor.owner()).to.equal(other.address);
+    });
+
+    it('acceptOwnership should revert if caller is not pendingOwner', async () => {
+      await descriptor.transferOwnership(other.address);
+      // owner is not the pendingOwner, so this should revert
+      await expect(
+        descriptor.acceptOwnership()
+      ).to.be.revertedWithCustomError(descriptor, 'OwnableUnauthorizedAccount');
+    });
+  });
+
   describe('isConfigured', () => {
     it('should return true when properly configured', async () => {
       expect(await descriptor.isConfigured()).to.be.true;
