@@ -105,20 +105,12 @@ contract NijiFuzzTest is Test {
 
     function testFuzz_generateSeedFromSource_validTraits(uint256 source) public {
         INijiSeeder.Seed memory seed = seeder.generateSeedFromSource(source);
+        uint256[] memory indices = _seedToTraitIndices(seed);
 
         // All traits must be < IMAGES_PER_TRAIT
-        assertLt(seed.special, IMAGES_PER_TRAIT, 'special out of range');
-        assertLt(seed.choker, IMAGES_PER_TRAIT, 'choker out of range');
-        assertLt(seed.headphone, IMAGES_PER_TRAIT, 'headphone out of range');
-        assertLt(seed.leftHand, IMAGES_PER_TRAIT, 'leftHand out of range');
-        assertLt(seed.hat, IMAGES_PER_TRAIT, 'hat out of range');
-        assertLt(seed.clothing, IMAGES_PER_TRAIT, 'clothing out of range');
-        assertLt(seed.ear, IMAGES_PER_TRAIT, 'ear out of range');
-        assertLt(seed.back, IMAGES_PER_TRAIT, 'back out of range');
-        assertLt(seed.backDecoration, IMAGES_PER_TRAIT, 'backDecoration out of range');
-        assertLt(seed.background, IMAGES_PER_TRAIT, 'background out of range');
-        assertLt(seed.solidBackground, IMAGES_PER_TRAIT, 'solidBackground out of range');
-        assertLt(seed.hair, IMAGES_PER_TRAIT, 'hair out of range');
+        for (uint256 i = 0; i < TRAIT_COUNT; i++) {
+            assertLt(indices[i], IMAGES_PER_TRAIT, string(abi.encodePacked(traitNames[i], ' out of range')));
+        }
     }
 
     // =========================================================================
