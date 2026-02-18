@@ -4,6 +4,18 @@
 
 ### nouns-contracts
 
+#### 改善
+- **テスト共通ヘルパー抽出** (#75)
+  - `test/niji/helpers/` モジュールを新規作成。5ファイルに散在していた重複コードを共通化
+  - `constants.ts`: TRAIT_NAMES, SAMPLE_PNG, RESOLUTION, COMPOSITE_ORDER, TRAIT_COUNT
+  - `deployers.ts`: deployNijiArt, deployNijiDescriptor, deployNijiSeeder, deployNijiToken
+  - `fixtures.ts`: populateAllTraits, buildTraitIndices
+  - `utils.ts`: decodeTokenURI
+  - `behaviors.ts`: shouldBehaveLikeOwnable2Step（Mocha shared behavior パターン）
+  - 対象: NijiArt, NijiDescriptor, NijiSeeder, NijiToken の4ファイル（フル移行）+ NijiGas（定数のみ）
+  - 全134テスト維持（テスト名・テスト数の変更なし）
+  - 重複削減: Ownable2Step テスト 100行以上、定数定義 60行以上、デプロイコード 40行以上
+
 #### 追加
 - **NijiGas: 本番サイズ PNG ガスベンチマーク** (#73)
   - `test/niji/NijiGas.test.ts` を新規作成。5KB/10KB/15KB/20KB の合成 PNG データを使用したガス計測テスト 12 件

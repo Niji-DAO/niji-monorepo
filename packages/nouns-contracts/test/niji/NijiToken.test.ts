@@ -2,6 +2,18 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { NijiArt, NijiDescriptor, NijiSeeder, NijiToken } from '../../typechain';
+import {
+  SAMPLE_PNG,
+  RESOLUTION,
+  COMPOSITE_ORDER,
+  deployNijiArt,
+  deployNijiDescriptor,
+  deployNijiSeeder,
+  deployNijiToken,
+  populateAllTraits,
+  decodeTokenURI,
+  shouldBehaveLikeOwnable2Step,
+} from './helpers';
 
 describe('NijiToken', () => {
   let art: NijiArt;
@@ -12,57 +24,28 @@ describe('NijiToken', () => {
   let minter: SignerWithAddress;
   let other: SignerWithAddress;
 
-  const traitNames = ['special', 'choker', 'headphone', 'leftHand', 'hat', 'clothing', 'ear', 'back', 'backDecoration', 'background', 'solidBackground', 'hair'];
-  const RESOLUTION = 320;
-  const COMPOSITE_ORDER = [10, 9, 8, 0, 3, 7, 5, 1, 6, 11, 4, 2];
   const MAX_SUPPLY = 100;
-
-  // Sample PNG data
-  const samplePng = Buffer.from([
-    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
-    0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
-    0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-    0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
-    0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41,
-    0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-    0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00,
-    0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
-    0x42, 0x60, 0x82
-  ]);
 
   beforeEach(async () => {
     [owner, minter, other] = await ethers.getSigners();
 
-    // Deploy NijiArt
-    const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-    art = (await NijiArtFactory.deploy(owner.address, traitNames)) as unknown as NijiArt;
-
-    // Deploy NijiDescriptor
-    const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
-    descriptor = (await NijiDescriptorFactory.deploy(await art.getAddress(), RESOLUTION, COMPOSITE_ORDER)) as unknown as NijiDescriptor;
-
-    // Deploy NijiSeeder
-    const NijiSeederFactory = await ethers.getContractFactory('NijiSeeder');
-    seeder = (await NijiSeederFactory.deploy(await art.getAddress())) as unknown as NijiSeeder;
-
-    // Deploy NijiToken
-    const NijiTokenFactory = await ethers.getContractFactory('NijiToken');
-    token = (await NijiTokenFactory.deploy(
-      'Niji',
-      'NIJI',
+    // Deploy contracts
+    art = await deployNijiArt(owner.address);
+    descriptor = await deployNijiDescriptor(await art.getAddress());
+    seeder = await deployNijiSeeder(await art.getAddress());
+    token = await deployNijiToken(
+      'Niji', 'NIJI',
       await descriptor.getAddress(),
       await seeder.getAddress(),
-      MAX_SUPPLY
-    )) as unknown as NijiToken;
+      MAX_SUPPLY,
+    );
 
     // Setup: set descriptor on art
     await art.setDescriptor(await descriptor.getAddress());
 
     // Add sample images for all traits
     await art.transferDescriptor(owner.address);
-    for (let i = 0; i < 12; i++) {
-      await art.addTraitImages(i, [samplePng, samplePng, samplePng]);
-    }
+    await populateAllTraits(art, SAMPLE_PNG);
   });
 
   describe('constructor', () => {
@@ -135,13 +118,11 @@ describe('NijiToken', () => {
 
     it('should revert if max supply reached', async () => {
       // Deploy with max supply of 1
-      const NijiTokenFactory = await ethers.getContractFactory('NijiToken');
-      const limitedToken = await NijiTokenFactory.deploy(
-        'Niji',
-        'NIJI',
+      const limitedToken = await deployNijiToken(
+        'Niji', 'NIJI',
         await descriptor.getAddress(),
         await seeder.getAddress(),
-        1
+        1,
       );
       await limitedToken.toggleMinting();
 
@@ -180,8 +161,7 @@ describe('NijiToken', () => {
       expect(uri).to.include('data:application/json;base64,');
 
       // Decode and check JSON
-      const jsonB64 = uri.replace('data:application/json;base64,', '');
-      const json = JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+      const json = decodeTokenURI(uri);
 
       expect(json.name).to.equal('Niji #0');
       expect(json.image).to.include('data:image/svg+xml;base64,');
@@ -193,8 +173,7 @@ describe('NijiToken', () => {
 
     it('should include attributes in tokenURI', async () => {
       const uri = await token.tokenURI(0);
-      const jsonB64 = uri.replace('data:application/json;base64,', '');
-      const json = JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+      const json = decodeTokenURI(uri);
 
       expect(json.attributes).to.be.an('array');
       expect(json.attributes.length).to.be.greaterThan(0);
@@ -240,8 +219,7 @@ describe('NijiToken', () => {
 
   describe('setDescriptor', () => {
     it('should allow owner to update descriptor', async () => {
-      const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
-      const newDescriptor = await NijiDescriptorFactory.deploy(await art.getAddress(), RESOLUTION, COMPOSITE_ORDER);
+      const newDescriptor = await deployNijiDescriptor(await art.getAddress());
       const descriptorAddr = await descriptor.getAddress();
       const newDescriptorAddr = await newDescriptor.getAddress();
 
@@ -261,8 +239,7 @@ describe('NijiToken', () => {
 
   describe('setSeeder', () => {
     it('should allow owner to update seeder', async () => {
-      const NijiSeederFactory = await ethers.getContractFactory('NijiSeeder');
-      const newSeeder = await NijiSeederFactory.deploy(await art.getAddress());
+      const newSeeder = await deployNijiSeeder(await art.getAddress());
       const seederAddr = await seeder.getAddress();
       const newSeederAddr = await newSeeder.getAddress();
 
@@ -320,36 +297,12 @@ describe('NijiToken', () => {
     });
   });
 
-  describe('Ownable2Step', () => {
-    it('transferOwnership should not change owner immediately', async () => {
-      await token.transferOwnership(other.address);
-      expect(await token.owner()).to.equal(owner.address);
-    });
-
-    it('transferOwnership should set pendingOwner', async () => {
-      await token.transferOwnership(other.address);
-      expect(await token.pendingOwner()).to.equal(other.address);
-    });
-
-    it('transferOwnership should emit OwnershipTransferStarted', async () => {
-      await expect(token.transferOwnership(other.address))
-        .to.emit(token, 'OwnershipTransferStarted')
-        .withArgs(owner.address, other.address);
-    });
-
-    it('acceptOwnership should transfer ownership to pendingOwner', async () => {
-      await token.transferOwnership(other.address);
-      await token.connect(other).acceptOwnership();
-      expect(await token.owner()).to.equal(other.address);
-    });
-
-    it('acceptOwnership should revert if caller is not pendingOwner', async () => {
-      await token.transferOwnership(other.address);
-      await expect(
-        token.connect(minter).acceptOwnership()
-      ).to.be.revertedWithCustomError(token, 'OwnableUnauthorizedAccount');
-    });
-  });
+  shouldBehaveLikeOwnable2Step(
+    () => token,
+    () => owner,
+    () => other,
+    () => minter,
+  );
 
   describe('contractURI', () => {
     it('should return ipfs:// with empty hash by default', async () => {
@@ -454,13 +407,11 @@ describe('NijiToken', () => {
     });
 
     it('should return max uint for unlimited supply', async () => {
-      const NijiTokenFactory = await ethers.getContractFactory('NijiToken');
-      const unlimitedToken = await NijiTokenFactory.deploy(
-        'Niji',
-        'NIJI',
+      const unlimitedToken = await deployNijiToken(
+        'Niji', 'NIJI',
         await descriptor.getAddress(),
         await seeder.getAddress(),
-        0 // unlimited
+        0, // unlimited
       );
 
       expect(await unlimitedToken.remainingSupply()).to.equal(ethers.MaxUint256);
