@@ -4,6 +4,16 @@
 
 ### nouns-contracts
 
+#### 追加
+- **エッジケース + 統合 + ファジングテスト** (#77)
+  - `test/niji/NijiArt.edge.test.ts`: NijiArt 境界値・エラーパステスト 19 件
+  - `test/niji/NijiDescriptor.edge.test.ts`: NijiDescriptor 境界値・エラーパステスト 15 件
+  - `test/niji/NijiToken.edge.test.ts`: NijiToken 境界値・未テストカスタムエラーテスト 14 件
+  - `test/niji/NijiSeeder.edge.test.ts`: NijiSeeder 境界値テスト 5 件
+  - `test/niji/NijiIntegration.test.ts`: クロスコントラクト統合テスト 8 件（フルフロー、Descriptor/Seeder/Minter差し替え、Ownership移転等）
+  - `test/foundry/NijiFuzz.t.sol`: Foundry ファジングテスト 6 件（generateSeedFromSource, generateSVG, mintBatch, addTraitImage, modulo分布）
+  - テスト数: Hardhat 134 → 195 (+61), Foundry +6, 合計 +67 テスト
+
 #### 改善
 - **テスト共通ヘルパー抽出** (#75)
   - `test/niji/helpers/` モジュールを新規作成。5ファイルに散在していた重複コードを共通化

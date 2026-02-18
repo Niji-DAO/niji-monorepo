@@ -63,6 +63,31 @@ forge install
 forge test -vvv
 ```
 
+### Test Structure
+
+#### Hardhat Tests (`test/niji/`)
+
+- **Unit Tests**: Basic functionality for each contract (`NijiArt.test.ts`, `NijiDescriptor.test.ts`, `NijiSeeder.test.ts`, `NijiToken.test.ts`)
+- **Edge Case Tests**: Boundary conditions and error paths (`*.edge.test.ts`)
+- **Integration Tests**: Cross-contract interactions and full workflows (`NijiIntegration.test.ts`)
+- **Gas Benchmarks**: Production-size PNG operation measurements (`NijiGas.test.ts`)
+
+#### Foundry Tests (`test/foundry/`)
+
+- **Fuzz Tests**: Property-based testing with randomized inputs (`NijiFuzz.t.sol`)
+  - Covers seed generation, SVG rendering, batch minting, trait image addition, modulo distribution
+  - 256 fuzz runs per test by default
+
+Run fuzz tests only:
+
+```sh
+forge test --match-contract NijiFuzz --fuzz-runs 256 -vv
+```
+
+#### Test Helpers (`test/niji/helpers/`)
+
+Shared test utilities: constants, deployers, fixtures, utils, behaviors (Ownable2Step).
+
 ### Environment Setup
 
 Copy `.env.example` to `.env` and fill in fields
