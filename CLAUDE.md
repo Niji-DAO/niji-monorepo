@@ -56,6 +56,12 @@ Located in `packages/nouns-contracts/`:
 - Deployment scripts in `script/`
 - Generated TypeChain types in `typechain/`
 
+### Contract Testing Stack
+- **ethers v6**: JavaScript/TypeScript Ethereum library (uses native `bigint`, not `BigNumber`)
+- **@nomicfoundation/hardhat-chai-matchers v2**: Waffle replacement. Use `revertedWithCustomError` for custom errors
+- **@nomicfoundation/hardhat-ethers v3**: Hardhat plugin for ethers v6
+- **TypeChain ethers-v6**: TypeChain type generation target
+
 Key contracts:
 - `NounsToken` - ERC721 for Noun NFTs
 - `NounsAuctionHouse` - Auction mechanism
