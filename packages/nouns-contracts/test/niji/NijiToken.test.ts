@@ -305,6 +305,37 @@ describe('NijiToken', () => {
     });
   });
 
+  describe('Ownable2Step', () => {
+    it('transferOwnership should not change owner immediately', async () => {
+      await token.transferOwnership(other.address);
+      expect(await token.owner()).to.equal(owner.address);
+    });
+
+    it('transferOwnership should set pendingOwner', async () => {
+      await token.transferOwnership(other.address);
+      expect(await token.pendingOwner()).to.equal(other.address);
+    });
+
+    it('transferOwnership should emit OwnershipTransferStarted', async () => {
+      await expect(token.transferOwnership(other.address))
+        .to.emit(token, 'OwnershipTransferStarted')
+        .withArgs(owner.address, other.address);
+    });
+
+    it('acceptOwnership should transfer ownership to pendingOwner', async () => {
+      await token.transferOwnership(other.address);
+      await token.connect(other).acceptOwnership();
+      expect(await token.owner()).to.equal(other.address);
+    });
+
+    it('acceptOwnership should revert if caller is not pendingOwner', async () => {
+      await token.transferOwnership(other.address);
+      await expect(
+        token.connect(minter).acceptOwnership()
+      ).to.be.revertedWithCustomError(token, 'OwnableUnauthorizedAccount');
+    });
+  });
+
   describe('exists', () => {
     beforeEach(async () => {
       await token.toggleMinting();
