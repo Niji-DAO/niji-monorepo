@@ -1,8 +1,7 @@
 import { deflateRawSync } from 'zlib';
 
-import { Block } from '@ethersproject/abstract-provider';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber } from 'ethers';
+import { Block } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers, network } from 'hardhat';
 
 import ImageData from '../files/image-data-v1.json';
@@ -71,7 +70,7 @@ export const deployNounsDescriptor = async (
   const nftDescriptorLibrary = await nftDescriptorLibraryFactory.deploy();
   const nounsDescriptorFactory = new NounsDescriptorFactory(
     {
-      'contracts/libs/NFTDescriptor.sol:NFTDescriptor': nftDescriptorLibrary.address,
+      'contracts/libs/NFTDescriptor.sol:NFTDescriptor': await nftDescriptorLibrary.getAddress(),
     },
     signer,
   );
@@ -87,21 +86,24 @@ export const deployNounsDescriptorV2 = async (
   const nftDescriptorLibrary = await nftDescriptorLibraryFactory.deploy();
   const nounsDescriptorFactory = new NounsDescriptorV2Factory(
     {
-      'contracts/libs/NFTDescriptorV2.sol:NFTDescriptorV2': nftDescriptorLibrary.address,
+      'contracts/libs/NFTDescriptorV2.sol:NFTDescriptorV2': await nftDescriptorLibrary.getAddress(),
     },
     signer,
   );
 
   const renderer = await new SVGRendererFactory(signer).deploy();
   const descriptor = await nounsDescriptorFactory.deploy(
-    ethers.constants.AddressZero,
-    renderer.address,
+    ethers.ZeroAddress,
+    await renderer.getAddress(),
   );
 
   const inflator = await new Inflator__factory(signer).deploy();
 
-  const art = await new NounsArtFactory(signer).deploy(descriptor.address, inflator.address);
-  await descriptor.setArt(art.address);
+  const art = await new NounsArtFactory(signer).deploy(
+    await descriptor.getAddress(),
+    await inflator.getAddress(),
+  );
+  await descriptor.setArt(await art.getAddress());
 
   return descriptor;
 };
@@ -114,21 +116,24 @@ export const deployNounsDescriptorV3 = async (
   const nftDescriptorLibrary = await nftDescriptorLibraryFactory.deploy();
   const nounsDescriptorFactory = new NounsDescriptorV3Factory(
     {
-      'contracts/libs/NFTDescriptorV2.sol:NFTDescriptorV2': nftDescriptorLibrary.address,
+      'contracts/libs/NFTDescriptorV2.sol:NFTDescriptorV2': await nftDescriptorLibrary.getAddress(),
     },
     signer,
   );
 
   const renderer = await new SVGRendererFactory(signer).deploy();
   const descriptor = await nounsDescriptorFactory.deploy(
-    ethers.constants.AddressZero,
-    renderer.address,
+    ethers.ZeroAddress,
+    await renderer.getAddress(),
   );
 
   const inflator = await new Inflator__factory(signer).deploy();
 
-  const art = await new NounsArtFactory(signer).deploy(descriptor.address, inflator.address);
-  await descriptor.setArt(art.address);
+  const art = await new NounsArtFactory(signer).deploy(
+    await descriptor.getAddress(),
+    await inflator.getAddress(),
+  );
+  await descriptor.setArt(await art.getAddress());
 
   return descriptor;
 };
@@ -153,8 +158,8 @@ export const deployNounsToken = async (
   return factory.deploy(
     noundersDAO || signer.address,
     minter || signer.address,
-    descriptor || (await deployNounsDescriptorV2(signer)).address,
-    seeder || (await deployNounsSeeder(signer)).address,
+    descriptor || (await (async () => (await deployNounsDescriptorV2(signer)).getAddress()))(),
+    seeder || (await (async () => (await deployNounsSeeder(signer)).getAddress()))(),
     proxyRegistryAddress || address(0),
   );
 };
@@ -237,9 +242,9 @@ export const deployGovAndToken = async (
   // nonce 10: Deploy NounsDAOProxy
   // nonce 11+: populate Descriptor
 
-  const govDelegatorAddress = ethers.utils.getContractAddress({
+  const govDelegatorAddress = ethers.getCreateAddress({
     from: deployer.address,
-    nonce: (await deployer.getTransactionCount()) + 10,
+    nonce: await deployer.getNonce() + 10,
   });
 
   // Deploy NounsDAOExecutor with pre-computed Delegator address
@@ -249,16 +254,17 @@ export const deployGovAndToken = async (
   );
 
   // Deploy Delegate
-  const { address: govDelegateAddress } = await new NounsDaoLogicV1Factory(deployer).deploy();
+  const govDelegate = await new NounsDaoLogicV1Factory(deployer).deploy();
+  const govDelegateAddress = await govDelegate.getAddress();
   // Deploy Nouns token
   const token = await deployNounsToken(deployer);
 
   // Deploy Delegator
   await new NounsDaoProxyFactory(deployer).deploy(
-    timelock.address,
-    token.address,
+    await timelock.getAddress(),
+    await token.getAddress(),
     vetoer || address(0),
-    timelock.address,
+    await timelock.getAddress(),
     govDelegateAddress,
     5760,
     1,
@@ -281,9 +287,9 @@ export const deployGovV2AndToken = async (
   quorumParams: NounsDAOStorageV2.DynamicQuorumParamsStruct,
   vetoer?: string,
 ): Promise<{ token: NounsToken; gov: NounsDAOLogicV2; timelock: NounsDAOExecutor }> => {
-  const govDelegatorAddress = ethers.utils.getContractAddress({
+  const govDelegatorAddress = ethers.getCreateAddress({
     from: deployer.address,
-    nonce: (await deployer.getTransactionCount()) + 10,
+    nonce: await deployer.getNonce() + 10,
   });
 
   // Deploy NounsDAOExecutor with pre-computed Delegator address
@@ -293,16 +299,17 @@ export const deployGovV2AndToken = async (
   );
 
   // Deploy Delegate
-  const { address: govDelegateAddress } = await new NounsDaoLogicV2Factory(deployer).deploy();
+  const govDelegate = await new NounsDaoLogicV2Factory(deployer).deploy();
+  const govDelegateAddress = await govDelegate.getAddress();
   // Deploy Nouns token
   const token = await deployNounsToken(deployer);
 
   // Deploy Delegator
   await new NounsDaoProxyV2Factory(deployer).deploy(
-    timelock.address,
-    token.address,
+    await timelock.getAddress(),
+    await token.getAddress(),
     vetoer || address(0),
-    timelock.address,
+    await timelock.getAddress(),
     govDelegateAddress,
     5760,
     1,
@@ -341,7 +348,7 @@ export const MintNouns = (
  * Mints or burns tokens to target a total supply. Due to Nounders' rewards tokens may be burned and tokenIds will not be sequential
  */
 export const setTotalSupply = async (token: NounsToken, newTotalSupply: number): Promise<void> => {
-  const totalSupply = (await token.totalSupply()).toNumber();
+  const totalSupply = Number(await token.totalSupply());
 
   if (totalSupply < newTotalSupply) {
     for (let i = 0; i < newTotalSupply - totalSupply; i++) {
@@ -371,7 +378,7 @@ const rpc = <T = unknown>({
 };
 
 export const encodeParameters = (types: string[], values: unknown[]): string => {
-  const abi = new ethers.utils.AbiCoder();
+  const abi = new ethers.AbiCoder();
   return abi.encode(types, values);
 };
 
@@ -408,8 +415,10 @@ export const blockTimestamp = async (
   return parse ? parseInt(block.timestamp.toString()) : block.timestamp;
 };
 
-export const setNextBlockBaseFee = async (value: BigNumber): Promise<void> => {
-  await network.provider.send('hardhat_setNextBlockBaseFeePerGas', [value.toHexString()]);
+export const setNextBlockBaseFee = async (value: bigint): Promise<void> => {
+  await network.provider.send('hardhat_setNextBlockBaseFeePerGas', [
+    '0x' + value.toString(16),
+  ]);
 };
 
 export const setNextBlockTimestamp = async (n: number, mine = true): Promise<void> => {
@@ -458,9 +467,8 @@ export const deployGovernorV1 = async (
   tokenAddress: string,
   quorumVotesBPs: number = MIN_QUORUM_VOTES_BPS,
 ): Promise<NounsDAOLogicV1Harness> => {
-  const { address: govDelegateAddress } = await new NounsDaoLogicV1HarnessFactory(
-    deployer,
-  ).deploy();
+  const govDelegate = await new NounsDaoLogicV1HarnessFactory(deployer).deploy();
+  const govDelegateAddress = await govDelegate.getAddress();
   const params: Parameters<NounsDaoProxyFactory['deploy']> = [
     address(0),
     tokenAddress,
@@ -473,11 +481,11 @@ export const deployGovernorV1 = async (
     quorumVotesBPs,
   ];
 
-  const { address: _govDelegatorAddress } = await (
+  const govDelegator = await (
     await ethers.getContractFactory('NounsDAOProxy', deployer)
   ).deploy(...params);
 
-  return NounsDaoLogicV1HarnessFactory.connect(_govDelegatorAddress, deployer);
+  return NounsDaoLogicV1HarnessFactory.connect(await govDelegator.getAddress(), deployer);
 };
 
 export const deployGovernorV2WithV2Proxy = async (
@@ -497,7 +505,7 @@ export const deployGovernorV2WithV2Proxy = async (
     tokenAddress,
     vetoerAddress || deployer.address,
     deployer.address,
-    v2LogicContract.address,
+    await v2LogicContract.getAddress(),
     votingPeriod || 5760,
     votingDelay || 1,
     proposalThresholdBPs || 1,
@@ -508,7 +516,7 @@ export const deployGovernorV2WithV2Proxy = async (
     },
   );
 
-  return NounsDaoLogicV2Factory.connect(proxy.address, deployer);
+  return NounsDaoLogicV2Factory.connect(await proxy.getAddress(), deployer);
 };
 
 export const deployGovernorV2 = async (
@@ -517,7 +525,7 @@ export const deployGovernorV2 = async (
 ): Promise<NounsDAOLogicV2> => {
   const v2LogicContract = await new NounsDaoLogicV2Factory(deployer).deploy();
   const proxy = NounsDaoProxyFactory.connect(proxyAddress, deployer);
-  await proxy._setImplementation(v2LogicContract.address);
+  await proxy._setImplementation(await v2LogicContract.getAddress());
 
   const govV2 = NounsDaoLogicV2Factory.connect(proxyAddress, deployer);
   return govV2;
@@ -556,7 +564,7 @@ function dataToDescriptorInput(data: string[]): {
   originalLength: number;
   itemCount: number;
 } {
-  const abiEncoded = ethers.utils.defaultAbiCoder.encode(['bytes[]'], [data]);
+  const abiEncoded = ethers.AbiCoder.defaultAbiCoder().encode(['bytes[]'], [data]);
   const encodedCompressed = `0x${deflateRawSync(
     Buffer.from(abiEncoded.substring(2), 'hex'),
   ).toString('hex')}`;
@@ -584,12 +592,16 @@ export const deployGovernorV3 = async (deployer: SignerWithAddress): Promise<Nou
 
   return await new NounsDaoLogicFactory(
     {
-      'contracts/governance/NounsDAOAdmin.sol:NounsDAOAdmin': NounsDAOAdmin.address,
-      'contracts/governance/NounsDAOProposals.sol:NounsDAOProposals': NounsDAOProposals.address,
-      'contracts/governance/fork/NounsDAOFork.sol:NounsDAOFork': NounsDAOFork.address,
-      'contracts/governance/NounsDAOVotes.sol:NounsDAOVotes': NounsDAOVotes.address,
+      'contracts/governance/NounsDAOAdmin.sol:NounsDAOAdmin':
+        await NounsDAOAdmin.getAddress(),
+      'contracts/governance/NounsDAOProposals.sol:NounsDAOProposals':
+        await NounsDAOProposals.getAddress(),
+      'contracts/governance/fork/NounsDAOFork.sol:NounsDAOFork':
+        await NounsDAOFork.getAddress(),
+      'contracts/governance/NounsDAOVotes.sol:NounsDAOVotes':
+        await NounsDAOVotes.getAddress(),
       'contracts/governance/NounsDAODynamicQuorum.sol:NounsDAODynamicQuorum':
-        NounsDAODynamicQuorum.address,
+        await NounsDAODynamicQuorum.getAddress(),
     },
     deployer,
   ).deploy();
@@ -602,7 +614,7 @@ export const deployGovernorV3AndSetImpl = async (
   const v3LogicContract = await deployGovernorV3(deployer);
 
   const proxy = NounsDaoProxyFactory.connect(proxyAddress, deployer);
-  await proxy._setImplementation(v3LogicContract.address);
+  await proxy._setImplementation(await v3LogicContract.getAddress());
 
   return INounsDAOLogic__factory.connect(proxyAddress, deployer);
 };
@@ -619,23 +631,24 @@ export const deployGovernorV3WithV3Proxy = async (
   dynamicQuorumParams?: DynamicQuorumParams,
 ): Promise<INounsDAOLogic> => {
   const v3LogicContract = await deployGovernorV3(deployer);
-  const predictedProxyAddress = ethers.utils.getContractAddress({
+  const predictedProxyAddress = ethers.getCreateAddress({
     from: deployer.address,
-    nonce: (await deployer.getTransactionCount()) + 1,
+    nonce: await deployer.getNonce() + 1,
   });
 
-  const escrowAddress = (
-    await new NounsDAOForkEscrowFactory(deployer).deploy(predictedProxyAddress, tokenAddress)
-  ).address;
+  const escrow = await new NounsDAOForkEscrowFactory(deployer).deploy(
+    predictedProxyAddress,
+    tokenAddress,
+  );
 
   const proxy = await new NounsDaoProxyV3Factory(deployer).deploy(
     timelockAddress || deployer.address,
     tokenAddress,
-    escrowAddress,
+    await escrow.getAddress(),
     forkDAODeployerAddress || deployer.address,
     vetoerAddress || deployer.address,
     deployer.address,
-    v3LogicContract.address,
+    await v3LogicContract.getAddress(),
     {
       votingPeriod: votingPeriod || 7200,
       votingDelay: votingDelay || 1,
@@ -651,5 +664,5 @@ export const deployGovernorV3WithV3Proxy = async (
     },
   );
 
-  return INounsDAOLogic__factory.connect(proxy.address, deployer);
+  return INounsDAOLogic__factory.connect(await proxy.getAddress(), deployer);
 };

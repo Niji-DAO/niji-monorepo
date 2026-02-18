@@ -1,4 +1,3 @@
-import { utils } from 'ethers';
 import { task, types } from 'hardhat/config';
 
 task('create-proposal', 'Create a governance proposal')
@@ -13,7 +12,7 @@ task('create-proposal', 'Create a governance proposal')
     const nounsDao = nounsDaoFactory.attach(nounsDaoProxy);
 
     const [deployer] = await ethers.getSigners();
-    const oneETH = utils.parseEther('1');
+    const oneETH = ethers.parseEther('1');
 
     const receipt = await (
       await nounsDao['propose(address[],uint256[],string[],bytes[],string)'](
@@ -24,7 +23,7 @@ task('create-proposal', 'Create a governance proposal')
         '# Test Proposal\n## This is a **test**.',
       )
     ).wait();
-    if (!receipt.events?.length) {
+    if (!receipt || receipt.logs.length === 0) {
       throw new Error('Failed to create proposal');
     }
     console.log('Proposal created');

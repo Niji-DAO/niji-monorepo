@@ -70,9 +70,9 @@ task('deploy-niji-base-sepolia', 'Deploy Niji PNG contracts to Base Sepolia and 
     console.log(`Resolution: ${RESOLUTION}x${RESOLUTION}, Palette: ${PALETTE_SIZE} colors\n`);
 
     const [deployer] = await ethers.getSigners();
-    const balance = await deployer.getBalance();
+    const balance = await ethers.provider.getBalance(deployer.address);
     console.log(`Deployer: ${deployer.address}`);
-    console.log(`Balance: ${ethers.utils.formatEther(balance)} ETH\n`);
+    console.log(`Balance: ${ethers.formatEther(balance)} ETH\n`);
 
     // Step 1: Prepare PNG data (one per category)
     console.log('1. PNG画像準備中...');
@@ -140,19 +140,20 @@ task('deploy-niji-base-sepolia', 'Deploy Niji PNG contracts to Base Sepolia and 
     const traitNames = TRAIT_DIRS.map(t => t.name);
     const NijiArt = await ethers.getContractFactory('NijiArt');
     const art = await NijiArt.deploy(deployer.address, traitNames);
-    await art.deployed();
-    console.log(`   NijiArt: ${art.address}`);
+    await art.waitForDeployment();
+    console.log(`   NijiArt: ${await art.getAddress()}`);
 
     // Step 3: Deploy NijiDescriptor
     console.log('   NijiDescriptor デプロイ中...');
     const NijiDescriptor = await ethers.getContractFactory('NijiDescriptor');
-    const descriptor = await NijiDescriptor.deploy(art.address, RESOLUTION, COMPOSITE_ORDER);
-    await descriptor.deployed();
-    console.log(`   NijiDescriptor: ${descriptor.address}`);
+    const artAddress = await art.getAddress();
+    const descriptor = await NijiDescriptor.deploy(artAddress, RESOLUTION, COMPOSITE_ORDER);
+    await descriptor.waitForDeployment();
+    console.log(`   NijiDescriptor: ${await descriptor.getAddress()}`);
 
     // Step 4: Upload PNG data
     console.log('\n3. PNGデータアップロード中 (SSTORE2)...');
-    let totalDeployGas = ethers.BigNumber.from(0);
+    let totalDeployGas = 0n;
 
     for (const trait of TRAIT_DIRS) {
       const pngBuf = samplePngs.get(trait.id);
@@ -161,8 +162,8 @@ task('deploy-niji-base-sepolia', 'Deploy Niji PNG contracts to Base Sepolia and 
       try {
         const tx = await art.addTraitImage(trait.id, pngBuf, { gasLimit: 5000000 });
         const receipt = await tx.wait();
-        totalDeployGas = totalDeployGas.add(receipt.gasUsed);
-        console.log(`   ${trait.name}: ${pngBuf.length}B → ${receipt.gasUsed.toLocaleString()} gas (tx: ${receipt.transactionHash})`);
+        totalDeployGas = totalDeployGas + receipt!.gasUsed;
+        console.log(`   ${trait.name}: ${pngBuf.length}B → ${receipt!.gasUsed.toLocaleString()} gas (tx: ${receipt!.hash})`);
       } catch (e: any) {
         console.error(`   ${trait.name}: FAILED - ${e.message}`);
       }
@@ -171,16 +172,17 @@ task('deploy-niji-base-sepolia', 'Deploy Niji PNG contracts to Base Sepolia and 
 
     // Step 5: Set descriptor
     console.log('\n4. Descriptor設定...');
-    const setTx = await art.setDescriptor(descriptor.address);
+    const descriptorAddress = await descriptor.getAddress();
+    const setTx = await art.setDescriptor(descriptorAddress);
     await setTx.wait();
     console.log('   Done');
 
     // Step 6: Call tokenURI via eth_call
     console.log('\n5. tokenURI() eth_call テスト...');
-    const traitIndices = TRAIT_DIRS.map(t => samplePngs.has(t.id) ? 0 : ethers.constants.MaxUint256);
+    const traitIndices = TRAIT_DIRS.map(t => samplePngs.has(t.id) ? 0 : ethers.MaxUint256);
 
     try {
-      const gasEstimate = await descriptor.estimateGas.tokenURI(0, traitIndices);
+      const gasEstimate = await descriptor.tokenURI.estimateGas(0, traitIndices);
       console.log(`   ガス見積もり: ${gasEstimate.toLocaleString()}`);
 
       const result = await descriptor.tokenURI(0, traitIndices);
@@ -206,18 +208,18 @@ task('deploy-niji-base-sepolia', 'Deploy Niji PNG contracts to Base Sepolia and 
       console.log('\n========================================');
       console.log('=== BASE SEPOLIA RESULT ===');
       console.log('========================================');
-      console.log(`   NijiArt:        ${art.address}`);
-      console.log(`   NijiDescriptor: ${descriptor.address}`);
+      console.log(`   NijiArt:        ${await art.getAddress()}`);
+      console.log(`   NijiDescriptor: ${descriptorAddress}`);
       console.log(`   Resolution:     ${RESOLUTION}x${RESOLUTION}`);
       console.log(`   Layers:         ${samplePngs.size}`);
       console.log(`   tokenURI gas:   ${gasEstimate.toLocaleString()}`);
       console.log(`   SVG size:       ${(svg.length / 1024).toFixed(1)}KB`);
-      console.log(`   30M limit:      ${gasEstimate.toBigInt() < 30000000n ? '✅ YES' : '❌ NO'}`);
+      console.log(`   30M limit:      ${gasEstimate < 30000000n ? '✅ YES' : '❌ NO'}`);
       console.log('========================================');
 
-      const balanceAfter = await deployer.getBalance();
-      console.log(`\n   残高: ${ethers.utils.formatEther(balanceAfter)} ETH`);
-      console.log(`   消費: ${ethers.utils.formatEther(balance.sub(balanceAfter))} ETH`);
+      const balanceAfter = await ethers.provider.getBalance(deployer.address);
+      console.log(`\n   残高: ${ethers.formatEther(balanceAfter)} ETH`);
+      console.log(`   消費: ${ethers.formatEther(balance - balanceAfter)} ETH`);
 
     } catch (e: any) {
       console.error(`   ERROR: ${e.message}`);

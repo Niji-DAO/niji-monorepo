@@ -20,26 +20,30 @@ task('deploy-descriptor-v3', 'Deploy NounsDescriptorV3 & populate it with art')
     const [deployer] = await ethers.getSigners();
     console.log(`Deploying from address ${deployer.address}`);
 
-    const nonce = await deployer.getTransactionCount();
-    const expectedNounsArtAddress = ethers.utils.getContractAddress({
+    const nonce = await deployer.getNonce();
+    const expectedNounsArtAddress = ethers.getCreateAddress({
       from: deployer.address,
       nonce: nonce + 4,
     });
 
     console.log('Deploying contracts...');
     const library = await (await ethers.getContractFactory('NFTDescriptorV2', deployer)).deploy();
+    await library.waitForDeployment();
+    const libraryAddress = await library.getAddress();
     contracts.NFTDescriptorV2 = {
       name: 'NFTDescriptorV2',
-      address: library.address,
+      address: libraryAddress,
       instance: library,
       constructorArguments: [],
       libraries: {},
     };
 
     const renderer = await (await ethers.getContractFactory('SVGRenderer', deployer)).deploy();
+    await renderer.waitForDeployment();
+    const rendererAddress = await renderer.getAddress();
     contracts.SVGRenderer = {
       name: 'SVGRenderer',
-      address: renderer.address,
+      address: rendererAddress,
       instance: renderer,
       constructorArguments: [],
       libraries: {},
@@ -47,27 +51,31 @@ task('deploy-descriptor-v3', 'Deploy NounsDescriptorV3 & populate it with art')
 
     const nounsDescriptorFactory = await ethers.getContractFactory('NounsDescriptorV3', {
       libraries: {
-        NFTDescriptorV2: library.address,
+        NFTDescriptorV2: libraryAddress,
       },
     });
     const nounsDescriptor = await nounsDescriptorFactory.deploy(
       expectedNounsArtAddress,
-      renderer.address,
+      rendererAddress,
     );
+    await nounsDescriptor.waitForDeployment();
+    const nounsDescriptorAddress = await nounsDescriptor.getAddress();
     contracts.NounsDescriptorV3 = {
       name: 'NounsDescriptorV3',
-      address: nounsDescriptor.address,
-      constructorArguments: [expectedNounsArtAddress, renderer.address],
+      address: nounsDescriptorAddress,
+      constructorArguments: [expectedNounsArtAddress, rendererAddress],
       instance: nounsDescriptor,
       libraries: {
-        NFTDescriptorV2: library.address,
+        NFTDescriptorV2: libraryAddress,
       },
     };
 
     const inflator = await (await ethers.getContractFactory('Inflator', deployer)).deploy();
+    await inflator.waitForDeployment();
+    const inflatorAddress = await inflator.getAddress();
     contracts.Inflator = {
       name: 'Inflator',
-      address: inflator.address,
+      address: inflatorAddress,
       instance: inflator,
       constructorArguments: [],
       libraries: {},
@@ -75,29 +83,24 @@ task('deploy-descriptor-v3', 'Deploy NounsDescriptorV3 & populate it with art')
 
     const art = await (
       await ethers.getContractFactory('NounsArt', deployer)
-    ).deploy(nounsDescriptor.address, inflator.address);
+    ).deploy(nounsDescriptorAddress, inflatorAddress);
+    await art.waitForDeployment();
+    const artAddress = await art.getAddress();
     contracts.NounsArt = {
       name: 'NounsArt',
-      address: art.address,
-      constructorArguments: [nounsDescriptor.address, inflator.address],
+      address: artAddress,
+      constructorArguments: [nounsDescriptorAddress, inflatorAddress],
       instance: art,
       libraries: {},
     };
-
-    console.log('Waiting for contracts to be deployed');
-    for (const c of Object.values<DeployedContract>(contracts)) {
-      console.log(`Waiting for ${c.name} to be deployed`);
-      await c.instance.deployTransaction.wait();
-      console.log('Done');
-    }
 
     console.log('Deployment complete:');
     printContractsTable(contracts);
 
     console.log('Populating Descriptor...');
     await run('populate-descriptor', {
-      nftDescriptor: contracts.NFTDescriptorV2.address,
-      nounsDescriptor: contracts.NounsDescriptorV3.address,
+      nftDescriptor: libraryAddress,
+      nounsDescriptor: nounsDescriptorAddress,
     });
     console.log('Population complete.');
 

@@ -80,9 +80,9 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     console.log('╚═══════════════════════════════════════════════════════════╝\n');
 
     const [deployer] = await ethers.getSigners();
-    const balance = await deployer.getBalance();
+    const balance = await ethers.provider.getBalance(deployer.address);
     console.log(`Deployer: ${deployer.address}`);
-    console.log(`Balance:  ${ethers.utils.formatEther(balance)} ETH\n`);
+    console.log(`Balance:  ${ethers.formatEther(balance)} ETH\n`);
 
     // =========================================
     // STEP 1: Prepare PNG data
@@ -157,8 +157,8 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     const traitNames = TRAIT_DIRS.map(t => t.name);
     const NijiArt = await ethers.getContractFactory('NijiArt');
     const art = await NijiArt.deploy(deployer.address, traitNames);
-    await art.deployed();
-    console.log(`│ NijiArt deployed: ${art.address}`);
+    await art.waitForDeployment();
+    console.log(`│ NijiArt deployed: ${await art.getAddress()}`);
     console.log('└──────────────────────────────────────────────────────────────┘\n');
 
     // =========================================
@@ -166,9 +166,10 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     // =========================================
     console.log('┌─ STEP 3: Deploy NijiDescriptor ───────────────────────────────┐');
     const NijiDescriptor = await ethers.getContractFactory('NijiDescriptor');
-    const descriptor = await NijiDescriptor.deploy(art.address, RESOLUTION, COMPOSITE_ORDER);
-    await descriptor.deployed();
-    console.log(`│ NijiDescriptor deployed: ${descriptor.address}`);
+    const artAddress = await art.getAddress();
+    const descriptor = await NijiDescriptor.deploy(artAddress, RESOLUTION, COMPOSITE_ORDER);
+    await descriptor.waitForDeployment();
+    console.log(`│ NijiDescriptor deployed: ${await descriptor.getAddress()}`);
     console.log('└──────────────────────────────────────────────────────────────┘\n');
 
     // =========================================
@@ -176,9 +177,9 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     // =========================================
     console.log('┌─ STEP 4: Deploy NijiSeeder ───────────────────────────────────┐');
     const NijiSeeder = await ethers.getContractFactory('NijiSeeder');
-    const seeder = await NijiSeeder.deploy(art.address);
-    await seeder.deployed();
-    console.log(`│ NijiSeeder deployed: ${seeder.address}`);
+    const seeder = await NijiSeeder.deploy(artAddress);
+    await seeder.waitForDeployment();
+    console.log(`│ NijiSeeder deployed: ${await seeder.getAddress()}`);
     console.log('└──────────────────────────────────────────────────────────────┘\n');
 
     // =========================================
@@ -188,15 +189,17 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     if (!args.skipToken) {
       console.log('┌─ STEP 5: Deploy NijiToken ────────────────────────────────────┐');
       const NijiToken = await ethers.getContractFactory('NijiToken');
+      const descriptorAddress = await descriptor.getAddress();
+      const seederAddress = await seeder.getAddress();
       token = await NijiToken.deploy(
         'Niji',
         'NIJI',
-        descriptor.address,
-        seeder.address,
+        descriptorAddress,
+        seederAddress,
         MAX_SUPPLY
       );
-      await token.deployed();
-      console.log(`│ NijiToken deployed: ${token.address}`);
+      await token.waitForDeployment();
+      console.log(`│ NijiToken deployed: ${await token.getAddress()}`);
       console.log('└──────────────────────────────────────────────────────────────┘\n');
     }
 
@@ -205,7 +208,7 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     // =========================================
     if (!args.skipImages && samplePngs.size > 0) {
       console.log('┌─ STEP 6: Upload PNG Data (SSTORE2) ───────────────────────────┐');
-      let totalDeployGas = ethers.BigNumber.from(0);
+      let totalDeployGas = 0n;
 
       for (const trait of TRAIT_DIRS) {
         const pngBuf = samplePngs.get(trait.id);
@@ -214,8 +217,8 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
         try {
           const tx = await art.addTraitImage(trait.id, pngBuf, { gasLimit: 5000000 });
           const receipt = await tx.wait();
-          totalDeployGas = totalDeployGas.add(receipt.gasUsed);
-          console.log(`│ ${trait.name.padEnd(16)} ${pngBuf.length.toString().padStart(6)}B → ${receipt.gasUsed.toLocaleString().padStart(10)} gas`);
+          totalDeployGas = totalDeployGas + receipt!.gasUsed;
+          console.log(`│ ${trait.name.padEnd(16)} ${pngBuf.length.toString().padStart(6)}B → ${receipt!.gasUsed.toLocaleString().padStart(10)} gas`);
         } catch (e: any) {
           console.error(`│ ${trait.name.padEnd(16)} FAILED: ${e.message.slice(0, 50)}`);
         }
@@ -230,7 +233,8 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     console.log('┌─ STEP 7: Configure Contracts ─────────────────────────────────┐');
 
     // Set descriptor as art's descriptor
-    const setTx = await art.setDescriptor(descriptor.address);
+    const descAddr = await descriptor.getAddress();
+    const setTx = await art.setDescriptor(descAddr);
     await setTx.wait();
     console.log('│ Set NijiArt.descriptor → NijiDescriptor');
 
@@ -241,10 +245,10 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     // =========================================
     if (samplePngs.size > 0) {
       console.log('┌─ STEP 8: Test tokenURI ─────────────────────────────────────┐');
-      const traitIndices = TRAIT_DIRS.map(t => samplePngs.has(t.id) ? 0 : ethers.constants.MaxUint256);
+      const traitIndices = TRAIT_DIRS.map(t => samplePngs.has(t.id) ? 0 : ethers.MaxUint256);
 
       try {
-        const gasEstimate = await descriptor.estimateGas.tokenURI(0, traitIndices);
+        const gasEstimate = await descriptor.tokenURI.estimateGas(0, traitIndices);
         console.log(`│ Gas estimate: ${gasEstimate.toLocaleString()}`);
 
         const result = await descriptor.tokenURI(0, traitIndices);
@@ -273,29 +277,33 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     // =========================================
     // SUMMARY
     // =========================================
-    const balanceAfter = await deployer.getBalance();
+    const balanceAfter = await ethers.provider.getBalance(deployer.address);
+
+    const artAddr = await art.getAddress();
+    const descAddrFinal = await descriptor.getAddress();
+    const seederAddr = await seeder.getAddress();
 
     console.log('╔═══════════════════════════════════════════════════════════════╗');
     console.log('║                    DEPLOYMENT SUMMARY                         ║');
     console.log('╠═══════════════════════════════════════════════════════════════╣');
-    console.log(`║ NijiArt:        ${art.address}  ║`);
-    console.log(`║ NijiDescriptor: ${descriptor.address}  ║`);
-    console.log(`║ NijiSeeder:     ${seeder.address}  ║`);
+    console.log(`║ NijiArt:        ${artAddr}  ║`);
+    console.log(`║ NijiDescriptor: ${descAddrFinal}  ║`);
+    console.log(`║ NijiSeeder:     ${seederAddr}  ║`);
     if (token) {
-      console.log(`║ NijiToken:      ${token.address}  ║`);
+      console.log(`║ NijiToken:      ${await token.getAddress()}  ║`);
     }
     console.log('╠═══════════════════════════════════════════════════════════════╣');
     console.log(`║ Resolution:     ${RESOLUTION}x${RESOLUTION}`);
     console.log(`║ Trait Categories: ${TRAIT_DIRS.length}`);
     console.log(`║ Images Uploaded: ${samplePngs.size}`);
-    console.log(`║ ETH Spent:      ${ethers.utils.formatEther(balance.sub(balanceAfter))} ETH`);
+    console.log(`║ ETH Spent:      ${ethers.formatEther(balance - balanceAfter)} ETH`);
     console.log('╚═══════════════════════════════════════════════════════════════╝');
 
     // Return addresses for scripting
     return {
-      art: art.address,
-      descriptor: descriptor.address,
-      seeder: seeder.address,
-      token: token?.address || null,
+      art: artAddr,
+      descriptor: descAddrFinal,
+      seeder: seederAddr,
+      token: token ? await token.getAddress() : null,
     };
   });

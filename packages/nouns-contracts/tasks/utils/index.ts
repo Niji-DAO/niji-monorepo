@@ -1,6 +1,6 @@
 import { deflateRawSync } from 'zlib';
 
-import { ethers } from 'ethers';
+import { AbiCoder } from 'ethers';
 import promptjs from 'prompt';
 
 import { ContractNamesDAOV3, ContractRow, DeployedContract } from '../types';
@@ -14,7 +14,7 @@ export function dataToDescriptorInput(data: string[]): {
   originalLength: number;
   itemCount: number;
 } {
-  const abiEncoded = ethers.utils.defaultAbiCoder.encode(['bytes[]'], [data]);
+  const abiEncoded = AbiCoder.defaultAbiCoder().encode(['bytes[]'], [data]);
   const encodedCompressed = `0x${deflateRawSync(
     Buffer.from(abiEncoded.substring(2), 'hex'),
   ).toString('hex')}`;
@@ -36,8 +36,9 @@ export function printContractsTable(contracts: Record<ContractNamesDAOV3, Deploy
         acc[contract.name] = {
           Address: contract.address,
         };
-        if (contract.instance?.deployTransaction) {
-          acc[contract.name]['Deployment Hash'] = contract.instance.deployTransaction.hash;
+        const deployTx = contract.instance?.deploymentTransaction?.();
+        if (deployTx) {
+          acc[contract.name]['Deployment Hash'] = deployTx.hash;
         }
         return acc;
       },

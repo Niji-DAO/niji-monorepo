@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { NijiArt, NijiDescriptor, NijiSeeder, NijiToken } from '../../typechain';
 
 describe('NijiToken', () => {
@@ -35,32 +35,28 @@ describe('NijiToken', () => {
 
     // Deploy NijiArt
     const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-    art = (await NijiArtFactory.deploy(owner.address, traitNames)) as NijiArt;
-    await art.deployed();
+    art = (await NijiArtFactory.deploy(owner.address, traitNames)) as unknown as NijiArt;
 
     // Deploy NijiDescriptor
     const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
-    descriptor = (await NijiDescriptorFactory.deploy(art.address, RESOLUTION, COMPOSITE_ORDER)) as NijiDescriptor;
-    await descriptor.deployed();
+    descriptor = (await NijiDescriptorFactory.deploy(await art.getAddress(), RESOLUTION, COMPOSITE_ORDER)) as unknown as NijiDescriptor;
 
     // Deploy NijiSeeder
     const NijiSeederFactory = await ethers.getContractFactory('NijiSeeder');
-    seeder = (await NijiSeederFactory.deploy(art.address)) as NijiSeeder;
-    await seeder.deployed();
+    seeder = (await NijiSeederFactory.deploy(await art.getAddress())) as unknown as NijiSeeder;
 
     // Deploy NijiToken
     const NijiTokenFactory = await ethers.getContractFactory('NijiToken');
     token = (await NijiTokenFactory.deploy(
       'Niji',
       'NIJI',
-      descriptor.address,
-      seeder.address,
+      await descriptor.getAddress(),
+      await seeder.getAddress(),
       MAX_SUPPLY
-    )) as NijiToken;
-    await token.deployed();
+    )) as unknown as NijiToken;
 
     // Setup: set descriptor on art
-    await art.setDescriptor(descriptor.address);
+    await art.setDescriptor(await descriptor.getAddress());
 
     // Add sample images for all traits
     await art.transferDescriptor(owner.address);
@@ -79,11 +75,11 @@ describe('NijiToken', () => {
     });
 
     it('should set descriptor correctly', async () => {
-      expect(await token.descriptor()).to.equal(descriptor.address);
+      expect(await token.descriptor()).to.equal(await descriptor.getAddress());
     });
 
     it('should set seeder correctly', async () => {
-      expect(await token.seeder()).to.equal(seeder.address);
+      expect(await token.seeder()).to.equal(await seeder.getAddress());
     });
 
     it('should set maxSupply correctly', async () => {
@@ -107,7 +103,7 @@ describe('NijiToken', () => {
     it('should mint token to recipient', async () => {
       await expect(token.mint(other.address))
         .to.emit(token, 'Transfer')
-        .withArgs(ethers.constants.AddressZero, other.address, 0);
+        .withArgs(ethers.ZeroAddress, other.address, 0);
 
       expect(await token.ownerOf(0)).to.equal(other.address);
       expect(await token.currentTokenId()).to.equal(1);
@@ -130,11 +126,11 @@ describe('NijiToken', () => {
     it('should revert if minting is not active', async () => {
       await token.toggleMinting(); // Turn off
 
-      await expect(token.mint(other.address)).to.be.revertedWith('MintingNotActive');
+      await expect(token.mint(other.address)).to.be.revertedWithCustomError(token, 'MintingNotActive');
     });
 
     it('should revert if caller is not minter', async () => {
-      await expect(token.connect(other).mint(other.address)).to.be.revertedWith('OnlyMinter');
+      await expect(token.connect(other).mint(other.address)).to.be.revertedWithCustomError(token, 'OnlyMinter');
     });
 
     it('should revert if max supply reached', async () => {
@@ -143,15 +139,14 @@ describe('NijiToken', () => {
       const limitedToken = await NijiTokenFactory.deploy(
         'Niji',
         'NIJI',
-        descriptor.address,
-        seeder.address,
+        await descriptor.getAddress(),
+        await seeder.getAddress(),
         1
       );
-      await limitedToken.deployed();
       await limitedToken.toggleMinting();
 
       await limitedToken.mint(other.address);
-      await expect(limitedToken.mint(other.address)).to.be.revertedWith('MaxSupplyReached');
+      await expect(limitedToken.mint(other.address)).to.be.revertedWithCustomError(limitedToken, 'MaxSupplyReached');
     });
   });
 
@@ -161,7 +156,7 @@ describe('NijiToken', () => {
     });
 
     it('should mint multiple tokens', async () => {
-      const tokenIds = await token.callStatic.mintBatch(other.address, 3);
+      const tokenIds = await token.mintBatch.staticCall(other.address, 3);
 
       expect(tokenIds.length).to.equal(3);
       expect(tokenIds[0]).to.equal(0);
@@ -193,7 +188,7 @@ describe('NijiToken', () => {
     });
 
     it('should revert for non-existent token', async () => {
-      await expect(token.tokenURI(999)).to.be.revertedWith('TokenDoesNotExist');
+      await expect(token.tokenURI(999)).to.be.revertedWithCustomError(token, 'TokenDoesNotExist');
     });
   });
 
@@ -211,7 +206,7 @@ describe('NijiToken', () => {
     });
 
     it('should revert for non-existent token', async () => {
-      await expect(token.getSeed(999)).to.be.revertedWith('TokenDoesNotExist');
+      await expect(token.getSeed(999)).to.be.revertedWithCustomError(token, 'TokenDoesNotExist');
     });
   });
 
@@ -231,32 +226,36 @@ describe('NijiToken', () => {
   describe('setDescriptor', () => {
     it('should allow owner to update descriptor', async () => {
       const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
-      const newDescriptor = await NijiDescriptorFactory.deploy(art.address, RESOLUTION, COMPOSITE_ORDER);
+      const newDescriptor = await NijiDescriptorFactory.deploy(await art.getAddress(), RESOLUTION, COMPOSITE_ORDER);
+      const descriptorAddr = await descriptor.getAddress();
+      const newDescriptorAddr = await newDescriptor.getAddress();
 
-      await expect(token.setDescriptor(newDescriptor.address))
+      await expect(token.setDescriptor(newDescriptorAddr))
         .to.emit(token, 'DescriptorUpdated')
-        .withArgs(descriptor.address, newDescriptor.address);
+        .withArgs(descriptorAddr, newDescriptorAddr);
 
-      expect(await token.descriptor()).to.equal(newDescriptor.address);
+      expect(await token.descriptor()).to.equal(newDescriptorAddr);
     });
 
     it('should revert if caller is not owner', async () => {
       await expect(
         token.connect(other).setDescriptor(other.address)
-      ).to.be.revertedWith('OwnableUnauthorizedAccount');
+      ).to.be.revertedWithCustomError(token, 'OwnableUnauthorizedAccount');
     });
   });
 
   describe('setSeeder', () => {
     it('should allow owner to update seeder', async () => {
       const NijiSeederFactory = await ethers.getContractFactory('NijiSeeder');
-      const newSeeder = await NijiSeederFactory.deploy(art.address);
+      const newSeeder = await NijiSeederFactory.deploy(await art.getAddress());
+      const seederAddr = await seeder.getAddress();
+      const newSeederAddr = await newSeeder.getAddress();
 
-      await expect(token.setSeeder(newSeeder.address))
+      await expect(token.setSeeder(newSeederAddr))
         .to.emit(token, 'SeederUpdated')
-        .withArgs(seeder.address, newSeeder.address);
+        .withArgs(seederAddr, newSeederAddr);
 
-      expect(await token.seeder()).to.equal(newSeeder.address);
+      expect(await token.seeder()).to.equal(newSeederAddr);
     });
   });
 
@@ -336,12 +335,12 @@ describe('NijiToken', () => {
       const unlimitedToken = await NijiTokenFactory.deploy(
         'Niji',
         'NIJI',
-        descriptor.address,
-        seeder.address,
+        await descriptor.getAddress(),
+        await seeder.getAddress(),
         0 // unlimited
       );
 
-      expect(await unlimitedToken.remainingSupply()).to.equal(ethers.constants.MaxUint256);
+      expect(await unlimitedToken.remainingSupply()).to.equal(ethers.MaxUint256);
     });
   });
 });

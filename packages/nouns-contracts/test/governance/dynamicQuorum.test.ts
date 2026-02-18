@@ -1,13 +1,9 @@
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import chai from 'chai';
-import { solidity } from 'ethereum-waffle';
-import { parseUnits } from 'ethers/lib/utils';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { expect } from 'chai';
+import { parseUnits } from 'ethers';
 
 import { NounsDAOLogicV4 } from '../../typechain';
 import { deployGovernorV3, getSigners, TestSigners } from '../utils';
-
-chai.use(solidity);
-const { expect } = chai;
 
 let deployer: SignerWithAddress;
 let signers: TestSigners;

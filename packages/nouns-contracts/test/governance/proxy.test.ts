@@ -1,11 +1,10 @@
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import chai from 'chai';
-import { solidity } from 'ethereum-waffle';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { expect } from 'chai';
 
 import {
   NounsToken,
   NounsDescriptorV3__factory as NounsDescriptorV3Factory,
-  NounsDAOLogicV4,
+  INounsDAOLogic,
 } from '../../typechain';
 import { MAX_QUORUM_VOTES_BPS, MIN_QUORUM_VOTES_BPS } from '../constants';
 import {
@@ -18,13 +17,10 @@ import {
   deployGovernorV3WithV3Proxy,
 } from '../utils';
 
-chai.use(solidity);
-const { expect } = chai;
-
 let token: NounsToken;
 let deployer: SignerWithAddress;
 let signers: TestSigners;
-let gov: NounsDAOLogicV4;
+let gov: INounsDAOLogic;
 
 async function setup() {
   token = await deployNounsToken(signers.deployer);
@@ -47,7 +43,7 @@ describe('NounsDAOProxyV3', () => {
   it('Deploys successfully', async () => {
     gov = await deployGovernorV3WithV3Proxy(
       deployer,
-      token.address,
+      await token.getAddress(),
       deployer.address,
       deployer.address,
       deployer.address,

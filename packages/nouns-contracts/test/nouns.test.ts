@@ -1,15 +1,11 @@
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import chai from 'chai';
-import { solidity } from 'ethereum-waffle';
-import { BigNumber as EthersBN, constants } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { expect } from 'chai';
+import { EventLog } from 'ethers';
 import { ethers } from 'hardhat';
 
 import { NounsDescriptorV3__factory as NounsDescriptorV3Factory, NounsToken } from '../typechain';
 
 import { deployNounsToken, populateDescriptorV2 } from './utils';
-
-chai.use(solidity);
-const { expect } = chai;
 
 describe('NounsToken', () => {
   let nounsToken: NounsToken;
@@ -37,25 +33,31 @@ describe('NounsToken', () => {
   it('should allow the minter to mint a noun to itself and a reward noun to the noundersDAO', async () => {
     const receipt = await (await nounsToken.mint()).wait();
 
-    const [, , , noundersNounCreated, , , , ownersNounCreated] = receipt.events || [];
+    const events = receipt!.logs.filter((log): log is EventLog => log instanceof EventLog);
+    const noundersNounCreated = events.find(
+      e => e.eventName === 'NounCreated' && e.args?.tokenId === 0n,
+    );
+    const ownersNounCreated = events.find(
+      e => e.eventName === 'NounCreated' && e.args?.tokenId === 1n,
+    );
 
     expect(await nounsToken.ownerOf(0)).to.eq(noundersDAO.address);
-    expect(noundersNounCreated?.event).to.eq('NounCreated');
+    expect(noundersNounCreated?.eventName).to.eq('NounCreated');
     expect(noundersNounCreated?.args?.tokenId).to.eq(0);
     expect(noundersNounCreated?.args?.seed.length).to.equal(5);
 
     expect(await nounsToken.ownerOf(1)).to.eq(deployer.address);
-    expect(ownersNounCreated?.event).to.eq('NounCreated');
+    expect(ownersNounCreated?.eventName).to.eq('NounCreated');
     expect(ownersNounCreated?.args?.tokenId).to.eq(1);
     expect(ownersNounCreated?.args?.seed.length).to.equal(5);
 
-    noundersNounCreated?.args?.seed.forEach((item: EthersBN | number) => {
-      const value = typeof item !== 'number' ? item?.toNumber() : item;
+    noundersNounCreated?.args?.seed.forEach((item: bigint | number) => {
+      const value = typeof item !== 'number' ? Number(item) : item;
       expect(value).to.be.a('number');
     });
 
-    ownersNounCreated?.args?.seed.forEach((item: EthersBN | number) => {
-      const value = typeof item !== 'number' ? item?.toNumber() : item;
+    ownersNounCreated?.args?.seed.forEach((item: bigint | number) => {
+      const value = typeof item !== 'number' ? Number(item) : item;
       expect(value).to.be.a('number');
     });
   });
@@ -72,15 +74,16 @@ describe('NounsToken', () => {
     await (await nounsToken.mint()).wait();
 
     const receipt = await (await nounsToken.mint()).wait();
-    const nounCreated = receipt.events?.[3];
+    const events = receipt!.logs.filter((log): log is EventLog => log instanceof EventLog);
+    const nounCreated = events.find(e => e.eventName === 'NounCreated' && e.args?.tokenId === 2n);
 
     expect(await nounsToken.ownerOf(2)).to.eq(deployer.address);
-    expect(nounCreated?.event).to.eq('NounCreated');
+    expect(nounCreated?.eventName).to.eq('NounCreated');
     expect(nounCreated?.args?.tokenId).to.eq(2);
     expect(nounCreated?.args?.seed.length).to.equal(5);
 
-    nounCreated?.args?.seed.forEach((item: EthersBN | number) => {
-      const value = typeof item !== 'number' ? item?.toNumber() : item;
+    nounCreated?.args?.seed.forEach((item: bigint | number) => {
+      const value = typeof item !== 'number' ? Number(item) : item;
       expect(value).to.be.a('number');
     });
   });
@@ -97,7 +100,7 @@ describe('NounsToken', () => {
 
     await expect(tx)
       .to.emit(nounsToken, 'Transfer')
-      .withArgs(constants.AddressZero, creator.address, 2);
+      .withArgs(ethers.ZeroAddress, creator.address, 2);
     await expect(tx).to.emit(nounsToken, 'Transfer').withArgs(creator.address, minter.address, 2);
   });
 

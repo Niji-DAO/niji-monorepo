@@ -19,12 +19,13 @@ task('verify-etherscan-dao-v3', 'Verify the Solidity contracts on Etherscan')
       for (const [, contract] of Object.entries(contracts)) {
         console.log(`verifying ${contract.name}...`);
         try {
-          const code = await contract.instance?.provider.getCode(contract.address);
+          const provider = contract.instance?.runner?.provider;
+          const code = provider ? await provider.getCode(contract.address) : '0x';
           if (code === '0x') {
             console.log(
               `${contract.name} contract deployment has not completed. waiting to verify...`,
             );
-            await contract.instance?.deployed();
+            await contract.instance?.waitForDeployment();
           }
           await hre.run('verify:verify', {
             ...contract,
