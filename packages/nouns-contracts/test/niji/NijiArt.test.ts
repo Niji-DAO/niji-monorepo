@@ -2,6 +2,12 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { NijiArt } from '../../typechain';
+import {
+  TRAIT_NAMES,
+  SAMPLE_PNG,
+  deployNijiArt,
+  shouldBehaveLikeOwnable2Step,
+} from './helpers';
 
 describe('NijiArt', () => {
   let art: NijiArt;
@@ -9,26 +15,9 @@ describe('NijiArt', () => {
   let descriptor: SignerWithAddress;
   let other: SignerWithAddress;
 
-  const traitNames = ['special', 'choker', 'headphone', 'leftHand', 'hat', 'clothing', 'ear', 'back', 'backDecoration', 'background', 'solidBackground', 'hair'];
-
-  // Sample PNG data (minimal valid PNG: 1x1 transparent pixel)
-  const samplePng = Buffer.from([
-    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // PNG signature
-    0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, // IHDR chunk
-    0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-    0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
-    0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41, // IDAT chunk
-    0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-    0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00,
-    0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, // IEND chunk
-    0x42, 0x60, 0x82
-  ]);
-
   beforeEach(async () => {
     [owner, descriptor, other] = await ethers.getSigners();
-
-    const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-    art = (await NijiArtFactory.deploy(descriptor.address, traitNames)) as unknown as NijiArt;
+    art = await deployNijiArt(descriptor.address);
   });
 
   describe('constructor', () => {
@@ -37,9 +26,9 @@ describe('NijiArt', () => {
     });
 
     it('should set trait names correctly', async () => {
-      expect(await art.traitCount()).to.equal(traitNames.length);
-      for (let i = 0; i < traitNames.length; i++) {
-        expect(await art.traitNames(i)).to.equal(traitNames[i]);
+      expect(await art.traitCount()).to.equal(TRAIT_NAMES.length);
+      for (let i = 0; i < TRAIT_NAMES.length; i++) {
+        expect(await art.traitNames(i)).to.equal(TRAIT_NAMES[i]);
       }
     });
 
@@ -50,14 +39,14 @@ describe('NijiArt', () => {
     it('should revert if descriptor is zero address', async () => {
       const NijiArtFactory = await ethers.getContractFactory('NijiArt');
       await expect(
-        NijiArtFactory.deploy(ethers.ZeroAddress, traitNames)
+        NijiArtFactory.deploy(ethers.ZeroAddress, TRAIT_NAMES)
       ).to.be.revertedWithCustomError(NijiArtFactory, 'EmptyDescriptorAddress');
     });
   });
 
   describe('addTraitImage', () => {
     it('should allow descriptor to add image and emit event', async () => {
-      await expect(art.connect(descriptor).addTraitImage(0, samplePng))
+      await expect(art.connect(descriptor).addTraitImage(0, SAMPLE_PNG))
         .to.emit(art, 'TraitImageAdded');
 
       expect(await art.getTraitImageCount(0)).to.equal(1);
@@ -69,13 +58,13 @@ describe('NijiArt', () => {
 
     it('should revert if caller is not descriptor', async () => {
       await expect(
-        art.connect(other).addTraitImage(0, samplePng)
+        art.connect(other).addTraitImage(0, SAMPLE_PNG)
       ).to.be.revertedWithCustomError(art, 'SenderIsNotDescriptor');
     });
 
     it('should revert for invalid trait ID', async () => {
       await expect(
-        art.connect(descriptor).addTraitImage(99, samplePng)
+        art.connect(descriptor).addTraitImage(99, SAMPLE_PNG)
       ).to.be.revertedWithCustomError(art, 'InvalidTraitId');
     });
 
@@ -88,7 +77,7 @@ describe('NijiArt', () => {
 
   describe('addTraitImages', () => {
     it('should allow descriptor to add multiple images', async () => {
-      const images = [samplePng, samplePng, samplePng];
+      const images = [SAMPLE_PNG, SAMPLE_PNG, SAMPLE_PNG];
       await expect(art.connect(descriptor).addTraitImages(0, images))
         .to.emit(art, 'TraitImagesAdded')
         .withArgs(0, 0, 3);
@@ -99,12 +88,12 @@ describe('NijiArt', () => {
 
   describe('getTraitImage', () => {
     beforeEach(async () => {
-      await art.connect(descriptor).addTraitImage(0, samplePng);
+      await art.connect(descriptor).addTraitImage(0, SAMPLE_PNG);
     });
 
     it('should return stored PNG data', async () => {
       const data = await art.getTraitImage(0, 0);
-      expect(data).to.equal('0x' + samplePng.toString('hex'));
+      expect(data).to.equal('0x' + SAMPLE_PNG.toString('hex'));
     });
 
     it('should revert for invalid trait ID', async () => {
@@ -148,41 +137,17 @@ describe('NijiArt', () => {
     });
   });
 
-  describe('Ownable2Step', () => {
-    it('transferOwnership should not change owner immediately', async () => {
-      await art.transferOwnership(other.address);
-      expect(await art.owner()).to.equal(owner.address);
-    });
-
-    it('transferOwnership should set pendingOwner', async () => {
-      await art.transferOwnership(other.address);
-      expect(await art.pendingOwner()).to.equal(other.address);
-    });
-
-    it('transferOwnership should emit OwnershipTransferStarted', async () => {
-      await expect(art.transferOwnership(other.address))
-        .to.emit(art, 'OwnershipTransferStarted')
-        .withArgs(owner.address, other.address);
-    });
-
-    it('acceptOwnership should transfer ownership to pendingOwner', async () => {
-      await art.transferOwnership(other.address);
-      await art.connect(other).acceptOwnership();
-      expect(await art.owner()).to.equal(other.address);
-    });
-
-    it('acceptOwnership should revert if caller is not pendingOwner', async () => {
-      await art.transferOwnership(other.address);
-      await expect(
-        art.connect(descriptor).acceptOwnership()
-      ).to.be.revertedWithCustomError(art, 'OwnableUnauthorizedAccount');
-    });
-  });
+  shouldBehaveLikeOwnable2Step(
+    () => art,
+    () => owner,
+    () => other,
+    () => descriptor,
+  );
 
   describe('getTraitNames', () => {
     it('should return all trait names', async () => {
       const names = await art.getTraitNames();
-      expect(names).to.deep.equal(traitNames);
+      expect(names).to.deep.equal(TRAIT_NAMES);
     });
   });
 

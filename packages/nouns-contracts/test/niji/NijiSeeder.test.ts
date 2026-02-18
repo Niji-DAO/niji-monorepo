@@ -2,6 +2,13 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { NijiArt, NijiSeeder } from '../../typechain';
+import {
+  TRAIT_NAMES,
+  deployNijiArt,
+  deployNijiSeeder,
+  populateAllTraits,
+  shouldBehaveLikeOwnable2Step,
+} from './helpers';
 
 describe('NijiSeeder', () => {
   let art: NijiArt;
@@ -9,36 +16,14 @@ describe('NijiSeeder', () => {
   let owner: SignerWithAddress;
   let other: SignerWithAddress;
 
-  const traitNames = ['special', 'choker', 'headphone', 'leftHand', 'hat', 'clothing', 'ear', 'back', 'backDecoration', 'background', 'solidBackground', 'hair'];
-
-  // Sample PNG data
-  const samplePng = Buffer.from([
-    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
-    0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
-    0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-    0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
-    0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41,
-    0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-    0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00,
-    0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
-    0x42, 0x60, 0x82
-  ]);
-
   beforeEach(async () => {
     [owner, other] = await ethers.getSigners();
 
-    // Deploy NijiArt
-    const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-    art = (await NijiArtFactory.deploy(owner.address, traitNames)) as unknown as NijiArt;
-
-    // Deploy NijiSeeder
-    const NijiSeederFactory = await ethers.getContractFactory('NijiSeeder');
-    seeder = (await NijiSeederFactory.deploy(await art.getAddress())) as unknown as NijiSeeder;
+    art = await deployNijiArt(owner.address);
+    seeder = await deployNijiSeeder(await art.getAddress());
 
     // Add some images for testing
-    for (let i = 0; i < 12; i++) {
-      await art.addTraitImages(i, [samplePng, samplePng, samplePng]);
-    }
+    await populateAllTraits(art);
   });
 
   describe('constructor', () => {
@@ -161,8 +146,7 @@ describe('NijiSeeder', () => {
 
   describe('setArt', () => {
     it('should allow owner to update art', async () => {
-      const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-      const newArt = await NijiArtFactory.deploy(owner.address, traitNames);
+      const newArt = await deployNijiArt(owner.address);
       const artAddr = await art.getAddress();
       const newArtAddr = await newArt.getAddress();
 
@@ -186,35 +170,10 @@ describe('NijiSeeder', () => {
     });
   });
 
-  describe('Ownable2Step', () => {
-    it('transferOwnership should not change owner immediately', async () => {
-      await seeder.transferOwnership(other.address);
-      expect(await seeder.owner()).to.equal(owner.address);
-    });
-
-    it('transferOwnership should set pendingOwner', async () => {
-      await seeder.transferOwnership(other.address);
-      expect(await seeder.pendingOwner()).to.equal(other.address);
-    });
-
-    it('transferOwnership should emit OwnershipTransferStarted', async () => {
-      await expect(seeder.transferOwnership(other.address))
-        .to.emit(seeder, 'OwnershipTransferStarted')
-        .withArgs(owner.address, other.address);
-    });
-
-    it('acceptOwnership should transfer ownership to pendingOwner', async () => {
-      await seeder.transferOwnership(other.address);
-      await seeder.connect(other).acceptOwnership();
-      expect(await seeder.owner()).to.equal(other.address);
-    });
-
-    it('acceptOwnership should revert if caller is not pendingOwner', async () => {
-      await seeder.transferOwnership(other.address);
-      // owner is not the pendingOwner, so this should revert
-      await expect(
-        seeder.acceptOwnership()
-      ).to.be.revertedWithCustomError(seeder, 'OwnableUnauthorizedAccount');
-    });
-  });
+  shouldBehaveLikeOwnable2Step(
+    () => seeder,
+    () => owner,
+    () => other,
+    () => owner,
+  );
 });
