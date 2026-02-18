@@ -387,6 +387,47 @@ describe('NijiToken', () => {
     });
   });
 
+  describe('provenanceHash', () => {
+    const SAMPLE_HASH = 'abc123def456789';
+
+    it('should default to empty string', async () => {
+      expect(await token.provenanceHash()).to.equal('');
+    });
+
+    it('should allow owner to set provenance hash', async () => {
+      await token.setProvenanceHash(SAMPLE_HASH);
+      expect(await token.provenanceHash()).to.equal(SAMPLE_HASH);
+    });
+
+    it('should emit ProvenanceHashSet event', async () => {
+      await expect(token.setProvenanceHash(SAMPLE_HASH))
+        .to.emit(token, 'ProvenanceHashSet')
+        .withArgs(SAMPLE_HASH);
+    });
+
+    it('should allow updating before lock', async () => {
+      await token.setProvenanceHash(SAMPLE_HASH);
+      const updatedHash = 'updated_hash_value';
+      await token.setProvenanceHash(updatedHash);
+      expect(await token.provenanceHash()).to.equal(updatedHash);
+    });
+
+    it('should revert setProvenanceHash after lock', async () => {
+      await token.setProvenanceHash(SAMPLE_HASH);
+      await token.lockProvenanceHash();
+
+      await expect(
+        token.setProvenanceHash('new_hash')
+      ).to.be.revertedWithCustomError(token, 'ProvenanceHashLocked');
+    });
+
+    it('should revert if non-owner calls setProvenanceHash', async () => {
+      await expect(
+        token.connect(other).setProvenanceHash(SAMPLE_HASH)
+      ).to.be.revertedWithCustomError(token, 'OwnableUnauthorizedAccount');
+    });
+  });
+
   describe('exists', () => {
     beforeEach(async () => {
       await token.toggleMinting();

@@ -4,6 +4,30 @@
 
 ### nouns-contracts
 
+#### 追加
+- **NijiToken: Provenance Hash 機能追加** (#38)
+  - `string public provenanceHash` ストレージを追加。全画像データの結合ハッシュを保持し、NFTコレクションの公平性証明に使用
+  - `bool public isProvenanceHashLocked` ストレージを追加。ハッシュのロック状態を管理
+  - `setProvenanceHash(string)` 関数を追加（onlyOwner）。ロック後に呼び出すと `ProvenanceHashLocked` エラーをrevert
+  - `lockProvenanceHash()` 関数を追加（onlyOwner）。一度ロックすると以降の変更を永久に禁止
+  - `ProvenanceHashLocked()` カスタムエラーを追加
+  - `ProvenanceHashSet(string provenanceHash)` イベントを追加
+  - テスト6件追加（デフォルト空文字・設定・イベント発行・ロック前更新可・ロック後revert・非ownerrevert）
+
+- **NijiDescriptor: OpenSea メタデータ標準対応（attributes 追加）** (#37)
+  - `_generateAttributes(uint256[] traitIndices)` internal 関数を追加。トレイトインデックスから OpenSea 標準の `attributes` 配列 JSON を生成
+  - `tokenURI()` および `tokenURIWithMetadata()` の JSON 出力に `"attributes":[…]` フィールドを追加
+  - `SKIP_LAYER`（`type(uint256).max`）のトレイトは attributes に含まれない
+  - トレイト名は `NijiArt.getTraitName(i)` から取得し、値はインデックスの数値文字列で表現
+  - テスト4件追加（`NijiDescriptor.test.ts`）、統合テスト1件追加（`NijiToken.test.ts`）
+
+- **NijiToken: contractURI サポート** (#36)
+  - `contractURI()` メソッドを追加。OpenSea 等のマーケットプレイスがコレクションレベルのメタデータを取得できるように対応
+  - `setContractURIHash(string)` メソッドを追加。オーナーが IPFS ハッシュを設定することで `ipfs://{hash}` 形式の URI を返却
+  - `ContractURIHashUpdated(string newContractURIHash)` イベントを追加
+  - デフォルト値は空文字列（`ipfs://` を返却）
+  - テスト5件追加（合計 189 テストすべてパス）
+
 #### 変更
 - **Ownable → Ownable2Step 移行** (#66)
   - `NijiToken`, `NijiArt`, `NijiDescriptor`, `NijiSeeder` の4コントラクトで `Ownable` → `Ownable2Step`（OZ v5）へ継承変更

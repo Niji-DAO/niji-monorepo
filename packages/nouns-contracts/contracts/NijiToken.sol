@@ -40,6 +40,9 @@ contract NijiToken is ERC721Enumerable, Ownable2Step, ReentrancyGuard {
     /// @notice Thrown when token does not exist
     error TokenDoesNotExist();
 
+    /// @notice Thrown when provenance hash is already locked
+    error ProvenanceHashLocked();
+
     // =============================================================
     //                           EVENTS
     // =============================================================
@@ -73,6 +76,10 @@ contract NijiToken is ERC721Enumerable, Ownable2Step, ReentrancyGuard {
     /// @param newContractURIHash The new IPFS hash for contract metadata
     event ContractURIHashUpdated(string newContractURIHash);
 
+    /// @notice Emitted when the provenance hash is set
+    /// @param provenanceHash The provenance hash value
+    event ProvenanceHashSet(string provenanceHash);
+
     // =============================================================
     //                           STORAGE
     // =============================================================
@@ -100,6 +107,12 @@ contract NijiToken is ERC721Enumerable, Ownable2Step, ReentrancyGuard {
 
     /// @notice The IPFS hash for the contract-level metadata
     string private _contractURIHash;
+
+    /// @notice The provenance hash for verifying image integrity
+    string public provenanceHash;
+
+    /// @notice Whether the provenance hash is locked
+    bool public isProvenanceHashLocked;
 
     // =============================================================
     //                           MODIFIERS
@@ -298,6 +311,20 @@ contract NijiToken is ERC721Enumerable, Ownable2Step, ReentrancyGuard {
     function setContractURIHash(string memory newContractURIHash) external onlyOwner {
         _contractURIHash = newContractURIHash;
         emit ContractURIHashUpdated(newContractURIHash);
+    }
+
+    /// @notice Set the provenance hash (can only be set before locking)
+    /// @param _provenanceHash The provenance hash value
+    function setProvenanceHash(string memory _provenanceHash) external onlyOwner {
+        if (isProvenanceHashLocked) revert ProvenanceHashLocked();
+        provenanceHash = _provenanceHash;
+        emit ProvenanceHashSet(_provenanceHash);
+    }
+
+    /// @notice Lock the provenance hash permanently
+    function lockProvenanceHash() external onlyOwner {
+        if (isProvenanceHashLocked) revert ProvenanceHashLocked();
+        isProvenanceHashLocked = true;
     }
 
     // =============================================================
