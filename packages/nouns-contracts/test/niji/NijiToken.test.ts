@@ -190,6 +190,21 @@ describe('NijiToken', () => {
     it('should revert for non-existent token', async () => {
       await expect(token.tokenURI(999)).to.be.revertedWithCustomError(token, 'TokenDoesNotExist');
     });
+
+    it('should include attributes in tokenURI', async () => {
+      const uri = await token.tokenURI(0);
+      const jsonB64 = uri.replace('data:application/json;base64,', '');
+      const json = JSON.parse(Buffer.from(jsonB64, 'base64').toString());
+
+      expect(json.attributes).to.be.an('array');
+      expect(json.attributes.length).to.be.greaterThan(0);
+
+      // Each attribute should have trait_type and value
+      for (const attr of json.attributes) {
+        expect(attr.trait_type).to.be.a('string');
+        expect(attr.value).to.be.a('string');
+      }
+    });
   });
 
   describe('getSeed', () => {
