@@ -8,9 +8,9 @@
 pragma solidity ^0.8.20;
 
 import { SSTORE2 } from './libs/SSTORE2.sol';
-import { Ownable } from '@openzeppelin/contracts-v5/access/Ownable.sol';
+import { Ownable2Step, Ownable } from '@openzeppelin/contracts-v5/access/Ownable2Step.sol';
 
-contract NijiArt is Ownable {
+contract NijiArt is Ownable2Step {
     // =============================================================
     //                           ERRORS
     // =============================================================

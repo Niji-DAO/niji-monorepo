@@ -10,9 +10,9 @@ pragma solidity ^0.8.20;
 import { Base64 } from 'base64-sol/base64.sol';
 import { NijiArt } from './NijiArt.sol';
 import { Strings } from '@openzeppelin/contracts-v5/utils/Strings.sol';
-import { Ownable } from '@openzeppelin/contracts-v5/access/Ownable.sol';
+import { Ownable2Step, Ownable } from '@openzeppelin/contracts-v5/access/Ownable2Step.sol';
 
-contract NijiDescriptor is Ownable {
+contract NijiDescriptor is Ownable2Step {
     using Strings for uint256;
 
     // =============================================================

@@ -9,12 +9,12 @@ pragma solidity ^0.8.20;
 
 import { ERC721 } from '@openzeppelin/contracts-v5/token/ERC721/ERC721.sol';
 import { ERC721Enumerable } from '@openzeppelin/contracts-v5/token/ERC721/extensions/ERC721Enumerable.sol';
-import { Ownable } from '@openzeppelin/contracts-v5/access/Ownable.sol';
+import { Ownable2Step, Ownable } from '@openzeppelin/contracts-v5/access/Ownable2Step.sol';
 import { ReentrancyGuard } from '@openzeppelin/contracts-v5/utils/ReentrancyGuard.sol';
 import { NijiDescriptor } from './NijiDescriptor.sol';
 import { INijiSeeder } from './interfaces/INijiSeeder.sol';
 
-contract NijiToken is ERC721Enumerable, Ownable, ReentrancyGuard {
+contract NijiToken is ERC721Enumerable, Ownable2Step, ReentrancyGuard {
     // =============================================================
     //                           ERRORS
     // =============================================================
