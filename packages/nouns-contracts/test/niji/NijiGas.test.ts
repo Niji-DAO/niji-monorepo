@@ -27,30 +27,14 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { NijiArt, NijiDescriptor } from '../../typechain';
 import crypto from 'crypto';
+import { TRAIT_NAMES, TRAIT_COUNT, RESOLUTION, COMPOSITE_ORDER } from './helpers';
 
 describe('NijiGas – production-size PNG gas benchmarks', function () {
   this.timeout(180_000); // 3 minutes — large images need longer setup
 
   let owner: SignerWithAddress;
 
-  const traitNames = [
-    'special',
-    'choker',
-    'headphone',
-    'leftHand',
-    'hat',
-    'clothing',
-    'ear',
-    'back',
-    'backDecoration',
-    'background',
-    'solidBackground',
-    'hair',
-  ];
-  const RESOLUTION = 320;
-  const COMPOSITE_ORDER = [10, 9, 8, 0, 3, 7, 5, 1, 6, 11, 4, 2];
   const BLOCK_GAS_LIMIT = 30_000_000n;
-  const TRAIT_COUNT = 12;
 
   /**
    * Gas limit for view-function transactions.
@@ -101,7 +85,7 @@ describe('NijiGas – production-size PNG gas benchmarks', function () {
     activeLayers: number = TRAIT_COUNT,
   ): Promise<{ art: NijiArt; descriptor: NijiDescriptor; traitIndices: bigint[] }> {
     const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-    const art = (await NijiArtFactory.deploy(owner.address, traitNames)) as unknown as NijiArt;
+    const art = (await NijiArtFactory.deploy(owner.address, TRAIT_NAMES)) as unknown as NijiArt;
 
     const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
     const descriptor = (await NijiDescriptorFactory.deploy(
@@ -179,7 +163,7 @@ describe('NijiGas – production-size PNG gas benchmarks', function () {
 
     beforeEach(async () => {
       const NijiArtFactory = await ethers.getContractFactory('NijiArt');
-      art = (await NijiArtFactory.deploy(owner.address, traitNames)) as unknown as NijiArt;
+      art = (await NijiArtFactory.deploy(owner.address, TRAIT_NAMES)) as unknown as NijiArt;
     });
 
     const sizes = [
