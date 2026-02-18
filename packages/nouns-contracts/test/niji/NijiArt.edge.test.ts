@@ -3,7 +3,6 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { NijiArt } from '../../typechain';
 import {
-  TRAIT_NAMES,
   TRAIT_COUNT,
   SAMPLE_PNG,
   deployNijiArt,

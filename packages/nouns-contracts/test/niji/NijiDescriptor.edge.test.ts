@@ -3,16 +3,13 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { NijiArt, NijiDescriptor } from '../../typechain';
 import {
-  TRAIT_NAMES,
   TRAIT_COUNT,
   SAMPLE_PNG,
   RESOLUTION,
   COMPOSITE_ORDER,
   deployNijiArt,
   deployNijiDescriptor,
-  populateAllTraits,
   buildTraitIndices,
-  decodeTokenURI,
 } from './helpers';
 
 describe('NijiDescriptor (edge cases)', () => {
