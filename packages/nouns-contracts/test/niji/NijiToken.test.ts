@@ -336,6 +336,42 @@ describe('NijiToken', () => {
     });
   });
 
+  describe('contractURI', () => {
+    it('should return ipfs:// with empty hash by default', async () => {
+      expect(await token.contractURI()).to.equal('ipfs://');
+    });
+
+    it('should allow owner to set contract URI hash', async () => {
+      const hash = 'QmTest1234567890abcdef';
+      await token.setContractURIHash(hash);
+      expect(await token.contractURI()).to.equal(`ipfs://${hash}`);
+    });
+
+    it('should emit ContractURIHashUpdated event', async () => {
+      const hash = 'QmTest1234567890abcdef';
+      await expect(token.setContractURIHash(hash))
+        .to.emit(token, 'ContractURIHashUpdated')
+        .withArgs(hash);
+    });
+
+    it('should allow updating hash multiple times', async () => {
+      const hash1 = 'QmFirst';
+      const hash2 = 'QmSecond';
+
+      await token.setContractURIHash(hash1);
+      expect(await token.contractURI()).to.equal(`ipfs://${hash1}`);
+
+      await token.setContractURIHash(hash2);
+      expect(await token.contractURI()).to.equal(`ipfs://${hash2}`);
+    });
+
+    it('should revert if caller is not owner', async () => {
+      await expect(
+        token.connect(other).setContractURIHash('QmTest')
+      ).to.be.revertedWithCustomError(token, 'OwnableUnauthorizedAccount');
+    });
+  });
+
   describe('exists', () => {
     beforeEach(async () => {
       await token.toggleMinting();
