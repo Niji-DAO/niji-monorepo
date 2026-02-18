@@ -62,6 +62,11 @@ Located in `packages/nouns-contracts/`:
 - **@nomicfoundation/hardhat-ethers v3**: Hardhat plugin for ethers v6
 - **TypeChain ethers-v6**: TypeChain type generation target
 
+### Hardhat Network Configuration (Gas Benchmarking)
+- **hardfork**: Pinned to `cancun` to avoid Fusaka's 16M tx gas cap (EIP-7825)
+- **blockGasLimit**: Set to 300M (elevated from default 30M) to support large view-function gas benchmarks
+- Gas benchmark tests in `test/niji/NijiGas.test.ts` measure production-size PNG operations (5-20KB per layer)
+
 Key contracts:
 - `NounsToken` - ERC721 for Noun NFTs
 - `NounsAuctionHouse` - Auction mechanism
