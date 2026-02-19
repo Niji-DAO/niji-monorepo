@@ -2,7 +2,6 @@ import type { Address, Hash, Hex } from '@/utils/types';
 
 import { useMemo } from 'react';
 
-import { useQuery } from '@apollo/client';
 import { filter, isNonNullish, isNullish, map, pipe, sort } from 'remeda';
 
 import {
@@ -18,12 +17,10 @@ import {
   useWriteNounsGovernorProposeBySigs,
   useWriteNounsGovernorUpdateProposalBySigs,
 } from '@/contracts';
+import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import {
-  CandidateFeedback as GraphQLCandidateFeedback,
-  Maybe,
   ProposalCandidate as GraphQLProposalCandidate,
   ProposalCandidateSignature as GraphQLProposalCandidateSignature,
-  ProposalFeedback as GraphQLProposalFeedback,
 } from '@/subgraphs/graphql';
 
 import {
@@ -39,12 +36,12 @@ import {
 } from './nounsDao';
 import { useDelegateNounsAtBlockQuery } from './nounToken';
 import {
-  candidateFeedbacksQuery,
-  candidateProposalQuery,
-  candidateProposalsQuery,
-  candidateProposalVersionsQuery,
+  candidateFeedbacksDocument,
+  candidateProposalDocument,
+  candidateProposalsDocument,
+  candidateProposalVersionsDocument,
   Delegates,
-  proposalFeedbacksQuery,
+  proposalFeedbacksDocument,
 } from './subgraph';
 
 export interface VoteSignalDetail {
@@ -183,11 +180,11 @@ const filterSigners = (
   sigsFiltered?.forEach(signature => {
     const delegateVoteCount =
       delegateSnapshot?.delegates?.find(delegate => delegate.id === signature.signer.id)
-        ?.nounsRepresented.length || 0;
+        ?.nounsRepresented.length ?? 0;
     // don't count votes from signers who have active or pending proposals
     // but include them in the list of signers to display with a note that they have an active proposal
     const parentProposalIsUpdatable =
-      proposalIdToUpdate && updatableProposalIds?.includes(proposalIdToUpdate ?? 0);
+      proposalIdToUpdate != null && (updatableProposalIds?.includes(proposalIdToUpdate) ?? false);
     const activeOrPendingProposal =
       !parentProposalIsUpdatable && activePendingProposers.includes(signature.signer.id);
     if (!activeOrPendingProposal) {
@@ -218,10 +215,11 @@ const filterSigners = (
 
 export const useCandidateProposals = (blockNumber?: bigint) => {
   const timestampNow = Math.floor(Date.now() / 1000); // in seconds
-  const { query, variables } = candidateProposalsQuery();
-  const { loading, data, error, refetch } = useQuery<{
-    proposalCandidates: Maybe<GraphQLProposalCandidate[]>;
-  }>(query, { variables });
+  const { loading, data, error, refetch } = useSubgraphQuery({
+    document: candidateProposalsDocument,
+    variables: { first: 1000 },
+    queryKey: ['candidateProposals', 1000],
+  });
 
   const unmatchedCandidates = pipe(
     data?.proposalCandidates ?? [],
@@ -246,31 +244,29 @@ export const useCandidateProposals = (blockNumber?: bigint) => {
     ?.map(candidate => candidate.latestVersion.content.contentSignatures?.map(sig => sig.signer.id))
     .flat();
   const signersDelegateSnapshot = useDelegateNounsAtBlockQuery(
-    allSigners ? deDupeSigners(allSigners) : [],
+    allSigners.length > 0 ? deDupeSigners(allSigners) : [],
     blockNumber ?? 0n,
   );
   const updatableProposalIds = useUpdatableProposalIds(blockNumber);
   const candidatesData = map(unmatchedCandidates ?? [], candidate => {
     const proposerVotes =
       proposerDelegates.data?.delegates.find(d => d.id === candidate.proposer.toLowerCase())
-        ?.nounsRepresented?.length || 0;
+        ?.nounsRepresented?.length ?? 0;
     return parseSubgraphCandidate(
-      candidate,
+      candidate as unknown as GraphQLProposalCandidate,
       proposerVotes,
       threshold,
       timestampNow,
       activePendingProposers.data,
       false,
-      signersDelegateSnapshot.data,
+      signersDelegateSnapshot.data as Delegates | undefined,
       updatableProposalIds.data,
     );
   });
 
-  if (candidatesData) {
-    candidatesData.sort((a, b) => {
-      return Number(a?.lastUpdatedTimestamp ?? 0) - Number(b?.lastUpdatedTimestamp ?? 0);
-    });
-  }
+  candidatesData.sort((a, b) => {
+    return Number(a?.lastUpdatedTimestamp ?? 0) - Number(b?.lastUpdatedTimestamp ?? 0);
+  });
   return { loading, data: candidatesData, error, refetch };
 };
 
@@ -281,19 +277,16 @@ export const useCandidateProposal = (
   blockNumber?: bigint,
 ) => {
   const timestampNow = Math.floor(Date.now() / 1000); // in seconds
-  const { query, variables } = candidateProposalQuery(id);
-  const { loading, data, error, refetch } = useQuery<{
-    proposalCandidate: Maybe<GraphQLProposalCandidate>;
-  }>(query, {
-    pollInterval,
-    variables,
+  const { loading, data, error, refetch } = useSubgraphQuery({
+    document: candidateProposalDocument,
+    variables: { id },
+    queryKey: ['candidateProposal', id],
+    refetchInterval: pollInterval,
   });
   const activePendingProposers = useActivePendingUpdatableProposers(blockNumber);
-  const threshold = useProposalThreshold() || 0;
+  const threshold = useProposalThreshold() ?? 0;
   const versionSignatures = data?.proposalCandidate?.latestVersion.content.contentSignatures;
-  const allSigners = versionSignatures?.map(
-    (sig: GraphQLProposalCandidateSignature) => sig.signer.id,
-  );
+  const allSigners = versionSignatures?.map(sig => sig.signer.id);
   const proposerDelegates = useDelegateNounsAtBlockQuery(
     data?.proposalCandidate?.proposer ? [data?.proposalCandidate?.proposer] : [],
     BigInt(blockNumber ?? 0n),
@@ -312,13 +305,13 @@ export const useCandidateProposal = (
     proposerDelegates.data &&
     data?.proposalCandidate &&
     parseSubgraphCandidate(
-      candidate,
+      candidate as unknown as GraphQLProposalCandidate | undefined,
       proposerNounVotes,
       threshold,
       timestampNow,
       activePendingProposers.data,
       toUpdate,
-      signersDelegateSnapshot.data,
+      signersDelegateSnapshot.data as Delegates | undefined,
       updatableProposalIds.data,
     );
 
@@ -326,12 +319,15 @@ export const useCandidateProposal = (
 };
 
 export const useCandidateProposalVersions = (id: string) => {
-  const { query, variables } = candidateProposalVersionsQuery(id);
-  const { loading, data, error } = useQuery<{
-    proposalCandidate: Maybe<GraphQLProposalCandidate>;
-  }>(query, { variables });
+  const { loading, data, error } = useSubgraphQuery({
+    document: candidateProposalVersionsDocument,
+    variables: { id },
+    queryKey: ['candidateProposalVersions', id],
+  });
 
-  const candidateVersions = parseSubgraphCandidateVersions(data?.proposalCandidate || undefined);
+  const candidateVersions = parseSubgraphCandidateVersions(
+    (data?.proposalCandidate || undefined) as unknown as GraphQLProposalCandidate | undefined,
+  );
   const versions = data?.proposalCandidate
     ? {
         ...candidateVersions,
@@ -346,11 +342,12 @@ export const useCandidateProposalVersions = (id: string) => {
         versions: candidateVersions?.versions || [],
         slug: candidateVersions?.slug || '',
         proposer: (data.proposalCandidate.proposer || '') as `0x${string}`,
-        canceled: !!candidateVersions?.canceled,
-        versionsCount: candidateVersions?.versionsCount || 0,
-        lastUpdatedTimestamp: candidateVersions?.lastUpdatedTimestamp
-          ? Number(candidateVersions.lastUpdatedTimestamp)
-          : 0,
+        canceled: candidateVersions?.canceled === true,
+        versionsCount: candidateVersions?.versionsCount ?? 0,
+        lastUpdatedTimestamp:
+          candidateVersions?.lastUpdatedTimestamp != null
+            ? Number(candidateVersions.lastUpdatedTimestamp)
+            : 0,
         createdTransactionHash: data.proposalCandidate.createdTransactionHash || '',
       }
     : undefined;
@@ -361,7 +358,7 @@ export const useCandidateProposalVersions = (id: string) => {
 export const useGetCreateCandidateCost = () => {
   const { data: createCandidateCost } = useReadNounsDataCreateCandidateCost();
 
-  if (!createCandidateCost) {
+  if (createCandidateCost == null) {
     return;
   }
 
@@ -371,7 +368,7 @@ export const useGetCreateCandidateCost = () => {
 export const useGetUpdateCandidateCost = () => {
   const { data: updateCandidateCost } = useReadNounsDataUpdateCandidateCost();
 
-  if (!updateCandidateCost) {
+  if (updateCandidateCost == null) {
     return;
   }
 
@@ -508,12 +505,11 @@ export const useSendFeedback = () => {
 };
 
 export const useProposalFeedback = (id: string, pollInterval: number = 0) => {
-  const { query, variables } = proposalFeedbacksQuery(id);
-  const { loading, data, error, refetch } = useQuery<{
-    proposalFeedbacks: Maybe<GraphQLProposalFeedback[]>;
-  }>(query, {
-    pollInterval,
-    variables,
+  const { loading, data, error, refetch } = useSubgraphQuery({
+    document: proposalFeedbacksDocument,
+    variables: { proposalId: id },
+    queryKey: ['proposalFeedbacks', id],
+    refetchInterval: pollInterval,
   });
 
   const feedbacks: VoteSignalDetail[] = map(data?.proposalFeedbacks ?? [], feedback => ({
@@ -521,7 +517,6 @@ export const useProposalFeedback = (id: string, pollInterval: number = 0) => {
     reason: feedback.reason || '',
     votes: Number(feedback.votes),
     createdTimestamp: Number(feedback.createdTimestamp),
-    createdBlock: Number(feedback.createdBlock),
     voter: {
       ...feedback.voter,
       id: feedback.voter.id as Address,
@@ -532,19 +527,17 @@ export const useProposalFeedback = (id: string, pollInterval: number = 0) => {
 };
 
 export const useCandidateFeedback = (id: string, pollInterval?: number) => {
-  const { query, variables } = candidateFeedbacksQuery(id);
-  const { loading, data, error, refetch } = useQuery<{
-    candidateFeedbacks: Maybe<GraphQLCandidateFeedback[]>;
-  }>(query, {
-    pollInterval,
-    variables,
+  const { loading, data, error, refetch } = useSubgraphQuery({
+    document: candidateFeedbacksDocument,
+    variables: { candidateId: id },
+    queryKey: ['candidateFeedbacks', id],
+    refetchInterval: pollInterval,
   });
   const feedbacks: VoteSignalDetail[] = map(data?.candidateFeedbacks ?? [], feedback => ({
     ...feedback,
     reason: feedback.reason || '',
     votes: Number(feedback.votes),
     createdTimestamp: Number(feedback.createdTimestamp),
-    createdBlock: Number(feedback.createdBlock),
     voter: {
       ...feedback.voter,
       id: feedback.voter.id as Address,
@@ -647,7 +640,7 @@ const parseSubgraphCandidate = (
     encodedProposalHash: latestVersion.content.encodedProposalHash as Hash,
   };
   let details;
-  if (toUpdate) {
+  if (toUpdate === true) {
     details = formatProposalTransactionDetailsToUpdate(transactionDetails);
   } else {
     details = formatProposalTransactionDetails(transactionDetails);
