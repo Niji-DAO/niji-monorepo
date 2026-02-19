@@ -177,7 +177,7 @@ The webapp is undergoing modernization efforts:
 **From**: Apollo Client with manual queries  
 **To**: TanStack Query + GraphQL Codegen with typed `execute()` function  
 **Guidance**: New GraphQL queries should use the codegen'd `execute()` pattern
-**Helper**: Use `useSubgraphQuery` hook (`src/hooks/useSubgraphQuery.ts`) for Apollo-compatible `{ loading, data, error, refetch }` interface
+**Helper**: Use `useSubgraphQuery` hook (`packages/nouns-webapp/src/hooks/useSubgraphQuery.ts`) for Apollo-compatible `{ loading, data, error, refetch }` interface
 
 ## Code Generation Dependencies
 

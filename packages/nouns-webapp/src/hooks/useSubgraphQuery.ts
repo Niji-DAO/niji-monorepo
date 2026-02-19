@@ -35,7 +35,7 @@ export function useSubgraphQuery<TResult, TVariables>({
   return {
     loading: result.isLoading,
     data: result.data,
-    error: result.error ?? undefined,
+    error: result.error || undefined,
     refetch: result.refetch,
   };
 }
