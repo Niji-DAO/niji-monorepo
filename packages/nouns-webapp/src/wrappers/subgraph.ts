@@ -3,6 +3,13 @@ import { ApolloClient, ApolloLink, gql, HttpLink, InMemoryCache } from '@apollo/
 import { graphql } from '@/subgraphs';
 import { BigNumberish } from '@/utils/types';
 
+export {
+  GetSeedsDocument as seedsDocument,
+  GetOwnedNounsDocument as ownedNounsDocument,
+  GetAccountEscrowedNounsDocument as accountEscrowedNounsDocument,
+  GetDelegateNounsAtBlockDocument as delegateNounsAtBlockDocument,
+} from '@/subgraphs/graphql';
+
 export const clientFactory = (uri: string) => {
   // patch BigInt JSON serialization (runs once)
   if (
@@ -66,19 +73,6 @@ export interface Delegate {
 export interface Delegates {
   delegates: Delegate[];
 }
-
-export const seedsDocument = graphql(`
-  query GetSeeds($first: Int!) {
-    seeds(first: $first) {
-      id
-      background
-      body
-      accessory
-      head
-      glasses
-    }
-  }
-`);
 
 export const seedsQuery = (first = 1_000) => ({
   query: gql`
@@ -582,17 +576,6 @@ export const proposalVotesQuery = (proposalId: string) => ({
   variables: { proposalId },
 });
 
-export const delegateNounsAtBlockDocument = graphql(`
-  query GetDelegateNounsAtBlock($delegates: [ID!]!, $block: Int!) {
-    delegates(where: { id_in: $delegates }, block: { number: $block }) {
-      id
-      nounsRepresented {
-        id
-      }
-    }
-  }
-`);
-
 export const delegateNounsAtBlockQuery = (delegates: string[], block: bigint) => ({
   query: gql`
     query GetDelegateNounsAtBlock($delegates: [ID!]!, $block: Int!) {
@@ -682,14 +665,6 @@ export const candidateFeedbacksQuery = (candidateId: string) => ({
   variables: { candidateId },
 });
 
-export const ownedNounsDocument = graphql(`
-  query GetOwnedNouns($owner: ID!) {
-    nouns(where: { owner_: { id: $owner } }) {
-      id
-    }
-  }
-`);
-
 export const ownedNounsQuery = (owner: string) => ({
   query: gql`
     query GetOwnedNouns($owner: ID!) {
@@ -700,19 +675,6 @@ export const ownedNounsQuery = (owner: string) => ({
   `,
   variables: { owner },
 });
-
-export const accountEscrowedNounsDocument = graphql(`
-  query GetAccountEscrowedNouns($owner: ID!) {
-    escrowedNouns(where: { owner_: { id: $owner } }, first: 1000) {
-      noun {
-        id
-      }
-      fork {
-        id
-      }
-    }
-  }
-`);
 
 export const accountEscrowedNounsQuery = (owner: string) => ({
   query: gql`

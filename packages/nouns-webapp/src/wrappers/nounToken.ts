@@ -223,15 +223,12 @@ export const useUserEscrowedNounIds = (pollInterval: number, forkId: string) => 
   });
   // filter escrowed nouns to just this fork
   const userEscrowedNounIds: number[] =
-    data?.escrowedNouns?.reduce(
-      (acc: number[], escrowedNoun: { noun: { id: string }; fork: { id: string } }) => {
-        if (escrowedNoun.fork.id === forkId) {
-          acc.push(+escrowedNoun.noun.id);
-        }
-        return acc;
-      },
-      [],
-    ) ?? [];
+    data?.escrowedNouns?.reduce((acc: number[], escrowedNoun) => {
+      if (escrowedNoun.fork.id === forkId) {
+        acc.push(+escrowedNoun.noun.id);
+      }
+      return acc;
+    }, []) ?? [];
   return { loading, data: userEscrowedNounIds, error, refetch };
 };
 
