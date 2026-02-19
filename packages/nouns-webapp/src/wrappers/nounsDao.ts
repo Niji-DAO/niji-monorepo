@@ -1,5 +1,27 @@
-import type { Proposal as GraphQLProposal } from '@/subgraphs/graphql';
+import type {
+  GetPartialProposalsQuery,
+  GetProposalQuery,
+  ProposalStatus,
+} from '@/subgraphs/graphql';
 import type { Address, Hash, Hex } from '@/utils/types';
+
+// Query result element types — narrower than full Proposal, matching actual query selections
+type PartialProposalResult = GetPartialProposalsQuery['proposals'][number];
+type FullProposalResult = NonNullable<GetProposalQuery['proposal']>;
+
+// Common fields for proposal state determination (both query types satisfy this)
+interface ProposalStateFields {
+  status?: ProposalStatus | null;
+  forVotes: bigint;
+  againstVotes: bigint;
+  quorumVotes?: bigint | null;
+  executionETA?: bigint | null;
+  startBlock: bigint;
+  endBlock: bigint;
+  updatePeriodEndBlock?: bigint | null;
+  objectionPeriodEndBlock: bigint;
+  onTimelockV1?: boolean | null;
+}
 
 import { useMemo } from 'react';
 
@@ -558,7 +580,7 @@ export function useFormattedProposalCreatedLogs(skip: boolean, fromBlockOverride
 const getProposalState = (
   blockNumber: number | undefined,
   blockTimestamp: Date | undefined,
-  proposal: GraphQLProposal,
+  proposal: ProposalStateFields,
   isDaoGteV3?: boolean,
   onTimelockV1?: boolean,
 ) => {
@@ -582,7 +604,7 @@ const getProposalState = (
 // Handle the state for PENDING or ACTIVE proposals
 const handlePendingOrActiveState = (
   blockNumber: number | undefined,
-  proposal: GraphQLProposal,
+  proposal: ProposalStateFields,
   isDaoGteV3?: boolean,
 ): ProposalState => {
   if (blockNumber === undefined) {
@@ -615,7 +637,7 @@ const handlePendingOrActiveState = (
 // Check if a proposal is in UPDATABLE state
 const isUpdatableProposal = (
   blockNumber: number,
-  proposal: GraphQLProposal,
+  proposal: ProposalStateFields,
   isDaoGteV3?: boolean,
 ): boolean => {
   return Boolean(
@@ -628,7 +650,7 @@ const isUpdatableProposal = (
 // Check if a proposal is in OBJECTION_PERIOD state
 const isInObjectionPeriod = (
   blockNumber: number,
-  proposal: GraphQLProposal,
+  proposal: ProposalStateFields,
   isDaoGteV3?: boolean,
 ): boolean => {
   return Boolean(
@@ -639,7 +661,7 @@ const isInObjectionPeriod = (
 };
 
 // Check if a proposal is past its end block
-const isPastEndBlock = (blockNumber: number, proposal: GraphQLProposal): boolean => {
+const isPastEndBlock = (blockNumber: number, proposal: ProposalStateFields): boolean => {
   return (
     blockNumber > BigInt(proposal.endBlock) &&
     blockNumber > BigInt(proposal.objectionPeriodEndBlock)
@@ -647,7 +669,7 @@ const isPastEndBlock = (blockNumber: number, proposal: GraphQLProposal): boolean
 };
 
 // Determine the state for a proposal that is past its end block
-const getPastEndBlockState = (proposal: GraphQLProposal): ProposalState => {
+const getPastEndBlockState = (proposal: ProposalStateFields): ProposalState => {
   const forVotes = BigInt(proposal.forVotes);
   if (forVotes <= BigInt(proposal.againstVotes) || forVotes < BigInt(proposal.quorumVotes ?? 0)) {
     return ProposalState.DEFEATED;
@@ -663,7 +685,7 @@ const getPastEndBlockState = (proposal: GraphQLProposal): ProposalState => {
 // Handle the state for QUEUED proposals
 const handleQueuedState = (
   blockTimestamp: Date | undefined,
-  proposal: GraphQLProposal,
+  proposal: ProposalStateFields,
   isDaoGteV3?: boolean,
   onTimelockV1?: boolean,
 ): ProposalState => {
@@ -681,7 +703,7 @@ const handleQueuedState = (
 // Check if a queued proposal has expired
 const isExpiredProposal = (
   blockTimestamp: Date,
-  proposal: GraphQLProposal,
+  proposal: ProposalStateFields,
   isDaoGteV3?: boolean,
   onTimelockV1?: boolean,
 ): boolean => {
@@ -695,7 +717,7 @@ const isExpiredProposal = (
 };
 
 const parsePartialSubgraphProposal = (
-  proposal: GraphQLProposal | undefined,
+  proposal: PartialProposalResult | undefined,
   blockNumber: bigint | number | undefined,
   timestamp: number | undefined,
   isDaoGteV3?: boolean,
@@ -728,7 +750,7 @@ const parsePartialSubgraphProposal = (
 };
 
 const parseSubgraphProposal = (
-  proposal: GraphQLProposal | undefined,
+  proposal: FullProposalResult | undefined,
   blockNumber: number | undefined,
   timestamp: number | undefined,
   toUpdate?: boolean,
@@ -802,12 +824,7 @@ export const useAllProposalsViaSubgraph = (): PartialProposalData => {
   const proposals = pipe(
     data?.proposals ?? [],
     map(proposal => {
-      return parsePartialSubgraphProposal(
-        proposal as unknown as GraphQLProposal,
-        Number(blockNumber),
-        timestamp,
-        isDaoGteV3,
-      );
+      return parsePartialSubgraphProposal(proposal, Number(blockNumber), timestamp, isDaoGteV3);
     }),
     filter((x): x is PartialProposal => x !== undefined),
   );
@@ -914,7 +931,7 @@ export const useProposal = (id: string | number, toUpdate?: boolean) => {
     variables: { id: String(id) },
     queryKey: ['proposal', id],
   });
-  const proposal = (data?.proposal as unknown as GraphQLProposal) ?? undefined;
+  const proposal = data?.proposal ?? undefined;
 
   return parseSubgraphProposal(proposal, Number(blockNumber), timestamp, toUpdate, isDaoGteV3);
 };
@@ -1498,18 +1515,9 @@ export const useForks = (pollInterval: number = 0) => {
   });
 
   const forks: Fork[] = map(data?.forks ?? [], fork => {
-    const forkAny = fork as Record<string, unknown>;
-    const joined =
-      (forkAny?.joinedNouns as { noun: { id: string } }[] | undefined)?.map(item => item.noun.id) ??
-      [];
-    const escrowed =
-      (forkAny?.escrowedNouns as { noun: { id: string } }[] | undefined)?.map(
-        item => item.noun.id,
-      ) ?? [];
-    const addedNouns = [...escrowed, ...joined];
     return {
       ...fork,
-      addedNouns,
+      addedNouns: [] as string[],
       executed: fork.executed ?? null,
       executedAt: fork.executedAt ?? null,
       forkTreasury: fork.forkTreasury ?? null,
