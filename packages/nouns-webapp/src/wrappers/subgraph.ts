@@ -3,6 +3,13 @@ import { ApolloClient, ApolloLink, gql, HttpLink, InMemoryCache } from '@apollo/
 import { graphql } from '@/subgraphs';
 import { BigNumberish } from '@/utils/types';
 
+export {
+  GetSeedsDocument as seedsDocument,
+  GetOwnedNounsDocument as ownedNounsDocument,
+  GetAccountEscrowedNounsDocument as accountEscrowedNounsDocument,
+  GetDelegateNounsAtBlockDocument as delegateNounsAtBlockDocument,
+} from '@/subgraphs/graphql';
+
 export const clientFactory = (uri: string) => {
   // patch BigInt JSON serialization (runs once)
   if (

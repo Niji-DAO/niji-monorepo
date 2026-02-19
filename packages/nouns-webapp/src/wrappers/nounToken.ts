@@ -1,9 +1,8 @@
-import type { Delegate, EscrowedNoun, Noun, Seed } from '@/subgraphs/graphql';
+import type { Seed } from '@/subgraphs/graphql';
 import type { Address } from '@/utils/types';
 
 import { useEffect } from 'react';
 
-import { useQuery } from '@apollo/client';
 import { zeroAddress } from 'viem';
 import { useAccount } from 'wagmi';
 
@@ -19,15 +18,16 @@ import {
   useWriteNounsTokenDelegate,
   useWriteNounsTokenSetApprovalForAll,
 } from '@/contracts';
+import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import { defaultChain } from '@/wagmi';
 
 import { cache, cacheKey, CHAIN_ID } from '../config';
 
 import {
-  accountEscrowedNounsQuery,
-  delegateNounsAtBlockQuery,
-  ownedNounsQuery,
-  seedsQuery,
+  accountEscrowedNounsDocument,
+  delegateNounsAtBlockDocument,
+  ownedNounsDocument,
+  seedsDocument,
 } from './subgraph';
 
 export interface INounSeed {
@@ -63,10 +63,11 @@ const seedArrayToObject = (seeds: (INounSeed & { id: string })[]) => {
 const useNounSeeds = () => {
   const cache = localStorage.getItem(seedCacheKey);
   const cachedSeeds = cache ? (JSON.parse(cache) as Seed[]) : undefined;
-  const { query, variables } = seedsQuery();
-  const { data } = useQuery<{ seeds: Seed[] }>(query, {
-    skip: !!cachedSeeds,
-    variables,
+  const { data } = useSubgraphQuery({
+    document: seedsDocument,
+    variables: { first: 1000 },
+    queryKey: ['seeds', 1000],
+    enabled: !cachedSeeds,
   });
 
   useEffect(() => {
@@ -200,32 +201,34 @@ export const useNounTokenBalance = (address: Address): number | undefined => {
 };
 export const useUserOwnedNounIds = (pollInterval: number) => {
   const { address } = useAccount();
-  const { query, variables } = ownedNounsQuery(address?.toLowerCase() ?? '');
-  const { loading, data, error, refetch } = useQuery<{ nouns: Noun[] }>(query, {
-    pollInterval,
-    variables,
+  const owner = address?.toLowerCase() ?? '';
+  const { loading, data, error, refetch } = useSubgraphQuery({
+    document: ownedNounsDocument,
+    variables: { owner },
+    queryKey: ['ownedNouns', owner],
+    refetchInterval: pollInterval,
   });
-  const userOwnedNouns: number[] = data?.nouns?.map(noun => Number(noun.id)) || [];
+  const userOwnedNouns: number[] = data?.nouns?.map(noun => Number(noun.id)) ?? [];
   return { loading, data: userOwnedNouns, error, refetch };
 };
 
 export const useUserEscrowedNounIds = (pollInterval: number, forkId: string) => {
   const { address } = useAccount();
-  const { query, variables } = accountEscrowedNounsQuery(address?.toLowerCase() ?? '');
-  const { loading, data, error, refetch } = useQuery<{
-    escrowedNouns: Array<EscrowedNoun>;
-  }>(query, {
-    pollInterval,
-    variables,
+  const owner = address?.toLowerCase() ?? '';
+  const { loading, data, error, refetch } = useSubgraphQuery({
+    document: accountEscrowedNounsDocument,
+    variables: { owner },
+    queryKey: ['accountEscrowedNouns', owner],
+    refetchInterval: pollInterval,
   });
   // filter escrowed nouns to just this fork
   const userEscrowedNounIds: number[] =
-    data?.escrowedNouns?.reduce((acc: number[], escrowedNoun: EscrowedNoun) => {
+    data?.escrowedNouns?.reduce((acc: number[], escrowedNoun) => {
       if (escrowedNoun.fork.id === forkId) {
         acc.push(+escrowedNoun.noun.id);
       }
       return acc;
-    }, []) || [];
+    }, []) ?? [];
   return { loading, data: userEscrowedNounIds, error, refetch };
 };
 
@@ -270,7 +273,10 @@ export const useIsApprovedForAll = () => {
   return (data as boolean) || false;
 };
 export const useDelegateNounsAtBlockQuery = (signers: string[], block: bigint) => {
-  const { query, variables } = delegateNounsAtBlockQuery(signers, block);
-  const { loading, data, error } = useQuery<{ delegates: Delegate[] }>(query, { variables });
+  const { loading, data, error } = useSubgraphQuery({
+    document: delegateNounsAtBlockDocument,
+    variables: { delegates: signers, block: Number(block) },
+    queryKey: ['delegateNounsAtBlock', signers, Number(block)],
+  });
   return { loading, data, error };
 };
