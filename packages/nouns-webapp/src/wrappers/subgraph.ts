@@ -67,6 +67,19 @@ export interface Delegates {
   delegates: Delegate[];
 }
 
+export const seedsDocument = graphql(`
+  query GetSeeds($first: Int!) {
+    seeds(first: $first) {
+      id
+      background
+      body
+      accessory
+      head
+      glasses
+    }
+  }
+`);
+
 export const seedsQuery = (first = 1_000) => ({
   query: gql`
     query GetSeeds($first: Int!) {
@@ -569,6 +582,17 @@ export const proposalVotesQuery = (proposalId: string) => ({
   variables: { proposalId },
 });
 
+export const delegateNounsAtBlockDocument = graphql(`
+  query GetDelegateNounsAtBlock($delegates: [ID!]!, $block: Int!) {
+    delegates(where: { id_in: $delegates }, block: { number: $block }) {
+      id
+      nounsRepresented {
+        id
+      }
+    }
+  }
+`);
+
 export const delegateNounsAtBlockQuery = (delegates: string[], block: bigint) => ({
   query: gql`
     query GetDelegateNounsAtBlock($delegates: [ID!]!, $block: Int!) {
@@ -658,6 +682,14 @@ export const candidateFeedbacksQuery = (candidateId: string) => ({
   variables: { candidateId },
 });
 
+export const ownedNounsDocument = graphql(`
+  query GetOwnedNouns($owner: ID!) {
+    nouns(where: { owner_: { id: $owner } }) {
+      id
+    }
+  }
+`);
+
 export const ownedNounsQuery = (owner: string) => ({
   query: gql`
     query GetOwnedNouns($owner: ID!) {
@@ -668,6 +700,19 @@ export const ownedNounsQuery = (owner: string) => ({
   `,
   variables: { owner },
 });
+
+export const accountEscrowedNounsDocument = graphql(`
+  query GetAccountEscrowedNouns($owner: ID!) {
+    escrowedNouns(where: { owner_: { id: $owner } }, first: 1000) {
+      noun {
+        id
+      }
+      fork {
+        id
+      }
+    }
+  }
+`);
 
 export const accountEscrowedNounsQuery = (owner: string) => ({
   query: gql`
