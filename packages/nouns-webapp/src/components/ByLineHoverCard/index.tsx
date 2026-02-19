@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useQuery } from '@apollo/client';
 import { ScaleIcon } from '@heroicons/react/solid';
 import { Trans } from '@lingui/react/macro';
 import { Spinner } from 'react-bootstrap';
@@ -8,9 +7,9 @@ import { map } from 'remeda';
 
 import HorizontalStackedNouns from '@/components/HorizontalStackedNouns';
 import ShortAddress from '@/components/ShortAddress';
-import { Delegate, Maybe } from '@/subgraphs/graphql';
+import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import { Address } from '@/utils/types';
-import { currentlyDelegatedNouns } from '@/wrappers/subgraph';
+import { currentlyDelegatedNounsDocument } from '@/wrappers/subgraph';
 
 import classes from './ByLineHoverCard.module.css';
 
@@ -23,8 +22,11 @@ const MAX_NOUN_IDS_SHOWN = 12;
 const ByLineHoverCard: React.FC<ByLineHoverCardProps> = props => {
   const { proposerAddress } = props;
 
-  const { query, variables } = currentlyDelegatedNouns(proposerAddress);
-  const { data, loading, error } = useQuery<{ delegates: Maybe<Delegate[]> }>(query, { variables });
+  const { data, loading, error } = useSubgraphQuery({
+    document: currentlyDelegatedNounsDocument,
+    variables: { delegate: proposerAddress },
+    queryKey: ['currentlyDelegatedNouns', proposerAddress],
+  });
 
   if (loading || (data && data?.delegates?.length === 0)) {
     return (
