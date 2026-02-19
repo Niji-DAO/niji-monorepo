@@ -3,13 +3,42 @@ import { ApolloClient, ApolloLink, gql, HttpLink, InMemoryCache } from '@apollo/
 import { graphql } from '@/subgraphs';
 import { BigNumberish } from '@/utils/types';
 
+// Re-export generated documents with shorter aliases
 export {
   GetSeedsDocument as seedsDocument,
+  GetProposalDocument as proposalDocument,
+  GetPartialProposalsDocument as partialProposalsDocument,
+  GetActivePendingUpdatableProposersDocument as activePendingUpdatableProposersDocument,
+  GetUpdatableProposalsDocument as updatableProposalsDocument,
+  GetCandidateProposalsDocument as candidateProposalsDocument,
+  GetCandidateProposalDocument as candidateProposalDocument,
+  GetCandidateProposalVersionsDocument as candidateProposalVersionsDocument,
+  GetProposalVersionsDocument as proposalVersionsDocument,
+  GetBidsByAuctionDocument as bidsByAuctionDocument,
+  GetNounDocument as nounDocument,
+  GetNounsIndexDocument as nounsIndexDocument,
+  GetLatestBidsDocument as latestBidsDocument,
+  GetNounVotingHistoryDocument as nounVotingHistoryDocument,
+  GetNounTransferHistoryDocument as nounTransferHistoryDocument,
+  GetNounDelegationHistoryDocument as nounDelegationHistoryDocument,
+  GetCreateTimestampAllProposalsDocument as createTimestampAllProposalsDocument,
+  GetProposalVotesDocument as proposalVotesDocument,
+  GetDelegateNounsAtBlockDocument as delegateNounsAtBlockDocument,
+  GetCurrentlyDelegatedNounsDocument as currentlyDelegatedNounsDocument,
+  GetAdjustedNounSupplyAtPropSnapshotDocument as adjustedNounSupplyAtPropSnapshotDocument,
+  GetPropUsingDynamicQuorumDocument as propUsingDynamicQuorumDocument,
+  GetProposalFeedbacksDocument as proposalFeedbacksDocument,
+  GetCandidateFeedbacksDocument as candidateFeedbacksDocument,
   GetOwnedNounsDocument as ownedNounsDocument,
   GetAccountEscrowedNounsDocument as accountEscrowedNounsDocument,
-  GetDelegateNounsAtBlockDocument as delegateNounsAtBlockDocument,
+  GetEscrowDepositEventsDocument as escrowDepositEventsDocument,
+  GetForkJoinsDocument as forkJoinsDocument,
+  GetEscrowWithdrawEventsDocument as escrowWithdrawEventsDocument,
+  GetProposalTitlesDocument as proposalTitlesDocument,
+  GetForkDetailsDocument as forkDetailsDocument,
+  GetForksDocument as forksDocument,
+  GetIsForkActiveDocument as isForkActiveDocument,
 } from '@/subgraphs/graphql';
-
 export const clientFactory = (uri: string) => {
   // patch BigInt JSON serialization (runs once)
   if (
