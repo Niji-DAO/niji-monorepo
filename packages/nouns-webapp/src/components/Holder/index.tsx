@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useQuery } from '@apollo/client';
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
 import { Col, Row } from 'react-bootstrap';
@@ -8,8 +7,9 @@ import { Col, Row } from 'react-bootstrap';
 import ShortAddress from '@/components/ShortAddress';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppSelector } from '@/hooks';
+import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
-import { nounQuery } from '@/wrappers/subgraph';
+import { nounDocument } from '@/wrappers/subgraph';
 
 import classes from './Holder.module.css';
 
@@ -23,8 +23,12 @@ const Holder: React.FC<HolderProps> = props => {
 
   const isCool = useAppSelector(state => state.application.isCoolBackground);
 
-  const { query, variables } = nounQuery(nounId.toString());
-  const { loading, error, data } = useQuery(query, { variables });
+  const id = nounId.toString();
+  const { loading, error, data } = useSubgraphQuery({
+    document: nounDocument,
+    variables: { id },
+    queryKey: ['noun', id],
+  });
 
   if (loading) {
     return <></>;
@@ -36,11 +40,11 @@ const Holder: React.FC<HolderProps> = props => {
     );
   }
 
-  const holder = data && data.noun.owner.id;
+  const holder = data?.noun?.owner.id;
 
   const nonNounderNounContent = (
     <a
-      href={buildEtherscanAddressLink(holder)}
+      href={buildEtherscanAddressLink(holder ?? '')}
       target={'_blank'}
       rel="noreferrer"
       className={classes.link}
@@ -50,7 +54,7 @@ const Holder: React.FC<HolderProps> = props => {
           <Trans>View on Etherscan</Trans>
         </TooltipContent>
         <TooltipTrigger>
-          <ShortAddress size={40} address={holder} avatar={true} />
+          <ShortAddress size={40} address={(holder ?? '') as `0x${string}`} avatar={true} />
         </TooltipTrigger>
       </Tooltip>
     </a>
@@ -78,7 +82,7 @@ const Holder: React.FC<HolderProps> = props => {
               color: isCool ? 'var(--brand-cool-dark-text)' : 'var(--brand-warm-dark-text)',
             }}
           >
-            {isNounders ? nounderNounContent : nonNounderNounContent}
+            {isNounders === true ? nounderNounContent : nonNounderNounContent}
           </h2>
         </Col>
       </Row>

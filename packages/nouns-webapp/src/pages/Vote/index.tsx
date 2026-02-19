@@ -2,7 +2,6 @@ import type { Address } from '@/utils/types';
 
 import { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { useQuery } from '@apollo/client';
 import { SearchIcon } from '@heroicons/react/solid';
 import { i18n } from '@lingui/core';
 import { t } from '@lingui/core/macro';
@@ -33,6 +32,7 @@ import VoteSignals from '@/components/VoteSignals/VoteSignals';
 import { useReadNounsGovernorQuorumVotes } from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { useActiveLocale } from '@/hooks/useActivateLocale';
+import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import { SUPPORTED_LOCALE_TO_DAYSJS_LOCALE, SupportedLocale } from '@/i18n/locales';
 import Section from '@/layout/Section';
 import { cn } from '@/lib/utils';
@@ -56,11 +56,9 @@ import {
 import { useProposalFeedback } from '@/wrappers/nounsData';
 import { useUserVotes, useUserVotesAsOfBlock } from '@/wrappers/nounToken';
 import {
-  delegateNounsAtBlockQuery,
-  Delegates,
-  ProposalVotes,
-  proposalVotesQuery,
-  propUsingDynamicQuorum,
+  delegateNounsAtBlockDocument,
+  proposalVotesDocument,
+  propUsingDynamicQuorumDocument,
 } from '@/wrappers/subgraph';
 
 import classes from './Vote.module.css';
@@ -117,8 +115,16 @@ const VotePage = () => {
   const activeLocale = useActiveLocale();
   const { _ } = useLingui();
   const { address: account } = useAccount();
-  const { query, variables } = propUsingDynamicQuorum(id ?? '0');
-  const { data: dqInfo, loading: loadingDQInfo, error: dqError } = useQuery(query, { variables });
+  const proposalId = id ?? '0';
+  const {
+    data: dqInfo,
+    loading: loadingDQInfo,
+    error: dqError,
+  } = useSubgraphQuery({
+    document: propUsingDynamicQuorumDocument,
+    variables: { proposalId },
+    queryKey: ['propUsingDynamicQuorum', proposalId],
+  });
   const { queueProposal, queueProposalState } = useQueueProposal();
   const { executeProposal, executeProposalState } = useExecuteProposal();
   const { cancelProposal, cancelProposalState } = useCancelProposal();
@@ -194,8 +200,8 @@ const VotePage = () => {
     args: [proposal !== undefined && proposal.id !== undefined ? BigInt(proposal.id) : 0n],
     query: {
       enabled:
-        dqInfo !== undefined && dqInfo.proposal !== undefined
-          ? dqInfo.proposal.quorumCoefficient === '0'
+        dqInfo !== undefined && dqInfo.proposal != null
+          ? dqInfo.proposal.quorumCoefficient === 0n
           : true,
     },
   });
@@ -400,27 +406,27 @@ const VotePage = () => {
   }, [forkActiveState.data, setIsForkActive]);
 
   const activeAccount = useAppSelector(state => state.account.activeAccount);
-  const { query: votesQuery, variables: votesVariables } = proposalVotesQuery(proposal?.id ?? '0');
   const {
     loading,
     error,
     data: voters,
-  } = useQuery<ProposalVotes>(votesQuery, {
-    skip: !proposal,
-    variables: votesVariables,
+  } = useSubgraphQuery({
+    document: proposalVotesDocument,
+    variables: { proposalId: proposal?.id ?? '0' },
+    queryKey: ['proposalVotes', proposal?.id ?? '0'],
+    enabled: !!proposal,
   });
 
   const voterIds = voters?.votes?.map(v => v.voter.id);
-  const { query: voteSnapshotQuery, variables: voteSnapshotVariables } = delegateNounsAtBlockQuery(
-    voterIds ?? [],
-    BigInt(proposal?.voteSnapshotBlock ?? 0),
-  );
-  const { data: delegateSnapshot } = useQuery<Delegates>(voteSnapshotQuery, {
-    skip: (voters?.votes?.length ?? 0) === 0,
-    variables: voteSnapshotVariables,
+  const snapshotBlock = Number(BigInt(proposal?.voteSnapshotBlock ?? 0));
+  const { data: delegateSnapshot } = useSubgraphQuery({
+    document: delegateNounsAtBlockDocument,
+    variables: { delegates: voterIds ?? [], block: snapshotBlock },
+    queryKey: ['delegateNounsAtBlock', voterIds ?? [], snapshotBlock],
+    enabled: (voters?.votes?.length ?? 0) > 0,
   });
 
-  const { delegates } = delegateSnapshot || {};
+  const delegates = delegateSnapshot?.delegates;
   const delegateToNounIds = delegates?.reduce<Record<string, string[]>>((acc, curr) => {
     acc[curr.id] = curr?.nounsRepresented?.map(nr => nr.id) ?? [];
     return acc;
@@ -428,7 +434,7 @@ const VotePage = () => {
 
   const data = voters?.votes?.map(v => ({
     delegate: v.voter.id as Address,
-    supportDetailed: v.supportDetailed,
+    supportDetailed: v.supportDetailed as 0 | 1 | 2,
     nounsRepresented: delegateToNounIds?.[v.voter.id] ?? [],
   }));
 
@@ -488,7 +494,7 @@ const VotePage = () => {
     return <Trans>Failed to fetch</Trans>;
   }
   const againstNouns = getNounVotes(data, 0);
-  const isV2Prop = dqInfo.proposal.quorumCoefficient > 0;
+  const isV2Prop = (dqInfo.proposal?.quorumCoefficient ?? 0n) > 0n;
 
   return (
     <Section fullWidth={false} className={classes.votePage}>

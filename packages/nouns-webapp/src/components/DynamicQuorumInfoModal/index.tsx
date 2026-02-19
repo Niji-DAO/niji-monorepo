@@ -1,14 +1,14 @@
 import React from 'react';
 
-import { useQuery } from '@apollo/client';
 import { XIcon } from '@heroicons/react/solid';
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
 import ReactDOM from 'react-dom';
 
 import { Backdrop } from '@/components/Modal';
+import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import { Proposal, useDynamicQuorumProps } from '@/wrappers/nounsDao';
-import { adjustedNounSupplyAtPropSnapshot } from '@/wrappers/subgraph';
+import { adjustedNounSupplyAtPropSnapshotDocument } from '@/wrappers/subgraph';
 
 import classes from './DynamicQuorumInfoModal.module.css';
 
@@ -293,10 +293,12 @@ const DynamicQuorumInfoModal: React.FC<{
 }> = props => {
   const { onDismiss, proposal, againstVotesAbsolute, currentQuorum } = props;
 
-  const { query,variables } = adjustedNounSupplyAtPropSnapshot(proposal && proposal.id ? proposal.id : '0');
-  const { data, loading, error } = useQuery(
-    query,{variables}
-  );
+  const proposalId = proposal.id ?? '0';
+  const { data, loading, error } = useSubgraphQuery({
+    document: adjustedNounSupplyAtPropSnapshotDocument,
+    variables: { proposalId },
+    queryKey: ['adjustedNounSupplyAtPropSnapshot', proposalId],
+  });
 
   const dynamicQuorumProps = useDynamicQuorumProps(BigInt(proposal.startBlock));
 
@@ -325,8 +327,9 @@ const DynamicQuorumInfoModal: React.FC<{
           minQuorumBps={dynamicQuorumProps?.minQuorumVotesBPS ?? 0}
           maxQuorumBps={dynamicQuorumProps?.maxQuorumVotesBPS ?? 0}
           quorumCoefficent={
-            dynamicQuorumProps?.quorumCoefficient
-              ? dynamicQuorumProps?.quorumCoefficient / scalingFactor
+            dynamicQuorumProps?.quorumCoefficient != null &&
+            dynamicQuorumProps.quorumCoefficient !== 0
+              ? dynamicQuorumProps.quorumCoefficient / scalingFactor
               : 0
           }
           onDismiss={onDismiss}
