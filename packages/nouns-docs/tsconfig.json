@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es2024",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "ESNext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,7 +18,7 @@
         "name": "next"
       }
     ],
-    "module": "esnext",
+    "module": "ESNext",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]

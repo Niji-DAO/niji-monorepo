@@ -10,6 +10,21 @@ This is a monorepo for Nouns DAO, a generative avatar art collective run by cryp
 - **TypeScript** throughout the codebase
 - **Node.js** 16.x or higher
 
+### TypeScript Configuration
+
+The monorepo uses a unified TypeScript configuration with package-specific overrides:
+
+- **Base configuration** (`tsconfig.base.json`):
+  - `target: ES2022` (Node.js 16+ and all modern browsers)
+  - `module: ESNext` (optimized for bundlers and tree-shaking)
+  - `lib: ["ES2022"]` (modern JavaScript features)
+
+- **CommonJS overrides** (for compatibility):
+  - `packages/nouns-contracts`: Uses `module: "CommonJS"` for Hardhat compatibility
+  - `packages/nouns-subgraph`: Uses `module: "CommonJS"` for Graph TS compatibility
+
+All other packages inherit the base configuration for consistency.
+
 ## Package Structure
 
 Six main packages with interdependencies:
@@ -55,6 +70,7 @@ Located in `packages/nouns-contracts/`:
 - Tests in `test/` (TypeScript) and `test/foundry/` (Solidity)
 - Deployment scripts in `script/`
 - Generated TypeChain types in `typechain/`
+- **TypeScript**: Uses CommonJS module format for Hardhat compatibility
 
 ### Contract Testing Stack
 - **ethers v6**: JavaScript/TypeScript Ethereum library (uses native `bigint`, not `BigNumber`)
@@ -152,12 +168,14 @@ Optional:
 ## Testing
 
 Each package has its own test setup:
-- **Assets/SDK**: Node.js with standard test runners
-- **Contracts**: Hardhat (TypeScript) + Foundry (Solidity)
-- **Webapp**: Vitest + React Testing Library
-- **Subgraph**: Matchstick framework
+- **Assets/SDK**: Node.js with standard test runners (ES2022 target)
+- **Contracts**: Hardhat (TypeScript with CommonJS) + Foundry (Solidity)
+- **Webapp**: Vitest + React Testing Library (ES2022 target)
+- **Subgraph**: Matchstick framework (CommonJS)
 
 Run `pnpm test` from root to test all packages, or `cd` into specific package for targeted testing.
+
+Note: Contracts and subgraph packages use CommonJS for compatibility with their respective frameworks, while other packages use ESNext modules.
 
 ## Active Migrations (nouns-webapp)
 
@@ -209,6 +227,7 @@ Located in `packages/nouns-docs/` - Next.js 15 documentation site built with Nex
 - **nextra-theme-docs** for the documentation theme
 - **Pagefind** for search functionality
 - **Lucide Icons** for UI components
+- **TypeScript**: ES2022 target with ESNext modules (bundler module resolution)
 
 ### File Structure
 - `app/layout.tsx` - Root layout with Nextra theme configuration
