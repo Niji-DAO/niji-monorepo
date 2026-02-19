@@ -386,7 +386,7 @@ const replaceInvalidDropboxImageLinks = (descriptionText: string | undefined) =>
 };
 
 export function useDynamicQuorumProps(block: bigint): DynamicQuorumParams | undefined {
-  // @ts-expect-error wagmi hook's return type might be inferred incorrectly or too broadly
+  // @ts-expect-error Type instantiation is excessively deep (wagmi codegen)
   const { data } = useReadNounsGovernorGetDynamicQuorumParamsAt({
     args: [block],
   });

@@ -81,7 +81,7 @@ Located in `packages/nouns-webapp/` - React web application built with Vite, Typ
 - **React 18** with **Vite** build tool
 - **Tailwind CSS** + **shadcn/ui** for styling (migrating from CSS Modules + react-bootstrap)
 - **wagmi** for Ethereum interactions
-- **TanStack Query** for server state (replacing Redux + Apollo Client)
+- **TanStack Query** for server state (Apollo Client fully removed)
 - **Lingui** for internationalization
 - **GraphQL Codegen** for type-safe subgraph queries
 
@@ -164,20 +164,19 @@ Run `pnpm test` from root to test all packages, or `cd` into specific package fo
 The webapp is undergoing modernization efforts:
 
 ### State Management Migration
-**From**: Redux Toolkit + Apollo Client  
-**To**: TanStack Query for server state, minimal Redux for UI state  
+**From**: Redux Toolkit
+**To**: TanStack Query for server state, minimal Redux for UI state
 **Guidance**: Prefer TanStack Query for new data fetching, use Redux only for truly global UI state
 
-### Styling Migration  
-**From**: CSS Modules + react-bootstrap  
-**To**: Tailwind CSS + shadcn/ui  
+### Styling Migration
+**From**: CSS Modules + react-bootstrap
+**To**: Tailwind CSS + shadcn/ui
 **Guidance**: Use Tailwind classes and shadcn/ui components for new features
 
-### GraphQL Migration
-**From**: Apollo Client with manual queries  
-**To**: TanStack Query + GraphQL Codegen with typed `execute()` function  
-**Guidance**: New GraphQL queries should use the codegen'd `execute()` pattern
-**Helper**: Use `useSubgraphQuery` hook (`packages/nouns-webapp/src/hooks/useSubgraphQuery.ts`) for Apollo-compatible `{ loading, data, error, refetch }` interface
+### GraphQL Migration (Completed)
+Apollo Client has been fully removed. All subgraph queries use TanStack Query + GraphQL Codegen.
+**Pattern**: Use `useSubgraphQuery` hook (`src/hooks/useSubgraphQuery.ts`) with typed codegen documents
+**Documents**: Re-exported with shorter aliases from `src/wrappers/subgraph.ts`
 
 ## Code Generation Dependencies
 

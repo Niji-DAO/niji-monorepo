@@ -23,8 +23,7 @@ const CandidateSponsors = ({
 }: CandidateSponsorsProps) => {
   const maxVisibleSpots = 5;
   const [signerCountOverflow, setSignerCountOverflow] = useState(0);
-  const activeSigners =
-    signers?.filter(s => s.signer.activeOrPendingProposal === false && s.signer.id !== '') ?? [];
+  const activeSigners = signers?.filter(s => s.signer.activeOrPendingProposal === false) ?? [];
   const signerIds = activeSigners?.map(s => s.signer.id) ?? [];
   const { data: delegateSnapshot } = useDelegateNounsAtBlockQuery(signerIds, currentBlock ?? 0n);
   const delegates = delegateSnapshot?.delegates;
