@@ -2,7 +2,6 @@ import type { Address } from './utils/types';
 
 import React, { useEffect } from 'react';
 
-import { ApolloProvider } from '@apollo/client';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRoot } from 'react-dom/client';
@@ -18,7 +17,7 @@ import { store } from '@/store';
 import { execute } from '@/subgraphs/execute';
 
 import App from './App';
-import config, { CHAIN_ID } from './config';
+import { CHAIN_ID } from './config';
 import {
   nounsAuctionHouseAddress,
   useReadNounsAuctionHouseAuction,
@@ -44,11 +43,9 @@ import { setLastAuctionNounId, setOnDisplayAuctionNounId } from './state/slices/
 import { addPastAuctions } from './state/slices/pastAuctions';
 import { nounPath } from './utils/history';
 import { defaultChain, config as wagmiConfig } from './wagmi';
-import { clientFactory, latestAuctionsQuery } from './wrappers/subgraph';
+import { latestAuctionsQuery } from './wrappers/subgraph';
 
 const queryClient = new QueryClient();
-
-const client = clientFactory(config.app.subgraphApiUri);
 
 const ChainSubscriber: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -232,14 +229,12 @@ createRoot(document.getElementById('root')!).render(
                 <ReactQueryDevtools initialIsOpen={false} />
               )}
               <ChainSubscriber />
-              <ApolloProvider client={client}>
-                <PastAuctions />
-                <LanguageProvider>
-                  <CustomConnectkitProvider>
-                    <App />
-                  </CustomConnectkitProvider>
-                </LanguageProvider>
-              </ApolloProvider>
+              <PastAuctions />
+              <LanguageProvider>
+                <CustomConnectkitProvider>
+                  <App />
+                </CustomConnectkitProvider>
+              </LanguageProvider>
             </QueryClientProvider>
           </WagmiProvider>
         </React.StrictMode>
