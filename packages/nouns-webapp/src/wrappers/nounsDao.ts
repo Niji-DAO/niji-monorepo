@@ -1,17 +1,30 @@
 import type {
-  EscrowDeposit as GraphQLEscrowDeposit,
-  EscrowWithdrawal as GraphQLEscrowWithdrawal,
-  Fork as GraphQLFork,
-  ForkJoin as GraphQLForkJoin,
-  Maybe,
-  Proposal as GraphQLProposal,
-  ProposalVersion as GraphQLProposalVersion,
+  GetPartialProposalsQuery,
+  GetProposalQuery,
+  ProposalStatus,
 } from '@/subgraphs/graphql';
 import type { Address, Hash, Hex } from '@/utils/types';
 
+// Query result element types — narrower than full Proposal, matching actual query selections
+type PartialProposalResult = GetPartialProposalsQuery['proposals'][number];
+type FullProposalResult = NonNullable<GetProposalQuery['proposal']>;
+
+// Common fields for proposal state determination (both query types satisfy this)
+interface ProposalStateFields {
+  status?: ProposalStatus | null;
+  forVotes: bigint;
+  againstVotes: bigint;
+  quorumVotes?: bigint | null;
+  executionETA?: bigint | null;
+  startBlock: bigint;
+  endBlock: bigint;
+  updatePeriodEndBlock?: bigint | null;
+  objectionPeriodEndBlock: bigint;
+  onTimelockV1?: boolean | null;
+}
+
 import { useMemo } from 'react';
 
-import { useQuery } from '@apollo/client';
 import { useQuery as useReactQuery } from '@tanstack/react-query';
 import {
   filter,
@@ -65,21 +78,22 @@ import {
   useWriteNounsGovernorWithdrawFromForkEscrow,
 } from '@/contracts';
 import { useBlockTimestamp } from '@/hooks/useBlockTimestamp';
+import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import { defaultChain } from '@/wagmi';
 
 import {
-  activePendingUpdatableProposersQuery,
-  escrowDepositEventsQuery,
-  escrowWithdrawEventsQuery,
-  forkDetailsQuery,
-  forkJoinsQuery,
-  forksQuery,
-  isForkActiveQuery,
-  partialProposalsQuery,
-  proposalQuery,
-  proposalTitlesQuery,
-  proposalVersionsQuery,
-  updatableProposalsQuery,
+  activePendingUpdatableProposersDocument,
+  escrowDepositEventsDocument,
+  escrowWithdrawEventsDocument,
+  forkDetailsDocument,
+  forkJoinsDocument,
+  forksDocument,
+  isForkActiveDocument,
+  partialProposalsDocument,
+  proposalDocument,
+  proposalTitlesDocument,
+  proposalVersionsDocument,
+  updatableProposalsDocument,
 } from './subgraph';
 
 export interface DynamicQuorumParams {
@@ -566,7 +580,7 @@ export function useFormattedProposalCreatedLogs(skip: boolean, fromBlockOverride
 const getProposalState = (
   blockNumber: number | undefined,
   blockTimestamp: Date | undefined,
-  proposal: GraphQLProposal,
+  proposal: ProposalStateFields,
   isDaoGteV3?: boolean,
   onTimelockV1?: boolean,
 ) => {
@@ -590,7 +604,7 @@ const getProposalState = (
 // Handle the state for PENDING or ACTIVE proposals
 const handlePendingOrActiveState = (
   blockNumber: number | undefined,
-  proposal: GraphQLProposal,
+  proposal: ProposalStateFields,
   isDaoGteV3?: boolean,
 ): ProposalState => {
   if (blockNumber === undefined) {
@@ -623,7 +637,7 @@ const handlePendingOrActiveState = (
 // Check if a proposal is in UPDATABLE state
 const isUpdatableProposal = (
   blockNumber: number,
-  proposal: GraphQLProposal,
+  proposal: ProposalStateFields,
   isDaoGteV3?: boolean,
 ): boolean => {
   return Boolean(
@@ -636,7 +650,7 @@ const isUpdatableProposal = (
 // Check if a proposal is in OBJECTION_PERIOD state
 const isInObjectionPeriod = (
   blockNumber: number,
-  proposal: GraphQLProposal,
+  proposal: ProposalStateFields,
   isDaoGteV3?: boolean,
 ): boolean => {
   return Boolean(
@@ -647,7 +661,7 @@ const isInObjectionPeriod = (
 };
 
 // Check if a proposal is past its end block
-const isPastEndBlock = (blockNumber: number, proposal: GraphQLProposal): boolean => {
+const isPastEndBlock = (blockNumber: number, proposal: ProposalStateFields): boolean => {
   return (
     blockNumber > BigInt(proposal.endBlock) &&
     blockNumber > BigInt(proposal.objectionPeriodEndBlock)
@@ -655,7 +669,7 @@ const isPastEndBlock = (blockNumber: number, proposal: GraphQLProposal): boolean
 };
 
 // Determine the state for a proposal that is past its end block
-const getPastEndBlockState = (proposal: GraphQLProposal): ProposalState => {
+const getPastEndBlockState = (proposal: ProposalStateFields): ProposalState => {
   const forVotes = BigInt(proposal.forVotes);
   if (forVotes <= BigInt(proposal.againstVotes) || forVotes < BigInt(proposal.quorumVotes ?? 0)) {
     return ProposalState.DEFEATED;
@@ -671,7 +685,7 @@ const getPastEndBlockState = (proposal: GraphQLProposal): ProposalState => {
 // Handle the state for QUEUED proposals
 const handleQueuedState = (
   blockTimestamp: Date | undefined,
-  proposal: GraphQLProposal,
+  proposal: ProposalStateFields,
   isDaoGteV3?: boolean,
   onTimelockV1?: boolean,
 ): ProposalState => {
@@ -689,7 +703,7 @@ const handleQueuedState = (
 // Check if a queued proposal has expired
 const isExpiredProposal = (
   blockTimestamp: Date,
-  proposal: GraphQLProposal,
+  proposal: ProposalStateFields,
   isDaoGteV3?: boolean,
   onTimelockV1?: boolean,
 ): boolean => {
@@ -703,7 +717,7 @@ const isExpiredProposal = (
 };
 
 const parsePartialSubgraphProposal = (
-  proposal: GraphQLProposal | undefined,
+  proposal: PartialProposalResult | undefined,
   blockNumber: bigint | number | undefined,
   timestamp: number | undefined,
   isDaoGteV3?: boolean,
@@ -736,7 +750,7 @@ const parsePartialSubgraphProposal = (
 };
 
 const parseSubgraphProposal = (
-  proposal: GraphQLProposal | undefined,
+  proposal: FullProposalResult | undefined,
   blockNumber: number | undefined,
   timestamp: number | undefined,
   toUpdate?: boolean,
@@ -799,9 +813,10 @@ const parseSubgraphProposal = (
 };
 
 export const useAllProposalsViaSubgraph = (): PartialProposalData => {
-  const { query, variables } = partialProposalsQuery();
-  const { loading, data, error } = useQuery<{ proposals: Maybe<GraphQLProposal[]> }>(query, {
-    variables,
+  const { loading, data, error } = useSubgraphQuery({
+    document: partialProposalsDocument,
+    variables: { first: 1000 },
+    queryKey: ['partialProposals', 1000],
   });
   const isDaoGteV3 = useIsDaoGteV3();
   const { data: blockNumber } = useBlockNumber();
@@ -911,16 +926,22 @@ export const useProposal = (id: string | number, toUpdate?: boolean) => {
   const timestamp = useBlockTimestamp(blockNumber);
   const isDaoGteV3 = useIsDaoGteV3();
 
-  const { query, variables } = proposalQuery(id);
-  const { data } = useQuery<{ proposal: Maybe<GraphQLProposal> }>(query, { variables });
+  const { data } = useSubgraphQuery({
+    document: proposalDocument,
+    variables: { id: String(id) },
+    queryKey: ['proposal', id],
+  });
   const proposal = data?.proposal ?? undefined;
 
   return parseSubgraphProposal(proposal, Number(blockNumber), timestamp, toUpdate, isDaoGteV3);
 };
 
 export const useProposalTitles = (ids: number[]): ProposalTitle[] | undefined => {
-  const { query, variables } = proposalTitlesQuery(ids);
-  const { data } = useQuery<{ proposals: Maybe<GraphQLProposal[]> }>(query, { variables });
+  const { data } = useSubgraphQuery({
+    document: proposalTitlesDocument,
+    variables: { ids: ids.map(String) },
+    queryKey: ['proposalTitles', ids],
+  });
 
   return (
     data?.proposals?.map(proposal => ({
@@ -931,10 +952,11 @@ export const useProposalTitles = (ids: number[]): ProposalTitle[] | undefined =>
 };
 
 export const useProposalVersions = (id: string | number): ProposalVersion[] | undefined => {
-  const { query, variables } = proposalVersionsQuery(id);
-  const { data } = useQuery<{
-    proposalVersions: Maybe<GraphQLProposalVersion[]>;
-  }>(query, { variables });
+  const { data } = useSubgraphQuery({
+    document: proposalVersionsDocument,
+    variables: { id: String(id) },
+    queryKey: ['proposalVersions', id],
+  });
 
   const sortedProposalVersions = sort(data?.proposalVersions ?? [], (a, b) =>
     a.createdAt > b.createdAt ? 1 : -1,
@@ -1308,12 +1330,11 @@ export function useNumTokensInForkEscrow(): number | undefined {
 }
 
 export const useEscrowDepositEvents = (pollInterval: number, forkId: string) => {
-  const { query, variables } = escrowDepositEventsQuery(forkId);
-  const { loading, data, error, refetch } = useQuery<{
-    escrowDeposits: Maybe<GraphQLEscrowDeposit[]>;
-  }>(query, {
-    pollInterval,
-    variables,
+  const { loading, data, error, refetch } = useSubgraphQuery({
+    document: escrowDepositEventsDocument,
+    variables: { forkId },
+    queryKey: ['escrowDepositEvents', forkId],
+    refetchInterval: pollInterval,
   });
   const escrowDeposits: EscrowDeposit[] = map(data?.escrowDeposits ?? [], escrowDeposit => {
     const proposalIDs = escrowDeposit.proposalIDs.map(id => Number(id));
@@ -1330,12 +1351,11 @@ export const useEscrowDepositEvents = (pollInterval: number, forkId: string) => 
 };
 
 export const useEscrowWithdrawalEvents = (pollInterval: number, forkId: string) => {
-  const { query, variables } = escrowWithdrawEventsQuery(forkId);
-  const { loading, data, error, refetch } = useQuery<{
-    escrowWithdrawals: Maybe<GraphQLEscrowWithdrawal[]>;
-  }>(query, {
-    pollInterval,
-    variables,
+  const { loading, data, error, refetch } = useSubgraphQuery({
+    document: escrowWithdrawEventsDocument,
+    variables: { forkId },
+    queryKey: ['escrowWithdrawEvents', forkId],
+    refetchInterval: pollInterval,
   });
 
   const escrowWithdrawals: EscrowWithdrawal[] = map(
@@ -1377,14 +1397,12 @@ const eventsWithforkCycleEvents = (events: EscrowEvent[], forkDetails: Fork) => 
 };
 
 export const useForkJoins = (pollInterval: number, forkId: string) => {
-  const { query, variables } = forkJoinsQuery(forkId);
-  const { loading, data, error, refetch } = useQuery<{ forkJoins: Maybe<GraphQLForkJoin[]> }>(
-    query,
-    {
-      pollInterval,
-      variables,
-    },
-  );
+  const { loading, data, error, refetch } = useSubgraphQuery({
+    document: forkJoinsDocument,
+    variables: { forkId },
+    queryKey: ['forkJoins', forkId],
+    refetchInterval: pollInterval,
+  });
   const forkJoins = data?.forkJoins?.map(forkJoin => {
     const proposalIDs = forkJoin.proposalIDs.map(id => id);
     return {
@@ -1462,16 +1480,17 @@ export const useEscrowEvents = (pollInterval: number, forkId: string) => {
 };
 
 export const useForkDetails = (pollInterval: number, id: string) => {
-  const { query, variables } = forkDetailsQuery(id.toString());
   const {
     loading,
     data: forkData,
     error,
     refetch,
-  } = useQuery<{ fork: Maybe<GraphQLFork> }>(query, {
-    pollInterval,
-    variables,
-  }) as { loading: boolean; data: { fork: ForkSubgraphEntity }; error: Error; refetch: () => void };
+  } = useSubgraphQuery({
+    document: forkDetailsDocument,
+    variables: { id: id.toString() },
+    queryKey: ['forkDetails', id],
+    refetchInterval: pollInterval,
+  });
   const joined = forkData?.fork?.joinedNouns?.map(item => item.noun.id) ?? [];
   const escrowed = forkData?.fork?.escrowedNouns?.map(item => item.noun.id) ?? [];
   const addedNouns = [...escrowed, ...joined];
@@ -1488,19 +1507,17 @@ export const useForkDetails = (pollInterval: number, id: string) => {
 };
 
 export const useForks = (pollInterval: number = 0) => {
-  const { query, variables } = forksQuery();
-  const { loading, data, error, refetch } = useQuery<{ forks: Maybe<GraphQLFork[]> }>(query, {
-    pollInterval,
-    variables,
+  const { loading, data, error, refetch } = useSubgraphQuery({
+    document: forksDocument,
+    variables: {},
+    queryKey: ['forks'],
+    refetchInterval: pollInterval,
   });
 
   const forks: Fork[] = map(data?.forks ?? [], fork => {
-    const joined = fork?.joinedNouns?.map(item => item.noun.id) ?? [];
-    const escrowed = fork?.escrowedNouns?.map(item => item.noun.id) ?? [];
-    const addedNouns = [...escrowed, ...joined];
     return {
       ...fork,
-      addedNouns,
+      addedNouns: [] as string[],
       executed: fork.executed ?? null,
       executedAt: fork.executedAt ?? null,
       forkTreasury: fork.forkTreasury ?? null,
@@ -1513,13 +1530,16 @@ export const useForks = (pollInterval: number = 0) => {
 };
 
 export const useIsForkActive = () => {
-  const timestamp = Number((new Date().getTime() / 1000).toFixed(0));
-  const { query, variables } = isForkActiveQuery(timestamp);
+  const timestamp = BigInt(Math.floor(new Date().getTime() / 1000));
   const {
     loading,
     data: forksData,
     error,
-  } = useQuery<{ forks: Maybe<GraphQLFork[]> }>(query, { variables });
+  } = useSubgraphQuery({
+    document: isForkActiveDocument,
+    variables: { currentTimestamp: timestamp },
+    queryKey: ['isForkActive', timestamp.toString()],
+  });
   const data = isTruthy(forksData?.forks?.length);
   return {
     loading,
@@ -1564,21 +1584,20 @@ export function useForkThresholdBPS(): number | undefined {
 }
 
 export const useActivePendingUpdatableProposers = (blockNumber: bigint = 0n) => {
-  const { query, variables } = activePendingUpdatableProposersQuery(1000, blockNumber);
   const {
     loading,
     data: proposals,
     error,
-  } = useQuery<{ proposals: Maybe<GraphQLProposal[]> }>(query, { variables }) as {
-    loading: boolean;
-    data: { proposals: ProposalProposerAndSigners[] };
-    error: Error;
-  };
+  } = useSubgraphQuery({
+    document: activePendingUpdatableProposersDocument,
+    variables: { first: 1000, currentBlock: blockNumber },
+    queryKey: ['activePendingUpdatableProposers', blockNumber.toString()],
+  });
   const data: string[] = [];
-  if (proposals?.proposals.length > 0) {
+  if (proposals?.proposals && proposals.proposals.length > 0) {
     forEach(proposals.proposals, proposal => {
       data.push(proposal.proposer.id);
-      forEach(proposal.signers, (signer: { id: string }) => {
+      forEach(proposal.signers ?? [], (signer: { id: string }) => {
         data.push(signer.id);
         return signer.id;
       });
@@ -1598,18 +1617,17 @@ export function useIsDaoGteV3(): boolean {
 }
 
 export function useUpdatableProposalIds(blockNumber?: bigint) {
-  const { query, variables } = updatableProposalsQuery(1000, blockNumber);
   const {
     loading,
     data: proposals,
     error,
-  } = useQuery<{ proposals: Maybe<GraphQLProposal[]> }>(query, { variables }) as {
-    loading: boolean;
-    data: { proposals: ProposalProposerAndSigners[] };
-    error: Error;
-  };
+  } = useSubgraphQuery({
+    document: updatableProposalsDocument,
+    variables: { first: 1000, currentBlock: blockNumber ?? 0n },
+    queryKey: ['updatableProposals', blockNumber?.toString()],
+  });
 
-  const data = proposals?.proposals.map(proposal => +proposal.id);
+  const data = proposals?.proposals?.map(proposal => +proposal.id);
 
   return {
     loading,
