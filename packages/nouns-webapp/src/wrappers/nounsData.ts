@@ -1,3 +1,8 @@
+import type {
+  GetCandidateProposalVersionsQuery,
+  GetCandidateProposalsQuery,
+  GetDelegateNounsAtBlockQuery,
+} from '@/subgraphs/graphql';
 import type { Address, Hash, Hex } from '@/utils/types';
 
 import { useMemo } from 'react';
@@ -18,10 +23,10 @@ import {
   useWriteNounsGovernorUpdateProposalBySigs,
 } from '@/contracts';
 import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
-import {
-  ProposalCandidate as GraphQLProposalCandidate,
-  ProposalCandidateSignature as GraphQLProposalCandidateSignature,
-} from '@/subgraphs/graphql';
+
+// Query result element types — narrower than full ProposalCandidate
+type CandidateResult = GetCandidateProposalsQuery['proposalCandidates'][number];
+type CandidateVersionsResult = NonNullable<GetCandidateProposalVersionsQuery['proposalCandidate']>;
 
 import {
   extractTitle,
@@ -40,7 +45,6 @@ import {
   candidateProposalDocument,
   candidateProposalsDocument,
   candidateProposalVersionsDocument,
-  Delegates,
   proposalFeedbacksDocument,
 } from './subgraph';
 
@@ -165,9 +169,9 @@ const deDupeSigners = (signers: string[]) => {
 
 const filterSigners = (
   timestampNow: number,
-  delegateSnapshot: Delegates | undefined,
+  delegateSnapshot: GetDelegateNounsAtBlockQuery | undefined,
   activePendingProposers: string[],
-  signers?: GraphQLProposalCandidateSignature[],
+  signers?: CandidateResult['latestVersion']['content']['contentSignatures'],
   proposalIdToUpdate?: number,
   updatableProposalIds?: number[],
 ) => {
@@ -253,13 +257,13 @@ export const useCandidateProposals = (blockNumber?: bigint) => {
       proposerDelegates.data?.delegates.find(d => d.id === candidate.proposer.toLowerCase())
         ?.nounsRepresented?.length ?? 0;
     return parseSubgraphCandidate(
-      candidate as unknown as GraphQLProposalCandidate,
+      candidate,
       proposerVotes,
       threshold,
       timestampNow,
       activePendingProposers.data,
       false,
-      signersDelegateSnapshot.data as Delegates | undefined,
+      signersDelegateSnapshot.data,
       updatableProposalIds.data,
     );
   });
@@ -305,13 +309,13 @@ export const useCandidateProposal = (
     proposerDelegates.data &&
     data?.proposalCandidate &&
     parseSubgraphCandidate(
-      candidate as unknown as GraphQLProposalCandidate | undefined,
+      candidate,
       proposerNounVotes,
       threshold,
       timestampNow,
       activePendingProposers.data,
       toUpdate,
-      signersDelegateSnapshot.data as Delegates | undefined,
+      signersDelegateSnapshot.data,
       updatableProposalIds.data,
     );
 
@@ -325,9 +329,7 @@ export const useCandidateProposalVersions = (id: string) => {
     queryKey: ['candidateProposalVersions', id],
   });
 
-  const candidateVersions = parseSubgraphCandidateVersions(
-    (data?.proposalCandidate || undefined) as unknown as GraphQLProposalCandidate | undefined,
-  );
+  const candidateVersions = parseSubgraphCandidateVersions(data?.proposalCandidate ?? undefined);
   const versions = data?.proposalCandidate
     ? {
         ...candidateVersions,
@@ -614,13 +616,13 @@ export const useUpdateProposalBySigs = () => {
 };
 
 const parseSubgraphCandidate = (
-  candidate: GraphQLProposalCandidate | undefined,
+  candidate: CandidateResult | undefined,
   proposerVotes: number,
   threshold: number,
   timestamp: number,
   activePendingProposers: string[],
   toUpdate?: boolean,
-  delegateSnapshot?: Delegates,
+  delegateSnapshot?: GetDelegateNounsAtBlockQuery,
   updatableProposalIds?: number[],
 ): ProposalCandidate | undefined => {
   if (isNullish(candidate)) {
@@ -691,7 +693,7 @@ const parseSubgraphCandidate = (
 };
 
 const parseSubgraphCandidateVersions = (
-  candidate: GraphQLProposalCandidate | undefined,
+  candidate: CandidateVersionsResult | undefined,
 ): ProposalCandidateVersions | undefined => {
   if (isNullish(candidate)) {
     return undefined;
@@ -736,9 +738,8 @@ const parseSubgraphCandidateVersions = (
     versionsCount: candidate.versions.length,
     createdTransactionHash: candidate.createdTransactionHash as Hash,
     title:
-      pipe(candidate.latestVersion.content.description, extractTitle, removeMarkdownStyle) ??
-      'Untitled',
-    description: candidate.latestVersion.content.description ?? 'No description.',
+      pipe(versionsByDate[0]?.content.description, extractTitle, removeMarkdownStyle) ?? 'Untitled',
+    description: versionsByDate[0]?.content.description ?? 'No description.',
     versions: versions,
     isProposal: false,
     requiredVotes: 0,
