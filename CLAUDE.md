@@ -168,14 +168,14 @@ Optional:
 ## Testing
 
 Each package has its own test setup:
-- **Assets/SDK**: Node.js with standard test runners (ES2022 target)
-- **Contracts**: Hardhat (TypeScript with CommonJS) + Foundry (Solidity)
-- **Webapp**: Vitest + React Testing Library (ES2022 target)
-- **Subgraph**: Matchstick framework (CommonJS)
+- **Assets/SDK**: Node.js with standard test runners
+- **Contracts**: Hardhat (TypeScript) + Foundry (Solidity)
+- **Webapp**: Vitest + React Testing Library
+- **Subgraph**: Matchstick framework
 
 Run `pnpm test` from root to test all packages, or `cd` into specific package for targeted testing.
 
-Note: Contracts and subgraph packages use CommonJS for compatibility with their respective frameworks, while other packages use ESNext modules.
+Note: All packages target ES2022. Contracts and subgraph use CommonJS modules for framework compatibility; other packages use ESNext.
 
 ## Active Migrations (nouns-webapp)
 
