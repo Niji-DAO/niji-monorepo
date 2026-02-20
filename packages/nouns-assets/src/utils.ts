@@ -1,5 +1,4 @@
-import { BigNumber, BigNumberish } from '@ethersproject/bignumber';
-import { keccak256 as solidityKeccak256 } from '@ethersproject/solidity';
+import { solidityPackedKeccak256 } from 'ethers';
 
 import { images, bgcolors } from './image-data.json';
 import { NounSeed, NounData } from './types';
@@ -40,17 +39,19 @@ export const getRandomNounSeed = (): NounSeed => {
 
 /**
  * Emulate bitwise right shift and uint cast
- * @param value A Big Number
+ * @param value A bigint-compatible value
  * @param shiftAmount The amount to right shift
  * @param uintSize The uint bit size to cast to
  */
 export const shiftRightAndCast = (
-  value: BigNumberish,
+  value: bigint | number | string,
   shiftAmount: number,
   uintSize: number,
 ): string => {
-  const shifted = BigNumber.from(value).shr(shiftAmount).toHexString();
-  return `0x${shifted.substring(shifted.length - uintSize / 4)}`;
+  const shifted = BigInt(value) >> BigInt(shiftAmount);
+  const mask = (1n << BigInt(uintSize)) - 1n;
+  const masked = shifted & mask;
+  return '0x' + masked.toString(16).padStart(uintSize / 4, '0');
 };
 
 /**
@@ -67,7 +68,7 @@ export const getPseudorandomPart = (
   uintSize = 48,
 ): number => {
   const hex = shiftRightAndCast(pseudorandomness, shiftAmount, uintSize);
-  return BigNumber.from(hex).mod(partCount).toNumber();
+  return Number(BigInt(hex) % BigInt(partCount));
 };
 
 /**
@@ -75,8 +76,11 @@ export const getPseudorandomPart = (
  * @param nounId The Noun tokenId used to create pseudorandomness
  * @param blockHash The block hash use to create pseudorandomness
  */
-export const getNounSeedFromBlockHash = (nounId: BigNumberish, blockHash: string): NounSeed => {
-  const pseudorandomness = solidityKeccak256(['bytes32', 'uint256'], [blockHash, nounId]);
+export const getNounSeedFromBlockHash = (
+  nounId: bigint | number | string,
+  blockHash: string,
+): NounSeed => {
+  const pseudorandomness = solidityPackedKeccak256(['bytes32', 'uint256'], [blockHash, nounId]);
   return {
     background: getPseudorandomPart(pseudorandomness, bgcolors.length, 0),
     body: getPseudorandomPart(pseudorandomness, bodies.length, 48),

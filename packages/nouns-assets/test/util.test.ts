@@ -1,4 +1,4 @@
-import { keccak256 as solidityKeccak256 } from '@ethersproject/solidity';
+import { solidityPackedKeccak256 } from 'ethers';
 import { describe, expect, it } from 'vitest';
 
 import { shiftRightAndCast, getPseudorandomPart, getNounSeedFromBlockHash } from '../src';
@@ -19,7 +19,7 @@ describe('@noun/assets utils', () => {
   };
   const NOUN116_PREV_BLOCKHASH =
     '0x5014101691e81d79a2eba711e698118e1a90c9be7acb2f40d7f200134ee53e01';
-  const NOUN116_PSEUDORANDOMNESS = solidityKeccak256(
+  const NOUN116_PSEUDORANDOMNESS = solidityPackedKeccak256(
     ['bytes32', 'uint256'],
     [NOUN116_PREV_BLOCKHASH, NOUN116_ID],
   );
