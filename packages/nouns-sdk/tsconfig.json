@@ -4,7 +4,7 @@
     "strict": true,
     /* → Basic ESM setup */
     "module": "ESNext",
-    "target": "ES2021",
+    "target": "ES2022",
     "lib": ["ES2022", "DOM"],
 
     /* → Tell TS how to resolve “./foo” imports */

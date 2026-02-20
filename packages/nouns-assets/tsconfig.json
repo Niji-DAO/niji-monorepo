@@ -3,7 +3,7 @@
     "composite": true,
     /* → Basic ESM setup */
     "module": "ESNext",
-    "target": "ES2020",
+    "target": "ES2022",
 
     /* → Tell TS how to resolve “./foo” imports */
     "moduleResolution": "node",
