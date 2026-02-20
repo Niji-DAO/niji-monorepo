@@ -61,9 +61,18 @@ describe('NijiSeeder (edge cases)', () => {
       const seed = await seeder.generateSeedFromSource(ethers.MaxUint256);
       // Should not revert; all values should be valid (0-2)
       for (const field of [
-        seed.special, seed.choker, seed.headphone, seed.leftHand,
-        seed.hat, seed.clothing, seed.ear, seed.back,
-        seed.backDecoration, seed.background, seed.solidBackground, seed.hair,
+        seed.special,
+        seed.choker,
+        seed.headphone,
+        seed.leftHand,
+        seed.hat,
+        seed.clothing,
+        seed.ear,
+        seed.back,
+        seed.backDecoration,
+        seed.background,
+        seed.solidBackground,
+        seed.hair,
       ]) {
         expect(field).to.be.at.least(0);
         expect(field).to.be.at.most(2);

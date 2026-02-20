@@ -23,7 +23,6 @@ try {
   fs.mkdirSync('../nouns-assets/test_output', { recursive: true });
   fs.writeFileSync('../nouns-assets/test_output/nouns-test.svg', svg);
   console.log('  Saved to: packages/nouns-assets/test_output/nouns-test.svg\n');
-
 } catch (error: any) {
   console.error('✗ Nouns test failed:', error.message, '\n');
 }
@@ -70,7 +69,6 @@ try {
 
   fs.writeFileSync('../nouns-assets/test_output/niji-test-12layers.svg', svg);
   console.log('  Saved to: packages/nouns-assets/test_output/niji-test-12layers.svg\n');
-
 } catch (error: any) {
   console.error('✗ Niji test failed:', error.message);
   console.error(error.stack, '\n');

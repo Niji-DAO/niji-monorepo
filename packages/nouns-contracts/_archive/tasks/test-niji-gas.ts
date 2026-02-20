@@ -26,10 +26,7 @@ task('test-niji-gas', 'Test gas costs for deploying Niji data to descriptor')
     console.log('\n=== NIJI GAS TEST ===\n');
 
     // Load Niji data
-    const nijiDataPath = path.join(
-      __dirname,
-      '../../nouns-assets/src/niji-data.json'
-    );
+    const nijiDataPath = path.join(__dirname, '../../nouns-assets/src/niji-data.json');
     const nijiData: NijiData = JSON.parse(fs.readFileSync(nijiDataPath, 'utf-8'));
 
     const { palette, images } = nijiData;
@@ -113,7 +110,9 @@ task('test-niji-gas', 'Test gas costs for deploying Niji data to descriptor')
         return sum + (data.length - 2) / 2; // Remove 0x and divide by 2
       }, 0);
 
-      console.log(`  Total size: ${totalBytes.toLocaleString()} bytes (${(totalBytes / 1024).toFixed(1)} KB)`);
+      console.log(
+        `  Total size: ${totalBytes.toLocaleString()} bytes (${(totalBytes / 1024).toFixed(1)} KB)`,
+      );
 
       // Try to add all traits at once
       try {

@@ -29,14 +29,20 @@ function hashSeed(seed: {
   hair: bigint;
 }): string {
   return ethers.keccak256(
-    ethers.AbiCoder.defaultAbiCoder().encode(
-      Array(TRAIT_COUNT).fill('uint48'),
-      [
-        seed.special, seed.choker, seed.headphone, seed.leftHand,
-        seed.hat, seed.clothing, seed.ear, seed.back,
-        seed.backDecoration, seed.background, seed.solidBackground, seed.hair,
-      ],
-    ),
+    ethers.AbiCoder.defaultAbiCoder().encode(Array(TRAIT_COUNT).fill('uint48'), [
+      seed.special,
+      seed.choker,
+      seed.headphone,
+      seed.leftHand,
+      seed.hat,
+      seed.clothing,
+      seed.ear,
+      seed.back,
+      seed.backDecoration,
+      seed.background,
+      seed.solidBackground,
+      seed.hair,
+    ]),
   );
 }
 
@@ -157,9 +163,7 @@ describe('NijiIntegration', () => {
       await token.setMinter(minter.address);
 
       // Old minter (owner) should fail
-      await expect(
-        token.mint(newOwner.address),
-      ).to.be.revertedWithCustomError(token, 'OnlyMinter');
+      await expect(token.mint(newOwner.address)).to.be.revertedWithCustomError(token, 'OnlyMinter');
 
       // New minter should succeed
       await token.connect(minter).mint(newOwner.address);
@@ -206,9 +210,10 @@ describe('NijiIntegration', () => {
       expect(await limitedToken.remainingSupply()).to.equal(0);
 
       // 6th should revert
-      await expect(
-        limitedToken.mint(minter.address),
-      ).to.be.revertedWithCustomError(limitedToken, 'MaxSupplyReached');
+      await expect(limitedToken.mint(minter.address)).to.be.revertedWithCustomError(
+        limitedToken,
+        'MaxSupplyReached',
+      );
     });
   });
 
@@ -229,9 +234,10 @@ describe('NijiIntegration', () => {
       expect(await token.minter()).to.equal(minter.address);
 
       // Old owner cannot
-      await expect(
-        token.setMinter(owner.address),
-      ).to.be.revertedWithCustomError(token, 'OwnableUnauthorizedAccount');
+      await expect(token.setMinter(owner.address)).to.be.revertedWithCustomError(
+        token,
+        'OwnableUnauthorizedAccount',
+      );
     });
   });
 
@@ -246,9 +252,10 @@ describe('NijiIntegration', () => {
       await art.transferDescriptor(minter.address);
 
       // Owner can no longer add images
-      await expect(
-        art.addTraitImage(0, SAMPLE_PNG),
-      ).to.be.revertedWithCustomError(art, 'SenderIsNotDescriptor');
+      await expect(art.addTraitImage(0, SAMPLE_PNG)).to.be.revertedWithCustomError(
+        art,
+        'SenderIsNotDescriptor',
+      );
 
       // New descriptor (minter) can add images
       const countBefore = await art.getTraitImageCount(0);

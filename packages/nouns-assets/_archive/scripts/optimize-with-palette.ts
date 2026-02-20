@@ -17,9 +17,7 @@ interface ColorRGB {
  * Load global palette
  */
 function loadPalette(): ColorRGB[] {
-  const paletteHex: string[] = JSON.parse(
-    fs.readFileSync(PALETTE_FILE, 'utf-8')
-  );
+  const paletteHex: string[] = JSON.parse(fs.readFileSync(PALETTE_FILE, 'utf-8'));
 
   return paletteHex.map(hex => {
     if (hex === '') return { r: 0, g: 0, b: 0 }; // Transparent
@@ -44,8 +42,7 @@ function nearestColor(r: number, g: number, b: number, palette: ColorRGB[]): num
     const pg = palette[i].g;
     const pb = palette[i].b;
 
-    const dist =
-      Math.pow(r - pr, 2) + Math.pow(g - pg, 2) + Math.pow(b - pb, 2);
+    const dist = Math.pow(r - pr, 2) + Math.pow(g - pg, 2) + Math.pow(b - pb, 2);
 
     if (dist < minDist) {
       minDist = dist;
@@ -62,7 +59,7 @@ function nearestColor(r: number, g: number, b: number, palette: ColorRGB[]): num
 async function optimizeWithPalette(
   inputPath: string,
   outputPath: string,
-  palette: ColorRGB[]
+  palette: ColorRGB[],
 ): Promise<void> {
   // Resize to 512x512
   const resized = await sharp(inputPath)
@@ -122,12 +119,12 @@ async function optimizeWithPalette(
 async function processDirectory(
   inputDir: string,
   outputDir: string,
-  palette: ColorRGB[]
+  palette: ColorRGB[],
 ): Promise<number> {
   await fs.promises.mkdir(outputDir, { recursive: true });
 
   const files = (await fs.promises.readdir(inputDir)).filter(
-    f => f.endsWith('.PNG') || f.endsWith('.png')
+    f => f.endsWith('.PNG') || f.endsWith('.png'),
   );
 
   let count = 0;

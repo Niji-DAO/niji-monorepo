@@ -97,9 +97,10 @@ describe('NijiToken (edge cases)', () => {
       await limitedToken.mintBatch(other.address, 2);
 
       // Trying to mint 2 more should revert (only 1 remaining)
-      await expect(
-        limitedToken.mintBatch(other.address, 2),
-      ).to.be.revertedWithCustomError(limitedToken, 'MaxSupplyReached');
+      await expect(limitedToken.mintBatch(other.address, 2)).to.be.revertedWithCustomError(
+        limitedToken,
+        'MaxSupplyReached',
+      );
     });
 
     it('should succeed when minting exactly up to maxSupply', async () => {
@@ -146,21 +147,24 @@ describe('NijiToken (edge cases)', () => {
 
   describe('set* with zero address', () => {
     it('should revert setDescriptor with EmptyAddress', async () => {
-      await expect(
-        token.setDescriptor(ethers.ZeroAddress),
-      ).to.be.revertedWithCustomError(token, 'EmptyAddress');
+      await expect(token.setDescriptor(ethers.ZeroAddress)).to.be.revertedWithCustomError(
+        token,
+        'EmptyAddress',
+      );
     });
 
     it('should revert setSeeder with EmptyAddress', async () => {
-      await expect(
-        token.setSeeder(ethers.ZeroAddress),
-      ).to.be.revertedWithCustomError(token, 'EmptyAddress');
+      await expect(token.setSeeder(ethers.ZeroAddress)).to.be.revertedWithCustomError(
+        token,
+        'EmptyAddress',
+      );
     });
 
     it('should revert setMinter with EmptyAddress', async () => {
-      await expect(
-        token.setMinter(ethers.ZeroAddress),
-      ).to.be.revertedWithCustomError(token, 'EmptyAddress');
+      await expect(token.setMinter(ethers.ZeroAddress)).to.be.revertedWithCustomError(
+        token,
+        'EmptyAddress',
+      );
     });
   });
 
@@ -224,9 +228,7 @@ describe('NijiToken (edge cases)', () => {
       await token.setMinter(minter.address);
 
       // Old minter (owner) should fail
-      await expect(
-        token.mint(other.address),
-      ).to.be.revertedWithCustomError(token, 'OnlyMinter');
+      await expect(token.mint(other.address)).to.be.revertedWithCustomError(token, 'OnlyMinter');
 
       // New minter should succeed
       await token.connect(minter).mint(other.address);

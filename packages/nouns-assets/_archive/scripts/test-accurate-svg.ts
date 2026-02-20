@@ -27,7 +27,12 @@ const TRAIT_DIRS = [
   { dir: '12_髪の毛', name: 'hair' },
 ];
 
-interface ColorInfo { r: number; g: number; b: number; count: number; }
+interface ColorInfo {
+  r: number;
+  g: number;
+  b: number;
+  count: number;
+}
 
 function medianCutPalette(colors: ColorInfo[], targetSize: number): ColorInfo[] {
   if (colors.length <= targetSize) return colors;
@@ -37,49 +42,78 @@ function medianCutPalette(colors: ColorInfo[], targetSize: number): ColorInfo[] 
   }
   let buckets: ColorInfo[][] = [workingColors];
   while (buckets.length < targetSize) {
-    let maxRange = -1, maxBucketIdx = 0, splitChannel: 'r'|'g'|'b' = 'r';
+    let maxRange = -1,
+      maxBucketIdx = 0,
+      splitChannel: 'r' | 'g' | 'b' = 'r';
     for (let i = 0; i < buckets.length; i++) {
       const bucket = buckets[i];
       if (bucket.length < 2) continue;
-      for (const ch of ['r','g','b'] as const) {
-        let min=255, max=0;
-        for (const c of bucket) { if(c[ch]<min)min=c[ch]; if(c[ch]>max)max=c[ch]; }
-        let tc=0; for(const c of bucket) tc+=c.count;
-        const wr = (max-min)*Math.log(tc+1);
-        if(wr>maxRange){maxRange=wr;maxBucketIdx=i;splitChannel=ch;}
+      for (const ch of ['r', 'g', 'b'] as const) {
+        let min = 255,
+          max = 0;
+        for (const c of bucket) {
+          if (c[ch] < min) min = c[ch];
+          if (c[ch] > max) max = c[ch];
+        }
+        let tc = 0;
+        for (const c of bucket) tc += c.count;
+        const wr = (max - min) * Math.log(tc + 1);
+        if (wr > maxRange) {
+          maxRange = wr;
+          maxBucketIdx = i;
+          splitChannel = ch;
+        }
       }
     }
-    if(maxRange<=0)break;
-    const b=buckets[maxBucketIdx];
-    b.sort((a,c)=>a[splitChannel]-c[splitChannel]);
-    const m=Math.floor(b.length/2);
-    buckets.splice(maxBucketIdx,1,b.slice(0,m),b.slice(m));
+    if (maxRange <= 0) break;
+    const b = buckets[maxBucketIdx];
+    b.sort((a, c) => a[splitChannel] - c[splitChannel]);
+    const m = Math.floor(b.length / 2);
+    buckets.splice(maxBucketIdx, 1, b.slice(0, m), b.slice(m));
   }
-  return buckets.map(bucket=>{
-    let tc=0,rs=0,gs=0,bs=0;
-    for(const c of bucket){tc+=c.count;rs+=c.r*c.count;gs+=c.g*c.count;bs+=c.b*c.count;}
-    return{r:Math.round(rs/tc),g:Math.round(gs/tc),b:Math.round(bs/tc),count:tc};
+  return buckets.map(bucket => {
+    let tc = 0,
+      rs = 0,
+      gs = 0,
+      bs = 0;
+    for (const c of bucket) {
+      tc += c.count;
+      rs += c.r * c.count;
+      gs += c.g * c.count;
+      bs += c.b * c.count;
+    }
+    return { r: Math.round(rs / tc), g: Math.round(gs / tc), b: Math.round(bs / tc), count: tc };
   });
 }
 
-function findNearest(r:number,g:number,b:number,palette:ColorInfo[]):number{
-  let md=Infinity,mi=0;
-  for(let i=0;i<palette.length;i++){
-    const dr=r-palette[i].r,dg=g-palette[i].g,db=b-palette[i].b;
-    const d=2*dr*dr+4*dg*dg+3*db*db;
-    if(d<md){md=d;mi=i;}
+function findNearest(r: number, g: number, b: number, palette: ColorInfo[]): number {
+  let md = Infinity,
+    mi = 0;
+  for (let i = 0; i < palette.length; i++) {
+    const dr = r - palette[i].r,
+      dg = g - palette[i].g,
+      db = b - palette[i].b;
+    const d = 2 * dr * dr + 4 * dg * dg + 3 * db * db;
+    if (d < md) {
+      md = d;
+      mi = i;
+    }
   }
   return mi;
 }
 
 async function getAllSourceFiles() {
-  const files: {inputPath:string;traitName:string;fileName:string}[] = [];
-  for(const trait of TRAIT_DIRS){
-    const tp=path.join(BASE_DIR,trait.dir);
-    if(!fs.existsSync(tp))continue;
-    const df=fs.readdirSync(tp).filter(f=>f.endsWith('.PNG')||f.endsWith('.png'));
-    for(const file of df){
-      files.push({inputPath:path.join(tp,file),traitName:trait.name,fileName:file.replace(/\.png$/i,'')});
+  const files: { inputPath: string; traitName: string; fileName: string }[] = [];
+  for (const trait of TRAIT_DIRS) {
+    const tp = path.join(BASE_DIR, trait.dir);
+    if (!fs.existsSync(tp)) continue;
+    const df = fs.readdirSync(tp).filter(f => f.endsWith('.PNG') || f.endsWith('.png'));
+    for (const file of df) {
+      files.push({
+        inputPath: path.join(tp, file),
+        traitName: trait.name,
+        fileName: file.replace(/\.png$/i, ''),
+      });
     }
   }
   return files;
@@ -104,48 +138,72 @@ async function testResolution(resolution: number, paletteSize: number) {
   console.log('  色収集中...');
   const colorMap = new Map<string, ColorInfo>();
   for (const sf of sourceFiles) {
-    const {data} = await sharp(sf.inputPath)
-      .resize(resolution,resolution,{kernel:'lanczos3',fit:'contain',background:{r:0,g:0,b:0,alpha:0}})
-      .ensureAlpha().raw().toBuffer({resolveWithObject:true});
-    for(let i=0;i<data.length;i+=4){
-      if(data[i+3]<128)continue;
-      const key=`${data[i]},${data[i+1]},${data[i+2]}`;
-      const ex=colorMap.get(key);
-      if(ex)ex.count++;else colorMap.set(key,{r:data[i],g:data[i+1],b:data[i+2],count:1});
+    const { data } = await sharp(sf.inputPath)
+      .resize(resolution, resolution, {
+        kernel: 'lanczos3',
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      })
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] < 128) continue;
+      const key = `${data[i]},${data[i + 1]},${data[i + 2]}`;
+      const ex = colorMap.get(key);
+      if (ex) ex.count++;
+      else colorMap.set(key, { r: data[i], g: data[i + 1], b: data[i + 2], count: 1 });
     }
   }
 
   // Generate palette
   console.log(`  パレット生成 (${colorMap.size}色→${paletteSize}色)...`);
   const palette = medianCutPalette(Array.from(colorMap.values()), paletteSize);
-  const paletteHex = palette.map(c =>
-    `${c.r.toString(16).padStart(2,'0')}${c.g.toString(16).padStart(2,'0')}${c.b.toString(16).padStart(2,'0')}`
+  const paletteHex = palette.map(
+    c =>
+      `${c.r.toString(16).padStart(2, '0')}${c.g.toString(16).padStart(2, '0')}${c.b.toString(16).padStart(2, '0')}`,
   );
 
   // Apply palette and save PNGs
   console.log('  パレット適用中...');
-  const processedFiles: {path:string;traitName:string;fileName:string}[] = [];
+  const processedFiles: { path: string; traitName: string; fileName: string }[] = [];
   for (let i = 0; i < sourceFiles.length; i++) {
     const sf = sourceFiles[i];
     const op = path.join(outputDir, `${sf.traitName}_${sf.fileName}.png`);
-    const {data} = await sharp(sf.inputPath)
-      .resize(resolution,resolution,{kernel:'lanczos3',fit:'contain',background:{r:0,g:0,b:0,alpha:0}})
-      .ensureAlpha().raw().toBuffer({resolveWithObject:true});
-    for(let j=0;j<data.length;j+=4){
-      if(data[j+3]<128){data[j]=0;data[j+1]=0;data[j+2]=0;data[j+3]=0;continue;}
-      data[j+3]=255;
-      const idx=findNearest(data[j],data[j+1],data[j+2],palette);
-      data[j]=palette[idx].r;data[j+1]=palette[idx].g;data[j+2]=palette[idx].b;
+    const { data } = await sharp(sf.inputPath)
+      .resize(resolution, resolution, {
+        kernel: 'lanczos3',
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      })
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    for (let j = 0; j < data.length; j += 4) {
+      if (data[j + 3] < 128) {
+        data[j] = 0;
+        data[j + 1] = 0;
+        data[j + 2] = 0;
+        data[j + 3] = 0;
+        continue;
+      }
+      data[j + 3] = 255;
+      const idx = findNearest(data[j], data[j + 1], data[j + 2], palette);
+      data[j] = palette[idx].r;
+      data[j + 1] = palette[idx].g;
+      data[j + 2] = palette[idx].b;
     }
-    await sharp(data,{raw:{width:resolution,height:resolution,channels:4}}).png({compressionLevel:9}).toFile(op);
-    processedFiles.push({path:op,traitName:sf.traitName,fileName:sf.fileName});
-    if((i+1)%100===0)process.stdout.write(`  ${i+1}/${sourceFiles.length}\r`);
+    await sharp(data, { raw: { width: resolution, height: resolution, channels: 4 } })
+      .png({ compressionLevel: 9 })
+      .toFile(op);
+    processedFiles.push({ path: op, traitName: sf.traitName, fileName: sf.fileName });
+    if ((i + 1) % 100 === 0) process.stdout.write(`  ${i + 1}/${sourceFiles.length}\r`);
   }
 
   // RLE encode
   console.log('  RLEエンコード中...');
   const encoder = new PNGCollectionEncoder(paletteHex);
-  for(const pf of processedFiles){
+  for (const pf of processedFiles) {
     const png = await readPngImage(pf.path);
     encoder.encodeImage(pf.fileName, png, pf.traitName);
   }
@@ -167,7 +225,9 @@ async function testResolution(resolution: number, paletteSize: number) {
       // Check: do the bounds make sense?
       if (right > resolution || bottom > resolution || left > resolution) {
         // This shouldn't happen for ≤255 resolution
-        console.log(`  ⚠️  バウンドオーバーフロー: ${trait.name} top=${top} right=${right} bottom=${bottom} left=${left}`);
+        console.log(
+          `  ⚠️  バウンドオーバーフロー: ${trait.name} top=${top} right=${right} bottom=${bottom} left=${left}`,
+        );
         boundsOK = false;
       }
     }
@@ -213,7 +273,7 @@ async function testResolution(resolution: number, paletteSize: number) {
     // Pick image with most data (likely most visible)
     const validImages = images.filter((img: any) => img && img.data);
     if (validImages.length === 0) continue;
-    const best = validImages.reduce((a: any, b: any) => a.data.length > b.data.length ? a : b);
+    const best = validImages.reduce((a: any, b: any) => (a.data.length > b.data.length ? a : b));
     bestParts.push(best);
   }
 
@@ -271,7 +331,7 @@ async function main() {
   for (const r of results) {
     const verdict = r.gasMax < 30_000_000 ? '✅' : r.gasMin < 30_000_000 ? '⚠️' : '❌';
     console.log(
-      `${r.resolution.toString().padStart(7)} | ${r.paletteSize.toString().padStart(4)} | ${(r.svgSize/1024).toFixed(0).padStart(7)} KB | ${(r.svgBestSize/1024).toFixed(0).padStart(7)} KB | ${(r.gasMin/1e6).toFixed(1).padStart(7)}M | ${(r.gasMax/1e6).toFixed(1).padStart(7)}M | ${verdict}`
+      `${r.resolution.toString().padStart(7)} | ${r.paletteSize.toString().padStart(4)} | ${(r.svgSize / 1024).toFixed(0).padStart(7)} KB | ${(r.svgBestSize / 1024).toFixed(0).padStart(7)} KB | ${(r.gasMin / 1e6).toFixed(1).padStart(7)}M | ${(r.gasMax / 1e6).toFixed(1).padStart(7)}M | ${verdict}`,
     );
   }
 }

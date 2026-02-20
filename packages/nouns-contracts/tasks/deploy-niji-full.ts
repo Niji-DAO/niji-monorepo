@@ -22,41 +22,74 @@ const TRAIT_DIRS = [
 // 重ね順（下から上）: solidBackground → background → backDecoration → special → leftHand → back → clothing → choker → ear → hair → hat → headphone
 const COMPOSITE_ORDER = [10, 9, 8, 0, 3, 7, 5, 1, 6, 11, 4, 2];
 
-interface ColorInfo { r: number; g: number; b: number; count: number; }
+interface ColorInfo {
+  r: number;
+  g: number;
+  b: number;
+  count: number;
+}
 
 function medianCutPalette(colors: ColorInfo[], targetSize: number): ColorInfo[] {
   if (colors.length <= targetSize) return colors;
-  let wc = colors.length > 50000 ? [...colors].sort((a, b) => b.count - a.count).slice(0, 50000) : colors;
+  let wc =
+    colors.length > 50000 ? [...colors].sort((a, b) => b.count - a.count).slice(0, 50000) : colors;
   let buckets: ColorInfo[][] = [wc];
   while (buckets.length < targetSize) {
-    let mr = -1, mi = 0, sc: 'r'|'g'|'b' = 'r';
+    let mr = -1,
+      mi = 0,
+      sc: 'r' | 'g' | 'b' = 'r';
     for (let i = 0; i < buckets.length; i++) {
       if (buckets[i].length < 2) continue;
-      for (const ch of ['r','g','b'] as const) {
-        let mn=255,mx=0; for(const c of buckets[i]){if(c[ch]<mn)mn=c[ch];if(c[ch]>mx)mx=c[ch];}
-        let tc=0; for(const c of buckets[i])tc+=c.count;
-        const wr=(mx-mn)*Math.log(tc+1);
-        if(wr>mr){mr=wr;mi=i;sc=ch;}
+      for (const ch of ['r', 'g', 'b'] as const) {
+        let mn = 255,
+          mx = 0;
+        for (const c of buckets[i]) {
+          if (c[ch] < mn) mn = c[ch];
+          if (c[ch] > mx) mx = c[ch];
+        }
+        let tc = 0;
+        for (const c of buckets[i]) tc += c.count;
+        const wr = (mx - mn) * Math.log(tc + 1);
+        if (wr > mr) {
+          mr = wr;
+          mi = i;
+          sc = ch;
+        }
       }
     }
-    if(mr<=0)break;
-    const b=buckets[mi]; b.sort((a,c)=>a[sc]-c[sc]);
-    const m=Math.floor(b.length/2);
-    buckets.splice(mi,1,b.slice(0,m),b.slice(m));
+    if (mr <= 0) break;
+    const b = buckets[mi];
+    b.sort((a, c) => a[sc] - c[sc]);
+    const m = Math.floor(b.length / 2);
+    buckets.splice(mi, 1, b.slice(0, m), b.slice(m));
   }
-  return buckets.map(bk=>{
-    let tc=0,rs=0,gs=0,bs=0;
-    for(const c of bk){tc+=c.count;rs+=c.r*c.count;gs+=c.g*c.count;bs+=c.b*c.count;}
-    return{r:Math.round(rs/tc),g:Math.round(gs/tc),b:Math.round(bs/tc),count:tc};
+  return buckets.map(bk => {
+    let tc = 0,
+      rs = 0,
+      gs = 0,
+      bs = 0;
+    for (const c of bk) {
+      tc += c.count;
+      rs += c.r * c.count;
+      gs += c.g * c.count;
+      bs += c.b * c.count;
+    }
+    return { r: Math.round(rs / tc), g: Math.round(gs / tc), b: Math.round(bs / tc), count: tc };
   });
 }
 
-function findNearest(r:number,g:number,b:number,p:ColorInfo[]):number{
-  let md=Infinity,mi=0;
-  for(let i=0;i<p.length;i++){
-    const dr=r-p[i].r,dg=g-p[i].g,db=b-p[i].b;
-    const d=2*dr*dr+4*dg*dg+3*db*db;
-    if(d<md){md=d;mi=i;}
+function findNearest(r: number, g: number, b: number, p: ColorInfo[]): number {
+  let md = Infinity,
+    mi = 0;
+  for (let i = 0; i < p.length; i++) {
+    const dr = r - p[i].r,
+      dg = g - p[i].g,
+      db = b - p[i].b;
+    const d = 2 * dr * dr + 4 * dg * dg + 3 * db * db;
+    if (d < md) {
+      md = d;
+      mi = i;
+    }
   }
   return mi;
 }
@@ -92,12 +125,16 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
 
     if (!args.skipImages) {
       console.log('┌─ STEP 1: Preparing PNG Images ─────────────────────────────┐');
-      const allFiles: {inputPath:string;traitName:string;traitId:number}[] = [];
+      const allFiles: { inputPath: string; traitName: string; traitId: number }[] = [];
       for (const trait of TRAIT_DIRS) {
         const tp = path.join(BASE_DIR, trait.dir);
         if (!fs.existsSync(tp)) continue;
         for (const file of fs.readdirSync(tp).filter(f => /\.png$/i.test(f))) {
-          allFiles.push({ inputPath: path.join(tp, file), traitName: trait.name, traitId: trait.id });
+          allFiles.push({
+            inputPath: path.join(tp, file),
+            traitName: trait.name,
+            traitId: trait.id,
+          });
         }
       }
 
@@ -105,13 +142,20 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
       const colorMap = new Map<string, ColorInfo>();
       for (const sf of allFiles) {
         const { data } = await sharp(sf.inputPath)
-          .resize(RESOLUTION, RESOLUTION, { kernel: 'lanczos3', fit: 'contain', background: { r:0,g:0,b:0,alpha:0 } })
-          .ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+          .resize(RESOLUTION, RESOLUTION, {
+            kernel: 'lanczos3',
+            fit: 'contain',
+            background: { r: 0, g: 0, b: 0, alpha: 0 },
+          })
+          .ensureAlpha()
+          .raw()
+          .toBuffer({ resolveWithObject: true });
         for (let i = 0; i < data.length; i += 4) {
-          if (data[i+3] < 128) continue;
-          const key = `${data[i]},${data[i+1]},${data[i+2]}`;
+          if (data[i + 3] < 128) continue;
+          const key = `${data[i]},${data[i + 1]},${data[i + 2]}`;
           const ex = colorMap.get(key);
-          if (ex) ex.count++; else colorMap.set(key, { r: data[i], g: data[i+1], b: data[i+2], count: 1 });
+          if (ex) ex.count++;
+          else colorMap.set(key, { r: data[i], g: data[i + 1], b: data[i + 2], count: 1 });
         }
       }
       palette = medianCutPalette(Array.from(colorMap.values()), PALETTE_SIZE);
@@ -126,25 +170,44 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
         let bestOpaque = 0;
         for (const sf of traitFiles.slice(0, 5)) {
           const { data } = await sharp(sf.inputPath)
-            .resize(RESOLUTION, RESOLUTION, { kernel: 'lanczos3', fit: 'contain', background: { r:0,g:0,b:0,alpha:0 } })
-            .ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+            .resize(RESOLUTION, RESOLUTION, {
+              kernel: 'lanczos3',
+              fit: 'contain',
+              background: { r: 0, g: 0, b: 0, alpha: 0 },
+            })
+            .ensureAlpha()
+            .raw()
+            .toBuffer({ resolveWithObject: true });
           for (let j = 0; j < data.length; j += 4) {
-            if (data[j+3] < 128) { data[j]=0;data[j+1]=0;data[j+2]=0;data[j+3]=0; continue; }
-            data[j+3] = 255;
-            const idx = findNearest(data[j], data[j+1], data[j+2], palette);
-            data[j] = palette[idx].r; data[j+1] = palette[idx].g; data[j+2] = palette[idx].b;
+            if (data[j + 3] < 128) {
+              data[j] = 0;
+              data[j + 1] = 0;
+              data[j + 2] = 0;
+              data[j + 3] = 0;
+              continue;
+            }
+            data[j + 3] = 255;
+            const idx = findNearest(data[j], data[j + 1], data[j + 2], palette);
+            data[j] = palette[idx].r;
+            data[j + 1] = palette[idx].g;
+            data[j + 2] = palette[idx].b;
           }
           let opaque = 0;
           for (let j = 3; j < data.length; j += 4) if (data[j] > 0) opaque++;
           if (opaque > bestOpaque) {
             bestOpaque = opaque;
-            bestBuf = await sharp(data, { raw: { width: RESOLUTION, height: RESOLUTION, channels: 4 } })
-              .png({ compressionLevel: 9, palette: true, colors: PALETTE_SIZE }).toBuffer();
+            bestBuf = await sharp(data, {
+              raw: { width: RESOLUTION, height: RESOLUTION, channels: 4 },
+            })
+              .png({ compressionLevel: 9, palette: true, colors: PALETTE_SIZE })
+              .toBuffer();
           }
         }
         if (bestBuf) {
           samplePngs.set(trait.id, bestBuf);
-          console.log(`│   ${trait.name.padEnd(16)} ${(bestBuf.length / 1024).toFixed(1).padStart(6)}KB`);
+          console.log(
+            `│   ${trait.name.padEnd(16)} ${(bestBuf.length / 1024).toFixed(1).padStart(6)}KB`,
+          );
         }
       }
       console.log('└──────────────────────────────────────────────────────────────┘\n');
@@ -191,13 +254,7 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
       const NijiToken = await ethers.getContractFactory('NijiToken');
       const descriptorAddress = await descriptor.getAddress();
       const seederAddress = await seeder.getAddress();
-      token = await NijiToken.deploy(
-        'Niji',
-        'NIJI',
-        descriptorAddress,
-        seederAddress,
-        MAX_SUPPLY
-      );
+      token = await NijiToken.deploy('Niji', 'NIJI', descriptorAddress, seederAddress, MAX_SUPPLY);
       await token.waitForDeployment();
       console.log(`│ NijiToken deployed: ${await token.getAddress()}`);
       console.log('└──────────────────────────────────────────────────────────────┘\n');
@@ -218,7 +275,9 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
           const tx = await art.addTraitImage(trait.id, pngBuf, { gasLimit: 5000000 });
           const receipt = await tx.wait();
           totalDeployGas = totalDeployGas + receipt!.gasUsed;
-          console.log(`│ ${trait.name.padEnd(16)} ${pngBuf.length.toString().padStart(6)}B → ${receipt!.gasUsed.toLocaleString().padStart(10)} gas`);
+          console.log(
+            `│ ${trait.name.padEnd(16)} ${pngBuf.length.toString().padStart(6)}B → ${receipt!.gasUsed.toLocaleString().padStart(10)} gas`,
+          );
         } catch (e: any) {
           console.error(`│ ${trait.name.padEnd(16)} FAILED: ${e.message.slice(0, 50)}`);
         }
@@ -245,7 +304,7 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     // =========================================
     if (samplePngs.size > 0) {
       console.log('┌─ STEP 8: Test tokenURI ─────────────────────────────────────┐');
-      const traitIndices = TRAIT_DIRS.map(t => samplePngs.has(t.id) ? 0 : ethers.MaxUint256);
+      const traitIndices = TRAIT_DIRS.map(t => (samplePngs.has(t.id) ? 0 : ethers.MaxUint256));
 
       try {
         const gasEstimate = await descriptor.tokenURI.estimateGas(0, traitIndices);
@@ -267,7 +326,6 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
         const outputDir = path.join(__dirname, '../../nouns-assets/test_output');
         fs.mkdirSync(outputDir, { recursive: true });
         fs.writeFileSync(path.join(outputDir, 'niji-tokenuri.svg'), svg);
-
       } catch (e: any) {
         console.error(`│ ERROR: ${e.message}`);
       }

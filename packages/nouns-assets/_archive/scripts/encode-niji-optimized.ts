@@ -30,9 +30,7 @@ async function encodeNiji() {
   console.log(`Output file: ${OUTPUT_FILE}\n`);
 
   // Load global palette
-  const paletteHex: string[] = JSON.parse(
-    fs.readFileSync(PALETTE_FILE, 'utf-8')
-  );
+  const paletteHex: string[] = JSON.parse(fs.readFileSync(PALETTE_FILE, 'utf-8'));
   console.log(`✓ Loaded global palette with ${paletteHex.length} colors\n`);
 
   // Create encoder instance with pre-defined palette

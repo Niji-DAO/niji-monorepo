@@ -83,9 +83,7 @@ describe('V3 Vote Refund', () => {
       expect(balanceDiff).to.be.closeTo(0n, REFUND_ERROR_MARGIN);
       expectRefundEvent(r, user, await txCostInEth(r));
       const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
-      await expect(tx)
-        .to.emit(govWithEvents, 'VoteCast')
-        .withArgs(user.address, 1n, 1, 2, '');
+      await expect(tx).to.emit(govWithEvents, 'VoteCast').withArgs(user.address, 1n, 1, 2, '');
     });
 
     it('does not refund users with no votes', async () => {
@@ -382,10 +380,17 @@ describe('V3 Vote Refund', () => {
   }
 
   async function fundGov(ethAmount: string = '100') {
-    await deployer.sendTransaction({ to: await gov.getAddress(), value: ethers.parseEther(ethAmount) });
+    await deployer.sendTransaction({
+      to: await gov.getAddress(),
+      value: ethers.parseEther(ethAmount),
+    });
   }
 
-  function expectRefundEvent(r: ContractTransactionReceipt, u: SignerWithAddress, expectedCost: bigint) {
+  function expectRefundEvent(
+    r: ContractTransactionReceipt,
+    u: SignerWithAddress,
+    expectedCost: bigint,
+  ) {
     // Not using expect emit because it doesn't support the `closeTo` matcher
     // Using longer event parsing because r.events doesn't work when using the Voter contract
     // to simulate multisig usage; events are returned undefined

@@ -20,7 +20,7 @@
 
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src", "typechain", "abi/**/*.json"]
 }

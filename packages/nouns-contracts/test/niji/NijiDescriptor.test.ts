@@ -54,14 +54,14 @@ describe('NijiDescriptor', () => {
     it('should revert if art is zero address', async () => {
       const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
       await expect(
-        NijiDescriptorFactory.deploy(ethers.ZeroAddress, RESOLUTION, COMPOSITE_ORDER)
+        NijiDescriptorFactory.deploy(ethers.ZeroAddress, RESOLUTION, COMPOSITE_ORDER),
       ).to.be.revertedWithCustomError(NijiDescriptorFactory, 'EmptyArtAddress');
     });
 
     it('should revert if resolution is zero', async () => {
       const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
       await expect(
-        NijiDescriptorFactory.deploy(await art.getAddress(), 0, COMPOSITE_ORDER)
+        NijiDescriptorFactory.deploy(await art.getAddress(), 0, COMPOSITE_ORDER),
       ).to.be.revertedWithCustomError(NijiDescriptorFactory, 'InvalidResolution');
     });
   });
@@ -71,14 +71,14 @@ describe('NijiDescriptor', () => {
       // Add sample images to art (need owner as descriptor first)
       await art.transferDescriptor(owner.address);
       await art.addTraitImage(10, SAMPLE_PNG); // solidBackground
-      await art.addTraitImage(9, SAMPLE_PNG);  // background
+      await art.addTraitImage(9, SAMPLE_PNG); // background
     });
 
     it('should generate valid SVG', async () => {
       // Skip traits without images
       const traitIndices = Array(12).fill(ethers.MaxUint256);
       traitIndices[10] = 0; // solidBackground
-      traitIndices[9] = 0;  // background
+      traitIndices[9] = 0; // background
 
       const svg = await descriptor.generateSVG(traitIndices);
 
@@ -122,7 +122,10 @@ describe('NijiDescriptor', () => {
     });
 
     it('should revert for empty trait indices', async () => {
-      await expect(descriptor.tokenURI(0, [])).to.be.revertedWithCustomError(descriptor, 'EmptyTraitIndices');
+      await expect(descriptor.tokenURI(0, [])).to.be.revertedWithCustomError(
+        descriptor,
+        'EmptyTraitIndices',
+      );
     });
   });
 
@@ -198,9 +201,10 @@ describe('NijiDescriptor', () => {
     });
 
     it('should revert if caller is not owner', async () => {
-      await expect(
-        descriptor.connect(other).setArt(other.address)
-      ).to.be.revertedWithCustomError(descriptor, 'OwnableUnauthorizedAccount');
+      await expect(descriptor.connect(other).setArt(other.address)).to.be.revertedWithCustomError(
+        descriptor,
+        'OwnableUnauthorizedAccount',
+      );
     });
   });
 
@@ -214,7 +218,10 @@ describe('NijiDescriptor', () => {
     });
 
     it('should revert for zero resolution', async () => {
-      await expect(descriptor.setResolution(0)).to.be.revertedWithCustomError(descriptor, 'InvalidResolution');
+      await expect(descriptor.setResolution(0)).to.be.revertedWithCustomError(
+        descriptor,
+        'InvalidResolution',
+      );
     });
   });
 
@@ -269,7 +276,10 @@ describe('NijiDescriptor', () => {
 
     it('should escape double quotes in name and JSON.parse succeeds', async () => {
       const uri = await descriptor.tokenURIWithMetadata(
-        0, traitIndices(), 'My "Cool" Art', 'A description'
+        0,
+        traitIndices(),
+        'My "Cool" Art',
+        'A description',
       );
       // JSON.parse succeeds = escaping is correct (would throw on unescaped ")
       const json = decodeTokenURI(uri);
@@ -279,16 +289,17 @@ describe('NijiDescriptor', () => {
 
     it('should escape backslash in name and JSON.parse succeeds', async () => {
       const uri = await descriptor.tokenURIWithMetadata(
-        0, traitIndices(), 'path\\to\\art', 'A description'
+        0,
+        traitIndices(),
+        'path\\to\\art',
+        'A description',
       );
       const json = decodeTokenURI(uri);
       expect(json.name).to.equal('path\\to\\art #0');
     });
 
     it('should escape newline in description and JSON.parse succeeds', async () => {
-      const uri = await descriptor.tokenURIWithMetadata(
-        0, traitIndices(), 'Art', 'Line1\nLine2'
-      );
+      const uri = await descriptor.tokenURIWithMetadata(0, traitIndices(), 'Art', 'Line1\nLine2');
       const json = decodeTokenURI(uri);
       // JSON.parse converts \n back to actual newline
       expect(json.description).to.equal('Line1\nLine2');
@@ -296,7 +307,10 @@ describe('NijiDescriptor', () => {
 
     it('should escape control characters in description and JSON.parse succeeds', async () => {
       const uri = await descriptor.tokenURIWithMetadata(
-        0, traitIndices(), 'Art', 'before\x01after'
+        0,
+        traitIndices(),
+        'Art',
+        'before\x01after',
       );
       const json = decodeTokenURI(uri);
       // JSON.parse converts \u0001 back to actual control char
@@ -305,7 +319,10 @@ describe('NijiDescriptor', () => {
 
     it('should handle mixed special characters', async () => {
       const uri = await descriptor.tokenURIWithMetadata(
-        0, traitIndices(), 'He said "hi"\\wow', 'tab\there\nnewline'
+        0,
+        traitIndices(),
+        'He said "hi"\\wow',
+        'tab\there\nnewline',
       );
       const json = decodeTokenURI(uri);
       expect(json.name).to.equal('He said "hi"\\wow #0');
@@ -314,7 +331,10 @@ describe('NijiDescriptor', () => {
 
     it('should not alter safe strings', async () => {
       const uri = await descriptor.tokenURIWithMetadata(
-        0, traitIndices(), 'SafeName', 'Safe description with spaces and 123'
+        0,
+        traitIndices(),
+        'SafeName',
+        'Safe description with spaces and 123',
       );
       const json = decodeTokenURI(uri);
       expect(json.name).to.equal('SafeName #0');
@@ -332,7 +352,9 @@ describe('NijiDescriptor', () => {
 
       const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
       const specialDescriptor = (await NijiDescriptorFactory.deploy(
-        await specialArt.getAddress(), RESOLUTION, [0]
+        await specialArt.getAddress(),
+        RESOLUTION,
+        [0],
       )) as unknown as NijiDescriptor;
 
       await specialArt.setDescriptor(await specialDescriptor.getAddress());

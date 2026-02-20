@@ -34,7 +34,8 @@ describe('NijiToken', () => {
     descriptor = await deployNijiDescriptor(await art.getAddress());
     seeder = await deployNijiSeeder(await art.getAddress());
     token = await deployNijiToken(
-      'Niji', 'NIJI',
+      'Niji',
+      'NIJI',
       await descriptor.getAddress(),
       await seeder.getAddress(),
       MAX_SUPPLY,
@@ -93,8 +94,7 @@ describe('NijiToken', () => {
     });
 
     it('should emit NijiMinted event', async () => {
-      await expect(token.mint(other.address))
-        .to.emit(token, 'NijiMinted');
+      await expect(token.mint(other.address)).to.emit(token, 'NijiMinted');
     });
 
     it('should store seed for token', async () => {
@@ -109,17 +109,24 @@ describe('NijiToken', () => {
     it('should revert if minting is not active', async () => {
       await token.toggleMinting(); // Turn off
 
-      await expect(token.mint(other.address)).to.be.revertedWithCustomError(token, 'MintingNotActive');
+      await expect(token.mint(other.address)).to.be.revertedWithCustomError(
+        token,
+        'MintingNotActive',
+      );
     });
 
     it('should revert if caller is not minter', async () => {
-      await expect(token.connect(other).mint(other.address)).to.be.revertedWithCustomError(token, 'OnlyMinter');
+      await expect(token.connect(other).mint(other.address)).to.be.revertedWithCustomError(
+        token,
+        'OnlyMinter',
+      );
     });
 
     it('should revert if max supply reached', async () => {
       // Deploy with max supply of 1
       const limitedToken = await deployNijiToken(
-        'Niji', 'NIJI',
+        'Niji',
+        'NIJI',
         await descriptor.getAddress(),
         await seeder.getAddress(),
         1,
@@ -127,7 +134,10 @@ describe('NijiToken', () => {
       await limitedToken.toggleMinting();
 
       await limitedToken.mint(other.address);
-      await expect(limitedToken.mint(other.address)).to.be.revertedWithCustomError(limitedToken, 'MaxSupplyReached');
+      await expect(limitedToken.mint(other.address)).to.be.revertedWithCustomError(
+        limitedToken,
+        'MaxSupplyReached',
+      );
     });
   });
 
@@ -231,9 +241,10 @@ describe('NijiToken', () => {
     });
 
     it('should revert if caller is not owner', async () => {
-      await expect(
-        token.connect(other).setDescriptor(other.address)
-      ).to.be.revertedWithCustomError(token, 'OwnableUnauthorizedAccount');
+      await expect(token.connect(other).setDescriptor(other.address)).to.be.revertedWithCustomError(
+        token,
+        'OwnableUnauthorizedAccount',
+      );
     });
   });
 
@@ -281,9 +292,7 @@ describe('NijiToken', () => {
     });
 
     it('should emit MintingToggled event', async () => {
-      await expect(token.toggleMinting())
-        .to.emit(token, 'MintingToggled')
-        .withArgs(true);
+      await expect(token.toggleMinting()).to.emit(token, 'MintingToggled').withArgs(true);
     });
   });
 
@@ -334,9 +343,10 @@ describe('NijiToken', () => {
     });
 
     it('should revert if caller is not owner', async () => {
-      await expect(
-        token.connect(other).setContractURIHash('QmTest')
-      ).to.be.revertedWithCustomError(token, 'OwnableUnauthorizedAccount');
+      await expect(token.connect(other).setContractURIHash('QmTest')).to.be.revertedWithCustomError(
+        token,
+        'OwnableUnauthorizedAccount',
+      );
     });
   });
 
@@ -369,14 +379,15 @@ describe('NijiToken', () => {
       await token.setProvenanceHash(SAMPLE_HASH);
       await token.lockProvenanceHash();
 
-      await expect(
-        token.setProvenanceHash('new_hash')
-      ).to.be.revertedWithCustomError(token, 'ProvenanceHashLocked');
+      await expect(token.setProvenanceHash('new_hash')).to.be.revertedWithCustomError(
+        token,
+        'ProvenanceHashLocked',
+      );
     });
 
     it('should revert if non-owner calls setProvenanceHash', async () => {
       await expect(
-        token.connect(other).setProvenanceHash(SAMPLE_HASH)
+        token.connect(other).setProvenanceHash(SAMPLE_HASH),
       ).to.be.revertedWithCustomError(token, 'OwnableUnauthorizedAccount');
     });
   });
@@ -408,7 +419,8 @@ describe('NijiToken', () => {
 
     it('should return max uint for unlimited supply', async () => {
       const unlimitedToken = await deployNijiToken(
-        'Niji', 'NIJI',
+        'Niji',
+        'NIJI',
         await descriptor.getAddress(),
         await seeder.getAddress(),
         0, // unlimited

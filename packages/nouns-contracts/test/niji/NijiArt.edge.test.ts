@@ -2,11 +2,7 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { NijiArt } from '../../typechain';
-import {
-  TRAIT_COUNT,
-  SAMPLE_PNG,
-  deployNijiArt,
-} from './helpers';
+import { TRAIT_COUNT, SAMPLE_PNG, deployNijiArt } from './helpers';
 
 describe('NijiArt (edge cases)', () => {
   let art: NijiArt;
@@ -66,10 +62,7 @@ describe('NijiArt (edge cases)', () => {
 
   describe('getTraitImage edge cases', () => {
     it('should revert at index 0 when trait has no images', async () => {
-      await expect(art.getTraitImage(0, 0)).to.be.revertedWithCustomError(
-        art,
-        'InvalidImageIndex',
-      );
+      await expect(art.getTraitImage(0, 0)).to.be.revertedWithCustomError(art, 'InvalidImageIndex');
     });
 
     it('should succeed at last valid imageIndex', async () => {
@@ -81,10 +74,7 @@ describe('NijiArt (edge cases)', () => {
 
     it('should revert at imageIndex = imageCount (just out of bounds)', async () => {
       await art.connect(descriptor).addTraitImage(0, SAMPLE_PNG);
-      await expect(art.getTraitImage(0, 1)).to.be.revertedWithCustomError(
-        art,
-        'InvalidImageIndex',
-      );
+      await expect(art.getTraitImage(0, 1)).to.be.revertedWithCustomError(art, 'InvalidImageIndex');
     });
   });
 
@@ -94,10 +84,7 @@ describe('NijiArt (edge cases)', () => {
 
   describe('getTraitPointer edge cases', () => {
     it('should revert for invalid traitId', async () => {
-      await expect(art.getTraitPointer(99, 0)).to.be.revertedWithCustomError(
-        art,
-        'InvalidTraitId',
-      );
+      await expect(art.getTraitPointer(99, 0)).to.be.revertedWithCustomError(art, 'InvalidTraitId');
     });
 
     it('should revert for out-of-bounds imageIndex', async () => {
@@ -116,10 +103,7 @@ describe('NijiArt (edge cases)', () => {
 
   describe('getTraitPointers edge cases', () => {
     it('should revert for invalid traitId', async () => {
-      await expect(art.getTraitPointers(99)).to.be.revertedWithCustomError(
-        art,
-        'InvalidTraitId',
-      );
+      await expect(art.getTraitPointers(99)).to.be.revertedWithCustomError(art, 'InvalidTraitId');
     });
 
     it('should return empty array when no images stored', async () => {

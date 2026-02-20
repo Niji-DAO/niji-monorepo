@@ -19,7 +19,8 @@ async function createGlobalPalette(traitDirs: string[], baseInputDir: string): P
     const dirPath = path.join(baseInputDir, dir);
     if (!fs.existsSync(dirPath)) continue;
 
-    const files = fs.readdirSync(dirPath)
+    const files = fs
+      .readdirSync(dirPath)
       .filter(f => f.endsWith('.PNG') || f.endsWith('.png'))
       .slice(0, 10); // Sample first 10 images per category
 
@@ -40,7 +41,10 @@ async function createGlobalPalette(traitDirs: string[], baseInputDir: string): P
     const y = Math.floor(i / GRID_SIZE) * SAMPLE_SIZE;
 
     const resized = await sharp(sampleImages[i])
-      .resize(SAMPLE_SIZE, SAMPLE_SIZE, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .resize(SAMPLE_SIZE, SAMPLE_SIZE, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      })
       .toBuffer();
 
     compositeOps.push({ input: resized, top: y, left: x });
@@ -52,12 +56,12 @@ async function createGlobalPalette(traitDirs: string[], baseInputDir: string): P
       width: GRID_SIZE * SAMPLE_SIZE,
       height: GRID_SIZE * SAMPLE_SIZE,
       channels: 4,
-      background: { r: 0, g: 0, b: 0, alpha: 0 }
-    }
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    },
   })
-  .composite(compositeOps)
-  .png({ palette: true, colors: GLOBAL_PALETTE_SIZE, dither: 1.0 })
-  .toBuffer();
+    .composite(compositeOps)
+    .png({ palette: true, colors: GLOBAL_PALETTE_SIZE, dither: 1.0 })
+    .toBuffer();
 
   console.log(`  ✓ Global palette created from ${sampleImages.length} sample images`);
 
@@ -70,7 +74,7 @@ async function createGlobalPalette(traitDirs: string[], baseInputDir: string): P
 async function optimizeImageWithPalette(
   inputPath: string,
   outputPath: string,
-  paletteSample: Buffer
+  paletteSample: Buffer,
 ): Promise<{ originalSize: number; optimizedSize: number }> {
   const originalStats = fs.statSync(inputPath);
   const originalSize = originalStats.size;
@@ -171,9 +175,7 @@ async function main() {
 
     await fs.promises.mkdir(outputDir, { recursive: true });
 
-    const files = fs
-      .readdirSync(inputDir)
-      .filter(f => f.endsWith('.PNG') || f.endsWith('.png'));
+    const files = fs.readdirSync(inputDir).filter(f => f.endsWith('.PNG') || f.endsWith('.png'));
 
     console.log(`  Processing ${files.length} images...`);
 
@@ -182,11 +184,7 @@ async function main() {
       const outputPath = path.join(outputDir, file);
 
       try {
-        const result = await optimizeImageWithPalette(
-          inputPath,
-          outputPath,
-          paletteSample
-        );
+        const result = await optimizeImageWithPalette(inputPath, outputPath, paletteSample);
 
         totalOriginal += result.originalSize;
         totalOptimized += result.optimizedSize;
@@ -207,12 +205,8 @@ async function main() {
   console.log(`Total images: ${totalImages}`);
   console.log(`Original total: ${(totalOriginal / 1024 / 1024).toFixed(2)} MB`);
   console.log(`Optimized total: ${(totalOptimized / 1024 / 1024).toFixed(2)} MB`);
-  console.log(
-    `Compression ratio: ${((totalOptimized / totalOriginal) * 100).toFixed(1)}%`
-  );
-  console.log(
-    `Space saved: ${((totalOriginal - totalOptimized) / 1024 / 1024).toFixed(2)} MB`
-  );
+  console.log(`Compression ratio: ${((totalOptimized / totalOriginal) * 100).toFixed(1)}%`);
+  console.log(`Space saved: ${((totalOriginal - totalOptimized) / 1024 / 1024).toFixed(2)} MB`);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

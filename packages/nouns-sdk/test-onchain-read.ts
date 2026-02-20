@@ -32,12 +32,17 @@ async function testOnChainRead() {
 
     console.log('✓ SUCCESS: SVG generated from on-chain!');
     console.log('  Time:', duration + 'ms');
-    console.log('  SVG size:', svg.length.toLocaleString(), 'chars,', (svg.length / 1024).toFixed(2), 'KB');
+    console.log(
+      '  SVG size:',
+      svg.length.toLocaleString(),
+      'chars,',
+      (svg.length / 1024).toFixed(2),
+      'KB',
+    );
 
     fs.mkdirSync('../nouns-assets/test_output', { recursive: true });
     fs.writeFileSync('../nouns-assets/test_output/onchain-nouns-read.svg', svg);
     console.log('  Saved: packages/nouns-assets/test_output/onchain-nouns-read.svg\n');
-
   } catch (error: any) {
     console.error('✗ FAILED:', error.message);
 

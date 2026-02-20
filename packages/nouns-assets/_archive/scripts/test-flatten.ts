@@ -32,42 +32,74 @@ const TRAIT_DIRS = [
   { dir: '12_髪の毛', name: 'hair' },
 ];
 
-interface ColorInfo { r: number; g: number; b: number; count: number; }
+interface ColorInfo {
+  r: number;
+  g: number;
+  b: number;
+  count: number;
+}
 
 function medianCutPalette(colors: ColorInfo[], targetSize: number): ColorInfo[] {
   if (colors.length <= targetSize) return colors;
-  let wc = colors.length > 50000 ? [...colors].sort((a, b) => b.count - a.count).slice(0, 50000) : colors;
+  let wc =
+    colors.length > 50000 ? [...colors].sort((a, b) => b.count - a.count).slice(0, 50000) : colors;
   let buckets: ColorInfo[][] = [wc];
   while (buckets.length < targetSize) {
-    let mr = -1, mi = 0, sc: 'r' | 'g' | 'b' = 'r';
+    let mr = -1,
+      mi = 0,
+      sc: 'r' | 'g' | 'b' = 'r';
     for (let i = 0; i < buckets.length; i++) {
       if (buckets[i].length < 2) continue;
       for (const ch of ['r', 'g', 'b'] as const) {
-        let mn = 255, mx = 0;
-        for (const c of buckets[i]) { if (c[ch] < mn) mn = c[ch]; if (c[ch] > mx) mx = c[ch]; }
-        let tc = 0; for (const c of buckets[i]) tc += c.count;
+        let mn = 255,
+          mx = 0;
+        for (const c of buckets[i]) {
+          if (c[ch] < mn) mn = c[ch];
+          if (c[ch] > mx) mx = c[ch];
+        }
+        let tc = 0;
+        for (const c of buckets[i]) tc += c.count;
         const wr = (mx - mn) * Math.log(tc + 1);
-        if (wr > mr) { mr = wr; mi = i; sc = ch; }
+        if (wr > mr) {
+          mr = wr;
+          mi = i;
+          sc = ch;
+        }
       }
     }
     if (mr <= 0) break;
-    const b = buckets[mi]; b.sort((a, c) => a[sc] - c[sc]);
+    const b = buckets[mi];
+    b.sort((a, c) => a[sc] - c[sc]);
     const m = Math.floor(b.length / 2);
     buckets.splice(mi, 1, b.slice(0, m), b.slice(m));
   }
   return buckets.map(bk => {
-    let tc = 0, rs = 0, gs = 0, bs = 0;
-    for (const c of bk) { tc += c.count; rs += c.r * c.count; gs += c.g * c.count; bs += c.b * c.count; }
+    let tc = 0,
+      rs = 0,
+      gs = 0,
+      bs = 0;
+    for (const c of bk) {
+      tc += c.count;
+      rs += c.r * c.count;
+      gs += c.g * c.count;
+      bs += c.b * c.count;
+    }
     return { r: Math.round(rs / tc), g: Math.round(gs / tc), b: Math.round(bs / tc), count: tc };
   });
 }
 
 function findNearest(r: number, g: number, b: number, p: ColorInfo[]): number {
-  let md = Infinity, mi = 0;
+  let md = Infinity,
+    mi = 0;
   for (let i = 0; i < p.length; i++) {
-    const dr = r - p[i].r, dg = g - p[i].g, db = b - p[i].b;
+    const dr = r - p[i].r,
+      dg = g - p[i].g,
+      db = b - p[i].b;
     const d = 2 * dr * dr + 4 * dg * dg + 3 * db * db;
-    if (d < md) { md = d; mi = i; }
+    if (d < md) {
+      md = d;
+      mi = i;
+    }
   }
   return mi;
 }
@@ -77,12 +109,7 @@ function findNearest(r: number, g: number, b: number, p: ColorInfo[]): number {
  * For each row, scan pixels left→right. If a pixel's RGB distance to its left neighbor
  * is small, snap it to that neighbor's color. This increases RLE run lengths.
  */
-function flattenHorizontal(
-  data: Buffer,
-  width: number,
-  height: number,
-  threshold: number
-): void {
+function flattenHorizontal(data: Buffer, width: number, height: number, threshold: number): void {
   for (let y = 0; y < height; y++) {
     for (let x = 1; x < width; x++) {
       const i = (y * width + x) * 4;
@@ -107,12 +134,7 @@ function flattenHorizontal(
  * above is small, snap it to the upper pixel's color.
  * This prevents horizontal banding caused by row-only flattening.
  */
-function flattenVertical(
-  data: Buffer,
-  width: number,
-  height: number,
-  threshold: number
-): void {
+function flattenVertical(data: Buffer, width: number, height: number, threshold: number): void {
   for (let x = 0; x < width; x++) {
     for (let y = 1; y < height; y++) {
       const i = (y * width + x) * 4;
@@ -142,7 +164,7 @@ function flatten2D(
   width: number,
   height: number,
   hThreshold: number,
-  vThreshold: number
+  vThreshold: number,
 ): void {
   // Vertical first to unify colors across rows (reduces banding)
   if (vThreshold > 0) flattenVertical(data, width, height, vThreshold);
@@ -161,7 +183,7 @@ function modeFilter(
   height: number,
   palette: ColorInfo[],
   radius: number,
-  iterations: number
+  iterations: number,
 ): void {
   // First, create palette index map
   const idxMap = new Uint8Array(width * height);
@@ -206,7 +228,8 @@ function modeFilter(
         if (total === 0) continue;
 
         // Find most common color
-        let maxCount = 0, maxIdx = idxMap[pos];
+        let maxCount = 0,
+          maxIdx = idxMap[pos];
         for (let c = 0; c < palette.length; c++) {
           if (counts[c] > maxCount) {
             maxCount = counts[c];
@@ -244,7 +267,7 @@ function weightedModeFilter(
   palette: ColorInfo[],
   radius: number,
   similarityThreshold: number,
-  iterations: number
+  iterations: number,
 ): void {
   const idxMap = new Uint8Array(width * height);
   const alphaMap = new Uint8Array(width * height);
@@ -269,7 +292,9 @@ function weightedModeFilter(
         if (alphaMap[pos] === 0) continue;
 
         const centerIdx = idxMap[pos];
-        const cR = palette[centerIdx].r, cG = palette[centerIdx].g, cB = palette[centerIdx].b;
+        const cR = palette[centerIdx].r,
+          cG = palette[centerIdx].g,
+          cB = palette[centerIdx].b;
 
         weights.fill(0);
         const yMin = Math.max(0, y - radius);
@@ -282,8 +307,12 @@ function weightedModeFilter(
             const npos = ny * width + nx;
             if (alphaMap[npos] === 0) continue;
             const nIdx = idxMap[npos];
-            const nR = palette[nIdx].r, nG = palette[nIdx].g, nB = palette[nIdx].b;
-            const dr = cR - nR, dg = cG - nG, db = cB - nB;
+            const nR = palette[nIdx].r,
+              nG = palette[nIdx].g,
+              nB = palette[nIdx].b;
+            const dr = cR - nR,
+              dg = cG - nG,
+              db = cB - nB;
             const dist = 2 * dr * dr + 4 * dg * dg + 3 * db * db;
             // Only count if similar enough to center
             if (dist < similarityThreshold) {
@@ -293,7 +322,8 @@ function weightedModeFilter(
         }
 
         // Find highest weight
-        let maxW = 0, maxIdx = centerIdx;
+        let maxW = 0,
+          maxIdx = centerIdx;
         for (let c = 0; c < palette.length; c++) {
           if (weights[c] > maxW) {
             maxW = weights[c];
@@ -324,19 +354,18 @@ function weightedModeFilter(
  * After palette mapping, find runs shorter than minRun and merge them
  * into the longer adjacent run.
  */
-function eliminateShortRuns(
-  data: Buffer,
-  width: number,
-  height: number,
-  minRun: number
-): void {
+function eliminateShortRuns(data: Buffer, width: number, height: number, minRun: number): void {
   for (let y = 0; y < height; y++) {
     // Find runs in this row
-    const runs: { start: number; length: number; r: number; g: number; b: number; a: number }[] = [];
+    const runs: { start: number; length: number; r: number; g: number; b: number; a: number }[] =
+      [];
     let runStart = 0;
     for (let x = 0; x < width; x++) {
       const i = (y * width + x) * 4;
-      const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+      const r = data[i],
+        g = data[i + 1],
+        b = data[i + 2],
+        a = data[i + 3];
 
       if (x === 0) {
         runs.push({ start: 0, length: 1, r, g, b, a });
@@ -386,12 +415,24 @@ function eliminateShortRuns(
           run.b = mergeInto.b;
 
           // Merge adjacent same-color runs
-          if (ri > 0 && runs[ri - 1].r === run.r && runs[ri - 1].g === run.g && runs[ri - 1].b === run.b && runs[ri - 1].a === run.a) {
+          if (
+            ri > 0 &&
+            runs[ri - 1].r === run.r &&
+            runs[ri - 1].g === run.g &&
+            runs[ri - 1].b === run.b &&
+            runs[ri - 1].a === run.a
+          ) {
             runs[ri - 1].length += run.length;
             runs.splice(ri, 1);
             ri--;
           }
-          if (ri < runs.length - 1 && runs[ri + 1].r === runs[ri].r && runs[ri + 1].g === runs[ri].g && runs[ri + 1].b === runs[ri].b && runs[ri + 1].a === runs[ri].a) {
+          if (
+            ri < runs.length - 1 &&
+            runs[ri + 1].r === runs[ri].r &&
+            runs[ri + 1].g === runs[ri].g &&
+            runs[ri + 1].b === runs[ri].b &&
+            runs[ri + 1].a === runs[ri].a
+          ) {
             runs[ri].length += runs[ri + 1].length;
             runs.splice(ri + 1, 1);
           }
@@ -408,12 +449,12 @@ interface TestConfig {
   paletteSize: number;
   // Mode filter settings (applied before palette mapping)
   mode: 'none' | 'flatten2d' | 'modeFilter' | 'weightedMode' | 'nearest';
-  flattenH: number;            // For flatten2d
-  flattenV: number;            // For flatten2d
-  modeRadius: number;          // For modeFilter/weightedMode
-  modeIterations: number;      // For modeFilter/weightedMode
-  modeSimilarity: number;      // For weightedMode threshold
-  minRunLength: number;        // Short run elimination after all processing
+  flattenH: number; // For flatten2d
+  flattenV: number; // For flatten2d
+  modeRadius: number; // For modeFilter/weightedMode
+  modeIterations: number; // For modeFilter/weightedMode
+  modeSimilarity: number; // For weightedMode threshold
+  minRunLength: number; // Short run elimination after all processing
 }
 
 async function getAllSourceFiles() {
@@ -422,21 +463,45 @@ async function getAllSourceFiles() {
     const tp = path.join(BASE_DIR, trait.dir);
     if (!fs.existsSync(tp)) continue;
     for (const file of fs.readdirSync(tp).filter(f => /\.png$/i.test(f))) {
-      files.push({ inputPath: path.join(tp, file), traitName: trait.name, fileName: file.replace(/\.png$/i, '') });
+      files.push({
+        inputPath: path.join(tp, file),
+        traitName: trait.name,
+        fileName: file.replace(/\.png$/i, ''),
+      });
     }
   }
   return files;
 }
 
 async function runTest(config: TestConfig) {
-  const { label, resolution, paletteSize, mode, flattenH, flattenV, modeRadius, modeIterations, modeSimilarity, minRunLength } = config;
-  const modeDesc = mode === 'flatten2d' ? `flatH=${flattenH},flatV=${flattenV}`
-    : mode === 'modeFilter' ? `r=${modeRadius},iter=${modeIterations}`
-    : mode === 'weightedMode' ? `r=${modeRadius},iter=${modeIterations},sim=${modeSimilarity}`
-    : 'none';
-  console.log(`\n🎨 ${label}: ${resolution}px, ${paletteSize}色, ${mode}(${modeDesc}), minRun=${minRunLength}`);
+  const {
+    label,
+    resolution,
+    paletteSize,
+    mode,
+    flattenH,
+    flattenV,
+    modeRadius,
+    modeIterations,
+    modeSimilarity,
+    minRunLength,
+  } = config;
+  const modeDesc =
+    mode === 'flatten2d'
+      ? `flatH=${flattenH},flatV=${flattenV}`
+      : mode === 'modeFilter'
+        ? `r=${modeRadius},iter=${modeIterations}`
+        : mode === 'weightedMode'
+          ? `r=${modeRadius},iter=${modeIterations},sim=${modeSimilarity}`
+          : 'none';
+  console.log(
+    `\n🎨 ${label}: ${resolution}px, ${paletteSize}色, ${mode}(${modeDesc}), minRun=${minRunLength}`,
+  );
 
-  if (resolution > 255) { console.log('  スキップ'); return null; }
+  if (resolution > 255) {
+    console.log('  スキップ');
+    return null;
+  }
 
   const outputDir = path.join(OUTPUT_BASE, label);
   await fs.promises.mkdir(outputDir, { recursive: true });
@@ -449,21 +514,29 @@ async function runTest(config: TestConfig) {
   const colorMap = new Map<string, ColorInfo>();
   for (const sf of sourceFiles) {
     const { data } = await sharp(sf.inputPath)
-      .resize(resolution, resolution, { kernel, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-      .ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      .resize(resolution, resolution, {
+        kernel,
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      })
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
     for (let i = 0; i < data.length; i += 4) {
       if (data[i + 3] < 128) continue;
       const key = `${data[i]},${data[i + 1]},${data[i + 2]}`;
       const ex = colorMap.get(key);
-      if (ex) ex.count++; else colorMap.set(key, { r: data[i], g: data[i + 1], b: data[i + 2], count: 1 });
+      if (ex) ex.count++;
+      else colorMap.set(key, { r: data[i], g: data[i + 1], b: data[i + 2], count: 1 });
     }
   }
 
   // Step 2: Generate palette
   console.log(`  パレット (${colorMap.size}→${paletteSize})...`);
   const palette = medianCutPalette(Array.from(colorMap.values()), paletteSize);
-  const paletteHex = palette.map(c =>
-    `${c.r.toString(16).padStart(2, '0')}${c.g.toString(16).padStart(2, '0')}${c.b.toString(16).padStart(2, '0')}`
+  const paletteHex = palette.map(
+    c =>
+      `${c.r.toString(16).padStart(2, '0')}${c.g.toString(16).padStart(2, '0')}${c.b.toString(16).padStart(2, '0')}`,
   );
 
   // Step 3: Apply palette + flatten + eliminate short runs
@@ -474,12 +547,24 @@ async function runTest(config: TestConfig) {
     const op = path.join(outputDir, `${sf.traitName}_${sf.fileName}.png`);
 
     const { data } = await sharp(sf.inputPath)
-      .resize(resolution, resolution, { kernel, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-      .ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      .resize(resolution, resolution, {
+        kernel,
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      })
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
 
     // Binarize alpha
     for (let j = 0; j < data.length; j += 4) {
-      if (data[j + 3] < 128) { data[j] = 0; data[j + 1] = 0; data[j + 2] = 0; data[j + 3] = 0; continue; }
+      if (data[j + 3] < 128) {
+        data[j] = 0;
+        data[j + 1] = 0;
+        data[j + 2] = 0;
+        data[j + 3] = 0;
+        continue;
+      }
       data[j + 3] = 255;
     }
 
@@ -491,14 +576,18 @@ async function runTest(config: TestConfig) {
       for (let j = 0; j < data.length; j += 4) {
         if (data[j + 3] === 0) continue;
         const idx = findNearest(data[j], data[j + 1], data[j + 2], palette);
-        data[j] = palette[idx].r; data[j + 1] = palette[idx].g; data[j + 2] = palette[idx].b;
+        data[j] = palette[idx].r;
+        data[j + 1] = palette[idx].g;
+        data[j + 2] = palette[idx].b;
       }
     } else if (mode === 'modeFilter') {
       // Map to palette first, then apply mode filter
       for (let j = 0; j < data.length; j += 4) {
         if (data[j + 3] === 0) continue;
         const idx = findNearest(data[j], data[j + 1], data[j + 2], palette);
-        data[j] = palette[idx].r; data[j + 1] = palette[idx].g; data[j + 2] = palette[idx].b;
+        data[j] = palette[idx].r;
+        data[j + 1] = palette[idx].g;
+        data[j + 2] = palette[idx].b;
       }
       modeFilter(data, resolution, resolution, palette, modeRadius, modeIterations);
     } else if (mode === 'weightedMode') {
@@ -506,15 +595,27 @@ async function runTest(config: TestConfig) {
       for (let j = 0; j < data.length; j += 4) {
         if (data[j + 3] === 0) continue;
         const idx = findNearest(data[j], data[j + 1], data[j + 2], palette);
-        data[j] = palette[idx].r; data[j + 1] = palette[idx].g; data[j + 2] = palette[idx].b;
+        data[j] = palette[idx].r;
+        data[j + 1] = palette[idx].g;
+        data[j + 2] = palette[idx].b;
       }
-      weightedModeFilter(data, resolution, resolution, palette, modeRadius, modeSimilarity, modeIterations);
+      weightedModeFilter(
+        data,
+        resolution,
+        resolution,
+        palette,
+        modeRadius,
+        modeSimilarity,
+        modeIterations,
+      );
     } else {
       // No filter (or nearest mode), just map to palette
       for (let j = 0; j < data.length; j += 4) {
         if (data[j + 3] === 0) continue;
         const idx = findNearest(data[j], data[j + 1], data[j + 2], palette);
-        data[j] = palette[idx].r; data[j + 1] = palette[idx].g; data[j + 2] = palette[idx].b;
+        data[j] = palette[idx].r;
+        data[j + 1] = palette[idx].g;
+        data[j + 2] = palette[idx].b;
       }
     }
 
@@ -524,7 +625,8 @@ async function runTest(config: TestConfig) {
     }
 
     await sharp(data, { raw: { width: resolution, height: resolution, channels: 4 } })
-      .png({ compressionLevel: 9 }).toFile(op);
+      .png({ compressionLevel: 9 })
+      .toFile(op);
     processedFiles.push({ path: op, traitName: sf.traitName, fileName: sf.fileName });
     if ((i + 1) % 100 === 0) process.stdout.write(`  ${i + 1}/${sourceFiles.length}\r`);
   }
@@ -547,7 +649,7 @@ async function runTest(config: TestConfig) {
     const valid = images.filter((img: any) => img?.data);
     if (valid.length === 0) continue;
     testParts.push(valid[0]);
-    bestParts.push(valid.reduce((a: any, b: any) => a.data.length > b.data.length ? a : b));
+    bestParts.push(valid.reduce((a: any, b: any) => (a.data.length > b.data.length ? a : b)));
   }
 
   const svg = buildSVG(testParts, nijiData.palette, 'd5d7e1');
@@ -557,35 +659,65 @@ async function runTest(config: TestConfig) {
   const rects = (svg.match(/<rect /g) || []).length;
   const rectsBest = (svgBest.match(/<rect /g) || []).length;
 
-  console.log(`  通常: SVG=${(svgSize / 1024).toFixed(0)}KB, ${rects}rects, ${(svgSize * 150 / 1e6).toFixed(1)}Mgas`);
-  console.log(`  最大: SVG=${(svgBestSize / 1024).toFixed(0)}KB, ${rectsBest}rects, ${(svgBestSize * 150 / 1e6).toFixed(1)}Mgas`);
+  console.log(
+    `  通常: SVG=${(svgSize / 1024).toFixed(0)}KB, ${rects}rects, ${((svgSize * 150) / 1e6).toFixed(1)}Mgas`,
+  );
+  console.log(
+    `  最大: SVG=${(svgBestSize / 1024).toFixed(0)}KB, ${rectsBest}rects, ${((svgBestSize * 150) / 1e6).toFixed(1)}Mgas`,
+  );
 
   // Save composite
   const compositeBest: any[] = [];
   for (const t of TRAIT_DIRS) {
     const files = processedFiles.filter(f => f.traitName === t.name);
     if (files.length === 0) continue;
-    let bestFile = files[0], bestOp = 0;
+    let bestFile = files[0],
+      bestOp = 0;
     for (const f of files.slice(0, 10)) {
-      const { data } = await sharp(f.path).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-      let op = 0; for (let i = 3; i < data.length; i += 4) if (data[i] > 0) op++;
-      if (op > bestOp) { bestOp = op; bestFile = f; }
+      const { data } = await sharp(f.path)
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      let op = 0;
+      for (let i = 3; i < data.length; i += 4) if (data[i] > 0) op++;
+      if (op > bestOp) {
+        bestOp = op;
+        bestFile = f;
+      }
     }
     compositeBest.push({ input: await sharp(bestFile.path).toBuffer(), top: 0, left: 0 });
   }
   const compPath = path.join(outputDir, 'composite_best.png');
-  await sharp({ create: { width: resolution, height: resolution, channels: 4, background: { r: 213, g: 215, b: 225, alpha: 1 } } })
-    .composite(compositeBest).png().toFile(compPath);
+  await sharp({
+    create: {
+      width: resolution,
+      height: resolution,
+      channels: 4,
+      background: { r: 213, g: 215, b: 225, alpha: 1 },
+    },
+  })
+    .composite(compositeBest)
+    .png()
+    .toFile(compPath);
   const scale = Math.ceil(320 / resolution);
-  await sharp(compPath).resize(resolution * scale, resolution * scale, { kernel: 'nearest' })
+  await sharp(compPath)
+    .resize(resolution * scale, resolution * scale, { kernel: 'nearest' })
     .toFile(path.join(outputDir, 'composite_best_upscaled.png'));
 
   fs.writeFileSync(path.join(outputDir, 'sample_best.svg'), svgBest);
 
   return {
-    label, resolution, paletteSize, mode, minRunLength,
-    svgSize, svgBestSize, rects, rectsBest,
-    gasNormal: svgSize * 150, gasMax: svgBestSize * 150,
+    label,
+    resolution,
+    paletteSize,
+    mode,
+    minRunLength,
+    svgSize,
+    svgBestSize,
+    rects,
+    rectsBest,
+    gasNormal: svgSize * 150,
+    gasMax: svgBestSize * 150,
   };
 }
 
@@ -593,24 +725,31 @@ async function main() {
   console.log('=== 64px付近 最大品質テスト (v7) ===');
   console.log('nearest + フィルタなし + ラン除去なし で30M以内の最大品質\n');
 
-  const d = { flattenH: 0, flattenV: 0, modeRadius: 0, modeIterations: 0, modeSimilarity: 0, minRunLength: 1 };
+  const d = {
+    flattenH: 0,
+    flattenV: 0,
+    modeRadius: 0,
+    modeIterations: 0,
+    modeSimilarity: 0,
+    minRunLength: 1,
+  };
 
   const tests: TestConfig[] = [
     // ベースライン: 64×64 48色 = 29.8M ✅ (ユーザー評価済み)
-    { label: '64_48c_nn',   resolution: 64, paletteSize: 48, mode: 'nearest', ...d },
+    { label: '64_48c_nn', resolution: 64, paletteSize: 48, mode: 'nearest', ...d },
 
     // 色数を増やす (64px固定)
-    { label: '64_52c_nn',   resolution: 64, paletteSize: 52, mode: 'nearest', ...d },
-    { label: '64_56c_nn',   resolution: 64, paletteSize: 56, mode: 'nearest', ...d },
-    { label: '64_60c_nn',   resolution: 64, paletteSize: 60, mode: 'nearest', ...d },
-    { label: '64_64c_nn',   resolution: 64, paletteSize: 64, mode: 'nearest', ...d },
+    { label: '64_52c_nn', resolution: 64, paletteSize: 52, mode: 'nearest', ...d },
+    { label: '64_56c_nn', resolution: 64, paletteSize: 56, mode: 'nearest', ...d },
+    { label: '64_60c_nn', resolution: 64, paletteSize: 60, mode: 'nearest', ...d },
+    { label: '64_64c_nn', resolution: 64, paletteSize: 64, mode: 'nearest', ...d },
 
     // 解像度を少し上げる (色数抑え)
-    { label: '66_48c_nn',   resolution: 66, paletteSize: 48, mode: 'nearest', ...d },
-    { label: '68_48c_nn',   resolution: 68, paletteSize: 48, mode: 'nearest', ...d },
-    { label: '68_40c_nn',   resolution: 68, paletteSize: 40, mode: 'nearest', ...d },
-    { label: '70_40c_nn',   resolution: 70, paletteSize: 40, mode: 'nearest', ...d },
-    { label: '70_48c_nn',   resolution: 70, paletteSize: 48, mode: 'nearest', ...d },
+    { label: '66_48c_nn', resolution: 66, paletteSize: 48, mode: 'nearest', ...d },
+    { label: '68_48c_nn', resolution: 68, paletteSize: 48, mode: 'nearest', ...d },
+    { label: '68_40c_nn', resolution: 68, paletteSize: 40, mode: 'nearest', ...d },
+    { label: '70_40c_nn', resolution: 70, paletteSize: 40, mode: 'nearest', ...d },
+    { label: '70_48c_nn', resolution: 70, paletteSize: 48, mode: 'nearest', ...d },
   ];
 
   const results: any[] = [];
@@ -628,7 +767,7 @@ async function main() {
   for (const r of results) {
     const v = r.gasMax < 30e6 ? '✅' : r.gasNormal < 30e6 ? '⚠️' : '❌';
     console.log(
-      `${r.label.padEnd(16)} | ${r.resolution.toString().padStart(3)} | ${r.paletteSize.toString().padStart(4)} | ${r.rects.toString().padStart(7)} | ${r.rectsBest.toString().padStart(7)} | ${(r.gasNormal / 1e6).toFixed(1).padStart(6)}M | ${(r.gasMax / 1e6).toFixed(1).padStart(6)}M | ${v}`
+      `${r.label.padEnd(16)} | ${r.resolution.toString().padStart(3)} | ${r.paletteSize.toString().padStart(4)} | ${r.rects.toString().padStart(7)} | ${r.rectsBest.toString().padStart(7)} | ${(r.gasNormal / 1e6).toFixed(1).padStart(6)}M | ${(r.gasMax / 1e6).toFixed(1).padStart(6)}M | ${v}`,
     );
   }
 }

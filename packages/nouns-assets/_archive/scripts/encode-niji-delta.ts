@@ -9,7 +9,10 @@ class DeltaEncoder {
     const width = png.width;
     const height = png.height;
 
-    let minX = width, maxX = 0, minY = height, maxY = 0;
+    let minX = width,
+      maxX = 0,
+      minY = height,
+      maxY = 0;
     const pixels: Array<{ x: number; y: number; colorIndex: number }> = [];
 
     for (let y = 0; y < height; y++) {
@@ -139,7 +142,7 @@ async function encodeWithComparison() {
 
         const savings = ((1 - deltaBytes / rleBytes) * 100).toFixed(1);
         console.log(
-          `    ${imageName}: RLE ${rleBytes}B → Delta ${deltaBytes}B (${savings}% smaller)`
+          `    ${imageName}: RLE ${rleBytes}B → Delta ${deltaBytes}B (${savings}% smaller)`,
         );
       } catch (error) {
         console.error(`    ✗ ${file}: ${error}`);
@@ -168,9 +171,7 @@ async function encodeWithComparison() {
   console.log(`  File size: ${(deltaFileSize / 1024).toFixed(2)} KB`);
   console.log(`\nSavings:`);
   console.log(`  Data: ${((1 - totalDeltaSize / totalRLESize) * 100).toFixed(1)}%`);
-  console.log(
-    `  File: ${((1 - deltaFileSize / rleFileSize) * 100).toFixed(1)}%`
-  );
+  console.log(`  File: ${((1 - deltaFileSize / rleFileSize) * 100).toFixed(1)}%`);
 
   console.log(`\n✓ Files saved:`);
   console.log(`  RLE: ${OUTPUT_FILE_RLE}`);
@@ -183,19 +184,15 @@ async function encodeWithComparison() {
   console.log(`\n📊 FULL DATASET ESTIMATE:`);
   console.log(`  Current (RLE): 27 MB`);
   console.log(
-    `  Estimated (Delta): ${fullDatasetEstimate.toFixed(2)} MB (${(avgCompressionRatio * 100).toFixed(1)}%)`
+    `  Estimated (Delta): ${fullDatasetEstimate.toFixed(2)} MB (${(avgCompressionRatio * 100).toFixed(1)}%)`,
   );
-  console.log(
-    `  Estimated SVG size: ${(362 * avgCompressionRatio).toFixed(0)} KB`
-  );
+  console.log(`  Estimated SVG size: ${(362 * avgCompressionRatio).toFixed(0)} KB`);
 
   if (fullDatasetEstimate < 5) {
     console.log(`\n✅ EXCELLENT! Delta encoding brings data under 5 MB`);
     console.log(`   This should be deployable and readable on-chain!\n`);
   } else if (fullDatasetEstimate < 10) {
-    console.log(
-      `\n✓ GOOD! Delta encoding significantly reduces size, may still need batching\n`
-    );
+    console.log(`\n✓ GOOD! Delta encoding significantly reduces size, may still need batching\n`);
   } else {
     console.log(`\n⚠️  Still large, but major improvement. Further optimization needed.\n`);
   }

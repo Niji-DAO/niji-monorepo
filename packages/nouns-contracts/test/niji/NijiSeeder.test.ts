@@ -37,9 +37,10 @@ describe('NijiSeeder', () => {
 
     it('should revert if art is zero address', async () => {
       const NijiSeederFactory = await ethers.getContractFactory('NijiSeeder');
-      await expect(
-        NijiSeederFactory.deploy(ethers.ZeroAddress)
-      ).to.be.revertedWithCustomError(NijiSeederFactory, 'InvalidArtAddress');
+      await expect(NijiSeederFactory.deploy(ethers.ZeroAddress)).to.be.revertedWithCustomError(
+        NijiSeederFactory,
+        'InvalidArtAddress',
+      );
     });
   });
 
@@ -85,15 +86,67 @@ describe('NijiSeeder', () => {
       // Seeds should be different (very unlikely to be the same)
       const seed1Hash = ethers.keccak256(
         ethers.AbiCoder.defaultAbiCoder().encode(
-          ['uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48'],
-          [seed1.special, seed1.choker, seed1.headphone, seed1.leftHand, seed1.hat, seed1.clothing, seed1.ear, seed1.back, seed1.backDecoration, seed1.background, seed1.solidBackground, seed1.hair]
-        )
+          [
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+          ],
+          [
+            seed1.special,
+            seed1.choker,
+            seed1.headphone,
+            seed1.leftHand,
+            seed1.hat,
+            seed1.clothing,
+            seed1.ear,
+            seed1.back,
+            seed1.backDecoration,
+            seed1.background,
+            seed1.solidBackground,
+            seed1.hair,
+          ],
+        ),
       );
       const seed2Hash = ethers.keccak256(
         ethers.AbiCoder.defaultAbiCoder().encode(
-          ['uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48', 'uint48'],
-          [seed2.special, seed2.choker, seed2.headphone, seed2.leftHand, seed2.hat, seed2.clothing, seed2.ear, seed2.back, seed2.backDecoration, seed2.background, seed2.solidBackground, seed2.hair]
-        )
+          [
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+            'uint48',
+          ],
+          [
+            seed2.special,
+            seed2.choker,
+            seed2.headphone,
+            seed2.leftHand,
+            seed2.hat,
+            seed2.clothing,
+            seed2.ear,
+            seed2.back,
+            seed2.backDecoration,
+            seed2.background,
+            seed2.solidBackground,
+            seed2.hair,
+          ],
+        ),
       );
 
       expect(seed1Hash).to.not.equal(seed2Hash);
@@ -120,8 +173,8 @@ describe('NijiSeeder', () => {
       // Different sources should (very likely) produce different seeds
       expect(
         seed1.special !== seed2.special ||
-        seed1.choker !== seed2.choker ||
-        seed1.hair !== seed2.hair
+          seed1.choker !== seed2.choker ||
+          seed1.hair !== seed2.hair,
       ).to.be.true;
     });
   });
@@ -158,15 +211,17 @@ describe('NijiSeeder', () => {
     });
 
     it('should revert if caller is not owner', async () => {
-      await expect(
-        seeder.connect(other).setArt(other.address)
-      ).to.be.revertedWithCustomError(seeder, 'OwnableUnauthorizedAccount');
+      await expect(seeder.connect(other).setArt(other.address)).to.be.revertedWithCustomError(
+        seeder,
+        'OwnableUnauthorizedAccount',
+      );
     });
 
     it('should revert if art is zero address', async () => {
-      await expect(
-        seeder.setArt(ethers.ZeroAddress)
-      ).to.be.revertedWithCustomError(seeder, 'InvalidArtAddress');
+      await expect(seeder.setArt(ethers.ZeroAddress)).to.be.revertedWithCustomError(
+        seeder,
+        'InvalidArtAddress',
+      );
     });
   });
 

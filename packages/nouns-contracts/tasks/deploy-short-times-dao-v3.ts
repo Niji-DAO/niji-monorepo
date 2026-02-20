@@ -301,9 +301,7 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
         };
       }
       if (!args.autoDeploy) {
-        const gasInGwei = Math.round(
-          Number(ethersLib.formatUnits(gasOptions.gasPrice!, 'gwei')),
-        );
+        const gasInGwei = Math.round(Number(ethersLib.formatUnits(gasOptions.gasPrice!, 'gwei')));
 
         promptjs.start();
 
@@ -349,10 +347,7 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
         const deploymentCost = deploymentGas * gasOptions.gasPrice!;
 
         console.log(
-          `Estimated cost to deploy ${name}: ${ethersLib.formatUnits(
-            deploymentCost,
-            'ether',
-          )} ETH`,
+          `Estimated cost to deploy ${name}: ${ethersLib.formatUnits(deploymentCost, 'ether')} ETH`,
         );
 
         const result = await promptjs.get([

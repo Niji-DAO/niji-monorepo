@@ -105,7 +105,10 @@ async function testNoDither(colorCount: number) {
 
     for (const imgPath of traitImages) {
       const png = await readPngImage(imgPath);
-      const filename = path.basename(imgPath).replace(`${trait.name}_`, '').replace(/\.png$/i, '');
+      const filename = path
+        .basename(imgPath)
+        .replace(`${trait.name}_`, '')
+        .replace(/\.png$/i, '');
       encoder.encodeImage(filename, png, trait.name);
     }
   }
@@ -187,7 +190,7 @@ async function main() {
         `${(result.totalSize / 1024 / 1024).toFixed(2).padStart(10)} MB | ` +
         `${(result.encodedSize / 1024 / 1024).toFixed(2).padStart(12)} MB | ` +
         `${estimatedSVG.toFixed(0).padStart(8)} KB | ` +
-        `${estimatedGas.toFixed(1).padStart(8)}M ${viable}`
+        `${estimatedGas.toFixed(1).padStart(8)}M ${viable}`,
     );
   }
 
@@ -198,13 +201,13 @@ async function main() {
 
   // Find best viable option
   const viable = results.filter(r => {
-    const estimatedGas = ((r.encodedSize / 1024 / 1024) * 13.5 / 362) * 55;
+    const estimatedGas = (((r.encodedSize / 1024 / 1024) * 13.5) / 362) * 55;
     return estimatedGas < 25;
   });
 
   if (viable.length > 0) {
     const best = viable.reduce((a, b) => (a.colorCount > b.colorCount ? a : b));
-    const estGas = ((best.encodedSize / 1024 / 1024) * 13.5 / 362) * 55;
+    const estGas = (((best.encodedSize / 1024 / 1024) * 13.5) / 362) * 55;
 
     console.log(`\n✅ VIABLE AT 512×512 WITH ${best.colorCount} COLORS!`);
     console.log(`   Actual colors: ${best.actualColors}`);
