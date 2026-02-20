@@ -23,7 +23,7 @@ The monorepo uses a unified TypeScript configuration with package-specific overr
   - `packages/nouns-contracts`: Uses `module: "CommonJS"` for Hardhat compatibility
   - `packages/nouns-subgraph`: Uses `module: "CommonJS"` for Graph TS compatibility
 
-All other packages inherit the base configuration for consistency.
+Packages extending the base: `nouns-contracts`, `nouns-subgraph`, `nouns-webapp`. Standalone configs: `nouns-assets`, `nouns-sdk`, `nouns-docs` (aligned to the same ES2022/ESNext standard).
 
 ## Package Structure
 
