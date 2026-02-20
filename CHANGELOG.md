@@ -92,3 +92,22 @@
 | `@nomicfoundation/hardhat-chai-matchers` | `^1.x`（waffle）| `^2.1.2` |
 | `@typechain/ethers-v6` | - | `^0.5.1`（新規追加）|
 | `hardhat` | 2.28.6 | 2.28.6（変更なし）|
+
+### nouns-assets
+
+#### 変更
+- **ethers v6 移行** (#48)
+  - `@ethersproject/bignumber` および `@ethersproject/solidity` を削除し、`ethers` v6 に統合
+  - `BigNumber` → native `bigint` へ移行
+  - `solidityKeccak256` → `solidityPackedKeccak256` へ変更
+  - 型定義: `BigNumberish` → `bigint | number | string`
+  - 対象ファイル: `src/utils.ts`（内部実装のみ、外部 API シグネチャは後方互換）
+
+### ワークスペース全体
+
+#### 依存関係の更新
+
+| パッケージ | 変更前 | 変更後 |
+|---|---|---|
+| `turbo` | `^2.5.3` | `^2.8.10` |
+| `prettier` | `^3.6.2` | `^3.8.1` |
