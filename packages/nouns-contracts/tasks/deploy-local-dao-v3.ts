@@ -151,10 +151,7 @@ task('deploy-local-dao-v3', 'Deploy contracts to hardhat')
         waitForConfirmation: true,
       },
       NounsDAOForkEscrow: {
-        args: [
-          expectedNounsDAOProxyAddress,
-          () => contracts.NounsToken.instance?.target as string,
-        ],
+        args: [expectedNounsDAOProxyAddress, () => contracts.NounsToken.instance?.target as string],
       },
       NounsTokenFork: {},
       NounsAuctionHouseFork: {},
@@ -253,7 +250,8 @@ task('deploy-local-dao-v3', 'Deploy contracts to hardhat')
       throw 'wrong address';
     }
 
-    const actualAuctionHouseProxyAddress = contracts.NounsAuctionHouseProxy.instance?.target as string;
+    const actualAuctionHouseProxyAddress = contracts.NounsAuctionHouseProxy.instance
+      ?.target as string;
     if (expectedAuctionHouseProxyAddress !== actualAuctionHouseProxyAddress) {
       console.log(
         `wrong auctio house proxy address expected: ${expectedAuctionHouseProxyAddress} actual: ${actualAuctionHouseProxyAddress}`,

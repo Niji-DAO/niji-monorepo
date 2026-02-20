@@ -30,14 +30,18 @@ describe('NounsAuctionHouse', () => {
 
   async function deploy(deployer?: SignerWithAddress) {
     const auctionHouseFactory = await ethers.getContractFactory('NounsAuctionHouse', deployer);
-    return upgrades.deployProxy(auctionHouseFactory, [
-      await nounsToken.getAddress(),
-      await weth.getAddress(),
-      TIME_BUFFER,
-      RESERVE_PRICE,
-      MIN_INCREMENT_BID_PERCENTAGE,
-      DURATION,
-    ], { unsafeAllow: ['missing-initializer-call', 'incorrect-initializer-order'] }) as unknown as NounsAuctionHouse;
+    return upgrades.deployProxy(
+      auctionHouseFactory,
+      [
+        await nounsToken.getAddress(),
+        await weth.getAddress(),
+        TIME_BUFFER,
+        RESERVE_PRICE,
+        MIN_INCREMENT_BID_PERCENTAGE,
+        DURATION,
+      ],
+      { unsafeAllow: ['missing-initializer-call', 'incorrect-initializer-order'] },
+    ) as unknown as NounsAuctionHouse;
   }
 
   before(async () => {

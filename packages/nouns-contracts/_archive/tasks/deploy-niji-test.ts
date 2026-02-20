@@ -31,7 +31,9 @@ task('deploy-niji-test', 'Deploy a small subset of Niji data and test reading')
 
     console.log('📊 NIJI DATA:');
     console.log(`  Palette: ${nijiData.palette.length} colors`);
-    console.log(`  Total traits: ${Object.values(nijiData.images).reduce((sum, arr) => sum + arr.length, 0)}`);
+    console.log(
+      `  Total traits: ${Object.values(nijiData.images).reduce((sum, arr) => sum + arr.length, 0)}`,
+    );
     console.log('');
 
     // Get descriptor
@@ -64,12 +66,9 @@ task('deploy-niji-test', 'Deploy a small subset of Niji data and test reading')
     console.log(`  Size: ${clothingBytes.toLocaleString()} bytes`);
 
     try {
-      const tx = await descriptor.addBodies(
-        clothing.data,
-        clothingBytes,
-        1,
-        { gasLimit: 30000000 }
-      );
+      const tx = await descriptor.addBodies(clothing.data, clothingBytes, 1, {
+        gasLimit: 30000000,
+      });
       const receipt = await tx.wait();
       console.log(`  ✓ Trait uploaded!`);
       console.log(`    Gas used: ${receipt.gasUsed.toLocaleString()}`);
@@ -86,12 +85,9 @@ task('deploy-niji-test', 'Deploy a small subset of Niji data and test reading')
     console.log(`  Total size: ${hairBytes.toLocaleString()} bytes`);
 
     try {
-      const tx = await descriptor.addHeads(
-        hairData,
-        hairBytes,
-        hairTraits.length,
-        { gasLimit: 30000000 }
-      );
+      const tx = await descriptor.addHeads(hairData, hairBytes, hairTraits.length, {
+        gasLimit: 30000000,
+      });
       const receipt = await tx.wait();
       console.log(`  ✓ Traits uploaded!`);
       console.log(`    Gas used: ${receipt.gasUsed.toLocaleString()}`);
@@ -119,13 +115,17 @@ task('deploy-niji-test', 'Deploy a small subset of Niji data and test reading')
 
       console.log(`  ✓ SVG generated!`);
       console.log(`    Time: ${duration}ms`);
-      console.log(`    SVG size: ${svg.length.toLocaleString()} chars (${(svg.length / 1024).toFixed(2)} KB)`);
+      console.log(
+        `    SVG size: ${svg.length.toLocaleString()} chars (${(svg.length / 1024).toFixed(2)} KB)`,
+      );
 
       // Save SVG
-      const outputPath = path.join(__dirname, '../../nouns-assets/test_output/onchain-niji-test.svg');
+      const outputPath = path.join(
+        __dirname,
+        '../../nouns-assets/test_output/onchain-niji-test.svg',
+      );
       fs.writeFileSync(outputPath, svg);
       console.log(`    Saved to: ${outputPath}`);
-
     } catch (error: any) {
       console.error(`  ✗ SVG GENERATION FAILED: ${error.message}`);
 

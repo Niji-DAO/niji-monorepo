@@ -17,13 +17,11 @@ interface ColorCount {
 /**
  * Extract all unique colors from all Niji images
  */
-async function extractAllColors(
-  inputDir: string
-): Promise<Map<string, ColorCount>> {
+async function extractAllColors(inputDir: string): Promise<Map<string, ColorCount>> {
   const colorMap = new Map<string, ColorCount>();
 
   const files = (await fs.promises.readdir(inputDir)).filter(
-    f => f.endsWith('.PNG') || f.endsWith('.png')
+    f => f.endsWith('.PNG') || f.endsWith('.png'),
   );
 
   for (const file of files) {
@@ -66,10 +64,7 @@ async function extractAllColors(
  * Fast palette reduction using median cut algorithm (like pngquant)
  * Much faster than k-means for large color sets
  */
-function medianCutPalette(
-  colors: ColorCount[],
-  targetSize: number
-): ColorCount[] {
+function medianCutPalette(colors: ColorCount[], targetSize: number): ColorCount[] {
   if (colors.length <= targetSize) {
     return colors;
   }
@@ -129,9 +124,7 @@ function medianCutPalette(
  * Euclidean distance between two colors in RGB space
  */
 function colorDistance(a: ColorCount, b: ColorCount): number {
-  return Math.sqrt(
-    Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2)
-  );
+  return Math.sqrt(Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2));
 }
 
 /**
@@ -188,23 +181,21 @@ async function main() {
   console.log(`\n✓ Total unique colors across all images: ${totalColors}`);
 
   // Sample colors if too many (keep most common colors)
-  const allColors = Array.from(globalColorMap.values()).sort(
-    (a, b) => b.count - a.count
-  );
+  const allColors = Array.from(globalColorMap.values()).sort((a, b) => b.count - a.count);
 
   const MAX_COLORS_FOR_PROCESSING = 50000;
   let colorsToProcess = allColors;
 
   if (allColors.length > MAX_COLORS_FOR_PROCESSING) {
     console.log(
-      `\n⚡ Sampling ${MAX_COLORS_FOR_PROCESSING} most common colors from ${totalColors} for faster processing...`
+      `\n⚡ Sampling ${MAX_COLORS_FOR_PROCESSING} most common colors from ${totalColors} for faster processing...`,
     );
     colorsToProcess = allColors.slice(0, MAX_COLORS_FOR_PROCESSING);
   }
 
   // Reduce to target palette size using median cut
   console.log(
-    `\n🎨 Reducing palette from ${colorsToProcess.length} to ${TARGET_PALETTE_SIZE} colors using median cut algorithm...`
+    `\n🎨 Reducing palette from ${colorsToProcess.length} to ${TARGET_PALETTE_SIZE} colors using median cut algorithm...`,
   );
   const palette = medianCutPalette(colorsToProcess, TARGET_PALETTE_SIZE);
 
@@ -212,10 +203,7 @@ async function main() {
 
   // Save palette
   const paletteHexArray = ['', ...palette.map(c => c.hex)]; // Empty string for transparent
-  await fs.promises.writeFile(
-    OUTPUT_PALETTE_FILE,
-    JSON.stringify(paletteHexArray, null, 2)
-  );
+  await fs.promises.writeFile(OUTPUT_PALETTE_FILE, JSON.stringify(paletteHexArray, null, 2));
 
   console.log(`\n💾 Palette saved to ${OUTPUT_PALETTE_FILE}`);
   console.log(`\n=== SUMMARY ===`);

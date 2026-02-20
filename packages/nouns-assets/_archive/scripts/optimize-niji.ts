@@ -19,10 +19,7 @@ interface OptimizationResult {
  * 2. Quantize to 256 colors
  * 3. Binarize alpha channel (0 or 255 only)
  */
-async function optimizeImage(
-  inputPath: string,
-  outputPath: string
-): Promise<OptimizationResult> {
+async function optimizeImage(inputPath: string, outputPath: string): Promise<OptimizationResult> {
   const originalStats = fs.statSync(inputPath);
   const originalSize = originalStats.size;
 
@@ -81,14 +78,14 @@ async function optimizeImage(
  */
 async function optimizeDirectory(
   inputDir: string,
-  outputDir: string
+  outputDir: string,
 ): Promise<OptimizationResult[]> {
   // Create output directory
   await fs.promises.mkdir(outputDir, { recursive: true });
 
   // Get all PNG files
   const files = (await fs.promises.readdir(inputDir)).filter(
-    f => f.endsWith('.PNG') || f.endsWith('.png')
+    f => f.endsWith('.PNG') || f.endsWith('.png'),
   );
 
   console.log(`  Processing ${files.length} images...`);
@@ -103,7 +100,7 @@ async function optimizeDirectory(
       const result = await optimizeImage(inputPath, outputPath);
       results.push(result);
       console.log(
-        `    ✓ ${file}: ${(result.originalSize / 1024).toFixed(1)}KB → ${(result.optimizedSize / 1024).toFixed(1)}KB (${(result.compressionRatio * 100).toFixed(1)}%)`
+        `    ✓ ${file}: ${(result.originalSize / 1024).toFixed(1)}KB → ${(result.optimizedSize / 1024).toFixed(1)}KB (${(result.compressionRatio * 100).toFixed(1)}%)`,
       );
     } catch (error) {
       console.error(`    ✗ ${file}: ${error}`);
@@ -167,12 +164,8 @@ async function main() {
   console.log(`Total images: ${totalImages}`);
   console.log(`Original total: ${(totalOriginal / 1024 / 1024).toFixed(2)} MB`);
   console.log(`Optimized total: ${(totalOptimized / 1024 / 1024).toFixed(2)} MB`);
-  console.log(
-    `Compression ratio: ${((totalOptimized / totalOriginal) * 100).toFixed(1)}%`
-  );
-  console.log(
-    `Space saved: ${((totalOriginal - totalOptimized) / 1024 / 1024).toFixed(2)} MB`
-  );
+  console.log(`Compression ratio: ${((totalOptimized / totalOriginal) * 100).toFixed(1)}%`);
+  console.log(`Space saved: ${((totalOriginal - totalOptimized) / 1024 / 1024).toFixed(2)} MB`);
 }
 
 // Check if running as a script (not imported as module)

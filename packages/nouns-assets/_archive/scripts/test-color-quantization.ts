@@ -56,7 +56,8 @@ function medianCutPalette(colors: ColorInfo[], targetSize: number): ColorInfo[] 
       if (bucket.length < 2) continue;
 
       for (const ch of ['r', 'g', 'b'] as const) {
-        let min = 255, max = 0;
+        let min = 255,
+          max = 0;
         for (const c of bucket) {
           if (c[ch] < min) min = c[ch];
           if (c[ch] > max) max = c[ch];
@@ -85,7 +86,10 @@ function medianCutPalette(colors: ColorInfo[], targetSize: number): ColorInfo[] 
 
   // Return weighted average of each bucket
   return buckets.map(bucket => {
-    let totalCount = 0, rSum = 0, gSum = 0, bSum = 0;
+    let totalCount = 0,
+      rSum = 0,
+      gSum = 0,
+      bSum = 0;
     for (const c of bucket) {
       totalCount += c.count;
       rSum += c.r * c.count;
@@ -101,7 +105,14 @@ function medianCutPalette(colors: ColorInfo[], targetSize: number): ColorInfo[] 
   });
 }
 
-function colorDistanceSq(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number): number {
+function colorDistanceSq(
+  r1: number,
+  g1: number,
+  b1: number,
+  r2: number,
+  g2: number,
+  b2: number,
+): number {
   const dr = r1 - r2;
   const dg = g1 - g2;
   const db = b1 - b2;
@@ -139,12 +150,16 @@ interface TestResult {
   samplePath: string;
 }
 
-async function getAllSourceFiles(): Promise<{ inputPath: string; traitName: string; fileName: string }[]> {
+async function getAllSourceFiles(): Promise<
+  { inputPath: string; traitName: string; fileName: string }[]
+> {
   const files: { inputPath: string; traitName: string; fileName: string }[] = [];
   for (const trait of TRAIT_DIRS) {
     const traitPath = path.join(BASE_DIR, trait.dir);
     if (!fs.existsSync(traitPath)) continue;
-    const dirFiles = fs.readdirSync(traitPath).filter(f => f.endsWith('.PNG') || f.endsWith('.png'));
+    const dirFiles = fs
+      .readdirSync(traitPath)
+      .filter(f => f.endsWith('.PNG') || f.endsWith('.png'));
     for (const file of dirFiles) {
       files.push({
         inputPath: path.join(traitPath, file),
@@ -156,7 +171,10 @@ async function getAllSourceFiles(): Promise<{ inputPath: string; traitName: stri
   return files;
 }
 
-async function collectAllColors(sourceFiles: { inputPath: string }[], resolution: number): Promise<Map<string, ColorInfo>> {
+async function collectAllColors(
+  sourceFiles: { inputPath: string }[],
+  resolution: number,
+): Promise<Map<string, ColorInfo>> {
   const colorMap = new Map<string, ColorInfo>();
 
   for (const sf of sourceFiles) {
@@ -172,7 +190,9 @@ async function collectAllColors(sourceFiles: { inputPath: string }[], resolution
 
     for (let i = 0; i < data.length; i += 4) {
       if (data[i + 3] < 128) continue;
-      const r = data[i], g = data[i + 1], b = data[i + 2];
+      const r = data[i],
+        g = data[i + 1],
+        b = data[i + 2];
       const key = `${r},${g},${b}`;
       const existing = colorMap.get(key);
       if (existing) {
@@ -204,7 +224,10 @@ async function applyGlobalPalette(
 
   for (let i = 0; i < data.length; i += 4) {
     if (data[i + 3] < 128) {
-      data[i] = 0; data[i + 1] = 0; data[i + 2] = 0; data[i + 3] = 0;
+      data[i] = 0;
+      data[i + 1] = 0;
+      data[i + 2] = 0;
+      data[i + 3] = 0;
       continue;
     }
     data[i + 3] = 255;
@@ -257,8 +280,9 @@ async function runTest(config: TestConfig): Promise<TestResult> {
 
   // Step 4: RLE encode
   console.log('  RLEエンコード中...');
-  const paletteHex = palette.map(c =>
-    `${c.r.toString(16).padStart(2, '0')}${c.g.toString(16).padStart(2, '0')}${c.b.toString(16).padStart(2, '0')}`
+  const paletteHex = palette.map(
+    c =>
+      `${c.r.toString(16).padStart(2, '0')}${c.g.toString(16).padStart(2, '0')}${c.b.toString(16).padStart(2, '0')}`,
   );
 
   const encoder = new PNGCollectionEncoder(paletteHex);
@@ -287,7 +311,9 @@ async function runTest(config: TestConfig): Promise<TestResult> {
     const svg = buildSVG(testParts, nijiData.palette, 'd5d7e1');
     svgSize = Buffer.byteLength(svg);
     estimatedGas = svgSize * 150;
-    console.log(`  SVG: ${(svgSize / 1024).toFixed(1)} KB → 推定 ${(estimatedGas / 1_000_000).toFixed(1)}Mガス`);
+    console.log(
+      `  SVG: ${(svgSize / 1024).toFixed(1)} KB → 推定 ${(estimatedGas / 1_000_000).toFixed(1)}Mガス`,
+    );
     fs.writeFileSync(path.join(outputDir, 'sample.svg'), svg);
   }
 
@@ -302,17 +328,36 @@ async function runTest(config: TestConfig): Promise<TestResult> {
   }
   if (compositeInputs.length > 0) {
     await sharp({
-      create: { width: resolution, height: resolution, channels: 4, background: { r: 213, g: 215, b: 225, alpha: 1 } },
-    }).composite(compositeInputs).png().toFile(samplePath);
+      create: {
+        width: resolution,
+        height: resolution,
+        channels: 4,
+        background: { r: 213, g: 215, b: 225, alpha: 1 },
+      },
+    })
+      .composite(compositeInputs)
+      .png()
+      .toFile(samplePath);
   }
 
   // Save samples for visual comparison
   const hair = processedFiles.find(f => f.traitName === 'hair');
   if (hair) await fs.promises.copyFile(hair.path, path.join(outputDir, 'sample_hair.png'));
   const clothing = processedFiles.find(f => f.traitName === 'clothing');
-  if (clothing) await fs.promises.copyFile(clothing.path, path.join(outputDir, 'sample_clothing.png'));
+  if (clothing)
+    await fs.promises.copyFile(clothing.path, path.join(outputDir, 'sample_clothing.png'));
 
-  return { label, resolution, paletteSize, actualColors: palette.length, totalPngSize, encodedSize, svgSize, estimatedGas, samplePath };
+  return {
+    label,
+    resolution,
+    paletteSize,
+    actualColors: palette.length,
+    totalPngSize,
+    encodedSize,
+    svgSize,
+    estimatedGas,
+    samplePath,
+  };
 }
 
 async function main() {
@@ -324,12 +369,12 @@ async function main() {
     // 320×320 combinations
     { label: '320_gp256', resolution: 320, paletteSize: 256 },
     { label: '320_gp128', resolution: 320, paletteSize: 128 },
-    { label: '320_gp64',  resolution: 320, paletteSize: 64 },
+    { label: '320_gp64', resolution: 320, paletteSize: 64 },
 
     // 256×256 combinations
     { label: '256_gp256', resolution: 256, paletteSize: 256 },
     { label: '256_gp128', resolution: 256, paletteSize: 128 },
-    { label: '256_gp64',  resolution: 256, paletteSize: 64 },
+    { label: '256_gp64', resolution: 256, paletteSize: 64 },
 
     // 192×192 combinations
     { label: '192_gp256', resolution: 192, paletteSize: 256 },
@@ -365,7 +410,7 @@ async function main() {
     const gasM = r.estimatedGas / 1_000_000;
     const verdict = gasM < 20 ? '✅ 安全' : gasM < 30 ? '⚠️ ギリ' : '❌ NG';
     console.log(
-      `${r.label.padEnd(14)}| ${r.resolution.toString().padStart(6)} | ${r.actualColors.toString().padStart(4)} | ${(r.totalPngSize / 1024 / 1024).toFixed(1).padStart(6)} MB | ${(r.encodedSize / 1024 / 1024).toFixed(1).padStart(6)} MB | ${(r.svgSize / 1024).toFixed(0).padStart(6)} KB | ${gasM.toFixed(1).padStart(6)}M | ${verdict}`
+      `${r.label.padEnd(14)}| ${r.resolution.toString().padStart(6)} | ${r.actualColors.toString().padStart(4)} | ${(r.totalPngSize / 1024 / 1024).toFixed(1).padStart(6)} MB | ${(r.encodedSize / 1024 / 1024).toFixed(1).padStart(6)} MB | ${(r.svgSize / 1024).toFixed(0).padStart(6)} KB | ${gasM.toFixed(1).padStart(6)}M | ${verdict}`,
     );
   }
 
@@ -374,9 +419,11 @@ async function main() {
   if (viable.length > 0) {
     console.log('\n✅ ガスリミット内のオプション:');
     viable.forEach(r => {
-      console.log(`  ${r.label}: ${r.resolution}×${r.resolution}, ${r.actualColors}色, SVG=${(r.svgSize / 1024).toFixed(0)}KB, ガス=${(r.estimatedGas / 1_000_000).toFixed(1)}M`);
+      console.log(
+        `  ${r.label}: ${r.resolution}×${r.resolution}, ${r.actualColors}色, SVG=${(r.svgSize / 1024).toFixed(0)}KB, ガス=${(r.estimatedGas / 1_000_000).toFixed(1)}M`,
+      );
     });
-    const best = viable.reduce((a, b) => a.resolution > b.resolution ? a : b);
+    const best = viable.reduce((a, b) => (a.resolution > b.resolution ? a : b));
     console.log(`\n🏆 最高画質の実現可能オプション: ${best.label}`);
   }
 }

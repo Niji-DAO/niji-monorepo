@@ -21,7 +21,7 @@ async function analyzeImage(imagePath: string) {
       transparent++;
     } else {
       opaque++;
-      const color = `${data[i]},${data[i+1]},${data[i+2]}`;
+      const color = `${data[i]},${data[i + 1]},${data[i + 2]}`;
       colors.add(color);
     }
   }

@@ -9,8 +9,8 @@ interface NijiData {
   };
 }
 
-task('deploy-and-test-niji', 'Deploy NijiDescriptor and test read/write')
-  .setAction(async (_, { ethers }) => {
+task('deploy-and-test-niji', 'Deploy NijiDescriptor and test read/write').setAction(
+  async (_, { ethers }) => {
     console.log('\n=== NIJI DESCRIPTOR DEPLOYMENT & TEST ===\n');
 
     // Load Niji data
@@ -19,7 +19,9 @@ task('deploy-and-test-niji', 'Deploy NijiDescriptor and test read/write')
 
     console.log('📊 Niji Data Stats:');
     console.log(`  Palette: ${nijiData.palette.length} colors`);
-    console.log(`  Total traits: ${Object.values(nijiData.images).reduce((sum, arr) => sum + arr.length, 0)}`);
+    console.log(
+      `  Total traits: ${Object.values(nijiData.images).reduce((sum, arr) => sum + arr.length, 0)}`,
+    );
     console.log('');
 
     // Deploy NijiDescriptor
@@ -64,7 +66,9 @@ task('deploy-and-test-niji', 'Deploy NijiDescriptor and test read/write')
       try {
         const tx = await (descriptor as any)[category.method](dataArray, { gasLimit: 30000000 });
         const receipt = await tx.wait();
-        console.log(`  ✓ ${category.name}: ${sampleTraits.length} traits (${receipt.gasUsed.toLocaleString()} gas)`);
+        console.log(
+          `  ✓ ${category.name}: ${sampleTraits.length} traits (${receipt.gasUsed.toLocaleString()} gas)`,
+        );
       } catch (error: any) {
         console.error(`  ✗ ${category.name}: FAILED - ${error.message}`);
       }
@@ -85,13 +89,14 @@ task('deploy-and-test-niji', 'Deploy NijiDescriptor and test read/write')
           if (count > 0) {
             const traitData = await descriptor.getTraitData(i, 0);
             const dataSize = (traitData.length - 2) / 2; // Remove 0x prefix
-            console.log(`  ✓ Trait type ${i}: ${count.toNumber()} items, first item: ${dataSize} bytes`);
+            console.log(
+              `  ✓ Trait type ${i}: ${count.toNumber()} items, first item: ${dataSize} bytes`,
+            );
           }
         } catch (error) {
           // Skip if no data
         }
       }
-
     } catch (error: any) {
       console.error(`  ✗ Read failed: ${error.message}`);
     }
@@ -129,11 +134,13 @@ task('deploy-and-test-niji', 'Deploy NijiDescriptor and test read/write')
       console.log(`  ✓ SVG size: ${(svg.length / 1024).toFixed(2)} KB`);
 
       // Save SVG
-      const outputPath = path.join(__dirname, '../../nouns-assets/test_output/onchain-niji-generated.svg');
+      const outputPath = path.join(
+        __dirname,
+        '../../nouns-assets/test_output/onchain-niji-generated.svg',
+      );
       fs.mkdirSync(path.dirname(outputPath), { recursive: true });
       fs.writeFileSync(outputPath, svg);
       console.log(`  ✓ Saved: ${outputPath}`);
-
     } catch (error: any) {
       console.error(`  ✗ SVG generation failed: ${error.message}`);
     }
@@ -146,4 +153,5 @@ task('deploy-and-test-niji', 'Deploy NijiDescriptor and test read/write')
     console.log('');
     console.log(`Descriptor address: ${descriptor.address}`);
     console.log('');
-  });
+  },
+);

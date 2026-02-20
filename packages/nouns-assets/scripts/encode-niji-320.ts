@@ -35,7 +35,8 @@ async function main() {
   const allFiles: { path: string; traitName: string; fileName: string }[] = [];
 
   for (const trait of TRAIT_ORDER) {
-    const files = fs.readdirSync(INPUT_DIR)
+    const files = fs
+      .readdirSync(INPUT_DIR)
       .filter(f => f.startsWith(`${trait}_`) && f.endsWith('.png') && !f.includes('sample'))
       .sort();
 
@@ -52,9 +53,7 @@ async function main() {
         }
       }
 
-      const fileName = file
-        .replace(`${trait}_`, '')
-        .replace(/\.png$/i, '');
+      const fileName = file.replace(`${trait}_`, '').replace(/\.png$/i, '');
       allFiles.push({ path: filePath, traitName: trait, fileName });
     }
   }

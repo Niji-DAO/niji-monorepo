@@ -244,7 +244,7 @@ export const deployGovAndToken = async (
 
   const govDelegatorAddress = ethers.getCreateAddress({
     from: deployer.address,
-    nonce: await deployer.getNonce() + 10,
+    nonce: (await deployer.getNonce()) + 10,
   });
 
   // Deploy NounsDAOExecutor with pre-computed Delegator address
@@ -289,7 +289,7 @@ export const deployGovV2AndToken = async (
 ): Promise<{ token: NounsToken; gov: NounsDAOLogicV2; timelock: NounsDAOExecutor }> => {
   const govDelegatorAddress = ethers.getCreateAddress({
     from: deployer.address,
-    nonce: await deployer.getNonce() + 10,
+    nonce: (await deployer.getNonce()) + 10,
   });
 
   // Deploy NounsDAOExecutor with pre-computed Delegator address
@@ -416,9 +416,7 @@ export const blockTimestamp = async (
 };
 
 export const setNextBlockBaseFee = async (value: bigint): Promise<void> => {
-  await network.provider.send('hardhat_setNextBlockBaseFeePerGas', [
-    '0x' + value.toString(16),
-  ]);
+  await network.provider.send('hardhat_setNextBlockBaseFeePerGas', ['0x' + value.toString(16)]);
 };
 
 export const setNextBlockTimestamp = async (n: number, mine = true): Promise<void> => {
@@ -592,14 +590,11 @@ export const deployGovernorV3 = async (deployer: SignerWithAddress): Promise<Nou
 
   return await new NounsDaoLogicFactory(
     {
-      'contracts/governance/NounsDAOAdmin.sol:NounsDAOAdmin':
-        await NounsDAOAdmin.getAddress(),
+      'contracts/governance/NounsDAOAdmin.sol:NounsDAOAdmin': await NounsDAOAdmin.getAddress(),
       'contracts/governance/NounsDAOProposals.sol:NounsDAOProposals':
         await NounsDAOProposals.getAddress(),
-      'contracts/governance/fork/NounsDAOFork.sol:NounsDAOFork':
-        await NounsDAOFork.getAddress(),
-      'contracts/governance/NounsDAOVotes.sol:NounsDAOVotes':
-        await NounsDAOVotes.getAddress(),
+      'contracts/governance/fork/NounsDAOFork.sol:NounsDAOFork': await NounsDAOFork.getAddress(),
+      'contracts/governance/NounsDAOVotes.sol:NounsDAOVotes': await NounsDAOVotes.getAddress(),
       'contracts/governance/NounsDAODynamicQuorum.sol:NounsDAODynamicQuorum':
         await NounsDAODynamicQuorum.getAddress(),
     },
@@ -633,7 +628,7 @@ export const deployGovernorV3WithV3Proxy = async (
   const v3LogicContract = await deployGovernorV3(deployer);
   const predictedProxyAddress = ethers.getCreateAddress({
     from: deployer.address,
-    nonce: await deployer.getNonce() + 1,
+    nonce: (await deployer.getNonce()) + 1,
   });
 
   const escrow = await new NounsDAOForkEscrowFactory(deployer).deploy(

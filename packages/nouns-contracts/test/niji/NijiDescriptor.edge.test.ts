@@ -120,9 +120,10 @@ describe('NijiDescriptor (edge cases)', () => {
 
   describe('setArt edge cases', () => {
     it('should revert for zero address', async () => {
-      await expect(
-        descriptor.setArt(ethers.ZeroAddress),
-      ).to.be.revertedWithCustomError(descriptor, 'EmptyArtAddress');
+      await expect(descriptor.setArt(ethers.ZeroAddress)).to.be.revertedWithCustomError(
+        descriptor,
+        'EmptyArtAddress',
+      );
     });
 
     it('should use new art for SVG generation after setArt', async () => {

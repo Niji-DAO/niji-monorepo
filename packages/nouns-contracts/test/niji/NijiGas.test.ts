@@ -61,10 +61,7 @@ describe('NijiGas – production-size PNG gas benchmarks', function () {
    *
    * Returns gasUsed from the transaction receipt.
    */
-  async function measureViewGas(
-    contractAddress: string,
-    callData: string,
-  ): Promise<bigint> {
+  async function measureViewGas(contractAddress: string, callData: string): Promise<bigint> {
     const tx = await owner.sendTransaction({
       to: contractAddress,
       data: callData,
@@ -179,7 +176,9 @@ describe('NijiGas – production-size PNG gas benchmarks', function () {
         const tx = await art.addTraitImage(0, png);
         const receipt = await tx.wait();
 
-        console.log(`        addTraitImage     | ${label}            | ${receipt!.gasUsed.toLocaleString()} gas`);
+        console.log(
+          `        addTraitImage     | ${label}            | ${receipt!.gasUsed.toLocaleString()} gas`,
+        );
       });
     }
 
@@ -188,7 +187,9 @@ describe('NijiGas – production-size PNG gas benchmarks', function () {
       const tx = await art.addTraitImages(0, [png, png, png]);
       const receipt = await tx.wait();
 
-      console.log(`        addTraitImages    | 3 x 10KB          | ${receipt!.gasUsed.toLocaleString()} gas`);
+      console.log(
+        `        addTraitImages    | 3 x 10KB          | ${receipt!.gasUsed.toLocaleString()} gas`,
+      );
     });
   });
 

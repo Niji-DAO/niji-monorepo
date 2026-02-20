@@ -31,9 +31,7 @@ async function main() {
 
       console.log(`  Original:  ${(result.originalSize / 1024).toFixed(1)} KB`);
       console.log(`  Optimized: ${(result.optimizedSize / 1024).toFixed(1)} KB`);
-      console.log(
-        `  Reduction: ${((1 - result.compressionRatio) * 100).toFixed(1)}%`
-      );
+      console.log(`  Reduction: ${((1 - result.compressionRatio) * 100).toFixed(1)}%`);
       console.log(`  Output: ${sample.output}`);
     } catch (error) {
       console.error(`  Error: ${error}`);

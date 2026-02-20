@@ -38,7 +38,9 @@ task('test-svg-generation', 'Test SVG generation from deployed Nouns descriptor 
 
     for (const seed of seeds) {
       console.log(`\n📝 Testing seed: ${seed.name}`);
-      console.log(`   Background: ${seed.background}, Body: ${seed.body}, Accessory: ${seed.accessory}, Head: ${seed.head}, Glasses: ${seed.glasses}`);
+      console.log(
+        `   Background: ${seed.background}, Body: ${seed.body}, Accessory: ${seed.accessory}, Head: ${seed.head}, Glasses: ${seed.glasses}`,
+      );
 
       try {
         // Generate SVG directly (view call)
@@ -48,13 +50,14 @@ task('test-svg-generation', 'Test SVG generation from deployed Nouns descriptor 
         const duration = Date.now() - startTime;
 
         console.log(`   ✓ SVG generated in ${duration}ms`);
-        console.log(`   ✓ SVG size: ${svg.length.toLocaleString()} characters (${(svg.length / 1024).toFixed(2)} KB)`);
+        console.log(
+          `   ✓ SVG size: ${svg.length.toLocaleString()} characters (${(svg.length / 1024).toFixed(2)} KB)`,
+        );
 
         // Save to file
         const outputPath = path.join(outputDir, `${seed.name}.svg`);
         await fs.promises.writeFile(outputPath, svg);
         console.log(`   ✓ Saved to: ${outputPath}`);
-
       } catch (error: any) {
         console.error(`   ✗ FAILED: ${error.message}`);
         if (error.message.includes('gas') || error.message.includes('limit')) {

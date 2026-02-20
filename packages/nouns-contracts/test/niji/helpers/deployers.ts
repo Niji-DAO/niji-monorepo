@@ -19,7 +19,11 @@ export async function deployNijiDescriptor(
   compositeOrder: number[] = COMPOSITE_ORDER,
 ): Promise<NijiDescriptor> {
   const factory = await ethers.getContractFactory('NijiDescriptor');
-  return (await factory.deploy(artAddress, resolution, compositeOrder)) as unknown as NijiDescriptor;
+  return (await factory.deploy(
+    artAddress,
+    resolution,
+    compositeOrder,
+  )) as unknown as NijiDescriptor;
 }
 
 export async function deployNijiSeeder(artAddress: string): Promise<NijiSeeder> {
@@ -36,6 +40,10 @@ export async function deployNijiToken(
 ): Promise<NijiToken> {
   const factory = await ethers.getContractFactory('NijiToken');
   return (await factory.deploy(
-    name, symbol, descriptorAddress, seederAddress, maxSupply,
+    name,
+    symbol,
+    descriptorAddress,
+    seederAddress,
+    maxSupply,
   )) as unknown as NijiToken;
 }

@@ -169,7 +169,14 @@ async function main() {
   console.log('--------|------------|------------|----------|----------|--------');
 
   for (const r of results) {
-    const verdict = r.estimatedGasM < 20 ? '✅ 余裕' : r.estimatedGasM < 25 ? '✅ OK' : r.estimatedGasM < 30 ? '⚠️ ギリ' : '❌ NG';
+    const verdict =
+      r.estimatedGasM < 20
+        ? '✅ 余裕'
+        : r.estimatedGasM < 25
+          ? '✅ OK'
+          : r.estimatedGasM < 30
+            ? '⚠️ ギリ'
+            : '❌ NG';
     console.log(
       `${r.resolution}×${r.resolution} | ${(r.totalPngSize / 1024 / 1024).toFixed(2).padStart(8)} MB | ${(r.encodedSize / 1024 / 1024).toFixed(2).padStart(8)} MB | ${r.estimatedSvgKB.toFixed(0).padStart(6)} KB | ${r.estimatedGasM.toFixed(1).padStart(7)}M | ${verdict}`,
     );
@@ -186,7 +193,9 @@ async function main() {
     const best = viable.reduce((a, b) => (a.resolution > b.resolution ? a : b));
     console.log(`\n✅ 最適解: ${best.resolution}×${best.resolution}`);
     console.log(`   推定SVG: ${best.estimatedSvgKB.toFixed(0)} KB`);
-    console.log(`   推定ガス: ${best.estimatedGasM.toFixed(1)}M (30M制限の${((best.estimatedGasM / 30) * 100).toFixed(0)}%)`);
+    console.log(
+      `   推定ガス: ${best.estimatedGasM.toFixed(1)}M (30M制限の${((best.estimatedGasM / 30) * 100).toFixed(0)}%)`,
+    );
     console.log(`   サンプル: ${best.samplePath}`);
   }
 

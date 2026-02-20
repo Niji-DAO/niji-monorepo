@@ -28,9 +28,9 @@ const config: CodegenConfig = {
     './src/subgraphs/schema.graphql': {
       plugins: ['schema-ast'],
       config: {
-        includeDirectives: true
-      }
-    }
+        includeDirectives: true,
+      },
+    },
   },
 };
 
