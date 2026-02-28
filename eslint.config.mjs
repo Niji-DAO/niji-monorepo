@@ -14,6 +14,9 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import reactRefreshPlugin from 'eslint-plugin-react-refresh';
 
+// Config
+import prettierConfig from 'eslint-config-prettier';
+
 // Other plugins
 import importXPlugin from 'eslint-plugin-import-x';
 import linguiPlugin from 'eslint-plugin-lingui';
@@ -77,13 +80,9 @@ export default defineConfig([
     },
     extends: [
       ...tseslint.configs.recommended,
-      ...compat.extends(
-        'plugin:@typescript-eslint/recommended',
-        'plugin:prettier/recommended',
-        'prettier',
-      ),
       importXPlugin.flatConfigs.recommended,
       importXPlugin.flatConfigs.typescript,
+      prettierConfig,
     ],
     rules: {
       '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -197,8 +196,9 @@ export default defineConfig([
       prettier: prettierPlugin,
     },
     extends: [
-      ...compat.extends('plugin:react/recommended', 'plugin:prettier/recommended'),
+      ...compat.extends('plugin:react/recommended'),
       eslintReactPlugin.configs['recommended-typescript'],
+      prettierConfig,
     ],
     rules: {
       // React hooks rules
@@ -255,7 +255,7 @@ export default defineConfig([
   // Base JS configuration
   {
     files: ['**/*.js', '**/*.mjs'],
-    extends: [js.configs.recommended, ...compat.extends('plugin:prettier/recommended')],
+    extends: [js.configs.recommended, prettierConfig],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
