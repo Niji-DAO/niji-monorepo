@@ -15,7 +15,7 @@ import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import reactRefreshPlugin from 'eslint-plugin-react-refresh';
 
 // Other plugins
-import importPlugin from 'eslint-plugin-import';
+import importXPlugin from 'eslint-plugin-import-x';
 import linguiPlugin from 'eslint-plugin-lingui';
 import prettierPlugin from 'eslint-plugin-prettier';
 import turboPlugin from 'eslint-plugin-turbo';
@@ -67,7 +67,7 @@ export default defineConfig([
     },
     plugins: {
       '@typescript-eslint': typescriptEslintEslintPlugin,
-      import: importPlugin,
+      'import-x': importXPlugin,
       lingui: linguiPlugin,
       prettier: prettierPlugin,
       turbo: turboPlugin,
@@ -79,21 +79,21 @@ export default defineConfig([
       ...tseslint.configs.recommended,
       ...compat.extends(
         'plugin:@typescript-eslint/recommended',
-        'plugin:import/recommended',
-        'plugin:import/typescript',
         'plugin:prettier/recommended',
         'prettier',
       ),
+      importXPlugin.flatConfigs.recommended,
+      importXPlugin.flatConfigs.typescript,
     ],
     rules: {
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       // Import plugin rules
-      'import/no-unresolved': 'error',
-      'import/named': 'warn',
-      'import/default': 'error',
-      'import/namespace': 'error',
-      'import/export': 'error',
-      'import/order': [
+      'import-x/no-unresolved': 'error',
+      'import-x/named': 'warn',
+      'import-x/default': 'error',
+      'import-x/namespace': 'error',
+      'import-x/export': 'error',
+      'import-x/order': [
         'warn',
         {
           groups: [
@@ -149,9 +149,9 @@ export default defineConfig([
       'prettier/prettier': 'warn',
     },
     settings: {
-      ...importPlugin.configs.typescript.settings,
-      'import/resolver': {
-        ...importPlugin.configs.typescript.settings['import/resolver'],
+      ...importXPlugin.configs.typescript.settings,
+      'import-x/resolver': {
+        ...importXPlugin.configs.typescript.settings['import-x/resolver'],
         typescript: {
           project: './tsconfig.json',
         },
@@ -163,9 +163,9 @@ export default defineConfig([
   {
     files: ['**/packages/nouns-docs/**/*.{ts,tsx}'],
     settings: {
-      ...importPlugin.configs.typescript.settings,
-      'import/resolver': {
-        ...importPlugin.configs.typescript.settings['import/resolver'],
+      ...importXPlugin.configs.typescript.settings,
+      'import-x/resolver': {
+        ...importXPlugin.configs.typescript.settings['import-x/resolver'],
         typescript: {
           project: 'packages/nouns-docs/tsconfig.json',
         },
@@ -177,9 +177,9 @@ export default defineConfig([
   {
     files: ['**/packages/nouns-webapp/**/*.{ts,tsx}'],
     settings: {
-      ...importPlugin.configs.typescript.settings,
-      'import/resolver': {
-        ...importPlugin.configs.typescript.settings['import/resolver'],
+      ...importXPlugin.configs.typescript.settings,
+      'import-x/resolver': {
+        ...importXPlugin.configs.typescript.settings['import-x/resolver'],
         typescript: {
           project: 'packages/nouns-webapp/tsconfig.json',
         },
@@ -263,16 +263,16 @@ export default defineConfig([
       },
     },
     plugins: {
-      import: importPlugin,
+      'import-x': importXPlugin,
       prettier: prettierPlugin,
     },
     rules: {
       // Import plugin rules for JS files
-      'import/no-unresolved': 'error',
-      'import/named': 'warn',
-      'import/default': 'error',
-      'import/namespace': 'error',
-      'import/export': 'error',
+      'import-x/no-unresolved': 'error',
+      'import-x/named': 'warn',
+      'import-x/default': 'error',
+      'import-x/namespace': 'error',
+      'import-x/export': 'error',
       // Prettier rules
       'prettier/prettier': 'warn',
     },
@@ -288,9 +288,9 @@ export default defineConfig([
       },
     },
     settings: {
-      ...importPlugin.configs.typescript.settings,
-      'import/resolver': {
-        ...importPlugin.configs.typescript.settings['import/resolver'],
+      ...importXPlugin.configs.typescript.settings,
+      'import-x/resolver': {
+        ...importXPlugin.configs.typescript.settings['import-x/resolver'],
         typescript: {
           project: 'packages/nouns-api/tsconfig.json',
         },
@@ -298,7 +298,7 @@ export default defineConfig([
     },
     rules: {
       // Disable import/no-unresolved for Ponder virtual modules
-      'import/no-unresolved': [
+      'import-x/no-unresolved': [
         'error',
         {
           ignore: ['^ponder:'],
