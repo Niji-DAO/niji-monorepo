@@ -3,7 +3,7 @@
   "build": {
     "builder": "NIXPACKS",
     "buildCommand": "pnpm install && pnpm build --filter=@niji/api",
-    "watchPatterns": ["/packages/nouns-api"]
+    "watchPatterns": ["/packages/niji-api"]
   },
   "deploy": {
     "startCommand": "pnpm --filter @niji/api -- start --schema $RAILWAY_DEPLOYMENT_ID",

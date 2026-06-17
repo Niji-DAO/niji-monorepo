@@ -292,7 +292,7 @@ export default defineConfig([
     },
   },
 
-  // nouns-api specific configuration (Ponder)
+  // niji-api specific configuration (Ponder)
   // eslint-config-ponder hard-codes `tsconfigRootDir: './'` and
   // `project: true`. The former is rejected as a non-absolute path when
   // lint-staged invokes eslint from the repo root with file arguments, and
@@ -302,7 +302,7 @@ export default defineConfig([
     const { project: _project, ...restParserOptions } = cfg.languageOptions?.parserOptions ?? {};
     return {
       ...cfg,
-      files: cfg.files ?? ['**/packages/nouns-api/**/*.{ts,tsx}'],
+      files: cfg.files ?? ['**/packages/niji-api/**/*.{ts,tsx}'],
       languageOptions: {
         ...cfg.languageOptions,
         parserOptions: {
@@ -313,7 +313,7 @@ export default defineConfig([
     };
   }),
   {
-    files: ['**/packages/nouns-api/**/*.{ts,tsx}'],
+    files: ['**/packages/niji-api/**/*.{ts,tsx}'],
     languageOptions: {
       parserOptions: {
         tsconfigRootDir: __dirname,
@@ -324,7 +324,7 @@ export default defineConfig([
       'import-x/resolver': {
         ...importXPlugin.configs.typescript.settings['import-x/resolver'],
         typescript: {
-          project: 'packages/nouns-api/tsconfig.json',
+          project: 'packages/niji-api/tsconfig.json',
         },
       },
     },

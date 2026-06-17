@@ -16,13 +16,13 @@ The [nouns contracts](packages/nouns-contracts) is the suite of Solidity contrac
 
 The [nouns sdk](packages/nouns-sdk) includes methods and react hooks for interacting with all the Nouns contracts, as well as image encoding and SVG building utilities.
 
-### nouns-api
+### niji-api
 
 A [ponder.sh](https://github.com/ponder-sh/ponder) based API for all historical NounsDAO data
 
 ### niji-subgraph
 
-**deprecated** in favor of **nouns-api**
+**deprecated** in favor of **niji-api**
 
 In order to make retrieving more complex data from the auction history, [nouns subgraph](packages/niji-subgraph) contains subgraph manifests that are deployed onto [The Graph](https://thegraph.com).
 
