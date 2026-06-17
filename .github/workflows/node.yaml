@@ -54,7 +54,7 @@ jobs:
       - name: Build packages
         run: pnpm build
       - name: Netlify build
-        run: pnpm netlify build --offline --filter packages/nouns-webapp
+        run: pnpm netlify build --offline --filter packages/niji-webapp
 
   test:
     name: Test

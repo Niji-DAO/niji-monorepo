@@ -26,9 +26,9 @@ A [ponder.sh](https://github.com/ponder-sh/ponder) based API for all historical 
 
 In order to make retrieving more complex data from the auction history, [nouns subgraph](packages/niji-subgraph) contains subgraph manifests that are deployed onto [The Graph](https://thegraph.com).
 
-### nouns-webapp
+### niji-webapp
 
-The [nouns webapp](packages/nouns-webapp) is the frontend for interacting with Noun auctions as hosted at [nouns.wtf](https://nouns.wtf).
+The [nouns webapp](packages/niji-webapp) is the frontend for interacting with Noun auctions as hosted at [nouns.wtf](https://nouns.wtf).
 
 ## Quickstart
 

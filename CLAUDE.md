@@ -23,7 +23,7 @@ The monorepo uses a unified TypeScript configuration with package-specific overr
   - `packages/niji-contracts`: Uses `module: "CommonJS"` for Hardhat compatibility
   - `packages/niji-subgraph`: Uses `module: "CommonJS"` for Graph TS compatibility
 
-Packages extending the base: `niji-contracts`, `niji-subgraph`, `nouns-webapp`. Standalone configs: `niji-assets`, `niji-sdk`, `niji-docs` (aligned to the same ES2022/ESNext standard).
+Packages extending the base: `niji-contracts`, `niji-subgraph`, `niji-webapp`. Standalone configs: `niji-assets`, `niji-sdk`, `niji-docs` (aligned to the same ES2022/ESNext standard).
 
 ## Package Structure
 
@@ -32,7 +32,7 @@ Six main packages with interdependencies:
 1. **niji-assets** - PNG and run-length encoded Noun image data
 2. **niji-contracts** - Solidity smart contracts for Nouns DAO (uses Hardhat + Foundry)
 3. **niji-sdk** - Contract addresses, ABIs, instances, and image utilities
-4. **nouns-webapp** - React frontend (Vite + Tailwind + i18n)
+4. **niji-webapp** - React frontend (Vite + Tailwind + i18n)
 5. **niji-subgraph** - The Graph subgraph manifests
 6. **niji-docs** - Next.js 15 documentation site with Nextra 4
 
@@ -57,7 +57,7 @@ pnpm format           # Prettier formatting
 ### Package-Specific Work
 ```bash
 # Work in specific package
-cd packages/nouns-webapp
+cd packages/niji-webapp
 pnpm dev              # Start webapp dev server
 pnpm test             # Run package tests
 pnpm build            # Build package
@@ -89,9 +89,9 @@ Key contracts:
 - `governance/` - DAO governance contracts
 - `NounsDescriptor` - SVG generation and metadata
 
-## Frontend Architecture (nouns-webapp)
+## Frontend Architecture (niji-webapp)
 
-Located in `packages/nouns-webapp/` - React web application built with Vite, TypeScript, and Wagmi.
+Located in `packages/niji-webapp/` - React web application built with Vite, TypeScript, and Wagmi.
 
 ### Tech Stack
 - **React 18** with **Vite** build tool
@@ -125,7 +125,7 @@ Pattern: Use `useQuery` with `execute()` function from GraphQL Codegen (see `src
 
 ### Webapp-Specific Commands
 ```bash
-# From packages/nouns-webapp directory
+# From packages/niji-webapp directory
 cp .env.example.local .env    # Setup environment
 pnpm dev                      # Start dev server on port 3000
 pnpm test:watch               # Run tests in watch mode
@@ -177,7 +177,7 @@ Run `pnpm test` from root to test all packages, or `cd` into specific package fo
 
 Note: All packages target ES2022. Contracts and subgraph use CommonJS modules for framework compatibility; other packages use ESNext.
 
-## Active Migrations (nouns-webapp)
+## Active Migrations (niji-webapp)
 
 The webapp is undergoing modernization efforts:
 
@@ -208,7 +208,7 @@ Always run code generation after:
 - Modifying GraphQL queries
 - Adding new translatable strings
 
-## Feature Flags (nouns-webapp)
+## Feature Flags (niji-webapp)
 
 Feature toggles in `src/config.ts`:
 - `daoGteV3`: DAO v3+ features
