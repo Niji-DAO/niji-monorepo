@@ -7,13 +7,13 @@ import { formatEther, parseEther } from 'viem';
 
 import SettleManuallyBtn from '@/components/SettleManuallyBtn';
 import {
-  useReadNounsAuctionHouseMinBidIncrementPercentage,
-  useWriteNounsAuctionHouseCreateBid,
-  useWriteNounsAuctionHouseSettleCurrentAndCreateNewAuction,
+  useReadNijiAuctionHouseMinBidIncrementPercentage,
+  useWriteNijiAuctionHouseCreateBid,
+  useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction,
 } from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { useActiveLocale } from '@/hooks/useActivateLocale';
-import { Auction } from '@/wrappers/nounsAuction';
+import { Auction } from '@/wrappers/nijiAuction';
 
 import classes from './Bid.module.css';
 
@@ -67,7 +67,7 @@ const Bid: React.FC<BidProps> = props => {
 
   const { t } = useLingui();
 
-  const { data: minBidIncPercentage } = useReadNounsAuctionHouseMinBidIncrementPercentage();
+  const { data: minBidIncPercentage } = useReadNijiAuctionHouseMinBidIncrementPercentage();
   const minBid = computeMinimumNextBid(
     auction.amount !== undefined ? BigInt(auction.amount.toString()) : 0n,
     minBidIncPercentage !== undefined ? BigInt(minBidIncPercentage.toString()) : undefined,
@@ -78,7 +78,7 @@ const Bid: React.FC<BidProps> = props => {
     isPending: isPlacingBid,
     isError: didPlaceBidFail,
     isSuccess: placeBidSucceeded,
-  } = useWriteNounsAuctionHouseCreateBid();
+  } = useWriteNijiAuctionHouseCreateBid();
 
   const {
     writeContract: settleAuction,
@@ -87,7 +87,7 @@ const Bid: React.FC<BidProps> = props => {
     isError: didSettleFail,
     isIdle: isSettleIdle,
     error: settleAuctionError,
-  } = useWriteNounsAuctionHouseSettleCurrentAndCreateNewAuction();
+  } = useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction();
 
   const bidInputHandler = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.target.value;

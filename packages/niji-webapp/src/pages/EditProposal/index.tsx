@@ -13,7 +13,7 @@ import EditProposalButton from '@/components/EditProposalButton/index';
 import ProposalActionModal from '@/components/ProposalActionsModal';
 import ProposalEditor from '@/components/ProposalEditor';
 import ProposalTransactions from '@/components/ProposalTransactions';
-import { nounsTokenBuyerAddress } from '@/contracts';
+import { nijiTokenBuyerAddress } from '@/contracts';
 import Section from '@/layout/Section';
 import { useEthNeeded } from '@/utils/tokenBuyerContractUtils/tokenBuyer';
 import { Address, Hex } from '@/utils/types';
@@ -26,8 +26,8 @@ import {
   useUpdateProposal,
   useUpdateProposalDescription,
   useUpdateProposalTransactions,
-} from '@/wrappers/nounsDao';
-import { useCreateProposalCandidate, useGetCreateCandidateCost } from '@/wrappers/nounsData';
+} from '@/wrappers/nijiDao';
+import { useCreateProposalCandidate, useGetCreateCandidateCost } from '@/wrappers/nijiData';
 import { useUserVotes } from '@/wrappers/nounToken';
 
 import navBarButtonClasses from '@/components/NavBarButton/NavBarButton.module.css';
@@ -76,9 +76,9 @@ const EditProposalPage: React.FC<EditProposalProps> = () => {
   );
   const chainId = defaultChain.id;
   const ethNeeded = useEthNeeded(
-    nounsTokenBuyerAddress[chainId],
+    nijiTokenBuyerAddress[chainId],
     totalUSDCPayment,
-    nounsTokenBuyerAddress[chainId] == undefined || totalUSDCPayment === 0,
+    nijiTokenBuyerAddress[chainId] == undefined || totalUSDCPayment === 0,
   );
 
   const removeTitleFromDescription = (description: string, title: string) => {
@@ -132,13 +132,13 @@ const EditProposalPage: React.FC<EditProposalProps> = () => {
   useEffect(() => {
     if (ethNeeded !== undefined && ethNeeded !== tokenBuyerTopUpEth && totalUSDCPayment > 0) {
       const hasTokenBuyterTopTop =
-        proposalTransactions.filter(txn => txn.address === nounsTokenBuyerAddress[chainId]).length >
+        proposalTransactions.filter(txn => txn.address === nijiTokenBuyerAddress[chainId]).length >
         0;
 
       // Add a new top up txn if one isn't there already, else add to the existing one
       if (Number(ethNeeded) > 0 && !hasTokenBuyterTopTop) {
         handleAddProposalAction({
-          address: nounsTokenBuyerAddress[chainId],
+          address: nijiTokenBuyerAddress[chainId],
           value: BigInt(ethNeeded ?? 0),
           calldata: '0x' as Hex,
           signature: '',
@@ -148,7 +148,7 @@ const EditProposalPage: React.FC<EditProposalProps> = () => {
           const indexOfTokenBuyerTopUp =
             proposalTransactions
               .map((txn, index: number) => {
-                if (txn.address === nounsTokenBuyerAddress[chainId]) {
+                if (txn.address === nijiTokenBuyerAddress[chainId]) {
                   return index;
                 } else {
                   return -1;

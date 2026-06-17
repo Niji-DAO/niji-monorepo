@@ -17,11 +17,11 @@ import {
 import { useSignTypedData } from 'wagmi';
 
 import link from '@/assets/icons/Link.svg';
-import { nounsGovernorAddress } from '@/contracts';
+import { nijiGovernorAddress } from '@/contracts';
 import { buildEtherscanTxLink } from '@/utils/etherscan';
 import { Address } from '@/utils/types';
 import { defaultChain } from '@/wagmi';
-import { ProposalCandidate, useAddSignature } from '@/wrappers/nounsData';
+import { ProposalCandidate, useAddSignature } from '@/wrappers/nijiData';
 
 import classes from './CandidateSponsors.module.css';
 
@@ -80,13 +80,13 @@ const SignatureForm = (props: Readonly<SignatureFormProps>) => {
   const [domain, setDomain] = useState({
     name: 'Nouns DAO',
     chainId,
-    verifyingContract: nounsGovernorAddress[chainId],
+    verifyingContract: nijiGovernorAddress[chainId],
   });
 
   useEffect(() => {
     setDomain(prev => ({
       ...prev,
-      verifyingContract: nounsGovernorAddress[chainId],
+      verifyingContract: nijiGovernorAddress[chainId],
     }));
   }, []);
 

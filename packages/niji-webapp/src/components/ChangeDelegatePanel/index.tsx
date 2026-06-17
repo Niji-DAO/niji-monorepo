@@ -13,7 +13,7 @@ import { useActiveLocale } from '@/hooks/useActivateLocale';
 import { buildEtherscanTxLink } from '@/utils/etherscan';
 import { usePickByState } from '@/utils/pickByState';
 import { Address } from '@/utils/types';
-import { useProposalThreshold } from '@/wrappers/nounsDao';
+import { useProposalThreshold } from '@/wrappers/nijiDao';
 import {
   useAccountVotes,
   useDelegateVotes,

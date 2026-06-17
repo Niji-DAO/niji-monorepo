@@ -8,7 +8,7 @@ import duration from 'dayjs/plugin/duration';
 import { Col, Row } from 'react-bootstrap';
 
 import { useAppSelector } from '@/hooks';
-import { Auction } from '@/wrappers/nounsAuction';
+import { Auction } from '@/wrappers/nijiAuction';
 
 import classes from './AuctionTimer.module.css';
 

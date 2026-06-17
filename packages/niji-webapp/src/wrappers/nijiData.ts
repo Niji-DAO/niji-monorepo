@@ -10,17 +10,17 @@ import { useMemo } from 'react';
 import { filter, isNonNullish, isNullish, map, pipe, sort } from 'remeda';
 
 import {
-  useReadNounsDataCreateCandidateCost,
-  useReadNounsDataUpdateCandidateCost,
-  useWriteNounsDataAddSignature,
-  useWriteNounsDataCancelProposalCandidate,
-  useWriteNounsDataCreateProposalCandidate,
-  useWriteNounsDataSendCandidateFeedback,
-  useWriteNounsDataSendFeedback,
-  useWriteNounsDataUpdateProposalCandidate,
-  useWriteNounsGovernorCancelSig,
-  useWriteNounsGovernorProposeBySigs,
-  useWriteNounsGovernorUpdateProposalBySigs,
+  useReadNijiDataCreateCandidateCost,
+  useReadNijiDataUpdateCandidateCost,
+  useWriteNijiDataAddSignature,
+  useWriteNijiDataCancelProposalCandidate,
+  useWriteNijiDataCreateProposalCandidate,
+  useWriteNijiDataSendCandidateFeedback,
+  useWriteNijiDataSendFeedback,
+  useWriteNijiDataUpdateProposalCandidate,
+  useWriteNijiGovernorCancelSig,
+  useWriteNijiGovernorProposeBySigs,
+  useWriteNijiGovernorUpdateProposalBySigs,
 } from '@/contracts';
 import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 
@@ -38,7 +38,7 @@ import {
   useActivePendingUpdatableProposers,
   useProposalThreshold,
   useUpdatableProposalIds,
-} from './nounsDao';
+} from './nijiDao';
 import { useDelegateNounsAtBlockQuery } from './nounToken';
 import {
   candidateFeedbacksDocument,
@@ -65,7 +65,7 @@ export const useCreateProposalCandidate = () => {
     isPending: isCreatePending,
     isSuccess: isCreateSuccess,
     error: createError,
-  } = useWriteNounsDataCreateProposalCandidate();
+  } = useWriteNijiDataCreateProposalCandidate();
 
   let status = 'None';
   if (isCreatePending) {
@@ -98,7 +98,7 @@ export const useCancelCandidate = () => {
     isPending: isCancelPending,
     isSuccess: isCancelSuccess,
     error: cancelError,
-  } = useWriteNounsDataCancelProposalCandidate();
+  } = useWriteNijiDataCancelProposalCandidate();
 
   let status = 'None';
   if (isCancelPending) {
@@ -131,7 +131,7 @@ export const useAddSignature = () => {
     isPending: isAddPending,
     isSuccess: isAddSuccess,
     error: addError,
-  } = useWriteNounsDataAddSignature();
+  } = useWriteNijiDataAddSignature();
 
   let status = 'None';
   if (isAddPending) {
@@ -358,7 +358,7 @@ export const useCandidateProposalVersions = (id: string) => {
 };
 
 export const useGetCreateCandidateCost = () => {
-  const { data: createCandidateCost } = useReadNounsDataCreateCandidateCost();
+  const { data: createCandidateCost } = useReadNijiDataCreateCandidateCost();
 
   if (createCandidateCost == null) {
     return;
@@ -368,7 +368,7 @@ export const useGetCreateCandidateCost = () => {
 };
 
 export const useGetUpdateCandidateCost = () => {
-  const { data: updateCandidateCost } = useReadNounsDataUpdateCandidateCost();
+  const { data: updateCandidateCost } = useReadNijiDataUpdateCandidateCost();
 
   if (updateCandidateCost == null) {
     return;
@@ -384,7 +384,7 @@ export const useUpdateProposalCandidate = () => {
     isPending: isUpdatePending,
     isSuccess: isUpdateSuccess,
     error: updateError,
-  } = useWriteNounsDataUpdateProposalCandidate();
+  } = useWriteNijiDataUpdateProposalCandidate();
 
   let status = 'None';
   if (isUpdatePending) {
@@ -417,7 +417,7 @@ export const useCancelSignature = () => {
     isPending: isCancelSigPending,
     isSuccess: isCancelSigSuccess,
     error: cancelSigError,
-  } = useWriteNounsGovernorCancelSig();
+  } = useWriteNijiGovernorCancelSig();
 
   let status = 'None';
   if (isCancelSigPending) {
@@ -452,7 +452,7 @@ export const useSendFeedback = () => {
     isPending: isSendProposalFeedbackPending,
     isSuccess: isSendProposalFeedbackSuccess,
     error: sendProposalFeedbackError,
-  } = useWriteNounsDataSendFeedback();
+  } = useWriteNijiDataSendFeedback();
 
   let proposalFeedbackStatus = 'None';
   if (isSendProposalFeedbackPending) {
@@ -478,7 +478,7 @@ export const useSendFeedback = () => {
     isPending: isSendCandidateFeedbackPending,
     isSuccess: isSendCandidateFeedbackSuccess,
     error: sendCandidateFeedbackError,
-  } = useWriteNounsDataSendCandidateFeedback();
+  } = useWriteNijiDataSendCandidateFeedback();
 
   let candidateFeedbackStatus = 'None';
   if (isSendCandidateFeedbackPending) {
@@ -556,7 +556,7 @@ export const useProposeBySigs = () => {
     isPending: isProposePending,
     isSuccess: isProposeSuccess,
     error: proposeError,
-  } = useWriteNounsGovernorProposeBySigs();
+  } = useWriteNijiGovernorProposeBySigs();
 
   let status = 'None';
   if (isProposePending) {
@@ -589,7 +589,7 @@ export const useUpdateProposalBySigs = () => {
     isPending: isUpdatePending,
     isSuccess: isUpdateSuccess,
     error: updateError,
-  } = useWriteNounsGovernorUpdateProposalBySigs();
+  } = useWriteNijiGovernorUpdateProposalBySigs();
 
   let status = 'None';
   if (isUpdatePending) {

@@ -6,7 +6,7 @@ import { encodeFunctionData, parseAbi, parseEther } from 'viem';
 import ModalBottomButtonRow from '@/components/ModalBottomButtonRow';
 import ModalTitle from '@/components/ModalTitle';
 import ShortAddress from '@/components/ShortAddress';
-import { nounsPayerAbi, stEthAddress, nounsPayerAddress } from '@/contracts';
+import { nijiPayerAbi, stEthAddress, nijiPayerAddress } from '@/contracts';
 import { Address, Hex } from '@/utils/types';
 import { defaultChain } from '@/wagmi';
 
@@ -60,13 +60,13 @@ const handleActionAdd = (
     // Convert USDC amount - USDC has 6 decimals
     const usdcAmount = Math.round(parseFloat(state.amount ?? '0') * 1_000_000).toString();
     const calldata = encodeFunctionData({
-      abi: nounsPayerAbi,
+      abi: nijiPayerAbi,
       functionName: 'sendOrRegisterDebt',
       args: [state.address, BigInt(usdcAmount)],
     });
 
     onActionAdd({
-      address: nounsPayerAddress[chainId],
+      address: nijiPayerAddress[chainId],
       value: 0n,
       usdcValue: Math.round(parseFloat(state.amount ?? '0') * 1_000_000),
       signature: 'sendOrRegisterDebt(address,uint256)',

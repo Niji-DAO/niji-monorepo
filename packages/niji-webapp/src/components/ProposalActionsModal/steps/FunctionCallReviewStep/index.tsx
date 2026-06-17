@@ -1,4 +1,4 @@
-import type { ProposalTransaction } from '@/wrappers/nounsDao';
+import type { ProposalTransaction } from '@/wrappers/nijiDao';
 import type { AbiFunction } from 'viem';
 
 import React from 'react';

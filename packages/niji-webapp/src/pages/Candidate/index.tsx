@@ -25,12 +25,12 @@ import {
   useProposal,
   useProposalCount,
   useProposalThreshold,
-} from '@/wrappers/nounsDao';
+} from '@/wrappers/nijiDao';
 import {
   useCancelCandidate,
   useCandidateFeedback,
   useCandidateProposal,
-} from '@/wrappers/nounsData';
+} from '@/wrappers/nijiData';
 import { useUserVotes } from '@/wrappers/nounToken';
 
 import classes from './Candidate.module.css';

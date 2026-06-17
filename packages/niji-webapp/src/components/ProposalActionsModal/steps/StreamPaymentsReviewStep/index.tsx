@@ -1,5 +1,5 @@
 import type { FinalProposalActionStepProps } from '@/components/ProposalActionsModal';
-import type { ProposalTransaction } from '@/wrappers/nounsDao';
+import type { ProposalTransaction } from '@/wrappers/nijiDao';
 
 import React from 'react';
 
@@ -11,7 +11,7 @@ import ModalLabel from '@/components/ModalLabel';
 import ModalTextPrimary from '@/components/ModalTextPrimary';
 import ModalTitle from '@/components/ModalTitle';
 import ShortAddress from '@/components/ShortAddress';
-import { nounsGovernorAddress } from '@/contracts';
+import { nijiGovernorAddress } from '@/contracts';
 import useStreamPaymentTransactions from '@/hooks/useStreamPaymentTransactions';
 import {
   formatTokenAmount,
@@ -29,8 +29,8 @@ const StreamPaymentsReviewStep: React.FC<FinalProposalActionStepProps> = props =
   const chainId = defaultChain.id;
 
   const predictedAddress = usePredictStreamAddress({
-    msgSender: nounsGovernorAddress[chainId],
-    payer: nounsGovernorAddress[chainId],
+    msgSender: nijiGovernorAddress[chainId],
+    payer: nijiGovernorAddress[chainId],
     recipient: state.address,
     tokenAmount: formatTokenAmount(Number(state.amount), state.TransferFundsCurrency),
     tokenAddress: getTokenAddressForCurrency(state.TransferFundsCurrency),

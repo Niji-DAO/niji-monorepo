@@ -29,8 +29,8 @@ import {
   ProposalState,
   useIsDaoGteV3,
   useProposalThreshold,
-} from '@/wrappers/nounsDao';
-import { ProposalCandidate, useCandidateProposals } from '@/wrappers/nounsData';
+} from '@/wrappers/nijiDao';
+import { ProposalCandidate, useCandidateProposals } from '@/wrappers/nijiData';
 import { useNounTokenBalance, useUserVotes } from '@/wrappers/nounToken';
 
 import classes from './Proposals.module.css';

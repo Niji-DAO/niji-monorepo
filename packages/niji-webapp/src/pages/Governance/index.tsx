@@ -1,8 +1,8 @@
 import { i18n } from '@lingui/core';
 import { Trans } from '@lingui/react/macro';
 import {
-  useReadNounsTreasuryBalancesInEth,
-  useReadNounsTreasuryBalancesInUsd,
+  useReadNijiTreasuryBalancesInEth,
+  useReadNijiTreasuryBalancesInUsd,
 } from '@niji/sdk/react/treasury';
 import clsx from 'clsx';
 import { Col, Row } from 'react-bootstrap';
@@ -10,7 +10,7 @@ import { formatEther, formatUnits } from 'viem';
 
 import Proposals from '@/components/Proposals';
 import Section from '@/layout/Section';
-import { useAllProposals, useProposalThreshold } from '@/wrappers/nounsDao';
+import { useAllProposals, useProposalThreshold } from '@/wrappers/nijiDao';
 
 import classes from './Governance.module.css';
 
@@ -19,7 +19,7 @@ const GovernancePage = () => {
   const threshold = useProposalThreshold();
   const nounsRequired = threshold == null ? undefined : threshold + 1;
 
-  const treasuryBalance = useReadNounsTreasuryBalancesInEth({
+  const treasuryBalance = useReadNijiTreasuryBalancesInEth({
     query: {
       select: balances => {
         console.log('eth', balances);
@@ -27,7 +27,7 @@ const GovernancePage = () => {
       },
     },
   }).data;
-  const treasuryBalanceUSD = useReadNounsTreasuryBalancesInUsd({
+  const treasuryBalanceUSD = useReadNijiTreasuryBalancesInUsd({
     query: {
       select: balances => {
         console.log(

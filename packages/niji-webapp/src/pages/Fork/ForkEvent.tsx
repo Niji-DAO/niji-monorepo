@@ -12,7 +12,7 @@ import {
   EscrowWithdrawal,
   ForkCycleEvent,
   useProposalTitles,
-} from '@/wrappers/nounsDao';
+} from '@/wrappers/nijiDao';
 
 import classes from './Fork.module.css';
 

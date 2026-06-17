@@ -6,7 +6,7 @@ import { map } from 'remeda';
 
 import SolidColorBackgroundModal from '@/components/SolidColorBackgroundModal';
 import { buildEtherscanTxLink } from '@/utils/etherscan';
-import { useWithdrawFromForkEscrow } from '@/wrappers/nounsDao';
+import { useWithdrawFromForkEscrow } from '@/wrappers/nijiDao';
 
 import classes from './Fork.module.css';
 

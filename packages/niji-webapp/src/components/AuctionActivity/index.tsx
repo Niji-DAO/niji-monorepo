@@ -19,19 +19,19 @@ import CurrentBid from '@/components/CurrentBid';
 import Holder from '@/components/Holder';
 import NounInfoCard from '@/components/NounInfoCard';
 import Winner from '@/components/Winner';
-import { nounsAuctionHouseAddress } from '@/contracts';
+import { nijiAuctionHouseAddress } from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { RootState } from '@/store';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
 import { defaultChain } from '@/wagmi';
-import { Auction } from '@/wrappers/nounsAuction';
+import { Auction } from '@/wrappers/nijiAuction';
 
 import classes from './AuctionActivity.module.css';
 import bidHistoryClasses from './BidHistory.module.css';
 
 const openEtherscanBidHistory = () => {
   const chainId = defaultChain.id;
-  const url = buildEtherscanAddressLink(nounsAuctionHouseAddress[chainId]);
+  const url = buildEtherscanAddressLink(nijiAuctionHouseAddress[chainId]);
   window.open(url);
 };
 

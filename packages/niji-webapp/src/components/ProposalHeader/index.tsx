@@ -24,7 +24,7 @@ import {
   useHasVotedOnProposal,
   useIsDaoGteV3,
   useProposalVote,
-} from '@/wrappers/nounsDao';
+} from '@/wrappers/nijiDao';
 import { useUserVotesAsOfBlock } from '@/wrappers/nounToken';
 
 import classes from './ProposalHeader.module.css';

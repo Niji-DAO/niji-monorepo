@@ -13,7 +13,7 @@ import { RootState } from '@/store';
 import { nounPath } from '@/utils/history';
 import { beige, grey } from '@/utils/nounBgColors';
 import { isNounderNoun } from '@/utils/nounderNoun';
-import { Auction as IAuction } from '@/wrappers/nounsAuction';
+import { Auction as IAuction } from '@/wrappers/nijiAuction';
 import { INounSeed } from '@/wrappers/nounToken';
 
 import classes from './Auction.module.css';

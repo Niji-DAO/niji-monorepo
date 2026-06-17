@@ -7,7 +7,7 @@ import { Spinner } from 'react-bootstrap';
 import SolidColorBackgroundModal from '@/components/SolidColorBackgroundModal';
 import { buildEtherscanTxLink } from '@/utils/etherscan';
 import { Hash } from '@/utils/types';
-import { useExecuteFork } from '@/wrappers/nounsDao';
+import { useExecuteFork } from '@/wrappers/nijiDao';
 
 import classes from './Fork.module.css';
 

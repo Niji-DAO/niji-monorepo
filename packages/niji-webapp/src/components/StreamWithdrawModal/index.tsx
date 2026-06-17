@@ -24,7 +24,7 @@ import {
   useElapsedTime,
   useStreamRemainingBalance,
   useWithdrawTokens,
-} from '@/wrappers/nounsStream';
+} from '@/wrappers/nijiStream';
 
 import classes from './StreamWithdrawModal.module.css';
 

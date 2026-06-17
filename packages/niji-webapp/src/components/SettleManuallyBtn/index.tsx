@@ -6,7 +6,7 @@ import { Trans } from '@lingui/react/macro';
 import dayjs from 'dayjs';
 
 import { CHAIN_ID } from '@/config';
-import { Auction } from '@/wrappers/nounsAuction';
+import { Auction } from '@/wrappers/nijiAuction';
 
 import classes from './SettleManuallyBtn.module.css';
 

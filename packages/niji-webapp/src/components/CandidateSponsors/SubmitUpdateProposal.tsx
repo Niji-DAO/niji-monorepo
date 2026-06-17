@@ -11,7 +11,7 @@ import {
   CandidateSignature,
   ProposalCandidate,
   useUpdateProposalBySigs,
-} from '@/wrappers/nounsData';
+} from '@/wrappers/nijiData';
 
 import SolidColorBackgroundModal from '../SolidColorBackgroundModal';
 

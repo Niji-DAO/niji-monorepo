@@ -20,7 +20,7 @@ import { useReadNounsTokenSeeds } from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { useBreakpointValues } from '@/hooks/useBreakpointValues';
 import { traitName } from '@/lib/traitName';
-import { Auction as IAuction } from '@/wrappers/nounsAuction';
+import { Auction as IAuction } from '@/wrappers/nijiAuction';
 type NounsPageProps = object;
 
 const NounsPage: React.FC<NounsPageProps> = () => {

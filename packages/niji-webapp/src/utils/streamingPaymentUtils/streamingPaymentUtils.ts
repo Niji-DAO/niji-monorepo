@@ -4,7 +4,7 @@ import { SupportedCurrency } from '@/components/ProposalActionsModal/steps/Trans
 import {
   stEthAddress,
   usdcAddress,
-  useReadNounsStreamFactoryPredictStreamAddress,
+  useReadNijiStreamFactoryPredictStreamAddress,
   wethAddress,
 } from '@/contracts';
 import { Address } from '@/utils/types';
@@ -28,7 +28,7 @@ export const usePredictStreamAddress = ({
   startTime,
   endTime,
 }: UsePredictStreamAddressProps) => {
-  const { data: predictedAddress } = useReadNounsStreamFactoryPredictStreamAddress({
+  const { data: predictedAddress } = useReadNijiStreamFactoryPredictStreamAddress({
     args: [msgSender, payer, recipient, tokenAmount, tokenAddress, startTime, endTime],
   });
 

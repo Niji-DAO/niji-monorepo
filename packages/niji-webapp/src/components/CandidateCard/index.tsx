@@ -6,8 +6,8 @@ import { Link } from 'react-router';
 
 import ShortAddress from '@/components/ShortAddress';
 import { relativeTimestamp } from '@/utils/timeUtils';
-import { PartialProposal } from '@/wrappers/nounsDao';
-import { ProposalCandidate } from '@/wrappers/nounsData';
+import { PartialProposal } from '@/wrappers/nijiDao';
+import { ProposalCandidate } from '@/wrappers/nijiData';
 
 import classes from './CandidateCard.module.css';
 import CandidateSponsors from './CandidateSponsors';

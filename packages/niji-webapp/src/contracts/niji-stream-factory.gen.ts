@@ -13,14 +13,14 @@ import {
 } from 'wagmi/codegen'
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// NounsStreamFactory
+// NijiStreamFactory
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const nounsStreamFactoryAbi = [
+export const nijiStreamFactoryAbi = [
   {
     type: 'constructor',
     inputs: [{ name: '_streamImplementation', internalType: 'address', type: 'address' }],
@@ -161,7 +161,7 @@ export const nounsStreamFactoryAbi = [
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const nounsStreamFactoryAddress = {
+export const nijiStreamFactoryAddress = {
   1: '0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff',
   11155111: '0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5',
 } as const
@@ -170,9 +170,9 @@ export const nounsStreamFactoryAddress = {
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const nounsStreamFactoryConfig = {
-  address: nounsStreamFactoryAddress,
-  abi: nounsStreamFactoryAbi,
+export const nijiStreamFactoryConfig = {
+  address: nijiStreamFactoryAddress,
+  abi: nijiStreamFactoryAbi,
 } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,132 +180,132 @@ export const nounsStreamFactoryConfig = {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const useReadNounsStreamFactory = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const useReadNijiStreamFactory = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `functionName` set to `"predictStreamAddress"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `functionName` set to `"predictStreamAddress"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const useReadNounsStreamFactoryPredictStreamAddress = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const useReadNijiStreamFactoryPredictStreamAddress = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
   functionName: 'predictStreamAddress',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `functionName` set to `"streamImplementation"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `functionName` set to `"streamImplementation"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const useReadNounsStreamFactoryStreamImplementation = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const useReadNijiStreamFactoryStreamImplementation = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
   functionName: 'streamImplementation',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const useWriteNounsStreamFactory = /*#__PURE__*/ createUseWriteContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const useWriteNijiStreamFactory = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `functionName` set to `"createAndFundStream"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `functionName` set to `"createAndFundStream"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const useWriteNounsStreamFactoryCreateAndFundStream = /*#__PURE__*/ createUseWriteContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const useWriteNijiStreamFactoryCreateAndFundStream = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
   functionName: 'createAndFundStream',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `functionName` set to `"createStream"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `functionName` set to `"createStream"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const useWriteNounsStreamFactoryCreateStream = /*#__PURE__*/ createUseWriteContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const useWriteNijiStreamFactoryCreateStream = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
   functionName: 'createStream',
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const useSimulateNounsStreamFactory = /*#__PURE__*/ createUseSimulateContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const useSimulateNijiStreamFactory = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `functionName` set to `"createAndFundStream"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `functionName` set to `"createAndFundStream"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const useSimulateNounsStreamFactoryCreateAndFundStream =
+export const useSimulateNijiStreamFactoryCreateAndFundStream =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: nounsStreamFactoryAbi,
-    address: nounsStreamFactoryAddress,
+    abi: nijiStreamFactoryAbi,
+    address: nijiStreamFactoryAddress,
     functionName: 'createAndFundStream',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `functionName` set to `"createStream"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `functionName` set to `"createStream"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const useSimulateNounsStreamFactoryCreateStream = /*#__PURE__*/ createUseSimulateContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const useSimulateNijiStreamFactoryCreateStream = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
   functionName: 'createStream',
 })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nounsStreamFactoryAbi}__
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiStreamFactoryAbi}__
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const useWatchNounsStreamFactoryEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const useWatchNijiStreamFactoryEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
 })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `eventName` set to `"StreamCreated"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `eventName` set to `"StreamCreated"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const useWatchNounsStreamFactoryStreamCreatedEvent =
+export const useWatchNijiStreamFactoryStreamCreatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
-    abi: nounsStreamFactoryAbi,
-    address: nounsStreamFactoryAddress,
+    abi: nijiStreamFactoryAbi,
+    address: nijiStreamFactoryAddress,
     eventName: 'StreamCreated',
   })
 
@@ -314,129 +314,129 @@ export const useWatchNounsStreamFactoryStreamCreatedEvent =
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__
+ * Wraps __{@link readContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const readNounsStreamFactory = /*#__PURE__*/ createReadContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const readNijiStreamFactory = /*#__PURE__*/ createReadContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `functionName` set to `"predictStreamAddress"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `functionName` set to `"predictStreamAddress"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const readNounsStreamFactoryPredictStreamAddress = /*#__PURE__*/ createReadContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const readNijiStreamFactoryPredictStreamAddress = /*#__PURE__*/ createReadContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
   functionName: 'predictStreamAddress',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `functionName` set to `"streamImplementation"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `functionName` set to `"streamImplementation"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const readNounsStreamFactoryStreamImplementation = /*#__PURE__*/ createReadContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const readNijiStreamFactoryStreamImplementation = /*#__PURE__*/ createReadContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
   functionName: 'streamImplementation',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const writeNounsStreamFactory = /*#__PURE__*/ createWriteContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const writeNijiStreamFactory = /*#__PURE__*/ createWriteContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `functionName` set to `"createAndFundStream"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `functionName` set to `"createAndFundStream"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const writeNounsStreamFactoryCreateAndFundStream = /*#__PURE__*/ createWriteContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const writeNijiStreamFactoryCreateAndFundStream = /*#__PURE__*/ createWriteContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
   functionName: 'createAndFundStream',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `functionName` set to `"createStream"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `functionName` set to `"createStream"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const writeNounsStreamFactoryCreateStream = /*#__PURE__*/ createWriteContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const writeNijiStreamFactoryCreateStream = /*#__PURE__*/ createWriteContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
   functionName: 'createStream',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const simulateNounsStreamFactory = /*#__PURE__*/ createSimulateContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const simulateNijiStreamFactory = /*#__PURE__*/ createSimulateContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `functionName` set to `"createAndFundStream"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `functionName` set to `"createAndFundStream"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const simulateNounsStreamFactoryCreateAndFundStream = /*#__PURE__*/ createSimulateContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const simulateNijiStreamFactoryCreateAndFundStream = /*#__PURE__*/ createSimulateContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
   functionName: 'createAndFundStream',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `functionName` set to `"createStream"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `functionName` set to `"createStream"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const simulateNounsStreamFactoryCreateStream = /*#__PURE__*/ createSimulateContract({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const simulateNijiStreamFactoryCreateStream = /*#__PURE__*/ createSimulateContract({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
   functionName: 'createStream',
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link nounsStreamFactoryAbi}__
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link nijiStreamFactoryAbi}__
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const watchNounsStreamFactoryEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const watchNijiStreamFactoryEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link nounsStreamFactoryAbi}__ and `eventName` set to `"StreamCreated"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link nijiStreamFactoryAbi}__ and `eventName` set to `"StreamCreated"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5)
  */
-export const watchNounsStreamFactoryStreamCreatedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: nounsStreamFactoryAbi,
-  address: nounsStreamFactoryAddress,
+export const watchNijiStreamFactoryStreamCreatedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: nijiStreamFactoryAbi,
+  address: nijiStreamFactoryAddress,
   eventName: 'StreamCreated',
 })

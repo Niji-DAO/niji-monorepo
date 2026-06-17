@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { faFile, faPenToSquare, faPlay, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
-import { useReadNounsTreasuryBalancesInEth } from '@niji/sdk/react/treasury';
+import { useReadNijiTreasuryBalancesInEth } from '@niji/sdk/react/treasury';
 import clsx from 'clsx';
 import { ConnectKitButton } from 'connectkit';
 import { Container, Dropdown, Nav, Navbar } from 'react-bootstrap';
@@ -19,12 +19,12 @@ import NavDropdown from '@/components/NavDropdown';
 import NavLocaleSwitcher from '@/components/NavLocaleSwitcher';
 import ShortAddress from '@/components/ShortAddress';
 import config, { CHAIN_ID } from '@/config';
-import { nounsTreasuryAddress } from '@/contracts';
+import { nijiTreasuryAddress } from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { usePickByState } from '@/utils/colorResponsiveUIUtils';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
 import { defaultChain } from '@/wagmi';
-import { useIsDaoGteV3 } from '@/wrappers/nounsDao';
+import { useIsDaoGteV3 } from '@/wrappers/nijiDao';
 
 import classes from './NavBar.module.css';
 import navDropdownClasses from './NavBarDropdown.module.css';
@@ -37,7 +37,7 @@ const NavBar = () => {
   const stateBgColor = useAppSelector(state => state.application.stateBackgroundColor);
   const isCool = useAppSelector(state => state.application.isCoolBackground);
   const location = useLocation();
-  const treasuryBalance = useReadNounsTreasuryBalancesInEth({
+  const treasuryBalance = useReadNijiTreasuryBalancesInEth({
     query: {
       select: data => {
         console.log(data);
@@ -45,7 +45,7 @@ const NavBar = () => {
       },
     },
   }).data;
-  const daoEtherscanLink = buildEtherscanAddressLink(nounsTreasuryAddress[chainId]);
+  const daoEtherscanLink = buildEtherscanAddressLink(nijiTreasuryAddress[chainId]);
   const [isNavExpanded, setIsNavExpanded] = useState(false);
 
   const useStateBg =

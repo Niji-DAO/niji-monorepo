@@ -10,8 +10,8 @@ import ShortAddress from '@/components/ShortAddress';
 import SolidColorBackgroundModal from '@/components/SolidColorBackgroundModal';
 import { buildEtherscanTxLink } from '@/utils/etherscan';
 import { Address, Hex } from '@/utils/types';
-import { usePropose } from '@/wrappers/nounsDao';
-import { CandidateSignature, ProposalCandidate, useProposeBySigs } from '@/wrappers/nounsData';
+import { usePropose } from '@/wrappers/nijiDao';
+import { CandidateSignature, ProposalCandidate, useProposeBySigs } from '@/wrappers/nijiData';
 
 import classes from './SelectSponsorsToPropose.module.css';
 

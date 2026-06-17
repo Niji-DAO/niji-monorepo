@@ -7,7 +7,7 @@ import { zeroAddress } from 'viem';
 import { useAccount } from 'wagmi';
 
 import {
-  nounsGovernorAddress,
+  nijiGovernorAddress,
   nounsTokenAddress,
   useReadNounsTokenBalanceOf,
   useReadNounsTokenDelegates,
@@ -257,7 +257,7 @@ export const useSetApprovalForAll = () => {
 
   return {
     setApproval: async () => {
-      await writeContractAsync({ args: [nounsGovernorAddress[chainId], true] });
+      await writeContractAsync({ args: [nijiGovernorAddress[chainId], true] });
     },
     setApprovalState,
   };
@@ -266,7 +266,7 @@ export const useSetApprovalForAll = () => {
 export const useIsApprovedForAll = () => {
   const { address } = useAccount();
   const { data } = useReadNounsTokenIsApprovedForAll({
-    args: address ? [address, nounsGovernorAddress[chainId]] : undefined,
+    args: address ? [address, nijiGovernorAddress[chainId]] : undefined,
     query: { enabled: !!address },
   });
 

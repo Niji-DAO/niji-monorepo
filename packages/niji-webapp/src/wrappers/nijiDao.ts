@@ -51,31 +51,31 @@ import { mainnet } from 'viem/chains';
 import { useAccount, useBlockNumber, usePublicClient, useReadContracts } from 'wagmi';
 
 import {
-  nounsGovernorAbi,
-  nounsGovernorAddress,
-  useReadNounsGovernorAdjustedTotalSupply,
-  useReadNounsGovernorForkThreshold,
-  useReadNounsGovernorForkThresholdBps,
-  useReadNounsGovernorGetDynamicQuorumParamsAt,
-  useReadNounsGovernorGetReceipt,
-  useReadNounsGovernorNumTokensInForkEscrow,
-  useReadNounsGovernorProposalCount,
-  useReadNounsGovernorProposalThreshold,
-  useWriteNounsGovernorCancel,
-  useWriteNounsGovernorCancelSig,
-  useWriteNounsGovernorCastRefundableVote,
-  useWriteNounsGovernorCastRefundableVoteWithReason,
-  useWriteNounsGovernorEscrowToFork,
-  useWriteNounsGovernorExecute,
-  useWriteNounsGovernorExecuteFork,
-  useWriteNounsGovernorJoinFork,
-  useWriteNounsGovernorPropose,
-  useWriteNounsGovernorProposeOnTimelockV1,
-  useWriteNounsGovernorQueue,
-  useWriteNounsGovernorUpdateProposal,
-  useWriteNounsGovernorUpdateProposalDescription,
-  useWriteNounsGovernorUpdateProposalTransactions,
-  useWriteNounsGovernorWithdrawFromForkEscrow,
+  nijiGovernorAbi,
+  nijiGovernorAddress,
+  useReadNijiGovernorAdjustedTotalSupply,
+  useReadNijiGovernorForkThreshold,
+  useReadNijiGovernorForkThresholdBps,
+  useReadNijiGovernorGetDynamicQuorumParamsAt,
+  useReadNijiGovernorGetReceipt,
+  useReadNijiGovernorNumTokensInForkEscrow,
+  useReadNijiGovernorProposalCount,
+  useReadNijiGovernorProposalThreshold,
+  useWriteNijiGovernorCancel,
+  useWriteNijiGovernorCancelSig,
+  useWriteNijiGovernorCastRefundableVote,
+  useWriteNijiGovernorCastRefundableVoteWithReason,
+  useWriteNijiGovernorEscrowToFork,
+  useWriteNijiGovernorExecute,
+  useWriteNijiGovernorExecuteFork,
+  useWriteNijiGovernorJoinFork,
+  useWriteNijiGovernorPropose,
+  useWriteNijiGovernorProposeOnTimelockV1,
+  useWriteNijiGovernorQueue,
+  useWriteNijiGovernorUpdateProposal,
+  useWriteNijiGovernorUpdateProposalDescription,
+  useWriteNijiGovernorUpdateProposalTransactions,
+  useWriteNijiGovernorWithdrawFromForkEscrow,
 } from '@/contracts';
 import { useBlockTimestamp } from '@/hooks/useBlockTimestamp';
 import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
@@ -387,7 +387,7 @@ const replaceInvalidDropboxImageLinks = (descriptionText: string | undefined) =>
 
 export function useDynamicQuorumProps(block: bigint): DynamicQuorumParams | undefined {
   // @ts-expect-error Type instantiation is excessively deep (wagmi codegen)
-  const { data } = useReadNounsGovernorGetDynamicQuorumParamsAt({
+  const { data } = useReadNijiGovernorGetDynamicQuorumParamsAt({
     args: [block],
   });
 
@@ -405,7 +405,7 @@ export function useHasVotedOnProposal(proposalId: bigint): boolean {
   /**
    * @ts-expect-error wagmi hook's argument types might be inferred incorrectly
    */
-  const { data: receipt } = useReadNounsGovernorGetReceipt({
+  const { data: receipt } = useReadNijiGovernorGetReceipt({
     args: [proposalId, address!],
     query: { enabled: Boolean(proposalId && address) },
   });
@@ -420,7 +420,7 @@ export function useProposalVote(proposalId: bigint): 'Against' | 'For' | 'Abstai
   /**
    * @ts-expect-error wagmi hook's return type might be inferred incorrectly or too broadly
    */
-  const { data: receipt } = useReadNounsGovernorGetReceipt({
+  const { data: receipt } = useReadNijiGovernorGetReceipt({
     args: [proposalId, address!],
     query: { enabled },
   });
@@ -434,13 +434,13 @@ export function useProposalVote(proposalId: bigint): 'Against' | 'For' | 'Abstai
 }
 
 export function useProposalCount(): number | undefined {
-  const { data: count } = useReadNounsGovernorProposalCount();
+  const { data: count } = useReadNijiGovernorProposalCount();
 
   return count != null ? Number(count) : undefined;
 }
 
 export function useProposalThreshold(): number | null {
-  const { data } = useReadNounsGovernorProposalThreshold();
+  const { data } = useReadNijiGovernorProposalThreshold();
 
   return data == null ? null : Number(data);
 }
@@ -551,7 +551,7 @@ export function useFormattedProposalCreatedLogs(skip: boolean, fromBlockOverride
     queryKey: ['proposalCreatedLogs', fromBlock.toString()],
     queryFn: () =>
       publicClient.getLogs({
-        address: nounsGovernorAddress[chainId],
+        address: nijiGovernorAddress[chainId],
         event: proposalCreatedEvent,
         fromBlock,
       }),
@@ -563,7 +563,7 @@ export function useFormattedProposalCreatedLogs(skip: boolean, fromBlockOverride
     if (!logs) return [];
     return logs.map(log => {
       const parsed = decodeEventLog({
-        abi: nounsGovernorAbi,
+        abi: nijiGovernorAbi,
         eventName: 'ProposalCreated',
         data: log.data,
         topics: log.topics,
@@ -844,8 +844,8 @@ export const useAllProposalsViaChain = (skip = false): PartialProposalData => {
   const proposalCalls = useMemo(
     () =>
       govProposalIndexes.map(idx => ({
-        abi: nounsGovernorAbi,
-        address: nounsGovernorAddress[chainId],
+        abi: nijiGovernorAbi,
+        address: nijiGovernorAddress[chainId],
         functionName: 'proposals',
         args: [idx],
       })),
@@ -855,8 +855,8 @@ export const useAllProposalsViaChain = (skip = false): PartialProposalData => {
   const stateCalls = useMemo(
     () =>
       govProposalIndexes.map(idx => ({
-        abi: nounsGovernorAbi,
-        address: nounsGovernorAddress[chainId],
+        abi: nijiGovernorAbi,
+        address: nijiGovernorAddress[chainId],
         functionName: 'state',
         args: [idx],
       })),
@@ -999,7 +999,7 @@ export function useCancelSignature() {
     isPending: isCancelPending,
     isSuccess: isCancelSuccess,
     error: cancelError,
-  } = useWriteNounsGovernorCancelSig();
+  } = useWriteNijiGovernorCancelSig();
 
   let status = 'None';
   if (isCancelPending) status = 'Mining';
@@ -1025,7 +1025,7 @@ export function useCastRefundableVote() {
     isPending: isCastRefundableVotePending,
     isSuccess: isCastRefundableVoteSuccess,
     error: castRefundableVoteError,
-  } = useWriteNounsGovernorCastRefundableVote();
+  } = useWriteNijiGovernorCastRefundableVote();
 
   let status = 'None';
   if (isCastRefundableVotePending) status = 'Mining';
@@ -1048,7 +1048,7 @@ export function useCastRefundableVoteWithReason() {
     isPending: isCastRefundableVoteWithReasonPending,
     isSuccess: isCastRefundableVoteWithReasonSuccess,
     error: castRefundableVoteWithReasonError,
-  } = useWriteNounsGovernorCastRefundableVoteWithReason();
+  } = useWriteNijiGovernorCastRefundableVoteWithReason();
 
   let status = 'None';
   if (isCastRefundableVoteWithReasonPending) status = 'Mining';
@@ -1071,7 +1071,7 @@ export function usePropose() {
     isPending: isProposePending,
     isSuccess: isProposeSuccess,
     error: proposeError,
-  } = useWriteNounsGovernorPropose();
+  } = useWriteNijiGovernorPropose();
 
   let status = 'None';
   if (isProposePending) status = 'Mining';
@@ -1094,7 +1094,7 @@ export function useProposeOnTimelockV1() {
     isPending: isProposeOnTimelockV1Pending,
     isSuccess: isProposeOnTimelockV1Success,
     error: proposeOnTimelockV1Error,
-  } = useWriteNounsGovernorProposeOnTimelockV1();
+  } = useWriteNijiGovernorProposeOnTimelockV1();
 
   let status = 'None';
   if (isProposeOnTimelockV1Pending) status = 'Mining';
@@ -1117,7 +1117,7 @@ export function useUpdateProposal() {
     isPending: isUpdateProposalPending,
     isSuccess: isUpdateProposalSuccess,
     error: updateProposalError,
-  } = useWriteNounsGovernorUpdateProposal();
+  } = useWriteNijiGovernorUpdateProposal();
 
   let status = 'None';
   if (isUpdateProposalPending) status = 'Mining';
@@ -1140,7 +1140,7 @@ export function useUpdateProposalTransactions() {
     isPending: isUpdateProposalTransactionsPending,
     isSuccess: isUpdateProposalTransactionsSuccess,
     error: updateProposalTransactionsError,
-  } = useWriteNounsGovernorUpdateProposalTransactions();
+  } = useWriteNijiGovernorUpdateProposalTransactions();
 
   let status = 'None';
   if (isUpdateProposalTransactionsPending) status = 'Mining';
@@ -1163,7 +1163,7 @@ export function useUpdateProposalDescription() {
     isPending: isUpdateProposalDescriptionPending,
     isSuccess: isUpdateProposalDescriptionSuccess,
     error: updateProposalDescriptionError,
-  } = useWriteNounsGovernorUpdateProposalDescription();
+  } = useWriteNijiGovernorUpdateProposalDescription();
 
   let status = 'None';
   if (isUpdateProposalDescriptionPending) status = 'Mining';
@@ -1186,7 +1186,7 @@ export function useQueueProposal() {
     isPending: isQueueProposalPending,
     isSuccess: isQueueProposalSuccess,
     error: queueProposalError,
-  } = useWriteNounsGovernorQueue();
+  } = useWriteNijiGovernorQueue();
 
   let status = 'None';
   if (isQueueProposalPending) status = 'Mining';
@@ -1209,7 +1209,7 @@ export function useCancelProposal() {
     isPending: isCancelProposalPending,
     isSuccess: isCancelProposalSuccess,
     error: cancelProposalError,
-  } = useWriteNounsGovernorCancel();
+  } = useWriteNijiGovernorCancel();
 
   let status = 'None';
   if (isCancelProposalPending) status = 'Mining';
@@ -1232,7 +1232,7 @@ export function useExecuteProposal() {
     isPending: isExecuteProposalPending,
     isSuccess: isExecuteProposalSuccess,
     error: executeProposalError,
-  } = useWriteNounsGovernorExecute();
+  } = useWriteNijiGovernorExecute();
 
   let status = 'None';
   if (isExecuteProposalPending) status = 'Mining';
@@ -1255,7 +1255,7 @@ export function useEscrowToFork() {
     isPending: isEscrowToForkPending,
     isSuccess: isEscrowToForkSuccess,
     error: escrowToForkError,
-  } = useWriteNounsGovernorEscrowToFork();
+  } = useWriteNijiGovernorEscrowToFork();
 
   let status = 'None';
   if (isEscrowToForkPending) status = 'Mining';
@@ -1278,7 +1278,7 @@ export function useWithdrawFromForkEscrow() {
     isPending: isWithdrawFromForkEscrowPending,
     isSuccess: isWithdrawFromForkEscrowSuccess,
     error: withdrawFromForkEscrowError,
-  } = useWriteNounsGovernorWithdrawFromForkEscrow();
+  } = useWriteNijiGovernorWithdrawFromForkEscrow();
 
   let status = 'None';
   if (isWithdrawFromForkEscrowPending) status = 'Mining';
@@ -1301,7 +1301,7 @@ export function useJoinFork() {
     isPending: isJoinForkPending,
     isSuccess: isJoinForkSuccess,
     error: joinForkError,
-  } = useWriteNounsGovernorJoinFork();
+  } = useWriteNijiGovernorJoinFork();
 
   let status = 'None';
   if (isJoinForkPending) status = 'Mining';
@@ -1318,13 +1318,13 @@ export function useJoinFork() {
 }
 
 export function useForkThreshold(): number | undefined {
-  const { data: threshold } = useReadNounsGovernorForkThreshold();
+  const { data: threshold } = useReadNijiGovernorForkThreshold();
 
   return threshold != null ? Number(threshold) : undefined;
 }
 
 export function useNumTokensInForkEscrow(): number | undefined {
-  const { data: count } = useReadNounsGovernorNumTokensInForkEscrow();
+  const { data: count } = useReadNijiGovernorNumTokensInForkEscrow();
 
   return count != null ? Number(count) : undefined;
 }
@@ -1555,7 +1555,7 @@ export function useExecuteFork() {
     isPending: isExecuteForkPending,
     isSuccess: isExecuteForkSuccess,
     error: executeForkError,
-  } = useWriteNounsGovernorExecuteFork();
+  } = useWriteNijiGovernorExecuteFork();
 
   let status = 'None';
   if (isExecuteForkPending) status = 'Mining';
@@ -1572,13 +1572,13 @@ export function useExecuteFork() {
 }
 
 export function useAdjustedTotalSupply(): number | undefined {
-  const { data } = useReadNounsGovernorAdjustedTotalSupply();
+  const { data } = useReadNijiGovernorAdjustedTotalSupply();
 
   return data != null ? Number(data) : undefined;
 }
 
 export function useForkThresholdBPS(): number | undefined {
-  const { data } = useReadNounsGovernorForkThresholdBps();
+  const { data } = useReadNijiGovernorForkThresholdBps();
 
   return data != null ? Number(data) : undefined;
 }

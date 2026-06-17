@@ -14,13 +14,13 @@ import CreateCandidateButton from '@/components/CreateCandidateButton';
 import ProposalActionModal from '@/components/ProposalActionsModal';
 import ProposalEditor from '@/components/ProposalEditor';
 import ProposalTransactions from '@/components/ProposalTransactions';
-import { nounsTokenBuyerAddress } from '@/contracts';
+import { nijiTokenBuyerAddress } from '@/contracts';
 import Section from '@/layout/Section';
 import { useEthNeeded } from '@/utils/tokenBuyerContractUtils/tokenBuyer';
 import { Hex } from '@/utils/types';
 import { defaultChain } from '@/wagmi';
-import { ProposalTransaction, useProposalThreshold } from '@/wrappers/nounsDao';
-import { useCreateProposalCandidate, useGetCreateCandidateCost } from '@/wrappers/nounsData';
+import { ProposalTransaction, useProposalThreshold } from '@/wrappers/nijiDao';
+import { useCreateProposalCandidate, useGetCreateCandidateCost } from '@/wrappers/nijiData';
 import { useUserVotes } from '@/wrappers/nounToken';
 
 import classes from '../CreateProposal/CreateProposal.module.css';
@@ -38,7 +38,7 @@ const CreateCandidatePage = () => {
   const availableVotes = useUserVotes();
   const proposalThreshold = useProposalThreshold();
   const chainId = defaultChain.id;
-  const ethNeeded = useEthNeeded(nounsTokenBuyerAddress[chainId], totalUSDCPayment);
+  const ethNeeded = useEthNeeded(nijiTokenBuyerAddress[chainId], totalUSDCPayment);
   const createCandidateCost = useGetCreateCandidateCost();
   const [showTransactionFormModal, setShowTransactionFormModal] = useState(false);
   const [isProposePending, setProposePending] = useState(false);
@@ -79,13 +79,13 @@ const CreateCandidatePage = () => {
   useEffect(() => {
     if (ethNeeded !== undefined && ethNeeded !== tokenBuyerTopUpEth && totalUSDCPayment > 0) {
       const hasTokenBuyerTopTop =
-        proposalTransactions.filter(txn => txn.address === nounsTokenBuyerAddress[chainId]).length >
+        proposalTransactions.filter(txn => txn.address === nijiTokenBuyerAddress[chainId]).length >
         0;
 
       // Add a new top-up txn if one isn't there already, else add to the existing one
       if (Number(ethNeeded) > 0 && !hasTokenBuyerTopTop) {
         handleAddProposalAction({
-          address: nounsTokenBuyerAddress[chainId],
+          address: nijiTokenBuyerAddress[chainId],
           value: BigInt(ethNeeded ?? 0),
           calldata: '0x' as Hex,
           signature: '',
@@ -95,7 +95,7 @@ const CreateCandidatePage = () => {
           const indexOfTokenBuyerTopUp =
             proposalTransactions
               .map((txn, index: number) => {
-                if (txn.address === nounsTokenBuyerAddress[chainId]) {
+                if (txn.address === nijiTokenBuyerAddress[chainId]) {
                   return index;
                 } else {
                   return -1;

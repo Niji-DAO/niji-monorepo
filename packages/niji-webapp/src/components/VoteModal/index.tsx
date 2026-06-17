@@ -8,7 +8,7 @@ import { Button, FloatingLabel, FormControl, Spinner } from 'react-bootstrap';
 import NavBarButton, { NavBarButtonStyle } from '@/components/NavBarButton';
 import SolidColorBackgroundModal from '@/components/SolidColorBackgroundModal';
 import { cn } from '@/lib/utils';
-import { useCastRefundableVote, useCastRefundableVoteWithReason, Vote } from '@/wrappers/nounsDao';
+import { useCastRefundableVote, useCastRefundableVoteWithReason, Vote } from '@/wrappers/nijiDao';
 
 import classes from './VoteModal.module.css';
 
