@@ -1,8 +1,8 @@
-import { nounsAuctionHouseAbi } from '@nouns/sdk/auction-house';
-import { nounsTokenAbi } from '@nouns/sdk/token';
-import { nounsGovernorAbi } from '@nouns/sdk/governor';
-import { nounsStreamFactoryAbi } from '@nouns/sdk/stream-factory';
-import { nounsStreamAbi } from '@nouns/sdk/stream';
+import { nounsAuctionHouseAbi } from '@niji/sdk/auction-house';
+import { nounsTokenAbi } from '@niji/sdk/token';
+import { nounsGovernorAbi } from '@niji/sdk/governor';
+import { nounsStreamFactoryAbi } from '@niji/sdk/stream-factory';
+import { nounsStreamAbi } from '@niji/sdk/stream';
 import { createConfig, factory } from 'ponder';
 import { getAbiItem } from 'viem';
 import dotenv from 'dotenv';

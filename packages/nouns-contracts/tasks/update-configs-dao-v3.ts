@@ -38,7 +38,7 @@ task('update-configs-dao-v3', 'Write the deployed addresses to the SDK and subgr
           cwd: sdkPath,
         });
       } catch {
-        console.log('Failed to re-build `@nouns/sdk`. Please rebuild manually.');
+        console.log('Failed to re-build `@niji/sdk`. Please rebuild manually.');
       }
       console.log('Addresses written to the Nouns SDK.');
 

@@ -7,8 +7,8 @@ import {
   readNounsGovernorProposalUpdatablePeriodInBlocks,
   readNounsGovernorVotingDelay,
   readNounsGovernorVotingPeriod,
-} from '@nouns/sdk/governor';
-import { readNounsTreasuryDelay, readNounsTreasuryGracePeriod } from '@nouns/sdk/treasury';
+} from '@niji/sdk/governor';
+import { readNounsTreasuryDelay, readNounsTreasuryGracePeriod } from '@niji/sdk/treasury';
 import { getBlockNumber } from '@wagmi/core';
 
 import config, { wagmiConfig } from '@/config';

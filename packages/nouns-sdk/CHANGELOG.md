@@ -11,10 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `@nouns/sdk/treasury` actions:
+- `@niji/sdk/treasury` actions:
   - `readNounsTreasuryBalancesInUsd`
   - `readNounsTreasuryBalancesInEth`
-- `@nouns/sdk/react/treasury` hooks:
+- `@niji/sdk/react/treasury` hooks:
   - `useReadNounsTreasuryBalancesInUsd`
   - `useReadNounsTreasuryBalancesInEth`
 
@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Stream actions (`@nouns/sdk/stream`) and react hooks (`@nouns/sdk/react/stream`) to be paired up with the `stream-factory` ones
+- Stream actions (`@niji/sdk/stream`) and react hooks (`@niji/sdk/react/stream`) to be paired up with the `stream-factory` ones
 
 ## [1.0.0] - 2025-07-24
 
@@ -34,27 +34,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - modules with Wagmi cli generated actions and React hooks for current contracts:
   - actions:
-    - `@nouns/sdk/governor`
-    - `@nouns/sdk/legacy-treasury`
-    - `@nouns/sdk/treasury`
-    - `@nouns/sdk/data`
-    - `@nouns/sdk/token`
-    - `@nouns/sdk/auction-house`
-    - `@nouns/sdk/descriptor`
-    - `@nouns/sdk/stream-factory`
-    - `@nouns/sdk/usdc-payer`
-    - `@nouns/sdk/usdc-token-buyer`
+    - `@niji/sdk/governor`
+    - `@niji/sdk/legacy-treasury`
+    - `@niji/sdk/treasury`
+    - `@niji/sdk/data`
+    - `@niji/sdk/token`
+    - `@niji/sdk/auction-house`
+    - `@niji/sdk/descriptor`
+    - `@niji/sdk/stream-factory`
+    - `@niji/sdk/usdc-payer`
+    - `@niji/sdk/usdc-token-buyer`
   - react hooks:
-    - `@nouns/sdk/react/governor`
-    - `@nouns/sdk/react/legacy-treasury`
-    - `@nouns/sdk/react/treasury`
-    - `@nouns/sdk/react/data`
-    - `@nouns/sdk/react/token`
-    - `@nouns/sdk/react/auction-house`
-    - `@nouns/sdk/react/descriptor`
-    - `@nouns/sdk/react/stream-factory`
-    - `@nouns/sdk/react/usdc-payer`
-    - `@nouns/sdk/react/usdc-token-buyer`
+    - `@niji/sdk/react/governor`
+    - `@niji/sdk/react/legacy-treasury`
+    - `@niji/sdk/react/treasury`
+    - `@niji/sdk/react/data`
+    - `@niji/sdk/react/token`
+    - `@niji/sdk/react/auction-house`
+    - `@niji/sdk/react/descriptor`
+    - `@niji/sdk/react/stream-factory`
+    - `@niji/sdk/react/usdc-payer`
+    - `@niji/sdk/react/usdc-token-buyer`
 
 ### Changed
 
@@ -62,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- **BREAKING**: Ethers.js dependency and old contract definitions and legacy exports from root module `@nouns/sdk`
+- **BREAKING**: Ethers.js dependency and old contract definitions and legacy exports from root module `@niji/sdk`
   - types: `ChainId`, `ContractAddresses`
   - methods: `getContractsForChainOrThrow`, `getContractAddressesForChainOrThrow`
   - abis: `NounsTokenABI`, `NounsAuctionHouseABI`, `NounsDescriptorABI`, `NounsSeederABI`, `NounsDAOABI`, `NounsDAOV2ABI`,
