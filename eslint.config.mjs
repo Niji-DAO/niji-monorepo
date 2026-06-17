@@ -1,7 +1,12 @@
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // TypeScript plugins and parsers
 import typescriptEslintEslintPlugin from '@typescript-eslint/eslint-plugin';
@@ -65,7 +70,11 @@ export default defineConfig([
       parserOptions: {
         // Enable project service for better TypeScript integration
         projectService: true,
-        tsconfigRootDir: import.meta.dirname,
+        // Use fileURLToPath + dirname for a deterministically absolute
+        // root directory. `import.meta.dirname` works in most setups but
+        // some lint-staged invocations leave it resolving to a relative
+        // './' which the typescript-eslint parser rejects.
+        tsconfigRootDir: __dirname,
       },
     },
     plugins: {
@@ -279,12 +288,30 @@ export default defineConfig([
   },
 
   // nouns-api specific configuration (Ponder)
+  // eslint-config-ponder hard-codes `tsconfigRootDir: './'` and
+  // `project: true`. The former is rejected as a non-absolute path when
+  // lint-staged invokes eslint from the repo root with file arguments, and
+  // the latter conflicts with our base config's `projectService: true`.
+  // Patch both options on the extended configs before spreading.
+  ...compat.extends('ponder').map(cfg => {
+    const { project: _project, ...restParserOptions } = cfg.languageOptions?.parserOptions ?? {};
+    return {
+      ...cfg,
+      files: cfg.files ?? ['**/packages/nouns-api/**/*.{ts,tsx}'],
+      languageOptions: {
+        ...cfg.languageOptions,
+        parserOptions: {
+          ...restParserOptions,
+          tsconfigRootDir: __dirname,
+        },
+      },
+    };
+  }),
   {
     files: ['**/packages/nouns-api/**/*.{ts,tsx}'],
-    extends: [...compat.extends('ponder')],
     languageOptions: {
       parserOptions: {
-        project: ['packages/nouns-api/tsconfig.json'],
+        tsconfigRootDir: __dirname,
       },
     },
     settings: {
