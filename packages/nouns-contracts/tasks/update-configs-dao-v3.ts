@@ -16,7 +16,7 @@ task('update-configs-dao-v3', 'Write the deployed addresses to the SDK and subgr
       const { name: network, chainId } = await ethers.provider.getNetwork();
 
       // Update SDK addresses
-      const sdkPath = join(__dirname, '../../nouns-sdk');
+      const sdkPath = join(__dirname, '../../niji-sdk');
       const addressesPath = join(sdkPath, 'src/contract/addresses.json');
       const addresses = JSON.parse(readFileSync(addressesPath, 'utf8'));
       addresses[chainId] = {

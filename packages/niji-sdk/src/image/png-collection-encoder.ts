@@ -10,7 +10,7 @@ export class PNGCollectionEncoder implements IEncoder {
   private _colors: Map<string, number> = new Map([this._transparent]);
   private _images: Map<string, string> = new Map();
   private _folders: { [name: string]: string[] } = {};
-  private _fs: any | null = null;
+  private _fs: { writeFile: (path: string, data: string | Buffer) => Promise<void> } | null = null;
   private _isNode: boolean;
 
   constructor(colors?: string[]) {
@@ -22,7 +22,7 @@ export class PNGCollectionEncoder implements IEncoder {
       try {
         // Use dynamic import to avoid bundler issues
         import('fs').then(fs => (this._fs = fs.promises));
-      } catch (e) {
+      } catch {
         console.warn('File system module not available');
       }
     }

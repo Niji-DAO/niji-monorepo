@@ -12,9 +12,9 @@ The [nouns assets](packages/niji-assets) package holds the Noun PNG and run-leng
 
 The [nouns contracts](packages/nouns-contracts) is the suite of Solidity contracts powering Nouns DAO.
 
-### nouns-sdk
+### niji-sdk
 
-The [nouns sdk](packages/nouns-sdk) includes methods and react hooks for interacting with all the Nouns contracts, as well as image encoding and SVG building utilities.
+The [nouns sdk](packages/niji-sdk) includes methods and react hooks for interacting with all the Nouns contracts, as well as image encoding and SVG building utilities.
 
 ### niji-api
 

@@ -1,5 +1,9 @@
-import { ethers } from 'ethers';
 import fs from 'fs';
+
+// ethers is intentionally not in @niji/sdk's package.json (dev-only on-chain
+// smoke test); follow-up cleanup will either remove this script or move it.
+// eslint-disable-next-line import-x/no-unresolved
+import { ethers } from 'ethers';
 
 async function testOnChainRead() {
   console.log('\n=== ON-CHAIN SVG READ TEST ===\n');
@@ -40,13 +44,14 @@ async function testOnChainRead() {
       'KB',
     );
 
-    fs.mkdirSync('../nouns-assets/test_output', { recursive: true });
-    fs.writeFileSync('../nouns-assets/test_output/onchain-nouns-read.svg', svg);
-    console.log('  Saved: packages/nouns-assets/test_output/onchain-nouns-read.svg\n');
-  } catch (error: any) {
-    console.error('✗ FAILED:', error.message);
+    fs.mkdirSync('../niji-assets/test_output', { recursive: true });
+    fs.writeFileSync('../niji-assets/test_output/onchain-nouns-read.svg', svg);
+    console.log('  Saved: packages/niji-assets/test_output/onchain-nouns-read.svg\n');
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('✗ FAILED:', message);
 
-    if (error.message.includes('gas') || error.message.includes('limit')) {
+    if (message.includes('gas') || message.includes('limit')) {
       console.error('\n💥 GAS LIMIT EXCEEDED!');
       console.error('Cannot read SVG from contract - data too large!\n');
     }

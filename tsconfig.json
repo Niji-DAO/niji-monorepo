@@ -2,7 +2,7 @@
   "references": [
     { "path": "packages/niji-assets" },
     { "path": "packages/nouns-contracts" },
-    { "path": "packages/nouns-sdk" },
+    { "path": "packages/niji-sdk" },
     { "path": "packages/niji-subgraph" },
   ]
 }
