@@ -44,7 +44,7 @@ task('update-configs-dao-v3', 'Write the deployed addresses to the SDK and subgr
 
       // Generate subgraph config
       const configName = `${network}-fork`;
-      const subgraphConfigPath = join(__dirname, `../../nouns-subgraph/config/${configName}.json`);
+      const subgraphConfigPath = join(__dirname, `../../niji-subgraph/config/${configName}.json`);
 
       const getDeployBlockNumber = async (contract: DeployedContract) => {
         const deployTx = contract.instance.deploymentTransaction();
