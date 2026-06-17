@@ -1,4 +1,4 @@
-import type { TreasuryBalancesInUsdData } from '../../actions/treasury/readNounsTreasuryBalancesInUsd';
+import type { TreasuryBalancesInUsdData } from '../../actions/treasury/readNijiTreasuryBalancesInUsd';
 
 import { ReactNode } from 'react';
 
@@ -12,7 +12,7 @@ import { WagmiProvider } from 'wagmi';
 
 import { setupPolly } from '../../../test/setup';
 
-import { useReadNounsTreasuryBalancesInUsd } from './useReadNounsTreasuryBalancesInUsd';
+import { useReadNijiTreasuryBalancesInUsd } from './useReadNijiTreasuryBalancesInUsd';
 
 const formatAsUsd = (data: Record<string, bigint>) =>
   Object.fromEntries(Object.entries(data).map(([key, value]) => [key, formatUnits(value, 6)]));
@@ -36,11 +36,11 @@ function createTestWrapper(config: Config) {
   };
 }
 
-describe('useReadNounsTreasuryBalancesInUsd', () => {
+describe('useReadNijiTreasuryBalancesInUsd', () => {
   let polly: ReturnType<typeof setupPolly>;
 
   beforeAll(() => {
-    polly = setupPolly(`useReadNounsTreasuryBalancesInUsd`);
+    polly = setupPolly(`useReadNijiTreasuryBalancesInUsd`);
   });
 
   afterAll(async () => {
@@ -59,7 +59,7 @@ describe('useReadNounsTreasuryBalancesInUsd', () => {
 
     const { result } = renderHook(
       () =>
-        useReadNounsTreasuryBalancesInUsd({
+        useReadNijiTreasuryBalancesInUsd({
           blockNumber: 23148279n,
         }),
       { wrapper },
@@ -89,7 +89,7 @@ describe('useReadNounsTreasuryBalancesInUsd', () => {
 
     const { result } = renderHook(
       () =>
-        useReadNounsTreasuryBalancesInUsd({
+        useReadNijiTreasuryBalancesInUsd({
           blockNumber: 123n,
           chainId: mainnet.id,
         }),
@@ -98,7 +98,7 @@ describe('useReadNounsTreasuryBalancesInUsd', () => {
 
     // Access the query key from the hook's internal query
     const queryKey = result.current.queryKey;
-    expect(queryKey).toEqual(['nounsTreasuryBalancesInUsd', mainnet.id, 123n]);
+    expect(queryKey).toEqual(['nijiTreasuryBalancesInUsd', mainnet.id, 123n]);
   });
 
   it('should handle config and chainId overrides', async () => {
@@ -113,7 +113,7 @@ describe('useReadNounsTreasuryBalancesInUsd', () => {
 
     const { result } = renderHook(
       () =>
-        useReadNounsTreasuryBalancesInUsd({
+        useReadNijiTreasuryBalancesInUsd({
           blockNumber: 8984842n,
           chainId: sepolia.id,
           config: customConfig,
@@ -122,7 +122,7 @@ describe('useReadNounsTreasuryBalancesInUsd', () => {
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.queryKey).toEqual(['nounsTreasuryBalancesInUsd', sepolia.id, 8984842n]);
+    expect(result.current.queryKey).toEqual(['nijiTreasuryBalancesInUsd', sepolia.id, 8984842n]);
     expect(result.current.data).toBeDefined();
   });
 
@@ -131,7 +131,7 @@ describe('useReadNounsTreasuryBalancesInUsd', () => {
 
     const { result } = renderHook(
       () =>
-        useReadNounsTreasuryBalancesInUsd({
+        useReadNijiTreasuryBalancesInUsd({
           blockNumber: 23141580n,
           query: {
             enabled: false,
@@ -150,7 +150,7 @@ describe('useReadNounsTreasuryBalancesInUsd', () => {
 
     const { result } = renderHook(
       () =>
-        useReadNounsTreasuryBalancesInUsd({
+        useReadNijiTreasuryBalancesInUsd({
           blockNumber: 23148279n,
           query: {
             select: (data: TreasuryBalancesInUsdData) => formatUnits(data.total, 6),

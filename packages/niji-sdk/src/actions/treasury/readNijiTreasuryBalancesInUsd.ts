@@ -8,8 +8,8 @@ import { readStEthBalanceOf } from '../treasury-assets/steth.gen.js';
 import { readUsdcBalanceOf } from '../treasury-assets/usdc.gen.js';
 import { readWethBalanceOf } from '../treasury-assets/weth.gen.js';
 import { readWstEthBalanceOf } from '../treasury-assets/wsteth.gen.js';
-import { nounsTreasuryAddress } from '../treasury.gen.js';
-import { nounsUsdcPayerAddress } from '../usdc-payer.gen.js';
+import { nijiTreasuryAddress } from '../treasury.gen.js';
+import { nijiUsdcPayerAddress } from '../usdc-payer.gen.js';
 
 export type TreasuryBalancesInUsdData = {
   ETH: bigint;
@@ -23,19 +23,19 @@ export type TreasuryBalancesInUsdData = {
   total: bigint;
 };
 
-export interface ReadNounsTreasuryBalancesInUsdOptions {
+export interface ReadNijiTreasuryBalancesInUsdOptions {
   blockNumber?: bigint;
-  chainId?: keyof typeof nounsTreasuryAddress;
+  chainId?: keyof typeof nijiTreasuryAddress;
 }
 
-export const readNounsTreasuryBalancesInUsd = async (
+export const readNijiTreasuryBalancesInUsd = async (
   config: Config,
-  { blockNumber, chainId: chainIdOverride }: ReadNounsTreasuryBalancesInUsdOptions = {},
+  { blockNumber, chainId: chainIdOverride }: ReadNijiTreasuryBalancesInUsdOptions = {},
 ): Promise<TreasuryBalancesInUsdData> => {
-  const chainId = (chainIdOverride ?? getChainId(config)) as keyof typeof nounsTreasuryAddress;
-  if (!nounsTreasuryAddress[chainId]) throw new Error(`chain id ${chainId} is not supported`);
+  const chainId = (chainIdOverride ?? getChainId(config)) as keyof typeof nijiTreasuryAddress;
+  if (!nijiTreasuryAddress[chainId]) throw new Error(`chain id ${chainId} is not supported`);
 
-  const treasuryAddress = nounsTreasuryAddress[chainId];
+  const treasuryAddress = nijiTreasuryAddress[chainId];
   const oneQuadrillion = 1_000_000_000_000_000n;
 
   // Check if rETH is supported on this chain
@@ -58,7 +58,7 @@ export const readNounsTreasuryBalancesInUsd = async (
     readMEthBalanceOf(config, { args: [treasuryAddress], blockNumber, chainId }),
     readStEthBalanceOf(config, { args: [treasuryAddress], blockNumber, chainId }),
     readUsdcBalanceOf(config, { args: [treasuryAddress], blockNumber, chainId }),
-    readUsdcBalanceOf(config, { args: [nounsUsdcPayerAddress[chainId]], blockNumber, chainId }),
+    readUsdcBalanceOf(config, { args: [nijiUsdcPayerAddress[chainId]], blockNumber, chainId }),
     readWethBalanceOf(config, { args: [treasuryAddress], blockNumber, chainId }),
     readWstEthBalanceOf(config, { args: [treasuryAddress], blockNumber, chainId }),
     isREthSupported

@@ -1,11 +1,11 @@
 export * from '../treasury.gen.js';
 
 export {
-  UseReadNounsTreasuryBalancesInEthParameters,
-  useReadNounsTreasuryBalancesInEth,
-} from './useReadNounsTreasuryBalancesInEth.js';
+  UseReadNijiTreasuryBalancesInEthParameters,
+  useReadNijiTreasuryBalancesInEth,
+} from './useReadNijiTreasuryBalancesInEth.js';
 
 export {
-  UseReadNounsTreasuryBalancesInUsdParameters,
-  useReadNounsTreasuryBalancesInUsd,
-} from './useReadNounsTreasuryBalancesInUsd.js';
+  UseReadNijiTreasuryBalancesInUsdParameters,
+  useReadNijiTreasuryBalancesInUsd,
+} from './useReadNijiTreasuryBalancesInUsd.js';

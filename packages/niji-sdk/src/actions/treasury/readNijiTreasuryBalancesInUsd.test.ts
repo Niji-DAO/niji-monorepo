@@ -1,20 +1,20 @@
 import { createConfig, http } from '@wagmi/core';
 import { mainnet, sepolia, base } from '@wagmi/core/chains';
-import { formatEther } from 'viem';
+import { formatUnits } from 'viem';
 import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 
 import { setupPolly } from '../../../test/setup';
 
-import { readNounsTreasuryBalancesInEth } from './readNounsTreasuryBalancesInEth.js';
+import { readNijiTreasuryBalancesInUsd } from './readNijiTreasuryBalancesInUsd.js';
 
-const formatAsEther = (data: Record<string, bigint>) =>
-  Object.fromEntries(Object.entries(data).map(([key, value]) => [key, formatEther(value)]));
+const formatAsUsd = (data: Record<string, bigint>) =>
+  Object.fromEntries(Object.entries(data).map(([key, value]) => [key, formatUnits(value, 6)]));
 
-describe('readNounsTreasuryBalancesInEth', () => {
+describe('readNijiTreasuryBalancesInUsd', () => {
   let polly: ReturnType<typeof setupPolly>;
 
   beforeAll(() => {
-    polly = setupPolly(`readNounsTreasuryBalancesInEth`);
+    polly = setupPolly(`readNijiTreasuryBalancesInUsd`);
   });
 
   afterAll(async () => {
@@ -29,24 +29,24 @@ describe('readNounsTreasuryBalancesInEth', () => {
       },
     });
 
-    it('should fetch main treasury assets balances, convert to ETH and calculate the total', async () => {
-      const result = await readNounsTreasuryBalancesInEth(config, {
+    it('should fetch main treasury assets balances, convert to USD and calculate the total', async () => {
+      const result = await readNijiTreasuryBalancesInUsd(config, {
         chainId: mainnet.id,
         blockNumber: 23141580n,
       });
 
       // Validate return structure
-      expect(formatAsEther(result)).toMatchInlineSnapshot(`
+      expect(formatAsUsd(result)).toMatchInlineSnapshot(`
         {
-          "ETH": "394.739202794352184387",
-          "USDC": "198.824314297168906627",
-          "mETH": "1002.920895319786459215",
-          "payerContractUSDC": "3.322392780521144714",
-          "rETH": "186.487482675539284285",
-          "stETH": "1.925835847141988032",
-          "total": "3577.930610487749123829",
-          "wETH": "64.465259338723698418",
-          "wstETH": "1725.245227434515458151",
+          "ETH": "1782544.191417",
+          "USDC": "897841.217832",
+          "mETH": "4528941.649949",
+          "payerContractUSDC": "15003.100555",
+          "rETH": "842131.150547",
+          "stETH": "8696.596331",
+          "total": "16157045.922647",
+          "wETH": "291109.098789",
+          "wstETH": "7790778.917227",
         }
       `);
 
@@ -73,23 +73,23 @@ describe('readNounsTreasuryBalancesInEth', () => {
       },
     });
 
-    it('should fetch main treasury assets balances, convert to ETH and calculate the total', async () => {
-      const result = await readNounsTreasuryBalancesInEth(config, {
+    it('should fetch main treasury assets balances, convert to USD and calculate the total', async () => {
+      const result = await readNijiTreasuryBalancesInUsd(config, {
         chainId: sepolia.id,
         blockNumber: 8984842n,
       });
 
       // Validate return structure
-      expect(formatAsEther(result)).toMatchInlineSnapshot(`
+      expect(formatAsUsd(result)).toMatchInlineSnapshot(`
         {
-          "ETH": "0.084881509922875974",
+          "ETH": "383.342046",
           "USDC": "0",
           "mETH": "0",
           "payerContractUSDC": "0",
           "rETH": "0",
           "stETH": "0",
-          "total": "1.787711371033987086",
-          "wETH": "1.702829861111111112",
+          "total": "8073.665697",
+          "wETH": "7690.323651",
           "wstETH": "0",
         }
       `);
@@ -119,7 +119,7 @@ describe('readNounsTreasuryBalancesInEth', () => {
 
     it('throws on unsupported chain id', async () => {
       await expect(() =>
-        readNounsTreasuryBalancesInEth(config, {
+        readNijiTreasuryBalancesInUsd(config, {
           chainId: base.id as 1,
           blockNumber: 666n,
         }),

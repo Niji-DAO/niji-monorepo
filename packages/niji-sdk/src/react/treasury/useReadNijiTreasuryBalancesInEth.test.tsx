@@ -1,4 +1,4 @@
-import type { TreasuryBalancesInEthData } from '../../actions/treasury/readNounsTreasuryBalancesInEth';
+import type { TreasuryBalancesInEthData } from '../../actions/treasury/readNijiTreasuryBalancesInEth';
 
 import { ReactNode } from 'react';
 
@@ -12,7 +12,7 @@ import { WagmiProvider } from 'wagmi';
 
 import { setupPolly } from '../../../test/setup';
 
-import { useReadNounsTreasuryBalancesInEth } from './useReadNounsTreasuryBalancesInEth';
+import { useReadNijiTreasuryBalancesInEth } from './useReadNijiTreasuryBalancesInEth';
 
 const formatAsEther = (data: Record<string, bigint>) =>
   Object.fromEntries(Object.entries(data).map(([key, value]) => [key, formatEther(value)]));
@@ -36,11 +36,11 @@ function createTestWrapper(config: Config) {
   };
 }
 
-describe('useReadNounsTreasuryBalancesInEth', () => {
+describe('useReadNijiTreasuryBalancesInEth', () => {
   let polly: ReturnType<typeof setupPolly>;
 
   beforeAll(() => {
-    polly = setupPolly(`useReadNounsTreasuryBalancesInEth`);
+    polly = setupPolly(`useReadNijiTreasuryBalancesInEth`);
   });
 
   afterAll(async () => {
@@ -59,7 +59,7 @@ describe('useReadNounsTreasuryBalancesInEth', () => {
 
     const { result } = renderHook(
       () =>
-        useReadNounsTreasuryBalancesInEth({
+        useReadNijiTreasuryBalancesInEth({
           blockNumber: 23141580n,
         }),
       { wrapper },
@@ -89,7 +89,7 @@ describe('useReadNounsTreasuryBalancesInEth', () => {
 
     const { result } = renderHook(
       () =>
-        useReadNounsTreasuryBalancesInEth({
+        useReadNijiTreasuryBalancesInEth({
           blockNumber: 123n,
           chainId: mainnet.id,
         }),
@@ -98,7 +98,7 @@ describe('useReadNounsTreasuryBalancesInEth', () => {
 
     // Access the query key from the hook's internal query
     const queryKey = result.current.queryKey;
-    expect(queryKey).toEqual(['nounsTreasuryBalancesInEth', mainnet.id, 123n]);
+    expect(queryKey).toEqual(['nijiTreasuryBalancesInEth', mainnet.id, 123n]);
   });
 
   it('should handle config and chainId overrides', async () => {
@@ -113,7 +113,7 @@ describe('useReadNounsTreasuryBalancesInEth', () => {
 
     const { result } = renderHook(
       () =>
-        useReadNounsTreasuryBalancesInEth({
+        useReadNijiTreasuryBalancesInEth({
           blockNumber: 8984842n,
           chainId: sepolia.id,
           config: customConfig,
@@ -122,7 +122,7 @@ describe('useReadNounsTreasuryBalancesInEth', () => {
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.queryKey).toEqual(['nounsTreasuryBalancesInEth', sepolia.id, 8984842n]);
+    expect(result.current.queryKey).toEqual(['nijiTreasuryBalancesInEth', sepolia.id, 8984842n]);
     expect(result.current.data).toBeDefined();
   });
 
@@ -131,7 +131,7 @@ describe('useReadNounsTreasuryBalancesInEth', () => {
 
     const { result } = renderHook(
       () =>
-        useReadNounsTreasuryBalancesInEth({
+        useReadNijiTreasuryBalancesInEth({
           blockNumber: 23141580n,
           query: {
             enabled: false,
@@ -150,7 +150,7 @@ describe('useReadNounsTreasuryBalancesInEth', () => {
 
     const { result } = renderHook(
       () =>
-        useReadNounsTreasuryBalancesInEth<string>({
+        useReadNijiTreasuryBalancesInEth<string>({
           blockNumber: 23141580n,
           query: {
             select: (data: TreasuryBalancesInEthData) => formatEther(data.total),

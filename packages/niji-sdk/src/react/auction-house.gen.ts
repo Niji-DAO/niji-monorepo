@@ -6,7 +6,7 @@ import {
 } from 'wagmi/codegen';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// NounsAuctionHouse
+// NijiAuctionHouse
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -150,7 +150,7 @@ export const nounsAuctionHouseAbi = [
     outputs: [
       {
         name: '',
-        internalType: 'struct INounsAuctionHouseV3.AuctionV2View',
+        internalType: 'struct INijiAuctionHouseV3.AuctionV2View',
         type: 'tuple',
         components: [
           { name: 'nounId', internalType: 'uint96', type: 'uint96' },
@@ -227,7 +227,7 @@ export const nounsAuctionHouseAbi = [
     outputs: [
       {
         name: 'settlements',
-        internalType: 'struct INounsAuctionHouseV3.Settlement[]',
+        internalType: 'struct INijiAuctionHouseV3.Settlement[]',
         type: 'tuple[]',
         components: [
           { name: 'blockTimestamp', internalType: 'uint32', type: 'uint32' },
@@ -251,7 +251,7 @@ export const nounsAuctionHouseAbi = [
     outputs: [
       {
         name: 'settlements',
-        internalType: 'struct INounsAuctionHouseV3.Settlement[]',
+        internalType: 'struct INijiAuctionHouseV3.Settlement[]',
         type: 'tuple[]',
         components: [
           { name: 'blockTimestamp', internalType: 'uint32', type: 'uint32' },
@@ -275,7 +275,7 @@ export const nounsAuctionHouseAbi = [
     outputs: [
       {
         name: 'settlements',
-        internalType: 'struct INounsAuctionHouseV3.Settlement[]',
+        internalType: 'struct INijiAuctionHouseV3.Settlement[]',
         type: 'tuple[]',
         components: [
           { name: 'blockTimestamp', internalType: 'uint32', type: 'uint32' },
@@ -366,7 +366,7 @@ export const nounsAuctionHouseAbi = [
     inputs: [
       {
         name: 'settlements',
-        internalType: 'struct INounsAuctionHouseV3.SettlementNoClientId[]',
+        internalType: 'struct INijiAuctionHouseV3.SettlementNoClientId[]',
         type: 'tuple[]',
         components: [
           { name: 'blockTimestamp', internalType: 'uint32', type: 'uint32' },
@@ -477,7 +477,7 @@ export const nounsAuctionHouseConfig = {
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouse = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouse = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
 });
@@ -488,7 +488,7 @@ export const useReadNounsAuctionHouse = /*#__PURE__*/ createUseReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseMaxTimeBuffer = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseMaxTimeBuffer = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'MAX_TIME_BUFFER',
@@ -500,7 +500,7 @@ export const useReadNounsAuctionHouseMaxTimeBuffer = /*#__PURE__*/ createUseRead
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseAuction = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseAuction = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'auction',
@@ -512,7 +512,7 @@ export const useReadNounsAuctionHouseAuction = /*#__PURE__*/ createUseReadContra
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseAuctionStorage = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseAuctionStorage = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'auctionStorage',
@@ -524,7 +524,7 @@ export const useReadNounsAuctionHouseAuctionStorage = /*#__PURE__*/ createUseRea
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseBiddingClient = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseBiddingClient = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'biddingClient',
@@ -536,7 +536,7 @@ export const useReadNounsAuctionHouseBiddingClient = /*#__PURE__*/ createUseRead
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseDuration = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseDuration = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'duration',
@@ -548,7 +548,7 @@ export const useReadNounsAuctionHouseDuration = /*#__PURE__*/ createUseReadContr
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseGetPrices = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseGetPrices = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'getPrices',
@@ -560,7 +560,7 @@ export const useReadNounsAuctionHouseGetPrices = /*#__PURE__*/ createUseReadCont
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseGetSettlements = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseGetSettlements = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'getSettlements',
@@ -572,7 +572,7 @@ export const useReadNounsAuctionHouseGetSettlements = /*#__PURE__*/ createUseRea
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseGetSettlementsFromIdtoTimestamp =
+export const useReadNijiAuctionHouseGetSettlementsFromIdtoTimestamp =
   /*#__PURE__*/ createUseReadContract({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -585,7 +585,7 @@ export const useReadNounsAuctionHouseGetSettlementsFromIdtoTimestamp =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseMinBidIncrementPercentage =
+export const useReadNijiAuctionHouseMinBidIncrementPercentage =
   /*#__PURE__*/ createUseReadContract({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -598,7 +598,7 @@ export const useReadNounsAuctionHouseMinBidIncrementPercentage =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseNouns = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseNouns = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'nouns',
@@ -610,7 +610,7 @@ export const useReadNounsAuctionHouseNouns = /*#__PURE__*/ createUseReadContract
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseOwner = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseOwner = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'owner',
@@ -622,7 +622,7 @@ export const useReadNounsAuctionHouseOwner = /*#__PURE__*/ createUseReadContract
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHousePaused = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHousePaused = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'paused',
@@ -634,7 +634,7 @@ export const useReadNounsAuctionHousePaused = /*#__PURE__*/ createUseReadContrac
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseReservePrice = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseReservePrice = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'reservePrice',
@@ -646,7 +646,7 @@ export const useReadNounsAuctionHouseReservePrice = /*#__PURE__*/ createUseReadC
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseSanctionsOracle = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseSanctionsOracle = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'sanctionsOracle',
@@ -658,7 +658,7 @@ export const useReadNounsAuctionHouseSanctionsOracle = /*#__PURE__*/ createUseRe
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseTimeBuffer = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseTimeBuffer = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'timeBuffer',
@@ -670,7 +670,7 @@ export const useReadNounsAuctionHouseTimeBuffer = /*#__PURE__*/ createUseReadCon
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useReadNounsAuctionHouseWeth = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiAuctionHouseWeth = /*#__PURE__*/ createUseReadContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'weth',
@@ -682,7 +682,7 @@ export const useReadNounsAuctionHouseWeth = /*#__PURE__*/ createUseReadContract(
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouse = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHouse = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
 });
@@ -693,7 +693,7 @@ export const useWriteNounsAuctionHouse = /*#__PURE__*/ createUseWriteContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseCreateBid = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHouseCreateBid = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'createBid',
@@ -705,7 +705,7 @@ export const useWriteNounsAuctionHouseCreateBid = /*#__PURE__*/ createUseWriteCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseInitialize = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHouseInitialize = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'initialize',
@@ -717,7 +717,7 @@ export const useWriteNounsAuctionHouseInitialize = /*#__PURE__*/ createUseWriteC
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHousePause = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHousePause = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'pause',
@@ -729,7 +729,7 @@ export const useWriteNounsAuctionHousePause = /*#__PURE__*/ createUseWriteContra
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHouseRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'renounceOwnership',
@@ -741,7 +741,7 @@ export const useWriteNounsAuctionHouseRenounceOwnership = /*#__PURE__*/ createUs
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseSetMinBidIncrementPercentage =
+export const useWriteNijiAuctionHouseSetMinBidIncrementPercentage =
   /*#__PURE__*/ createUseWriteContract({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -754,7 +754,7 @@ export const useWriteNounsAuctionHouseSetMinBidIncrementPercentage =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseSetPrices = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHouseSetPrices = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'setPrices',
@@ -766,7 +766,7 @@ export const useWriteNounsAuctionHouseSetPrices = /*#__PURE__*/ createUseWriteCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseSetReservePrice = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHouseSetReservePrice = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'setReservePrice',
@@ -778,7 +778,7 @@ export const useWriteNounsAuctionHouseSetReservePrice = /*#__PURE__*/ createUseW
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseSetSanctionsOracle = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHouseSetSanctionsOracle = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'setSanctionsOracle',
@@ -790,7 +790,7 @@ export const useWriteNounsAuctionHouseSetSanctionsOracle = /*#__PURE__*/ createU
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseSetTimeBuffer = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHouseSetTimeBuffer = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'setTimeBuffer',
@@ -802,7 +802,7 @@ export const useWriteNounsAuctionHouseSetTimeBuffer = /*#__PURE__*/ createUseWri
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseSettleAuction = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHouseSettleAuction = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'settleAuction',
@@ -814,7 +814,7 @@ export const useWriteNounsAuctionHouseSettleAuction = /*#__PURE__*/ createUseWri
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseSettleCurrentAndCreateNewAuction =
+export const useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction =
   /*#__PURE__*/ createUseWriteContract({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -827,7 +827,7 @@ export const useWriteNounsAuctionHouseSettleCurrentAndCreateNewAuction =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseTransferOwnership = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHouseTransferOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'transferOwnership',
@@ -839,7 +839,7 @@ export const useWriteNounsAuctionHouseTransferOwnership = /*#__PURE__*/ createUs
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseUnpause = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHouseUnpause = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'unpause',
@@ -851,7 +851,7 @@ export const useWriteNounsAuctionHouseUnpause = /*#__PURE__*/ createUseWriteCont
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWriteNounsAuctionHouseWarmUpSettlementState = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiAuctionHouseWarmUpSettlementState = /*#__PURE__*/ createUseWriteContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'warmUpSettlementState',
@@ -863,7 +863,7 @@ export const useWriteNounsAuctionHouseWarmUpSettlementState = /*#__PURE__*/ crea
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouse = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiAuctionHouse = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
 });
@@ -874,7 +874,7 @@ export const useSimulateNounsAuctionHouse = /*#__PURE__*/ createUseSimulateContr
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseCreateBid = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiAuctionHouseCreateBid = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'createBid',
@@ -886,7 +886,7 @@ export const useSimulateNounsAuctionHouseCreateBid = /*#__PURE__*/ createUseSimu
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseInitialize = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiAuctionHouseInitialize = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'initialize',
@@ -898,7 +898,7 @@ export const useSimulateNounsAuctionHouseInitialize = /*#__PURE__*/ createUseSim
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHousePause = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiAuctionHousePause = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'pause',
@@ -910,7 +910,7 @@ export const useSimulateNounsAuctionHousePause = /*#__PURE__*/ createUseSimulate
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseRenounceOwnership =
+export const useSimulateNijiAuctionHouseRenounceOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -923,7 +923,7 @@ export const useSimulateNounsAuctionHouseRenounceOwnership =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseSetMinBidIncrementPercentage =
+export const useSimulateNijiAuctionHouseSetMinBidIncrementPercentage =
   /*#__PURE__*/ createUseSimulateContract({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -936,7 +936,7 @@ export const useSimulateNounsAuctionHouseSetMinBidIncrementPercentage =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseSetPrices = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiAuctionHouseSetPrices = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'setPrices',
@@ -948,7 +948,7 @@ export const useSimulateNounsAuctionHouseSetPrices = /*#__PURE__*/ createUseSimu
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseSetReservePrice = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiAuctionHouseSetReservePrice = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'setReservePrice',
@@ -960,7 +960,7 @@ export const useSimulateNounsAuctionHouseSetReservePrice = /*#__PURE__*/ createU
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseSetSanctionsOracle =
+export const useSimulateNijiAuctionHouseSetSanctionsOracle =
   /*#__PURE__*/ createUseSimulateContract({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -973,7 +973,7 @@ export const useSimulateNounsAuctionHouseSetSanctionsOracle =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseSetTimeBuffer = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiAuctionHouseSetTimeBuffer = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'setTimeBuffer',
@@ -985,7 +985,7 @@ export const useSimulateNounsAuctionHouseSetTimeBuffer = /*#__PURE__*/ createUse
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseSettleAuction = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiAuctionHouseSettleAuction = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'settleAuction',
@@ -997,7 +997,7 @@ export const useSimulateNounsAuctionHouseSettleAuction = /*#__PURE__*/ createUse
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseSettleCurrentAndCreateNewAuction =
+export const useSimulateNijiAuctionHouseSettleCurrentAndCreateNewAuction =
   /*#__PURE__*/ createUseSimulateContract({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1010,7 +1010,7 @@ export const useSimulateNounsAuctionHouseSettleCurrentAndCreateNewAuction =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseTransferOwnership =
+export const useSimulateNijiAuctionHouseTransferOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1023,7 +1023,7 @@ export const useSimulateNounsAuctionHouseTransferOwnership =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseUnpause = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiAuctionHouseUnpause = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   functionName: 'unpause',
@@ -1035,7 +1035,7 @@ export const useSimulateNounsAuctionHouseUnpause = /*#__PURE__*/ createUseSimula
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useSimulateNounsAuctionHouseWarmUpSettlementState =
+export const useSimulateNijiAuctionHouseWarmUpSettlementState =
   /*#__PURE__*/ createUseSimulateContract({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1048,7 +1048,7 @@ export const useSimulateNounsAuctionHouseWarmUpSettlementState =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiAuctionHouseEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
 });
@@ -1059,7 +1059,7 @@ export const useWatchNounsAuctionHouseEvent = /*#__PURE__*/ createUseWatchContra
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseAuctionBidEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiAuctionHouseAuctionBidEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   eventName: 'AuctionBid',
@@ -1071,7 +1071,7 @@ export const useWatchNounsAuctionHouseAuctionBidEvent = /*#__PURE__*/ createUseW
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseAuctionBidWithClientIdEvent =
+export const useWatchNijiAuctionHouseAuctionBidWithClientIdEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1084,7 +1084,7 @@ export const useWatchNounsAuctionHouseAuctionBidWithClientIdEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseAuctionCreatedEvent =
+export const useWatchNijiAuctionHouseAuctionCreatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1097,7 +1097,7 @@ export const useWatchNounsAuctionHouseAuctionCreatedEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseAuctionExtendedEvent =
+export const useWatchNijiAuctionHouseAuctionExtendedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1110,7 +1110,7 @@ export const useWatchNounsAuctionHouseAuctionExtendedEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseAuctionMinBidIncrementPercentageUpdatedEvent =
+export const useWatchNijiAuctionHouseAuctionMinBidIncrementPercentageUpdatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1123,7 +1123,7 @@ export const useWatchNounsAuctionHouseAuctionMinBidIncrementPercentageUpdatedEve
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseAuctionReservePriceUpdatedEvent =
+export const useWatchNijiAuctionHouseAuctionReservePriceUpdatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1136,7 +1136,7 @@ export const useWatchNounsAuctionHouseAuctionReservePriceUpdatedEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseAuctionSettledEvent =
+export const useWatchNijiAuctionHouseAuctionSettledEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1149,7 +1149,7 @@ export const useWatchNounsAuctionHouseAuctionSettledEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseAuctionSettledWithClientIdEvent =
+export const useWatchNijiAuctionHouseAuctionSettledWithClientIdEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1162,7 +1162,7 @@ export const useWatchNounsAuctionHouseAuctionSettledWithClientIdEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseAuctionTimeBufferUpdatedEvent =
+export const useWatchNijiAuctionHouseAuctionTimeBufferUpdatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1175,7 +1175,7 @@ export const useWatchNounsAuctionHouseAuctionTimeBufferUpdatedEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseOwnershipTransferredEvent =
+export const useWatchNijiAuctionHouseOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1188,7 +1188,7 @@ export const useWatchNounsAuctionHouseOwnershipTransferredEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHousePausedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiAuctionHousePausedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   eventName: 'Paused',
@@ -1200,7 +1200,7 @@ export const useWatchNounsAuctionHousePausedEvent = /*#__PURE__*/ createUseWatch
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseSanctionsOracleSetEvent =
+export const useWatchNijiAuctionHouseSanctionsOracleSetEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsAuctionHouseAbi,
     address: nounsAuctionHouseAddress,
@@ -1213,7 +1213,7 @@ export const useWatchNounsAuctionHouseSanctionsOracleSetEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x830bd73e4184cef73443c15111a1df14e495c706)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x488609b7113fcf3b761a05956300d605e8f6bcaf)
  */
-export const useWatchNounsAuctionHouseUnpausedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiAuctionHouseUnpausedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsAuctionHouseAbi,
   address: nounsAuctionHouseAddress,
   eventName: 'Unpaused',
