@@ -12,7 +12,7 @@ import 'hardhat-gas-reporter';
 import './tasks';
 
 dotenv.config();
-dotenv.config({ path: '../nouns-assets/.env' });
+dotenv.config({ path: '../niji-assets/.env' });
 
 const config: HardhatUserConfig = {
   solidity: {

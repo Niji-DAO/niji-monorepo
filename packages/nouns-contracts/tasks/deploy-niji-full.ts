@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 
-const BASE_DIR = path.join(__dirname, '../../nouns-assets/images_niji');
+const BASE_DIR = path.join(__dirname, '../../niji-assets/images_niji');
 const TRAIT_DIRS = [
   { dir: '01_スペシャル', name: 'special', id: 0 },
   { dir: '02_チョーカー', name: 'choker', id: 1 },
@@ -323,7 +323,7 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
         console.log(`│ <image> tags: ${(svg.match(/<image /g) || []).length}`);
 
         // Save output
-        const outputDir = path.join(__dirname, '../../nouns-assets/test_output');
+        const outputDir = path.join(__dirname, '../../niji-assets/test_output');
         fs.mkdirSync(outputDir, { recursive: true });
         fs.writeFileSync(path.join(outputDir, 'niji-tokenuri.svg'), svg);
       } catch (e: any) {

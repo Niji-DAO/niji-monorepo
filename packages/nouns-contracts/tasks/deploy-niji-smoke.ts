@@ -15,7 +15,7 @@
  *   pnpm exec hardhat deploy-niji-smoke --network baseSepolia
  *
  * Encoder pipeline: P6 (512×512 / global 256 palette + pngquant + oxipng
- * + 23KB SSTORE2 cap), implemented in nouns-assets/scripts/niji-encoder.ts.
+ * + 23KB SSTORE2 cap), implemented in niji-assets/scripts/niji-encoder.ts.
  */
 import { task } from 'hardhat/config';
 import fs from 'fs';
@@ -31,7 +31,7 @@ import {
   pickRepresentative,
 } from '../scripts/niji-encoder';
 
-const SOURCE_DIR = path.join(__dirname, '../../nouns-assets/_archive/work/quality-test/source');
+const SOURCE_DIR = path.join(__dirname, '../../niji-assets/_archive/work/quality-test/source');
 const DEPLOY_LOG_DIR = path.join(__dirname, '../deploy');
 
 interface SelectedFile {

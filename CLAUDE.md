@@ -23,13 +23,13 @@ The monorepo uses a unified TypeScript configuration with package-specific overr
   - `packages/nouns-contracts`: Uses `module: "CommonJS"` for Hardhat compatibility
   - `packages/niji-subgraph`: Uses `module: "CommonJS"` for Graph TS compatibility
 
-Packages extending the base: `nouns-contracts`, `niji-subgraph`, `nouns-webapp`. Standalone configs: `nouns-assets`, `nouns-sdk`, `niji-docs` (aligned to the same ES2022/ESNext standard).
+Packages extending the base: `nouns-contracts`, `niji-subgraph`, `nouns-webapp`. Standalone configs: `niji-assets`, `nouns-sdk`, `niji-docs` (aligned to the same ES2022/ESNext standard).
 
 ## Package Structure
 
 Six main packages with interdependencies:
 
-1. **nouns-assets** - PNG and run-length encoded Noun image data
+1. **niji-assets** - PNG and run-length encoded Noun image data
 2. **nouns-contracts** - Solidity smart contracts for Nouns DAO (uses Hardhat + Foundry)
 3. **nouns-sdk** - Contract addresses, ABIs, instances, and image utilities
 4. **nouns-webapp** - React frontend (Vite + Tailwind + i18n)
@@ -147,9 +147,9 @@ pnpm i18n:compile             # Compile translations
 ## Image System
 
 The image generation system spans multiple packages:
-- `nouns-assets` contains PNG files and encoded data
+- `niji-assets` contains PNG files and encoded data
 - `nouns-sdk` provides SVG building utilities
-- Image encoding scripts in `nouns-assets/scripts/`
+- Image encoding scripts in `niji-assets/scripts/`
 
 ## Environment Variables
 

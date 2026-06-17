@@ -4,9 +4,9 @@ Nouns DAO is a generative avatar art collective run by a group of crypto misfits
 
 ## Packages
 
-### nouns-assets
+### niji-assets
 
-The [nouns assets](packages/nouns-assets) package holds the Noun PNG and run-length encoded image data.
+The [nouns assets](packages/niji-assets) package holds the Noun PNG and run-length encoded image data.
 
 ### nouns-contracts
 

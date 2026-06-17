@@ -93,7 +93,7 @@
 | `@typechain/ethers-v6` | - | `^0.5.1`（新規追加）|
 | `hardhat` | 2.28.6 | 2.28.6（変更なし）|
 
-### nouns-assets
+### niji-assets
 
 #### 変更
 - **ethers v6 移行** (#48)
