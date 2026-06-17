@@ -49,7 +49,7 @@ const config: HardhatUserConfig = {
     },
     baseSepolia: {
       url: 'https://sepolia.base.org',
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: [process.env.WALLET_PRIVATE_KEY!].filter(Boolean),
       chainId: 84532,
     },
     hardhat: {

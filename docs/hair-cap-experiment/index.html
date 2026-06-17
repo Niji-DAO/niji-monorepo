@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<title>Hair Cap Experiment (worst case)</title>
+<style>
+body { font-family:-apple-system,sans-serif; background:#0d0d0d; color:#eee; margin:0; padding:16px; }
+h1 { font-size:18px; margin:0 0 8px; }
+.meta { color:#888; font-size:12px; margin-bottom:16px; }
+table { border-collapse:collapse; width:100%; margin-top:16px; }
+th, td { border:1px solid #2a2a2a; padding:8px; text-align:center; vertical-align:top; background:#161616; font-size:12px; }
+th { background:#1f1f1f; }
+.lbl { font-size:12px; color:#ffcc66; font-weight:600; margin-bottom:4px; }
+.kb { font-size:11px; color:#66ccff; margin:4px 0; }
+.hair { width:140px; height:140px; object-fit:contain; background:repeating-conic-gradient(#333 0% 25%, #2a2a2a 0% 50%) 50% / 12px 12px; display:block; margin:4px auto; }
+.composite { width:300px; height:300px; object-fit:contain; background:repeating-conic-gradient(#333 0% 25%, #2a2a2a 0% 50%) 50% / 14px 14px; display:block; margin:4px auto; }
+b { color:#ffaa66; }
+.warn { color:#ff6666; font-weight:600; }
+.ok { color:#66ff66; font-weight:600; }
+</style></head><body>
+<h1>Hair cap experiment (worst case body)</h1>
+<div class="meta">caps 23KB / 18KB / 14KB / 10KB を hair に当てた時の 12 layer 合成画と tokenURI 推定値を比較</div>
+<table>
+<thead><tr>
+  <th>cap (全12layer適用)</th>
+  <th>composite (worst case)</th>
+  <th>hair KB</th>
+  <th>12layer total</th>
+  <th>tokenURI 推定</th>
+  <th>Blockscout (~200KB)</th>
+</tr></thead>
+<tbody>
+<tr>
+  <td><b>23KB</b></td>
+  <td><img class="composite" src="cap_23KB/composite.png"></td>
+  <td>21.42KB</td>
+  <td>121.09KB</td>
+  <td>217.6KB</td>
+  <td class="warn">✗ cap 超え</td>
+</tr>
+<tr>
+  <td><b>20KB</b></td>
+  <td><img class="composite" src="cap_20KB/composite.png"></td>
+  <td>19.65KB</td>
+  <td>119.32KB</td>
+  <td>214.5KB</td>
+  <td class="warn">✗ cap 超え</td>
+</tr>
+<tr>
+  <td><b>18KB</b></td>
+  <td><img class="composite" src="cap_18KB/composite.png"></td>
+  <td>18.56KB</td>
+  <td>113.31KB</td>
+  <td>203.8KB</td>
+  <td class="warn">✗ cap 超え</td>
+</tr>
+<tr>
+  <td><b>16KB</b></td>
+  <td><img class="composite" src="cap_16KB/composite.png"></td>
+  <td>18.56KB</td>
+  <td>108.05KB</td>
+  <td>194.4KB</td>
+  <td class="ok">✓ 通る</td>
+</tr>
+</tbody>
+</table>
+
+<h2 style="color:#ffcc66;margin-top:32px;">各 layer 個別 (画質劣化箇所の特定用)</h2>
+<h3 style="color:#66ddff;">cap 23KB layers</h3>
+<table><thead><tr><th>special</th><th>choker</th><th>headphone</th><th>leftHand</th><th>hat</th><th>clothing</th><th>ear</th><th>back</th><th>backDecoration</th><th>background</th><th>solidBackground</th><th>hair</th></tr></thead>
+<tbody><tr><td><img class="hair" src="cap_23KB/layers/00_special.png"></td><td><img class="hair" src="cap_23KB/layers/01_choker.png"></td><td><img class="hair" src="cap_23KB/layers/02_headphone.png"></td><td><img class="hair" src="cap_23KB/layers/03_leftHand.png"></td><td><img class="hair" src="cap_23KB/layers/04_hat.png"></td><td><img class="hair" src="cap_23KB/layers/05_clothing.png"></td><td><img class="hair" src="cap_23KB/layers/06_ear.png"></td><td><img class="hair" src="cap_23KB/layers/07_back.png"></td><td><img class="hair" src="cap_23KB/layers/08_backDecoration.png"></td><td><img class="hair" src="cap_23KB/layers/09_background.png"></td><td><img class="hair" src="cap_23KB/layers/10_solidBackground.png"></td><td><img class="hair" src="cap_23KB/layers/11_hair.png"></td></tr></tbody>
+</table>
+<h3 style="color:#66ddff;">cap 20KB layers</h3>
+<table><thead><tr><th>special</th><th>choker</th><th>headphone</th><th>leftHand</th><th>hat</th><th>clothing</th><th>ear</th><th>back</th><th>backDecoration</th><th>background</th><th>solidBackground</th><th>hair</th></tr></thead>
+<tbody><tr><td><img class="hair" src="cap_20KB/layers/00_special.png"></td><td><img class="hair" src="cap_20KB/layers/01_choker.png"></td><td><img class="hair" src="cap_20KB/layers/02_headphone.png"></td><td><img class="hair" src="cap_20KB/layers/03_leftHand.png"></td><td><img class="hair" src="cap_20KB/layers/04_hat.png"></td><td><img class="hair" src="cap_20KB/layers/05_clothing.png"></td><td><img class="hair" src="cap_20KB/layers/06_ear.png"></td><td><img class="hair" src="cap_20KB/layers/07_back.png"></td><td><img class="hair" src="cap_20KB/layers/08_backDecoration.png"></td><td><img class="hair" src="cap_20KB/layers/09_background.png"></td><td><img class="hair" src="cap_20KB/layers/10_solidBackground.png"></td><td><img class="hair" src="cap_20KB/layers/11_hair.png"></td></tr></tbody>
+</table>
+<h3 style="color:#66ddff;">cap 18KB layers</h3>
+<table><thead><tr><th>special</th><th>choker</th><th>headphone</th><th>leftHand</th><th>hat</th><th>clothing</th><th>ear</th><th>back</th><th>backDecoration</th><th>background</th><th>solidBackground</th><th>hair</th></tr></thead>
+<tbody><tr><td><img class="hair" src="cap_18KB/layers/00_special.png"></td><td><img class="hair" src="cap_18KB/layers/01_choker.png"></td><td><img class="hair" src="cap_18KB/layers/02_headphone.png"></td><td><img class="hair" src="cap_18KB/layers/03_leftHand.png"></td><td><img class="hair" src="cap_18KB/layers/04_hat.png"></td><td><img class="hair" src="cap_18KB/layers/05_clothing.png"></td><td><img class="hair" src="cap_18KB/layers/06_ear.png"></td><td><img class="hair" src="cap_18KB/layers/07_back.png"></td><td><img class="hair" src="cap_18KB/layers/08_backDecoration.png"></td><td><img class="hair" src="cap_18KB/layers/09_background.png"></td><td><img class="hair" src="cap_18KB/layers/10_solidBackground.png"></td><td><img class="hair" src="cap_18KB/layers/11_hair.png"></td></tr></tbody>
+</table>
+<h3 style="color:#66ddff;">cap 16KB layers</h3>
+<table><thead><tr><th>special</th><th>choker</th><th>headphone</th><th>leftHand</th><th>hat</th><th>clothing</th><th>ear</th><th>back</th><th>backDecoration</th><th>background</th><th>solidBackground</th><th>hair</th></tr></thead>
+<tbody><tr><td><img class="hair" src="cap_16KB/layers/00_special.png"></td><td><img class="hair" src="cap_16KB/layers/01_choker.png"></td><td><img class="hair" src="cap_16KB/layers/02_headphone.png"></td><td><img class="hair" src="cap_16KB/layers/03_leftHand.png"></td><td><img class="hair" src="cap_16KB/layers/04_hat.png"></td><td><img class="hair" src="cap_16KB/layers/05_clothing.png"></td><td><img class="hair" src="cap_16KB/layers/06_ear.png"></td><td><img class="hair" src="cap_16KB/layers/07_back.png"></td><td><img class="hair" src="cap_16KB/layers/08_backDecoration.png"></td><td><img class="hair" src="cap_16KB/layers/09_background.png"></td><td><img class="hair" src="cap_16KB/layers/10_solidBackground.png"></td><td><img class="hair" src="cap_16KB/layers/11_hair.png"></td></tr></tbody>
+</table>
+</body></html>

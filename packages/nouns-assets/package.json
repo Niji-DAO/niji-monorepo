@@ -24,7 +24,7 @@
     "clean": "rimraf dist",
     "encode": "ts-node scripts/encode.ts",
     "encode-more": "ts-node scripts/encode-more.ts",
-    "encode-niji": "tsx scripts/encode-niji.ts",
+    "encode-niji-png": "tsx scripts/encode-niji-png.ts",
     "test": "vitest run"
   },
   "dependencies": {
