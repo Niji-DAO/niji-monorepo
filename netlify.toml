@@ -1,6 +1,6 @@
 [build]
   command = "pnpm build"
-  publish = "packages/nouns-webapp/dist"
+  publish = "packages/niji-webapp/dist"
 
 [[redirects]]
   from = "/*"
