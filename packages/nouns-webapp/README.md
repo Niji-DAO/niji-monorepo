@@ -11,8 +11,8 @@ In the first shell:
 ```sh
 # Install all dependencies and build contract artifacts
 pnpm install
-# Switch to nouns-contracts
-cd packages/nouns-contracts
+# Switch to niji-contracts
+cd packages/niji-contracts
 # Start local simnet
 pnpm task:run-local
 ```

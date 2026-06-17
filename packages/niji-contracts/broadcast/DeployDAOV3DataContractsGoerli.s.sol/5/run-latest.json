@@ -106,7 +106,7 @@
   ],
   "libraries": [],
   "pending": [],
-  "path": "/Users/elad/code/nounsDAO/nouns-monorepo/packages/nouns-contracts/broadcast/DeployDAOV3DataContractsGoerli.s.sol/5/run-latest.json",
+  "path": "/Users/elad/code/nounsDAO/nouns-monorepo/packages/niji-contracts/broadcast/DeployDAOV3DataContractsGoerli.s.sol/5/run-latest.json",
   "returns": {
     "dataProxy": {
       "internal_type": "contract NounsDAODataProxy",

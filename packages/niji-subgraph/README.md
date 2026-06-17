@@ -65,7 +65,7 @@ Run your local graph node by running:
 pnpm graph-node
 ```
 
-Make sure your local chain is running: in a new terminal go to the `nouns-contracts` package and run:
+Make sure your local chain is running: in a new terminal go to the `niji-contracts` package and run:
 
 ```sh
 pnpm task:run-local

@@ -58,6 +58,14 @@ export default defineConfig([
       // mapping sources fail import resolution; treat the whole subgraph
       // package src as opt-out so dir-rename PRs don't trip on it.
       '**/packages/*-subgraph/src/**',
+      // contracts package's hardhat tasks / tests import typechain factories
+      // that live at packages/*-contracts/typechain/. These only exist after
+      // `hardhat compile`. Same reasoning as the subgraph case — opt out so
+      // dir-rename PRs don't fail on unresolved typechain modules.
+      '**/packages/*-contracts/tasks/**',
+      '**/packages/*-contracts/test/**',
+      '**/packages/*-contracts/scripts/**',
+      '**/packages/*-contracts/src/**',
       '**/*.gen.ts',
     ],
   },

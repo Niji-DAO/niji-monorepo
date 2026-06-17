@@ -8,9 +8,9 @@ Nouns DAO is a generative avatar art collective run by a group of crypto misfits
 
 The [nouns assets](packages/niji-assets) package holds the Noun PNG and run-length encoded image data.
 
-### nouns-contracts
+### niji-contracts
 
-The [nouns contracts](packages/nouns-contracts) is the suite of Solidity contracts powering Nouns DAO.
+The [nouns contracts](packages/niji-contracts) is the suite of Solidity contracts powering Nouns DAO.
 
 ### niji-sdk
 
