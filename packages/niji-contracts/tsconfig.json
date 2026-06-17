@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "module": "CommonJS"
+  },
+  "extends": "../../tsconfig.base.json",
+  "include": [
+    "utils.ts",
+    "./tasks",
+    "./src",
+    "./test",
+    "./typechain",
+    "./abi/**/*.json",
+    "./files/*.json"
+  ],
+  "exclude": ["./test/foundry/**"],
+  "files": ["./hardhat.config.ts"],
+  "references": [
+    {
+      "path": "../niji-assets/tsconfig.build.json"
+    }
+  ]
+}

@@ -20,21 +20,21 @@ The monorepo uses a unified TypeScript configuration with package-specific overr
   - `lib: ["ES2022"]` (modern JavaScript features)
 
 - **CommonJS overrides** (for compatibility):
-  - `packages/nouns-contracts`: Uses `module: "CommonJS"` for Hardhat compatibility
-  - `packages/nouns-subgraph`: Uses `module: "CommonJS"` for Graph TS compatibility
+  - `packages/niji-contracts`: Uses `module: "CommonJS"` for Hardhat compatibility
+  - `packages/niji-subgraph`: Uses `module: "CommonJS"` for Graph TS compatibility
 
-Packages extending the base: `nouns-contracts`, `nouns-subgraph`, `nouns-webapp`. Standalone configs: `nouns-assets`, `nouns-sdk`, `nouns-docs` (aligned to the same ES2022/ESNext standard).
+Packages extending the base: `niji-contracts`, `niji-subgraph`, `nouns-webapp`. Standalone configs: `niji-assets`, `niji-sdk`, `niji-docs` (aligned to the same ES2022/ESNext standard).
 
 ## Package Structure
 
 Six main packages with interdependencies:
 
-1. **nouns-assets** - PNG and run-length encoded Noun image data
-2. **nouns-contracts** - Solidity smart contracts for Nouns DAO (uses Hardhat + Foundry)
-3. **nouns-sdk** - Contract addresses, ABIs, instances, and image utilities
+1. **niji-assets** - PNG and run-length encoded Noun image data
+2. **niji-contracts** - Solidity smart contracts for Nouns DAO (uses Hardhat + Foundry)
+3. **niji-sdk** - Contract addresses, ABIs, instances, and image utilities
 4. **nouns-webapp** - React frontend (Vite + Tailwind + i18n)
-5. **nouns-subgraph** - The Graph subgraph manifests
-6. **nouns-docs** - Next.js 15 documentation site with Nextra 4
+5. **niji-subgraph** - The Graph subgraph manifests
+6. **niji-docs** - Next.js 15 documentation site with Nextra 4
 
 Build dependencies: webapp depends on assets → contracts → sdk.
 
@@ -65,7 +65,7 @@ pnpm build            # Build package
 
 ## Smart Contract Development
 
-Located in `packages/nouns-contracts/`:
+Located in `packages/niji-contracts/`:
 - Uses both **Hardhat** and **Foundry** for testing/deployment
 - Tests in `test/` (TypeScript) and `test/foundry/` (Solidity)
 - Deployment scripts in `script/`
@@ -147,9 +147,9 @@ pnpm i18n:compile             # Compile translations
 ## Image System
 
 The image generation system spans multiple packages:
-- `nouns-assets` contains PNG files and encoded data
-- `nouns-sdk` provides SVG building utilities
-- Image encoding scripts in `nouns-assets/scripts/`
+- `niji-assets` contains PNG files and encoded data
+- `niji-sdk` provides SVG building utilities
+- Image encoding scripts in `niji-assets/scripts/`
 
 ## Environment Variables
 
@@ -216,9 +216,9 @@ Feature toggles in `src/config.ts`:
 - `candidates`: Proposal candidates system
 - `fork`: Fork-related functionality
 
-## Documentation Site (nouns-docs)
+## Documentation Site (niji-docs)
 
-Located in `packages/nouns-docs/` - Next.js 15 documentation site built with Nextra 4.
+Located in `packages/niji-docs/` - Next.js 15 documentation site built with Nextra 4.
 
 ### Tech Stack
 - **Next.js 15** with App Router
@@ -243,7 +243,7 @@ Located in `packages/nouns-docs/` - Next.js 15 documentation site built with Nex
 
 ### Docs-Specific Commands
 ```bash
-# From packages/nouns-docs directory
+# From packages/niji-docs directory
 pnpm dev       # Start development server
 pnpm build     # Build application (includes Pagefind search index generation)
 pnpm start     # Start production server
@@ -256,6 +256,6 @@ pnpm start     # Start production server
 ## Local Development with Contracts
 
 For full local development:
-1. Start local blockchain: `cd packages/nouns-contracts && pnpm task:run-local`
+1. Start local blockchain: `cd packages/niji-contracts && pnpm task:run-local`
 2. Use hardhat chain ID (31337) in environment
 3. Import development private key to MetaMask: `0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`

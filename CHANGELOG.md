@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-### nouns-contracts
+### niji-contracts
 
 #### 追加
 - **エッジケース + 統合 + ファジングテスト** (#77)
@@ -83,7 +83,7 @@
   - カスタムエラーのアサーションを `revertedWith` → `revertedWithCustomError` へ変更
   - テスト対象: 164 テストすべてパス
 
-#### 依存関係の更新（packages/nouns-contracts）
+#### 依存関係の更新（packages/niji-contracts）
 
 | パッケージ | 変更前 | 変更後 |
 |---|---|---|
@@ -93,7 +93,7 @@
 | `@typechain/ethers-v6` | - | `^0.5.1`（新規追加）|
 | `hardhat` | 2.28.6 | 2.28.6（変更なし）|
 
-### nouns-assets
+### niji-assets
 
 #### 変更
 - **ethers v6 移行** (#48)

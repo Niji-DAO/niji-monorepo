@@ -53,6 +53,19 @@ export default defineConfig([
       // Generated code (use a more consistent pattern)
       '**/typechain/**',
       '**/src/{types,contracts,subgraphs}/**',
+      // subgraph mappings depend on `graph codegen` output that lives at
+      // packages/*-subgraph/src/types/**. Without running prebuild first the
+      // mapping sources fail import resolution; treat the whole subgraph
+      // package src as opt-out so dir-rename PRs don't trip on it.
+      '**/packages/*-subgraph/src/**',
+      // contracts package's hardhat tasks / tests import typechain factories
+      // that live at packages/*-contracts/typechain/. These only exist after
+      // `hardhat compile`. Same reasoning as the subgraph case — opt out so
+      // dir-rename PRs don't fail on unresolved typechain modules.
+      '**/packages/*-contracts/tasks/**',
+      '**/packages/*-contracts/test/**',
+      '**/packages/*-contracts/scripts/**',
+      '**/packages/*-contracts/src/**',
       '**/*.gen.ts',
     ],
   },
@@ -167,15 +180,15 @@ export default defineConfig([
     },
   },
 
-  // nouns-docs specific configuration
+  // niji-docs specific configuration
   {
-    files: ['**/packages/nouns-docs/**/*.{ts,tsx}'],
+    files: ['**/packages/niji-docs/**/*.{ts,tsx}'],
     settings: {
       ...importXPlugin.configs.typescript.settings,
       'import-x/resolver': {
         ...importXPlugin.configs.typescript.settings['import-x/resolver'],
         typescript: {
-          project: 'packages/nouns-docs/tsconfig.json',
+          project: 'packages/niji-docs/tsconfig.json',
         },
       },
     },
@@ -287,7 +300,7 @@ export default defineConfig([
     },
   },
 
-  // nouns-api specific configuration (Ponder)
+  // niji-api specific configuration (Ponder)
   // eslint-config-ponder hard-codes `tsconfigRootDir: './'` and
   // `project: true`. The former is rejected as a non-absolute path when
   // lint-staged invokes eslint from the repo root with file arguments, and
@@ -297,7 +310,7 @@ export default defineConfig([
     const { project: _project, ...restParserOptions } = cfg.languageOptions?.parserOptions ?? {};
     return {
       ...cfg,
-      files: cfg.files ?? ['**/packages/nouns-api/**/*.{ts,tsx}'],
+      files: cfg.files ?? ['**/packages/niji-api/**/*.{ts,tsx}'],
       languageOptions: {
         ...cfg.languageOptions,
         parserOptions: {
@@ -308,7 +321,7 @@ export default defineConfig([
     };
   }),
   {
-    files: ['**/packages/nouns-api/**/*.{ts,tsx}'],
+    files: ['**/packages/niji-api/**/*.{ts,tsx}'],
     languageOptions: {
       parserOptions: {
         tsconfigRootDir: __dirname,
@@ -319,7 +332,7 @@ export default defineConfig([
       'import-x/resolver': {
         ...importXPlugin.configs.typescript.settings['import-x/resolver'],
         typescript: {
-          project: 'packages/nouns-api/tsconfig.json',
+          project: 'packages/niji-api/tsconfig.json',
         },
       },
     },
