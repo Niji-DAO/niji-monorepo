@@ -23,7 +23,7 @@ The monorepo uses a unified TypeScript configuration with package-specific overr
   - `packages/nouns-contracts`: Uses `module: "CommonJS"` for Hardhat compatibility
   - `packages/niji-subgraph`: Uses `module: "CommonJS"` for Graph TS compatibility
 
-Packages extending the base: `nouns-contracts`, `niji-subgraph`, `nouns-webapp`. Standalone configs: `nouns-assets`, `nouns-sdk`, `nouns-docs` (aligned to the same ES2022/ESNext standard).
+Packages extending the base: `nouns-contracts`, `niji-subgraph`, `nouns-webapp`. Standalone configs: `nouns-assets`, `nouns-sdk`, `niji-docs` (aligned to the same ES2022/ESNext standard).
 
 ## Package Structure
 
@@ -34,7 +34,7 @@ Six main packages with interdependencies:
 3. **nouns-sdk** - Contract addresses, ABIs, instances, and image utilities
 4. **nouns-webapp** - React frontend (Vite + Tailwind + i18n)
 5. **niji-subgraph** - The Graph subgraph manifests
-6. **nouns-docs** - Next.js 15 documentation site with Nextra 4
+6. **niji-docs** - Next.js 15 documentation site with Nextra 4
 
 Build dependencies: webapp depends on assets → contracts → sdk.
 
@@ -216,9 +216,9 @@ Feature toggles in `src/config.ts`:
 - `candidates`: Proposal candidates system
 - `fork`: Fork-related functionality
 
-## Documentation Site (nouns-docs)
+## Documentation Site (niji-docs)
 
-Located in `packages/nouns-docs/` - Next.js 15 documentation site built with Nextra 4.
+Located in `packages/niji-docs/` - Next.js 15 documentation site built with Nextra 4.
 
 ### Tech Stack
 - **Next.js 15** with App Router
@@ -243,7 +243,7 @@ Located in `packages/nouns-docs/` - Next.js 15 documentation site built with Nex
 
 ### Docs-Specific Commands
 ```bash
-# From packages/nouns-docs directory
+# From packages/niji-docs directory
 pnpm dev       # Start development server
 pnpm build     # Build application (includes Pagefind search index generation)
 pnpm start     # Start production server

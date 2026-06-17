@@ -172,15 +172,15 @@ export default defineConfig([
     },
   },
 
-  // nouns-docs specific configuration
+  // niji-docs specific configuration
   {
-    files: ['**/packages/nouns-docs/**/*.{ts,tsx}'],
+    files: ['**/packages/niji-docs/**/*.{ts,tsx}'],
     settings: {
       ...importXPlugin.configs.typescript.settings,
       'import-x/resolver': {
         ...importXPlugin.configs.typescript.settings['import-x/resolver'],
         typescript: {
-          project: 'packages/nouns-docs/tsconfig.json',
+          project: 'packages/niji-docs/tsconfig.json',
         },
       },
     },
