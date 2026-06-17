@@ -1,9 +1,9 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { type ChangeEvent, type FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import { i18n } from '@lingui/core';
 import { Trans } from '@lingui/react/macro';
+import { buildSVG, EncodedImage, PNGCollectionEncoder } from '@niji/sdk';
 import { getNounData, getRandomNounSeed, ImageData } from '@noundry/nouns-assets';
-import { buildSVG, EncodedImage, PNGCollectionEncoder } from '@nouns/sdk';
 import { PNG } from 'pngjs';
 import {
   Button,
@@ -92,7 +92,7 @@ const traitKeyToLocalizedTraitKeyFirstLetterCapitalized = (s: string) => {
   }
 };
 
-const Playground: React.FC = () => {
+const Playground: FC = () => {
   const [nounSvgs, setNounSvgs] = useState<string[]>();
   const [traits, setTraits] = useState<Trait[]>();
   const [modSeed, setModSeed] = useState<{ [key: string]: number }>();
@@ -105,7 +105,7 @@ const Playground: React.FC = () => {
 
   const customTraitFileRef = useRef<HTMLInputElement>(null);
 
-  const generateNounSvg = React.useCallback(
+  const generateNounSvg = useCallback(
     (amount: number = 1) => {
       for (let i = 0; i < amount; i++) {
         const seed = { ...getRandomNounSeed(), ...modSeed };
@@ -190,7 +190,7 @@ const Playground: React.FC = () => {
     }
   };
 
-  let pendingTraitErrorTimeout: NodeJS.Timeout;
+  let pendingTraitErrorTimeout: NodeJS.Timeout | undefined;
   const setPendingTraitInvalid = () => {
     setPendingTraitValid(false);
     resetTraitFileUpload();
@@ -200,7 +200,7 @@ const Playground: React.FC = () => {
   };
 
   const validateAndSetCustomTrait = (file: File | undefined) => {
-    if (pendingTraitErrorTimeout) {
+    if (pendingTraitErrorTimeout !== undefined) {
       clearTimeout(pendingTraitErrorTimeout);
     }
     if (!file) {

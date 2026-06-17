@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { faFile, faPenToSquare, faPlay, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
-import { useReadNounsTreasuryBalancesInEth } from '@nouns/sdk/react/treasury';
+import { useReadNounsTreasuryBalancesInEth } from '@niji/sdk/react/treasury';
 import clsx from 'clsx';
 import { ConnectKitButton } from 'connectkit';
 import { Container, Dropdown, Nav, Navbar } from 'react-bootstrap';

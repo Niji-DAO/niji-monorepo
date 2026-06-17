@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import { type FC, useEffect } from 'react';
 
+import { buildSVG } from '@niji/sdk';
 import { getNounData, ImageData as data } from '@noundry/nouns-assets';
-import { buildSVG } from '@nouns/sdk';
 import Image from 'react-bootstrap/Image';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router';
@@ -45,7 +45,7 @@ export const getNoun = (nounId: string | bigint, seed: INounSeed) => {
 /**
  * @deprecated Use [Noun](../Noun.tsx) instead
  */
-export const StandaloneNounImage: React.FC<StandaloneNounProps> = (props: StandaloneNounProps) => {
+export const StandaloneNounImage: FC<StandaloneNounProps> = (props: StandaloneNounProps) => {
   const { nounId } = props;
   const seed = useNounSeed(nounId);
   const noun = seed && getNoun(nounId, seed);
@@ -56,7 +56,7 @@ export const StandaloneNounImage: React.FC<StandaloneNounProps> = (props: Standa
 /**
  * @deprecated Use [Noun](../Noun.tsx) instead
  */
-const StandaloneNoun: React.FC<StandaloneNounProps> = (props: StandaloneNounProps) => {
+const StandaloneNoun: FC<StandaloneNounProps> = (props: StandaloneNounProps) => {
   const { nounId } = props;
   const seed = useNounSeed(nounId);
   const noun = seed && getNoun(nounId, seed);
@@ -81,7 +81,7 @@ const StandaloneNoun: React.FC<StandaloneNounProps> = (props: StandaloneNounProp
 /**
  * @deprecated Use [Noun](../Noun.tsx) instead
  */
-export const StandaloneNounCircular: React.FC<StandaloneCircularNounProps> = (
+export const StandaloneNounCircular: FC<StandaloneCircularNounProps> = (
   props: StandaloneCircularNounProps,
 ) => {
   const { nounId, border } = props;
@@ -115,7 +115,7 @@ export const StandaloneNounCircular: React.FC<StandaloneCircularNounProps> = (
 /**
  * @deprecated Use [Noun](../Noun.tsx) instead
  */
-export const StandaloneNounRoundedCorners: React.FC<StandaloneNounProps> = (
+export const StandaloneNounRoundedCorners: FC<StandaloneNounProps> = (
   props: StandaloneNounProps,
 ) => {
   const { nounId } = props;
@@ -145,7 +145,7 @@ export const StandaloneNounRoundedCorners: React.FC<StandaloneNounProps> = (
 /**
  * @deprecated Use [Noun](../Noun.tsx) instead
  */
-export const StandaloneNounWithSeed: React.FC<StandaloneNounWithSeedProps> = ({
+export const StandaloneNounWithSeed: FC<StandaloneNounWithSeedProps> = ({
   nounId,
   onLoadSeed,
   shouldLinkToProfile,
