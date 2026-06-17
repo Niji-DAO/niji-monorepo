@@ -3,6 +3,6 @@
     { "path": "packages/nouns-assets" },
     { "path": "packages/nouns-contracts" },
     { "path": "packages/nouns-sdk" },
-    { "path": "packages/nouns-subgraph" },
+    { "path": "packages/niji-subgraph" },
   ]
 }

@@ -53,6 +53,11 @@ export default defineConfig([
       // Generated code (use a more consistent pattern)
       '**/typechain/**',
       '**/src/{types,contracts,subgraphs}/**',
+      // subgraph mappings depend on `graph codegen` output that lives at
+      // packages/*-subgraph/src/types/**. Without running prebuild first the
+      // mapping sources fail import resolution; treat the whole subgraph
+      // package src as opt-out so dir-rename PRs don't trip on it.
+      '**/packages/*-subgraph/src/**',
       '**/*.gen.ts',
     ],
   },

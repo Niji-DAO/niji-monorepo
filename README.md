@@ -20,11 +20,11 @@ The [nouns sdk](packages/nouns-sdk) includes methods and react hooks for interac
 
 A [ponder.sh](https://github.com/ponder-sh/ponder) based API for all historical NounsDAO data
 
-### nouns-subgraph
+### niji-subgraph
 
 **deprecated** in favor of **nouns-api**
 
-In order to make retrieving more complex data from the auction history, [nouns subgraph](packages/nouns-subgraph) contains subgraph manifests that are deployed onto [The Graph](https://thegraph.com).
+In order to make retrieving more complex data from the auction history, [nouns subgraph](packages/niji-subgraph) contains subgraph manifests that are deployed onto [The Graph](https://thegraph.com).
 
 ### nouns-webapp
 

@@ -21,9 +21,9 @@ The monorepo uses a unified TypeScript configuration with package-specific overr
 
 - **CommonJS overrides** (for compatibility):
   - `packages/nouns-contracts`: Uses `module: "CommonJS"` for Hardhat compatibility
-  - `packages/nouns-subgraph`: Uses `module: "CommonJS"` for Graph TS compatibility
+  - `packages/niji-subgraph`: Uses `module: "CommonJS"` for Graph TS compatibility
 
-Packages extending the base: `nouns-contracts`, `nouns-subgraph`, `nouns-webapp`. Standalone configs: `nouns-assets`, `nouns-sdk`, `nouns-docs` (aligned to the same ES2022/ESNext standard).
+Packages extending the base: `nouns-contracts`, `niji-subgraph`, `nouns-webapp`. Standalone configs: `nouns-assets`, `nouns-sdk`, `nouns-docs` (aligned to the same ES2022/ESNext standard).
 
 ## Package Structure
 
@@ -33,7 +33,7 @@ Six main packages with interdependencies:
 2. **nouns-contracts** - Solidity smart contracts for Nouns DAO (uses Hardhat + Foundry)
 3. **nouns-sdk** - Contract addresses, ABIs, instances, and image utilities
 4. **nouns-webapp** - React frontend (Vite + Tailwind + i18n)
-5. **nouns-subgraph** - The Graph subgraph manifests
+5. **niji-subgraph** - The Graph subgraph manifests
 6. **nouns-docs** - Next.js 15 documentation site with Nextra 4
 
 Build dependencies: webapp depends on assets → contracts → sdk.
