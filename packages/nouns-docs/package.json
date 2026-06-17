@@ -1,5 +1,5 @@
 {
-  "name": "@nouns/docs",
+  "name": "@niji/docs",
   "version": "1.0.0",
   "description": "Nouns DAO documentation",
   "license": "MIT",
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
-    "@nouns/sdk": "workspace:*",
+    "@niji/sdk": "workspace:*",
     "@wagmi/core": "catalog:",
     "clsx": "^2.1.1",
     "lucide": "catalog:",

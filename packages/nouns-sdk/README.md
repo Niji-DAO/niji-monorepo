@@ -1,4 +1,4 @@
-# @nouns/sdk
+# @niji/sdk
 
 ## Usage
 
@@ -32,17 +32,17 @@ Actions are framework-agnostic named wrappers around wagmi's methods that supply
 
 The actions for each contract are available as a separate import:
 
-- `@nouns/sdk/governor`
-- `@nouns/sdk/legacy-treasury`
-- `@nouns/sdk/treasury`
-- `@nouns/sdk/data`
-- `@nouns/sdk/token`
-- `@nouns/sdk/auction-house`
-- `@nouns/sdk/descriptor`
-- `@nouns/sdk/stream-factory`
-- `@nouns/sdk/stream`
-- `@nouns/sdk/usdc-payer`
-- `@nouns/sdk/usdc-token-buyer`
+- `@niji/sdk/governor`
+- `@niji/sdk/legacy-treasury`
+- `@niji/sdk/treasury`
+- `@niji/sdk/data`
+- `@niji/sdk/token`
+- `@niji/sdk/auction-house`
+- `@niji/sdk/descriptor`
+- `@niji/sdk/stream-factory`
+- `@niji/sdk/stream`
+- `@niji/sdk/usdc-payer`
+- `@niji/sdk/usdc-token-buyer`
 
 Every read function is available as a wrapper around wagmi's [readContract](https://wagmi.sh/core/api/actions/readContract#readcontract) in the format: `read<ContractName><FunctionName>(wagmiConfig, args)`
 
@@ -51,7 +51,7 @@ e.g.:
 ```ts
 import { createConfig, http } from '@wagmi/core';
 import { mainnet } from '@wagmi/core/chains';
-import { readNounsAuctionHouseAuction } from '@nouns/sdk/auction-house';
+import { readNounsAuctionHouseAuction } from '@niji/sdk/auction-house';
 
 const config = createConfig({
   chains: [mainnet],
@@ -84,7 +84,7 @@ import { mainnet } from '@wagmi/core/chains';
 import {
   simulateNounsAuctionHouseCreateBid,
   writeNounsAuctionHouseCreateBid,
-} from '@nouns/sdk/auctionHouse';
+} from '@niji/sdk/auctionHouse';
 
 const config = createConfig({
   chains: [mainnet],
@@ -114,7 +114,7 @@ e.g.:
 ```ts
 import { createConfig, http } from '@wagmi/core';
 import { mainnet } from '@wagmi/core/chains';
-import { watchNounsAuctionHouseAuctionBidEvent } from '@nouns/sdk/auction-house';
+import { watchNounsAuctionHouseAuctionBidEvent } from '@niji/sdk/auction-house';
 
 const config = createConfig({
   chains: [mainnet],
@@ -151,22 +151,22 @@ Every read/write/simulate/watch action also has a corresponding wagmi react hook
 
 The hooks for each contract are available as a separate import:
 
-- `@nouns/sdk/react/governor`
-- `@nouns/sdk/react/legacy-treasury`
-- `@nouns/sdk/react/treasury`
-- `@nouns/sdk/react/data`
-- `@nouns/sdk/react/token`
-- `@nouns/sdk/react/auction-house`
-- `@nouns/sdk/react/descriptor`
-- `@nouns/sdk/react/stream-factory`
-- `@nouns/sdk/react/stream`
-- `@nouns/sdk/react/usdc-payer`
-- `@nouns/sdk/react/usdc-token-buyer`
+- `@niji/sdk/react/governor`
+- `@niji/sdk/react/legacy-treasury`
+- `@niji/sdk/react/treasury`
+- `@niji/sdk/react/data`
+- `@niji/sdk/react/token`
+- `@niji/sdk/react/auction-house`
+- `@niji/sdk/react/descriptor`
+- `@niji/sdk/react/stream-factory`
+- `@niji/sdk/react/stream`
+- `@niji/sdk/react/usdc-payer`
+- `@niji/sdk/react/usdc-token-buyer`
 
 example:
 
 ```tsx
-import { useReadNounsGovernorVotingPeriod } from '@nouns/sdk/react/governor';
+import { useReadNounsGovernorVotingPeriod } from '@niji/sdk/react/governor';
 
 // Must be used inside of a <WagmiProvider/>
 const { data } = useReadNounsGovernorVotingPeriod();
@@ -201,7 +201,7 @@ const { data } = useReadNounsGovernorVotingPeriod();
 **Run-length Encode Images**
 
 ```ts
-import { PNGCollectionEncoder } from '@nouns/sdk';
+import { PNGCollectionEncoder } from '@niji/sdk';
 import { readPngFile } from 'node-libpng';
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -229,7 +229,7 @@ encode();
 **Create SVGs from Run-length Encoded Data**
 
 ```ts
-import { buildSVG } from '@nouns/sdk';
+import { buildSVG } from '@niji/sdk';
 
 const svg = buildSVG(RLE_PARTS, PALETTE_COLORS, BACKGROUND_COLOR);
 ```

@@ -118,5 +118,5 @@ jobs:
         run: pnpm build
       - name: Check for missing translations
         run: |
-          pnpm --filter @nouns/webapp -- i18n:extract
-          pnpm --filter @nouns/webapp -- i18n:compile --strict
+          pnpm --filter @niji/webapp -- i18n:extract
+          pnpm --filter @niji/webapp -- i18n:compile --strict

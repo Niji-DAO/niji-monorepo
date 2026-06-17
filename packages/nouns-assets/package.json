@@ -1,5 +1,5 @@
 {
-  "name": "@nouns/assets",
+  "name": "@niji/assets",
   "version": "0.10.0",
   "description": "Nouns run-length encoded image data",
   "homepage": "https://nouns.wtf",
@@ -31,7 +31,7 @@
     "ethers": "^6.13.4"
   },
   "devDependencies": {
-    "@nouns/sdk": "workspace:*",
+    "@niji/sdk": "workspace:*",
     "@types/pngjs": "^6.0.1",
     "pngjs": "^6.0.0",
     "sharp": "^0.34.5",

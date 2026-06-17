@@ -1,4 +1,4 @@
-# @nouns/contracts
+# @niji/contracts
 
 ## Background
 

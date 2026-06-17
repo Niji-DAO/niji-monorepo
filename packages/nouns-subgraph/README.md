@@ -1,4 +1,4 @@
-# @nouns/subgraph
+# @niji/subgraph
 
 A subgraph that indexes nouns events.
 

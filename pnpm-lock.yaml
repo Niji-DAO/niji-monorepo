@@ -186,7 +186,7 @@ importers:
 
   packages/nouns-api:
     dependencies:
-      '@nouns/sdk':
+      '@niji/sdk':
         specifier: workspace:*
         version: link:../nouns-sdk
       hono:
@@ -212,7 +212,7 @@ importers:
         specifier: ^6.13.4
         version: 6.16.0(bufferutil@4.0.9)(utf-8-validate@5.0.7)
     devDependencies:
-      '@nouns/sdk':
+      '@niji/sdk':
         specifier: workspace:*
         version: link:../nouns-sdk
       '@types/pngjs':
@@ -339,7 +339,7 @@ importers:
       '@headlessui/react':
         specifier: ^2.2.4
         version: 2.2.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@nouns/sdk':
+      '@niji/sdk':
         specifier: workspace:*
         version: link:../nouns-sdk
       '@wagmi/core':
@@ -523,18 +523,18 @@ importers:
       '@lingui/react':
         specifier: ^5.9.0
         version: 5.9.2(@lingui/babel-plugin-lingui-macro@5.9.2(babel-plugin-macros@3.1.0)(typescript@5.9.2))(babel-plugin-macros@3.1.0)(react@19.1.0)
+      '@niji/assets':
+        specifier: workspace:*
+        version: link:../nouns-assets
+      '@niji/contracts':
+        specifier: workspace:*
+        version: link:../nouns-contracts
+      '@niji/sdk':
+        specifier: workspace:*
+        version: link:../nouns-sdk
       '@noundry/nouns-assets':
         specifier: ^1.17.0
         version: 1.17.0
-      '@nouns/assets':
-        specifier: workspace:*
-        version: link:../nouns-assets
-      '@nouns/contracts':
-        specifier: workspace:*
-        version: link:../nouns-contracts
-      '@nouns/sdk':
-        specifier: workspace:*
-        version: link:../nouns-sdk
       '@radix-ui/react-dialog':
         specifier: ^1.1.14
         version: 1.1.14(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -10840,10 +10840,6 @@ packages:
   json-to-pretty-yaml@1.2.2:
     resolution: {integrity: sha512-rvm6hunfCcqegwYaG5T4yKJWxc9FXFgBVrcTZ4XfSVRwa5HA/Xs+vB/Eo9treYYHCeNM0nrSUr82V/M31Urc7A==}
     engines: {node: '>= 0.2.0'}
-
-  json5@1.0.2:
-    resolution: {integrity: sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==}
-    hasBin: true
 
   json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
@@ -27357,7 +27353,7 @@ snapshots:
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
-      minimatch: 3.1.2
+      minimatch: 3.1.5
       object.fromentries: 2.0.8
       object.groupby: 1.0.3
       object.values: 1.2.1
@@ -29950,11 +29946,6 @@ snapshots:
     dependencies:
       remedial: 1.0.8
       remove-trailing-spaces: 1.0.9
-
-  json5@1.0.2:
-    dependencies:
-      minimist: 1.2.8
-    optional: true
 
   json5@2.2.3: {}
 
@@ -35034,7 +35025,7 @@ snapshots:
   tsconfig-paths@3.15.0:
     dependencies:
       '@types/json5': 0.0.29
-      json5: 1.0.2
+      json5: 2.2.3
       minimist: 1.2.8
       strip-bom: 3.0.0
     optional: true

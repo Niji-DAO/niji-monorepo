@@ -1,7 +1,7 @@
 import { FC, HTMLAttributes } from 'react';
 
+import { buildSVG } from '@niji/sdk';
 import { ImageData } from '@noundry/nouns-assets';
-import { buildSVG } from '@nouns/sdk';
 import { useQuery } from '@tanstack/react-query';
 
 import { traitCategory } from '@/lib/traitCategory';

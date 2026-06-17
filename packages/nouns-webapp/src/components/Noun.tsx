@@ -1,7 +1,7 @@
 import { FC, HTMLAttributes, useState, useEffect } from 'react';
 
+import { buildSVG } from '@niji/sdk';
 import { getNounData, ImageData } from '@noundry/nouns-assets';
-import { buildSVG } from '@nouns/sdk';
 import { useQuery } from '@tanstack/react-query';
 
 import loadingNoun from '@/assets/loading-skull-noun.gif';
@@ -32,7 +32,7 @@ export const Noun: FC<NounProps> = ({
     query: {
       enabled: nounId !== undefined && !providedSeed,
       select: data => {
-        if (!data) return null;
+        if (data === undefined) return null;
         return {
           background: Number(data[0]),
           body: Number(data[1]),
@@ -57,11 +57,11 @@ export const Noun: FC<NounProps> = ({
 
   // Handle fallback timing logic
   useEffect(() => {
-    if (!svg && loadingNounFallback && !shouldShowFallback && !fallbackStartTime) {
+    if (!svg && loadingNounFallback === true && !shouldShowFallback && fallbackStartTime == null) {
       // Start showing fallback and record start time
       setShouldShowFallback(true);
       setFallbackStartTime(Date.now());
-    } else if (svg && shouldShowFallback && fallbackStartTime) {
+    } else if (svg !== undefined && shouldShowFallback && fallbackStartTime != null) {
       // SVG is ready, check if minimum duration has passed
       const elapsed = Date.now() - fallbackStartTime;
       if (elapsed >= minFallbackDuration) {
@@ -77,7 +77,7 @@ export const Noun: FC<NounProps> = ({
         }, remainingTime);
         return () => clearTimeout(timeoutId);
       }
-    } else if (!loadingNounFallback && shouldShowFallback) {
+    } else if (loadingNounFallback !== true && shouldShowFallback) {
       // Fallback disabled, reset state
       setShouldShowFallback(false);
       setFallbackStartTime(null);
