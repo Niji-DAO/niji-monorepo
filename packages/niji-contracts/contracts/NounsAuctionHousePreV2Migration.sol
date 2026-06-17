@@ -20,8 +20,8 @@ pragma solidity ^0.8.19;
 import { PausableUpgradeable } from '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
 import { ReentrancyGuardUpgradeable } from '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 import { OwnableUpgradeable } from '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
-import { INounsAuctionHouse } from './interfaces/INounsAuctionHouse.sol';
-import { INounsAuctionHouseV2 } from './interfaces/INounsAuctionHouseV2.sol';
+import { INijiAuctionHouse } from './interfaces/INijiAuctionHouse.sol';
+import { INijiAuctionHouseV2 } from './interfaces/INijiAuctionHouseV2.sol';
 
 contract NounsAuctionHousePreV2Migration is PausableUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable {
     struct OldLayout {
@@ -31,14 +31,14 @@ contract NounsAuctionHousePreV2Migration is PausableUpgradeable, ReentrancyGuard
         uint256 reservePrice;
         uint8 minBidIncrementPercentage;
         uint256 duration;
-        INounsAuctionHouse.Auction auction;
+        INijiAuctionHouse.Auction auction;
     }
 
     struct NewLayout {
         uint192 reservePrice;
         uint56 timeBuffer;
         uint8 minBidIncrementPercentage;
-        INounsAuctionHouseV2.AuctionV2 auction;
+        INijiAuctionHouseV2.AuctionV2 auction;
     }
 
     uint256 private startSlot;
@@ -64,13 +64,13 @@ contract NounsAuctionHousePreV2Migration is PausableUpgradeable, ReentrancyGuard
         oldLayout.reservePrice = 0;
         oldLayout.minBidIncrementPercentage = 0;
         oldLayout.duration = 0;
-        oldLayout.auction = INounsAuctionHouse.Auction(0, 0, 0, 0, payable(0), false);
+        oldLayout.auction = INijiAuctionHouse.Auction(0, 0, 0, 0, payable(0), false);
 
         // Populate the new layout from the cache
         newLayout.reservePrice = uint192(oldLayoutCache.reservePrice);
         newLayout.timeBuffer = uint56(oldLayoutCache.timeBuffer);
         newLayout.minBidIncrementPercentage = oldLayoutCache.minBidIncrementPercentage;
-        newLayout.auction = INounsAuctionHouseV2.AuctionV2({
+        newLayout.auction = INijiAuctionHouseV2.AuctionV2({
             nounId: uint96(oldLayoutCache.auction.nounId),
             clientId: 0,
             amount: uint128(oldLayoutCache.auction.amount),

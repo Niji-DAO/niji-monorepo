@@ -2,10 +2,10 @@
 pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
-import { NounsDAOLogicBaseTest } from './NounsDAOLogicBaseTest.sol';
-import { NounsDAOProposals } from '../../../contracts/governance/NounsDAOProposals.sol';
+import { NijiDAOLogicBaseTest } from './NijiDAOLogicBaseTest.sol';
+import { NijiDAOProposals } from '../../../contracts/governance/NijiDAOProposals.sol';
 
-abstract contract ExecutableProposalState is NounsDAOLogicBaseTest {
+abstract contract ExecutableProposalState is NijiDAOLogicBaseTest {
     address user = makeAddr('user');
     uint256 proposalId;
 
@@ -57,7 +57,7 @@ abstract contract ExecutableProposalWithActiveForkState is ExecutableProposalSta
 
 contract ExecutableProposalWithActiveForkStateTest is ExecutableProposalWithActiveForkState {
     function test_executionRevertsDuringFork() public {
-        vm.expectRevert(NounsDAOProposals.CannotExecuteDuringForkingPeriod.selector);
+        vm.expectRevert(NijiDAOProposals.CannotExecuteDuringForkingPeriod.selector);
         dao.execute(proposalId);
     }
 

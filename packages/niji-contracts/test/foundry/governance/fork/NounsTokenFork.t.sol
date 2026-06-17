@@ -5,12 +5,12 @@ import 'forge-std/Test.sol';
 
 import { DeployUtilsFork } from '../../helpers/DeployUtilsFork.sol';
 import { NounsTokenFork } from '../../../../contracts/governance/fork/newdao/token/NounsTokenFork.sol';
-import { NounsDAOForkEscrowMock } from '../../helpers/NounsDAOForkEscrowMock.sol';
+import { NijiDAOForkEscrowMock } from '../../helpers/NijiDAOForkEscrowMock.sol';
 import { NounsSeeder } from '../../../../contracts/NounsSeeder.sol';
 import { NounsDescriptorV2 } from '../../../../contracts/NounsDescriptorV2.sol';
 import { NounsToken } from '../../../../contracts/NounsToken.sol';
 import { IProxyRegistry } from '../../../../contracts/external/opensea/IProxyRegistry.sol';
-import { NounsTokenLike } from '../../../../contracts/governance/NounsDAOInterfaces.sol';
+import { NounsTokenLike } from '../../../../contracts/governance/NijiDAOInterfaces.sol';
 import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 import { ERC1967Proxy } from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
 
@@ -21,7 +21,7 @@ abstract contract NounsTokenForkBase is DeployUtilsFork {
     uint32 forkId;
     NounsSeeder seeder;
     NounsDescriptorV2 descriptor;
-    NounsDAOForkEscrowMock escrow;
+    NijiDAOForkEscrowMock escrow;
 
     address treasury = makeAddr('treasury');
     address minter = makeAddr('minter');
@@ -45,7 +45,7 @@ abstract contract NounsTokenForkBase is DeployUtilsFork {
         vm.stopPrank();
 
         forkId = 1;
-        escrow = new NounsDAOForkEscrowMock(forkId, originalDAO, NounsTokenLike(address(originalToken)));
+        escrow = new NijiDAOForkEscrowMock(forkId, originalDAO, NounsTokenLike(address(originalToken)));
 
         tokenIds.push(1);
         tokenIds.push(4);

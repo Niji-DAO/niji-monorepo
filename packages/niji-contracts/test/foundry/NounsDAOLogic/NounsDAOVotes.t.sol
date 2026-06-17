@@ -2,11 +2,11 @@
 pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
-import { NounsDAOLogicBaseTest } from './NounsDAOLogicBaseTest.sol';
-import { NounsDAOVotes } from '../../../contracts/governance/NounsDAOVotes.sol';
-import { NounsDAOTypes } from '../../../contracts/governance/NounsDAOInterfaces.sol';
+import { NijiDAOLogicBaseTest } from './NijiDAOLogicBaseTest.sol';
+import { NijiDAOVotes } from '../../../contracts/governance/NijiDAOVotes.sol';
+import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 
-contract NounsDAOLogicVotesTest is NounsDAOLogicBaseTest {
+contract NijiDAOLogicVotesTest is NijiDAOLogicBaseTest {
     address proposer = makeAddr('proposer');
     address voter = makeAddr('voter');
     uint256 proposalId;
@@ -39,18 +39,18 @@ contract NounsDAOLogicVotesTest is NounsDAOLogicBaseTest {
 
         // go into objection period
         vm.roll(block.number + dao.lastMinuteWindowInBlocks());
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.ObjectionPeriod);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.ObjectionPeriod);
 
-        vm.expectRevert(NounsDAOVotes.CanOnlyVoteAgainstDuringObjectionPeriod.selector);
+        vm.expectRevert(NijiDAOVotes.CanOnlyVoteAgainstDuringObjectionPeriod.selector);
         vm.prank(voter);
         dao.castVote(proposalId, 1);
     }
 
     function test_givenStateUpdatable_reverts() public {
         vm.startPrank(voter);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Updatable);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Updatable);
 
-        vm.expectRevert('NounsDAO::castVoteInternal: voting is closed');
+        vm.expectRevert('NijiDAO::castVoteInternal: voting is closed');
         dao.castVote(proposalId, 1);
     }
 
@@ -58,9 +58,9 @@ contract NounsDAOLogicVotesTest is NounsDAOLogicBaseTest {
         vm.startPrank(voter);
 
         vm.roll(block.number + dao.proposalUpdatablePeriodInBlocks() + 1);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Pending);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Pending);
 
-        vm.expectRevert('NounsDAO::castVoteInternal: voting is closed');
+        vm.expectRevert('NijiDAO::castVoteInternal: voting is closed');
         dao.castVote(proposalId, 1);
     }
 
@@ -68,9 +68,9 @@ contract NounsDAOLogicVotesTest is NounsDAOLogicBaseTest {
         vm.startPrank(voter);
 
         vm.roll(block.number + dao.proposalUpdatablePeriodInBlocks() + dao.votingDelay() + dao.votingPeriod() + 1);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Defeated);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Defeated);
 
-        vm.expectRevert('NounsDAO::castVoteInternal: voting is closed');
+        vm.expectRevert('NijiDAO::castVoteInternal: voting is closed');
         dao.castVote(proposalId, 1);
     }
 
@@ -78,14 +78,14 @@ contract NounsDAOLogicVotesTest is NounsDAOLogicBaseTest {
         vm.startPrank(voter);
 
         vm.roll(block.number + dao.proposalUpdatablePeriodInBlocks() + dao.votingDelay() + 1);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Active);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Active);
 
         dao.castVote(proposalId, 1);
 
         vm.roll(block.number + dao.votingPeriod());
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Succeeded);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Succeeded);
 
-        vm.expectRevert('NounsDAO::castVoteInternal: voting is closed');
+        vm.expectRevert('NijiDAO::castVoteInternal: voting is closed');
         dao.castVote(proposalId, 1);
     }
 
@@ -100,7 +100,7 @@ contract NounsDAOLogicVotesTest is NounsDAOLogicBaseTest {
         dao.queue(proposalId);
 
         changePrank(proposer);
-        vm.expectRevert('NounsDAO::castVoteInternal: voting is closed');
+        vm.expectRevert('NijiDAO::castVoteInternal: voting is closed');
         dao.castVote(proposalId, 1);
     }
 }

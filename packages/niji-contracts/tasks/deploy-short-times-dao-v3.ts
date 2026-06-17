@@ -2,9 +2,9 @@ import { ethers as ethersLib, Interface, parseUnits } from 'ethers';
 import { task, types } from 'hardhat/config';
 import promptjs from 'prompt';
 
-import { default as NounsDaoDataABI } from '../abi/contracts/governance/data/NounsDAOData.sol/NounsDAOData.json';
-import { default as NounsDAOExecutorV2ABI } from '../abi/contracts/governance/NounsDAOExecutorV2.sol/NounsDAOExecutorV2.json';
-import { default as NounsAuctionHouseABI } from '../abi/contracts/NounsAuctionHouse.sol/NounsAuctionHouse.json';
+import { default as NijiDaoDataABI } from '../abi/contracts/governance/data/NijiDAOData.sol/NijiDAOData.json';
+import { default as NijiDAOExecutorV2ABI } from '../abi/contracts/governance/NijiDAOExecutorV2.sol/NijiDAOExecutorV2.json';
+import { default as NijiAuctionHouseABI } from '../abi/contracts/NijiAuctionHouse.sol/NijiAuctionHouse.json';
 
 import { ChainId, ContractDeployment, ContractNamesDAOV3, DeployedContract } from './types';
 
@@ -29,7 +29,7 @@ const NOUNS_ART_NONCE_OFFSET = 4;
 const AUCTION_HOUSE_PROXY_NONCE_OFFSET = 9;
 const GOVERNOR_N_DELEGATOR_NONCE_OFFSET = 23;
 
-task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov times for testing')
+task('deploy-short-times-dao-v3', 'Deploy all Niji contracts with short gov times for testing')
   .addFlag('autoDeploy', 'Deploy all contracts without user interaction')
   .addOptionalParam('weth', 'The WETH contract address', undefined, types.string)
   .addOptionalParam('noundersdao', 'The nounders DAO contract address', undefined, types.string)
@@ -128,7 +128,7 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
       from: deployer.address,
       nonce: nonce + AUCTION_HOUSE_PROXY_NONCE_OFFSET,
     });
-    const expectedNounsDAOProxyAddress = ethersLib.getCreateAddress({
+    const expectedNijiDAOProxyAddress = ethersLib.getCreateAddress({
       from: deployer.address,
       nonce: nonce + GOVERNOR_N_DELEGATOR_NONCE_OFFSET,
     });
@@ -159,16 +159,16 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
           proxyRegistryAddress,
         ],
       },
-      NounsAuctionHouse: {
+      NijiAuctionHouse: {
         waitForConfirmation: true,
       },
-      NounsAuctionHouseProxyAdmin: {},
-      NounsAuctionHouseProxy: {
+      NijiAuctionHouseProxyAdmin: {},
+      NijiAuctionHouseProxy: {
         args: [
-          () => deployment.NounsAuctionHouse.address,
-          () => deployment.NounsAuctionHouseProxyAdmin.address,
+          () => deployment.NijiAuctionHouse.address,
+          () => deployment.NijiAuctionHouseProxyAdmin.address,
           () =>
-            new Interface(NounsAuctionHouseABI).encodeFunctionData('initialize', [
+            new Interface(NijiAuctionHouseABI).encodeFunctionData('initialize', [
               deployment.NounsToken.address,
               args.weth,
               args.auctionTimeBuffer,
@@ -180,7 +180,7 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
         waitForConfirmation: true,
         validateDeployment: () => {
           const expected = expectedAuctionHouseProxyAddress.toLowerCase();
-          const actual = deployment.NounsAuctionHouseProxy.address.toLowerCase();
+          const actual = deployment.NijiAuctionHouseProxy.address.toLowerCase();
           if (expected !== actual) {
             throw new Error(
               `Unexpected auction house proxy address. Expected: ${expected}. Actual: ${actual}.`,
@@ -188,36 +188,36 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
           }
         },
       },
-      NounsDAODynamicQuorum: {},
-      NounsDAOAdmin: {},
-      NounsDAOProposals: {},
-      NounsDAOVotes: {},
-      NounsDAOFork: {},
-      NounsDAOLogicV4: {
+      NijiDAODynamicQuorum: {},
+      NijiDAOAdmin: {},
+      NijiDAOProposals: {},
+      NijiDAOVotes: {},
+      NijiDAOFork: {},
+      NijiDAOLogicV4: {
         libraries: () => ({
-          NounsDAOAdmin: deployment.NounsDAOAdmin.address,
-          NounsDAODynamicQuorum: deployment.NounsDAODynamicQuorum.address,
-          NounsDAOProposals: deployment.NounsDAOProposals.address,
-          NounsDAOVotes: deployment.NounsDAOVotes.address,
-          NounsDAOFork: deployment.NounsDAOFork.address,
+          NijiDAOAdmin: deployment.NijiDAOAdmin.address,
+          NijiDAODynamicQuorum: deployment.NijiDAODynamicQuorum.address,
+          NijiDAOProposals: deployment.NijiDAOProposals.address,
+          NijiDAOVotes: deployment.NijiDAOVotes.address,
+          NijiDAOFork: deployment.NijiDAOFork.address,
         }),
         waitForConfirmation: true,
       },
-      NounsDAOForkEscrow: {
-        args: [expectedNounsDAOProxyAddress, () => deployment.NounsToken.address],
+      NijiDAOForkEscrow: {
+        args: [expectedNijiDAOProxyAddress, () => deployment.NounsToken.address],
       },
       NounsTokenFork: {},
-      NounsAuctionHouseFork: {},
-      NounsDAOLogicV1Fork: {},
-      NounsDAOExecutorV2: {
+      NijiAuctionHouseFork: {},
+      NijiDAOLogicV1Fork: {},
+      NijiDAOExecutorV2: {
         waitForConfirmation: true,
       },
-      NounsDAOExecutorProxy: {
+      NijiDAOExecutorProxy: {
         args: [
-          () => deployment.NounsDAOExecutorV2.address,
+          () => deployment.NijiDAOExecutorV2.address,
           () =>
-            new Interface(NounsDAOExecutorV2ABI).encodeFunctionData('initialize', [
-              expectedNounsDAOProxyAddress,
+            new Interface(NijiDAOExecutorV2ABI).encodeFunctionData('initialize', [
+              expectedNijiDAOProxyAddress,
               args.timelockDelay,
             ]),
         ],
@@ -225,9 +225,9 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
       ForkDAODeployer: {
         args: [
           () => deployment.NounsTokenFork.address,
-          () => deployment.NounsAuctionHouseFork.address,
-          () => deployment.NounsDAOLogicV1Fork.address,
-          () => deployment.NounsDAOExecutorV2.address,
+          () => deployment.NijiAuctionHouseFork.address,
+          () => deployment.NijiDAOLogicV1Fork.address,
+          () => deployment.NijiDAOExecutorV2.address,
           60 * 60 * 24 * 30, // 30 days
           36000,
           36000,
@@ -235,15 +235,15 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
           1000,
         ],
       },
-      NounsDAOProxyV3: {
+      NijiDAOProxyV3: {
         args: [
-          () => deployment.NounsDAOExecutorProxy.address, // timelock
+          () => deployment.NijiDAOExecutorProxy.address, // timelock
           () => deployment.NounsToken.address, // token
-          () => deployment.NounsDAOForkEscrow.address, // forkEscrow
+          () => deployment.NijiDAOForkEscrow.address, // forkEscrow
           () => deployment.ForkDAODeployer.address, // forkDAODeployer
           args.noundersdao || deployer.address, // vetoer
-          () => deployment.NounsDAOExecutorProxy.address, // admin
-          () => deployment.NounsDAOLogicV4.address, // implementation
+          () => deployment.NijiDAOExecutorProxy.address, // admin
+          () => deployment.NijiDAOLogicV4.address, // implementation
           {
             votingPeriod: args.votingPeriod,
             votingDelay: args.votingDelay,
@@ -260,28 +260,28 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
         ],
         waitForConfirmation: true,
         validateDeployment: () => {
-          const expected = expectedNounsDAOProxyAddress.toLowerCase();
-          const actual = deployment.NounsDAOProxyV3.address.toLowerCase();
+          const expected = expectedNijiDAOProxyAddress.toLowerCase();
+          const actual = deployment.NijiDAOProxyV3.address.toLowerCase();
           if (expected !== actual) {
             throw new Error(
-              `Unexpected Nouns DAO proxy address. Expected: ${expected}. Actual: ${actual}.`,
+              `Unexpected Niji DAO proxy address. Expected: ${expected}. Actual: ${actual}.`,
             );
           }
         },
       },
-      NounsDAOData: {
-        args: [() => deployment.NounsToken.address, expectedNounsDAOProxyAddress],
+      NijiDAOData: {
+        args: [() => deployment.NounsToken.address, expectedNijiDAOProxyAddress],
         waitForConfirmation: true,
       },
-      NounsDAODataProxy: {
+      NijiDAODataProxy: {
         args: [
-          () => deployment.NounsDAOData.address,
+          () => deployment.NijiDAOData.address,
           () =>
-            new Interface(NounsDaoDataABI).encodeFunctionData('initialize', [
-              deployment.NounsDAOExecutorProxy.address,
+            new Interface(NijiDaoDataABI).encodeFunctionData('initialize', [
+              deployment.NijiDAOExecutorProxy.address,
               args.createCandidateCost,
               args.updateCandidateCost,
-              expectedNounsDAOProxyAddress,
+              expectedNijiDAOProxyAddress,
             ]),
         ],
       },
@@ -322,11 +322,11 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
 
       let nameForFactory: string;
       switch (name) {
-        case 'NounsDAOExecutorV2':
-          nameForFactory = 'NounsDAOExecutorV2Test';
+        case 'NijiDAOExecutorV2':
+          nameForFactory = 'NijiDAOExecutorV2Test';
           break;
-        case 'NounsDAOLogicV4':
-          nameForFactory = 'NounsDAOLogicV3Harness';
+        case 'NijiDAOLogicV4':
+          nameForFactory = 'NijiDAOLogicV3Harness';
           break;
         default:
           nameForFactory = name;

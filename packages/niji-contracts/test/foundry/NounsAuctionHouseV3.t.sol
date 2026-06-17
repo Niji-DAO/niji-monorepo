@@ -3,28 +3,28 @@ pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
 import { DeployUtils } from './helpers/DeployUtils.sol';
-import { NounsAuctionHouseProxy } from '../../contracts/proxies/NounsAuctionHouseProxy.sol';
-import { NounsAuctionHouseProxyAdmin } from '../../contracts/proxies/NounsAuctionHouseProxyAdmin.sol';
-import { NounsAuctionHouse } from '../../contracts/NounsAuctionHouse.sol';
-import { INounsAuctionHouseV3 as IAH } from '../../contracts/interfaces/INounsAuctionHouseV3.sol';
-import { NounsAuctionHouseV3 } from '../../contracts/NounsAuctionHouseV3.sol';
+import { NijiAuctionHouseProxy } from '../../contracts/proxies/NijiAuctionHouseProxy.sol';
+import { NijiAuctionHouseProxyAdmin } from '../../contracts/proxies/NijiAuctionHouseProxyAdmin.sol';
+import { NijiAuctionHouse } from '../../contracts/NijiAuctionHouse.sol';
+import { INijiAuctionHouseV3 as IAH } from '../../contracts/interfaces/INijiAuctionHouseV3.sol';
+import { NijiAuctionHouseV3 } from '../../contracts/NijiAuctionHouseV3.sol';
 import { BidderWithGasGriefing } from './helpers/BidderWithGasGriefing.sol';
 import { ChainalysisSanctionsListMock } from './helpers/ChainalysisSanctionsListMock.sol';
 
-contract NounsAuctionHouseV3TestBase is Test, DeployUtils {
+contract NijiAuctionHouseV3TestBase is Test, DeployUtils {
     address owner = address(0x1111);
     address noundersDAO = address(0x2222);
     address minter = address(0x3333);
     uint256[] nounIds;
     uint32 timestamp = 1702289583;
 
-    NounsAuctionHouseV3 auction;
+    NijiAuctionHouseV3 auction;
 
     function setUp() public virtual {
         vm.warp(timestamp);
-        (NounsAuctionHouseProxy auctionProxy, ) = _deployAuctionHouseAndToken(owner, noundersDAO, minter);
+        (NijiAuctionHouseProxy auctionProxy, ) = _deployAuctionHouseAndToken(owner, noundersDAO, minter);
 
-        auction = NounsAuctionHouseV3(address(auctionProxy));
+        auction = NijiAuctionHouseV3(address(auctionProxy));
 
         vm.prank(owner);
         auction.unpause();
@@ -57,7 +57,7 @@ contract NounsAuctionHouseV3TestBase is Test, DeployUtils {
     }
 }
 
-contract NounsAuctionHouseV3Test is NounsAuctionHouseV3TestBase {
+contract NijiAuctionHouseV3Test is NijiAuctionHouseV3TestBase {
     function test_createBid_revertsGivenWrongNounId() public {
         uint128 nounId = auction.auction().nounId;
 
@@ -159,9 +159,9 @@ contract NounsAuctionHouseV3Test is NounsAuctionHouseV3TestBase {
     }
 
     function test_settleAuction_revertsWhenAuctionHasntBegunYet() public {
-        (NounsAuctionHouseProxy auctionProxy, ) = _deployAuctionHouseAndToken(owner, noundersDAO, minter);
+        (NijiAuctionHouseProxy auctionProxy, ) = _deployAuctionHouseAndToken(owner, noundersDAO, minter);
 
-        auction = NounsAuctionHouseV3(address(auctionProxy));
+        auction = NijiAuctionHouseV3(address(auctionProxy));
 
         vm.expectRevert("Auction hasn't begun");
         auction.settleAuction();
@@ -199,7 +199,7 @@ contract NounsAuctionHouseV3Test is NounsAuctionHouseV3TestBase {
     }
 }
 
-contract AuctionHouseSanctionsTest is NounsAuctionHouseV3TestBase {
+contract AuctionHouseSanctionsTest is NijiAuctionHouseV3TestBase {
     address sanctionedBidder = makeAddr('sanctioned bidder');
     ChainalysisSanctionsListMock sanctionsMock;
 
@@ -219,7 +219,7 @@ contract AuctionHouseSanctionsTest is NounsAuctionHouseV3TestBase {
     }
 }
 
-abstract contract NoracleBaseTest is NounsAuctionHouseV3TestBase {
+abstract contract NoracleBaseTest is NijiAuctionHouseV3TestBase {
     uint256[] expectedPrices;
     IAH.Settlement[] expectedSettlements;
     address bidder = makeAddr('bidder');
@@ -289,7 +289,7 @@ contract NoracleTestOneAuctionSettledStateTest is NoracleBaseTest {
         assertEq(settlements, expectedSettlements);
     }
 
-    function test_getSettlements_skipFalse_returnsRawNounderNouns() public {
+    function test_getSettlements_skipFalse_returnsRawNounderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(2, false);
 
         expectedSettlements.push(nounId1Settlement);
@@ -299,7 +299,7 @@ contract NoracleTestOneAuctionSettledStateTest is NoracleBaseTest {
         assertEq(settlements, expectedSettlements);
     }
 
-    function test_getSettlementsRange_skipFalse_returnsRawNounderNouns() public {
+    function test_getSettlementsRange_skipFalse_returnsRawNounderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(0, 2, false);
         expectedSettlements.push(
             IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 0, clientId: 0 })
@@ -308,7 +308,7 @@ contract NoracleTestOneAuctionSettledStateTest is NoracleBaseTest {
         assertEq(settlements, expectedSettlements);
     }
 
-    function test_getSettlementsFromIdtoTimestamp_skipFalse_returnsRawNounderNouns() public {
+    function test_getSettlementsFromIdtoTimestamp_skipFalse_returnsRawNounderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlementsFromIdtoTimestamp(0, block.timestamp, false);
         expectedSettlements.push(
             IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 0, clientId: 0 })
@@ -352,20 +352,20 @@ contract NoracleTestOneAuctionSettledStateTest is NoracleBaseTest {
         assertEq(settlements, expectedSettlements);
     }
 
-    function test_getSettlements_skipTrue_skipsNounderNouns() public {
+    function test_getSettlements_skipTrue_skipsNounderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(2, true);
 
         expectedSettlements.push(nounId1Settlement);
         assertEq(settlements, expectedSettlements);
     }
 
-    function test_getSettlementsRange_skipTrue_skipsNounderNouns() public {
+    function test_getSettlementsRange_skipTrue_skipsNounderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(0, 2, true);
         expectedSettlements.push(nounId1Settlement);
         assertEq(settlements, expectedSettlements);
     }
 
-    function test_getSettlementsFromIdToTimestamp_skipTrue_skipsNonderNouns() public {
+    function test_getSettlementsFromIdToTimestamp_skipTrue_skipsNonderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlementsFromIdtoTimestamp(0, block.timestamp, true);
         expectedSettlements.push(nounId1Settlement);
         assertEq(settlements, expectedSettlements);
@@ -417,7 +417,7 @@ contract NoracleTestManyAuctionsSettledStateTest is NoracleBaseTest {
         }
     }
 
-    function test_getSettlements_skipsNounderNouns() public {
+    function test_getSettlements_skipsNounderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(20, true);
         assertEq(settlements[0].nounId, 22);
         assertEq(settlements[1].nounId, 21);
@@ -434,7 +434,7 @@ contract NoracleTestManyAuctionsSettledStateTest is NoracleBaseTest {
         assertEq(settlements[19].amount, 1 ether);
     }
 
-    function test_getPrices_skipsNounderNouns() public {
+    function test_getPrices_skipsNounderNiji() public {
         uint256[] memory prices = auction.getPrices(20);
         // prettier-ignore
         expectedPrices = [20e18, 19e18, 18e18, 17e18, 16e18, 15e18, 14e18, 13e18, 12e18, 11e18,
@@ -819,7 +819,7 @@ contract NoracleTest_NoActiveAuction is NoracleBaseTest {
     }
 }
 
-contract NounsAuctionHouseV3_setPricesTest is NoracleBaseTest {
+contract NijiAuctionHouseV3_setPricesTest is NoracleBaseTest {
     function test_setPrices_revertsForNonOwner() public {
         IAH.SettlementNoClientId[] memory settlements = new IAH.SettlementNoClientId[](1);
         settlements[0] = IAH.SettlementNoClientId({
@@ -869,7 +869,7 @@ contract NounsAuctionHouseV3_setPricesTest is NoracleBaseTest {
     }
 }
 
-contract NounsAuctionHouseV3_OwnerFunctionsTest is NounsAuctionHouseV3TestBase {
+contract NijiAuctionHouseV3_OwnerFunctionsTest is NijiAuctionHouseV3TestBase {
     function test_setTimeBuffer_revertsForNonOwner() public {
         vm.expectRevert('Ownable: caller is not the owner');
         auction.setTimeBuffer(1 days);

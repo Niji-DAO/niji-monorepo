@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.15;
 
-import { NounsTokenLike } from '../../../contracts/governance/NounsDAOInterfaces.sol';
+import { NounsTokenLike } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 import { INounsDescriptorMinimal } from '../../../contracts/interfaces/INounsDescriptorMinimal.sol';
 import { INounsSeeder } from '../../../contracts/interfaces/INounsSeeder.sol';
 

@@ -2,22 +2,22 @@
 
 pragma solidity ^0.8.19;
 
-import { NounsDAOExecutorV2 } from '../../../NounsDAOExecutorV2.sol';
+import { NijiDAOExecutorV2 } from '../../../NijiDAOExecutorV2.sol';
 import { INounsTokenForkLike } from './INounsTokenForkLike.sol';
 
 /**
- * @title Storage for `NounsDAOLogicV1Fork`.
- * @dev Based on NounsDAOStorageV1, with the following changes:
+ * @title Storage for `NijiDAOLogicV1Fork`.
+ * @dev Based on NijiDAOStorageV1, with the following changes:
  * - vetoer is removed.
  * - Vetoed proposal state removed.
  * - implementation is removed, instead it's stored in the ERC-1967 storage slot.
  * - proposals renamed to _proposals to enable the explicit getter, which solves the stack too deep issue with the
  *   default getter.
  * - creationBlock added to Proposal struct, similar to V2, to solve the votingDelay editing bug.
- * @notice For future upgrades, do not change NounsDAOStorageV1Fork. Create a new
- * contract which implements NounsDAOStorageV1Fork.
+ * @notice For future upgrades, do not change NijiDAOStorageV1Fork. Create a new
+ * contract which implements NijiDAOStorageV1Fork.
  */
-contract NounsDAOStorageV1Fork {
+contract NijiDAOStorageV1Fork {
     /// @notice Administrator for this contract
     address public admin;
 
@@ -39,10 +39,10 @@ contract NounsDAOStorageV1Fork {
     /// @notice The total number of proposals
     uint256 public proposalCount;
 
-    /// @notice The address of the Nouns DAO Executor NounsDAOExecutor
-    NounsDAOExecutorV2 public timelock;
+    /// @notice The address of the Niji DAO Executor NijiDAOExecutor
+    NijiDAOExecutorV2 public timelock;
 
-    /// @notice The address of the Nouns tokens
+    /// @notice The address of the Niji tokens
     INounsTokenForkLike public nouns;
 
     /// @notice The official record of all proposals ever proposed

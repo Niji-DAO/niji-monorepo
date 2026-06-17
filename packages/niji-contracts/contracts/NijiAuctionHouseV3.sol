@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title The Nouns DAO auction house
+/// @title The Niji DAO auction house
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -16,7 +16,7 @@
  *********************************/
 
 // LICENSE
-// NounsAuctionHouse.sol is a modified version of Zora's AuctionHouse.sol:
+// NijiAuctionHouse.sol is a modified version of Zora's AuctionHouse.sol:
 // https://github.com/ourzora/auction-house/blob/54a12ec1a6cf562e49f0a4917990474b11350a2d/contracts/AuctionHouse.sol
 //
 // AuctionHouse.sol source code Copyright Zora licensed under the GPL-3.0 license.
@@ -28,17 +28,17 @@ import { PausableUpgradeable } from '@openzeppelin/contracts-upgradeable/securit
 import { ReentrancyGuardUpgradeable } from '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 import { OwnableUpgradeable } from '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import { INounsAuctionHouseV3 } from './interfaces/INounsAuctionHouseV3.sol';
-import { INounsToken } from './interfaces/INounsToken.sol';
+import { INijiAuctionHouseV3 } from './interfaces/INijiAuctionHouseV3.sol';
+import { INounsToken as INijiToken } from './interfaces/INounsToken.sol';
 import { IWETH } from './interfaces/IWETH.sol';
 import { IChainalysisSanctionsList } from './external/chainalysis/IChainalysisSanctionsList.sol';
 
 /**
  * @dev The contract inherits from PausableUpgradeable & ReentrancyGuardUpgradeable most of all the keep the same
- * storage layout as the NounsAuctionHouse contract
+ * storage layout as the NijiAuctionHouse contract
  */
-contract NounsAuctionHouseV3 is
-    INounsAuctionHouseV3,
+contract NijiAuctionHouseV3 is
+    INijiAuctionHouseV3,
     PausableUpgradeable,
     ReentrancyGuardUpgradeable,
     OwnableUpgradeable
@@ -46,8 +46,8 @@ contract NounsAuctionHouseV3 is
     /// @notice A hard-coded cap on time buffer to prevent accidental auction disabling if set with a very high value.
     uint56 public constant MAX_TIME_BUFFER = 1 days;
 
-    /// @notice The Nouns ERC721 token contract
-    INounsToken public immutable nouns;
+    /// @notice The Niji ERC721 token contract
+    INijiToken public immutable nouns;
 
     /// @notice The address of the WETH contract
     address public immutable weth;
@@ -65,15 +65,15 @@ contract NounsAuctionHouseV3 is
     uint8 public minBidIncrementPercentage;
 
     /// @notice The active auction
-    INounsAuctionHouseV3.AuctionV2 public auctionStorage;
+    INijiAuctionHouseV3.AuctionV2 public auctionStorage;
 
-    /// @notice The Nouns price feed state
+    /// @notice The Niji price feed state
     mapping(uint256 => SettlementState) settlementHistory;
 
     /// @notice The contract used to verify bidders are not sanctioned wallets
     IChainalysisSanctionsList public sanctionsOracle;
 
-    constructor(INounsToken _nouns, address _weth, uint256 _duration) initializer {
+    constructor(INijiToken _nouns, address _weth, uint256 _duration) initializer {
         nouns = _nouns;
         weth = _weth;
         duration = _duration;
@@ -135,7 +135,7 @@ contract NounsAuctionHouseV3 is
      * @dev This contract only accepts payment in ETH.
      */
     function createBid(uint256 nounId, uint32 clientId) public payable override {
-        INounsAuctionHouseV3.AuctionV2 memory _auction = auctionStorage;
+        INijiAuctionHouseV3.AuctionV2 memory _auction = auctionStorage;
 
         (uint192 _reservePrice, uint56 _timeBuffer, uint8 _minBidIncrementPercentage) = (
             reservePrice,
@@ -191,7 +191,7 @@ contract NounsAuctionHouseV3 is
     }
 
     /**
-     * @notice Pause the Nouns auction house.
+     * @notice Pause the Niji auction house.
      * @dev This function can only be called by the owner when the
      * contract is unpaused. While no new auctions can be started when paused,
      * anyone can settle an ongoing auction.
@@ -201,7 +201,7 @@ contract NounsAuctionHouseV3 is
     }
 
     /**
-     * @notice Unpause the Nouns auction house.
+     * @notice Unpause the Niji auction house.
      * @dev This function can only be called by the owner when the
      * contract is paused. If required, this function will start a new auction.
      */
@@ -289,7 +289,7 @@ contract NounsAuctionHouseV3 is
      * @dev If there are no bids, the Noun is burned.
      */
     function _settleAuction() internal {
-        INounsAuctionHouseV3.AuctionV2 memory _auction = auctionStorage;
+        INijiAuctionHouseV3.AuctionV2 memory _auction = auctionStorage;
 
         require(_auction.startTime != 0, "Auction hasn't begun");
         require(!_auction.settled, 'Auction has already been settled');
@@ -350,7 +350,7 @@ contract NounsAuctionHouseV3 is
     }
 
     /**
-     * @notice Set historic prices; only callable by the owner, which in Nouns is the treasury (timelock) contract.
+     * @notice Set historic prices; only callable by the owner, which in Niji is the treasury (timelock) contract.
      * @dev This function lowers auction price accuracy from 18 decimals to 10 decimals, as part of the price history
      * bit packing, to save gas.
      * @param settlements The list of historic prices to set.

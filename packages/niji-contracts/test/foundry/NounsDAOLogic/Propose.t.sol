@@ -2,10 +2,10 @@
 pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
-import { NounsDAOLogicBaseTest } from './NounsDAOLogicBaseTest.sol';
-import { NounsDAOTypes } from '../../../contracts/governance/NounsDAOInterfaces.sol';
+import { NijiDAOLogicBaseTest } from './NijiDAOLogicBaseTest.sol';
+import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 
-contract ProposeTest is NounsDAOLogicBaseTest {
+contract ProposeTest is NijiDAOLogicBaseTest {
     address proposer = makeAddr('proposer');
 
     function setUp() public override {
@@ -62,7 +62,7 @@ contract ProposeTest is NounsDAOLogicBaseTest {
     }
 }
 
-contract ProposalDataForRewardsTest is NounsDAOLogicBaseTest {
+contract ProposalDataForRewardsTest is NijiDAOLogicBaseTest {
     address proposer = makeAddr('proposer');
     address voter = makeAddr('voter');
 
@@ -85,7 +85,7 @@ contract ProposalDataForRewardsTest is NounsDAOLogicBaseTest {
         uint256 proposalId = propose(proposer, address(1), 0, '', '', 'proposal', 123);
         uint32[] memory emptyArray = new uint32[](0);
 
-        NounsDAOTypes.ProposalForRewards[] memory data = dao.proposalDataForRewards({
+        NijiDAOTypes.ProposalForRewards[] memory data = dao.proposalDataForRewards({
             firstProposalId: proposalId,
             lastProposalId: proposalId,
             proposalEligibilityQuorumBps: 0,
@@ -105,7 +105,7 @@ contract ProposalDataForRewardsTest is NounsDAOLogicBaseTest {
         dao.cancel(proposalId);
 
         uint32[] memory emptyArray = new uint32[](0);
-        NounsDAOTypes.ProposalForRewards[] memory data = dao.proposalDataForRewards({
+        NijiDAOTypes.ProposalForRewards[] memory data = dao.proposalDataForRewards({
             firstProposalId: proposalId,
             lastProposalId: proposalId,
             proposalEligibilityQuorumBps: 0,
@@ -155,7 +155,7 @@ contract ProposalDataForRewardsTest is NounsDAOLogicBaseTest {
         dao.cancel(proposalId);
 
         uint32[] memory emptyArray = new uint32[](0);
-        NounsDAOTypes.ProposalForRewards[] memory data = dao.proposalDataForRewards({
+        NijiDAOTypes.ProposalForRewards[] memory data = dao.proposalDataForRewards({
             firstProposalId: proposalId,
             lastProposalId: proposalId,
             proposalEligibilityQuorumBps: 0,
@@ -171,7 +171,7 @@ contract ProposalDataForRewardsTest is NounsDAOLogicBaseTest {
         uint256 proposalId = propose(proposer, address(1), 0, '', '', 'proposal', 123);
 
         uint32[] memory emptyArray = new uint32[](0);
-        NounsDAOTypes.ProposalForRewards[] memory data = dao.proposalDataForRewards({
+        NijiDAOTypes.ProposalForRewards[] memory data = dao.proposalDataForRewards({
             firstProposalId: proposalId,
             lastProposalId: proposalId,
             proposalEligibilityQuorumBps: 2000,

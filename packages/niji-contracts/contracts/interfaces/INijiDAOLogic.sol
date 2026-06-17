@@ -17,9 +17,9 @@
 
 pragma solidity ^0.8.6;
 
-import '../governance/NounsDAOInterfaces.sol';
+import '../governance/NijiDAOInterfaces.sol';
 
-interface INounsDAOLogic {
+interface INijiDAOLogic {
     /**
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
      *   PROPOSALS
@@ -71,7 +71,7 @@ interface INounsDAOLogic {
     ) external returns (uint256);
 
     function proposeBySigs(
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures,
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures,
         address[] memory targets,
         uint256[] memory values,
         string[] memory signatures,
@@ -84,7 +84,7 @@ interface INounsDAOLogic {
      * @notice Function used to propose a new proposal. Sender and signers must have delegates above the proposal threshold
      * Signers are regarded as co-proposers, and therefore have the ability to cancel the proposal at any time.
      * @param proposerSignatures Array of signers who have signed the proposal and their signatures.
-     * @dev The signatures follow EIP-712. See `PROPOSAL_TYPEHASH` in NounsDAOProposals.sol
+     * @dev The signatures follow EIP-712. See `PROPOSAL_TYPEHASH` in NijiDAOProposals.sol
      * @param targets Target addresses for proposal calls
      * @param values Eth values for proposal calls
      * @param signatures Function signatures for proposal calls
@@ -93,7 +93,7 @@ interface INounsDAOLogic {
      * @return uint256 Proposal id of new proposal
      */
     function proposeBySigs(
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures,
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures,
         address[] memory targets,
         uint256[] memory values,
         string[] memory signatures,
@@ -171,7 +171,7 @@ interface INounsDAOLogic {
      * Requires the original signers to sign the update.
      * @param proposalId Proposal's id
      * @param proposerSignatures Array of signers who have signed the proposal and their signatures.
-     * @dev The signatures follow EIP-712. See `UPDATE_PROPOSAL_TYPEHASH` in NounsDAOProposals.sol
+     * @dev The signatures follow EIP-712. See `UPDATE_PROPOSAL_TYPEHASH` in NijiDAOProposals.sol
      * @param targets Updated target addresses for proposal calls
      * @param values Updated eth values for proposal calls
      * @param signatures Updated function signatures for proposal calls
@@ -181,7 +181,7 @@ interface INounsDAOLogic {
      */
     function updateProposalBySigs(
         uint256 proposalId,
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures,
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures,
         address[] memory targets,
         uint256[] memory values,
         string[] memory signatures,
@@ -214,7 +214,7 @@ interface INounsDAOLogic {
      * @param proposalId The id of the proposal
      * @return Proposal state
      */
-    function state(uint256 proposalId) external view returns (NounsDAOTypes.ProposalState);
+    function state(uint256 proposalId) external view returns (NijiDAOTypes.ProposalState);
 
     /**
      * @notice Gets actions of a proposal
@@ -242,7 +242,7 @@ interface INounsDAOLogic {
      * @param voter The address of the voter
      * @return The voting receipt
      */
-    function getReceipt(uint256 proposalId, address voter) external view returns (NounsDAOTypes.Receipt memory);
+    function getReceipt(uint256 proposalId, address voter) external view returns (NijiDAOTypes.Receipt memory);
 
     /**
      * @notice Returns the proposal details given a proposal id.
@@ -250,7 +250,7 @@ interface INounsDAOLogic {
      * @param proposalId the proposal id to get the data for
      * @return A `ProposalCondensed` struct with the proposal data, backwards compatible with V1 and V2
      */
-    function proposals(uint256 proposalId) external view returns (NounsDAOTypes.ProposalCondensedV2 memory);
+    function proposals(uint256 proposalId) external view returns (NijiDAOTypes.ProposalCondensedV2 memory);
 
     /**
      * @notice Returns the proposal details given a proposal id.
@@ -259,7 +259,7 @@ interface INounsDAOLogic {
      * @return A `ProposalCondensed` struct with the proposal data, not backwards compatible as it contains additional values
      * like `objectionPeriodEndBlock` and `signers`
      */
-    function proposalsV3(uint256 proposalId) external view returns (NounsDAOTypes.ProposalCondensedV3 memory);
+    function proposalsV3(uint256 proposalId) external view returns (NijiDAOTypes.ProposalCondensedV3 memory);
 
     function proposalDataForRewards(
         uint256 firstProposalId,
@@ -268,7 +268,7 @@ interface INounsDAOLogic {
         bool excludeCanceled,
         bool requireVotingEnded,
         uint32[] calldata votingClientIds
-    ) external view returns (NounsDAOTypes.ProposalForRewards[] memory);
+    ) external view returns (NijiDAOTypes.ProposalForRewards[] memory);
 
     /**
      * @notice Current proposal threshold using Noun Total Supply
@@ -470,14 +470,14 @@ interface INounsDAOLogic {
      *       quorumCoefficient * againstVotesBPS
      * @dev Note the coefficient is a fixed point integer with 6 decimals
      * @param againstVotes Number of against-votes in the proposal
-     * @param adjustedTotalSupply_ The adjusted total supply of Nouns at the time of proposal creation
+     * @param adjustedTotalSupply_ The adjusted total supply of Niji at the time of proposal creation
      * @param params Configurable parameters for calculating the quorum based on againstVotes. See `DynamicQuorumParams` definition for additional details.
      * @return quorumVotes The required quorum
      */
     function dynamicQuorumVotes(
         uint256 againstVotes,
         uint256 adjustedTotalSupply_,
-        NounsDAOTypes.DynamicQuorumParams memory params
+        NijiDAOTypes.DynamicQuorumParams memory params
     ) external pure returns (uint256);
 
     /**
@@ -489,29 +489,29 @@ interface INounsDAOLogic {
      */
     function getDynamicQuorumParamsAt(
         uint256 blockNumber_
-    ) external view returns (NounsDAOTypes.DynamicQuorumParams memory);
+    ) external view returns (NijiDAOTypes.DynamicQuorumParams memory);
 
     /**
-     * @notice Current min quorum votes using Nouns adjusted total supply
+     * @notice Current min quorum votes using Niji adjusted total supply
      */
     function minQuorumVotes() external view returns (uint256);
 
     /**
-     * @notice Current max quorum votes using Nouns adjusted total supply
+     * @notice Current max quorum votes using Niji adjusted total supply
      */
     function maxQuorumVotes() external view returns (uint256);
 
     /**
      * @notice Get all quorum params checkpoints
      */
-    function quorumParamsCheckpoints() external view returns (NounsDAOTypes.DynamicQuorumParamsCheckpoint[] memory);
+    function quorumParamsCheckpoints() external view returns (NijiDAOTypes.DynamicQuorumParamsCheckpoint[] memory);
 
     /**
      * @notice Get a quorum params checkpoint by its index
      */
     function quorumParamsCheckpoints(
         uint256 index
-    ) external view returns (NounsDAOTypes.DynamicQuorumParamsCheckpoint memory);
+    ) external view returns (NijiDAOTypes.DynamicQuorumParamsCheckpoint memory);
 
     /**
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -520,7 +520,7 @@ interface INounsDAOLogic {
      */
 
     /**
-     * @notice Escrow Nouns to contribute to the fork threshold
+     * @notice Escrow Niji to contribute to the fork threshold
      * @dev Requires approving the tokenIds or the entire noun token to the DAO contract
      * @param tokenIds the tokenIds to escrow. They will be sent to the DAO once the fork threshold is reached and the escrow is closed.
      * @param proposalIds array of proposal ids which are the reason for wanting to fork. This will only be used to emit event.
@@ -529,7 +529,7 @@ interface INounsDAOLogic {
     function escrowToFork(uint256[] calldata tokenIds, uint256[] calldata proposalIds, string calldata reason) external;
 
     /**
-     * @notice Withdraw Nouns from the fork escrow. Only possible if the fork has not been executed.
+     * @notice Withdraw Niji from the fork escrow. Only possible if the fork has not been executed.
      * Only allowed to withdraw tokens that the sender has escrowed.
      * @param tokenIds the tokenIds to withdraw
      */
@@ -557,7 +557,7 @@ interface INounsDAOLogic {
      * @dev Only the DAO can call this function
      * @param tokenIds the tokenIds to withdraw
      */
-    function withdrawDAONounsFromEscrowToTreasury(uint256[] calldata tokenIds) external;
+    function withdrawDAONijiFromEscrowToTreasury(uint256[] calldata tokenIds) external;
 
     /**
      * @notice Withdraws nouns from the fork escrow after the fork has been executed to an address other than the treasury
@@ -565,7 +565,7 @@ interface INounsDAOLogic {
      * @param tokenIds the tokenIds to withdraw
      * @param to the address to send the nouns to
      */
-    function withdrawDAONounsFromEscrowIncreasingTotalSupply(uint256[] calldata tokenIds, address to) external;
+    function withdrawDAONijiFromEscrowIncreasingTotalSupply(uint256[] calldata tokenIds, address to) external;
 
     /**
      * @notice Returns the number of nouns in supply minus nouns owned by the DAO, i.e. held in the treasury or in an
@@ -675,9 +675,9 @@ interface INounsDAOLogic {
 
     function proposalCount() external view returns (uint256);
 
-    function timelock() external view returns (INounsDAOExecutor);
+    function timelock() external view returns (INijiDAOExecutor);
 
-    function nouns() external view returns (NounsTokenLike);
+    function nouns() external view returns (NijiTokenLike);
 
     function latestProposalIds(address account) external view returns (uint256);
 
@@ -687,7 +687,7 @@ interface INounsDAOLogic {
 
     function erc20TokensToIncludeInFork() external view returns (address[] memory);
 
-    function forkEscrow() external view returns (INounsDAOForkEscrow);
+    function forkEscrow() external view returns (INijiDAOForkEscrow);
 
     function forkDAODeployer() external view returns (IForkDAODeployer);
 

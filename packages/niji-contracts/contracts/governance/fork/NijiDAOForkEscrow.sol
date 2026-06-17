@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title Escrow contract for Nouns to be used to trigger a fork
+/// @title Escrow contract for Niji to be used to trigger a fork
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -17,10 +17,10 @@
 
 pragma solidity ^0.8.19;
 
-import { NounsTokenLike } from '../NounsDAOInterfaces.sol';
+import { NijiTokenLike } from '../NijiDAOInterfaces.sol';
 import { IERC721Receiver } from '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
 
-contract NounsDAOForkEscrow is IERC721Receiver {
+contract NijiDAOForkEscrow is IERC721Receiver {
     /**
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
      *   ERRORS
@@ -28,7 +28,7 @@ contract NounsDAOForkEscrow is IERC721Receiver {
      */
 
     error OnlyDAO();
-    error OnlyNounsToken();
+    error OnlyNijiToken();
     error NotOwner();
 
     /**
@@ -37,11 +37,11 @@ contract NounsDAOForkEscrow is IERC721Receiver {
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
      */
 
-    /// @notice Nouns governance contract
+    /// @notice Niji governance contract
     address public immutable dao;
 
-    /// @notice Nouns token contract
-    NounsTokenLike public immutable nounsToken;
+    /// @notice Niji token contract
+    NijiTokenLike public immutable nounsToken;
 
     /**
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -62,7 +62,7 @@ contract NounsDAOForkEscrow is IERC721Receiver {
 
     constructor(address dao_, address nounsToken_) {
         dao = dao_;
-        nounsToken = NounsTokenLike(nounsToken_);
+        nounsToken = NijiTokenLike(nounsToken_);
     }
 
     /**
@@ -86,7 +86,7 @@ contract NounsDAOForkEscrow is IERC721Receiver {
 
     /**
      * @notice Escrows nouns tokens
-     * @dev Can only be called by the Nouns token contract, and initiated by the DAO contract
+     * @dev Can only be called by the Niji token contract, and initiated by the DAO contract
      * @param operator The address which called the `safeTransferFrom` function, can only be the DAO contract
      * @param from The address which previously owned the token
      * @param tokenId The id of the token being escrowed
@@ -97,7 +97,7 @@ contract NounsDAOForkEscrow is IERC721Receiver {
         uint256 tokenId,
         bytes memory
     ) public override returns (bytes4) {
-        if (msg.sender != address(nounsToken)) revert OnlyNounsToken();
+        if (msg.sender != address(nounsToken)) revert OnlyNijiToken();
         if (operator != dao) revert OnlyDAO();
 
         escrowedTokensByForkId[forkId][tokenId] = from;

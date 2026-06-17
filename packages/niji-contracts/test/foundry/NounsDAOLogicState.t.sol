@@ -2,16 +2,16 @@
 pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
-import { INounsDAOLogic } from '../../contracts/interfaces/INounsDAOLogic.sol';
-import { NounsDAOTypes } from '../../contracts/governance/NounsDAOInterfaces.sol';
+import { INijiDAOLogic } from '../../contracts/interfaces/INijiDAOLogic.sol';
+import { NijiDAOTypes } from '../../contracts/governance/NijiDAOInterfaces.sol';
 import { NounsDescriptorV2 } from '../../contracts/NounsDescriptorV2.sol';
 import { NounsToken } from '../../contracts/NounsToken.sol';
 import { NounsSeeder } from '../../contracts/NounsSeeder.sol';
 import { IProxyRegistry } from '../../contracts/external/opensea/IProxyRegistry.sol';
-import { NounsDAOExecutor } from '../../contracts/governance/NounsDAOExecutor.sol';
-import { NounsDAOLogicSharedBaseTest } from './helpers/NounsDAOLogicSharedBase.t.sol';
+import { NijiDAOExecutor } from '../../contracts/governance/NijiDAOExecutor.sol';
+import { NijiDAOLogicSharedBaseTest } from './helpers/NijiDAOLogicSharedBase.t.sol';
 
-abstract contract NounsDAOLogicStateBaseTest is NounsDAOLogicSharedBaseTest {
+abstract contract NijiDAOLogicStateBaseTest is NijiDAOLogicSharedBaseTest {
     function setUp() public override {
         super.setUp();
 
@@ -22,25 +22,25 @@ abstract contract NounsDAOLogicStateBaseTest is NounsDAOLogicSharedBaseTest {
 
     function testRevertsGivenProposalIdThatDoesntExist() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
-        vm.expectRevert('NounsDAO::state: invalid proposal id');
+        vm.expectRevert('NijiDAO::state: invalid proposal id');
         daoProxy.state(proposalId + 1);
     }
 
     function testPendingGivenProposalJustCreated() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
-        uint256 state = uint256(INounsDAOLogic(payable(address(daoProxy))).state(proposalId));
+        uint256 state = uint256(INijiDAOLogic(payable(address(daoProxy))).state(proposalId));
 
         if (daoVersion() < 3) {
-            assertEq(state, uint256(NounsDAOTypes.ProposalState.Pending));
+            assertEq(state, uint256(NijiDAOTypes.ProposalState.Pending));
         } else {
-            assertEq(state, uint256(NounsDAOTypes.ProposalState.Updatable));
+            assertEq(state, uint256(NijiDAOTypes.ProposalState.Updatable));
         }
     }
 
     function testActiveGivenProposalPastVotingDelay() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         vm.roll(block.number + daoProxy.votingDelay() + 1);
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Active);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Active);
     }
 
     function testCanceledGivenCanceledProposal() public {
@@ -48,14 +48,14 @@ abstract contract NounsDAOLogicStateBaseTest is NounsDAOLogicSharedBaseTest {
         vm.prank(proposer);
         daoProxy.cancel(proposalId);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Canceled);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Canceled);
     }
 
     function testDefeatedByRunningOutOfTime() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         vm.roll(block.number + daoProxy.votingDelay() + daoProxy.votingPeriod() + 1);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Defeated);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Defeated);
     }
 
     function testDefeatedByVotingAgainst() public {
@@ -70,7 +70,7 @@ abstract contract NounsDAOLogicStateBaseTest is NounsDAOLogicSharedBaseTest {
         vote(againstVoter, proposalId, 0);
         endVotingPeriod();
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Defeated);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Defeated);
     }
 
     function testSucceeded() public {
@@ -85,16 +85,16 @@ abstract contract NounsDAOLogicStateBaseTest is NounsDAOLogicSharedBaseTest {
         vote(againstVoter, proposalId, 0);
         endVotingPeriod();
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Succeeded);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Succeeded);
     }
 
     function testQueueRevertsGivenDefeatedProposal() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         vm.roll(block.number + daoProxy.votingDelay() + daoProxy.votingPeriod() + 1);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Defeated);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Defeated);
 
-        vm.expectRevert('NounsDAO::queue: proposal can only be queued if it is succeeded');
+        vm.expectRevert('NijiDAO::queue: proposal can only be queued if it is succeeded');
         daoProxy.queue(proposalId);
     }
 
@@ -103,9 +103,9 @@ abstract contract NounsDAOLogicStateBaseTest is NounsDAOLogicSharedBaseTest {
         vm.prank(proposer);
         daoProxy.cancel(proposalId);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Canceled);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Canceled);
 
-        vm.expectRevert('NounsDAO::queue: proposal can only be queued if it is succeeded');
+        vm.expectRevert('NijiDAO::queue: proposal can only be queued if it is succeeded');
         daoProxy.queue(proposalId);
     }
 
@@ -124,7 +124,7 @@ abstract contract NounsDAOLogicStateBaseTest is NounsDAOLogicSharedBaseTest {
         // anyone can queue
         daoProxy.queue(proposalId);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Queued);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Queued);
     }
 
     function testExpired() public {
@@ -141,7 +141,7 @@ abstract contract NounsDAOLogicStateBaseTest is NounsDAOLogicSharedBaseTest {
         daoProxy.queue(proposalId);
         vm.warp(block.timestamp + timelock.delay() + timelock.GRACE_PERIOD() + 1);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Expired);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Expired);
     }
 
     function testExecutedOnlyAfterQueued() public {
@@ -149,49 +149,49 @@ abstract contract NounsDAOLogicStateBaseTest is NounsDAOLogicSharedBaseTest {
         mint(forVoter, 4);
 
         uint256 proposalId = propose(address(0x1234), 100, '', '');
-        vm.expectRevert('NounsDAO::execute: proposal can only be executed if it is queued');
+        vm.expectRevert('NijiDAO::execute: proposal can only be executed if it is queued');
         daoProxy.execute(proposalId);
 
         startVotingPeriod();
         vote(forVoter, proposalId, 1);
-        vm.expectRevert('NounsDAO::execute: proposal can only be executed if it is queued');
+        vm.expectRevert('NijiDAO::execute: proposal can only be executed if it is queued');
         daoProxy.execute(proposalId);
 
         endVotingPeriod();
-        vm.expectRevert('NounsDAO::execute: proposal can only be executed if it is queued');
+        vm.expectRevert('NijiDAO::execute: proposal can only be executed if it is queued');
         daoProxy.execute(proposalId);
 
         daoProxy.queue(proposalId);
-        vm.expectRevert("NounsDAOExecutor::executeTransaction: Transaction hasn't surpassed time lock.");
+        vm.expectRevert("NijiDAOExecutor::executeTransaction: Transaction hasn't surpassed time lock.");
         daoProxy.execute(proposalId);
 
         vm.warp(block.timestamp + timelock.delay() + 1);
         vm.deal(address(timelock), 100);
         daoProxy.execute(proposalId);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Executed);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Executed);
 
         vm.warp(block.timestamp + timelock.delay() + timelock.GRACE_PERIOD() + 1);
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Executed);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Executed);
     }
 }
 
-contract NounsDAOLogicV1ForkStateTest is NounsDAOLogicStateBaseTest {
+contract NijiDAOLogicV1ForkStateTest is NijiDAOLogicStateBaseTest {
     function daoVersion() internal pure override returns (uint256) {
         return 1;
     }
 
-    function deployDAOProxy(address, address, address) internal override returns (INounsDAOLogic) {
-        return INounsDAOLogic(address(deployForkDAOProxy()));
+    function deployDAOProxy(address, address, address) internal override returns (INijiDAOLogic) {
+        return INijiDAOLogic(address(deployForkDAOProxy()));
     }
 }
 
-contract NounsDAOLogicV3StateTest is NounsDAOLogicStateBaseTest {
+contract NijiDAOLogicV3StateTest is NijiDAOLogicStateBaseTest {
     function deployDAOProxy(
         address timelock,
         address nounsToken,
         address vetoer
-    ) internal override returns (INounsDAOLogic) {
+    ) internal override returns (INijiDAOLogic) {
         return _createDAOV3Proxy(timelock, nounsToken, vetoer);
     }
 

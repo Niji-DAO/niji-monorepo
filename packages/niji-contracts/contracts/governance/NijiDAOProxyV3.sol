@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-/// @title The Nouns DAO proxy contract for V3
+/// @title The Niji DAO proxy contract for V3
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -15,11 +15,11 @@
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
  *********************************/
 
-// NounsDAOProxyV3.sol is a modified version of NounsDAOProxy.sol, tailored for the DAO's V3.
+// NijiDAOProxyV3.sol is a modified version of NijiDAOProxy.sol, tailored for the DAO's V3.
 // Its main purpose is to support people wishing to deploy V3 directly, without having to deploy V1 first and then upgrade.
 
 // LICENSE
-// NounsDAOProxy.sol is a modified version of Compound Lab's GovernorBravoDelegator.sol:
+// NijiDAOProxy.sol is a modified version of Compound Lab's GovernorBravoDelegator.sol:
 // https://github.com/compound-finance/compound-protocol/blob/b9b14038612d846b83f8a009a82c38974ff2dcfe/contracts/Governance/GovernorBravoDelegator.sol
 //
 // GovernorBravoDelegator.sol source code Copyright 2020 Compound Labs, Inc. licensed under the BSD-3-Clause license.
@@ -28,7 +28,7 @@
 // Additional conditions of BSD-3-Clause can be found here: https://opensource.org/licenses/BSD-3-Clause
 //
 //
-// NounsDAOProxy.sol uses parts of Open Zeppelin's Proxy.sol:
+// NijiDAOProxy.sol uses parts of Open Zeppelin's Proxy.sol:
 // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/5c8746f56b4bed8cc9e0e044f5f69ab2f9428ce1/contracts/proxy/Proxy.sol
 //
 // Proxy.sol source code licensed under MIT License.
@@ -38,9 +38,9 @@
 
 pragma solidity ^0.8.19;
 
-import { NounsDAOTypes } from './NounsDAOInterfaces.sol';
+import { NijiDAOTypes } from './NijiDAOInterfaces.sol';
 
-contract NounsDAOProxyV3 {
+contract NijiDAOProxyV3 {
     /// @notice Administrator for this contract
     address public admin;
 
@@ -61,8 +61,8 @@ contract NounsDAOProxyV3 {
         address vetoer_,
         address admin_,
         address implementation_,
-        NounsDAOTypes.NounsDAOParams memory daoParams_,
-        NounsDAOTypes.DynamicQuorumParams memory dynamicQuorumParams_
+        NijiDAOTypes.NijiDAOParams memory daoParams_,
+        NijiDAOTypes.DynamicQuorumParams memory dynamicQuorumParams_
     ) {
         // Admin set to msg.sender for initialization
         admin = msg.sender;
@@ -91,8 +91,8 @@ contract NounsDAOProxyV3 {
      * @param implementation_ The address of the new implementation for delegation
      */
     function _setImplementation(address implementation_) public {
-        require(msg.sender == admin, 'NounsDAOProxy::_setImplementation: admin only');
-        require(implementation_ != address(0), 'NounsDAOProxy::_setImplementation: invalid implementation address');
+        require(msg.sender == admin, 'NijiDAOProxy::_setImplementation: admin only');
+        require(implementation_ != address(0), 'NijiDAOProxy::_setImplementation: invalid implementation address');
 
         address oldImplementation = implementation;
         implementation = implementation_;

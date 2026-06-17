@@ -2,15 +2,15 @@
 pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
-import { NounsDAOLogicBaseTest } from './NounsDAOLogicBaseTest.sol';
+import { NijiDAOLogicBaseTest } from './NijiDAOLogicBaseTest.sol';
 import { ForkDAODeployerMock } from '../helpers/ForkDAODeployerMock.sol';
 import { ERC20Mock } from '../helpers/ERC20Mock.sol';
-import { NounsDAOFork } from '../../../contracts/governance/fork/NounsDAOFork.sol';
-import { NounsDAOForkEscrow } from '../../../contracts/governance/fork/NounsDAOForkEscrow.sol';
+import { NijiDAOFork } from '../../../contracts/governance/fork/NijiDAOFork.sol';
+import { NijiDAOForkEscrow } from '../../../contracts/governance/fork/NijiDAOForkEscrow.sol';
 import { IERC721 } from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
-import { INounsDAOForkEscrow } from '../../../contracts/governance/NounsDAOInterfaces.sol';
+import { INijiDAOForkEscrow } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 
-abstract contract DAOForkZeroState is NounsDAOLogicBaseTest {
+abstract contract DAOForkZeroState is NijiDAOLogicBaseTest {
     address tokenHolder = makeAddr('tokenHolder');
     address tokenHolder2 = makeAddr('tokenHolder2');
     uint256[] tokenIds;
@@ -18,7 +18,7 @@ abstract contract DAOForkZeroState is NounsDAOLogicBaseTest {
     ForkDAODeployerMock forkDAODeployer;
     ERC20Mock erc20Mock = new ERC20Mock();
     address[] erc20Tokens = [address(erc20Mock)];
-    INounsDAOForkEscrow escrow;
+    INijiDAOForkEscrow escrow;
 
     function setUp() public virtual override {
         super.setUp();
@@ -72,28 +72,28 @@ contract DAOForkZeroStateTest is DAOForkZeroState {
         nounsToken.setApprovalForAll(address(dao), true);
 
         vm.expectEmit(true, true, true, true);
-        emit NounsDAOFork.EscrowedToFork(escrow.forkId(), tokenHolder, tokenIds, proposalIds, 'time to fork');
+        emit NijiDAOFork.EscrowedToFork(escrow.forkId(), tokenHolder, tokenIds, proposalIds, 'time to fork');
         dao.escrowToFork(tokenIds, proposalIds, 'time to fork');
     }
 
     function test_executeFork_reverts() public {
-        vm.expectRevert(NounsDAOFork.ForkThresholdNotMet.selector);
+        vm.expectRevert(NijiDAOFork.ForkThresholdNotMet.selector);
         dao.executeFork();
     }
 
     function test_joinFork_reverts() public {
         tokenIds = [4, 5];
-        vm.expectRevert(NounsDAOFork.ForkPeriodNotActive.selector);
+        vm.expectRevert(NijiDAOFork.ForkPeriodNotActive.selector);
         vm.prank(tokenHolder);
         dao.joinFork(tokenIds, new uint256[](0), '');
     }
 
-    function test_withdrawDAONounsFromEscrow_onlyAdmin() public {
-        vm.expectRevert(NounsDAOFork.AdminOnly.selector);
-        dao.withdrawDAONounsFromEscrowToTreasury(tokenIds);
+    function test_withdrawDAONijiFromEscrow_onlyAdmin() public {
+        vm.expectRevert(NijiDAOFork.AdminOnly.selector);
+        dao.withdrawDAONijiFromEscrowToTreasury(tokenIds);
 
-        vm.expectRevert(NounsDAOFork.AdminOnly.selector);
-        dao.withdrawDAONounsFromEscrowIncreasingTotalSupply(tokenIds, address(1));
+        vm.expectRevert(NijiDAOFork.AdminOnly.selector);
+        dao.withdrawDAONijiFromEscrowIncreasingTotalSupply(tokenIds, address(1));
     }
 
     function test_givenThresholdSetToZero_requiresOneTokenInEscrowToFork() public {
@@ -101,7 +101,7 @@ contract DAOForkZeroStateTest is DAOForkZeroState {
         dao._setForkThresholdBPS(0);
         assertEq(escrow.numTokensInEscrow(), 0);
 
-        vm.expectRevert(NounsDAOFork.ForkThresholdNotMet.selector);
+        vm.expectRevert(NijiDAOFork.ForkThresholdNotMet.selector);
         dao.executeFork();
 
         tokenIds = [1];
@@ -130,13 +130,13 @@ abstract contract DAOForkSignaledUnderThresholdState is DAOForkZeroState {
 
 contract DAOForkSignaledUnderThresholdStateTest is DAOForkSignaledUnderThresholdState {
     function test_executeFork_reverts() public {
-        vm.expectRevert(NounsDAOFork.ForkThresholdNotMet.selector);
+        vm.expectRevert(NijiDAOFork.ForkThresholdNotMet.selector);
         dao.executeFork();
     }
 
     function test_joinFork_reverts() public {
         tokenIds = [4, 5];
-        vm.expectRevert(NounsDAOFork.ForkPeriodNotActive.selector);
+        vm.expectRevert(NijiDAOFork.ForkPeriodNotActive.selector);
         vm.prank(tokenHolder);
         dao.joinFork(tokenIds, new uint256[](0), '');
     }
@@ -147,7 +147,7 @@ contract DAOForkSignaledUnderThresholdStateTest is DAOForkSignaledUnderThreshold
         tokenIds = [1, 2, 3];
 
         vm.expectEmit(true, true, true, true);
-        emit NounsDAOFork.WithdrawFromForkEscrow(escrow.forkId(), tokenHolder, tokenIds);
+        emit NijiDAOFork.WithdrawFromForkEscrow(escrow.forkId(), tokenHolder, tokenIds);
         vm.prank(tokenHolder);
         dao.withdrawFromForkEscrow(tokenIds);
 
@@ -168,7 +168,7 @@ contract DAOForkSignaledUnderThresholdStateTest is DAOForkSignaledUnderThreshold
         vm.stopPrank();
 
         tokenIds = [7];
-        vm.expectRevert(NounsDAOForkEscrow.NotOwner.selector);
+        vm.expectRevert(NijiDAOForkEscrow.NotOwner.selector);
         vm.prank(tokenHolder);
         dao.withdrawFromForkEscrow(tokenIds);
     }
@@ -177,11 +177,11 @@ contract DAOForkSignaledUnderThresholdStateTest is DAOForkSignaledUnderThreshold
         tokenIds = [1];
         vm.startPrank(address(dao.timelock()));
 
-        vm.expectRevert(NounsDAOForkEscrow.NotOwner.selector);
-        dao.withdrawDAONounsFromEscrowToTreasury(tokenIds);
+        vm.expectRevert(NijiDAOForkEscrow.NotOwner.selector);
+        dao.withdrawDAONijiFromEscrowToTreasury(tokenIds);
 
-        vm.expectRevert(NounsDAOForkEscrow.NotOwner.selector);
-        dao.withdrawDAONounsFromEscrowIncreasingTotalSupply(tokenIds, address(1));
+        vm.expectRevert(NijiDAOForkEscrow.NotOwner.selector);
+        dao.withdrawDAONijiFromEscrowIncreasingTotalSupply(tokenIds, address(1));
     }
 }
 
@@ -204,7 +204,7 @@ contract DAOForkSignaledOverThresholdStateTest is DAOForkSignaledOverThresholdSt
         vm.prank(address(dao.timelock()));
         dao._setForkThresholdBPS(3_000); // 30%
 
-        vm.expectRevert(NounsDAOFork.ForkThresholdNotMet.selector);
+        vm.expectRevert(NijiDAOFork.ForkThresholdNotMet.selector);
         dao.executeFork();
 
         // adjustedTotalSupply = 20
@@ -219,7 +219,7 @@ contract DAOForkSignaledOverThresholdStateTest is DAOForkSignaledOverThresholdSt
 
     function test_joinFork_reverts() public {
         tokenIds = [6, 7];
-        vm.expectRevert(NounsDAOFork.ForkPeriodNotActive.selector);
+        vm.expectRevert(NijiDAOFork.ForkPeriodNotActive.selector);
         vm.prank(tokenHolder);
         dao.joinFork(tokenIds, new uint256[](0), '');
     }
@@ -233,7 +233,7 @@ contract DAOForkSignaledOverThresholdStateTest is DAOForkSignaledOverThresholdSt
         vm.expectEmit(true, true, true, true);
         emit ERC20Sent(address(forkDAODeployer.mockTreasury()), address(erc20Mock), 75 ether);
         vm.expectEmit(true, true, true, true);
-        emit NounsDAOFork.ExecuteFork(
+        emit NijiDAOFork.ExecuteFork(
             0,
             forkDAODeployer.mockTreasury(),
             forkDAODeployer.mockToken(),
@@ -270,7 +270,7 @@ contract DAOForkSignaledOverThresholdStateTest is DAOForkSignaledOverThresholdSt
         vm.prank(tokenHolder);
         dao.withdrawFromForkEscrow(tokenIds);
 
-        vm.expectRevert(NounsDAOFork.ForkThresholdNotMet.selector);
+        vm.expectRevert(NijiDAOFork.ForkThresholdNotMet.selector);
         dao.executeFork();
     }
 
@@ -278,11 +278,11 @@ contract DAOForkSignaledOverThresholdStateTest is DAOForkSignaledOverThresholdSt
         tokenIds = [1];
         vm.startPrank(address(dao.timelock()));
 
-        vm.expectRevert(NounsDAOForkEscrow.NotOwner.selector);
-        dao.withdrawDAONounsFromEscrowToTreasury(tokenIds);
+        vm.expectRevert(NijiDAOForkEscrow.NotOwner.selector);
+        dao.withdrawDAONijiFromEscrowToTreasury(tokenIds);
 
-        vm.expectRevert(NounsDAOForkEscrow.NotOwner.selector);
-        dao.withdrawDAONounsFromEscrowIncreasingTotalSupply(tokenIds, address(1));
+        vm.expectRevert(NijiDAOForkEscrow.NotOwner.selector);
+        dao.withdrawDAONijiFromEscrowIncreasingTotalSupply(tokenIds, address(1));
     }
 
     function test_proposalThresholdIsLowered() public {
@@ -321,20 +321,20 @@ contract DAOForkExecutedStateTest is DAOForkExecutedState {
     function test_signalFork_reverts() public {
         tokenIds = [8, 9];
 
-        vm.expectRevert(NounsDAOFork.ForkPeriodActive.selector);
+        vm.expectRevert(NijiDAOFork.ForkPeriodActive.selector);
         vm.prank(tokenHolder);
         dao.escrowToFork(tokenIds, new uint256[](0), '');
     }
 
     function test_executeFork_reverts() public {
-        vm.expectRevert(NounsDAOFork.ForkPeriodActive.selector);
+        vm.expectRevert(NijiDAOFork.ForkPeriodActive.selector);
         dao.executeFork();
     }
 
     function test_unsignalFork_reverts() public {
         tokenIds = [4, 5];
 
-        vm.expectRevert(NounsDAOFork.ForkPeriodActive.selector);
+        vm.expectRevert(NijiDAOFork.ForkPeriodActive.selector);
         vm.prank(tokenHolder);
         dao.withdrawFromForkEscrow(tokenIds);
     }
@@ -344,7 +344,7 @@ contract DAOForkExecutedStateTest is DAOForkExecutedState {
         proposalIds = [1, 2];
 
         vm.expectEmit(true, true, true, true);
-        emit NounsDAOFork.JoinFork(escrow.forkId() - 1, tokenHolder, tokenIds, proposalIds, 'some reason');
+        emit NijiDAOFork.JoinFork(escrow.forkId() - 1, tokenHolder, tokenIds, proposalIds, 'some reason');
         vm.prank(tokenHolder);
         dao.joinFork(tokenIds, proposalIds, 'some reason');
 
@@ -381,8 +381,8 @@ contract DAOForkExecutedStateTest is DAOForkExecutedState {
         tokenIds = [1, 2, 3];
         vm.prank(address(dao.timelock()));
         vm.expectEmit(true, true, true, true);
-        emit NounsDAOFork.DAONounsSupplyIncreasedFromEscrow(3, address(1));
-        dao.withdrawDAONounsFromEscrowIncreasingTotalSupply(tokenIds, address(1));
+        emit NijiDAOFork.DAONijiSupplyIncreasedFromEscrow(3, address(1));
+        dao.withdrawDAONijiFromEscrowIncreasingTotalSupply(tokenIds, address(1));
 
         assertEq(dao.nouns().ownerOf(1), address(1));
         assertEq(dao.nouns().ownerOf(2), address(1));
@@ -392,7 +392,7 @@ contract DAOForkExecutedStateTest is DAOForkExecutedState {
     function test_withdrawTokensToTreasury() public {
         tokenIds = [1, 2, 3];
         vm.prank(address(dao.timelock()));
-        dao.withdrawDAONounsFromEscrowToTreasury(tokenIds);
+        dao.withdrawDAONijiFromEscrowToTreasury(tokenIds);
 
         assertEq(dao.nouns().ownerOf(1), address(dao.timelock()));
         assertEq(dao.nouns().ownerOf(2), address(dao.timelock()));
@@ -413,19 +413,19 @@ contract DAOForkExecutedActivePeriodOverStateTest is DAOForkExecutedActivePeriod
         tokenIds = [8, 9];
 
         vm.prank(tokenHolder);
-        vm.expectRevert(NounsDAOFork.ForkPeriodNotActive.selector);
+        vm.expectRevert(NijiDAOFork.ForkPeriodNotActive.selector);
         dao.joinFork(tokenIds, new uint256[](0), '');
     }
 
     function test_execute_reverts() public {
-        vm.expectRevert(NounsDAOFork.ForkThresholdNotMet.selector);
+        vm.expectRevert(NijiDAOFork.ForkThresholdNotMet.selector);
         dao.executeFork();
     }
 
     function test_withdrawTokens() public {
         tokenIds = [1, 2, 3];
         vm.prank(address(dao.timelock()));
-        dao.withdrawDAONounsFromEscrowIncreasingTotalSupply(tokenIds, address(1));
+        dao.withdrawDAONijiFromEscrowIncreasingTotalSupply(tokenIds, address(1));
 
         assertOwnerOfTokens(address(dao.nouns()), tokenIds, address(1));
     }
@@ -433,7 +433,7 @@ contract DAOForkExecutedActivePeriodOverStateTest is DAOForkExecutedActivePeriod
     function test_withdrawTokensToTreasury() public {
         tokenIds = [1, 2, 3];
         vm.prank(address(dao.timelock()));
-        dao.withdrawDAONounsFromEscrowToTreasury(tokenIds);
+        dao.withdrawDAONijiFromEscrowToTreasury(tokenIds);
 
         assertOwnerOfTokens(address(dao.nouns()), tokenIds, address(dao.timelock()));
     }
@@ -459,13 +459,13 @@ abstract contract DAOSecondForkSignaledUnderThreshold is DAOForkExecutedActivePe
 
 contract DAOSecondForkSignaledUnderThresholdTest is DAOSecondForkSignaledUnderThreshold {
     function test_executeFork_reverts() public {
-        vm.expectRevert(NounsDAOFork.ForkThresholdNotMet.selector);
+        vm.expectRevert(NijiDAOFork.ForkThresholdNotMet.selector);
         dao.executeFork();
     }
 
     function test_joinFork_reverts() public {
         tokenIds = [14, 15];
-        vm.expectRevert(NounsDAOFork.ForkPeriodNotActive.selector);
+        vm.expectRevert(NijiDAOFork.ForkPeriodNotActive.selector);
         vm.prank(tokenHolder);
         dao.joinFork(tokenIds, new uint256[](0), '');
     }
@@ -484,11 +484,11 @@ contract DAOSecondForkSignaledUnderThresholdTest is DAOSecondForkSignaledUnderTh
         tokenIds = [11];
         vm.startPrank(address(dao.timelock()));
 
-        vm.expectRevert(NounsDAOForkEscrow.NotOwner.selector);
-        dao.withdrawDAONounsFromEscrowIncreasingTotalSupply(tokenIds, address(1));
+        vm.expectRevert(NijiDAOForkEscrow.NotOwner.selector);
+        dao.withdrawDAONijiFromEscrowIncreasingTotalSupply(tokenIds, address(1));
 
-        vm.expectRevert(NounsDAOForkEscrow.NotOwner.selector);
-        dao.withdrawDAONounsFromEscrowToTreasury(tokenIds);
+        vm.expectRevert(NijiDAOForkEscrow.NotOwner.selector);
+        dao.withdrawDAONijiFromEscrowToTreasury(tokenIds);
     }
 }
 
@@ -512,7 +512,7 @@ contract DAOSecondForkSignaledOverThresholdTest is DAOSecondForkSignaledOverThre
         dao.executeFork();
 
         // OG DAO should retain 73.333% of its funds
-        // Since we have 4 Nouns in escrow out of 15
+        // Since we have 4 Niji in escrow out of 15
         // 1 - (4/15) = 0.73333333
         assertEq(address(timelock).balance, 550 ether);
         assertEq(address(forkDAODeployer.mockTreasury()).balance, 450 ether);
@@ -522,7 +522,7 @@ contract DAOSecondForkSignaledOverThresholdTest is DAOSecondForkSignaledOverThre
 
         tokenIds = [11, 12, 13];
         vm.prank(address(dao.timelock()));
-        dao.withdrawDAONounsFromEscrowIncreasingTotalSupply(tokenIds, address(1));
+        dao.withdrawDAONijiFromEscrowIncreasingTotalSupply(tokenIds, address(1));
 
         assertOwnerOfTokens(address(dao.nouns()), tokenIds, address(1));
     }

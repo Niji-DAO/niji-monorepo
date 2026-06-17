@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title Library for Nouns DAO Logic containing the proposal lifecycle code
+/// @title Library for Niji DAO Logic containing the proposal lifecycle code
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -17,16 +17,16 @@
 
 pragma solidity ^0.8.19;
 
-import './NounsDAOInterfaces.sol';
-import { NounsDAODynamicQuorum } from './NounsDAODynamicQuorum.sol';
-import { NounsDAOFork } from './fork/NounsDAOFork.sol';
+import './NijiDAOInterfaces.sol';
+import { NijiDAODynamicQuorum } from './NijiDAODynamicQuorum.sol';
+import { NijiDAOFork } from './fork/NijiDAOFork.sol';
 import { SignatureChecker } from '../external/openzeppelin/SignatureChecker.sol';
 import { ECDSA } from '../external/openzeppelin/ECDSA.sol';
 import { SafeCast } from '@openzeppelin/contracts/utils/math/SafeCast.sol';
 
-library NounsDAOProposals {
-    using NounsDAODynamicQuorum for NounsDAOTypes.Storage;
-    using NounsDAOFork for NounsDAOTypes.Storage;
+library NijiDAOProposals {
+    using NijiDAODynamicQuorum for NijiDAOTypes.Storage;
+    using NijiDAOFork for NijiDAOTypes.Storage;
 
     error CantCancelProposalAtFinalState();
     error ProposalInfoArityMismatch();
@@ -79,7 +79,7 @@ library NounsDAOProposals {
      * @return Proposal id of new proposal
      */
     function propose(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         ProposalTxs memory txs,
         string memory description,
         uint32 clientId
@@ -95,7 +95,7 @@ library NounsDAOProposals {
 
         ds.proposalCount = ds.proposalCount + 1;
         uint32 proposalId = SafeCast.toUint32(ds.proposalCount);
-        NounsDAOTypes.Proposal storage newProposal = createNewProposal(
+        NijiDAOTypes.Proposal storage newProposal = createNewProposal(
             ds,
             proposalId,
             proposalThreshold_,
@@ -127,17 +127,17 @@ library NounsDAOProposals {
      * @return uint256 Proposal id of new proposal
      */
     function proposeOnTimelockV1(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         ProposalTxs memory txs,
         string memory description,
         uint32 clientId
     ) internal returns (uint256) {
         uint256 newProposalId = propose(ds, txs, description, clientId);
 
-        NounsDAOTypes.Proposal storage newProposal = ds._proposals[newProposalId];
+        NijiDAOTypes.Proposal storage newProposal = ds._proposals[newProposalId];
         newProposal.executeOnTimelockV1 = true;
 
-        emit NounsDAOEventsV3.ProposalCreatedOnTimelockV1(newProposalId);
+        emit NijiDAOEventsV3.ProposalCreatedOnTimelockV1(newProposalId);
 
         return newProposalId;
     }
@@ -151,15 +151,15 @@ library NounsDAOProposals {
     /**
      * @notice Function used to propose a new proposal. Sender and signers must have delegates above the proposal threshold
      * @param proposerSignatures Array of signers who have signed the proposal and their signatures.
-     * @dev The signatures follow EIP-712. See `PROPOSAL_TYPEHASH` in NounsDAOProposals.sol
+     * @dev The signatures follow EIP-712. See `PROPOSAL_TYPEHASH` in NijiDAOProposals.sol
      * @param txs Target addresses, eth values, function signatures and calldatas for proposal calls
      * @param description String description of the proposal
      * @param clientId The ID of the client that faciliated posting the proposal onchain
      * @return uint256 Proposal id of new proposal
      */
     function proposeBySigs(
-        NounsDAOTypes.Storage storage ds,
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures,
+        NijiDAOTypes.Storage storage ds,
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures,
         ProposalTxs memory txs,
         string memory description,
         uint32 clientId
@@ -173,7 +173,7 @@ library NounsDAOProposals {
         temp.adjustedTotalSupply = ds.adjustedTotalSupply();
         temp.propThreshold = proposalThreshold(ds, temp.adjustedTotalSupply);
 
-        NounsDAOTypes.Proposal storage newProposal = createNewProposal(
+        NijiDAOTypes.Proposal storage newProposal = createNewProposal(
             ds,
             temp.proposalId,
             temp.propThreshold,
@@ -217,11 +217,11 @@ library NounsDAOProposals {
      * not be invalidated.
      * @param sig The signature to cancel
      */
-    function cancelSig(NounsDAOTypes.Storage storage ds, bytes calldata sig) external {
+    function cancelSig(NijiDAOTypes.Storage storage ds, bytes calldata sig) external {
         bytes32 sigHash = keccak256(sig);
         ds.cancelledSigs[msg.sender][sigHash] = true;
 
-        emit NounsDAOEventsV3.SignatureCancelled(msg.sender, sig);
+        emit NijiDAOEventsV3.SignatureCancelled(msg.sender, sig);
     }
 
     /**
@@ -236,7 +236,7 @@ library NounsDAOProposals {
      * @param updateMessage Short message to explain the update
      */
     function updateProposal(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 proposalId,
         address[] memory targets,
         uint256[] memory values,
@@ -247,7 +247,7 @@ library NounsDAOProposals {
     ) external {
         updateProposalTransactionsInternal(ds, proposalId, targets, values, signatures, calldatas);
 
-        emit NounsDAOEventsV3.ProposalUpdated(
+        emit NijiDAOEventsV3.ProposalUpdated(
             proposalId,
             msg.sender,
             targets,
@@ -269,7 +269,7 @@ library NounsDAOProposals {
      * @param updateMessage Short message to explain the update
      */
     function updateProposalTransactions(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 proposalId,
         address[] memory targets,
         uint256[] memory values,
@@ -279,7 +279,7 @@ library NounsDAOProposals {
     ) external {
         updateProposalTransactionsInternal(ds, proposalId, targets, values, signatures, calldatas);
 
-        emit NounsDAOEventsV3.ProposalTransactionsUpdated(
+        emit NijiDAOEventsV3.ProposalTransactionsUpdated(
             proposalId,
             msg.sender,
             targets,
@@ -291,7 +291,7 @@ library NounsDAOProposals {
     }
 
     function updateProposalTransactionsInternal(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 proposalId,
         address[] memory targets,
         uint256[] memory values,
@@ -300,7 +300,7 @@ library NounsDAOProposals {
     ) internal {
         checkProposalTxs(ProposalTxs(targets, values, signatures, calldatas));
 
-        NounsDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
+        NijiDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
         checkProposalUpdatable(ds, proposalId, proposal);
 
         proposal.targets = targets;
@@ -316,15 +316,15 @@ library NounsDAOProposals {
      * @param updateMessage Short message to explain the update
      */
     function updateProposalDescription(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 proposalId,
         string calldata description,
         string calldata updateMessage
     ) external {
-        NounsDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
+        NijiDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
         checkProposalUpdatable(ds, proposalId, proposal);
 
-        emit NounsDAOEventsV3.ProposalDescriptionUpdated(proposalId, msg.sender, description, updateMessage);
+        emit NijiDAOEventsV3.ProposalDescriptionUpdated(proposalId, msg.sender, description, updateMessage);
     }
 
     /**
@@ -333,15 +333,15 @@ library NounsDAOProposals {
      * Requires the original signers to sign the update.
      * @param proposalId Proposal's id
      * @param proposerSignatures Array of signers who have signed the proposal and their signatures.
-     * @dev The signatures follow EIP-712. See `UPDATE_PROPOSAL_TYPEHASH` in NounsDAOProposals.sol
+     * @dev The signatures follow EIP-712. See `UPDATE_PROPOSAL_TYPEHASH` in NijiDAOProposals.sol
      * @param txs Updated transactions for the proposal
      * @param description Updated description of the proposal
      * @param updateMessage Short message to explain the update
      */
     function updateProposalBySigs(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 proposalId,
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures,
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures,
         ProposalTxs memory txs,
         string memory description,
         string memory updateMessage
@@ -351,8 +351,8 @@ library NounsDAOProposals {
         // this problem doesn't exist in the propose function because we check for prop threshold there
         if (proposerSignatures.length == 0) revert MustProvideSignatures();
 
-        NounsDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
-        if (stateInternal(ds, proposalId) != NounsDAOTypes.ProposalState.Updatable)
+        NijiDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
+        if (stateInternal(ds, proposalId) != NijiDAOTypes.ProposalState.Updatable)
             revert CanOnlyEditUpdatableProposals();
         if (msg.sender != proposal.proposer) revert OnlyProposerCanEdit();
 
@@ -377,7 +377,7 @@ library NounsDAOProposals {
         proposal.signatures = txs.signatures;
         proposal.calldatas = txs.calldatas;
 
-        emit NounsDAOEventsV3.ProposalUpdated(
+        emit NijiDAOEventsV3.ProposalUpdated(
             proposalId,
             msg.sender,
             txs.targets,
@@ -393,13 +393,13 @@ library NounsDAOProposals {
      * @notice Queues a proposal of state succeeded
      * @param proposalId The id of the proposal to queue
      */
-    function queue(NounsDAOTypes.Storage storage ds, uint256 proposalId) external {
+    function queue(NijiDAOTypes.Storage storage ds, uint256 proposalId) external {
         require(
-            stateInternal(ds, proposalId) == NounsDAOTypes.ProposalState.Succeeded,
-            'NounsDAO::queue: proposal can only be queued if it is succeeded'
+            stateInternal(ds, proposalId) == NijiDAOTypes.ProposalState.Succeeded,
+            'NijiDAO::queue: proposal can only be queued if it is succeeded'
         );
-        NounsDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
-        INounsDAOExecutor timelock = getProposalTimelock(ds, proposal);
+        NijiDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
+        INijiDAOExecutor timelock = getProposalTimelock(ds, proposal);
         uint256 eta = block.timestamp + timelock.delay();
         for (uint256 i = 0; i < proposal.targets.length; i++) {
             queueOrRevertInternal(
@@ -412,11 +412,11 @@ library NounsDAOProposals {
             );
         }
         proposal.eta = eta;
-        emit NounsDAOEventsV3.ProposalQueued(proposalId, eta);
+        emit NijiDAOEventsV3.ProposalQueued(proposalId, eta);
     }
 
     function queueOrRevertInternal(
-        INounsDAOExecutor timelock,
+        INijiDAOExecutor timelock,
         address target,
         uint256 value,
         string memory signature,
@@ -425,7 +425,7 @@ library NounsDAOProposals {
     ) internal {
         require(
             !timelock.queuedTransactions(keccak256(abi.encode(target, value, signature, data, eta))),
-            'NounsDAO::queueOrRevertInternal: identical proposal action already queued at eta'
+            'NijiDAO::queueOrRevertInternal: identical proposal action already queued at eta'
         );
         timelock.queueTransaction(target, value, signature, data, eta);
     }
@@ -434,20 +434,20 @@ library NounsDAOProposals {
      * @notice Executes a queued proposal if eta has passed
      * @param proposalId The id of the proposal to execute
      */
-    function execute(NounsDAOTypes.Storage storage ds, uint256 proposalId) external {
-        NounsDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
-        INounsDAOExecutor timelock = getProposalTimelock(ds, proposal);
+    function execute(NijiDAOTypes.Storage storage ds, uint256 proposalId) external {
+        NijiDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
+        INijiDAOExecutor timelock = getProposalTimelock(ds, proposal);
         executeInternal(ds, proposal, timelock);
     }
 
     function executeInternal(
-        NounsDAOTypes.Storage storage ds,
-        NounsDAOTypes.Proposal storage proposal,
-        INounsDAOExecutor timelock
+        NijiDAOTypes.Storage storage ds,
+        NijiDAOTypes.Proposal storage proposal,
+        INijiDAOExecutor timelock
     ) internal {
         require(
-            stateInternal(ds, proposal.id) == NounsDAOTypes.ProposalState.Queued,
-            'NounsDAO::execute: proposal can only be executed if it is queued'
+            stateInternal(ds, proposal.id) == NijiDAOTypes.ProposalState.Queued,
+            'NijiDAO::execute: proposal can only be executed if it is queued'
         );
         if (ds.isForkPeriodActive()) revert CannotExecuteDuringForkingPeriod();
 
@@ -462,13 +462,13 @@ library NounsDAOProposals {
                 proposal.eta
             );
         }
-        emit NounsDAOEventsV3.ProposalExecuted(proposal.id);
+        emit NijiDAOEventsV3.ProposalExecuted(proposal.id);
     }
 
     function getProposalTimelock(
-        NounsDAOTypes.Storage storage ds,
-        NounsDAOTypes.Proposal storage proposal
-    ) internal view returns (INounsDAOExecutor) {
+        NijiDAOTypes.Storage storage ds,
+        NijiDAOTypes.Proposal storage proposal
+    ) internal view returns (INijiDAOExecutor) {
         if (proposal.executeOnTimelockV1) {
             return ds.timelockV1;
         } else {
@@ -480,7 +480,7 @@ library NounsDAOProposals {
      * @notice Vetoes a proposal only if sender is the vetoer and the proposal has not been executed.
      * @param proposalId The id of the proposal to veto
      */
-    function veto(NounsDAOTypes.Storage storage ds, uint256 proposalId) external {
+    function veto(NijiDAOTypes.Storage storage ds, uint256 proposalId) external {
         if (ds.vetoer == address(0)) {
             revert VetoerBurned();
         }
@@ -489,14 +489,14 @@ library NounsDAOProposals {
             revert VetoerOnly();
         }
 
-        if (stateInternal(ds, proposalId) == NounsDAOTypes.ProposalState.Executed) {
+        if (stateInternal(ds, proposalId) == NijiDAOTypes.ProposalState.Executed) {
             revert CantVetoExecutedProposal();
         }
 
-        NounsDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
+        NijiDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
 
         proposal.vetoed = true;
-        INounsDAOExecutor timelock = getProposalTimelock(ds, proposal);
+        INijiDAOExecutor timelock = getProposalTimelock(ds, proposal);
         for (uint256 i = 0; i < proposal.targets.length; i++) {
             timelock.cancelTransaction(
                 proposal.targets[i],
@@ -507,7 +507,7 @@ library NounsDAOProposals {
             );
         }
 
-        emit NounsDAOEventsV3.ProposalVetoed(proposalId);
+        emit NijiDAOEventsV3.ProposalVetoed(proposalId);
     }
 
     /**
@@ -515,21 +515,21 @@ library NounsDAOProposals {
      * dropped below proposal threshold
      * @param proposalId The id of the proposal to cancel
      */
-    function cancel(NounsDAOTypes.Storage storage ds, uint256 proposalId) external {
-        NounsDAOTypes.ProposalState proposalState = stateInternal(ds, proposalId);
+    function cancel(NijiDAOTypes.Storage storage ds, uint256 proposalId) external {
+        NijiDAOTypes.ProposalState proposalState = stateInternal(ds, proposalId);
         if (
-            proposalState == NounsDAOTypes.ProposalState.Canceled ||
-            proposalState == NounsDAOTypes.ProposalState.Defeated ||
-            proposalState == NounsDAOTypes.ProposalState.Expired ||
-            proposalState == NounsDAOTypes.ProposalState.Executed ||
-            proposalState == NounsDAOTypes.ProposalState.Vetoed
+            proposalState == NijiDAOTypes.ProposalState.Canceled ||
+            proposalState == NijiDAOTypes.ProposalState.Defeated ||
+            proposalState == NijiDAOTypes.ProposalState.Expired ||
+            proposalState == NijiDAOTypes.ProposalState.Executed ||
+            proposalState == NijiDAOTypes.ProposalState.Vetoed
         ) {
             revert CantCancelProposalAtFinalState();
         }
 
-        NounsDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
+        NijiDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
         address proposer = proposal.proposer;
-        NounsTokenLike nouns = ds.nouns;
+        NijiTokenLike nouns = ds.nouns;
 
         uint256 votes = nouns.getPriorVotes(proposer, block.number - 1);
         bool msgSenderIsProposer = proposer == msg.sender;
@@ -541,11 +541,11 @@ library NounsDAOProposals {
 
         require(
             msgSenderIsProposer || votes <= proposal.proposalThreshold,
-            'NounsDAO::cancel: proposer above threshold'
+            'NijiDAO::cancel: proposer above threshold'
         );
 
         proposal.canceled = true;
-        INounsDAOExecutor timelock = getProposalTimelock(ds, proposal);
+        INijiDAOExecutor timelock = getProposalTimelock(ds, proposal);
         for (uint256 i = 0; i < proposal.targets.length; i++) {
             timelock.cancelTransaction(
                 proposal.targets[i],
@@ -556,7 +556,7 @@ library NounsDAOProposals {
             );
         }
 
-        emit NounsDAOEventsV3.ProposalCanceled(proposalId);
+        emit NijiDAOEventsV3.ProposalCanceled(proposalId);
     }
 
     /**
@@ -566,9 +566,9 @@ library NounsDAOProposals {
      * @return Proposal state
      */
     function state(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 proposalId
-    ) public view returns (NounsDAOTypes.ProposalState) {
+    ) public view returns (NijiDAOTypes.ProposalState) {
         return stateInternal(ds, proposalId);
     }
 
@@ -580,34 +580,34 @@ library NounsDAOProposals {
      * @return Proposal state
      */
     function stateInternal(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 proposalId
-    ) internal view returns (NounsDAOTypes.ProposalState) {
-        require(ds.proposalCount >= proposalId, 'NounsDAO::state: invalid proposal id');
-        NounsDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
+    ) internal view returns (NijiDAOTypes.ProposalState) {
+        require(ds.proposalCount >= proposalId, 'NijiDAO::state: invalid proposal id');
+        NijiDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
 
         if (proposal.vetoed) {
-            return NounsDAOTypes.ProposalState.Vetoed;
+            return NijiDAOTypes.ProposalState.Vetoed;
         } else if (proposal.canceled) {
-            return NounsDAOTypes.ProposalState.Canceled;
+            return NijiDAOTypes.ProposalState.Canceled;
         } else if (block.number <= proposal.updatePeriodEndBlock) {
-            return NounsDAOTypes.ProposalState.Updatable;
+            return NijiDAOTypes.ProposalState.Updatable;
         } else if (block.number <= proposal.startBlock) {
-            return NounsDAOTypes.ProposalState.Pending;
+            return NijiDAOTypes.ProposalState.Pending;
         } else if (block.number <= proposal.endBlock) {
-            return NounsDAOTypes.ProposalState.Active;
+            return NijiDAOTypes.ProposalState.Active;
         } else if (block.number <= proposal.objectionPeriodEndBlock) {
-            return NounsDAOTypes.ProposalState.ObjectionPeriod;
+            return NijiDAOTypes.ProposalState.ObjectionPeriod;
         } else if (isDefeated(ds, proposal)) {
-            return NounsDAOTypes.ProposalState.Defeated;
+            return NijiDAOTypes.ProposalState.Defeated;
         } else if (proposal.eta == 0) {
-            return NounsDAOTypes.ProposalState.Succeeded;
+            return NijiDAOTypes.ProposalState.Succeeded;
         } else if (proposal.executed) {
-            return NounsDAOTypes.ProposalState.Executed;
+            return NijiDAOTypes.ProposalState.Executed;
         } else if (block.timestamp >= proposal.eta + getProposalTimelock(ds, proposal).GRACE_PERIOD()) {
-            return NounsDAOTypes.ProposalState.Expired;
+            return NijiDAOTypes.ProposalState.Expired;
         } else {
-            return NounsDAOTypes.ProposalState.Queued;
+            return NijiDAOTypes.ProposalState.Queued;
         }
     }
 
@@ -620,7 +620,7 @@ library NounsDAOProposals {
      * @return calldatas
      */
     function getActions(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 proposalId
     )
         internal
@@ -632,7 +632,7 @@ library NounsDAOProposals {
             bytes[] memory calldatas
         )
     {
-        NounsDAOTypes.Proposal storage p = ds._proposals[proposalId];
+        NijiDAOTypes.Proposal storage p = ds._proposals[proposalId];
         return (p.targets, p.values, p.signatures, p.calldatas);
     }
 
@@ -643,10 +643,10 @@ library NounsDAOProposals {
      * @return The voting receipt
      */
     function getReceipt(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 proposalId,
         address voter
-    ) internal view returns (NounsDAOTypes.Receipt memory) {
+    ) internal view returns (NijiDAOTypes.Receipt memory) {
         return ds._proposals[proposalId].receipts[voter];
     }
 
@@ -657,12 +657,12 @@ library NounsDAOProposals {
      * @return A `ProposalCondensed` struct with the proposal data
      */
     function proposals(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 proposalId
-    ) external view returns (NounsDAOTypes.ProposalCondensedV2 memory) {
-        NounsDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
+    ) external view returns (NijiDAOTypes.ProposalCondensedV2 memory) {
+        NijiDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
         return
-            NounsDAOTypes.ProposalCondensedV2({
+            NijiDAOTypes.ProposalCondensedV2({
                 id: proposal.id,
                 proposer: proposal.proposer,
                 proposalThreshold: proposal.proposalThreshold,
@@ -688,12 +688,12 @@ library NounsDAOProposals {
      * @return A `ProposalCondensed` struct with the proposal data
      */
     function proposalsV3(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 proposalId
-    ) external view returns (NounsDAOTypes.ProposalCondensedV3 memory) {
-        NounsDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
+    ) external view returns (NijiDAOTypes.ProposalCondensedV3 memory) {
+        NijiDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
         return
-            NounsDAOTypes.ProposalCondensedV3({
+            NijiDAOTypes.ProposalCondensedV3({
                 id: proposal.id,
                 proposer: proposal.proposer,
                 proposalThreshold: proposal.proposalThreshold,
@@ -722,19 +722,19 @@ library NounsDAOProposals {
     }
 
     function proposalDataForRewards(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 firstProposalId,
         uint256 lastProposalId,
         uint16 proposalEligibilityQuorumBps,
         bool excludeCanceled,
         bool requireVotingEnded,
         uint32[] calldata votingClientIds
-    ) internal view returns (NounsDAOTypes.ProposalForRewards[] memory) {
+    ) internal view returns (NijiDAOTypes.ProposalForRewards[] memory) {
         require(lastProposalId >= firstProposalId, 'lastProposalId >= firstProposalId');
         uint256 numProposals = lastProposalId - firstProposalId + 1;
-        NounsDAOTypes.ProposalForRewards[] memory data = new NounsDAOTypes.ProposalForRewards[](numProposals);
+        NijiDAOTypes.ProposalForRewards[] memory data = new NijiDAOTypes.ProposalForRewards[](numProposals);
 
-        NounsDAOTypes.Proposal storage proposal;
+        NijiDAOTypes.Proposal storage proposal;
         uint256 i;
         Temp memory t;
         for (uint256 pid = firstProposalId; pid <= lastProposalId; ++pid) {
@@ -753,12 +753,12 @@ library NounsDAOProposals {
             uint256 totalSupply = proposal.totalSupply;
             if (forVotes < (totalSupply * proposalEligibilityQuorumBps) / 10_000) continue;
 
-            NounsDAOTypes.ClientVoteData[] memory c = new NounsDAOTypes.ClientVoteData[](votingClientIds.length);
+            NijiDAOTypes.ClientVoteData[] memory c = new NijiDAOTypes.ClientVoteData[](votingClientIds.length);
             for (uint256 j; j < votingClientIds.length; ++j) {
                 c[j] = proposal.voteClients[votingClientIds[j]];
             }
 
-            data[i++] = NounsDAOTypes.ProposalForRewards({
+            data[i++] = NijiDAOTypes.ProposalForRewards({
                 endBlock: t.endBlock,
                 objectionPeriodEndBlock: t.objectionPeriodEndBlock,
                 forVotes: forVotes,
@@ -784,15 +784,15 @@ library NounsDAOProposals {
      * Differs from `GovernerBravo` which uses fixed amount
      */
     function proposalThreshold(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 adjustedTotalSupply
     ) internal view returns (uint256) {
         return bps2Uint(ds.proposalThresholdBPS, adjustedTotalSupply);
     }
 
     function isDefeated(
-        NounsDAOTypes.Storage storage ds,
-        NounsDAOTypes.Proposal storage proposal
+        NijiDAOTypes.Storage storage ds,
+        NijiDAOTypes.Proposal storage proposal
     ) internal view returns (bool) {
         uint256 forVotes = proposal.forVotes;
         return forVotes <= proposal.againstVotes || forVotes < ds.quorumVotes(proposal.id);
@@ -802,15 +802,15 @@ library NounsDAOProposals {
      * @notice reverts if `proposer` is the proposer or signer of an active proposal.
      * This is a spam protection mechanism to limit the number of proposals each noun can back.
      */
-    function checkNoActiveProp(NounsDAOTypes.Storage storage ds, address proposer) internal view {
+    function checkNoActiveProp(NijiDAOTypes.Storage storage ds, address proposer) internal view {
         uint256 latestProposalId = ds.latestProposalIds[proposer];
         if (latestProposalId != 0) {
-            NounsDAOTypes.ProposalState proposersLatestProposalState = stateInternal(ds, latestProposalId);
+            NijiDAOTypes.ProposalState proposersLatestProposalState = stateInternal(ds, latestProposalId);
             if (
-                proposersLatestProposalState == NounsDAOTypes.ProposalState.ObjectionPeriod ||
-                proposersLatestProposalState == NounsDAOTypes.ProposalState.Active ||
-                proposersLatestProposalState == NounsDAOTypes.ProposalState.Pending ||
-                proposersLatestProposalState == NounsDAOTypes.ProposalState.Updatable
+                proposersLatestProposalState == NijiDAOTypes.ProposalState.ObjectionPeriod ||
+                proposersLatestProposalState == NijiDAOTypes.ProposalState.Active ||
+                proposersLatestProposalState == NijiDAOTypes.ProposalState.Pending ||
+                proposersLatestProposalState == NijiDAOTypes.ProposalState.Updatable
             ) revert ProposerAlreadyHasALiveProposal();
         }
     }
@@ -819,13 +819,13 @@ library NounsDAOProposals {
      * @dev Extracted this function to fix the `Stack too deep` error `proposeBySigs` hit.
      */
     function verifySignersCanBackThisProposalAndCountTheirVotes(
-        NounsDAOTypes.Storage storage ds,
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures,
+        NijiDAOTypes.Storage storage ds,
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures,
         ProposalTxs memory txs,
         string memory description,
         uint256 proposalId
     ) internal returns (uint256 votes, address[] memory signers) {
-        NounsTokenLike nouns = ds.nouns;
+        NijiTokenLike nouns = ds.nouns;
         bytes memory proposalEncodeData = calcProposalEncodeData(msg.sender, txs, description);
 
         signers = new address[](proposerSignatures.length);
@@ -885,24 +885,24 @@ library NounsDAOProposals {
     }
 
     function checkProposalUpdatable(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 proposalId,
-        NounsDAOTypes.Proposal storage proposal
+        NijiDAOTypes.Proposal storage proposal
     ) internal view {
-        if (stateInternal(ds, proposalId) != NounsDAOTypes.ProposalState.Updatable)
+        if (stateInternal(ds, proposalId) != NijiDAOTypes.ProposalState.Updatable)
             revert CanOnlyEditUpdatableProposals();
         if (msg.sender != proposal.proposer) revert OnlyProposerCanEdit();
         if (proposal.signers.length > 0) revert ProposerCannotUpdateProposalWithSigners();
     }
 
     function createNewProposal(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint32 proposalId,
         uint256 proposalThreshold_,
         uint256 adjustedTotalSupply,
         ProposalTxs memory txs,
         uint32 clientId
-    ) internal returns (NounsDAOTypes.Proposal storage newProposal) {
+    ) internal returns (NijiDAOTypes.Proposal storage newProposal) {
         uint64 updatePeriodEndBlock = SafeCast.toUint64(block.number + ds.proposalUpdatablePeriodInBlocks);
         uint256 startBlock = updatePeriodEndBlock + ds.votingDelay;
         uint256 endBlock = startBlock + ds.votingPeriod;
@@ -925,7 +925,7 @@ library NounsDAOProposals {
     }
 
     function emitNewPropEvents(
-        NounsDAOTypes.Proposal storage newProposal,
+        NijiDAOTypes.Proposal storage newProposal,
         address[] memory signers,
         uint256 minQuorumVotes,
         ProposalTxs memory txs,
@@ -933,7 +933,7 @@ library NounsDAOProposals {
         uint32 clientId
     ) internal {
         /// @notice Maintains backwards compatibility with GovernorBravo events
-        emit NounsDAOEventsV3.ProposalCreated(
+        emit NijiDAOEventsV3.ProposalCreated(
             newProposal.id,
             msg.sender,
             txs.targets,
@@ -949,7 +949,7 @@ library NounsDAOProposals {
         /// @notice V2: `quorumVotes` changed to `minQuorumVotes`
         /// @notice V3: Added signers and updatePeriodEndBlock
         /// @notice V4: Removed data that's already emitted in `ProposalCreated`, added clientId
-        emit NounsDAOEventsV3.ProposalCreatedWithRequirements(
+        emit NijiDAOEventsV3.ProposalCreatedWithRequirements(
             newProposal.id,
             signers,
             newProposal.updatePeriodEndBlock,
@@ -960,7 +960,7 @@ library NounsDAOProposals {
     }
 
     function checkPropThreshold(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 votes,
         uint256 adjustedTotalSupply
     ) internal view returns (uint256 propThreshold) {
@@ -979,9 +979,9 @@ library NounsDAOProposals {
     }
 
     function verifyProposalSignature(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         bytes memory proposalEncodeData,
-        NounsDAOTypes.ProposerSignature memory proposerSignature,
+        NijiDAOTypes.ProposerSignature memory proposerSignature,
         bytes32 typehash
     ) internal view {
         bytes32 sigHash = keccak256(proposerSignature.sig);
@@ -1011,7 +1011,7 @@ library NounsDAOProposals {
         bytes32 structHash = keccak256(abi.encodePacked(typehash, proposalEncodeData, expirationTimestamp));
 
         bytes32 domainSeparator = keccak256(
-            abi.encode(DOMAIN_TYPEHASH, keccak256(bytes('Nouns DAO')), block.chainid, verifyingContract)
+            abi.encode(DOMAIN_TYPEHASH, keccak256(bytes('Niji DAO')), block.chainid, verifyingContract)
         );
 
         return ECDSA.toTypedDataHash(domainSeparator, structHash);

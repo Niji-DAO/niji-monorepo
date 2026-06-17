@@ -2,11 +2,11 @@
 pragma solidity ^0.8.19;
 
 import 'forge-std/Base.sol';
-import { INounsAuctionHouse } from '../../../contracts/interfaces/INounsAuctionHouse.sol';
+import { INijiAuctionHouse } from '../../../contracts/interfaces/INijiAuctionHouse.sol';
 
 abstract contract AuctionHelpers is CommonBase {
-    function bidAndSettleAuction(INounsAuctionHouse auctionHouse, address buyer) internal {
-        INounsAuctionHouse.Auction memory auction = getAuction(auctionHouse);
+    function bidAndSettleAuction(INijiAuctionHouse auctionHouse, address buyer) internal {
+        INijiAuctionHouse.Auction memory auction = getAuction(auctionHouse);
         if (auction.endTime < block.timestamp) {
             auctionHouse.settleCurrentAndCreateNewAuction();
             auction = getAuction(auctionHouse);
@@ -22,7 +22,7 @@ abstract contract AuctionHelpers is CommonBase {
         vm.stopPrank();
     }
 
-    function getAuction(INounsAuctionHouse auctionHouse) internal view returns (INounsAuctionHouse.Auction memory) {
+    function getAuction(INijiAuctionHouse auctionHouse) internal view returns (INijiAuctionHouse.Auction memory) {
         (
             uint256 nounId,
             uint256 amount,
@@ -32,6 +32,6 @@ abstract contract AuctionHelpers is CommonBase {
             bool settled
         ) = auctionHouse.auction();
 
-        return INounsAuctionHouse.Auction(nounId, amount, startTime, endTime, bidder, settled);
+        return INijiAuctionHouse.Auction(nounId, amount, startTime, endTime, bidder, settled);
     }
 }

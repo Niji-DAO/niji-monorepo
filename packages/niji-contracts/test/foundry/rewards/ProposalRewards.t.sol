@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.19;
 
-import { NounsDAOLogicBaseTest } from '../NounsDAOLogic/NounsDAOLogicBaseTest.sol';
+import { NijiDAOLogicBaseTest } from '../NijiDAOLogic/NijiDAOLogicBaseTest.sol';
 import { ERC20Mock } from '../helpers/ERC20Mock.sol';
 import { Rewards } from '../../../contracts/client-incentives/Rewards.sol';
-import { INounsAuctionHouseV2 } from '../../../contracts/interfaces/INounsAuctionHouseV2.sol';
-import { NounsAuctionHouseProxy } from '../../../contracts/proxies/NounsAuctionHouseProxy.sol';
+import { INijiAuctionHouseV2 } from '../../../contracts/interfaces/INijiAuctionHouseV2.sol';
+import { NijiAuctionHouseProxy } from '../../../contracts/proxies/NijiAuctionHouseProxy.sol';
 import { NounsToken } from '../../../contracts/NounsToken.sol';
 import { RewardsDeployer } from '../../../script/Rewards/RewardsDeployer.sol';
 import 'forge-std/Test.sol';
 
-abstract contract BaseProposalRewardsTest is NounsDAOLogicBaseTest {
+abstract contract BaseProposalRewardsTest is NijiDAOLogicBaseTest {
     Rewards rewards;
     ERC20Mock erc20Mock = new ERC20Mock();
-    INounsAuctionHouseV2 auctionHouse;
+    INijiAuctionHouseV2 auctionHouse;
 
     address admin = makeAddr('admin');
     address bidder1 = makeAddr('bidder1');
@@ -77,7 +77,7 @@ abstract contract BaseProposalRewardsTest is NounsDAOLogicBaseTest {
         nounsToken = NounsToken(address(dao.nouns()));
         minter = nounsToken.minter();
 
-        auctionHouse = INounsAuctionHouseV2(minter);
+        auctionHouse = INijiAuctionHouseV2(minter);
         vm.prank(address(dao.timelock()));
         auctionHouse.unpause();
     }

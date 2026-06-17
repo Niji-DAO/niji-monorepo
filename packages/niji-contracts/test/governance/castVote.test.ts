@@ -6,7 +6,7 @@ const { ethers } = hardhat;
 import {
   NounsToken,
   NounsDescriptorV3__factory as NounsDescriptorV3Factory,
-  INounsDAOLogic,
+  INijiDAOLogic,
 } from '../../typechain';
 import {
   deployNounsToken,
@@ -30,7 +30,7 @@ let account1: SignerWithAddress;
 let account2: SignerWithAddress;
 let signers: TestSigners;
 
-let gov: INounsDAOLogic;
+let gov: INijiDAOLogic;
 let proposalId: bigint;
 
 async function reset() {
@@ -51,7 +51,7 @@ async function reset() {
   snapshotId = await ethers.provider.send('evm_snapshot', []);
 }
 
-describe('NounsDAOV2#castVote/2', () => {
+describe('NijiDAOV2#castVote/2', () => {
   before(async () => {
     signers = await getSigners();
     deployer = signers.deployer;
@@ -68,7 +68,7 @@ describe('NounsDAOV2#castVote/2', () => {
 
     it("There does not exist a proposal with matching proposal id where the current block number is between the proposal's start block (exclusive) and end block (inclusive)", async () => {
       await expect(gov.castVote(proposalId, 1)).revertedWith(
-        'NounsDAO::castVoteInternal: voting is closed',
+        'NijiDAO::castVoteInternal: voting is closed',
       );
     });
 
@@ -84,7 +84,7 @@ describe('NounsDAOV2#castVote/2', () => {
       await gov.connect(account1).castVoteWithReason(proposalId, 1, '');
 
       await expect(gov.connect(account0).castVote(proposalId, 1)).revertedWith(
-        'NounsDAO::castVoteDuringVotingPeriodInternal: voter already voted',
+        'NijiDAO::castVoteDuringVotingPeriodInternal: voter already voted',
       );
     });
   });

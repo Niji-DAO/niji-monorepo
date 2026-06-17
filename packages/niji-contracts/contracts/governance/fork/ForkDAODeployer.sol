@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title The deployer of new Nouns DAO forks
+/// @title The deployer of new Niji DAO forks
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -18,15 +18,15 @@
 pragma solidity ^0.8.19;
 
 import { ERC1967Proxy } from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
-import { IForkDAODeployer, INounsDAOForkEscrow, NounsDAOTypes } from '../NounsDAOInterfaces.sol';
+import { IForkDAODeployer, INijiDAOForkEscrow, NijiDAOTypes } from '../NijiDAOInterfaces.sol';
 import { NounsTokenFork } from './newdao/token/NounsTokenFork.sol';
-import { NounsAuctionHouseFork } from './newdao/NounsAuctionHouseFork.sol';
-import { NounsDAOExecutorV2 } from '../NounsDAOExecutorV2.sol';
-import { NounsDAOLogicV1Fork } from './newdao/governance/NounsDAOLogicV1Fork.sol';
+import { NijiAuctionHouseFork } from './newdao/NijiAuctionHouseFork.sol';
+import { NijiDAOExecutorV2 } from '../NijiDAOExecutorV2.sol';
+import { NijiDAOLogicV1Fork } from './newdao/governance/NijiDAOLogicV1Fork.sol';
 import { NounsToken } from '../../NounsToken.sol';
-import { NounsAuctionHouse } from '../../NounsAuctionHouse.sol';
+import { NijiAuctionHouse } from '../../NijiAuctionHouse.sol';
 
-interface INounsDAOForkTokens {
+interface INijiDAOForkTokens {
     function erc20TokensToIncludeInFork() external view returns (address[] memory);
 }
 
@@ -83,7 +83,7 @@ contract ForkDAODeployer is IForkDAODeployer {
     }
 
     /**
-     * @notice Deploys a new Nouns DAO fork, including a new token, auction house, governor, and treasury.
+     * @notice Deploys a new Niji DAO fork, including a new token, auction house, governor, and treasury.
      * All contracts are upgradable, and are almost entirely initialized with the same parameters as the original DAO.
      * @param forkingPeriodEndTimestamp The timestamp at which the forking period ends
      * @param forkEscrow The address of the fork escrow contract, used for claiming tokens that were escrowed in the original DAO
@@ -93,15 +93,15 @@ contract ForkDAODeployer is IForkDAODeployer {
      */
     function deployForkDAO(
         uint256 forkingPeriodEndTimestamp,
-        INounsDAOForkEscrow forkEscrow
+        INijiDAOForkEscrow forkEscrow
     ) external returns (address treasury, address token) {
         token = address(new ERC1967Proxy(tokenImpl, ''));
         address auction = address(new ERC1967Proxy(auctionImpl, ''));
         address governor = address(new ERC1967Proxy(governorImpl, ''));
         treasury = address(new ERC1967Proxy(treasuryImpl, ''));
 
-        NounsAuctionHouse originalAuction = getOriginalAuction(forkEscrow);
-        NounsDAOExecutorV2 originalTimelock = getOriginalTimelock(forkEscrow);
+        NijiAuctionHouse originalAuction = getOriginalAuction(forkEscrow);
+        NijiDAOExecutorV2 originalTimelock = getOriginalTimelock(forkEscrow);
 
         NounsTokenFork(token).initialize(
             treasury,
@@ -113,7 +113,7 @@ contract ForkDAODeployer is IForkDAODeployer {
             forkingPeriodEndTimestamp
         );
 
-        NounsAuctionHouseFork(auction).initialize(
+        NijiAuctionHouseFork(auction).initialize(
             treasury,
             NounsToken(token),
             originalAuction.weth(),
@@ -125,7 +125,7 @@ contract ForkDAODeployer is IForkDAODeployer {
 
         initDAO(governor, treasury, token, originalTimelock);
 
-        NounsDAOExecutorV2(payable(treasury)).initialize(governor, originalTimelock.delay());
+        NijiDAOExecutorV2(payable(treasury)).initialize(governor, originalTimelock.delay());
 
         emit DAODeployed(token, auction, governor, treasury);
     }
@@ -133,9 +133,9 @@ contract ForkDAODeployer is IForkDAODeployer {
     /**
      * @dev Used to prevent the 'Stack too deep' error in the main deploy function.
      */
-    function initDAO(address governor, address treasury, address token, NounsDAOExecutorV2 originalTimelock) internal {
-        INounsDAOForkTokens originalDAO = INounsDAOForkTokens(payable(originalTimelock.admin()));
-        NounsDAOLogicV1Fork(governor).initialize(
+    function initDAO(address governor, address treasury, address token, NijiDAOExecutorV2 originalTimelock) internal {
+        INijiDAOForkTokens originalDAO = INijiDAOForkTokens(payable(originalTimelock.admin()));
+        NijiDAOLogicV1Fork(governor).initialize(
             treasury,
             token,
             initialVotingPeriod,
@@ -150,20 +150,20 @@ contract ForkDAODeployer is IForkDAODeployer {
     /**
      * @dev Used to prevent the 'Stack too deep' error in the main deploy function.
      */
-    function getOriginalTimelock(INounsDAOForkEscrow forkEscrow) internal view returns (NounsDAOExecutorV2) {
+    function getOriginalTimelock(INijiDAOForkEscrow forkEscrow) internal view returns (NijiDAOExecutorV2) {
         NounsToken originalToken = NounsToken(address(forkEscrow.nounsToken()));
-        return NounsDAOExecutorV2(payable(originalToken.owner()));
+        return NijiDAOExecutorV2(payable(originalToken.owner()));
     }
 
     /**
      * @dev Used to prevent the 'Stack too deep' error in the main deploy function.
      */
-    function getOriginalAuction(INounsDAOForkEscrow forkEscrow) internal view returns (NounsAuctionHouse) {
+    function getOriginalAuction(INijiDAOForkEscrow forkEscrow) internal view returns (NijiAuctionHouse) {
         NounsToken originalToken = NounsToken(address(forkEscrow.nounsToken()));
-        return NounsAuctionHouse(originalToken.minter());
+        return NijiAuctionHouse(originalToken.minter());
     }
 
-    function getStartNounId(NounsAuctionHouse originalAuction) internal view returns (uint256) {
+    function getStartNounId(NijiAuctionHouse originalAuction) internal view returns (uint256) {
         (uint256 nounId, , , , , ) = originalAuction.auction();
         return nounId;
     }

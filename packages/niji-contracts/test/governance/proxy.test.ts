@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import {
   NounsToken,
   NounsDescriptorV3__factory as NounsDescriptorV3Factory,
-  INounsDAOLogic,
+  INijiDAOLogic,
 } from '../../typechain';
 import { MAX_QUORUM_VOTES_BPS, MIN_QUORUM_VOTES_BPS } from '../constants';
 import {
@@ -20,7 +20,7 @@ import {
 let token: NounsToken;
 let deployer: SignerWithAddress;
 let signers: TestSigners;
-let gov: INounsDAOLogic;
+let gov: INijiDAOLogic;
 
 async function setup() {
   token = await deployNounsToken(signers.deployer);
@@ -32,7 +32,7 @@ async function setup() {
   await setTotalSupply(token, 100);
 }
 
-describe('NounsDAOProxyV3', () => {
+describe('NijiDAOProxyV3', () => {
   before(async () => {
     signers = await getSigners();
     deployer = signers.deployer;

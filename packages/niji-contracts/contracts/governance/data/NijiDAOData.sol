@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title Nouns DAO Data Contract
+/// @title Niji DAO Data Contract
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -18,17 +18,17 @@
 pragma solidity ^0.8.19;
 
 import { OwnableUpgradeable } from '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
-import { NounsDAOProposals } from '../NounsDAOProposals.sol';
-import { NounsTokenLike, NounsDAOTypes } from '../NounsDAOInterfaces.sol';
+import { NijiDAOProposals } from '../NijiDAOProposals.sol';
+import { NijiTokenLike, NijiDAOTypes } from '../NijiDAOInterfaces.sol';
 import { SignatureChecker } from '../../external/openzeppelin/SignatureChecker.sol';
 import { UUPSUpgradeable } from '@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol';
-import { NounsDAODataEvents } from './NounsDAODataEvents.sol';
+import { NijiDAODataEvents } from './NijiDAODataEvents.sol';
 
-interface INounsDAO {
-    function proposalsV3(uint256 proposalId) external view returns (NounsDAOTypes.ProposalCondensedV3 memory);
+interface INijiDAO {
+    function proposalsV3(uint256 proposalId) external view returns (NijiDAOTypes.ProposalCondensedV3 memory);
 }
 
-contract NounsDAOData is OwnableUpgradeable, UUPSUpgradeable, NounsDAODataEvents {
+contract NijiDAOData is OwnableUpgradeable, UUPSUpgradeable, NijiDAODataEvents {
     /**
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
      *   ERRORS
@@ -61,9 +61,9 @@ contract NounsDAOData is OwnableUpgradeable, UUPSUpgradeable, NounsDAODataEvents
     /// @notice The number of blocks before the current block where account votes are counted.
     uint256 public constant PRIOR_VOTES_BLOCKS_AGO = 1;
 
-    /// @notice The Nouns token contract.
-    NounsTokenLike public immutable nounsToken;
-    /// @notice The Nouns DAO contract.
+    /// @notice The Niji token contract.
+    NijiTokenLike public immutable nounsToken;
+    /// @notice The Niji DAO contract.
     address public immutable nounsDao;
     /// @notice The cost non-Nouners must pay in ETH in order to emit a new proposal candidate event from this contract.
     uint256 public createCandidateCost;
@@ -75,7 +75,7 @@ contract NounsDAOData is OwnableUpgradeable, UUPSUpgradeable, NounsDAODataEvents
     address payable public feeRecipient;
 
     constructor(address nounsToken_, address nounsDao_) initializer {
-        nounsToken = NounsTokenLike(nounsToken_);
+        nounsToken = NijiTokenLike(nounsToken_);
         nounsDao = nounsDao_;
     }
 
@@ -131,8 +131,8 @@ contract NounsDAOData is OwnableUpgradeable, UUPSUpgradeable, NounsDAODataEvents
         uint256 proposalIdToUpdate
     ) external payable {
         if (proposalIdToUpdate > 0) {
-            INounsDAO dao = INounsDAO(nounsDao);
-            NounsDAOTypes.ProposalCondensedV3 memory propInfo = dao.proposalsV3(proposalIdToUpdate);
+            INijiDAO dao = INijiDAO(nounsDao);
+            NijiDAOTypes.ProposalCondensedV3 memory propInfo = dao.proposalsV3(proposalIdToUpdate);
 
             if (block.number > propInfo.updatePeriodEndBlock) revert ProposalToUpdateMustBeUpdatable();
             if (propInfo.proposer != msg.sender) revert OnlyProposerCanCreateUpdateCandidate();
@@ -142,13 +142,13 @@ contract NounsDAOData is OwnableUpgradeable, UUPSUpgradeable, NounsDAODataEvents
         }
 
         if (propCandidates[msg.sender][keccak256(bytes(slug))]) revert SlugAlreadyUsed();
-        NounsDAOProposals.checkProposalTxs(NounsDAOProposals.ProposalTxs(targets, values, signatures, calldatas));
+        NijiDAOProposals.checkProposalTxs(NijiDAOProposals.ProposalTxs(targets, values, signatures, calldatas));
 
         propCandidates[msg.sender][keccak256(bytes(slug))] = true;
 
-        bytes memory encodedProp = NounsDAOProposals.calcProposalEncodeData(
+        bytes memory encodedProp = NijiDAOProposals.calcProposalEncodeData(
             msg.sender,
-            NounsDAOProposals.ProposalTxs(targets, values, signatures, calldatas),
+            NijiDAOProposals.ProposalTxs(targets, values, signatures, calldatas),
             description
         );
         if (proposalIdToUpdate > 0) {
@@ -194,11 +194,11 @@ contract NounsDAOData is OwnableUpgradeable, UUPSUpgradeable, NounsDAODataEvents
     ) external payable {
         if (!isNouner(msg.sender) && msg.value < updateCandidateCost) revert MustBeNounerOrPaySufficientFee();
         if (!propCandidates[msg.sender][keccak256(bytes(slug))]) revert SlugDoesNotExist();
-        NounsDAOProposals.checkProposalTxs(NounsDAOProposals.ProposalTxs(targets, values, signatures, calldatas));
+        NijiDAOProposals.checkProposalTxs(NijiDAOProposals.ProposalTxs(targets, values, signatures, calldatas));
 
-        bytes memory encodedProp = NounsDAOProposals.calcProposalEncodeData(
+        bytes memory encodedProp = NijiDAOProposals.calcProposalEncodeData(
             msg.sender,
-            NounsDAOProposals.ProposalTxs(targets, values, signatures, calldatas),
+            NijiDAOProposals.ProposalTxs(targets, values, signatures, calldatas),
             description
         );
         if (proposalIdToUpdate > 0) {
@@ -241,7 +241,7 @@ contract NounsDAOData is OwnableUpgradeable, UUPSUpgradeable, NounsDAODataEvents
      * @param slug the slug of the proposal candidate signer signed on.
      * @param proposalIdToUpdate if this is an update to an existing proposal, the ID of the proposal to update, otherwise 0.
      * @param encodedProp the abi encoding of the candidate version signed; should be identical to the output of
-     * the `NounsDAOProposals.calcProposalEncodeData` function.
+     * the `NijiDAOProposals.calcProposalEncodeData` function.
      * @param reason signer's reason free text.
      */
     function addSignature(
@@ -256,10 +256,10 @@ contract NounsDAOData is OwnableUpgradeable, UUPSUpgradeable, NounsDAODataEvents
         if (!propCandidates[proposer][keccak256(bytes(slug))]) revert SlugDoesNotExist();
 
         bytes32 typeHash = proposalIdToUpdate == 0
-            ? NounsDAOProposals.PROPOSAL_TYPEHASH
-            : NounsDAOProposals.UPDATE_PROPOSAL_TYPEHASH;
+            ? NijiDAOProposals.PROPOSAL_TYPEHASH
+            : NijiDAOProposals.UPDATE_PROPOSAL_TYPEHASH;
 
-        bytes32 sigDigest = NounsDAOProposals.sigDigest(typeHash, encodedProp, expirationTimestamp, nounsDao);
+        bytes32 sigDigest = NijiDAOProposals.sigDigest(typeHash, encodedProp, expirationTimestamp, nounsDao);
 
         if (!SignatureChecker.isValidSignatureNow(msg.sender, sigDigest, sig)) revert InvalidSignature();
 

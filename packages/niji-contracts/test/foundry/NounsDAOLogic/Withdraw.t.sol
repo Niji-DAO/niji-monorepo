@@ -2,11 +2,11 @@
 pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
-import { NounsDAOLogicBaseTest } from './NounsDAOLogicBaseTest.sol';
-import { NounsDAOTypes } from '../../../contracts/governance/NounsDAOInterfaces.sol';
-import { NounsDAOAdmin } from '../../../contracts/governance/NounsDAOAdmin.sol';
+import { NijiDAOLogicBaseTest } from './NijiDAOLogicBaseTest.sol';
+import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiDAOAdmin } from '../../../contracts/governance/NijiDAOAdmin.sol';
 
-contract WithdrawTest is NounsDAOLogicBaseTest {
+contract WithdrawTest is NijiDAOLogicBaseTest {
     event Withdraw(uint256 amount, bool sent);
 
     function test_withdraw_worksForAdmin() public {
@@ -25,7 +25,7 @@ contract WithdrawTest is NounsDAOLogicBaseTest {
     }
 
     function test_withdraw_revertsForNonAdmin() public {
-        vm.expectRevert(NounsDAOAdmin.AdminOnly.selector);
+        vm.expectRevert(NijiDAOAdmin.AdminOnly.selector);
         dao._withdraw();
     }
 }

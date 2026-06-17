@@ -24,7 +24,7 @@ import { INounsSeeder } from '../../../../interfaces/INounsSeeder.sol';
 import { INounsTokenFork } from './INounsTokenFork.sol';
 import { IERC721 } from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import { UUPSUpgradeable } from '@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol';
-import { INounsDAOForkEscrow } from '../../../NounsDAOInterfaces.sol';
+import { INijiDAOForkEscrow } from '../../../NijiDAOInterfaces.sol';
 
 /**
  * @dev This contract is a fork of NounsToken, with the following changes:
@@ -55,7 +55,7 @@ contract NounsTokenFork is INounsTokenFork, OwnableUpgradeable, ERC721Checkpoint
     INounsSeeder public seeder;
 
     /// @notice The escrow contract used to verify ownership of the original Nouns in the post-fork claiming process
-    INounsDAOForkEscrow public escrow;
+    INijiDAOForkEscrow public escrow;
 
     /// @notice The fork ID, used when querying the escrow for token ownership
     uint32 public forkId;
@@ -121,7 +121,7 @@ contract NounsTokenFork is INounsTokenFork, OwnableUpgradeable, ERC721Checkpoint
     function initialize(
         address _owner,
         address _minter,
-        INounsDAOForkEscrow _escrow,
+        INijiDAOForkEscrow _escrow,
         uint32 _forkId,
         uint256 startNounId,
         uint256 tokensToClaim,

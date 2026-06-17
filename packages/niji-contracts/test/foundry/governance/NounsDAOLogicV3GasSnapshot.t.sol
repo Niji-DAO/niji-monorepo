@@ -3,13 +3,13 @@ pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
 
-import { NounsDAOLogicSharedBaseTest } from '../helpers/NounsDAOLogicSharedBase.t.sol';
-import { INounsDAOLogic } from '../../../contracts/interfaces/INounsDAOLogic.sol';
+import { NijiDAOLogicSharedBaseTest } from '../helpers/NijiDAOLogicSharedBase.t.sol';
+import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
 import { DeployUtilsV3 } from '../helpers/DeployUtilsV3.sol';
-import { NounsDAOProxyV3 } from '../../../contracts/governance/NounsDAOProxyV3.sol';
-import { NounsDAOTypes } from '../../../contracts/governance/NounsDAOInterfaces.sol';
+import { NijiDAOProxyV3 } from '../../../contracts/governance/NijiDAOProxyV3.sol';
+import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 
-abstract contract NounsDAOLogic_GasSnapshot_propose is NounsDAOLogicSharedBaseTest {
+abstract contract NijiDAOLogic_GasSnapshot_propose is NijiDAOLogicSharedBaseTest {
     address immutable target = makeAddr('target');
 
     function setUp() public override {
@@ -53,7 +53,7 @@ abstract contract NounsDAOLogic_GasSnapshot_propose is NounsDAOLogicSharedBaseTe
     }
 }
 
-abstract contract NounsDAOLogic_GasSnapshot_castVote is NounsDAOLogicSharedBaseTest {
+abstract contract NijiDAOLogic_GasSnapshot_castVote is NijiDAOLogicSharedBaseTest {
     address immutable nouner = makeAddr('nouner');
     address immutable target = makeAddr('target');
 
@@ -102,7 +102,7 @@ abstract contract NounsDAOLogic_GasSnapshot_castVote is NounsDAOLogicSharedBaseT
     }
 }
 
-abstract contract NounsDAOLogic_GasSnapshot_castVoteDuringObjectionPeriod is NounsDAOLogicSharedBaseTest {
+abstract contract NijiDAOLogic_GasSnapshot_castVoteDuringObjectionPeriod is NijiDAOLogicSharedBaseTest {
     address immutable nouner = makeAddr('nouner');
     address immutable target = makeAddr('target');
 
@@ -147,22 +147,22 @@ abstract contract NounsDAOLogic_GasSnapshot_castVoteDuringObjectionPeriod is Nou
     }
 }
 
-contract NounsDAOLogic_GasSnapshot_V3_propose is DeployUtilsV3, NounsDAOLogic_GasSnapshot_propose {
+contract NijiDAOLogic_GasSnapshot_V3_propose is DeployUtilsV3, NijiDAOLogic_GasSnapshot_propose {
     function deployDAOProxy(
         address timelock,
         address nounsToken,
         address vetoer
-    ) internal override returns (INounsDAOLogic) {
+    ) internal override returns (INijiDAOLogic) {
         return _createDAOV3Proxy(timelock, nounsToken, vetoer);
     }
 }
 
-contract NounsDAOLogic_GasSnapshot_V3_vote is DeployUtilsV3, NounsDAOLogic_GasSnapshot_castVote {
+contract NijiDAOLogic_GasSnapshot_V3_vote is DeployUtilsV3, NijiDAOLogic_GasSnapshot_castVote {
     function deployDAOProxy(
         address timelock,
         address nounsToken,
         address vetoer
-    ) internal override returns (INounsDAOLogic) {
+    ) internal override returns (INijiDAOLogic) {
         return _createDAOV3Proxy(timelock, nounsToken, vetoer);
     }
 
@@ -171,15 +171,15 @@ contract NounsDAOLogic_GasSnapshot_V3_vote is DeployUtilsV3, NounsDAOLogic_GasSn
     }
 }
 
-contract NounsDAOLogic_GasSnapshot_V3_voteDuringObjectionPeriod is
+contract NijiDAOLogic_GasSnapshot_V3_voteDuringObjectionPeriod is
     DeployUtilsV3,
-    NounsDAOLogic_GasSnapshot_castVoteDuringObjectionPeriod
+    NijiDAOLogic_GasSnapshot_castVoteDuringObjectionPeriod
 {
     function deployDAOProxy(
         address timelock,
         address nounsToken,
         address vetoer
-    ) internal override returns (INounsDAOLogic) {
+    ) internal override returns (INijiDAOLogic) {
         return _createDAOV3Proxy(timelock, nounsToken, vetoer);
     }
 }

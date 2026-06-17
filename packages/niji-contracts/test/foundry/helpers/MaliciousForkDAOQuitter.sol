@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.15;
 
-import { NounsDAOLogicV1Fork } from '../../../contracts/governance/fork/newdao/governance/NounsDAOLogicV1Fork.sol';
+import { NijiDAOLogicV1Fork } from '../../../contracts/governance/fork/newdao/governance/NijiDAOLogicV1Fork.sol';
 
 contract MaliciousForkDAOQuitter {
-    NounsDAOLogicV1Fork public dao;
+    NijiDAOLogicV1Fork public dao;
     uint256[] public tokenIds;
     bool triedReentry;
 
-    constructor(NounsDAOLogicV1Fork dao_) {
+    constructor(NijiDAOLogicV1Fork dao_) {
         dao = dao_;
     }
 

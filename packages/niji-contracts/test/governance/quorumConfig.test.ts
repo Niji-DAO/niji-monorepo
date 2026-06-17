@@ -6,9 +6,9 @@ import hardhat from 'hardhat';
 import {
   NounsToken,
   NounsDescriptorV2__factory as NounsDescriptorV3Factory,
-  INounsDAOLogic,
-  NounsDAOLogicV4__factory,
-  NounsDAOAdmin__factory,
+  INijiDAOLogic,
+  NijiDAOLogicV4__factory,
+  NijiDAOAdmin__factory,
 } from '../../typechain';
 import { DynamicQuorumParams } from '../types';
 import {
@@ -28,8 +28,8 @@ let token: NounsToken;
 let deployer: SignerWithAddress;
 let account0: SignerWithAddress;
 let signers: TestSigners;
-let gov: INounsDAOLogic;
-let govAdmin: ReturnType<typeof NounsDAOAdmin__factory.connect>;
+let gov: INijiDAOLogic;
+let govAdmin: ReturnType<typeof NijiDAOAdmin__factory.connect>;
 let snapshotId: number;
 
 async function setup() {
@@ -42,10 +42,10 @@ async function setup() {
   await setTotalSupply(token, 100);
 
   gov = await deployGovernorV3WithV3Proxy(deployer, await token.getAddress());
-  govAdmin = NounsDAOAdmin__factory.connect(await gov.getAddress(), deployer);
+  govAdmin = NijiDAOAdmin__factory.connect(await gov.getAddress(), deployer);
 }
 
-describe('NounsDAO#_setDynamicQuorumParams', () => {
+describe('NijiDAO#_setDynamicQuorumParams', () => {
   before(async () => {
     signers = await getSigners();
     deployer = signers.deployer;
@@ -110,7 +110,7 @@ describe('NounsDAO#_setDynamicQuorumParams', () => {
     expect(actualParams.maxQuorumVotesBPS).to.equal(2222);
     expect(actualParams.quorumCoefficient).to.equal(quorumCoefficient);
 
-    const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
+    const govWithEvents = NijiDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
 
     await expect(tx).to.emit(govWithEvents, 'MinQuorumVotesBPSSet').withArgs(200, 222);
     await expect(tx).to.emit(govWithEvents, 'MaxQuorumVotesBPSSet').withArgs(2000, 2222);
@@ -204,7 +204,7 @@ describe('NounsDAO#_setDynamicQuorumParams', () => {
         const params = await gov.getDynamicQuorumParamsAt(await blockNumber());
 
         expect(params.minQuorumVotesBPS).to.equal(222);
-        const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
+        const govWithEvents = NijiDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
         await expect(tx).to.emit(govWithEvents, 'MinQuorumVotesBPSSet').withArgs(200, 222);
       });
 
@@ -216,13 +216,13 @@ describe('NounsDAO#_setDynamicQuorumParams', () => {
 
       it('reverts given input below lower bound', async () => {
         await expect(gov._setMinQuorumVotesBPS(199)).to.be.revertedWith(
-          'NounsDAO::_setMinQuorumVotesBPS: invalid min quorum votes bps',
+          'NijiDAO::_setMinQuorumVotesBPS: invalid min quorum votes bps',
         );
       });
 
       it('reverts given input above upper bound', async () => {
         await expect(gov._setMinQuorumVotesBPS(2001)).to.be.revertedWith(
-          'NounsDAO::_setMinQuorumVotesBPS: invalid min quorum votes bps',
+          'NijiDAO::_setMinQuorumVotesBPS: invalid min quorum votes bps',
         );
       });
 
@@ -230,7 +230,7 @@ describe('NounsDAO#_setDynamicQuorumParams', () => {
         await gov._setMaxQuorumVotesBPS(1998);
 
         await expect(gov._setMinQuorumVotesBPS(1999)).to.be.revertedWith(
-          'NounsDAO::_setMinQuorumVotesBPS: min quorum votes bps greater than max',
+          'NijiDAO::_setMinQuorumVotesBPS: min quorum votes bps greater than max',
         );
       });
     });
@@ -241,7 +241,7 @@ describe('NounsDAO#_setDynamicQuorumParams', () => {
         const params = await gov.getDynamicQuorumParamsAt(await blockNumber());
 
         expect(params.maxQuorumVotesBPS).to.equal(3333);
-        const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
+        const govWithEvents = NijiDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
         await expect(tx).to.emit(govWithEvents, 'MaxQuorumVotesBPSSet').withArgs(3000, 3333);
       });
 
@@ -253,13 +253,13 @@ describe('NounsDAO#_setDynamicQuorumParams', () => {
 
       it('reverts given input above upper bound', async () => {
         await expect(gov._setMaxQuorumVotesBPS(6001)).to.be.revertedWith(
-          'NounsDAO::_setMaxQuorumVotesBPS: invalid max quorum votes bps',
+          'NijiDAO::_setMaxQuorumVotesBPS: invalid max quorum votes bps',
         );
       });
 
       it('reverts given input less than min param', async () => {
         await expect(gov._setMaxQuorumVotesBPS(199)).to.be.revertedWith(
-          'NounsDAO::_setMaxQuorumVotesBPS: min quorum votes bps greater than max',
+          'NijiDAO::_setMaxQuorumVotesBPS: min quorum votes bps greater than max',
         );
       });
     });
@@ -270,7 +270,7 @@ describe('NounsDAO#_setDynamicQuorumParams', () => {
         const params = await gov.getDynamicQuorumParamsAt(await blockNumber());
 
         expect(params.quorumCoefficient).to.equal(111);
-        const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
+        const govWithEvents = NijiDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
         await expect(tx).to.emit(govWithEvents, 'QuorumCoefficientSet').withArgs(1, 111);
       });
 

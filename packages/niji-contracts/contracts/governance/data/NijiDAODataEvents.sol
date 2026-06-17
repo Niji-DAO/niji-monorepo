@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title Nouns DAO Data Events
+/// @title Niji DAO Data Events
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -17,7 +17,7 @@
 
 pragma solidity ^0.8.19;
 
-contract NounsDAODataEvents {
+contract NijiDAODataEvents {
     event ProposalCandidateCreated(
         address indexed msgSender,
         address[] targets,

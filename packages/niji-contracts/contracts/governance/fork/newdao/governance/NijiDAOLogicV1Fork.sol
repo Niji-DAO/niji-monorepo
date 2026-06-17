@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-/// @title The Nouns DAO logic version 1
+/// @title The Niji DAO logic version 1
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -16,8 +16,8 @@
  *********************************/
 
 // LICENSE
-// NounsDAOLogicV1Fork.sol is a modified version of NounsDAOLogicV1.sol.
-// NounsDAOLogicV1.sol is a modified version of Compound Lab's GovernorBravoDelegate.sol:
+// NijiDAOLogicV1Fork.sol is a modified version of NijiDAOLogicV1.sol.
+// NijiDAOLogicV1.sol is a modified version of Compound Lab's GovernorBravoDelegate.sol:
 // https://github.com/compound-finance/compound-protocol/blob/b9b14038612d846b83f8a009a82c38974ff2dcfe/contracts/Governance/GovernorBravoDelegate.sol
 //
 // GovernorBravoDelegate.sol source code Copyright 2020 Compound Labs, Inc. licensed under the BSD-3-Clause license.
@@ -26,7 +26,7 @@
 // Additional conditions of BSD-3-Clause can be found here: https://opensource.org/licenses/BSD-3-Clause
 //
 // MODIFICATIONS
-// NounsDAOLogicV1Fork adds:
+// NijiDAOLogicV1Fork adds:
 // - `quit(tokenIds)`, a function that allows token holders to quit the DAO, taking their pro rata funds,
 //   and sending their tokens to the DAO treasury.
 //
@@ -41,7 +41,7 @@
 // - A new Proposal field: `creationBlock`, used to resolve the `votingDelay` bug, in which editing `votingDelay` would
 //  change the votes snapshot block for proposals in-progress.
 //
-// NounsDAOLogicV1Fork modifies:
+// NijiDAOLogicV1Fork modifies:
 // - The proxy pattern from Compound's old Transparent-like proxy, to OpenZeppelin's recommended UUPS pattern.
 //
 // - `propose`
@@ -59,7 +59,7 @@
 // - Modified MIN_VOTING_PERIOD, MAX_VOTING_PERIOD to correct block numbers assuming 12 second blocks
 // - Modified MAX_VOTING_DELAY to be 2 weeks
 //
-// NounsDAOLogicV1 adds:
+// NijiDAOLogicV1 adds:
 // - Proposal Threshold basis points instead of fixed number
 //   due to the Noun token's increasing supply
 //
@@ -82,7 +82,7 @@
 //   The `veto(uint proposalId)` logic is a modified version of `cancel(uint proposalId)`
 //   A `vetoed` flag was added to the `Proposal` struct to support this.
 //
-// NounsDAOLogicV1 removes:
+// NijiDAOLogicV1 removes:
 // - `initialProposalId` and `_initiate()` due to this being the
 //   first instance of the governance contract unlike
 //   GovernorBravo which upgrades GovernorAlpha
@@ -95,14 +95,14 @@
 pragma solidity ^0.8.19;
 
 import { UUPSUpgradeable } from '@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol';
-import { NounsDAOEventsFork } from './NounsDAOEventsFork.sol';
-import { NounsDAOStorageV1Fork } from './NounsDAOStorageV1Fork.sol';
-import { NounsDAOExecutorV2 } from '../../../NounsDAOExecutorV2.sol';
+import { NijiDAOEventsFork } from './NijiDAOEventsFork.sol';
+import { NijiDAOStorageV1Fork } from './NijiDAOStorageV1Fork.sol';
+import { NijiDAOExecutorV2 } from '../../../NijiDAOExecutorV2.sol';
 import { INounsTokenForkLike } from './INounsTokenForkLike.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { ReentrancyGuardUpgradeable } from '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 
-contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, NounsDAOStorageV1Fork, NounsDAOEventsFork {
+contract NijiDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, NijiDAOStorageV1Fork, NijiDAOEventsFork {
     error AdminOnly();
     error WaitingForTokensToClaimOrExpiration();
     error TokensMustBeASubsetOfWhitelistedTokens();
@@ -113,7 +113,7 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
     event Quit(address indexed msgSender, uint256[] tokenIds);
 
     /// @notice The name of this contract
-    string public constant name = 'Nouns DAO';
+    string public constant name = 'Niji DAO';
 
     /// @notice The minimum setable proposal threshold
     uint256 public constant MIN_PROPOSAL_THRESHOLD_BPS = 1; // 1 basis point or 0.01%
@@ -155,7 +155,7 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
      * @notice Used to initialize the contract during delegator constructor
      * @dev Not asserting that param values are within the hard-coded bounds in order to make it easier to run
      * manual tests; seems a safe decision since we assume fork DAOs are initialized by `ForkDAODeployer`
-     * @param timelock_ The address of the NounsDAOExecutor
+     * @param timelock_ The address of the NijiDAOExecutor
      * @param nouns_ The address of the NOUN tokens
      * @param votingPeriod_ The initial voting period
      * @param votingDelay_ The initial voting delay
@@ -175,9 +175,9 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
         uint256 delayedGovernanceExpirationTimestamp_
     ) public virtual {
         __ReentrancyGuard_init_unchained();
-        require(address(timelock) == address(0), 'NounsDAO::initialize: can only initialize once');
-        require(timelock_ != address(0), 'NounsDAO::initialize: invalid timelock address');
-        require(nouns_ != address(0), 'NounsDAO::initialize: invalid nouns address');
+        require(address(timelock) == address(0), 'NijiDAO::initialize: can only initialize once');
+        require(timelock_ != address(0), 'NijiDAO::initialize: invalid timelock address');
+        require(nouns_ != address(0), 'NijiDAO::initialize: invalid nouns address');
 
         emit VotingPeriodSet(votingPeriod, votingPeriod_);
         emit VotingDelaySet(votingDelay, votingDelay_);
@@ -185,7 +185,7 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
         emit QuorumVotesBPSSet(quorumVotesBPS, quorumVotesBPS_);
 
         admin = timelock_;
-        timelock = NounsDAOExecutorV2(payable(timelock_));
+        timelock = NijiDAOExecutorV2(payable(timelock_));
         nouns = INounsTokenForkLike(nouns_);
         votingPeriod = votingPeriod_;
         votingDelay = votingDelay_;
@@ -290,27 +290,27 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
 
         require(
             nouns.getPriorVotes(msg.sender, block.number - 1) > temp.proposalThreshold,
-            'NounsDAO::propose: proposer votes below proposal threshold'
+            'NijiDAO::propose: proposer votes below proposal threshold'
         );
         require(
             targets.length == values.length &&
                 targets.length == signatures.length &&
                 targets.length == calldatas.length,
-            'NounsDAO::propose: proposal function information arity mismatch'
+            'NijiDAO::propose: proposal function information arity mismatch'
         );
-        require(targets.length != 0, 'NounsDAO::propose: must provide actions');
-        require(targets.length <= proposalMaxOperations, 'NounsDAO::propose: too many actions');
+        require(targets.length != 0, 'NijiDAO::propose: must provide actions');
+        require(targets.length <= proposalMaxOperations, 'NijiDAO::propose: too many actions');
 
         temp.latestProposalId = latestProposalIds[msg.sender];
         if (temp.latestProposalId != 0) {
             ProposalState proposersLatestProposalState = state(temp.latestProposalId);
             require(
                 proposersLatestProposalState != ProposalState.Active,
-                'NounsDAO::propose: one live proposal per proposer, found an already active proposal'
+                'NijiDAO::propose: one live proposal per proposer, found an already active proposal'
             );
             require(
                 proposersLatestProposalState != ProposalState.Pending,
-                'NounsDAO::propose: one live proposal per proposer, found an already pending proposal'
+                'NijiDAO::propose: one live proposal per proposer, found an already pending proposal'
             );
         }
 
@@ -394,7 +394,7 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
     function queue(uint256 proposalId) external {
         require(
             state(proposalId) == ProposalState.Succeeded,
-            'NounsDAO::queue: proposal can only be queued if it is succeeded'
+            'NijiDAO::queue: proposal can only be queued if it is succeeded'
         );
         Proposal storage proposal = _proposals[proposalId];
         uint256 eta = block.timestamp + timelock.delay();
@@ -420,7 +420,7 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
     ) internal {
         require(
             !timelock.queuedTransactions(keccak256(abi.encode(target, value, signature, data, eta))),
-            'NounsDAO::queueOrRevertInternal: identical proposal action already queued at eta'
+            'NijiDAO::queueOrRevertInternal: identical proposal action already queued at eta'
         );
         timelock.queueTransaction(target, value, signature, data, eta);
     }
@@ -432,7 +432,7 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
     function execute(uint256 proposalId) external {
         require(
             state(proposalId) == ProposalState.Queued,
-            'NounsDAO::execute: proposal can only be executed if it is queued'
+            'NijiDAO::execute: proposal can only be executed if it is queued'
         );
         Proposal storage proposal = _proposals[proposalId];
         proposal.executed = true;
@@ -453,13 +453,13 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
      * @param proposalId The id of the proposal to cancel
      */
     function cancel(uint256 proposalId) external {
-        require(state(proposalId) != ProposalState.Executed, 'NounsDAO::cancel: cannot cancel executed proposal');
+        require(state(proposalId) != ProposalState.Executed, 'NijiDAO::cancel: cannot cancel executed proposal');
 
         Proposal storage proposal = _proposals[proposalId];
         require(
             msg.sender == proposal.proposer ||
                 nouns.getPriorVotes(proposal.proposer, block.number - 1) <= proposal.proposalThreshold,
-            'NounsDAO::cancel: proposer above threshold'
+            'NijiDAO::cancel: proposer above threshold'
         );
 
         proposal.canceled = true;
@@ -514,7 +514,7 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
      * @return Proposal state
      */
     function state(uint256 proposalId) public view returns (ProposalState) {
-        require(proposalCount >= proposalId, 'NounsDAO::state: invalid proposal id');
+        require(proposalCount >= proposalId, 'NijiDAO::state: invalid proposal id');
         Proposal storage proposal = _proposals[proposalId];
         if (proposal.canceled) {
             return ProposalState.Canceled;
@@ -602,7 +602,7 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
         bytes32 structHash = keccak256(abi.encode(BALLOT_TYPEHASH, proposalId, support));
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', domainSeparator, structHash));
         address signatory = ecrecover(digest, v, r, s);
-        require(signatory != address(0), 'NounsDAO::castVoteBySig: invalid signature');
+        require(signatory != address(0), 'NijiDAO::castVoteBySig: invalid signature');
         emit VoteCast(signatory, proposalId, support, castVoteInternal(signatory, proposalId, support), '');
     }
 
@@ -618,11 +618,11 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
         uint256 proposalId,
         uint8 support
     ) internal returns (uint96) {
-        require(state(proposalId) == ProposalState.Active, 'NounsDAO::castVoteInternal: voting is closed');
-        require(support <= 2, 'NounsDAO::castVoteInternal: invalid vote type');
+        require(state(proposalId) == ProposalState.Active, 'NijiDAO::castVoteInternal: voting is closed');
+        require(support <= 2, 'NijiDAO::castVoteInternal: invalid vote type');
         Proposal storage proposal = _proposals[proposalId];
         Receipt storage receipt = proposal.receipts[voter];
-        require(receipt.hasVoted == false, 'NounsDAO::castVoteInternal: voter already voted');
+        require(receipt.hasVoted == false, 'NijiDAO::castVoteInternal: voter already voted');
 
         /// @notice: Unlike GovernerBravo, votes are considered from the block the proposal was created in order to normalize quorumVotes and proposalThreshold metrics
         uint96 votes = nouns.getPriorVotes(voter, proposal.creationBlock);
@@ -647,10 +647,10 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
      * @param newVotingDelay new voting delay, in blocks
      */
     function _setVotingDelay(uint256 newVotingDelay) external {
-        require(msg.sender == admin, 'NounsDAO::_setVotingDelay: admin only');
+        require(msg.sender == admin, 'NijiDAO::_setVotingDelay: admin only');
         require(
             newVotingDelay >= MIN_VOTING_DELAY && newVotingDelay <= MAX_VOTING_DELAY,
-            'NounsDAO::_setVotingDelay: invalid voting delay'
+            'NijiDAO::_setVotingDelay: invalid voting delay'
         );
         uint256 oldVotingDelay = votingDelay;
         votingDelay = newVotingDelay;
@@ -663,10 +663,10 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
      * @param newVotingPeriod new voting period, in blocks
      */
     function _setVotingPeriod(uint256 newVotingPeriod) external {
-        require(msg.sender == admin, 'NounsDAO::_setVotingPeriod: admin only');
+        require(msg.sender == admin, 'NijiDAO::_setVotingPeriod: admin only');
         require(
             newVotingPeriod >= MIN_VOTING_PERIOD && newVotingPeriod <= MAX_VOTING_PERIOD,
-            'NounsDAO::_setVotingPeriod: invalid voting period'
+            'NijiDAO::_setVotingPeriod: invalid voting period'
         );
         uint256 oldVotingPeriod = votingPeriod;
         votingPeriod = newVotingPeriod;
@@ -680,11 +680,11 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
      * @param newProposalThresholdBPS new proposal threshold
      */
     function _setProposalThresholdBPS(uint256 newProposalThresholdBPS) external {
-        require(msg.sender == admin, 'NounsDAO::_setProposalThresholdBPS: admin only');
+        require(msg.sender == admin, 'NijiDAO::_setProposalThresholdBPS: admin only');
         require(
             newProposalThresholdBPS >= MIN_PROPOSAL_THRESHOLD_BPS &&
                 newProposalThresholdBPS <= MAX_PROPOSAL_THRESHOLD_BPS,
-            'NounsDAO::_setProposalThreshold: invalid proposal threshold'
+            'NijiDAO::_setProposalThreshold: invalid proposal threshold'
         );
         uint256 oldProposalThresholdBPS = proposalThresholdBPS;
         proposalThresholdBPS = newProposalThresholdBPS;
@@ -698,10 +698,10 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
      * @param newQuorumVotesBPS new proposal threshold
      */
     function _setQuorumVotesBPS(uint256 newQuorumVotesBPS) external {
-        require(msg.sender == admin, 'NounsDAO::_setQuorumVotesBPS: admin only');
+        require(msg.sender == admin, 'NijiDAO::_setQuorumVotesBPS: admin only');
         require(
             newQuorumVotesBPS >= MIN_QUORUM_VOTES_BPS && newQuorumVotesBPS <= MAX_QUORUM_VOTES_BPS,
-            'NounsDAO::_setQuorumVotesBPS: invalid quorum votes basis points'
+            'NijiDAO::_setQuorumVotesBPS: invalid quorum votes basis points'
         );
         uint256 oldQuorumVotesBPS = quorumVotesBPS;
         quorumVotesBPS = newQuorumVotesBPS;
@@ -716,7 +716,7 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
      */
     function _setPendingAdmin(address newPendingAdmin) external {
         // Check caller = admin
-        require(msg.sender == admin, 'NounsDAO::_setPendingAdmin: admin only');
+        require(msg.sender == admin, 'NijiDAO::_setPendingAdmin: admin only');
 
         // Save current value, if any, for inclusion in log
         address oldPendingAdmin = pendingAdmin;
@@ -734,7 +734,7 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
      */
     function _acceptAdmin() external {
         // Check caller is pendingAdmin and pendingAdmin ≠ address(0)
-        require(msg.sender == pendingAdmin && msg.sender != address(0), 'NounsDAO::_acceptAdmin: pending admin only');
+        require(msg.sender == pendingAdmin && msg.sender != address(0), 'NijiDAO::_acceptAdmin: pending admin only');
 
         // Save current values for inclusion in log
         address oldAdmin = admin;
@@ -791,7 +791,7 @@ contract NounsDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Nou
     }
 
     function _authorizeUpgrade(address) internal view override {
-        require(msg.sender == admin, 'NounsDAO::_authorizeUpgrade: admin only');
+        require(msg.sender == admin, 'NijiDAO::_authorizeUpgrade: admin only');
     }
 
     function checkForDuplicates(address[] calldata erc20tokens) internal pure {

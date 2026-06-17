@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-/// @title The Nouns DAO logic version 4
+/// @title The Niji DAO logic version 4
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -16,7 +16,7 @@
  *********************************/
 
 // LICENSE
-// NounsDAOLogicV2.sol is a modified version of Compound Lab's GovernorBravoDelegate.sol:
+// NijiDAOLogicV2.sol is a modified version of Compound Lab's GovernorBravoDelegate.sol:
 // https://github.com/compound-finance/compound-protocol/blob/b9b14038612d846b83f8a009a82c38974ff2dcfe/contracts/Governance/GovernorBravoDelegate.sol
 //
 // GovernorBravoDelegate.sol source code Copyright 2020 Compound Labs, Inc. licensed under the BSD-3-Clause license.
@@ -25,10 +25,10 @@
 // Additional conditions of BSD-3-Clause can be found here: https://opensource.org/licenses/BSD-3-Clause
 //
 // MODIFICATIONS
-// See NounsDAOLogicV1 for initial GovernorBravoDelegate modifications.
-// See NounsDAOLogicV2 for additional modifications
+// See NijiDAOLogicV1 for initial GovernorBravoDelegate modifications.
+// See NijiDAOLogicV2 for additional modifications
 //
-// NounsDAOLogicV3 adds:
+// NijiDAOLogicV3 adds:
 // - Contract has been broken down to use libraries because of contract size limitations
 // - Proposal editing: allowing proposers to update their proposal’s transactions and text description,
 // during the Updatable period only, which is the state upon proposal creation. Editing also works with signatures,
@@ -41,8 +41,8 @@
 // Only against votes are possible during the objection period.
 // - Votes snapshot after voting delay: moving votes snapshot up, to provide Nouners with reaction time per proposal,
 // to get their votes ready (e.g. some might want to move their delegations around).
-// In NounsDAOLogicV2 the vote snapshot block is the proposal creation block.
-// - Nouns fork: any token holder can signal to fork (exit) in response to a governance proposal.
+// In NijiDAOLogicV2 the vote snapshot block is the proposal creation block.
+// - Niji fork: any token holder can signal to fork (exit) in response to a governance proposal.
 // If a quorum of a configured threshold amount of tokens signals to exit, the fork will succeed.
 // This will deploy a new DAO and send part of the treasury to the new DAO.
 //
@@ -55,20 +55,20 @@
 
 pragma solidity ^0.8.19;
 
-import './NounsDAOInterfaces.sol';
-import { NounsDAOAdmin } from './NounsDAOAdmin.sol';
-import { NounsDAODynamicQuorum } from './NounsDAODynamicQuorum.sol';
-import { NounsDAOVotes } from './NounsDAOVotes.sol';
-import { NounsDAOProposals } from './NounsDAOProposals.sol';
-import { NounsDAOFork } from './fork/NounsDAOFork.sol';
+import './NijiDAOInterfaces.sol';
+import { NijiDAOAdmin } from './NijiDAOAdmin.sol';
+import { NijiDAODynamicQuorum } from './NijiDAODynamicQuorum.sol';
+import { NijiDAOVotes } from './NijiDAOVotes.sol';
+import { NijiDAOProposals } from './NijiDAOProposals.sol';
+import { NijiDAOFork } from './fork/NijiDAOFork.sol';
 import { Address } from '@openzeppelin/contracts/utils/Address.sol';
 
-contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
-    using NounsDAOAdmin for Storage;
-    using NounsDAODynamicQuorum for Storage;
-    using NounsDAOVotes for Storage;
-    using NounsDAOProposals for Storage;
-    using NounsDAOFork for Storage;
+contract NijiDAOLogicV4 is NijiDAOStorage, NijiDAOEventsV3 {
+    using NijiDAOAdmin for Storage;
+    using NijiDAODynamicQuorum for Storage;
+    using NijiDAOVotes for Storage;
+    using NijiDAOProposals for Storage;
+    using NijiDAOFork for Storage;
 
     /**
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -78,37 +78,37 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
 
     /// @notice The minimum setable proposal threshold
     function MIN_PROPOSAL_THRESHOLD_BPS() public pure returns (uint256) {
-        return NounsDAOAdmin.MIN_PROPOSAL_THRESHOLD_BPS;
+        return NijiDAOAdmin.MIN_PROPOSAL_THRESHOLD_BPS;
     }
 
     /// @notice The maximum setable proposal threshold
     function MAX_PROPOSAL_THRESHOLD_BPS() public pure returns (uint256) {
-        return NounsDAOAdmin.MAX_PROPOSAL_THRESHOLD_BPS;
+        return NijiDAOAdmin.MAX_PROPOSAL_THRESHOLD_BPS;
     }
 
     /// @notice The minimum setable voting period in blocks
     function MIN_VOTING_PERIOD() public pure returns (uint256) {
-        return NounsDAOAdmin.MIN_VOTING_PERIOD_BLOCKS;
+        return NijiDAOAdmin.MIN_VOTING_PERIOD_BLOCKS;
     }
 
     /// @notice The max setable voting period in blocks
     function MAX_VOTING_PERIOD() public pure returns (uint256) {
-        return NounsDAOAdmin.MAX_VOTING_PERIOD_BLOCKS;
+        return NijiDAOAdmin.MAX_VOTING_PERIOD_BLOCKS;
     }
 
     /// @notice The min setable voting delay in blocks
     function MIN_VOTING_DELAY() public pure returns (uint256) {
-        return NounsDAOAdmin.MIN_VOTING_DELAY_BLOCKS;
+        return NijiDAOAdmin.MIN_VOTING_DELAY_BLOCKS;
     }
 
     /// @notice The max setable voting delay in blocks
     function MAX_VOTING_DELAY() public pure returns (uint256) {
-        return NounsDAOAdmin.MAX_VOTING_DELAY_BLOCKS;
+        return NijiDAOAdmin.MAX_VOTING_DELAY_BLOCKS;
     }
 
     /// @notice The maximum number of actions that can be included in a proposal
     function proposalMaxOperations() public pure returns (uint256) {
-        return NounsDAOProposals.PROPOSAL_MAX_OPERATIONS;
+        return NijiDAOProposals.PROPOSAL_MAX_OPERATIONS;
     }
 
     /**
@@ -120,7 +120,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
     error AdminOnly();
     error CanOnlyInitializeOnce();
     error InvalidTimelockAddress();
-    error InvalidNounsAddress();
+    error InvalidNijiAddress();
 
     /**
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -131,7 +131,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
     /**
      * @notice Used to initialize the contract during delegator constructor
      * @dev This will only be called for a newly deployed DAO, not as part of an upgrade from V2 to V3
-     * @param timelock_ The address of the NounsDAOExecutor
+     * @param timelock_ The address of the NijiDAOExecutor
      * @param nouns_ The address of the NOUN tokens
      * @param forkEscrow_ The escrow contract used for creating forks
      * @param forkDAODeployer_ The contract used to deploy new forked DAOs
@@ -145,31 +145,31 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
         address forkEscrow_,
         address forkDAODeployer_,
         address vetoer_,
-        NounsDAOParams calldata daoParams_,
+        NijiDAOParams calldata daoParams_,
         DynamicQuorumParams calldata dynamicQuorumParams_
     ) public virtual {
         if (address(ds.timelock) != address(0)) revert CanOnlyInitializeOnce();
         if (msg.sender != ds.admin) revert AdminOnly();
         if (timelock_ == address(0)) revert InvalidTimelockAddress();
-        if (nouns_ == address(0)) revert InvalidNounsAddress();
+        if (nouns_ == address(0)) revert InvalidNijiAddress();
 
-        NounsDAOAdmin._setVotingPeriod(daoParams_.votingPeriod);
-        NounsDAOAdmin._setVotingDelay(daoParams_.votingDelay);
-        NounsDAOAdmin._setProposalThresholdBPS(daoParams_.proposalThresholdBPS);
-        ds.timelock = INounsDAOExecutorV2(timelock_);
-        ds.nouns = NounsTokenLike(nouns_);
-        ds.forkEscrow = INounsDAOForkEscrow(forkEscrow_);
+        NijiDAOAdmin._setVotingPeriod(daoParams_.votingPeriod);
+        NijiDAOAdmin._setVotingDelay(daoParams_.votingDelay);
+        NijiDAOAdmin._setProposalThresholdBPS(daoParams_.proposalThresholdBPS);
+        ds.timelock = INijiDAOExecutorV2(timelock_);
+        ds.nouns = NijiTokenLike(nouns_);
+        ds.forkEscrow = INijiDAOForkEscrow(forkEscrow_);
         ds.forkDAODeployer = IForkDAODeployer(forkDAODeployer_);
         ds.vetoer = vetoer_;
-        NounsDAOAdmin._setDynamicQuorumParams(
+        NijiDAOAdmin._setDynamicQuorumParams(
             dynamicQuorumParams_.minQuorumVotesBPS,
             dynamicQuorumParams_.maxQuorumVotesBPS,
             dynamicQuorumParams_.quorumCoefficient
         );
 
-        NounsDAOAdmin._setLastMinuteWindowInBlocks(daoParams_.lastMinuteWindowInBlocks);
-        NounsDAOAdmin._setObjectionPeriodDurationInBlocks(daoParams_.objectionPeriodDurationInBlocks);
-        NounsDAOAdmin._setProposalUpdatablePeriodInBlocks(daoParams_.proposalUpdatablePeriodInBlocks);
+        NijiDAOAdmin._setLastMinuteWindowInBlocks(daoParams_.lastMinuteWindowInBlocks);
+        NijiDAOAdmin._setObjectionPeriodDurationInBlocks(daoParams_.objectionPeriodDurationInBlocks);
+        NijiDAOAdmin._setProposalUpdatablePeriodInBlocks(daoParams_.proposalUpdatablePeriodInBlocks);
     }
 
     /**
@@ -215,7 +215,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
         string memory description,
         uint32 clientId
     ) public returns (uint256) {
-        return ds.propose(NounsDAOProposals.ProposalTxs(targets, values, signatures, calldatas), description, clientId);
+        return ds.propose(NijiDAOProposals.ProposalTxs(targets, values, signatures, calldatas), description, clientId);
     }
 
     /**
@@ -238,7 +238,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
     ) public returns (uint256) {
         return
             ds.proposeOnTimelockV1(
-                NounsDAOProposals.ProposalTxs(targets, values, signatures, calldatas),
+                NijiDAOProposals.ProposalTxs(targets, values, signatures, calldatas),
                 description,
                 0
             );
@@ -266,7 +266,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
     ) public returns (uint256) {
         return
             ds.proposeOnTimelockV1(
-                NounsDAOProposals.ProposalTxs(targets, values, signatures, calldatas),
+                NijiDAOProposals.ProposalTxs(targets, values, signatures, calldatas),
                 description,
                 clientId
             );
@@ -276,7 +276,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
      * @notice Function used to propose a new proposal. Sender and signers must have delegates above the proposal threshold
      * Signers are regarded as co-proposers, and therefore have the ability to cancel the proposal at any time.
      * @param proposerSignatures Array of signers who have signed the proposal and their signatures.
-     * @dev The signatures follow EIP-712. See `PROPOSAL_TYPEHASH` in NounsDAOProposals.sol
+     * @dev The signatures follow EIP-712. See `PROPOSAL_TYPEHASH` in NijiDAOProposals.sol
      * @param targets Target addresses for proposal calls
      * @param values Eth values for proposal calls
      * @param signatures Function signatures for proposal calls
@@ -299,7 +299,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
      * @notice Function used to propose a new proposal. Sender and signers must have delegates above the proposal threshold
      * Signers are regarded as co-proposers, and therefore have the ability to cancel the proposal at any time.
      * @param proposerSignatures Array of signers who have signed the proposal and their signatures.
-     * @dev The signatures follow EIP-712. See `PROPOSAL_TYPEHASH` in NounsDAOProposals.sol
+     * @dev The signatures follow EIP-712. See `PROPOSAL_TYPEHASH` in NijiDAOProposals.sol
      * @param targets Target addresses for proposal calls
      * @param values Eth values for proposal calls
      * @param signatures Function signatures for proposal calls
@@ -320,7 +320,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
         return
             ds.proposeBySigs(
                 proposerSignatures,
-                NounsDAOProposals.ProposalTxs(targets, values, signatures, calldatas),
+                NijiDAOProposals.ProposalTxs(targets, values, signatures, calldatas),
                 description,
                 clientId
             );
@@ -404,7 +404,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
      * Requires the original signers to sign the update.
      * @param proposalId Proposal's id
      * @param proposerSignatures Array of signers who have signed the proposal and their signatures.
-     * @dev The signatures follow EIP-712. See `UPDATE_PROPOSAL_TYPEHASH` in NounsDAOProposals.sol
+     * @dev The signatures follow EIP-712. See `UPDATE_PROPOSAL_TYPEHASH` in NijiDAOProposals.sol
      * @param targets Updated target addresses for proposal calls
      * @param values Updated eth values for proposal calls
      * @param signatures Updated function signatures for proposal calls
@@ -425,7 +425,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
         ds.updateProposalBySigs(
             proposalId,
             proposerSignatures,
-            NounsDAOProposals.ProposalTxs(targets, values, signatures, calldatas),
+            NijiDAOProposals.ProposalTxs(targets, values, signatures, calldatas),
             description,
             updateMessage
         );
@@ -504,7 +504,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
      * @param proposalId the proposal id to get the data for
      * @return A `ProposalCondensed` struct with the proposal data, backwards compatible with V1 and V2
      */
-    function proposals(uint256 proposalId) external view returns (NounsDAOTypes.ProposalCondensedV2 memory) {
+    function proposals(uint256 proposalId) external view returns (NijiDAOTypes.ProposalCondensedV2 memory) {
         return ds.proposals(proposalId);
     }
 
@@ -563,7 +563,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
      */
 
     /**
-     * @notice Escrow Nouns to contribute to the fork threshold
+     * @notice Escrow Niji to contribute to the fork threshold
      * @dev Requires approving the tokenIds or the entire noun token to the DAO contract
      * @param tokenIds the tokenIds to escrow. They will be sent to the DAO once the fork threshold is reached and the escrow is closed.
      * @param proposalIds array of proposal ids which are the reason for wanting to fork. This will only be used to emit event.
@@ -578,7 +578,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
     }
 
     /**
-     * @notice Withdraw Nouns from the fork escrow. Only possible if the fork has not been executed.
+     * @notice Withdraw Niji from the fork escrow. Only possible if the fork has not been executed.
      * Only allowed to withdraw tokens that the sender has escrowed.
      * @param tokenIds the tokenIds to withdraw
      */
@@ -612,8 +612,8 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
      * @dev Only the DAO can call this function
      * @param tokenIds the tokenIds to withdraw
      */
-    function withdrawDAONounsFromEscrowToTreasury(uint256[] calldata tokenIds) external {
-        ds.withdrawDAONounsFromEscrowToTreasury(tokenIds);
+    function withdrawDAONijiFromEscrowToTreasury(uint256[] calldata tokenIds) external {
+        ds.withdrawDAONijiFromEscrowToTreasury(tokenIds);
     }
 
     /**
@@ -622,8 +622,8 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
      * @param tokenIds the tokenIds to withdraw
      * @param to the address to send the nouns to
      */
-    function withdrawDAONounsFromEscrowIncreasingTotalSupply(uint256[] calldata tokenIds, address to) external {
-        ds.withdrawDAONounsFromEscrowIncreasingTotalSupply(tokenIds, to);
+    function withdrawDAONijiFromEscrowIncreasingTotalSupply(uint256[] calldata tokenIds, address to) external {
+        ds.withdrawDAONijiFromEscrowIncreasingTotalSupply(tokenIds, to);
     }
 
     /**
@@ -756,10 +756,10 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
     }
 
     /**
-     * @dev All other calls are called via NounsDAOAdmin
+     * @dev All other calls are called via NijiDAOAdmin
      */
     fallback(bytes calldata) external payable returns (bytes memory) {
-        return Address.functionDelegateCall(address(NounsDAOAdmin), msg.data);
+        return Address.functionDelegateCall(address(NijiDAOAdmin), msg.data);
     }
 
     /**
@@ -784,7 +784,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
      *       quorumCoefficient * againstVotesBPS
      * @dev Note the coefficient is a fixed point integer with 6 decimals
      * @param againstVotes Number of against-votes in the proposal
-     * @param adjustedTotalSupply_ The adjusted total supply of Nouns at the time of proposal creation
+     * @param adjustedTotalSupply_ The adjusted total supply of Niji at the time of proposal creation
      * @param params Configurable parameters for calculating the quorum based on againstVotes. See `DynamicQuorumParams` definition for additional details.
      * @return quorumVotes The required quorum
      */
@@ -793,7 +793,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
         uint256 adjustedTotalSupply_,
         DynamicQuorumParams memory params
     ) public pure returns (uint256) {
-        return NounsDAODynamicQuorum.dynamicQuorumVotes(againstVotes, adjustedTotalSupply_, params);
+        return NijiDAODynamicQuorum.dynamicQuorumVotes(againstVotes, adjustedTotalSupply_, params);
     }
 
     /**
@@ -808,14 +808,14 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
     }
 
     /**
-     * @notice Current min quorum votes using Nouns adjusted total supply
+     * @notice Current min quorum votes using Niji adjusted total supply
      */
     function minQuorumVotes() public view returns (uint256) {
         return ds.minQuorumVotes(ds.adjustedTotalSupply());
     }
 
     /**
-     * @notice Current max quorum votes using Nouns adjusted total supply
+     * @notice Current max quorum votes using Niji adjusted total supply
      */
     function maxQuorumVotes() public view returns (uint256) {
         return ds.maxQuorumVotes(ds.adjustedTotalSupply());
@@ -873,11 +873,11 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
         return ds.proposalCount;
     }
 
-    function timelock() public view returns (INounsDAOExecutor) {
+    function timelock() public view returns (INijiDAOExecutor) {
         return ds.timelock;
     }
 
-    function nouns() public view returns (NounsTokenLike) {
+    function nouns() public view returns (NijiTokenLike) {
         return ds.nouns;
     }
 
@@ -897,7 +897,7 @@ contract NounsDAOLogicV4 is NounsDAOStorage, NounsDAOEventsV3 {
         return ds.erc20TokensToIncludeInFork;
     }
 
-    function forkEscrow() public view returns (INounsDAOForkEscrow) {
+    function forkEscrow() public view returns (INijiDAOForkEscrow) {
         return ds.forkEscrow;
     }
 

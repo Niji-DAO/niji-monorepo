@@ -2,15 +2,15 @@
 
 pragma solidity ^0.8.19;
 
-import '../governance/NounsDAOLogicV4.sol';
-import { NounsDAOAdmin } from '../governance/NounsDAOAdmin.sol';
+import '../governance/NijiDAOLogicV4.sol';
+import { NijiDAOAdmin } from '../governance/NijiDAOAdmin.sol';
 
 /**
- * @dev A modified version of NounsDAOLogicV4 that exposes the `initialize` function for testing purposes.
+ * @dev A modified version of NijiDAOLogicV4 that exposes the `initialize` function for testing purposes.
  * The modification removes bounds checks on parameters, so we can dramatically shorten test scenarios setup.
  */
-contract NounsDAOLogicV3Harness is NounsDAOLogicV4 {
-    using NounsDAOAdmin for Storage;
+contract NijiDAOLogicV3Harness is NijiDAOLogicV4 {
+    using NijiDAOAdmin for Storage;
 
     function initialize(
         address timelock_,
@@ -18,29 +18,29 @@ contract NounsDAOLogicV3Harness is NounsDAOLogicV4 {
         address forkEscrow_,
         address forkDAODeployer_,
         address vetoer_,
-        NounsDAOParams calldata daoParams_,
+        NijiDAOParams calldata daoParams_,
         DynamicQuorumParams calldata dynamicQuorumParams_
     ) public override {
         if (address(ds.timelock) != address(0)) revert CanOnlyInitializeOnce();
         if (msg.sender != ds.admin) revert AdminOnly();
         if (timelock_ == address(0)) revert InvalidTimelockAddress();
-        if (nouns_ == address(0)) revert InvalidNounsAddress();
+        if (nouns_ == address(0)) revert InvalidNijiAddress();
 
         ds.votingPeriod = daoParams_.votingPeriod;
         ds.votingDelay = daoParams_.votingDelay;
         ds.proposalThresholdBPS = daoParams_.proposalThresholdBPS;
-        ds.timelock = INounsDAOExecutorV2(timelock_);
-        ds.nouns = NounsTokenLike(nouns_);
-        ds.forkEscrow = INounsDAOForkEscrow(forkEscrow_);
+        ds.timelock = INijiDAOExecutorV2(timelock_);
+        ds.nouns = NijiTokenLike(nouns_);
+        ds.forkEscrow = INijiDAOForkEscrow(forkEscrow_);
         ds.forkDAODeployer = IForkDAODeployer(forkDAODeployer_);
         ds.vetoer = vetoer_;
-        NounsDAOAdmin._setDynamicQuorumParams(
+        NijiDAOAdmin._setDynamicQuorumParams(
             dynamicQuorumParams_.minQuorumVotesBPS,
             dynamicQuorumParams_.maxQuorumVotesBPS,
             dynamicQuorumParams_.quorumCoefficient
         );
-        NounsDAOAdmin._setLastMinuteWindowInBlocks(daoParams_.lastMinuteWindowInBlocks);
-        NounsDAOAdmin._setObjectionPeriodDurationInBlocks(daoParams_.objectionPeriodDurationInBlocks);
-        NounsDAOAdmin._setProposalUpdatablePeriodInBlocks(daoParams_.proposalUpdatablePeriodInBlocks);
+        NijiDAOAdmin._setLastMinuteWindowInBlocks(daoParams_.lastMinuteWindowInBlocks);
+        NijiDAOAdmin._setObjectionPeriodDurationInBlocks(daoParams_.objectionPeriodDurationInBlocks);
+        NijiDAOAdmin._setProposalUpdatablePeriodInBlocks(daoParams_.proposalUpdatablePeriodInBlocks);
     }
 }

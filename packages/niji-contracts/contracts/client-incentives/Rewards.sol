@@ -17,9 +17,9 @@
 
 pragma solidity ^0.8.19;
 
-import { INounsDAOLogic } from '../interfaces/INounsDAOLogic.sol';
-import { INounsAuctionHouseV2 } from '../interfaces/INounsAuctionHouseV2.sol';
-import { NounsDAOTypes } from '../governance/NounsDAOInterfaces.sol';
+import { INijiDAOLogic } from '../interfaces/INijiDAOLogic.sol';
+import { INijiAuctionHouseV2 } from '../interfaces/INijiAuctionHouseV2.sol';
+import { NijiDAOTypes } from '../governance/NijiDAOInterfaces.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { UUPSUpgradeable } from '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
 import { SafeERC20 } from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
@@ -80,11 +80,11 @@ contract Rewards is
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
      */
 
-    /// @notice Nouns DAO proxy contract
-    INounsDAOLogic public immutable nounsDAO;
+    /// @notice Niji DAO proxy contract
+    INijiDAOLogic public immutable nounsDAO;
 
-    /// @notice Nouns Auction House proxy contract
-    INounsAuctionHouseV2 public immutable auctionHouse;
+    /// @notice Niji Auction House proxy contract
+    INijiAuctionHouseV2 public immutable auctionHouse;
 
     /**
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -162,8 +162,8 @@ contract Rewards is
     }
 
     constructor(address nounsDAO_, address auctionHouse_) initializer {
-        nounsDAO = INounsDAOLogic(nounsDAO_);
-        auctionHouse = INounsAuctionHouseV2(auctionHouse_);
+        nounsDAO = INijiDAOLogic(nounsDAO_);
+        auctionHouse = INijiAuctionHouseV2(auctionHouse_);
     }
 
     /**
@@ -174,7 +174,7 @@ contract Rewards is
      */
     function initialize(address owner, address admin_, address ethToken_, address descriptor_) public initializer {
         __Pausable_init_unchained();
-        __ERC721_init('Nouns Client Token', 'NOUNSCLIENT');
+        __ERC721_init('Niji Client Token', 'NOUNSCLIENT');
 
         RewardsStorage storage $ = _getRewardsStorage();
         $.nextTokenId = 1;
@@ -252,12 +252,12 @@ contract Rewards is
 
         $.nextAuctionIdToReward = lastNounId + 1;
 
-        INounsAuctionHouseV2.Settlement[] memory settlements = auctionHouse.getSettlements(
+        INijiAuctionHouseV2.Settlement[] memory settlements = auctionHouse.getSettlements(
             nextAuctionIdToReward_,
             lastNounId + 1,
             true
         );
-        INounsAuctionHouseV2.Settlement memory lastSettlement = settlements[settlements.length - 1];
+        INijiAuctionHouseV2.Settlement memory lastSettlement = settlements[settlements.length - 1];
         if (!(lastSettlement.nounId == lastNounId && lastSettlement.blockTimestamp > 1))
             revert LastNounIdMustBeSettled();
 
@@ -267,7 +267,7 @@ contract Rewards is
         });
 
         for (uint256 i; i < settlements.length; ++i) {
-            INounsAuctionHouseV2.Settlement memory settlement = settlements[i];
+            INijiAuctionHouseV2.Settlement memory settlement = settlements[i];
             if (settlement.clientId != 0 && settlement.clientId <= maxClientId) {
                 sawValidClientId = true;
                 m.inc(settlement.clientId, settlement.amount);
@@ -301,7 +301,7 @@ contract Rewards is
         uint256 proposalRewardForPeriod;
         uint256 votingRewardForPeriod;
         uint256 firstAuctionIdForRevenue;
-        NounsDAOTypes.ProposalForRewards lastProposal;
+        NijiDAOTypes.ProposalForRewards lastProposal;
     }
 
     /**
@@ -340,7 +340,7 @@ contract Rewards is
         );
         require(isSortedAndNoDuplicates(votingClientIds), 'must be sorted & unique');
 
-        NounsDAOTypes.ProposalForRewards[] memory proposals = nounsDAO.proposalDataForRewards({
+        NijiDAOTypes.ProposalForRewards[] memory proposals = nounsDAO.proposalDataForRewards({
             firstProposalId: nextProposalIdToReward_,
             lastProposalId: lastProposalId,
             proposalEligibilityQuorumBps: $.proposalRewardParams.proposalEligibilityQuorumBps,
@@ -419,7 +419,7 @@ contract Rewards is
             }
 
             uint256 votesInProposal;
-            NounsDAOTypes.ClientVoteData[] memory voteData = proposals[i].voteData;
+            NijiDAOTypes.ClientVoteData[] memory voteData = proposals[i].voteData;
             for (uint256 j; j < votingClientIds.length; ++j) {
                 clientId = votingClientIds[j];
                 uint256 votes = voteData[j].votes;
@@ -500,7 +500,7 @@ contract Rewards is
         for (uint32 i; i < numClientIds; ++i) {
             allClientIds[i] = i;
         }
-        NounsDAOTypes.ProposalForRewards[] memory proposals = nounsDAO.proposalDataForRewards({
+        NijiDAOTypes.ProposalForRewards[] memory proposals = nounsDAO.proposalDataForRewards({
             firstProposalId: $.nextProposalIdToReward,
             lastProposalId: lastProposalId,
             proposalEligibilityQuorumBps: $.proposalRewardParams.proposalEligibilityQuorumBps,
@@ -536,7 +536,7 @@ contract Rewards is
         uint256 firstNounId,
         uint256 endTimestamp
     ) public view returns (uint256 sumRevenue, uint256 lastAuctionId) {
-        INounsAuctionHouseV2.Settlement[] memory s = auctionHouse.getSettlementsFromIdtoTimestamp(
+        INijiAuctionHouseV2.Settlement[] memory s = auctionHouse.getSettlementsFromIdtoTimestamp(
             firstNounId,
             endTimestamp,
             true
@@ -759,7 +759,7 @@ contract Rewards is
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
      */
 
-    function sumAuctions(INounsAuctionHouseV2.Settlement[] memory s) internal pure returns (uint256 sum) {
+    function sumAuctions(INijiAuctionHouseV2.Settlement[] memory s) internal pure returns (uint256 sum) {
         for (uint256 i = 0; i < s.length; ++i) {
             sum += s[i].amount;
         }

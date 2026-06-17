@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.19;
 
-import { NounsDAOLogicBaseTest } from '../NounsDAOLogic/NounsDAOLogicBaseTest.sol';
+import { NijiDAOLogicBaseTest } from '../NijiDAOLogic/NijiDAOLogicBaseTest.sol';
 import { Rewards } from '../../../contracts/client-incentives/Rewards.sol';
 import { NounsToken } from '../../../contracts/NounsToken.sol';
-import { INounsAuctionHouseV2 } from '../../../contracts/interfaces/INounsAuctionHouseV2.sol';
-import { NounsAuctionHouseProxy } from '../../../contracts/proxies/NounsAuctionHouseProxy.sol';
+import { INijiAuctionHouseV2 } from '../../../contracts/interfaces/INijiAuctionHouseV2.sol';
+import { NijiAuctionHouseProxy } from '../../../contracts/proxies/NijiAuctionHouseProxy.sol';
 import { ERC20Mock } from '../helpers/ERC20Mock.sol';
 import { RewardsDeployer } from '../../../script/Rewards/RewardsDeployer.sol';
 import { INounsClientTokenTypes } from '../../../contracts/client-incentives/INounsClientTokenTypes.sol';
 import { console } from 'forge-std/console.sol';
 
-abstract contract RewardsBaseTest is NounsDAOLogicBaseTest {
+abstract contract RewardsBaseTest is NijiDAOLogicBaseTest {
     Rewards rewards;
-    INounsAuctionHouseV2 auctionHouse;
+    INijiAuctionHouseV2 auctionHouse;
 
     address admin = makeAddr('admin');
     address client1Wallet = makeAddr('client1Wallet');
@@ -39,7 +39,7 @@ abstract contract RewardsBaseTest is NounsDAOLogicBaseTest {
         nounsToken = NounsToken(address(dao.nouns()));
         minter = nounsToken.minter();
 
-        auctionHouse = INounsAuctionHouseV2(minter);
+        auctionHouse = INijiAuctionHouseV2(minter);
         vm.prank(address(dao.timelock()));
         auctionHouse.unpause();
 
@@ -498,7 +498,7 @@ contract NFTFunctionsTest is RewardsBaseTest {
         nounsToken = NounsToken(address(dao.nouns()));
         minter = nounsToken.minter();
 
-        auctionHouse = INounsAuctionHouseV2(minter);
+        auctionHouse = INijiAuctionHouseV2(minter);
         vm.prank(address(dao.timelock()));
         auctionHouse.unpause();
 

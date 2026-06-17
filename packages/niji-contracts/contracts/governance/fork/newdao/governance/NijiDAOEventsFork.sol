@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.19;
 
-contract NounsDAOEventsFork {
+contract NijiDAOEventsFork {
     /// @notice An event emitted when a new proposal is created
     event ProposalCreated(
         uint256 indexed id,
@@ -42,10 +42,10 @@ contract NounsDAOEventsFork {
     /// @notice An event emitted when a proposal has been canceled
     event ProposalCanceled(uint256 indexed id);
 
-    /// @notice An event emitted when a proposal has been queued in the NounsDAOExecutor
+    /// @notice An event emitted when a proposal has been queued in the NijiDAOExecutor
     event ProposalQueued(uint256 indexed id, uint256 eta);
 
-    /// @notice An event emitted when a proposal has been executed in the NounsDAOExecutor
+    /// @notice An event emitted when a proposal has been executed in the NijiDAOExecutor
     event ProposalExecuted(uint256 indexed id);
 
     /// @notice An event emitted when the voting delay is set

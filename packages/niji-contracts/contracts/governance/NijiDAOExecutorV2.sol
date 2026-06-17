@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-/// @title The Nouns DAO executor and treasury, supporting DAO fork
+/// @title The Niji DAO executor and treasury, supporting DAO fork
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -16,7 +16,7 @@
  *********************************/
 
 // LICENSE
-// NounsDAOExecutor2.sol is a modified version of Compound Lab's Timelock.sol:
+// NijiDAOExecutor2.sol is a modified version of Compound Lab's Timelock.sol:
 // https://github.com/compound-finance/compound-protocol/blob/20abad28055a2f91df48a90f8bb6009279a4cb35/contracts/Timelock.sol
 //
 // Timelock.sol source code Copyright 2020 Compound Labs, Inc. licensed under the BSD-3-Clause license.
@@ -25,14 +25,14 @@
 // Additional conditions of BSD-3-Clause can be found here: https://opensource.org/licenses/BSD-3-Clause
 //
 // MODIFICATIONS
-// NounsDAOExecutor2.sol is a modified version of NounsDAOExecutor.sol
+// NijiDAOExecutor2.sol is a modified version of NijiDAOExecutor.sol
 //
-// NounsDAOExecutor.sol modifications:
-// NounsDAOExecutor.sol modifies Timelock to use Solidity 0.8.x receive(), fallback(), and built-in over/underflow protection
-// This contract acts as executor of Nouns DAO governance and its treasury, so it has been modified to accept ETH.
+// NijiDAOExecutor.sol modifications:
+// NijiDAOExecutor.sol modifies Timelock to use Solidity 0.8.x receive(), fallback(), and built-in over/underflow protection
+// This contract acts as executor of Niji DAO governance and its treasury, so it has been modified to accept ETH.
 //
 //
-// NounsDAOExecutor2.sol modifications:
+// NijiDAOExecutor2.sol modifications:
 // - `sendETH` and `sendERC20` functions used for DAO forks
 // - is upgradable via UUPSUpgradeable. uses initializer instead of constructor.
 // - `GRACE_PERIOD` has been increased from 14 days to 21 days to allow more time in case of a forking period
@@ -45,7 +45,7 @@ import { Initializable } from '@openzeppelin/contracts-upgradeable/proxy/utils/I
 import { UUPSUpgradeable } from '@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol';
 import { Address } from '@openzeppelin/contracts/utils/Address.sol';
 
-contract NounsDAOExecutorV2 is UUPSUpgradeable, Initializable {
+contract NijiDAOExecutorV2 is UUPSUpgradeable, Initializable {
     using SafeERC20 for IERC20;
     using Address for address payable;
 
@@ -79,7 +79,7 @@ contract NounsDAOExecutorV2 is UUPSUpgradeable, Initializable {
     event ETHSent(address indexed to, uint256 amount);
     event ERC20Sent(address indexed to, address indexed erc20Token, uint256 amount);
 
-    string public constant NAME = 'NounsDAOExecutorV2';
+    string public constant NAME = 'NijiDAOExecutorV2';
 
     /// @dev increased grace period from 14 days to 21 days to allow more time in case of a forking period
     uint256 public constant GRACE_PERIOD = 21 days;
@@ -95,24 +95,24 @@ contract NounsDAOExecutorV2 is UUPSUpgradeable, Initializable {
     constructor() initializer {}
 
     function initialize(address admin_, uint256 delay_) public virtual initializer {
-        require(delay_ >= MINIMUM_DELAY, 'NounsDAOExecutor::constructor: Delay must exceed minimum delay.');
-        require(delay_ <= MAXIMUM_DELAY, 'NounsDAOExecutor::setDelay: Delay must not exceed maximum delay.');
+        require(delay_ >= MINIMUM_DELAY, 'NijiDAOExecutor::constructor: Delay must exceed minimum delay.');
+        require(delay_ <= MAXIMUM_DELAY, 'NijiDAOExecutor::setDelay: Delay must not exceed maximum delay.');
 
         admin = admin_;
         delay = delay_;
     }
 
     function setDelay(uint256 delay_) public {
-        require(msg.sender == address(this), 'NounsDAOExecutor::setDelay: Call must come from NounsDAOExecutor.');
-        require(delay_ >= MINIMUM_DELAY, 'NounsDAOExecutor::setDelay: Delay must exceed minimum delay.');
-        require(delay_ <= MAXIMUM_DELAY, 'NounsDAOExecutor::setDelay: Delay must not exceed maximum delay.');
+        require(msg.sender == address(this), 'NijiDAOExecutor::setDelay: Call must come from NijiDAOExecutor.');
+        require(delay_ >= MINIMUM_DELAY, 'NijiDAOExecutor::setDelay: Delay must exceed minimum delay.');
+        require(delay_ <= MAXIMUM_DELAY, 'NijiDAOExecutor::setDelay: Delay must not exceed maximum delay.');
         delay = delay_;
 
         emit NewDelay(delay_);
     }
 
     function acceptAdmin() public {
-        require(msg.sender == pendingAdmin, 'NounsDAOExecutor::acceptAdmin: Call must come from pendingAdmin.');
+        require(msg.sender == pendingAdmin, 'NijiDAOExecutor::acceptAdmin: Call must come from pendingAdmin.');
         admin = msg.sender;
         pendingAdmin = address(0);
 
@@ -122,7 +122,7 @@ contract NounsDAOExecutorV2 is UUPSUpgradeable, Initializable {
     function setPendingAdmin(address pendingAdmin_) public {
         require(
             msg.sender == address(this),
-            'NounsDAOExecutor::setPendingAdmin: Call must come from NounsDAOExecutor.'
+            'NijiDAOExecutor::setPendingAdmin: Call must come from NijiDAOExecutor.'
         );
         pendingAdmin = pendingAdmin_;
 
@@ -136,10 +136,10 @@ contract NounsDAOExecutorV2 is UUPSUpgradeable, Initializable {
         bytes memory data,
         uint256 eta
     ) public returns (bytes32) {
-        require(msg.sender == admin, 'NounsDAOExecutor::queueTransaction: Call must come from admin.');
+        require(msg.sender == admin, 'NijiDAOExecutor::queueTransaction: Call must come from admin.');
         require(
             eta >= getBlockTimestamp() + delay,
-            'NounsDAOExecutor::queueTransaction: Estimated execution block must satisfy delay.'
+            'NijiDAOExecutor::queueTransaction: Estimated execution block must satisfy delay.'
         );
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
@@ -156,7 +156,7 @@ contract NounsDAOExecutorV2 is UUPSUpgradeable, Initializable {
         bytes memory data,
         uint256 eta
     ) public {
-        require(msg.sender == admin, 'NounsDAOExecutor::cancelTransaction: Call must come from admin.');
+        require(msg.sender == admin, 'NijiDAOExecutor::cancelTransaction: Call must come from admin.');
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
         queuedTransactions[txHash] = false;
@@ -171,17 +171,17 @@ contract NounsDAOExecutorV2 is UUPSUpgradeable, Initializable {
         bytes memory data,
         uint256 eta
     ) public returns (bytes memory) {
-        require(msg.sender == admin, 'NounsDAOExecutor::executeTransaction: Call must come from admin.');
+        require(msg.sender == admin, 'NijiDAOExecutor::executeTransaction: Call must come from admin.');
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
-        require(queuedTransactions[txHash], "NounsDAOExecutor::executeTransaction: Transaction hasn't been queued.");
+        require(queuedTransactions[txHash], "NijiDAOExecutor::executeTransaction: Transaction hasn't been queued.");
         require(
             getBlockTimestamp() >= eta,
-            "NounsDAOExecutor::executeTransaction: Transaction hasn't surpassed time lock."
+            "NijiDAOExecutor::executeTransaction: Transaction hasn't surpassed time lock."
         );
         require(
             getBlockTimestamp() <= eta + GRACE_PERIOD,
-            'NounsDAOExecutor::executeTransaction: Transaction is stale.'
+            'NijiDAOExecutor::executeTransaction: Transaction is stale.'
         );
 
         queuedTransactions[txHash] = false;
@@ -196,7 +196,7 @@ contract NounsDAOExecutorV2 is UUPSUpgradeable, Initializable {
 
         // solium-disable-next-line security/no-call-value
         (bool success, bytes memory returnData) = target.call{ value: value }(callData);
-        require(success, 'NounsDAOExecutor::executeTransaction: Transaction execution reverted.');
+        require(success, 'NijiDAOExecutor::executeTransaction: Transaction execution reverted.');
 
         emit ExecuteTransaction(txHash, target, value, signature, data, eta);
 
@@ -213,7 +213,7 @@ contract NounsDAOExecutorV2 is UUPSUpgradeable, Initializable {
     fallback() external payable {}
 
     function sendETH(address payable recipient, uint256 ethToSend) external {
-        require(msg.sender == admin, 'NounsDAOExecutor::sendETH: Call must come from admin.');
+        require(msg.sender == admin, 'NijiDAOExecutor::sendETH: Call must come from admin.');
 
         recipient.sendValue(ethToSend);
 
@@ -225,7 +225,7 @@ contract NounsDAOExecutorV2 is UUPSUpgradeable, Initializable {
         address erc20Token,
         uint256 tokensToSend
     ) external {
-        require(msg.sender == admin, 'NounsDAOExecutor::sendERC20: Call must come from admin.');
+        require(msg.sender == admin, 'NijiDAOExecutor::sendERC20: Call must come from admin.');
 
         IERC20(erc20Token).safeTransfer(recipient, tokensToSend);
 
@@ -245,7 +245,7 @@ contract NounsDAOExecutorV2 is UUPSUpgradeable, Initializable {
     function _authorizeUpgrade(address) internal view override {
         require(
             msg.sender == address(this),
-            'NounsDAOExecutor::_authorizeUpgrade: Call must come from NounsDAOExecutor.'
+            'NijiDAOExecutor::_authorizeUpgrade: Call must come from NijiDAOExecutor.'
         );
     }
 }

@@ -2,18 +2,18 @@
 pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
-import { NounsDAOLogicBaseTest } from './NounsDAOLogicBaseTest.sol';
+import { NijiDAOLogicBaseTest } from './NijiDAOLogicBaseTest.sol';
 import { DeployUtils } from '../helpers/DeployUtils.sol';
 import { SigUtils, ERC1271Stub } from '../helpers/SigUtils.sol';
-import { NounsDAOProposals } from '../../../contracts/governance/NounsDAOProposals.sol';
-import { NounsDAOProxyV3 } from '../../../contracts/governance/NounsDAOProxyV3.sol';
-import { NounsDAOTypes } from '../../../contracts/governance/NounsDAOInterfaces.sol';
+import { NijiDAOProposals } from '../../../contracts/governance/NijiDAOProposals.sol';
+import { NijiDAOProxyV3 } from '../../../contracts/governance/NijiDAOProxyV3.sol';
+import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 import { NounsToken } from '../../../contracts/NounsToken.sol';
 import { NounsSeeder } from '../../../contracts/NounsSeeder.sol';
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
-import { NounsDAOExecutor } from '../../../contracts/governance/NounsDAOExecutor.sol';
+import { NijiDAOExecutor } from '../../../contracts/governance/NijiDAOExecutor.sol';
 
-abstract contract UpdateProposalBaseTest is NounsDAOLogicBaseTest {
+abstract contract UpdateProposalBaseTest is NijiDAOLogicBaseTest {
     address proposer = makeAddr('proposer');
     uint256 proposalId;
 
@@ -34,25 +34,25 @@ abstract contract UpdateProposalBaseTest is NounsDAOLogicBaseTest {
 
 contract UpdateProposalPermissionsTest is UpdateProposalBaseTest {
     function test_givenProposalDoesntExist_reverts() public {
-        vm.expectRevert('NounsDAO::state: invalid proposal id');
+        vm.expectRevert('NijiDAO::state: invalid proposal id');
         updateProposal(proposer, proposalId + 1, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert('NounsDAO::state: invalid proposal id');
+        vm.expectRevert('NijiDAO::state: invalid proposal id');
         updateProposalTransactions(proposer, proposalId + 1, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert('NounsDAO::state: invalid proposal id');
+        vm.expectRevert('NijiDAO::state: invalid proposal id');
         vm.prank(proposer);
         dao.updateProposalDescription(proposalId + 1, '', '');
     }
 
     function test_givenMsgSenderNotProposer_reverts() public {
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.OnlyProposerCanEdit.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.OnlyProposerCanEdit.selector));
         updateProposal(makeAddr('not proposer'), proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.OnlyProposerCanEdit.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.OnlyProposerCanEdit.selector));
         updateProposalTransactions(makeAddr('not proposer'), proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.OnlyProposerCanEdit.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.OnlyProposerCanEdit.selector));
         vm.prank(makeAddr('not proposer'));
         dao.updateProposalDescription(proposalId, '', '');
     }
@@ -76,13 +76,13 @@ contract UpdateProposalPermissionsTest is UpdateProposalBaseTest {
             expirationTimestamp
         );
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.ProposerCannotUpdateProposalWithSigners.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.ProposerCannotUpdateProposalWithSigners.selector));
         updateProposal(proposer, propId, makeAddr('target'), 1, '', '', 'description');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.ProposerCannotUpdateProposalWithSigners.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.ProposerCannotUpdateProposalWithSigners.selector));
         updateProposalTransactions(proposer, propId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.ProposerCannotUpdateProposalWithSigners.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.ProposerCannotUpdateProposalWithSigners.selector));
         vm.prank(proposer);
         dao.updateProposalDescription(propId, '', '');
     }
@@ -90,27 +90,27 @@ contract UpdateProposalPermissionsTest is UpdateProposalBaseTest {
     function test_givenStatesPendingActiveSucceededQueuedAndExecuted_reverts() public {
         // Pending
         vm.roll(block.number + proposalUpdatablePeriodInBlocks);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Pending);
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Pending);
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposal(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposalTransactions(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         vm.prank(proposer);
         dao.updateProposalDescription(proposalId, '', '');
 
         // Active
         vm.roll(block.number + VOTING_DELAY);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Active);
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Active);
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposal(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposalTransactions(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         vm.prank(proposer);
         dao.updateProposalDescription(proposalId, '', '');
 
@@ -118,41 +118,41 @@ contract UpdateProposalPermissionsTest is UpdateProposalBaseTest {
         vm.prank(proposer);
         dao.castVote(proposalId, 1);
         vm.roll(block.number + VOTING_PERIOD);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Succeeded);
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Succeeded);
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposal(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposalTransactions(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         vm.prank(proposer);
         dao.updateProposalDescription(proposalId, '', '');
 
         // Queued
         dao.queue(proposalId);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Queued);
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Queued);
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposal(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposalTransactions(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         vm.prank(proposer);
         dao.updateProposalDescription(proposalId, '', '');
 
         // Executed
         vm.warp(block.timestamp + TIMELOCK_DELAY);
         dao.execute(proposalId);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Executed);
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Executed);
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposal(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposalTransactions(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         vm.prank(proposer);
         dao.updateProposalDescription(proposalId, '', '');
     }
@@ -160,15 +160,15 @@ contract UpdateProposalPermissionsTest is UpdateProposalBaseTest {
     function test_givenStateCanceled_reverts() public {
         vm.prank(proposer);
         dao.cancel(proposalId);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Canceled);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Canceled);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposal(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposalTransactions(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         vm.prank(proposer);
         dao.updateProposalDescription(proposalId, '', '');
     }
@@ -178,15 +178,15 @@ contract UpdateProposalPermissionsTest is UpdateProposalBaseTest {
         vm.prank(proposer);
         dao.castVote(proposalId, 0);
         vm.roll(block.number + VOTING_PERIOD);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Defeated);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Defeated);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposal(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposalTransactions(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         vm.prank(proposer);
         dao.updateProposalDescription(proposalId, '', '');
     }
@@ -198,15 +198,15 @@ contract UpdateProposalPermissionsTest is UpdateProposalBaseTest {
         vm.roll(block.number + VOTING_PERIOD);
         dao.queue(proposalId);
         vm.warp(block.timestamp + TIMELOCK_DELAY + timelock.GRACE_PERIOD());
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Expired);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Expired);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposal(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposalTransactions(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         vm.prank(proposer);
         dao.updateProposalDescription(proposalId, '', '');
     }
@@ -214,15 +214,15 @@ contract UpdateProposalPermissionsTest is UpdateProposalBaseTest {
     function test_givenStateVetoed_reverts() public {
         vm.prank(vetoer);
         dao.veto(proposalId);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Vetoed);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Vetoed);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposal(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposalTransactions(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         vm.prank(proposer);
         dao.updateProposalDescription(proposalId, '', '');
     }
@@ -234,15 +234,15 @@ contract UpdateProposalPermissionsTest is UpdateProposalBaseTest {
         vm.prank(proposer);
         dao.castVote(proposalId, 1);
         vm.roll(block.number + lastMinuteWindowInBlocks);
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.ObjectionPeriod);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.ObjectionPeriod);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposal(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         updateProposalTransactions(proposer, proposalId, makeAddr('target'), 0, '', '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.CanOnlyEditUpdatableProposals.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.CanOnlyEditUpdatableProposals.selector));
         vm.prank(proposer);
         dao.updateProposalDescription(proposalId, '', '');
     }
@@ -259,11 +259,11 @@ contract UpdateProposalTransactionsTest is UpdateProposalBaseTest {
         string[] memory signatures = new string[](0);
         bytes[] memory calldatas = new bytes[](0);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.MustProvideActions.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.MustProvideActions.selector));
         vm.prank(proposer);
         dao.updateProposal(proposalId, targets, values, signatures, calldatas, '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.MustProvideActions.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.MustProvideActions.selector));
         vm.prank(proposer);
         dao.updateProposalTransactions(proposalId, targets, values, signatures, calldatas, '');
     }
@@ -280,11 +280,11 @@ contract UpdateProposalTransactionsTest is UpdateProposalBaseTest {
             calldatas[i] = '';
         }
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.TooManyActions.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.TooManyActions.selector));
         vm.prank(proposer);
         dao.updateProposal(proposalId, targets, values, signatures, calldatas, '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.TooManyActions.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.TooManyActions.selector));
         vm.prank(proposer);
         dao.updateProposalTransactions(proposalId, targets, values, signatures, calldatas, '');
     }
@@ -296,17 +296,17 @@ contract UpdateProposalTransactionsTest is UpdateProposalBaseTest {
         string[] memory signatures = new string[](0);
         bytes[] memory calldatas = new bytes[](0);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.ProposalInfoArityMismatch.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.ProposalInfoArityMismatch.selector));
         vm.prank(proposer);
         dao.updateProposal(proposalId, targets, values, signatures, calldatas, '', '');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.ProposalInfoArityMismatch.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.ProposalInfoArityMismatch.selector));
         vm.prank(proposer);
         dao.updateProposalTransactions(proposalId, targets, values, signatures, calldatas, '');
     }
 
     function test_givenStateUpdatable_updateProposal_updatesTxsAndEmitsEvent() public {
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Updatable);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Updatable);
         (
             address[] memory targetsBefore,
             uint256[] memory valuesBefore,
@@ -317,7 +317,7 @@ contract UpdateProposalTransactionsTest is UpdateProposalBaseTest {
         assertEq(valuesBefore[0], 0);
         assertEq(signaturesBefore[0], '');
         assertEq(calldatasBefore[0], '');
-        NounsDAOProposals.ProposalTxs memory txsAfter = makeTxs(
+        NijiDAOProposals.ProposalTxs memory txsAfter = makeTxs(
             makeAddr('targetAfter'),
             1,
             'signatureAfter',
@@ -359,7 +359,7 @@ contract UpdateProposalTransactionsTest is UpdateProposalBaseTest {
     }
 
     function test_givenStateUpdatable_updateProposalTransactions_updatesTxsAndEmitsEvent() public {
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Updatable);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Updatable);
         (
             address[] memory targetsBefore,
             uint256[] memory valuesBefore,
@@ -370,7 +370,7 @@ contract UpdateProposalTransactionsTest is UpdateProposalBaseTest {
         assertEq(valuesBefore[0], 0);
         assertEq(signaturesBefore[0], '');
         assertEq(calldatasBefore[0], '');
-        NounsDAOProposals.ProposalTxs memory txsAfter = makeTxs(
+        NijiDAOProposals.ProposalTxs memory txsAfter = makeTxs(
             makeAddr('targetAfter'),
             1,
             'signatureAfter',
@@ -412,7 +412,7 @@ contract UpdateProposalTransactionsTest is UpdateProposalBaseTest {
 
 contract UpdateProposalDescriptionTest is UpdateProposalBaseTest {
     function test_givenStateUpdatable_updatesDescriptionAndEmitsEvent() public {
-        assertTrue(dao.state(proposalId) == NounsDAOTypes.ProposalState.Updatable);
+        assertTrue(dao.state(proposalId) == NijiDAOTypes.ProposalState.Updatable);
 
         vm.expectEmit(true, true, true, true);
         emit ProposalDescriptionUpdated(proposalId, proposer, 'new description', 'update message');

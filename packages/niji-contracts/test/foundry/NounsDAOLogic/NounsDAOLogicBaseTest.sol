@@ -5,17 +5,17 @@ import 'forge-std/Test.sol';
 import { DeployUtilsV3 } from '../helpers/DeployUtilsV3.sol';
 import { SigUtils, ERC1271Stub } from '../helpers/SigUtils.sol';
 import { ProxyRegistryMock } from '../helpers/ProxyRegistryMock.sol';
-import { NounsDAOProposals } from '../../../contracts/governance/NounsDAOProposals.sol';
-import { NounsDAOProxyV3 } from '../../../contracts/governance/NounsDAOProxyV3.sol';
-import { NounsDAOTypes } from '../../../contracts/governance/NounsDAOInterfaces.sol';
+import { NijiDAOProposals } from '../../../contracts/governance/NijiDAOProposals.sol';
+import { NijiDAOProxyV3 } from '../../../contracts/governance/NijiDAOProxyV3.sol';
+import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 import { NounsToken } from '../../../contracts/NounsToken.sol';
 import { NounsSeeder } from '../../../contracts/NounsSeeder.sol';
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
-import { NounsDAOExecutorV2 } from '../../../contracts/governance/NounsDAOExecutorV2.sol';
-import { NounsDAOForkEscrow } from '../../../contracts/governance/fork/NounsDAOForkEscrow.sol';
-import { INounsDAOLogic } from '../../../contracts/interfaces/INounsDAOLogic.sol';
+import { NijiDAOExecutorV2 } from '../../../contracts/governance/NijiDAOExecutorV2.sol';
+import { NijiDAOForkEscrow } from '../../../contracts/governance/fork/NijiDAOForkEscrow.sol';
+import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
 
-abstract contract NounsDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
+abstract contract NijiDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
     event ProposalUpdated(
         uint256 indexed id,
         address indexed proposer,
@@ -66,8 +66,8 @@ abstract contract NounsDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
     );
 
     NounsToken nounsToken;
-    INounsDAOLogic dao;
-    NounsDAOExecutorV2 timelock;
+    INijiDAOLogic dao;
+    NijiDAOExecutorV2 timelock;
 
     address noundersDAO = makeAddr('nounders');
     address minter;
@@ -81,7 +81,7 @@ abstract contract NounsDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
         dao = _deployDAOV3();
         nounsToken = NounsToken(address(dao.nouns()));
         minter = nounsToken.minter();
-        timelock = NounsDAOExecutorV2(payable(address(dao.timelock())));
+        timelock = NijiDAOExecutorV2(payable(address(dao.timelock())));
         forkEscrow = address(dao.forkEscrow());
     }
 
@@ -193,7 +193,7 @@ abstract contract NounsDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
         address proposer,
         address signer,
         uint256 signerPK,
-        NounsDAOProposals.ProposalTxs memory txs,
+        NijiDAOProposals.ProposalTxs memory txs,
         string memory description,
         uint256 expirationTimestamp
     ) internal returns (uint256 proposalId) {
@@ -212,12 +212,12 @@ abstract contract NounsDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
         address[] memory signers,
         uint256[] memory signerPKs,
         uint256[] memory expirationTimestamps,
-        NounsDAOProposals.ProposalTxs memory txs,
+        NijiDAOProposals.ProposalTxs memory txs,
         string memory description
     ) internal returns (uint256 proposalId) {
-        NounsDAOTypes.ProposerSignature[] memory sigs = new NounsDAOTypes.ProposerSignature[](signers.length);
+        NijiDAOTypes.ProposerSignature[] memory sigs = new NijiDAOTypes.ProposerSignature[](signers.length);
         for (uint256 i = 0; i < signers.length; ++i) {
-            sigs[i] = NounsDAOTypes.ProposerSignature(
+            sigs[i] = NijiDAOTypes.ProposerSignature(
                 signProposal(proposer, signerPKs[i], txs, description, expirationTimestamps[i], address(dao)),
                 signers[i],
                 expirationTimestamps[i]
@@ -234,12 +234,12 @@ abstract contract NounsDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
         address[] memory signers,
         uint256[] memory signerPKs,
         uint256[] memory expirationTimestamps,
-        NounsDAOProposals.ProposalTxs memory txs,
+        NijiDAOProposals.ProposalTxs memory txs,
         string memory description
     ) internal {
-        NounsDAOTypes.ProposerSignature[] memory sigs = new NounsDAOTypes.ProposerSignature[](signers.length);
+        NijiDAOTypes.ProposerSignature[] memory sigs = new NijiDAOTypes.ProposerSignature[](signers.length);
         for (uint256 i = 0; i < signers.length; ++i) {
-            sigs[i] = NounsDAOTypes.ProposerSignature(
+            sigs[i] = NijiDAOTypes.ProposerSignature(
                 signProposal(proposer, signerPKs[i], txs, description, expirationTimestamps[i], address(dao)),
                 signers[i],
                 expirationTimestamps[i]
@@ -264,7 +264,7 @@ abstract contract NounsDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
         uint256 value,
         string memory signature,
         bytes memory data
-    ) internal pure returns (NounsDAOProposals.ProposalTxs memory) {
+    ) internal pure returns (NijiDAOProposals.ProposalTxs memory) {
         address[] memory targets = new address[](1);
         targets[0] = target;
         uint256[] memory values = new uint256[](1);
@@ -273,11 +273,11 @@ abstract contract NounsDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
         signatures[0] = signature;
         bytes[] memory calldatas = new bytes[](1);
         calldatas[0] = data;
-        return NounsDAOProposals.ProposalTxs(targets, values, signatures, calldatas);
+        return NijiDAOProposals.ProposalTxs(targets, values, signatures, calldatas);
     }
 
     function expectNewPropEvents(
-        NounsDAOProposals.ProposalTxs memory txs,
+        NijiDAOProposals.ProposalTxs memory txs,
         address expectedProposer,
         uint256 expectedPropId,
         uint256 expectedPropThreshold,

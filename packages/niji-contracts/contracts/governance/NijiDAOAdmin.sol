@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title Library for Nouns DAO Logic containing admin related functions
+/// @title Library for Niji DAO Logic containing admin related functions
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -17,11 +17,11 @@
 
 pragma solidity ^0.8.19;
 
-import './NounsDAOInterfaces.sol';
-import { NounsDAODynamicQuorum } from './NounsDAODynamicQuorum.sol';
+import './NijiDAOInterfaces.sol';
+import { NijiDAODynamicQuorum } from './NijiDAODynamicQuorum.sol';
 
-library NounsDAOAdmin {
-    using NounsDAODynamicQuorum for NounsDAOTypes.Storage;
+library NijiDAOAdmin {
+    using NijiDAODynamicQuorum for NijiDAOTypes.Storage;
 
     error AdminOnly();
     error VetoerOnly();
@@ -156,7 +156,7 @@ library NounsDAOAdmin {
     function _setVotingDelay(uint256 newVotingDelay) external onlyAdmin {
         require(
             newVotingDelay >= MIN_VOTING_DELAY_BLOCKS && newVotingDelay <= MAX_VOTING_DELAY_BLOCKS,
-            'NounsDAO::_setVotingDelay: invalid voting delay'
+            'NijiDAO::_setVotingDelay: invalid voting delay'
         );
         uint256 oldVotingDelay = ds().votingDelay;
         ds().votingDelay = newVotingDelay;
@@ -171,7 +171,7 @@ library NounsDAOAdmin {
     function _setVotingPeriod(uint256 newVotingPeriod) external onlyAdmin {
         require(
             newVotingPeriod >= MIN_VOTING_PERIOD_BLOCKS && newVotingPeriod <= MAX_VOTING_PERIOD_BLOCKS,
-            'NounsDAO::_setVotingPeriod: invalid voting period'
+            'NijiDAO::_setVotingPeriod: invalid voting period'
         );
         uint256 oldVotingPeriod = ds().votingPeriod;
         ds().votingPeriod = newVotingPeriod;
@@ -188,7 +188,7 @@ library NounsDAOAdmin {
         require(
             newProposalThresholdBPS >= MIN_PROPOSAL_THRESHOLD_BPS &&
                 newProposalThresholdBPS <= MAX_PROPOSAL_THRESHOLD_BPS,
-            'NounsDAO::_setProposalThreshold: invalid proposal threshold bps'
+            'NijiDAO::_setProposalThreshold: invalid proposal threshold bps'
         );
         uint256 oldProposalThresholdBPS = ds().proposalThresholdBPS;
         ds().proposalThresholdBPS = newProposalThresholdBPS;
@@ -259,7 +259,7 @@ library NounsDAOAdmin {
         // Check caller is pendingAdmin and pendingAdmin ≠ address(0)
         require(
             msg.sender == ds().pendingAdmin && msg.sender != address(0),
-            'NounsDAO::_acceptAdmin: pending admin only'
+            'NijiDAO::_acceptAdmin: pending admin only'
         );
 
         // Save current values for inclusion in log
@@ -313,7 +313,7 @@ library NounsDAOAdmin {
      */
     function _burnVetoPower() public {
         // Check caller is vetoer
-        require(msg.sender == ds().vetoer, 'NounsDAO::_burnVetoPower: vetoer only');
+        require(msg.sender == ds().vetoer, 'NijiDAO::_burnVetoPower: vetoer only');
 
         // Update vetoer to 0x0
         emit NewVetoer(ds().vetoer, address(0));
@@ -331,16 +331,16 @@ library NounsDAOAdmin {
      *     Must be lower than or equal to maxQuorumVotesBPS
      */
     function _setMinQuorumVotesBPS(uint16 newMinQuorumVotesBPS) external onlyAdmin {
-        NounsDAOTypes.DynamicQuorumParams memory params = ds().getDynamicQuorumParamsAt(block.number);
+        NijiDAOTypes.DynamicQuorumParams memory params = ds().getDynamicQuorumParamsAt(block.number);
 
         require(
             newMinQuorumVotesBPS >= MIN_QUORUM_VOTES_BPS_LOWER_BOUND &&
                 newMinQuorumVotesBPS <= MIN_QUORUM_VOTES_BPS_UPPER_BOUND,
-            'NounsDAO::_setMinQuorumVotesBPS: invalid min quorum votes bps'
+            'NijiDAO::_setMinQuorumVotesBPS: invalid min quorum votes bps'
         );
         require(
             newMinQuorumVotesBPS <= params.maxQuorumVotesBPS,
-            'NounsDAO::_setMinQuorumVotesBPS: min quorum votes bps greater than max'
+            'NijiDAO::_setMinQuorumVotesBPS: min quorum votes bps greater than max'
         );
 
         uint16 oldMinQuorumVotesBPS = params.minQuorumVotesBPS;
@@ -358,15 +358,15 @@ library NounsDAOAdmin {
      *     Must be higher than or equal to minQuorumVotesBPS
      */
     function _setMaxQuorumVotesBPS(uint16 newMaxQuorumVotesBPS) external onlyAdmin {
-        NounsDAOTypes.DynamicQuorumParams memory params = ds().getDynamicQuorumParamsAt(block.number);
+        NijiDAOTypes.DynamicQuorumParams memory params = ds().getDynamicQuorumParamsAt(block.number);
 
         require(
             newMaxQuorumVotesBPS <= MAX_QUORUM_VOTES_BPS_UPPER_BOUND,
-            'NounsDAO::_setMaxQuorumVotesBPS: invalid max quorum votes bps'
+            'NijiDAO::_setMaxQuorumVotesBPS: invalid max quorum votes bps'
         );
         require(
             params.minQuorumVotesBPS <= newMaxQuorumVotesBPS,
-            'NounsDAO::_setMaxQuorumVotesBPS: min quorum votes bps greater than max'
+            'NijiDAO::_setMaxQuorumVotesBPS: min quorum votes bps greater than max'
         );
 
         uint16 oldMaxQuorumVotesBPS = params.maxQuorumVotesBPS;
@@ -382,7 +382,7 @@ library NounsDAOAdmin {
      * @param newQuorumCoefficient the new coefficient, as a fixed point integer with 6 decimals
      */
     function _setQuorumCoefficient(uint32 newQuorumCoefficient) external onlyAdmin {
-        NounsDAOTypes.DynamicQuorumParams memory params = ds().getDynamicQuorumParamsAt(block.number);
+        NijiDAOTypes.DynamicQuorumParams memory params = ds().getDynamicQuorumParamsAt(block.number);
 
         uint32 oldQuorumCoefficient = params.quorumCoefficient;
         params.quorumCoefficient = newQuorumCoefficient;
@@ -420,9 +420,9 @@ library NounsDAOAdmin {
             revert MinQuorumBPSGreaterThanMaxQuorumBPS();
         }
 
-        NounsDAOTypes.DynamicQuorumParams memory oldParams = ds().getDynamicQuorumParamsAt(block.number);
+        NijiDAOTypes.DynamicQuorumParams memory oldParams = ds().getDynamicQuorumParamsAt(block.number);
 
-        NounsDAOTypes.DynamicQuorumParams memory params = NounsDAOTypes.DynamicQuorumParams({
+        NijiDAOTypes.DynamicQuorumParams memory params = NijiDAOTypes.DynamicQuorumParams({
             minQuorumVotesBPS: newMinQuorumVotesBPS,
             maxQuorumVotesBPS: newMaxQuorumVotesBPS,
             quorumCoefficient: newQuorumCoefficient
@@ -473,7 +473,7 @@ library NounsDAOAdmin {
     function _setForkEscrow(address newForkEscrow) public onlyAdmin {
         emit ForkEscrowSet(address(ds().forkEscrow), newForkEscrow);
 
-        ds().forkEscrow = INounsDAOForkEscrow(newForkEscrow);
+        ds().forkEscrow = INijiDAOForkEscrow(newForkEscrow);
     }
 
     function _setForkPeriod(uint256 newForkPeriod) public onlyAdmin {
@@ -529,8 +529,8 @@ library NounsDAOAdmin {
      * @param admin the new admin address
      */
     function _setTimelocksAndAdmin(address timelock, address timelockV1, address admin) external onlyAdmin {
-        ds().timelock = INounsDAOExecutorV2(timelock);
-        ds().timelockV1 = INounsDAOExecutor(timelockV1);
+        ds().timelock = INijiDAOExecutorV2(timelock);
+        ds().timelockV1 = INijiDAOExecutor(timelockV1);
         ds().admin = admin;
 
         emit TimelocksAndAdminSet(timelock, timelockV1, admin);
@@ -545,14 +545,14 @@ library NounsDAOAdmin {
         ds().voteSnapshotBlockSwitchProposalId = 0;
     }
 
-    function _writeQuorumParamsCheckpoint(NounsDAOTypes.DynamicQuorumParams memory params) internal {
+    function _writeQuorumParamsCheckpoint(NijiDAOTypes.DynamicQuorumParams memory params) internal {
         uint32 blockNumber = safe32(block.number, 'block number exceeds 32 bits');
         uint256 pos = ds().quorumParamsCheckpoints.length;
         if (pos > 0 && ds().quorumParamsCheckpoints[pos - 1].fromBlock == blockNumber) {
             ds().quorumParamsCheckpoints[pos - 1].params = params;
         } else {
             ds().quorumParamsCheckpoints.push(
-                NounsDAOTypes.DynamicQuorumParamsCheckpoint({ fromBlock: blockNumber, params: params })
+                NijiDAOTypes.DynamicQuorumParamsCheckpoint({ fromBlock: blockNumber, params: params })
             );
         }
     }
@@ -578,7 +578,7 @@ library NounsDAOAdmin {
      * since the DAO no longer makes explicit calls to this library.
      * This function assumes the storage struct starts at slot 0.
      */
-    function ds() internal pure returns (NounsDAOTypes.Storage storage ds_) {
+    function ds() internal pure returns (NijiDAOTypes.Storage storage ds_) {
         assembly {
             ds_.slot := 0
         }

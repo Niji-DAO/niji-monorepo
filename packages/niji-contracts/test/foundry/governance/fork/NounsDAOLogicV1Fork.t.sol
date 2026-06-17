@@ -7,27 +7,27 @@ import 'forge-std/Base.sol';
 import { DeployUtilsFork } from '../../helpers/DeployUtilsFork.sol';
 import { NounsToken } from '../../../../contracts/NounsToken.sol';
 import { NounsTokenFork } from '../../../../contracts/governance/fork/newdao/token/NounsTokenFork.sol';
-import { NounsDAOExecutorV2 } from '../../../../contracts/governance/NounsDAOExecutorV2.sol';
-import { NounsDAOLogicV1Fork } from '../../../../contracts/governance/fork/newdao/governance/NounsDAOLogicV1Fork.sol';
-import { NounsDAOStorageV1Fork } from '../../../../contracts/governance/fork/newdao/governance/NounsDAOStorageV1Fork.sol';
-import { NounsDAOForkEscrowMock } from '../../helpers/NounsDAOForkEscrowMock.sol';
+import { NijiDAOExecutorV2 } from '../../../../contracts/governance/NijiDAOExecutorV2.sol';
+import { NijiDAOLogicV1Fork } from '../../../../contracts/governance/fork/newdao/governance/NijiDAOLogicV1Fork.sol';
+import { NijiDAOStorageV1Fork } from '../../../../contracts/governance/fork/newdao/governance/NijiDAOStorageV1Fork.sol';
+import { NijiDAOForkEscrowMock } from '../../helpers/NijiDAOForkEscrowMock.sol';
 import { NounsTokenLikeMock } from '../../helpers/NounsTokenLikeMock.sol';
-import { NounsTokenLike } from '../../../../contracts/governance/NounsDAOInterfaces.sol';
+import { NounsTokenLike } from '../../../../contracts/governance/NijiDAOInterfaces.sol';
 import { ERC20Mock, IERC20Receiver } from '../../helpers/ERC20Mock.sol';
 import { MaliciousForkDAOQuitter } from '../../helpers/MaliciousForkDAOQuitter.sol';
-import { NounsAuctionHouse } from '../../../../contracts/NounsAuctionHouse.sol';
-import { INounsAuctionHouse } from '../../../../contracts/interfaces/INounsAuctionHouse.sol';
-import { INounsDAOLogic } from '../../../../contracts/interfaces/INounsDAOLogic.sol';
+import { NijiAuctionHouse } from '../../../../contracts/NijiAuctionHouse.sol';
+import { INijiAuctionHouse } from '../../../../contracts/interfaces/INijiAuctionHouse.sol';
+import { INijiDAOLogic } from '../../../../contracts/interfaces/INijiDAOLogic.sol';
 
-abstract contract NounsDAOLogicV1ForkBase is DeployUtilsFork {
-    NounsDAOLogicV1Fork dao;
+abstract contract NijiDAOLogicV1ForkBase is DeployUtilsFork {
+    NijiDAOLogicV1Fork dao;
     address timelock;
     NounsTokenFork token;
     address proposer = makeAddr('proposer');
 
     function setUp() public virtual {
         (address treasuryAddress, address tokenAddress, address daoAddress) = _deployForkDAO();
-        dao = NounsDAOLogicV1Fork(daoAddress);
+        dao = NijiDAOLogicV1Fork(daoAddress);
         token = NounsTokenFork(tokenAddress);
         timelock = treasuryAddress;
 
@@ -66,7 +66,7 @@ abstract contract NounsDAOLogicV1ForkBase is DeployUtilsFork {
     }
 }
 
-contract NounsDAOLogicV1Fork_setErc20TokensToIncludeInQuit_Test is NounsDAOLogicV1ForkBase {
+contract NijiDAOLogicV1Fork_setErc20TokensToIncludeInQuit_Test is NijiDAOLogicV1ForkBase {
     event ERC20TokensToIncludeInQuitSet(address[] oldErc20Tokens, address[] newErc20tokens);
 
     function test_givenDuplicateAddressesInInput_reverts() public {
@@ -75,7 +75,7 @@ contract NounsDAOLogicV1Fork_setErc20TokensToIncludeInQuit_Test is NounsDAOLogic
         tokens[1] = address(42);
 
         vm.prank(address(dao.timelock()));
-        vm.expectRevert(NounsDAOLogicV1Fork.DuplicateTokenAddress.selector);
+        vm.expectRevert(NijiDAOLogicV1Fork.DuplicateTokenAddress.selector);
         dao._setErc20TokensToIncludeInQuit(tokens);
     }
 
@@ -107,7 +107,7 @@ contract NounsDAOLogicV1Fork_setErc20TokensToIncludeInQuit_Test is NounsDAOLogic
     }
 }
 
-contract NounsDAOLogicV1Fork_votingDelayBugFix_Test is NounsDAOLogicV1ForkBase {
+contract NijiDAOLogicV1Fork_votingDelayBugFix_Test is NijiDAOLogicV1ForkBase {
     uint256 proposalId;
     uint256 creationBlock;
 
@@ -144,7 +144,7 @@ contract NounsDAOLogicV1Fork_votingDelayBugFix_Test is NounsDAOLogicV1ForkBase {
     }
 }
 
-contract NounsDAOLogicV1Fork_cancelProposalUnderThresholdBugFix_Test is NounsDAOLogicV1ForkBase {
+contract NijiDAOLogicV1Fork_cancelProposalUnderThresholdBugFix_Test is NijiDAOLogicV1ForkBase {
     uint256 proposalId;
 
     function setUp() public override {
@@ -195,22 +195,22 @@ contract NounsDAOLogicV1Fork_cancelProposalUnderThresholdBugFix_Test is NounsDAO
         assertEq(token.getPriorVotes(proposer, block.number - 1), dao.proposalThreshold() + 1);
 
         vm.startPrank(makeAddr('not proposer'));
-        vm.expectRevert('NounsDAO::cancel: proposer above threshold');
+        vm.expectRevert('NijiDAO::cancel: proposer above threshold');
         dao.cancel(proposalId);
     }
 }
 
-abstract contract ForkWithEscrow is NounsDAOLogicV1ForkBase {
-    NounsDAOForkEscrowMock escrow;
+abstract contract ForkWithEscrow is NijiDAOLogicV1ForkBase {
+    NijiDAOForkEscrowMock escrow;
     NounsTokenLike originalToken;
-    INounsDAOLogic originalDAO;
+    INijiDAOLogic originalDAO;
 
     address owner1 = makeAddr('owner1');
 
     function setUp() public virtual override {
         originalDAO = _deployDAOV3();
         originalToken = originalDAO.nouns();
-        NounsAuctionHouse originalMinter = NounsAuctionHouse(originalToken.minter());
+        NijiAuctionHouse originalMinter = NijiAuctionHouse(originalToken.minter());
 
         // Minting original tokens
         vm.prank(address(originalDAO.timelock()));
@@ -237,15 +237,15 @@ abstract contract ForkWithEscrow is NounsDAOLogicV1ForkBase {
 
         (address treasuryAddress, address tokenAddress, address daoAddress) = _deployForkDAO(originalDAO.forkEscrow());
 
-        dao = NounsDAOLogicV1Fork(daoAddress);
+        dao = NijiDAOLogicV1Fork(daoAddress);
         token = NounsTokenFork(tokenAddress);
         timelock = treasuryAddress;
     }
 
-    function bidAndSettleAuction(NounsAuctionHouse auctionHouse, address buyer) internal {
+    function bidAndSettleAuction(NijiAuctionHouse auctionHouse, address buyer) internal {
         vm.deal(buyer, buyer.balance + 0.1 ether);
         vm.startPrank(buyer);
-        INounsAuctionHouse.Auction memory auction = getAuction(auctionHouse);
+        INijiAuctionHouse.Auction memory auction = getAuction(auctionHouse);
         uint256 newNounId = auction.nounId;
         auctionHouse.createBid{ value: 0.1 ether }(newNounId);
         vm.warp(block.timestamp + auction.endTime);
@@ -255,7 +255,7 @@ abstract contract ForkWithEscrow is NounsDAOLogicV1ForkBase {
         vm.stopPrank();
     }
 
-    function getAuction(NounsAuctionHouse auctionHouse) internal view returns (INounsAuctionHouse.Auction memory) {
+    function getAuction(NijiAuctionHouse auctionHouse) internal view returns (INijiAuctionHouse.Auction memory) {
         (
             uint256 nounId,
             uint256 amount,
@@ -265,11 +265,11 @@ abstract contract ForkWithEscrow is NounsDAOLogicV1ForkBase {
             bool settled
         ) = auctionHouse.auction();
 
-        return INounsAuctionHouse.Auction(nounId, amount, startTime, endTime, bidder, settled);
+        return INijiAuctionHouse.Auction(nounId, amount, startTime, endTime, bidder, settled);
     }
 }
 
-contract NounsDAOLogicV1Fork_DelayedGovernance_Test is ForkWithEscrow {
+contract NijiDAOLogicV1Fork_DelayedGovernance_Test is ForkWithEscrow {
     function setUp() public override {
         super.setUp();
 
@@ -291,7 +291,7 @@ contract NounsDAOLogicV1Fork_DelayedGovernance_Test is ForkWithEscrow {
         // mining one block so proposer prior votes getter sees their tokens.
         vm.roll(block.number + 1);
 
-        vm.expectRevert(NounsDAOLogicV1Fork.GovernanceBlockedDuringForkingPeriod.selector);
+        vm.expectRevert(NijiDAOLogicV1Fork.GovernanceBlockedDuringForkingPeriod.selector);
         propose();
     }
 
@@ -310,12 +310,12 @@ contract NounsDAOLogicV1Fork_DelayedGovernance_Test is ForkWithEscrow {
 
         token.setApprovalForAll(address(dao), true);
 
-        vm.expectRevert(NounsDAOLogicV1Fork.GovernanceBlockedDuringForkingPeriod.selector);
+        vm.expectRevert(NijiDAOLogicV1Fork.GovernanceBlockedDuringForkingPeriod.selector);
         dao.quit(tokens);
     }
 
     function test_propose_givenTokenToClaim_reverts() public {
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOLogicV1Fork.WaitingForTokensToClaimOrExpiration.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOLogicV1Fork.WaitingForTokensToClaimOrExpiration.selector));
         propose();
     }
 
@@ -325,7 +325,7 @@ contract NounsDAOLogicV1Fork_DelayedGovernance_Test is ForkWithEscrow {
         vm.prank(proposer);
         token.claimFromEscrow(tokens);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOLogicV1Fork.WaitingForTokensToClaimOrExpiration.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOLogicV1Fork.WaitingForTokensToClaimOrExpiration.selector));
         propose();
     }
 
@@ -366,10 +366,10 @@ contract NounsDAOLogicV1Fork_DelayedGovernance_Test is ForkWithEscrow {
 
         token.setApprovalForAll(address(dao), true);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOLogicV1Fork.WaitingForTokensToClaimOrExpiration.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOLogicV1Fork.WaitingForTokensToClaimOrExpiration.selector));
         dao.quit(tokens);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOLogicV1Fork.WaitingForTokensToClaimOrExpiration.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOLogicV1Fork.WaitingForTokensToClaimOrExpiration.selector));
         dao.quit(tokens, new address[](0));
     }
 
@@ -415,7 +415,7 @@ contract NounsDAOLogicV1Fork_DelayedGovernance_Test is ForkWithEscrow {
     }
 }
 
-contract NounsDAOLogicV1Fork_Quit_Test is NounsDAOLogicV1ForkBase {
+contract NijiDAOLogicV1Fork_Quit_Test is NijiDAOLogicV1ForkBase {
     address quitter = makeAddr('quitter');
     uint256[] quitterTokens;
     ERC20Mock token1;
@@ -439,7 +439,7 @@ contract NounsDAOLogicV1Fork_Quit_Test is NounsDAOLogicV1ForkBase {
         // Send ETH to the DAO
         vm.deal(address(dao.timelock()), ETH_BALANCE);
 
-        mintNounsToQuitter();
+        mintNijiToQuitter();
 
         ethPerNoun = ETH_BALANCE / token.totalSupply();
 
@@ -483,7 +483,7 @@ contract NounsDAOLogicV1Fork_Quit_Test is NounsDAOLogicV1ForkBase {
         address[] memory tokensToInclude = new address[](2);
         tokensToInclude[0] = address(token2);
         tokensToInclude[1] = address(token2);
-        vm.expectRevert(NounsDAOLogicV1Fork.DuplicateTokenAddress.selector);
+        vm.expectRevert(NijiDAOLogicV1Fork.DuplicateTokenAddress.selector);
         dao.quit(quitterTokens, tokensToInclude);
     }
 
@@ -502,7 +502,7 @@ contract NounsDAOLogicV1Fork_Quit_Test is NounsDAOLogicV1ForkBase {
         address[] memory tokensToInclude = new address[](2);
         tokensToInclude[0] = address(token2);
         tokensToInclude[1] = makeAddr('random addr');
-        vm.expectRevert(NounsDAOLogicV1Fork.TokensMustBeASubsetOfWhitelistedTokens.selector);
+        vm.expectRevert(NijiDAOLogicV1Fork.TokensMustBeASubsetOfWhitelistedTokens.selector);
         dao.quit(quitterTokens, tokensToInclude);
     }
 
@@ -578,7 +578,7 @@ contract NounsDAOLogicV1Fork_Quit_Test is NounsDAOLogicV1ForkBase {
         tokens.push(address(token2));
     }
 
-    function mintNounsToQuitter() internal {
+    function mintNijiToQuitter() internal {
         address minter = token.minter();
         vm.startPrank(minter);
         while (token.totalSupply() < 10) {
@@ -599,7 +599,7 @@ contract NounsDAOLogicV1Fork_Quit_Test is NounsDAOLogicV1ForkBase {
     }
 }
 
-contract NounsDAOLogicV1Fork_AdjustedTotalSupply_Test is ForkWithEscrow {
+contract NijiDAOLogicV1Fork_AdjustedTotalSupply_Test is ForkWithEscrow {
     uint256 constant TOTAL_MINTED = 20;
     uint256 constant MIN_ID_FOR_QUITTER = TOTAL_MINTED - ((2 * TOTAL_MINTED) / 10); // 20% of tokens go to quitter
 
@@ -706,7 +706,7 @@ contract MaliciousCallbackForker is IERC20Receiver, CommonBase {
             reentered = true;
 
             // Simulating joinFork on original DAO
-            address treasury = address(NounsDAOLogicV1Fork(forkDAO).timelock());
+            address treasury = address(NijiDAOLogicV1Fork(forkDAO).timelock());
             vm.deal(treasury, treasury.balance + ethPerNoun);
             vm.prank(originalDAO);
             token.claimDuringForkPeriod(address(this), tokenIdsToReenterWith);

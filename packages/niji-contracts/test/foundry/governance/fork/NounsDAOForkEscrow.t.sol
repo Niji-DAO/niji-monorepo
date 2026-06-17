@@ -3,7 +3,7 @@ pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
 
-import { NounsDAOForkEscrow, NounsTokenLike } from '../../../../contracts/governance/fork/NounsDAOForkEscrow.sol';
+import { NijiDAOForkEscrow, NounsTokenLike } from '../../../../contracts/governance/fork/NijiDAOForkEscrow.sol';
 import { ERC721Mock } from '../../helpers/ERC721Mock.sol';
 import { IERC721 } from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 
@@ -22,13 +22,13 @@ contract DAOMock {
 }
 
 abstract contract ZeroState is Test {
-    NounsDAOForkEscrow escrow;
+    NijiDAOForkEscrow escrow;
     ERC721Mock token = new ERC721Mock();
     DAOMock dao;
 
     function setUp() public virtual {
         dao = new DAOMock(token);
-        escrow = new NounsDAOForkEscrow(address(dao), address(token));
+        escrow = new NijiDAOForkEscrow(address(dao), address(token));
     }
 }
 
@@ -42,25 +42,25 @@ contract ZeroStateTest is ZeroState {
     }
 
     function test_onERC721Received_onlyNounsToken() public {
-        vm.expectRevert(NounsDAOForkEscrow.OnlyNounsToken.selector);
+        vm.expectRevert(NijiDAOForkEscrow.OnlyNounsToken.selector);
         escrow.onERC721Received(address(0), address(0), 0, '');
     }
 
     function test_onERC721Received_onlyFromDAO() public {
         token.mint(address(this), 1234);
 
-        vm.expectRevert(NounsDAOForkEscrow.OnlyDAO.selector);
+        vm.expectRevert(NijiDAOForkEscrow.OnlyDAO.selector);
         token.safeTransferFrom(address(this), address(escrow), 1234);
     }
 
     function test_returnTokensToOwner_onlyDAO() public {
-        vm.expectRevert(NounsDAOForkEscrow.OnlyDAO.selector);
+        vm.expectRevert(NijiDAOForkEscrow.OnlyDAO.selector);
         uint256[] memory tokenIds = new uint256[](0);
         escrow.returnTokensToOwner(makeAddr('user1'), tokenIds);
     }
 
     function test_closeEscrow_onlyDAO() public {
-        vm.expectRevert(NounsDAOForkEscrow.OnlyDAO.selector);
+        vm.expectRevert(NijiDAOForkEscrow.OnlyDAO.selector);
         escrow.closeEscrow();
     }
 
@@ -124,13 +124,13 @@ contract TwoUsersEscrowedStateTest is TwoUsersEscrowedState {
 
     function test_cannotUnescrowTokensOfOtherOwners() public {
         vm.prank(address(dao));
-        vm.expectRevert(NounsDAOForkEscrow.NotOwner.selector);
+        vm.expectRevert(NijiDAOForkEscrow.NotOwner.selector);
         escrow.returnTokensToOwner(user1, user2tokenIds);
     }
 
     function test_daoCannotWithdrawTokensYet() public {
         vm.prank(address(dao));
-        vm.expectRevert(NounsDAOForkEscrow.NotOwner.selector);
+        vm.expectRevert(NijiDAOForkEscrow.NotOwner.selector);
         escrow.withdrawTokens(user1tokenIds, makeAddr('timelock'));
     }
 }
@@ -187,7 +187,7 @@ contract EscrowClosedStateTest is EscrowClosedState {
 
     function test_cannotReturnTokensToOwner() public {
         vm.prank(address(dao));
-        vm.expectRevert(NounsDAOForkEscrow.NotOwner.selector);
+        vm.expectRevert(NijiDAOForkEscrow.NotOwner.selector);
         escrow.returnTokensToOwner(user2, user2tokenIds);
     }
 
@@ -231,13 +231,13 @@ contract EscrowedTokensAfterClosingStateTest is EscrowedTokensAfterClosingState 
 
     function test_cannotWithdrawTokens_fromCurrentFork() public {
         vm.prank(address(dao));
-        vm.expectRevert(NounsDAOForkEscrow.NotOwner.selector);
+        vm.expectRevert(NijiDAOForkEscrow.NotOwner.selector);
         escrow.withdrawTokens(user1tokenIds, makeAddr('timelock'));
     }
 
     function test_cannotReturnTokensToOwner_fromPreviousFork() public {
         vm.prank(address(dao));
-        vm.expectRevert(NounsDAOForkEscrow.NotOwner.selector);
+        vm.expectRevert(NijiDAOForkEscrow.NotOwner.selector);
         escrow.returnTokensToOwner(user2, user2tokenIds);
     }
 

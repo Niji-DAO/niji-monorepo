@@ -4,8 +4,8 @@ pragma solidity ^0.8.15;
 import 'forge-std/Test.sol';
 import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 import { IERC1271 } from '@openzeppelin/contracts/interfaces/IERC1271.sol';
-import { NounsDAOTypes } from '../../../contracts/governance/NounsDAOInterfaces.sol';
-import { NounsDAOProposals } from '../../../contracts/governance/NounsDAOProposals.sol';
+import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiDAOProposals } from '../../../contracts/governance/NijiDAOProposals.sol';
 
 contract SigUtils is Test {
     bytes32 public constant DOMAIN_TYPEHASH =
@@ -25,7 +25,7 @@ contract SigUtils is Test {
     struct UpdateProposalParams {
         uint256 proposalId;
         address proposer;
-        NounsDAOProposals.ProposalTxs txs;
+        NijiDAOProposals.ProposalTxs txs;
         string description;
     }
 
@@ -35,7 +35,7 @@ contract SigUtils is Test {
         uint256[] memory expirationTimestamps,
         UpdateProposalParams memory proposalParams,
         address verifyingContract
-    ) internal view returns (NounsDAOTypes.ProposerSignature[] memory sigs) {
+    ) internal view returns (NijiDAOTypes.ProposerSignature[] memory sigs) {
         return
             makeUpdateProposalSigs(
                 signers,
@@ -43,7 +43,7 @@ contract SigUtils is Test {
                 expirationTimestamps,
                 proposalParams,
                 verifyingContract,
-                'Nouns DAO'
+                'Niji DAO'
             );
     }
 
@@ -54,10 +54,10 @@ contract SigUtils is Test {
         UpdateProposalParams memory proposalParams,
         address verifyingContract,
         string memory domainName
-    ) internal view returns (NounsDAOTypes.ProposerSignature[] memory sigs) {
-        sigs = new NounsDAOTypes.ProposerSignature[](signers.length);
+    ) internal view returns (NijiDAOTypes.ProposerSignature[] memory sigs) {
+        sigs = new NijiDAOTypes.ProposerSignature[](signers.length);
         for (uint256 i = 0; i < signers.length; ++i) {
-            sigs[i] = NounsDAOTypes.ProposerSignature(
+            sigs[i] = NijiDAOTypes.ProposerSignature(
                 signProposalUpdate(
                     proposalParams.proposalId,
                     proposalParams.proposer,
@@ -78,7 +78,7 @@ contract SigUtils is Test {
         uint256 proposalId,
         address proposer,
         uint256 signerPK,
-        NounsDAOProposals.ProposalTxs memory txs,
+        NijiDAOProposals.ProposalTxs memory txs,
         string memory description,
         uint256 expirationTimestamp,
         address verifyingContract,
@@ -98,18 +98,18 @@ contract SigUtils is Test {
     function signProposal(
         address proposer,
         uint256 signerPK,
-        NounsDAOProposals.ProposalTxs memory txs,
+        NijiDAOProposals.ProposalTxs memory txs,
         string memory description,
         uint256 expirationTimestamp,
         address verifyingContract
     ) public view returns (bytes memory) {
-        return signProposal(proposer, signerPK, txs, description, expirationTimestamp, verifyingContract, 'Nouns DAO');
+        return signProposal(proposer, signerPK, txs, description, expirationTimestamp, verifyingContract, 'Niji DAO');
     }
 
     function signProposal(
         address proposer,
         uint256 signerPK,
-        NounsDAOProposals.ProposalTxs memory txs,
+        NijiDAOProposals.ProposalTxs memory txs,
         string memory description,
         uint256 expirationTimestamp,
         address verifyingContract,
@@ -148,7 +148,7 @@ contract SigUtils is Test {
 
     function calcProposalEncodeData(
         address proposer,
-        NounsDAOProposals.ProposalTxs memory txs,
+        NijiDAOProposals.ProposalTxs memory txs,
         string memory description
     ) internal pure returns (bytes memory) {
         bytes32[] memory signatureHashes = new bytes32[](txs.signatures.length);

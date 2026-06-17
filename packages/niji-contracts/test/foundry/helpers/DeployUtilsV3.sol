@@ -3,68 +3,68 @@ pragma solidity ^0.8.19;
 
 import 'forge-std/Test.sol';
 import { DeployUtils } from './DeployUtils.sol';
-import { INounsDAOLogic } from '../../../contracts/interfaces/INounsDAOLogic.sol';
-import { NounsDAOLogicV4 } from '../../../contracts/governance/NounsDAOLogicV4.sol';
-import { NounsDAOProxyV3 } from '../../../contracts/governance/NounsDAOProxyV3.sol';
-import { NounsDAOForkEscrow } from '../../../contracts/governance/fork/NounsDAOForkEscrow.sol';
-import { NounsDAOExecutorV2 } from '../../../contracts/governance/NounsDAOExecutorV2.sol';
+import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
+import { NijiDAOLogicV4 } from '../../../contracts/governance/NijiDAOLogicV4.sol';
+import { NijiDAOProxyV3 } from '../../../contracts/governance/NijiDAOProxyV3.sol';
+import { NijiDAOForkEscrow } from '../../../contracts/governance/fork/NijiDAOForkEscrow.sol';
+import { NijiDAOExecutorV2 } from '../../../contracts/governance/NijiDAOExecutorV2.sol';
 import { ERC1967Proxy } from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
-import { NounsAuctionHouseV3 } from '../../../contracts/NounsAuctionHouseV3.sol';
-import { NounsAuctionHouseProxy } from '../../../contracts/proxies/NounsAuctionHouseProxy.sol';
-import { NounsAuctionHouseProxyAdmin } from '../../../contracts/proxies/NounsAuctionHouseProxyAdmin.sol';
+import { NijiAuctionHouseV3 } from '../../../contracts/NijiAuctionHouseV3.sol';
+import { NijiAuctionHouseProxy } from '../../../contracts/proxies/NijiAuctionHouseProxy.sol';
+import { NijiAuctionHouseProxyAdmin } from '../../../contracts/proxies/NijiAuctionHouseProxyAdmin.sol';
 import { NounsToken } from '../../../contracts/NounsToken.sol';
 import { NounsSeeder } from '../../../contracts/NounsSeeder.sol';
 import { ProxyRegistryMock } from './ProxyRegistryMock.sol';
 import { ForkDAODeployer } from '../../../contracts/governance/fork/ForkDAODeployer.sol';
 import { NounsTokenFork } from '../../../contracts/governance/fork/newdao/token/NounsTokenFork.sol';
-import { NounsAuctionHouseFork } from '../../../contracts/governance/fork/newdao/NounsAuctionHouseFork.sol';
-import { NounsDAOLogicV1Fork } from '../../../contracts/governance/fork/newdao/governance/NounsDAOLogicV1Fork.sol';
-import { NounsDAOTypes } from '../../../contracts/governance/NounsDAOInterfaces.sol';
-import { INounsDAOLogic } from '../../../contracts/interfaces/INounsDAOLogic.sol';
+import { NijiAuctionHouseFork } from '../../../contracts/governance/fork/newdao/NijiAuctionHouseFork.sol';
+import { NijiDAOLogicV1Fork } from '../../../contracts/governance/fork/newdao/governance/NijiDAOLogicV1Fork.sol';
+import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
+import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
 import { INounsToken } from '../../../contracts/interfaces/INounsToken.sol';
 import { WETH } from '../../../contracts/test/WETH.sol';
 import { ChainalysisSanctionsListMock } from './ChainalysisSanctionsListMock.sol';
 
 abstract contract DeployUtilsV3 is DeployUtils {
-    NounsAuctionHouseProxyAdmin auctionHouseProxyAdmin;
+    NijiAuctionHouseProxyAdmin auctionHouseProxyAdmin;
 
     function _createDAOV3Proxy(
         address timelock,
         address nounsToken,
         address vetoer,
-        NounsDAOTypes.NounsDAOParams memory daoParams,
-        NounsDAOTypes.DynamicQuorumParams memory dqParams
-    ) internal returns (INounsDAOLogic dao) {
+        NijiDAOTypes.NijiDAOParams memory daoParams,
+        NijiDAOTypes.DynamicQuorumParams memory dqParams
+    ) internal returns (INijiDAOLogic dao) {
         uint256 nonce = vm.getNonce(address(this));
         address predictedForkEscrowAddress = computeCreateAddress(address(this), nonce + 2);
-        dao = INounsDAOLogic(
+        dao = INijiDAOLogic(
             address(
-                new NounsDAOProxyV3(
+                new NijiDAOProxyV3(
                     timelock,
                     nounsToken,
                     predictedForkEscrowAddress,
                     address(0),
                     vetoer,
                     timelock,
-                    address(new NounsDAOLogicV4()),
+                    address(new NijiDAOLogicV4()),
                     daoParams,
                     dqParams
                 )
             )
         );
-        address(new NounsDAOForkEscrow(address(dao), address(nounsToken)));
+        address(new NijiDAOForkEscrow(address(dao), address(nounsToken)));
     }
 
     function _createDAOV3Proxy(
         address timelock,
         address nounsToken,
         address vetoer
-    ) internal returns (INounsDAOLogic dao) {
+    ) internal returns (INijiDAOLogic dao) {
         dao = _createDAOV3Proxy(
             timelock,
             nounsToken,
             vetoer,
-            NounsDAOTypes.NounsDAOParams({
+            NijiDAOTypes.NijiDAOParams({
                 votingPeriod: VOTING_PERIOD,
                 votingDelay: VOTING_DELAY,
                 proposalThresholdBPS: PROPOSAL_THRESHOLD,
@@ -72,7 +72,7 @@ abstract contract DeployUtilsV3 is DeployUtils {
                 objectionPeriodDurationInBlocks: OBJECTION_PERIOD_BLOCKS,
                 proposalUpdatablePeriodInBlocks: 0
             }),
-            NounsDAOTypes.DynamicQuorumParams({
+            NijiDAOTypes.DynamicQuorumParams({
                 minQuorumVotesBPS: 200,
                 maxQuorumVotesBPS: 2000,
                 quorumCoefficient: 10000
@@ -81,23 +81,23 @@ abstract contract DeployUtilsV3 is DeployUtils {
     }
 
     struct Temp {
-        NounsDAOExecutorV2 timelock;
+        NijiDAOExecutorV2 timelock;
         NounsToken nounsToken;
     }
 
-    function _deployDAOV3WithParams(uint256 auctionDuration) internal returns (INounsDAOLogic) {
+    function _deployDAOV3WithParams(uint256 auctionDuration) internal returns (INijiDAOLogic) {
         Temp memory t;
-        t.timelock = NounsDAOExecutorV2(payable(address(new ERC1967Proxy(address(new NounsDAOExecutorV2()), ''))));
+        t.timelock = NijiDAOExecutorV2(payable(address(new ERC1967Proxy(address(new NijiDAOExecutorV2()), ''))));
         t.timelock.initialize(address(1), TIMELOCK_DELAY);
 
-        auctionHouseProxyAdmin = new NounsAuctionHouseProxyAdmin();
+        auctionHouseProxyAdmin = new NijiAuctionHouseProxyAdmin();
         address predictedTokenAddress = computeCreateAddress(address(this), vm.getNonce(address(this)) + 9);
-        NounsAuctionHouseV3 auctionHouseImpl = new NounsAuctionHouseV3(
+        NijiAuctionHouseV3 auctionHouseImpl = new NijiAuctionHouseV3(
             INounsToken(predictedTokenAddress),
             address(new WETH()),
             auctionDuration
         );
-        NounsAuctionHouseProxy auctionProxy = new NounsAuctionHouseProxy(
+        NijiAuctionHouseProxy auctionProxy = new NijiAuctionHouseProxy(
             address(auctionHouseImpl),
             address(auctionHouseProxyAdmin),
             ''
@@ -115,16 +115,16 @@ abstract contract DeployUtilsV3 is DeployUtils {
 
         require(predictedTokenAddress == address(t.nounsToken), 'Token address mismatch');
 
-        address daoLogicImplementation = address(new NounsDAOLogicV4());
+        address daoLogicImplementation = address(new NijiDAOLogicV4());
 
         uint256 nonce = vm.getNonce(address(this));
         address predictedForkEscrowAddress = computeCreateAddress(address(this), nonce + 6);
 
         ForkDAODeployer forkDeployer = new ForkDAODeployer(
             address(new NounsTokenFork()),
-            address(new NounsAuctionHouseFork()),
-            address(new NounsDAOLogicV1Fork()),
-            address(new NounsDAOExecutorV2()),
+            address(new NijiAuctionHouseFork()),
+            address(new NijiDAOLogicV1Fork()),
+            address(new NijiDAOExecutorV2()),
             DELAYED_GOV_DURATION,
             FORK_DAO_VOTING_PERIOD,
             FORK_DAO_VOTING_DELAY,
@@ -132,9 +132,9 @@ abstract contract DeployUtilsV3 is DeployUtils {
             FORK_DAO_QUORUM_VOTES_BPS
         );
 
-        INounsDAOLogic dao = INounsDAOLogic(
+        INijiDAOLogic dao = INijiDAOLogic(
             payable(
-                new NounsDAOProxyV3(
+                new NijiDAOProxyV3(
                     address(t.timelock),
                     address(t.nounsToken),
                     predictedForkEscrowAddress,
@@ -142,7 +142,7 @@ abstract contract DeployUtilsV3 is DeployUtils {
                     makeAddr('vetoer'),
                     address(t.timelock),
                     daoLogicImplementation,
-                    NounsDAOTypes.NounsDAOParams({
+                    NijiDAOTypes.NijiDAOParams({
                         votingPeriod: VOTING_PERIOD,
                         votingDelay: VOTING_DELAY,
                         proposalThresholdBPS: PROPOSAL_THRESHOLD,
@@ -150,7 +150,7 @@ abstract contract DeployUtilsV3 is DeployUtils {
                         objectionPeriodDurationInBlocks: OBJECTION_PERIOD_BLOCKS,
                         proposalUpdatablePeriodInBlocks: UPDATABLE_PERIOD_BLOCKS
                     }),
-                    NounsDAOTypes.DynamicQuorumParams({
+                    NijiDAOTypes.DynamicQuorumParams({
                         minQuorumVotesBPS: 200,
                         maxQuorumVotesBPS: 2000,
                         quorumCoefficient: 10000
@@ -159,12 +159,12 @@ abstract contract DeployUtilsV3 is DeployUtils {
             )
         );
 
-        address(new NounsDAOForkEscrow(address(dao), address(t.nounsToken)));
+        address(new NijiDAOForkEscrow(address(dao), address(t.nounsToken)));
 
         ChainalysisSanctionsListMock sanctionsOracle = new ChainalysisSanctionsListMock();
 
         vm.prank(address(t.timelock));
-        NounsAuctionHouseV3(address(auctionProxy)).initialize({
+        NijiAuctionHouseV3(address(auctionProxy)).initialize({
             _reservePrice: 0,
             _timeBuffer: 2,
             _minBidIncrementPercentage: 1,
@@ -184,7 +184,7 @@ abstract contract DeployUtilsV3 is DeployUtils {
         return dao;
     }
 
-    function _deployDAOV3() internal returns (INounsDAOLogic) {
+    function _deployDAOV3() internal returns (INijiDAOLogic) {
         return _deployDAOV3WithParams(10 minutes);
     }
 }

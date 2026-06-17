@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title Library for Nouns DAO Logic containing functions related to quorum calculations
+/// @title Library for Niji DAO Logic containing functions related to quorum calculations
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -17,11 +17,11 @@
 
 pragma solidity ^0.8.19;
 
-import './NounsDAOInterfaces.sol';
-import { NounsDAOFork } from './fork/NounsDAOFork.sol';
+import './NijiDAOInterfaces.sol';
+import { NijiDAOFork } from './fork/NijiDAOFork.sol';
 
-library NounsDAODynamicQuorum {
-    using NounsDAOFork for NounsDAOTypes.Storage;
+library NijiDAODynamicQuorum {
+    using NijiDAOFork for NijiDAOTypes.Storage;
 
     error UnsafeUint16Cast();
 
@@ -29,8 +29,8 @@ library NounsDAODynamicQuorum {
      * @notice Quorum votes required for a specific proposal to succeed
      * Differs from `GovernerBravo` which uses fixed amount
      */
-    function quorumVotes(NounsDAOTypes.Storage storage ds, uint256 proposalId) internal view returns (uint256) {
-        NounsDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
+    function quorumVotes(NijiDAOTypes.Storage storage ds, uint256 proposalId) internal view returns (uint256) {
+        NijiDAOTypes.Proposal storage proposal = ds._proposals[proposalId];
         if (proposal.totalSupply == 0) {
             return proposal.quorumVotes;
         }
@@ -51,14 +51,14 @@ library NounsDAODynamicQuorum {
      *       quorumCoefficient * againstVotesBPS
      * @dev Note the coefficient is a fixed point integer with 6 decimals
      * @param againstVotes Number of against-votes in the proposal
-     * @param totalSupply The total supply of Nouns at the time of proposal creation
+     * @param totalSupply The total supply of Niji at the time of proposal creation
      * @param params Configurable parameters for calculating the quorum based on againstVotes. See `DynamicQuorumParams` definition for additional details.
      * @return quorumVotes The required quorum
      */
     function dynamicQuorumVotes(
         uint256 againstVotes,
         uint256 totalSupply,
-        NounsDAOTypes.DynamicQuorumParams memory params
+        NijiDAOTypes.DynamicQuorumParams memory params
     ) public pure returns (uint256) {
         uint256 againstVotesBPS = (10000 * againstVotes) / totalSupply;
         uint256 quorumAdjustmentBPS = (params.quorumCoefficient * againstVotesBPS) / 1e6;
@@ -75,15 +75,15 @@ library NounsDAODynamicQuorum {
      * @return The dynamic quorum parameters that were set at the given block number
      */
     function getDynamicQuorumParamsAt(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 blockNumber_
-    ) internal view returns (NounsDAOTypes.DynamicQuorumParams memory) {
-        uint32 blockNumber = safe32(blockNumber_, 'NounsDAO::getDynamicQuorumParamsAt: block number exceeds 32 bits');
+    ) internal view returns (NijiDAOTypes.DynamicQuorumParams memory) {
+        uint32 blockNumber = safe32(blockNumber_, 'NijiDAO::getDynamicQuorumParamsAt: block number exceeds 32 bits');
         uint256 len = ds.quorumParamsCheckpoints.length;
 
         if (len == 0) {
             return
-                NounsDAOTypes.DynamicQuorumParams({
+                NijiDAOTypes.DynamicQuorumParams({
                     minQuorumVotesBPS: safe16(ds.quorumVotesBPS),
                     maxQuorumVotesBPS: safe16(ds.quorumVotesBPS),
                     quorumCoefficient: 0
@@ -96,7 +96,7 @@ library NounsDAODynamicQuorum {
 
         if (ds.quorumParamsCheckpoints[0].fromBlock > blockNumber) {
             return
-                NounsDAOTypes.DynamicQuorumParams({
+                NijiDAOTypes.DynamicQuorumParams({
                     minQuorumVotesBPS: safe16(ds.quorumVotesBPS),
                     maxQuorumVotesBPS: safe16(ds.quorumVotesBPS),
                     quorumCoefficient: 0
@@ -107,7 +107,7 @@ library NounsDAODynamicQuorum {
         uint256 upper = len - 1;
         while (upper > lower) {
             uint256 center = upper - (upper - lower) / 2;
-            NounsDAOTypes.DynamicQuorumParamsCheckpoint memory cp = ds.quorumParamsCheckpoints[center];
+            NijiDAOTypes.DynamicQuorumParamsCheckpoint memory cp = ds.quorumParamsCheckpoints[center];
             if (cp.fromBlock == blockNumber) {
                 return cp.params;
             } else if (cp.fromBlock < blockNumber) {
@@ -120,20 +120,20 @@ library NounsDAODynamicQuorum {
     }
 
     /**
-     * @notice Current min quorum votes using Nouns adjusted total supply
+     * @notice Current min quorum votes using Niji adjusted total supply
      */
     function minQuorumVotes(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 adjustedTotalSupply
     ) internal view returns (uint256) {
         return bps2Uint(getDynamicQuorumParamsAt(ds, block.number).minQuorumVotesBPS, adjustedTotalSupply);
     }
 
     /**
-     * @notice Current max quorum votes using Nouns adjusted total supply
+     * @notice Current max quorum votes using Niji adjusted total supply
      */
     function maxQuorumVotes(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256 adjustedTotalSupply
     ) internal view returns (uint256) {
         return bps2Uint(getDynamicQuorumParamsAt(ds, block.number).maxQuorumVotesBPS, adjustedTotalSupply);

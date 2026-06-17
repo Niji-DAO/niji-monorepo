@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.15;
 
-import { INounsDAOForkEscrow, NounsTokenLike } from '../../../contracts/governance/NounsDAOInterfaces.sol';
+import { INijiDAOForkEscrow, NounsTokenLike } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 
-contract NounsDAOForkEscrowMock is INounsDAOForkEscrow {
+contract NijiDAOForkEscrowMock is INijiDAOForkEscrow {
     uint32 public forkId;
     address public dao;
     NounsTokenLike public nounsToken;

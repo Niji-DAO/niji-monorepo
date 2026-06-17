@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-/// @title Nouns DAO Logic interfaces and events
+/// @title Niji DAO Logic interfaces and events
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -16,7 +16,7 @@
  *********************************/
 
 // LICENSE
-// NounsDAOInterfaces.sol is a modified version of Compound Lab's GovernorBravoInterfaces.sol:
+// NijiDAOInterfaces.sol is a modified version of Compound Lab's GovernorBravoInterfaces.sol:
 // https://github.com/compound-finance/compound-protocol/blob/b9b14038612d846b83f8a009a82c38974ff2dcfe/contracts/Governance/GovernorBravoInterfaces.sol
 //
 // GovernorBravoInterfaces.sol source code Copyright 2020 Compound Labs, Inc. licensed under the BSD-3-Clause license.
@@ -25,16 +25,16 @@
 // Additional conditions of BSD-3-Clause can be found here: https://opensource.org/licenses/BSD-3-Clause
 //
 // MODIFICATIONS
-// NounsDAOEvents, NounsDAOProxyStorage, NounsDAOStorageV1 add support for changes made by Nouns DAO to GovernorBravo.sol
-// See NounsDAOLogicV1.sol for more details.
-// NounsDAOStorageV1Adjusted and NounsDAOStorageV2 add support for a dynamic vote quorum.
-// See NounsDAOLogicV2.sol for more details.
-// NounsDAOStorageV3
-// See NounsDAOLogicV3.sol for more details.
+// NijiDAOEvents, NijiDAOProxyStorage, NijiDAOStorageV1 add support for changes made by Niji DAO to GovernorBravo.sol
+// See NijiDAOLogicV1.sol for more details.
+// NijiDAOStorageV1Adjusted and NijiDAOStorageV2 add support for a dynamic vote quorum.
+// See NijiDAOLogicV2.sol for more details.
+// NijiDAOStorageV3
+// See NijiDAOLogicV3.sol for more details.
 
 pragma solidity ^0.8.19;
 
-interface NounsDAOEventsV3 {
+interface NijiDAOEventsV3 {
     /// @notice An event emitted when a new proposal is created
     event ProposalCreated(
         uint256 id,
@@ -74,10 +74,10 @@ interface NounsDAOEventsV3 {
     /// @notice An event emitted when a proposal has been canceled
     event ProposalCanceled(uint256 id);
 
-    /// @notice An event emitted when a proposal has been queued in the NounsDAOExecutor
+    /// @notice An event emitted when a proposal has been queued in the NijiDAOExecutor
     event ProposalQueued(uint256 id, uint256 eta);
 
-    /// @notice An event emitted when a proposal has been executed in the NounsDAOExecutor
+    /// @notice An event emitted when a proposal has been executed in the NijiDAOExecutor
     event ProposalExecuted(uint256 id);
 
     /// @notice An event emitted when a proposal has been vetoed by vetoAddress
@@ -235,10 +235,10 @@ interface NounsDAOEventsV3 {
     );
 
     /// @notice Emitted when the DAO withdraws nouns from the fork escrow after a fork has been executed
-    event DAOWithdrawNounsFromEscrow(uint256[] tokenIds, address to);
+    event DAOWithdrawNijiFromEscrow(uint256[] tokenIds, address to);
 
     /// @notice Emitted when withdrawing nouns from escrow increases adjusted total supply
-    event DAONounsSupplyIncreasedFromEscrow(uint256 numTokens, address to);
+    event DAONijiSupplyIncreasedFromEscrow(uint256 numTokens, address to);
 
     /// @notice An event emitted when a vote has been cast with a non-zero client Id.
     /// @dev Assumes the `VoteCast` event is emitted, and that indexers can use the voter address and propose ID to
@@ -246,7 +246,7 @@ interface NounsDAOEventsV3 {
     event VoteCastWithClientId(address indexed voter, uint256 indexed proposalId, uint32 indexed clientId);
 }
 
-interface INounsDAOExecutor {
+interface INijiDAOExecutor {
     function delay() external view returns (uint256);
 
     function GRACE_PERIOD() external view returns (uint256);
@@ -280,7 +280,7 @@ interface INounsDAOExecutor {
     ) external payable returns (bytes memory);
 }
 
-interface NounsTokenLike {
+interface NijiTokenLike {
     function getPriorVotes(address account, uint256 blockNumber) external view returns (uint96);
 
     function totalSupply() external view returns (uint256);
@@ -303,7 +303,7 @@ interface NounsTokenLike {
 interface IForkDAODeployer {
     function deployForkDAO(
         uint256 forkingPeriodEndTimestamp,
-        INounsDAOForkEscrow forkEscrowAddress
+        INijiDAOForkEscrow forkEscrowAddress
     ) external returns (address treasury, address token);
 
     function tokenImpl() external view returns (address);
@@ -315,13 +315,13 @@ interface IForkDAODeployer {
     function treasuryImpl() external view returns (address);
 }
 
-interface INounsDAOExecutorV2 is INounsDAOExecutor {
+interface INijiDAOExecutorV2 is INijiDAOExecutor {
     function sendETH(address recipient, uint256 ethToSend) external;
 
     function sendERC20(address recipient, address erc20Token, uint256 tokensToSend) external;
 }
 
-interface INounsDAOForkEscrow {
+interface INijiDAOForkEscrow {
     function markOwner(address owner, uint256[] calldata tokenIds) external;
 
     function returnTokensToOwner(address owner, uint256[] calldata tokenIds) external;
@@ -336,14 +336,14 @@ interface INounsDAOForkEscrow {
 
     function forkId() external view returns (uint32);
 
-    function nounsToken() external view returns (NounsTokenLike);
+    function nounsToken() external view returns (NijiTokenLike);
 
     function dao() external view returns (address);
 
     function ownerOfEscrowedToken(uint32 forkId_, uint256 tokenId) external view returns (address);
 }
 
-interface NounsDAOTypes {
+interface NijiDAOTypes {
     struct Storage {
         // ================ PROXY ================ //
         /// @notice Administrator for this contract
@@ -365,10 +365,10 @@ interface NounsDAOTypes {
         uint256 quorumVotesBPS;
         /// @notice The total number of proposals
         uint256 proposalCount;
-        /// @notice The address of the Nouns DAO Executor NounsDAOExecutor
-        INounsDAOExecutorV2 timelock;
-        /// @notice The address of the Nouns tokens
-        NounsTokenLike nouns;
+        /// @notice The address of the Niji DAO Executor NijiDAOExecutor
+        INijiDAOExecutorV2 timelock;
+        /// @notice The address of the Niji tokens
+        NijiTokenLike nouns;
         /// @notice The official record of all proposals ever proposed
         mapping(uint256 => Proposal) _proposals;
         /// @notice The latest proposal for each proposer
@@ -387,7 +387,7 @@ interface NounsDAOTypes {
         /// @notice Length of proposal updatable period in block
         uint32 proposalUpdatablePeriodInBlocks;
         /// @notice address of the DAO's fork escrow contract
-        INounsDAOForkEscrow forkEscrow;
+        INijiDAOForkEscrow forkEscrow;
         /// @notice address of the DAO's fork deployer contract
         IForkDAODeployer forkDAODeployer;
         /// @notice ERC20 tokens to include when sending funds to a deployed fork
@@ -403,7 +403,7 @@ interface NounsDAOTypes {
         /// @notice Threshold defined in basis points (10,000 = 100%) required for forking
         uint256 forkThresholdBPS;
         /// @notice Address of the original timelock
-        INounsDAOExecutor timelockV1;
+        INijiDAOExecutor timelockV1;
         /// @dev Make sure this stays the last variable in this struct, so we can delete it in the next version
         /// @dev To be zeroed-out in the upcoming DAO upgrade.
         uint256 voteSnapshotBlockSwitchProposalId;
@@ -601,7 +601,7 @@ interface NounsDAOTypes {
         uint32 quorumCoefficient;
     }
 
-    struct NounsDAOParams {
+    struct NijiDAOParams {
         uint256 votingPeriod;
         uint256 votingDelay;
         uint256 proposalThresholdBPS;
@@ -634,6 +634,6 @@ interface NounsDAOTypes {
     }
 }
 
-contract NounsDAOStorage is NounsDAOTypes {
+contract NijiDAOStorage is NijiDAOTypes {
     Storage ds;
 }

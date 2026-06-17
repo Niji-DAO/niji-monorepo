@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title Library for Nouns DAO Logic containing the dao fork logic
+/// @title Library for Niji DAO Logic containing the dao fork logic
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -17,11 +17,11 @@
 
 pragma solidity ^0.8.19;
 
-import { NounsDAOTypes, INounsDAOForkEscrow, INounsDAOExecutorV2 } from '../NounsDAOInterfaces.sol';
+import { NijiDAOTypes, INijiDAOForkEscrow, INijiDAOExecutorV2 } from '../NijiDAOInterfaces.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { NounsTokenFork } from './newdao/token/NounsTokenFork.sol';
 
-library NounsDAOFork {
+library NijiDAOFork {
     error ForkThresholdNotMet();
     error ForkPeriodNotActive();
     error ForkPeriodActive();
@@ -59,26 +59,26 @@ library NounsDAOFork {
     );
 
     /// @notice Emitted when the DAO withdraws nouns from the fork escrow after a fork has been executed
-    event DAOWithdrawNounsFromEscrow(uint256[] tokenIds, address to);
+    event DAOWithdrawNijiFromEscrow(uint256[] tokenIds, address to);
 
     /// @notice Emitted when withdrawing nouns from escrow increases adjusted total supply
-    event DAONounsSupplyIncreasedFromEscrow(uint256 numTokens, address to);
+    event DAONijiSupplyIncreasedFromEscrow(uint256 numTokens, address to);
 
     /**
-     * @notice Escrow Nouns to contribute to the fork threshold
+     * @notice Escrow Niji to contribute to the fork threshold
      * @dev Requires approving the tokenIds or the entire noun token to the DAO contract
      * @param tokenIds the tokenIds to escrow. They will be sent to the DAO once the fork threshold is reached and the escrow is closed.
      * @param proposalIds array of proposal ids which are the reason for wanting to fork. This will only be used to emit event.
      * @param reason the reason for want to fork. This will only be used to emit event.
      */
     function escrowToFork(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256[] calldata tokenIds,
         uint256[] calldata proposalIds,
         string calldata reason
     ) external {
         if (isForkPeriodActive(ds)) revert ForkPeriodActive();
-        INounsDAOForkEscrow forkEscrow = ds.forkEscrow;
+        INijiDAOForkEscrow forkEscrow = ds.forkEscrow;
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
             ds.nouns.safeTransferFrom(msg.sender, address(forkEscrow), tokenIds[i]);
@@ -88,14 +88,14 @@ library NounsDAOFork {
     }
 
     /**
-     * @notice Withdraw Nouns from the fork escrow. Only possible if the fork has not been executed.
+     * @notice Withdraw Niji from the fork escrow. Only possible if the fork has not been executed.
      * Only allowed to withdraw tokens that the sender has escrowed.
      * @param tokenIds the tokenIds to withdraw
      */
-    function withdrawFromForkEscrow(NounsDAOTypes.Storage storage ds, uint256[] calldata tokenIds) external {
+    function withdrawFromForkEscrow(NijiDAOTypes.Storage storage ds, uint256[] calldata tokenIds) external {
         if (isForkPeriodActive(ds)) revert ForkPeriodActive();
 
-        INounsDAOForkEscrow forkEscrow = ds.forkEscrow;
+        INijiDAOForkEscrow forkEscrow = ds.forkEscrow;
         forkEscrow.returnTokensToOwner(msg.sender, tokenIds);
 
         emit WithdrawFromForkEscrow(forkEscrow.forkId(), msg.sender, tokenIds);
@@ -108,9 +108,9 @@ library NounsDAOFork {
      * @return forkTreasury The address of the new DAO's treasury
      * @return forkToken The address of the new DAO's token
      */
-    function executeFork(NounsDAOTypes.Storage storage ds) external returns (address forkTreasury, address forkToken) {
+    function executeFork(NijiDAOTypes.Storage storage ds) external returns (address forkTreasury, address forkToken) {
         if (isForkPeriodActive(ds)) revert ForkPeriodActive();
-        INounsDAOForkEscrow forkEscrow = ds.forkEscrow;
+        INijiDAOForkEscrow forkEscrow = ds.forkEscrow;
 
         uint256 tokensInEscrow = forkEscrow.numTokensInEscrow();
         if (tokensInEscrow <= forkThreshold(ds)) revert ForkThresholdNotMet();
@@ -136,14 +136,14 @@ library NounsDAOFork {
      * @param tokenIds the tokenIds to send to the DAO in exchange for joining the fork
      */
     function joinFork(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         uint256[] calldata tokenIds,
         uint256[] calldata proposalIds,
         string calldata reason
     ) external {
         if (!isForkPeriodActive(ds)) revert ForkPeriodNotActive();
 
-        INounsDAOForkEscrow forkEscrow = ds.forkEscrow;
+        INijiDAOForkEscrow forkEscrow = ds.forkEscrow;
         address timelock = address(ds.timelock);
         sendProRataTreasury(ds, ds.forkDAOTreasury, tokenIds.length, adjustedTotalSupply(ds));
 
@@ -161,11 +161,11 @@ library NounsDAOFork {
      * @dev Only the DAO can call this function
      * @param tokenIds the tokenIds to withdraw
      */
-    function withdrawDAONounsFromEscrowToTreasury(
-        NounsDAOTypes.Storage storage ds,
+    function withdrawDAONijiFromEscrowToTreasury(
+        NijiDAOTypes.Storage storage ds,
         uint256[] calldata tokenIds
     ) external {
-        withdrawDAONounsFromEscrow(ds, tokenIds, address(ds.timelock));
+        withdrawDAONijiFromEscrow(ds, tokenIds, address(ds.timelock));
     }
 
     /**
@@ -174,20 +174,20 @@ library NounsDAOFork {
      * @param tokenIds the tokenIds to withdraw
      * @param to the address to send the nouns to
      */
-    function withdrawDAONounsFromEscrowIncreasingTotalSupply(
-        NounsDAOTypes.Storage storage ds,
+    function withdrawDAONijiFromEscrowIncreasingTotalSupply(
+        NijiDAOTypes.Storage storage ds,
         uint256[] calldata tokenIds,
         address to
     ) external {
         if (to == address(ds.timelock)) revert UseAlternativeWithdrawFunction();
 
-        withdrawDAONounsFromEscrow(ds, tokenIds, to);
+        withdrawDAONijiFromEscrow(ds, tokenIds, to);
 
-        emit DAONounsSupplyIncreasedFromEscrow(tokenIds.length, to);
+        emit DAONijiSupplyIncreasedFromEscrow(tokenIds.length, to);
     }
 
-    function withdrawDAONounsFromEscrow(
-        NounsDAOTypes.Storage storage ds,
+    function withdrawDAONijiFromEscrow(
+        NijiDAOTypes.Storage storage ds,
         uint256[] calldata tokenIds,
         address to
     ) private {
@@ -197,20 +197,20 @@ library NounsDAOFork {
 
         ds.forkEscrow.withdrawTokens(tokenIds, to);
 
-        emit DAOWithdrawNounsFromEscrow(tokenIds, to);
+        emit DAOWithdrawNijiFromEscrow(tokenIds, to);
     }
 
     /**
      * @notice Returns the required number of tokens to escrow to trigger a fork
      */
-    function forkThreshold(NounsDAOTypes.Storage storage ds) public view returns (uint256) {
+    function forkThreshold(NijiDAOTypes.Storage storage ds) public view returns (uint256) {
         return (adjustedTotalSupply(ds) * ds.forkThresholdBPS) / 10_000;
     }
 
     /**
      * @notice Returns the number of tokens currently in escrow, contributing to the fork threshold
      */
-    function numTokensInForkEscrow(NounsDAOTypes.Storage storage ds) public view returns (uint256) {
+    function numTokensInForkEscrow(NijiDAOTypes.Storage storage ds) public view returns (uint256) {
         return ds.forkEscrow.numTokensInEscrow();
     }
 
@@ -219,14 +219,14 @@ library NounsDAOFork {
      * escrow after it has closed.
      * This is used when calculating proposal threshold, quorum, fork threshold & treasury split.
      */
-    function adjustedTotalSupply(NounsDAOTypes.Storage storage ds) internal view returns (uint256) {
+    function adjustedTotalSupply(NijiDAOTypes.Storage storage ds) internal view returns (uint256) {
         return ds.nouns.totalSupply() - ds.nouns.balanceOf(address(ds.timelock)) - ds.forkEscrow.numTokensOwnedByDAO();
     }
 
     /**
      * @notice Returns true if noun holders can currently join a fork
      */
-    function isForkPeriodActive(NounsDAOTypes.Storage storage ds) internal view returns (bool) {
+    function isForkPeriodActive(NijiDAOTypes.Storage storage ds) internal view returns (bool) {
         return ds.forkEndTimestamp > block.timestamp;
     }
 
@@ -236,12 +236,12 @@ library NounsDAOFork {
      * Sends ETH and ERC20 tokens listed in `ds.erc20TokensToIncludeInFork`.
      */
     function sendProRataTreasury(
-        NounsDAOTypes.Storage storage ds,
+        NijiDAOTypes.Storage storage ds,
         address newDAOTreasury,
         uint256 tokenCount,
         uint256 totalSupply
     ) internal {
-        INounsDAOExecutorV2 timelock = ds.timelock;
+        INijiDAOExecutorV2 timelock = ds.timelock;
         uint256 ethToSend = (address(timelock).balance * tokenCount) / totalSupply;
 
         timelock.sendETH(newDAOTreasury, ethToSend);

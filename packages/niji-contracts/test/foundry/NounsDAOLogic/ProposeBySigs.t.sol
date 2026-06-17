@@ -2,18 +2,18 @@
 pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
-import { NounsDAOLogicBaseTest } from './NounsDAOLogicBaseTest.sol';
+import { NijiDAOLogicBaseTest } from './NijiDAOLogicBaseTest.sol';
 import { DeployUtils } from '../helpers/DeployUtils.sol';
 import { SigUtils, ERC1271Stub } from '../helpers/SigUtils.sol';
-import { NounsDAOProposals } from '../../../contracts/governance/NounsDAOProposals.sol';
-import { NounsDAOProxyV3 } from '../../../contracts/governance/NounsDAOProxyV3.sol';
-import { NounsDAOTypes } from '../../../contracts/governance/NounsDAOInterfaces.sol';
+import { NijiDAOProposals } from '../../../contracts/governance/NijiDAOProposals.sol';
+import { NijiDAOProxyV3 } from '../../../contracts/governance/NijiDAOProxyV3.sol';
+import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 import { NounsToken } from '../../../contracts/NounsToken.sol';
 import { NounsSeeder } from '../../../contracts/NounsSeeder.sol';
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
-import { NounsDAOExecutor } from '../../../contracts/governance/NounsDAOExecutor.sol';
+import { NijiDAOExecutor } from '../../../contracts/governance/NijiDAOExecutor.sol';
 
-contract ProposeBySigsTest is NounsDAOLogicBaseTest {
+contract ProposeBySigsTest is NijiDAOLogicBaseTest {
     address proposerWithVote;
     uint256 proposerWithVotePK;
     address proposerWithNoVotes = makeAddr('proposerWithNoVotes');
@@ -47,18 +47,18 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
     }
 
     function test_givenNoSigs_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](0);
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](0);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.MustProvideSignatures.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.MustProvideSignatures.selector));
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, '');
     }
 
     function test_givenCanceledSig_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, '', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
@@ -67,31 +67,31 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
         vm.prank(signerWithVote1);
         dao.cancelSig(proposerSignatures[0].sig);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.SignatureIsCancelled.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.SignatureIsCancelled.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, '');
     }
 
     function test_givenExpireddSig_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp - 1;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, '', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
         );
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.SignatureExpired.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.SignatureExpired.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, '');
     }
 
     function test_givenSigOnDifferentDescription_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(
                 proposerWithVote,
                 signerWithVote1PK,
@@ -104,7 +104,7 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
             expirationTimestamp
         );
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.InvalidSignature.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.InvalidSignature.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(
             proposerSignatures,
@@ -117,10 +117,10 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
     }
 
     function test_givenSigOnDifferentTargets_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
@@ -128,16 +128,16 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
 
         txs.targets[0] = makeAddr('different target');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.InvalidSignature.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.InvalidSignature.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
 
     function test_givenSigOnDifferentValues_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
@@ -145,16 +145,16 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
 
         txs.values[0] = 42;
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.InvalidSignature.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.InvalidSignature.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
 
     function test_givenSigOnDifferentSignatures_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
@@ -162,16 +162,16 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
 
         txs.signatures[0] = 'different signature';
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.InvalidSignature.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.InvalidSignature.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
 
     function test_givenSigOnDifferentCalldatas_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
@@ -179,16 +179,16 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
 
         txs.calldatas[0] = 'different calldatas';
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.InvalidSignature.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.InvalidSignature.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
 
     function test_givenSigOnDifferentExpiration_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
@@ -196,16 +196,16 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
 
         proposerSignatures[0].expirationTimestamp = expirationTimestamp + 1;
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.InvalidSignature.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.InvalidSignature.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
 
     function test_givenSigOnDifferentSigner_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
@@ -213,16 +213,16 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
 
         proposerSignatures[0].signer = makeAddr('different signer than sig');
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.InvalidSignature.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.InvalidSignature.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
 
     function test_givenSigOnDifferentDomainName_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(
                 proposerWithVote,
                 signerWithVote1PK,
@@ -236,16 +236,16 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
             expirationTimestamp
         );
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.InvalidSignature.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.InvalidSignature.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
 
     function test_givenSigOnDifferentVerifyingContract_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(
                 proposerWithVote,
                 signerWithVote1PK,
@@ -258,24 +258,24 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
             expirationTimestamp
         );
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.InvalidSignature.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.InvalidSignature.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
 
     function test_givenERC1271CheckReturnsFalse_reverts() public {
         ERC1271Stub erc1271 = new ERC1271Stub();
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             address(erc1271),
             expirationTimestamp
         );
         erc1271.setResponse(keccak256(proposerSignatures[0].sig), false);
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.InvalidSignature.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.InvalidSignature.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
@@ -283,16 +283,16 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
     function test_givenSignerWithAnActiveProp_reverts() public {
         propose(signerWithVote1, makeAddr('target'), 0, '', '', '');
 
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
         );
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.ProposerAlreadyHasALiveProposal.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.ProposerAlreadyHasALiveProposal.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
@@ -300,16 +300,16 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
     function test_givenProposerWithAnActiveProp_reverts() public {
         propose(proposerWithVote, makeAddr('target'), 0, '', '', '');
 
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
         );
 
-        vm.expectRevert(abi.encodeWithSelector(NounsDAOProposals.ProposerAlreadyHasALiveProposal.selector));
+        vm.expectRevert(abi.encodeWithSelector(NijiDAOProposals.ProposerAlreadyHasALiveProposal.selector));
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
@@ -323,31 +323,31 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
         vm.roll(block.number + 1);
         vm.stopPrank();
 
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
         );
 
-        vm.expectRevert(NounsDAOProposals.VotesBelowProposalThreshold.selector);
+        vm.expectRevert(NijiDAOProposals.VotesBelowProposalThreshold.selector);
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
 
     function test_givenProposerWithEnoughVotesAndSignerWithNoVotes_reverts() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithNoVotesPK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithNoVotes,
             expirationTimestamp
         );
 
-        vm.expectRevert(NounsDAOProposals.MustProvideSignatures.selector);
+        vm.expectRevert(NijiDAOProposals.MustProvideSignatures.selector);
         vm.prank(proposerWithVote);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
@@ -361,10 +361,10 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
         vm.roll(block.number + 1);
         vm.stopPrank();
 
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
@@ -388,25 +388,25 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
         vm.stopPrank();
         assertEq(dao.proposalThreshold(), 1);
 
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithVote, proposerWithVotePK, txs, 'description', expirationTimestamp, address(dao)),
             proposerWithVote,
             expirationTimestamp
         );
 
         vm.prank(proposerWithVote);
-        vm.expectRevert(NounsDAOProposals.ProposerAlreadyHasALiveProposal.selector);
+        vm.expectRevert(NijiDAOProposals.ProposerAlreadyHasALiveProposal.selector);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
 
     function test_givenProposerWithNoVotesAndSignerWithEnoughVotes_worksAndEmitsEvents() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithNoVotes, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
@@ -421,10 +421,10 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
     }
 
     function test_givenOnesOfSignersHasNoVotes_signerIsFilteredOut() public {
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](2);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](2);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(
                 proposerWithNoVotes,
                 signerWithNoVotesPK,
@@ -436,7 +436,7 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
             signerWithNoVotes,
             expirationTimestamp
         );
-        proposerSignatures[1] = NounsDAOTypes.ProposerSignature(
+        proposerSignatures[1] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithNoVotes, signerWithVote2PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote2,
             expirationTimestamp
@@ -456,7 +456,7 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
             'description'
         );
 
-        NounsDAOTypes.ProposalCondensedV3 memory proposal = dao.proposalsV3(proposalId);
+        NijiDAOTypes.ProposalCondensedV3 memory proposal = dao.proposalsV3(proposalId);
         assertEq(proposal.signers, expectedSigners);
     }
 
@@ -469,15 +469,15 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
         vm.roll(block.number + 1);
         vm.stopPrank();
 
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](2);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](2);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithNoVotes, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
         );
-        proposerSignatures[1] = NounsDAOTypes.ProposerSignature(
+        proposerSignatures[1] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithNoVotes, signerWithVote2PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote2,
             expirationTimestamp
@@ -498,7 +498,7 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
             'description'
         );
 
-        NounsDAOTypes.ProposalCondensedV3 memory proposal = dao.proposalsV3(proposalId);
+        NijiDAOTypes.ProposalCondensedV3 memory proposal = dao.proposalsV3(proposalId);
         assertEq(proposal.signers, expectedSigners);
     }
 
@@ -511,15 +511,15 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
         vm.roll(block.number + 1);
         vm.stopPrank();
 
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](2);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](2);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithNoVotes, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             signerWithVote1,
             expirationTimestamp
         );
-        proposerSignatures[1] = NounsDAOTypes.ProposerSignature(
+        proposerSignatures[1] = NijiDAOTypes.ProposerSignature(
             signProposal(
                 proposerWithNoVotes,
                 signerWithVote1PK,
@@ -533,7 +533,7 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
         );
 
         vm.prank(proposerWithNoVotes);
-        vm.expectRevert(NounsDAOProposals.ProposerAlreadyHasALiveProposal.selector);
+        vm.expectRevert(NijiDAOProposals.ProposerAlreadyHasALiveProposal.selector);
         dao.proposeBySigs(proposerSignatures, txs.targets, txs.values, txs.signatures, txs.calldatas, 'description');
     }
 
@@ -543,10 +543,10 @@ contract ProposeBySigsTest is NounsDAOLogicBaseTest {
         nounsToken.delegate(address(erc1271));
         vm.roll(block.number + 1);
 
-        NounsDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
+        NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;
-        NounsDAOTypes.ProposerSignature[] memory proposerSignatures = new NounsDAOTypes.ProposerSignature[](1);
-        proposerSignatures[0] = NounsDAOTypes.ProposerSignature(
+        NijiDAOTypes.ProposerSignature[] memory proposerSignatures = new NijiDAOTypes.ProposerSignature[](1);
+        proposerSignatures[0] = NijiDAOTypes.ProposerSignature(
             signProposal(proposerWithNoVotes, signerWithVote1PK, txs, 'description', expirationTimestamp, address(dao)),
             address(erc1271),
             expirationTimestamp

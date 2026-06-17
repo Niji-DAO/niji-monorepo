@@ -2,13 +2,13 @@
 pragma solidity ^0.8.19;
 
 import 'forge-std/Test.sol';
-import { NounsDAOLogicSharedBaseTest } from '../helpers/NounsDAOLogicSharedBase.t.sol';
-import { NounsDAOTypes } from '../../../contracts/governance/NounsDAOInterfaces.sol';
-import { NounsDAOProposals } from '../../../contracts/governance/NounsDAOProposals.sol';
-import { NounsDAOAdmin } from '../../../contracts/governance/NounsDAOAdmin.sol';
-import { INounsDAOLogic } from '../../../contracts/interfaces/INounsDAOLogic.sol';
+import { NijiDAOLogicSharedBaseTest } from '../helpers/NijiDAOLogicSharedBase.t.sol';
+import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiDAOProposals } from '../../../contracts/governance/NijiDAOProposals.sol';
+import { NijiDAOAdmin } from '../../../contracts/governance/NijiDAOAdmin.sol';
+import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
 
-contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
+contract NijiDAOLogicV3VetoTest is NijiDAOLogicSharedBaseTest {
     event NewPendingVetoer(address oldPendingVetoer, address newPendingVetoer);
     event NewVetoer(address oldVetoer, address newVetoer);
 
@@ -25,7 +25,7 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
     }
 
     function test_burnVetoPower_revertsForNonVetoer() public {
-        vm.expectRevert('NounsDAO::_burnVetoPower: vetoer only');
+        vm.expectRevert('NijiDAO::_burnVetoPower: vetoer only');
         daoProxy._burnVetoPower();
     }
 
@@ -41,7 +41,7 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
     function test_veto_revertsForNonVetoer() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
 
-        vm.expectRevert(NounsDAOProposals.VetoerOnly.selector);
+        vm.expectRevert(NijiDAOProposals.VetoerOnly.selector);
 
         daoProxy.veto(proposalId);
     }
@@ -51,7 +51,7 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
         vm.startPrank(vetoer);
         daoProxy._burnVetoPower();
 
-        vm.expectRevert(NounsDAOProposals.VetoerBurned.selector);
+        vm.expectRevert(NijiDAOProposals.VetoerBurned.selector);
 
         daoProxy.veto(proposalId);
 
@@ -62,35 +62,35 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         // Need to roll one block because in V3 on the proposal creation block the state is Updatable
         vm.roll(block.number + 1);
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Pending);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Pending);
 
         vm.prank(vetoer);
         daoProxy.veto(proposalId);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Vetoed);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Vetoed);
     }
 
     function test_veto_worksForPropStateActive() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         vm.roll(block.number + daoProxy.votingDelay() + 1);
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Active);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Active);
 
         vm.prank(vetoer);
         daoProxy.veto(proposalId);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Vetoed);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Vetoed);
     }
 
     function test_veto_worksForPropStateCanceled() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         vm.prank(proposer);
         daoProxy.cancel(proposalId);
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Canceled);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Canceled);
 
         vm.prank(vetoer);
         daoProxy.veto(proposalId);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Vetoed);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Vetoed);
     }
 
     function test_veto_worksForPropStateDefeated() public {
@@ -99,12 +99,12 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
         vm.prank(proposer);
         daoProxy.castVote(proposalId, 0);
         vm.roll(block.number + daoProxy.votingPeriod() + 1);
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Defeated);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Defeated);
 
         vm.prank(vetoer);
         daoProxy.veto(proposalId);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Vetoed);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Vetoed);
     }
 
     function test_veto_worksForPropStateSucceeded() public {
@@ -113,12 +113,12 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
         vm.prank(proposer);
         daoProxy.castVote(proposalId, 1);
         vm.roll(block.number + daoProxy.votingPeriod() + 1);
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Succeeded);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Succeeded);
 
         vm.prank(vetoer);
         daoProxy.veto(proposalId);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Vetoed);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Vetoed);
     }
 
     function test_veto_worksForPropStateQueued() public {
@@ -128,12 +128,12 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
         daoProxy.castVote(proposalId, 1);
         vm.roll(block.number + daoProxy.votingPeriod() + 1);
         daoProxy.queue(proposalId);
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Queued);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Queued);
 
         vm.prank(vetoer);
         daoProxy.veto(proposalId);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Vetoed);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Vetoed);
     }
 
     function test_veto_worksForPropStateExpired() public {
@@ -144,12 +144,12 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
         vm.roll(block.number + daoProxy.votingPeriod() + 1);
         daoProxy.queue(proposalId);
         vm.warp(block.timestamp + timelock.delay() + timelock.GRACE_PERIOD() + 1);
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Expired);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Expired);
 
         vm.prank(vetoer);
         daoProxy.veto(proposalId);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Vetoed);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Vetoed);
     }
 
     function test_veto_revertsForPropStateExecuted() public {
@@ -162,9 +162,9 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
         daoProxy.queue(proposalId);
         vm.warp(block.timestamp + timelock.delay() + 1);
         daoProxy.execute(proposalId);
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Executed);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Executed);
 
-        vm.expectRevert(NounsDAOProposals.CantVetoExecutedProposal.selector);
+        vm.expectRevert(NijiDAOProposals.CantVetoExecutedProposal.selector);
         vm.prank(vetoer);
         daoProxy.veto(proposalId);
     }
@@ -173,28 +173,28 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         vm.prank(vetoer);
         daoProxy.veto(proposalId);
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Vetoed);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Vetoed);
 
         vm.prank(vetoer);
         daoProxy.veto(proposalId);
 
-        assertTrue(daoProxy.state(proposalId) == NounsDAOTypes.ProposalState.Vetoed);
+        assertTrue(daoProxy.state(proposalId) == NijiDAOTypes.ProposalState.Vetoed);
     }
 
     function test_veto_worksForPropStateUpdatable() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
-        INounsDAOLogic daoAsV3 = INounsDAOLogic(payable(address(daoProxy)));
+        INijiDAOLogic daoAsV3 = INijiDAOLogic(payable(address(daoProxy)));
 
-        assertTrue(daoAsV3.state(proposalId) == NounsDAOTypes.ProposalState.Updatable);
+        assertTrue(daoAsV3.state(proposalId) == NijiDAOTypes.ProposalState.Updatable);
 
         vm.prank(vetoer);
         daoAsV3.veto(proposalId);
 
-        assertTrue(daoAsV3.state(proposalId) == NounsDAOTypes.ProposalState.Vetoed);
+        assertTrue(daoAsV3.state(proposalId) == NijiDAOTypes.ProposalState.Vetoed);
     }
 
     function test_setPendingVetoer_failsIfNotCurrentVetoer() public {
-        vm.expectRevert(NounsDAOProposals.VetoerOnly.selector);
+        vm.expectRevert(NijiDAOProposals.VetoerOnly.selector);
         daoProxy._setPendingVetoer(address(0x1234));
     }
 
@@ -217,7 +217,7 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
         vm.prank(vetoer);
         daoProxy._setPendingVetoer(pendingVetoer);
 
-        vm.expectRevert(NounsDAOAdmin.PendingVetoerOnly.selector);
+        vm.expectRevert(NijiDAOAdmin.PendingVetoerOnly.selector);
         daoProxy._acceptVetoer();
 
         vm.prank(pendingVetoer);
@@ -230,7 +230,7 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
     }
 
     function test_burnVetoPower_failsIfNotVetoer() public {
-        vm.expectRevert('NounsDAO::_burnVetoPower: vetoer only');
+        vm.expectRevert('NijiDAO::_burnVetoPower: vetoer only');
         daoProxy._burnVetoPower();
     }
 
@@ -255,7 +255,7 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
         daoProxy._burnVetoPower();
 
         vm.prank(pendingVetoer);
-        vm.expectRevert(NounsDAOAdmin.PendingVetoerOnly.selector);
+        vm.expectRevert(NijiDAOAdmin.PendingVetoerOnly.selector);
         daoProxy._acceptVetoer();
 
         assertEq(daoProxy.pendingVetoer(), address(0));
@@ -265,7 +265,7 @@ contract NounsDAOLogicV3VetoTest is NounsDAOLogicSharedBaseTest {
         address timelock,
         address nounsToken,
         address vetoer
-    ) internal override returns (INounsDAOLogic) {
+    ) internal override returns (INijiDAOLogic) {
         return _createDAOV3Proxy(timelock, nounsToken, vetoer);
     }
 

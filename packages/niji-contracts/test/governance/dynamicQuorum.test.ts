@@ -2,12 +2,12 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { parseUnits } from 'ethers';
 
-import { NounsDAOLogicV4 } from '../../typechain';
+import { NijiDAOLogicV4 } from '../../typechain';
 import { deployGovernorV3, getSigners, TestSigners } from '../utils';
 
 let deployer: SignerWithAddress;
 let signers: TestSigners;
-let gov: NounsDAOLogicV4;
+let gov: NijiDAOLogicV4;
 
 describe('Dynamic Quorum', () => {
   before(async () => {
