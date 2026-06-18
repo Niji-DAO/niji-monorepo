@@ -9,12 +9,14 @@ pragma solidity ^0.8.20;
 
 import { ERC721 } from '@openzeppelin/contracts-v5/token/ERC721/ERC721.sol';
 import { ERC721Enumerable } from '@openzeppelin/contracts-v5/token/ERC721/extensions/ERC721Enumerable.sol';
+import { ERC721Votes } from '@openzeppelin/contracts-v5/token/ERC721/extensions/ERC721Votes.sol';
+import { EIP712 } from '@openzeppelin/contracts-v5/utils/cryptography/EIP712.sol';
 import { Ownable2Step, Ownable } from '@openzeppelin/contracts-v5/access/Ownable2Step.sol';
 import { ReentrancyGuard } from '@openzeppelin/contracts-v5/utils/ReentrancyGuard.sol';
 import { NijiDescriptor } from './NijiDescriptor.sol';
 import { INijiSeeder } from './interfaces/INijiSeeder.sol';
 
-contract NijiToken is ERC721Enumerable, Ownable2Step, ReentrancyGuard {
+contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGuard {
     // =============================================================
     //                           ERRORS
     // =============================================================
@@ -140,7 +142,7 @@ contract NijiToken is ERC721Enumerable, Ownable2Step, ReentrancyGuard {
         address _descriptor,
         address _seeder,
         uint256 _maxSupply
-    ) ERC721(_name, _symbol) Ownable(msg.sender) {
+    ) ERC721(_name, _symbol) EIP712(_name, '1') Ownable(msg.sender) {
         if (_descriptor == address(0)) revert DescriptorNotSet();
         if (_seeder == address(0)) revert SeederNotSet();
 
@@ -356,5 +358,37 @@ contract NijiToken is ERC721Enumerable, Ownable2Step, ReentrancyGuard {
     function remainingSupply() external view returns (uint256) {
         if (maxSupply == 0) return type(uint256).max;
         return maxSupply > _currentTokenId ? maxSupply - _currentTokenId : 0;
+    }
+
+    // =============================================================
+    //                      ERC721Votes INTEGRATION
+    // =============================================================
+
+    /// @dev Multi-inheritance override: ERC721Enumerable + ERC721Votes both override `_update`.
+    /// Calling super.* chains both extensions: enumeration bookkeeping + voting unit transfer.
+    function _update(
+        address to,
+        uint256 tokenId,
+        address auth
+    ) internal override(ERC721Enumerable, ERC721Votes) returns (address) {
+        return super._update(to, tokenId, auth);
+    }
+
+    /// @dev Multi-inheritance override for `_increaseBalance` (required by ERC721Enumerable + ERC721Votes).
+    function _increaseBalance(address account, uint128 amount)
+        internal
+        override(ERC721Enumerable, ERC721Votes)
+    {
+        super._increaseBalance(account, amount);
+    }
+
+    /// @dev Multi-inheritance override for `supportsInterface` (ERC721Enumerable + ERC721).
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }
