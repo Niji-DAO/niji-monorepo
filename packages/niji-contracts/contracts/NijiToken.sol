@@ -179,6 +179,14 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
         return _mintTo(msg.sender);
     }
 
+    /// @notice Burn a Niji (legacy NounsDAO governance compat for auction house unbid settlement)
+    /// @dev Auction house contracts (NijiAuctionHouse / NijiAuctionHouseV3 / NijiAuctionHouseFork) call `nouns.burn(tokenId)` when an auction ends with no bids.
+    ///      onlyMinter modifier ensures only the auction house can burn, matching NounsToken behavior.
+    /// @param tokenId The token ID to burn
+    function burn(uint256 tokenId) external onlyMinter nonReentrant {
+        _burn(tokenId);
+    }
+
     /// @notice Mint multiple Nijis to an address
     /// @param to The recipient address
     /// @param quantity Number of tokens to mint
@@ -198,6 +206,7 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     }
 
     /// @notice Internal mint function
+    /// @dev Uses _mint (not _safeMint) to remain compatible with auction house contracts that do not implement IERC721Receiver — matching NounsToken behavior.
     /// @param to The recipient address
     /// @return tokenId The minted token ID
     function _mintTo(address to) internal returns (uint256) {
@@ -207,7 +216,7 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
         INijiSeeder.Seed memory seed = seeder.generateSeed(tokenId, address(descriptor));
         seeds[tokenId] = seed;
 
-        _safeMint(to, tokenId);
+        _mint(to, tokenId);
 
         unchecked { ++_currentTokenId; }
 
