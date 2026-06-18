@@ -73,7 +73,7 @@ export function getOrCreateDelegateWithNullOption(
     delegate.delegatedVotesRaw = BIGINT_ZERO;
     delegate.delegatedVotes = BIGINT_ZERO;
     delegate.tokenHoldersRepresentedAmount = 0;
-    delegate.nounsRepresented = [];
+    delegate.nijiRepresented = [];
     if (id != ZERO_ADDRESS) {
       const governance = getGovernanceEntity();
       governance.totalDelegates = governance.totalDelegates.plus(BIGINT_ONE);
@@ -258,7 +258,7 @@ function keccak256Bytes(bytes: Bytes): Bytes {
 }
 
 /**
- * encodes the proposal content as done in `NounsDAOProposals.calcProposalEncodeData`
+ * encodes the proposal content as done in `NijiDAOProposals.calcProposalEncodeData`
  * and hashes it with keccak256
  */
 export function calcEncodedProposalHash(proposal: Proposal, isUpdate: boolean): Bytes {

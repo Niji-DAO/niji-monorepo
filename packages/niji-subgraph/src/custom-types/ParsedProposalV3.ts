@@ -1,10 +1,7 @@
 import { BigInt } from '@graphprotocol/graph-ts';
 
-import {
-  ProposalCreatedWithRequirements,
-  ProposalCreatedWithRequirements1,
-} from '../types/NounsDAO/NounsDAO';
-import { ProposalCreatedWithRequirements1 as ProposalCreatedWithRequirementsV4 } from '../types/NounsDAOV4/NounsDAOV4';
+import { ProposalCreatedWithRequirements } from '../types/NijiDAO/NijiDAO';
+import { ProposalCreatedWithRequirements1 as ProposalCreatedWithRequirementsV4 } from '../types/NijiDAOV4/NijiDAOV4';
 import { BIGINT_ZERO } from '../utils/constants';
 
 export class ParsedProposalV3 {
@@ -16,29 +13,12 @@ export class ParsedProposalV3 {
   signers: string[] = [];
   clientId: BigInt = BIGINT_ZERO;
 
-  static fromV1Event(event: ProposalCreatedWithRequirements1): ParsedProposalV3 {
+  static fromV1Event(event: ProposalCreatedWithRequirements): ParsedProposalV3 {
     const proposal = new ParsedProposalV3();
     proposal.id = event.params.id.toString();
     proposal.txHash = event.transaction.hash.toHexString();
     proposal.proposalThreshold = event.params.proposalThreshold;
     proposal.quorumVotes = event.params.quorumVotes;
-
-    return proposal;
-  }
-
-  static fromV3Event(event: ProposalCreatedWithRequirements): ParsedProposalV3 {
-    const proposal = new ParsedProposalV3();
-    proposal.id = event.params.id.toString();
-    proposal.txHash = event.transaction.hash.toHexString();
-    proposal.proposalThreshold = event.params.proposalThreshold;
-    proposal.quorumVotes = event.params.quorumVotes;
-
-    proposal.signers = new Array<string>(event.params.signers.length);
-    for (let i = 0; i < event.params.signers.length; i++) {
-      proposal.signers[i] = event.params.signers[i].toHexString();
-    }
-
-    proposal.updatePeriodEndBlock = event.params.updatePeriodEndBlock;
 
     return proposal;
   }

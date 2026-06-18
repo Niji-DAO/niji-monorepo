@@ -8,7 +8,7 @@ import {
   ProposalCandidateCreated,
   ProposalCandidateUpdated,
   SignatureAdded,
-} from './types/NounsDAOData/NounsDAOData';
+} from './types/NijiDAOData/NijiDAOData';
 import { ProposalCandidateContent, ProposalCandidateVersion } from './types/schema';
 import {
   candidateID,

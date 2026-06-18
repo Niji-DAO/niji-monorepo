@@ -5,10 +5,9 @@ import {
   handleMinQuorumVotesBPSSet,
   handleMaxQuorumVotesBPSSet,
   handleQuorumCoefficientSet,
-} from '../src/nouns-dao';
+} from '../src/niji-dao';
 import {
   ProposalCreatedWithRequirements,
-  ProposalCreatedWithRequirements1,
   VoteCast,
   MinQuorumVotesBPSSet,
   MaxQuorumVotesBPSSet,
@@ -24,48 +23,27 @@ import {
   ProposalExecuted,
   ProposalQueued,
   ProposalCreated,
-} from '../src/types/NounsDAO/NounsDAO';
-import { ProposalCandidateCreated, SignatureAdded } from '../src/types/NounsDAOData/NounsDAOData';
+} from '../src/types/NijiDAO/NijiDAO';
+import { ProposalCreatedWithRequirements1 as ProposalCreatedWithRequirementsV4 } from '../src/types/NijiDAOV4/NijiDAOV4';
+import { ProposalCandidateCreated, SignatureAdded } from '../src/types/NijiDAOData/NijiDAOData';
 import {
   DelegateChanged,
   DelegateVotesChanged,
   Transfer,
-} from '../src/types/NounsToken/NounsToken';
+} from '../src/types/NijiToken/NijiToken';
 import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from '../src/utils/constants';
 
-export function createProposalCreatedWithRequirementsEventV3(
+export function createProposalCreatedWithRequirementsEventV4(
   input: ProposalCreatedWithRequirementsEvent,
-): ProposalCreatedWithRequirements {
-  const newEvent = changetype<ProposalCreatedWithRequirements>(newMockEvent());
+): ProposalCreatedWithRequirementsV4 {
+  const newEvent = changetype<ProposalCreatedWithRequirementsV4>(newMockEvent());
   newEvent.parameters = [];
 
   newEvent.parameters.push(
     new ethereum.EventParam('id', ethereum.Value.fromUnsignedBigInt(input.id)),
   );
   newEvent.parameters.push(
-    new ethereum.EventParam('proposer', ethereum.Value.fromAddress(input.proposer)),
-  );
-  newEvent.parameters.push(
     new ethereum.EventParam('signers', ethereum.Value.fromAddressArray(input.signers)),
-  );
-  newEvent.parameters.push(
-    new ethereum.EventParam('targets', ethereum.Value.fromAddressArray(input.targets)),
-  );
-  newEvent.parameters.push(
-    new ethereum.EventParam('values', ethereum.Value.fromUnsignedBigIntArray(input.values)),
-  );
-  newEvent.parameters.push(
-    new ethereum.EventParam('signatures', ethereum.Value.fromStringArray(input.signatures)),
-  );
-
-  newEvent.parameters.push(
-    new ethereum.EventParam('calldatas', ethereum.Value.fromBytesArray(input.calldatas)),
-  );
-  newEvent.parameters.push(
-    new ethereum.EventParam('startBlock', ethereum.Value.fromUnsignedBigInt(input.startBlock)),
-  );
-  newEvent.parameters.push(
-    new ethereum.EventParam('endBlock', ethereum.Value.fromUnsignedBigInt(input.endBlock)),
   );
   newEvent.parameters.push(
     new ethereum.EventParam(
@@ -83,7 +61,7 @@ export function createProposalCreatedWithRequirementsEventV3(
     new ethereum.EventParam('quorumVotes', ethereum.Value.fromUnsignedBigInt(input.quorumVotes)),
   );
   newEvent.parameters.push(
-    new ethereum.EventParam('description', ethereum.Value.fromString(input.description)),
+    new ethereum.EventParam('clientId', ethereum.Value.fromUnsignedBigInt(input.clientId)),
   );
 
   newEvent.block.number = input.eventBlockNumber;
@@ -105,13 +83,14 @@ export class ProposalCreatedWithRequirementsEvent {
   proposalThreshold: BigInt;
   quorumVotes: BigInt;
   description: string;
+  clientId: BigInt;
   eventBlockNumber: BigInt;
 }
 
 export function createProposalCreatedWithRequirementsEventV1(
   input: ProposalCreatedWithRequirementsEvent,
-): ProposalCreatedWithRequirements1 {
-  const newEvent = changetype<ProposalCreatedWithRequirements1>(newMockEvent());
+): ProposalCreatedWithRequirements {
+  const newEvent = changetype<ProposalCreatedWithRequirements>(newMockEvent());
   newEvent.parameters = [];
 
   newEvent.parameters.push(
@@ -175,6 +154,7 @@ export function stubProposalCreatedWithRequirementsEventInput(
     proposalThreshold: BIGINT_ONE,
     quorumVotes: BIGINT_ONE,
     description: 'some description',
+    clientId: BIGINT_ZERO,
     eventBlockNumber: eventBlockNumber,
   };
 }
@@ -731,8 +711,8 @@ export function createDelegateVotesChangedEvent(
   blockTimestamp: BigInt,
   blockNumber: BigInt,
   delegate: Address,
-  previousBalance: BigInt,
-  newBalance: BigInt,
+  previousVotes: BigInt,
+  newVotes: BigInt,
 ): DelegateVotesChanged {
   const newEvent = changetype<DelegateVotesChanged>(newMockEvent());
 
@@ -746,10 +726,10 @@ export function createDelegateVotesChangedEvent(
     new ethereum.EventParam('delegate', ethereum.Value.fromAddress(delegate)),
   );
   newEvent.parameters.push(
-    new ethereum.EventParam('previousBalance', ethereum.Value.fromUnsignedBigInt(previousBalance)),
+    new ethereum.EventParam('previousVotes', ethereum.Value.fromUnsignedBigInt(previousVotes)),
   );
   newEvent.parameters.push(
-    new ethereum.EventParam('newBalance', ethereum.Value.fromUnsignedBigInt(newBalance)),
+    new ethereum.EventParam('newVotes', ethereum.Value.fromUnsignedBigInt(newVotes)),
   );
 
   return newEvent;

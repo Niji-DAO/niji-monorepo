@@ -3,27 +3,34 @@ import { log } from '@graphprotocol/graph-ts';
 import {
   DelegateChanged,
   DelegateVotesChanged,
-  NounCreated,
+  NijiMinted,
   Transfer,
-} from './types/NounsToken/NounsToken';
+} from './types/NijiToken/NijiToken';
 import { Noun, Seed, DelegationEvent, TransferEvent } from './types/schema';
 import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from './utils/constants';
 import { getGovernanceEntity, getOrCreateDelegate, getOrCreateAccount } from './utils/helpers';
 
-export function handleNounCreated(event: NounCreated): void {
+export function handleNijiMinted(event: NijiMinted): void {
   const nounId = event.params.tokenId.toString();
 
   const seed = new Seed(nounId);
+  seed.special = event.params.seed.special;
+  seed.choker = event.params.seed.choker;
+  seed.headphone = event.params.seed.headphone;
+  seed.leftHand = event.params.seed.leftHand;
+  seed.hat = event.params.seed.hat;
+  seed.clothing = event.params.seed.clothing;
+  seed.ear = event.params.seed.ear;
+  seed.back = event.params.seed.back;
+  seed.backDecoration = event.params.seed.backDecoration;
   seed.background = event.params.seed.background;
-  seed.body = event.params.seed.body;
-  seed.accessory = event.params.seed.accessory;
-  seed.head = event.params.seed.head;
-  seed.glasses = event.params.seed.glasses;
+  seed.solidBackground = event.params.seed.solidBackground;
+  seed.hair = event.params.seed.hair;
   seed.save();
 
   const noun = Noun.load(nounId);
   if (noun == null) {
-    log.error('[handleNounCreated] Noun #{} not found. Hash: {}', [
+    log.error('[handleNijiMinted] Noun #{} not found. Hash: {}', [
       nounId,
       event.transaction.hash.toHex(),
     ]);
@@ -48,16 +55,14 @@ export function handleDelegateChanged(event: DelegateChanged): void {
 
   previousDelegate.tokenHoldersRepresentedAmount =
     previousDelegate.tokenHoldersRepresentedAmount - 1;
-  const previousNounsRepresented = previousDelegate.nounsRepresented; // Re-assignment required to update array
-  previousDelegate.nounsRepresented = previousNounsRepresented.filter(
-    n => !accountNouns.includes(n),
-  );
+  const previousNijiRepresented = previousDelegate.nijiRepresented; // Re-assignment required to update array
+  previousDelegate.nijiRepresented = previousNijiRepresented.filter(n => !accountNouns.includes(n));
   newDelegate.tokenHoldersRepresentedAmount = newDelegate.tokenHoldersRepresentedAmount + 1;
-  const newNounsRepresented = newDelegate.nounsRepresented; // Re-assignment required to update array
+  const newNijiRepresented = newDelegate.nijiRepresented; // Re-assignment required to update array
   for (let i = 0; i < accountNouns.length; i++) {
-    newNounsRepresented.push(accountNouns[i]);
+    newNijiRepresented.push(accountNouns[i]);
   }
-  newDelegate.nounsRepresented = newNounsRepresented;
+  newDelegate.nijiRepresented = newNijiRepresented;
   previousDelegate.save();
   newDelegate.save();
 
@@ -81,16 +86,16 @@ export function handleDelegateChanged(event: DelegateChanged): void {
 export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
   const governance = getGovernanceEntity();
   const delegate = getOrCreateDelegate(event.params.delegate.toHexString());
-  const votesDifference = event.params.newBalance.minus(event.params.previousBalance);
+  const votesDifference = event.params.newVotes.minus(event.params.previousVotes);
 
-  delegate.delegatedVotesRaw = event.params.newBalance;
-  delegate.delegatedVotes = event.params.newBalance;
+  delegate.delegatedVotesRaw = event.params.newVotes;
+  delegate.delegatedVotes = event.params.newVotes;
   delegate.save();
 
-  if (event.params.previousBalance == BIGINT_ZERO && event.params.newBalance > BIGINT_ZERO) {
+  if (event.params.previousVotes == BIGINT_ZERO && event.params.newVotes > BIGINT_ZERO) {
     governance.currentDelegates = governance.currentDelegates.plus(BIGINT_ONE);
   }
-  if (event.params.newBalance == BIGINT_ZERO) {
+  if (event.params.newVotes == BIGINT_ZERO) {
     governance.currentDelegates = governance.currentDelegates.minus(BIGINT_ONE);
   }
   governance.delegatedVotesRaw = governance.delegatedVotesRaw.plus(votesDifference);
@@ -128,8 +133,8 @@ export function handleTransfer(event: Transfer): void {
 
     if (fromHolder.delegate != null) {
       const fromHolderDelegate = getOrCreateDelegate(fromHolder.delegate as string);
-      const fromHolderNounsRepresented = fromHolderDelegate.nounsRepresented; // Re-assignment required to update array
-      fromHolderDelegate.nounsRepresented = fromHolderNounsRepresented.filter(
+      const fromHolderNijiRepresented = fromHolderDelegate.nijiRepresented; // Re-assignment required to update array
+      fromHolderDelegate.nijiRepresented = fromHolderNijiRepresented.filter(
         n => n != transferredNounId,
       );
       fromHolderDelegate.save();
@@ -180,9 +185,9 @@ export function handleTransfer(event: Transfer): void {
   const toHolderDelegate = getOrCreateDelegate(
     toHolder.delegate ? toHolder.delegate! : toHolder.id,
   );
-  const toHolderNounsRepresented = toHolderDelegate.nounsRepresented; // Re-assignment required to update array
-  toHolderNounsRepresented.push(transferredNounId);
-  toHolderDelegate.nounsRepresented = toHolderNounsRepresented;
+  const toHolderNijiRepresented = toHolderDelegate.nijiRepresented; // Re-assignment required to update array
+  toHolderNijiRepresented.push(transferredNounId);
+  toHolderDelegate.nijiRepresented = toHolderNijiRepresented;
   toHolderDelegate.save();
 
   const toHolderPreviousBalance = toHolder.tokenBalanceRaw;
