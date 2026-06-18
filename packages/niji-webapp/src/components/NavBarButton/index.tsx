@@ -1,8 +1,7 @@
 import { FC, HTMLAttributes } from 'react';
 
-import { faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
 import navDropdownClasses from '../NavBar/NavBarDropdown.module.css';
 
@@ -125,7 +124,7 @@ const NavBarButton: FC<NavBarButtonProps> = ({
                 isButtonUp === true ? navDropdownClasses.arrowUp : navDropdownClasses.arrowDown
               }
             >
-              <FontAwesomeIcon icon={isButtonUp === true ? faSortUp : faSortDown} />{' '}
+              {isButtonUp === true ? <ChevronUpIcon /> : <ChevronDownIcon />}{' '}
             </div>
           )}
         </div>

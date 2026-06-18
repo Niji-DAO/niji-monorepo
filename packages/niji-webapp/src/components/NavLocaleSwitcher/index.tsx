@@ -1,10 +1,9 @@
 import React, { HTMLAttributes, useState } from 'react';
 
-import { faCheck, faGlobe, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
 import { useAtom } from 'jotai/react';
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, GlobeIcon } from 'lucide-react';
 import { Dropdown } from 'react-bootstrap';
 
 import LanguageSelectionModal from '@/components/LanguageSelectionModal';
@@ -93,11 +92,9 @@ const NavLocaleSwitcher: React.FC<NavLocalSwitcherProps> = props => {
         }}
       >
         <div className={navDropdownClasses.button}>
-          <div className={navDropdownClasses.dropdownBtnContent}>
-            {<FontAwesomeIcon icon={faGlobe} />}
-          </div>
+          <div className={navDropdownClasses.dropdownBtnContent}>{<GlobeIcon />}</div>
           <div className={buttonUp ? navDropdownClasses.arrowUp : navDropdownClasses.arrowDown}>
-            <FontAwesomeIcon icon={buttonUp ? faSortUp : faSortDown} />{' '}
+            {buttonUp ? <ChevronUpIcon /> : <ChevronDownIcon />}{' '}
           </div>
         </div>
       </div>
@@ -118,7 +115,7 @@ const NavLocaleSwitcher: React.FC<NavLocalSwitcherProps> = props => {
       >
         <NavBarButton
           buttonText={<Trans>Language</Trans>}
-          buttonIcon={<FontAwesomeIcon icon={faGlobe} />}
+          buttonIcon={<GlobeIcon />}
           buttonStyle={buttonStyle}
         />
       </div>
@@ -161,9 +158,7 @@ const NavLocaleSwitcher: React.FC<NavLocalSwitcherProps> = props => {
                 onClick={() => setActiveLocale(locale)}
               >
                 {LOCALE_LABEL[locale]}
-                {activeLocale === locale && (
-                  <FontAwesomeIcon icon={faCheck} height={24} width={24} />
-                )}
+                {activeLocale === locale && <CheckIcon height={24} width={24} />}
               </div>
             );
           })}

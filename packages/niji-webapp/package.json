@@ -27,9 +27,6 @@
     "not op_mini all"
   ],
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.7.0",
-    "@fortawesome/free-solid-svg-icons": "^6.7.0",
-    "@fortawesome/react-fontawesome": "^0.2.2",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@heroicons/react": "^1.0.6",
     "@lingui/core": "^5.9.0",
@@ -121,7 +118,6 @@
     "@types/pngjs": "^6.0.1",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@types/react-fontawesome": "^1.6.5",
     "@types/react-transition-group": "^4.4.5",
     "@types/redux-logger": "^3.0.13",
     "@vitejs/plugin-react": "^5.0.0",

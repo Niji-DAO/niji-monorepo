@@ -2,12 +2,11 @@ import type { Address } from '@/utils/types';
 
 import React, { useEffect } from 'react';
 
-import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { CircleCheckIcon } from 'lucide-react';
 
 import ShortAddress from '@/components/ShortAddress';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
@@ -158,7 +157,7 @@ const Signature: React.FC<CandidateSignatureProps> = props => {
         {props.isUpdateToProposal && !props.isAccountSigner && (
           <p className={classes.sigStatus}>
             <span>
-              <FontAwesomeIcon icon={faCircleCheck} />
+              <CircleCheckIcon />
             </span>
             <Trans>Re-signed</Trans>
           </p>
