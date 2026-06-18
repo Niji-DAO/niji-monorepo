@@ -6,7 +6,7 @@ import { Trans } from '@lingui/react/macro';
 import { Col, Row } from 'react-bootstrap';
 
 import AuctionActivityDateHeadline from '@/components/AuctionActivityDateHeadline';
-import AuctionActivityNounTitle from '@/components/AuctionActivityNounTitle';
+import AuctionActivityNijiTitle from '@/components/AuctionActivityNijiTitle';
 import AuctionActivityWrapper from '@/components/AuctionActivityWrapper';
 import AuctionNavigation from '@/components/AuctionNavigation';
 import AuctionTimer from '@/components/AuctionTimer';
@@ -17,7 +17,7 @@ import BidHistoryBtn from '@/components/BidHistoryBtn';
 import BidHistoryModal from '@/components/BidHistoryModal';
 import CurrentBid from '@/components/CurrentBid';
 import Holder from '@/components/Holder';
-import NounInfoCard from '@/components/NounInfoCard';
+import NijiInfoCard from '@/components/NijiInfoCard';
 import Winner from '@/components/Winner';
 import { nijiAuctionHouseAddress } from '@/contracts';
 import { useAppSelector } from '@/hooks';
@@ -116,7 +116,7 @@ const AuctionActivity: React.FC<AuctionActivityProps> = (props: AuctionActivityP
               <AuctionActivityDateHeadline startTime={BigInt(auction.startTime)} />
             </AuctionTitleAndNavWrapper>
             <Col lg={12}>
-              <AuctionActivityNounTitle isCool={isCool} nounId={BigInt(auction.nounId)} />
+              <AuctionActivityNijiTitle isCool={isCool} nounId={BigInt(auction.nounId)} />
             </Col>
           </Row>
           <Row className={classes.activityRow}>
@@ -140,7 +140,7 @@ const AuctionActivity: React.FC<AuctionActivityProps> = (props: AuctionActivityP
             <Col lg={12} className={classes.nextNounLink}>
               <FontAwesomeIcon icon={faInfoCircle} />
               <a href={'https://www.nouns.game/crystal-ball'} target={'_blank'} rel="noreferrer">
-                <Trans>Help mint the next Noun</Trans>
+                <Trans>Help mint the next Niji</Trans>
               </a>
             </Col>
           </Row>
@@ -157,7 +157,7 @@ const AuctionActivity: React.FC<AuctionActivityProps> = (props: AuctionActivityP
         <Row className={classes.activityRow}>
           <Col lg={12}>
             {!isLastAuction ? (
-              <NounInfoCard
+              <NijiInfoCard
                 nounId={BigInt(auction.nounId)}
                 bidHistoryOnClickHandler={showBidModalHandler}
               />

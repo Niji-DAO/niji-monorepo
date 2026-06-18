@@ -32,7 +32,7 @@ const AuctionNavigation: React.FC<AuctionNavigationProps> = props => {
         // from the noun at / doesn't work (i.e.,
         // to go from current noun to current noun - 1 would take two arrow presses)
         if (onDisplayAuctionNounId === lastAuctionNounId) {
-          navigate(`/noun/${lastAuctionNounId}`);
+          navigate(`/niji/${lastAuctionNounId}`);
         }
 
         if (!isFirstAuction) {

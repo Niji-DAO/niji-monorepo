@@ -5,7 +5,7 @@ import { useEnsAvatar, useEnsName } from 'wagmi';
 
 import { formatShortAddress } from '@/utils/addressAndENSDisplayUtils';
 import { containsBlockedText } from '@/utils/moderation/containsBlockedText';
-import { resolveNounContractAddress } from '@/utils/resolveNounsContractAddress';
+import { resolveNijiContractAddress } from '@/utils/resolveNijiContractAddress';
 import { Address } from '@/utils/types';
 
 interface ShortAddressProps {
@@ -16,7 +16,7 @@ interface ShortAddressProps {
 
 const ShortAddress: React.FC<ShortAddressProps> = ({ address, avatar = false, size = 24 }) => {
   const { data: ensName } = useEnsName({ address });
-  const resolvedName = ensName ?? resolveNounContractAddress(address);
+  const resolvedName = ensName ?? resolveNijiContractAddress(address);
   const isBlocklisted = resolvedName ? containsBlockedText(resolvedName, 'en') : false;
   const shortAddress = formatShortAddress(address);
   const { data: ensAvatar } = useEnsAvatar({ name: resolvedName });

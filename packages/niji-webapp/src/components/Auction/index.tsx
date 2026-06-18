@@ -5,14 +5,14 @@ import { useNavigate } from 'react-router';
 
 import AuctionActivity from '@/components/AuctionActivity';
 import { LoadingNoun } from '@/components/LegacyNoun';
-import NounderNounContent from '@/components/NounderNounContent';
+import NijiContent from '@/components/NijiContent';
 import { StandaloneNounWithSeed } from '@/components/StandaloneNoun';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { setStateBackgroundColor } from '@/state/slices/application';
 import { RootState } from '@/store';
 import { nounPath } from '@/utils/history';
 import { beige, grey } from '@/utils/nounBgColors';
-import { isNounderNoun } from '@/utils/nounderNoun';
+import { isNounderNiji } from '@/utils/nounderNiji';
 import { Auction as IAuction } from '@/wrappers/nijiAuction';
 import { INounSeed } from '@/wrappers/nijiToken';
 
@@ -72,7 +72,7 @@ const Auction: React.FC<AuctionProps> = props => {
     />
   );
   const nounderNounContent = currentAuction && lastNounId && (
-    <NounderNounContent
+    <NijiContent
       mintTimestamp={BigInt(currentAuction.startTime)}
       nounId={BigInt(currentAuction.nounId)}
       isFirstAuction={currentAuction.nounId === 0n}
@@ -91,7 +91,7 @@ const Auction: React.FC<AuctionProps> = props => {
           </Col>
           <Col lg={{ span: 6 }} className={classes.auctionActivityCol}>
             {currentAuction &&
-              (isNounderNoun(BigInt(currentAuction.nounId))
+              (isNounderNiji(BigInt(currentAuction.nounId))
                 ? nounderNounContent
                 : currentAuctionActivityContent)}
           </Col>

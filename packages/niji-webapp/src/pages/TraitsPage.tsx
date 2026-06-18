@@ -4,7 +4,6 @@ import { type FC, useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { buildSVG, PNGCollectionEncoder } from '@niji/sdk';
-import { ImageData } from '@noundry/nouns-assets';
 import JSZip from 'jszip';
 import { CopyIcon, DownloadIcon, PackageIcon } from 'lucide-react';
 import { toast } from 'sonner';
@@ -18,7 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { traitCategory } from '@/lib/traitCategory';
+import { humanizeTraitKey, NijiImageData, nijiTraitKeys } from '@/lib/nijiAssets';
 import { traitName } from '@/lib/traitName';
 import { svg2png } from '@/utils/svg2png';
 
@@ -29,29 +28,9 @@ interface TraitItem {
   category: string;
   type: string;
   index: number;
-  hexColor?: string;
 }
 
-interface EncodedImage {
-  filename: string;
-  data: string;
-}
-
-const encoder = new PNGCollectionEncoder(ImageData.palette);
-
-const capitalizeFirstLetter = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
-
-const traitKeyToTitle: Record<string, string> = {
-  glasses: 'Noggles',
-  heads: 'Heads',
-  accessories: 'Accessories',
-  bodies: 'Bodies',
-};
-
-const backgroundColors = {
-  cool: '#d5d7e1',
-  warm: '#e1d7d5',
-};
+const encoder = new PNGCollectionEncoder(NijiImageData.palette);
 
 const downloadSVG = (svg: string, filename: string) => {
   const blob = new Blob([svg], { type: 'image/svg+xml' });
@@ -90,15 +69,16 @@ const copyToClipboard = async (text: string) => {
 const generateTraitItems = (): TraitItem[] => {
   const traitItems: TraitItem[] = [];
 
-  // Process each trait category
-  Object.entries(traitCategory).forEach(([traitType, imageKey]) => {
-    const categoryTitle = traitKeyToTitle[imageKey] || capitalizeFirstLetter(imageKey);
-    const images = ImageData.images[imageKey];
+  nijiTraitKeys.forEach(traitType => {
+    const categoryTitle = humanizeTraitKey(traitType);
+    const images = NijiImageData.images[traitType];
 
-    images.forEach((imageData: EncodedImage, index: number) => {
+    images.forEach((imageData, index: number) => {
+      if (imageData.data === undefined) {
+        return;
+      }
       const name = traitName(traitType as keyof INounSeed, index);
 
-      // Build SVG for this single trait (with transparent background)
       const svg = buildSVG([imageData], encoder.data.palette, undefined);
 
       traitItems.push({
@@ -106,28 +86,9 @@ const generateTraitItems = (): TraitItem[] => {
         filename: imageData.filename,
         svg,
         category: categoryTitle,
-        type: traitType === 'glasses' ? 'Noggles' : traitType,
+        type: traitType,
         index,
       });
-    });
-  });
-
-  // Add background colors
-  Object.entries(backgroundColors).forEach(([bgName, hexColor], index) => {
-    // Create a colored rectangle SVG with centered hex code text
-    const svg = `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-      <rect width="32" height="32" fill="${hexColor}" />
-      <text x="16" y="18" text-anchor="middle" font-family="monospace" font-size="3" fill="${hexColor === '#d5d7e1' ? '#333' : '#666'}">${hexColor}</text>
-    </svg>`;
-
-    traitItems.push({
-      name: capitalizeFirstLetter(bgName),
-      filename: `background-${bgName}`,
-      svg,
-      category: 'Backgrounds',
-      type: 'background',
-      index,
-      hexColor,
     });
   });
 
@@ -168,52 +129,29 @@ const TraitsPage: FC = () => {
         {} as Record<string, TraitItem[]>,
       );
 
-      // Collect background colors info for consolidated file
-      const backgroundColors: string[] = [];
-
-      // Process each category
       for (const [category, categoryTraits] of Object.entries(traitsByCategory)) {
         const categoryFolder = zip.folder(category);
 
         for (const trait of categoryTraits) {
-          // Create filename with trait index prefix
           const indexedFilename = `${trait.index}-${trait.filename}`;
-
-          // Add SVG file
           categoryFolder?.file(`${indexedFilename}.svg`, trait.svg);
-
-          // For background colors, collect info for consolidated file
-          if (trait.type === 'background' && trait.hexColor) {
-            backgroundColors.push(`${trait.index}: ${trait.name} - ${trait.hexColor}`);
-          } else {
-            // For other traits, add PNG version
-            try {
-              const pngBlob = await svg2png(trait.svg, 512, 512);
-              if (pngBlob) {
-                // Convert data URL to blob
-                const response = await fetch(pngBlob);
-                const blob = await response.blob();
-                categoryFolder?.file(`${indexedFilename}.png`, blob);
-              }
-            } catch (error) {
-              console.warn(`Failed to convert ${trait.filename} to PNG:`, error);
+          try {
+            const pngBlob = await svg2png(trait.svg, 512, 512);
+            if (pngBlob) {
+              const response = await fetch(pngBlob);
+              const blob = await response.blob();
+              categoryFolder?.file(`${indexedFilename}.png`, blob);
             }
+          } catch (error) {
+            console.warn(`Failed to convert ${trait.filename} to PNG:`, error);
           }
         }
       }
 
-      // Add consolidated backgrounds.txt file if there are background colors
-      if (backgroundColors.length > 0) {
-        const backgroundsFolder = zip.folder('Backgrounds');
-        const backgroundsContent = backgroundColors.join('\n');
-        backgroundsFolder?.file('backgrounds.txt', backgroundsContent);
-      }
-
-      // Generate and download the ZIP
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       const downloadEl = document.createElement('a');
       downloadEl.href = URL.createObjectURL(zipBlob);
-      downloadEl.download = 'nouns-traits.zip';
+      downloadEl.download = 'niji-traits.zip';
       downloadEl.click();
       URL.revokeObjectURL(downloadEl.href);
 
@@ -248,11 +186,9 @@ const TraitsPage: FC = () => {
     {} as Record<string, TraitItem[]>,
   );
 
-  // Define the order for categories
-  const categoryOrder = ['Noggles', 'Heads', 'Accessories', 'Bodies', 'Backgrounds'];
-  const orderedCategories = categoryOrder.filter(
-    category => traitsByCategory[category] !== undefined,
-  );
+  const orderedCategories = nijiTraitKeys
+    .map(humanizeTraitKey)
+    .filter(category => traitsByCategory[category] !== undefined);
 
   return (
     <div className="container mx-auto px-4 pt-8">
@@ -302,7 +238,7 @@ const TraitsPage: FC = () => {
                 <DialogContent className="max-w-[min(calc(100vw-2rem),28rem)] rounded-xl">
                   <DialogHeader>
                     <DialogTitle>
-                      {trait.name} {capitalizeFirstLetter(trait.type)}
+                      {trait.name} {humanizeTraitKey(trait.type as keyof INounSeed)}
                     </DialogTitle>
                   </DialogHeader>
                   <div className="flex flex-col items-center space-y-4">
@@ -313,37 +249,32 @@ const TraitsPage: FC = () => {
                         className="h-full w-full object-contain"
                       />
                     </div>
-                    {trait.type === 'background' ? (
-                      <div className="flex flex-col items-center gap-3">
-                        <Button
-                          variant="outline"
-                          onClick={() => copyToClipboard(trait.hexColor!)}
-                          className="flex items-center gap-2"
-                        >
-                          <CopyIcon size={16} />
-                          Copy Hex Code
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex gap-3">
-                        <Button
-                          variant="outline"
-                          onClick={() => downloadSVG(trait.svg, trait.filename)}
-                          className="flex items-center gap-2"
-                        >
-                          <DownloadIcon size={16} />
-                          SVG
-                        </Button>
-                        <Button
-                          variant="outline"
-                          onClick={() => downloadPNG(trait.svg, trait.filename)}
-                          className="flex items-center gap-2"
-                        >
-                          <DownloadIcon size={16} />
-                          PNG
-                        </Button>
-                      </div>
-                    )}
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => downloadSVG(trait.svg, trait.filename)}
+                        className="flex items-center gap-2"
+                      >
+                        <DownloadIcon size={16} />
+                        SVG
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => downloadPNG(trait.svg, trait.filename)}
+                        className="flex items-center gap-2"
+                      >
+                        <DownloadIcon size={16} />
+                        PNG
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => copyToClipboard(trait.filename)}
+                        className="flex items-center gap-2"
+                      >
+                        <CopyIcon size={16} />
+                        <Trans>Filename</Trans>
+                      </Button>
+                    </div>
                   </div>
                 </DialogContent>
               </Dialog>

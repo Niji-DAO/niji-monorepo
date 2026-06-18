@@ -4,7 +4,7 @@ import { ScaleIcon } from '@heroicons/react/solid';
 import { Trans } from '@lingui/react/macro';
 import { Spinner } from 'react-bootstrap';
 
-import HorizontalStackedNouns from '@/components/HorizontalStackedNouns';
+import HorizontalStackedNijis from '@/components/HorizontalStackedNijis';
 import ShortAddress from '@/components/ShortAddress';
 import { useDelegateNounsAtBlockQuery } from '@/wrappers/nijiToken';
 
@@ -39,13 +39,13 @@ const DelegateHoverCard: React.FC<DelegateHoverCardProps> = props => {
     return <>Error fetching Vote info</>;
   }
 
-  const numVotesForProp = data.delegates[0].nounsRepresented.length;
+  const numVotesForProp = data.delegates[0].nijiRepresented.length;
 
   return (
     <div className={classes.wrapper}>
       <div className={classes.stackedNounWrapper}>
-        <HorizontalStackedNouns
-          nounIds={data.delegates[0].nounsRepresented.map((noun: { id: string }) => noun.id)}
+        <HorizontalStackedNijis
+          nounIds={data.delegates[0].nijiRepresented.map((noun: { id: string }) => noun.id)}
         />
       </div>
 
@@ -57,7 +57,7 @@ const DelegateHoverCard: React.FC<DelegateHoverCardProps> = props => {
         <ScaleIcon height={20} width={20} className={classes.icon} />
         {numVotesForProp === 1 ? (
           <Trans>
-            Voted with<span className={classes.bold}>{numVotesForProp}</span>Noun
+            Voted with<span className={classes.bold}>{numVotesForProp}</span>Niji
           </Trans>
         ) : (
           <Trans>

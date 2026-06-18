@@ -8,7 +8,7 @@ import { Link, useParams } from 'react-router';
 import { formatEther } from 'viem';
 import { useAccount } from 'wagmi';
 
-import AddNounsToForkModal from '@/components/AddNounsToForkModal';
+import AddNijisToForkModal from '@/components/AddNijisToForkModal';
 import ForkingPeriodTimer from '@/components/ForkingPeriodTimer';
 import useForkTreasuryBalance from '@/hooks/useForkTreasuryBalance';
 import { useScrollToLocation } from '@/hooks/useScrollToLocation';
@@ -31,7 +31,7 @@ import NotFoundPage from '../NotFound';
 import DeployForkButton from './DeployForkButton';
 import classes from './Fork.module.css';
 import ForkEvent from './ForkEvent';
-import WithdrawNounsButton from './WithdrawNounsButton';
+import WithdrawNijisButton from './WithdrawNijisButton';
 
 const now = new Date();
 
@@ -208,7 +208,7 @@ const ForkPage = () => {
                     <div className={classes.spacer} />
                   </div>
                   <h1>
-                    <Trans>Fork Nouns DAO</Trans>
+                    <Trans>Fork Niji DAO</Trans>
                   </h1>
                   <p className="mb-4">
                     <Trans>
@@ -269,7 +269,7 @@ const ForkPage = () => {
                     userEscrowedNounIds != null &&
                     userEscrowedNounIds.data != null &&
                     userEscrowedNounIds.data.length > 0 && (
-                      <WithdrawNounsButton
+                      <WithdrawNijisButton
                         tokenIds={userEscrowedNounIds.data}
                         isWithdrawModalOpen={isWithdrawModalOpen}
                         setIsWithdrawModalOpen={setIsWithdrawModalOpen}
@@ -378,7 +378,7 @@ const ForkPage = () => {
                     ) : (
                       <>{numTokensInForkEscrow !== undefined ? numTokensInForkEscrow : '...'}</>
                     )}{' '}
-                    Noun
+                    Niji
                     {(() => {
                       if (isForkPeriodActive || isForked) {
                         return forkDetails.data?.tokensForkingCount === 1 ? '' : 's';
@@ -409,7 +409,7 @@ const ForkPage = () => {
                 {(isForkPeriodActive || isForked) && (
                   <div className={classes.nounsInFork}>
                     {forkDetails.data.addedNouns.map(nounId => (
-                      <a href={`/noun/${nounId}`} target="_blank" rel="noreferrer" key={nounId}>
+                      <a href={`/niji/${nounId}`} target="_blank" rel="noreferrer" key={nounId}>
                         <img
                           src={`https://noun.pics/${nounId}`}
                           alt="noun"
@@ -430,7 +430,7 @@ const ForkPage = () => {
                   userEscrowedNounIds.data.length > 0 && (
                     <div className={clsx(classes.userNouns, classes.callout)}>
                       <p>
-                        Your Noun{userEscrowedNounIds.data.length > 1 && 's'} in escrow:{' '}
+                        Your Niji{userEscrowedNounIds.data.length > 1 && 's'} in escrow:{' '}
                         <strong>
                           {userEscrowedNounIds.data.map(nounId => `Noun ${nounId}`).join(', ')}
                         </strong>
@@ -463,7 +463,7 @@ const ForkPage = () => {
       )}
       {account && (
         <>
-          <AddNounsToForkModal
+          <AddNijisToForkModal
             setIsModalOpen={setIsModalOpen}
             isModalOpen={isModalOpen}
             isConfirmModalOpen={isConfirmModalOpen}

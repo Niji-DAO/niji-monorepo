@@ -27,9 +27,9 @@ import EditProposalPage from '@/pages/EditProposal';
 import ForkPage from '@/pages/Fork';
 import ForksPage from '@/pages/Forks';
 import GovernancePage from '@/pages/Governance';
+import NijisPage from '@/pages/NijisPage';
 import NotFoundPage from '@/pages/NotFound';
 import NoundersPage from '@/pages/Nounders';
-import NounsPage from '@/pages/NounsPage';
 import Playground from '@/pages/Playground';
 import ProposalHistory from '@/pages/ProposalHistory';
 import TraitsPage from '@/pages/TraitsPage';
@@ -56,8 +56,7 @@ function App() {
         <NavBar />
         <Routes>
           <Route path="/" element={<AuctionPage />} />
-          <Route path="/auction/:id" element={<Navigate to="/noun/:id" replace />} />
-          <Route path="/noun/:id" element={<AuctionPage />} />
+          <Route path="/niji/:id" element={<AuctionPage />} />
           <Route path="/nounders" element={<NoundersPage />} />
           <Route path="/create-proposal" element={<CreateProposalPage />} />
           <Route path="/create-candidate" element={<CreateCandidatePage />} />
@@ -79,8 +78,8 @@ function App() {
           <Route path="/playground" element={<Playground />} />
           <Route path="/delegate" element={<DelegatePage />} />
           <Route path="/traits" element={<TraitsPage />} />
-          <Route path="/explore" element={<Navigate to="/nouns" replace />} />
-          <Route path="/nouns" element={<NounsPage />} />
+          <Route path="/explore" element={<Navigate to="/nijis" replace />} />
+          <Route path="/nijis" element={<NijisPage />} />
           <Route path="/fork/:id" element={<ForkPage />} />
           <Route path="/fork" element={<ForksPage />} />
           <Route path="/brand" element={<BrandAssetsPage />} />

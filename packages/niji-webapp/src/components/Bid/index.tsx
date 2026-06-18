@@ -222,7 +222,7 @@ const Bid: React.FC<BidProps> = props => {
           <>
             <Col lg={12} className={classes.voteForNextNounBtnWrapper}>
               <Button className={classes.bidBtnAuctionEnded} onClick={crytalBallBtnOnClickHandler}>
-                <Trans>Pick the next Noun</Trans> ⌐◧-◧
+                <Trans>Pick the next Niji</Trans> ⌐◧-◧
               </Button>
             </Col>
             {/* Only show the force settles button if the wallet connected */}

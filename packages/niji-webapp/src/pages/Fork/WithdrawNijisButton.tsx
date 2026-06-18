@@ -17,7 +17,7 @@ type Props = {
   setDataFetchPollInterval: (interval: number) => void;
 };
 
-function WithdrawNounsButton(props: Props) {
+function WithdrawNijisButton(props: Props) {
   const { withdrawFromForkEscrow, withdrawFromForkEscrowState } = useWithdrawFromForkEscrow();
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -79,9 +79,9 @@ function WithdrawNounsButton(props: Props) {
   const modalContent = (
     <div className={classes.transactionModal}>
       <h2 className={classes.transactionModalTitle}>
-        <Trans>Withdraw Nouns from escrow</Trans>
+        <Trans>Withdraw Nijis from escrow</Trans>
       </h2>
-      <p>Withdrawing {props.tokenIds.map(nounId => `Noun ${nounId}`).join(', ')}</p>
+      <p>Withdrawing {props.tokenIds.map(nounId => `Niji ${nounId}`).join(', ')}</p>
       <p
         className={clsx(
           classes.transactionStatus,
@@ -144,7 +144,7 @@ function WithdrawNounsButton(props: Props) {
         }}
         disabled={isLoading || isWaiting}
       >
-        <Trans>Withdraw Nouns from escrow</Trans>
+        <Trans>Withdraw Nijis from escrow</Trans>
       </button>
       <SolidColorBackgroundModal
         show={props.isWithdrawModalOpen}
@@ -163,4 +163,4 @@ function WithdrawNounsButton(props: Props) {
   );
 }
 
-export default WithdrawNounsButton;
+export default WithdrawNijisButton;

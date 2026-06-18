@@ -5,7 +5,7 @@ import { Col, Row } from 'react-bootstrap';
 import { Link } from 'react-router';
 
 import AuctionActivityDateHeadline from '@/components/AuctionActivityDateHeadline';
-import AuctionActivityNounTitle from '@/components/AuctionActivityNounTitle';
+import AuctionActivityNijiTitle from '@/components/AuctionActivityNijiTitle';
 import AuctionActivityWrapper from '@/components/AuctionActivityWrapper';
 import AuctionNavigation from '@/components/AuctionNavigation';
 import AuctionTitleAndNavWrapper from '@/components/AuctionTitleAndNavWrapper';
@@ -13,13 +13,13 @@ import CurrentBid, { BID_N_A } from '@/components/CurrentBid';
 import Winner from '@/components/Winner';
 import { useAppSelector } from '@/hooks';
 
-import nounContentClasses from './NounderNounContent.module.css';
+import nounContentClasses from './NijiContent.module.css';
 
 import auctionActivityClasses from '@/components/AuctionActivity/AuctionActivity.module.css';
 import auctionBidClasses from '@/components/AuctionActivity/BidHistory.module.css';
 import bidBtnClasses from '@/components/BidHistoryBtn/BidHistoryBtn.module.css';
 
-interface NounderNounContentProps {
+interface NijiContentProps {
   mintTimestamp: bigint;
   nounId: bigint;
   isFirstAuction: boolean;
@@ -28,7 +28,7 @@ interface NounderNounContentProps {
   onNextAuctionClick: () => void;
 }
 
-const NounderNounContent: React.FC<NounderNounContentProps> = props => {
+const NijiContent: React.FC<NijiContentProps> = props => {
   const {
     mintTimestamp,
     nounId,
@@ -40,7 +40,7 @@ const NounderNounContent: React.FC<NounderNounContentProps> = props => {
 
   const isCool = useAppSelector(state => state.application.isCoolBackground);
 
-  // Page through Nouns via a keyboard
+  // Page through Nijis via keyboard
   // handle what happens on key press
   const handleKeyPress = useCallback(
     (event: { key: string }) => {
@@ -78,7 +78,7 @@ const NounderNounContent: React.FC<NounderNounContentProps> = props => {
             <AuctionActivityDateHeadline startTime={mintTimestamp} />
           </AuctionTitleAndNavWrapper>
           <Col lg={12}>
-            <AuctionActivityNounTitle nounId={nounId} />
+            <AuctionActivityNijiTitle nounId={nounId} />
           </Col>
         </Row>
         <Row className={auctionActivityClasses.activityRow}>
@@ -104,16 +104,16 @@ const NounderNounContent: React.FC<NounderNounContentProps> = props => {
                 ` ${nounContentClasses.bidRow}`
               }
             >
-              <Trans>All Noun auction proceeds are sent to the</Trans>{' '}
+              <Trans>All Niji auction proceeds are sent to the</Trans>{' '}
               <Link to="/vote" className={nounContentClasses.link}>
                 <Trans>Niji DAO</Trans>
               </Link>
               .{' '}
               <Trans>
                 For this reason, we, the project&#39;s founders (‘Nounders’) have chosen to
-                compensate compensate ourselves with Nouns. Every 10th Noun for the first 5 years of
-                the project will be sent to our multisig (5/10), where it will be vested and
-                distributed Nounders.
+                compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the
+                project will be sent to our multisig (5/10), where it will be vested and distributed
+                to Nounders.
               </Trans>
             </li>
           </ul>
@@ -134,4 +134,4 @@ const NounderNounContent: React.FC<NounderNounContentProps> = props => {
     </AuctionActivityWrapper>
   );
 };
-export default NounderNounContent;
+export default NijiContent;

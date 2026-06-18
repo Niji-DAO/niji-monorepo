@@ -90,7 +90,7 @@ function DeployForkButton(props: Props) {
         <Trans>Deploy Fork</Trans>
       </h2>
       <p>
-        <Trans>Deploying Nouns fork and beginning the forking period</Trans>
+        <Trans>Deploying Niji fork and beginning the forking period</Trans>
       </p>
       <p
         className={clsx(
@@ -156,7 +156,7 @@ function DeployForkButton(props: Props) {
               <Spinner animation="border" />
             </div>
           ) : (
-            <Trans>Deploy Nouns fork</Trans>
+            <Trans>Deploy Niji fork</Trans>
           )}
         </button>
       )}

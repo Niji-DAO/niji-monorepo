@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { XIcon } from '@heroicons/react/solid';
 import ReactDOM from 'react-dom';
 
-import NounsTransition from '@/components/NounsTransition';
+import NijisTransition from '@/components/NijisTransition';
 import {
   basicFadeInOut,
   desktopModalSlideInFromTopAndGrow,
@@ -17,7 +17,7 @@ export const Backdrop: React.FC<{ onDismiss: () => void; show: boolean }> = prop
   const nodeRef = useRef(null);
 
   return (
-    <NounsTransition
+    <NijisTransition
       className={classes.backdrop}
       nodeRef={nodeRef}
       show={props.show}
@@ -56,7 +56,7 @@ const SolidColorBackgroundModalOverlay: React.FC<{
 
   return (
     <>
-      <NounsTransition
+      <NijisTransition
         nodeRef={exitBtnRef}
         timeout={200}
         transitionStyes={basicFadeInOut}
@@ -67,8 +67,8 @@ const SolidColorBackgroundModalOverlay: React.FC<{
             <XIcon className={classes.icon} />
           </button>
         </div>
-      </NounsTransition>
-      <NounsTransition
+      </NijisTransition>
+      <NijisTransition
         nodeRef={modalRef}
         show={show}
         className={classes.modal}
@@ -76,7 +76,7 @@ const SolidColorBackgroundModalOverlay: React.FC<{
         transitionStyes={isMobile ? mobileModalSlideInFromBottm : desktopModalSlideInFromTopAndGrow}
       >
         <>{content}</>
-      </NounsTransition>
+      </NijisTransition>
     </>
   );
 };

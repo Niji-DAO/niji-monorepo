@@ -32,7 +32,7 @@ interface ProviderProps {
   children: ReactNode;
 }
 
-export function NounsI18nProvider({ locale, onActivate, children }: Readonly<ProviderProps>) {
+export function NijiI18nProvider({ locale, onActivate, children }: Readonly<ProviderProps>) {
   useEffect(() => {
     dynamicActivate(locale)
       .then(() => onActivate?.(locale))

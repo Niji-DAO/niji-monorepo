@@ -26,7 +26,7 @@ export const Footer = () => {
         { label: t`Governance`, url: '/vote' },
         { label: t`Brand Assets`, url: '/brand' },
         { label: t`Playground`, url: '/playground' },
-        { label: t`Nouns`, url: '/nouns' },
+        { label: t`Nijis`, url: '/nijis' },
         { label: t`Traits`, url: '/traits' },
         {
           label: t`Forks`,
@@ -66,7 +66,7 @@ export const Footer = () => {
     { alt: 'X', url: 'https://x.com/nounsdao', icon: <XIcon className="size-6 p-0.5" /> },
     {
       alt: 'Farcaster',
-      url: 'https://farcaster.xyz/~/channel/nouns',
+      url: 'https://farcaster.xyz/~/channel/nijis',
       icon: <FarcasterIcon className="size-6" />,
     },
     { alt: 'GitHub', url: 'https://github.com/nounsDAO', icon: <GitHubIcon className="size-6" /> },
@@ -118,7 +118,7 @@ export const Footer = () => {
       </div>
 
       <div className="mt-12 flex items-center justify-center text-base text-black sm:mt-16">
-        <p className="m-0 p-1">{`${new Date().getFullYear()} Nouns DAO`}</p>·
+        <p className="m-0 p-1">{`${new Date().getFullYear()} Niji DAO`}</p>·
         <p className="m-0 p-1">
           <Trans>
             made with <NogglesLogo className="inline-block h-3 align-baseline" />

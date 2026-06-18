@@ -1,12 +1,12 @@
 import { type FC, useEffect } from 'react';
 
 import { buildSVG } from '@niji/sdk';
-import { getNounData, ImageData as data } from '@noundry/nouns-assets';
 import Image from 'react-bootstrap/Image';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router';
 
 import LegacyNoun from '@/components/LegacyNoun';
+import { getNijiData, NijiImageData } from '@/lib/nijiAssets';
 import { setOnDisplayAuctionNounId } from '@/state/slices/onDisplayAuction';
 import { INounSeed, useNounSeed } from '@/wrappers/nijiToken';
 
@@ -30,10 +30,10 @@ interface StandaloneNounWithSeedProps {
 
 export const getNoun = (nounId: string | bigint, seed: INounSeed) => {
   const id = nounId.toString();
-  const name = `Noun ${id}`;
-  const description = `Noun ${id} is a member of the Nouns DAO`;
-  const { parts, background } = getNounData(seed);
-  const image = `data:image/svg+xml;base64,${btoa(buildSVG(parts, data.palette, background))}`;
+  const name = `Niji ${id}`;
+  const description = `Niji ${id} is a member of the Niji DAO`;
+  const { parts, background } = getNijiData(seed);
+  const image = `data:image/svg+xml;base64,${btoa(buildSVG(parts, NijiImageData.palette, background))}`;
 
   return {
     name,
@@ -69,7 +69,7 @@ const StandaloneNoun: FC<StandaloneNounProps> = (props: StandaloneNounProps) => 
 
   return (
     <Link
-      to={'/noun/' + nounId.toString()}
+      to={'/niji/' + nounId.toString()}
       className={classes.clickableNoun}
       onClick={onClickHandler}
     >
@@ -98,7 +98,7 @@ export const StandaloneNounCircular: FC<StandaloneCircularNounProps> = (
 
   return (
     <Link
-      to={'/noun/' + nounId.toString()}
+      to={'/niji/' + nounId.toString()}
       className={classes.clickableNoun}
       onClick={onClickHandler}
     >
@@ -129,7 +129,7 @@ export const StandaloneNounRoundedCorners: FC<StandaloneNounProps> = (
 
   return (
     <Link
-      to={'/noun/' + nounId.toString()}
+      to={'/niji/' + nounId.toString()}
       className={classes.clickableNoun}
       onClick={onClickHandler}
     >
@@ -172,7 +172,7 @@ export const StandaloneNounWithSeed: FC<StandaloneNounWithSeedProps> = ({
   const noun = <LegacyNoun imgPath={image} alt={description} />;
   const nounWithLink = (
     <Link
-      to={'/noun/' + nounId.toString()}
+      to={'/niji/' + nounId.toString()}
       className={classes.clickableNoun}
       onClick={onClickHandler}
     >

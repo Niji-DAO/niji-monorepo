@@ -1,10 +1,9 @@
 import { FC, HTMLAttributes } from 'react';
 
 import { buildSVG } from '@niji/sdk';
-import { ImageData } from '@noundry/nouns-assets';
 import { useQuery } from '@tanstack/react-query';
 
-import { traitCategory } from '@/lib/traitCategory';
+import { NijiImageData } from '@/lib/nijiAssets';
 import { INounSeed } from '@/wrappers/nijiToken';
 
 export interface TraitProps extends HTMLAttributes<HTMLImageElement> {
@@ -19,9 +18,10 @@ export const Trait: FC<TraitProps> = ({ type, seed, ...props }) => {
   const { data: svg } = useQuery({
     queryKey: ['trait-svg', type, seed] as const,
     queryFn: () => {
-      return type === 'background'
-        ? buildSVG([], ImageData.palette, ImageData.bgcolors[seed!])
-        : buildSVG([ImageData.images[traitCategory[type]][seed!]], ImageData.palette, '');
+      const image = NijiImageData.images[type][seed!];
+      return image?.data
+        ? buildSVG([image], NijiImageData.palette, undefined)
+        : buildSVG([], NijiImageData.palette, undefined);
     },
     enabled: seed !== undefined,
   });

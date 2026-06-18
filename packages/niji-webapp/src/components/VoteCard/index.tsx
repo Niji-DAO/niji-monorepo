@@ -14,7 +14,7 @@ import { lookupNNSOrENS } from '@/utils/lookupNNSOrENS';
 import { Address } from '@/utils/types';
 import { Proposal } from '@/wrappers/nijiDao';
 
-import DelegateGroupedNounImageVoteTable from '../DelegateGroupedNounImageVoteTable';
+import DelegateGroupedNijiImageVoteTable from '../DelegateGroupedNijiImageVoteTable';
 
 import classes from './VoteCard.module.css';
 
@@ -31,7 +31,7 @@ interface VoteCardProps {
   percentage: number;
   variant: VoteCardVariant;
   delegateGroupedVoteData:
-    | { delegate: Address; supportDetailed: 0 | 1 | 2; nounsRepresented: string[] }[]
+    | { delegate: Address; supportDetailed: 0 | 1 | 2; nijiRepresented: string[] }[]
     | undefined;
 }
 
@@ -154,7 +154,7 @@ const VoteCard: React.FC<VoteCardProps> = props => {
 
           <VoteProgressBar variant={variant} percentage={percentage} />
           <Row className={classes.nounProfilePics}>
-            <DelegateGroupedNounImageVoteTable
+            <DelegateGroupedNijiImageVoteTable
               filteredDelegateGroupedVoteData={filteredDelegateGroupedVoteData}
               propId={Number(proposal.id || '0')}
               proposalCreationBlock={proposal.createdBlock}

@@ -22,7 +22,7 @@ interface CacheBucket {
 export const cache: Record<string, CacheBucket> = {
   seed: {
     name: 'seed',
-    version: 'v1',
+    version: 'v2',
   },
   ens: {
     name: 'ens',
@@ -68,7 +68,7 @@ const app: Record<SupportedChains, AppConfig> = {
   [hardhat.id]: {
     jsonRpcUri: 'http://localhost:8545',
     wsRpcUri: 'ws://localhost:8545',
-    subgraphApiUri: 'http://localhost:8000/subgraphs/name/nounsdao/nouns-subgraph',
+    subgraphApiUri: 'http://localhost:8000/subgraphs/name/nounsdao/nijis-subgraph',
     enableHistory: import.meta.env.VITE_ENABLE_HISTORY === 'true',
   },
 };

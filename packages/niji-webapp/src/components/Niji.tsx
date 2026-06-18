@@ -1,14 +1,13 @@
 import { FC, HTMLAttributes, useState, useEffect } from 'react';
 
 import { buildSVG } from '@niji/sdk';
-import { getNounData, ImageData } from '@noundry/nouns-assets';
 import { useQuery } from '@tanstack/react-query';
 
 import loadingNoun from '@/assets/loading-skull-noun.gif';
-import { useReadNijiTokenSeeds } from '@/contracts';
-import { INounSeed } from '@/wrappers/nijiToken';
+import { getNijiData, NijiImageData } from '@/lib/nijiAssets';
+import { INounSeed, useNounSeed } from '@/wrappers/nijiToken';
 
-export interface NounProps extends HTMLAttributes<HTMLImageElement> {
+export interface NijiProps extends HTMLAttributes<HTMLImageElement> {
   nounId?: bigint;
   seed?: INounSeed;
   loadingNounFallback?: boolean;
@@ -18,7 +17,7 @@ export interface NounProps extends HTMLAttributes<HTMLImageElement> {
 const fallbackTransparentPixel =
   'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
-export const Noun: FC<NounProps> = ({
+export const Niji: FC<NijiProps> = ({
   nounId,
   seed: providedSeed,
   loadingNounFallback,
@@ -27,30 +26,15 @@ export const Noun: FC<NounProps> = ({
 }) => {
   const [shouldShowFallback, setShouldShowFallback] = useState(false);
   const [fallbackStartTime, setFallbackStartTime] = useState<number | null>(null);
-  const { data: fetchedSeed } = useReadNijiTokenSeeds({
-    args: [nounId!],
-    query: {
-      enabled: nounId !== undefined && !providedSeed,
-      select: data => {
-        if (data === undefined) return null;
-        return {
-          background: Number(data[0]),
-          body: Number(data[1]),
-          accessory: Number(data[2]),
-          head: Number(data[3]),
-          glasses: Number(data[4]),
-        };
-      },
-    },
-  });
+  const fetchedSeed = useNounSeed(nounId ?? 0n);
 
-  const seed = providedSeed ?? fetchedSeed;
+  const seed = providedSeed ?? (nounId !== undefined ? fetchedSeed : undefined);
 
   const { data: svg } = useQuery({
-    queryKey: ['noun-svg', seed] as const,
+    queryKey: ['niji-svg', seed] as const,
     queryFn: () => {
-      const { parts, background } = getNounData(seed!);
-      return buildSVG(parts, ImageData.palette, background);
+      const { parts, background } = getNijiData(seed!);
+      return buildSVG(parts, NijiImageData.palette, background);
     },
     enabled: !!seed,
   });

@@ -43,7 +43,7 @@ export const config = createConfig({
     }),
     coinbaseWallet({
       appName: 'Nouns.WTF',
-      appLogoUrl: 'https://nouns.wtf/static/media/logo.cdea1650.svg',
+      appLogoUrl: 'https://nijis.wtf/static/media/logo.cdea1650.svg',
     }),
   ],
 });

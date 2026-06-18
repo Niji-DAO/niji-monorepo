@@ -5,7 +5,7 @@ import { Trans } from '@lingui/react/macro';
 import { Spinner } from 'react-bootstrap';
 import { map } from 'remeda';
 
-import HorizontalStackedNouns from '@/components/HorizontalStackedNouns';
+import HorizontalStackedNijis from '@/components/HorizontalStackedNijis';
 import ShortAddress from '@/components/ShortAddress';
 import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import { Address } from '@/utils/types';
@@ -41,7 +41,7 @@ const ByLineHoverCard: React.FC<ByLineHoverCardProps> = props => {
     return <>Error fetching Vote info</>;
   }
 
-  const sortedNounIds = data?.delegates?.[0]?.nounsRepresented
+  const sortedNounIds = data?.delegates?.[0]?.nijiRepresented
     .map((noun: { id: string }) => {
       return Number(noun.id);
     })
@@ -52,9 +52,9 @@ const ByLineHoverCard: React.FC<ByLineHoverCardProps> = props => {
   return (
     <div className={classes.wrapper}>
       <div className={classes.stackedNounWrapper}>
-        <HorizontalStackedNouns
+        <HorizontalStackedNijis
           nounIds={map(
-            data?.delegates?.[0]?.nounsRepresented ?? [],
+            data?.delegates?.[0]?.nijiRepresented ?? [],
             (noun: { id: string }) => noun.id,
           )}
         />
@@ -64,7 +64,7 @@ const ByLineHoverCard: React.FC<ByLineHoverCardProps> = props => {
         <ShortAddress address={data?.delegates?.[0]?.id as Address} />
       </div>
 
-      <div className={classes.nounsRepresented}>
+      <div className={classes.nijiRepresented}>
         <div>
           <ScaleIcon height={15} width={15} className={classes.icon} />
           {sortedNounIds?.length === 1 ? (

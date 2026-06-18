@@ -240,7 +240,7 @@ const CandidateSponsors: React.FC<CandidateSponsorsProps> = props => {
                           const sigVoteCount =
                             originalSignersDelegateSnapshot.data?.delegates?.find(
                               delegate => delegate.id === ogSigner.id,
-                            )?.nounsRepresented.length;
+                            )?.nijiRepresented.length;
                           if (signers?.includes(ogSigner.id.toLowerCase())) return null;
                           if (!sigVoteCount || !activePendingProposers) return null;
                           return (

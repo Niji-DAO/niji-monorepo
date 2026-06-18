@@ -14,7 +14,7 @@ import { buildEtherscanTxLink } from '@/utils/etherscan';
 import { useAllProposals, useEscrowToFork, useJoinFork } from '@/wrappers/nijiDao';
 import { useIsApprovedForAll, useSetApprovalForAll } from '@/wrappers/nijiToken';
 
-import classes from './AddNounsToForkModal.module.css';
+import classes from './AddNijisToForkModal.module.css';
 
 type AddNounsToForkModalProps = {
   setIsModalOpen: (isOpen: boolean) => void;
@@ -33,7 +33,7 @@ type AddNounsToForkModalProps = {
   setIsConfirmModalOpen: (isOpen: boolean) => void;
 };
 
-const AddNounsToForkModal = (props: AddNounsToForkModalProps) => {
+const AddNijisToForkModal = (props: AddNounsToForkModalProps) => {
   const [reasonText, setReasonText] = React.useState('');
   const [selectedProposals, setSelectedProposals] = React.useState<number[]>([]);
   const [selectedNouns, setSelectedNouns] = React.useState<number[]>([]);
@@ -406,7 +406,7 @@ const AddNounsToForkModal = (props: AddNounsToForkModalProps) => {
                     alt="noun"
                     className={classes.nounImage}
                   />
-                  Noun {nounId}
+                  Niji {nounId}
                 </div>
                 {props.userEscrowedNouns?.includes(nounId) && (
                   <span className={classes.escrowedNounLabel}>
@@ -440,7 +440,7 @@ const AddNounsToForkModal = (props: AddNounsToForkModalProps) => {
           >
             {!isWaiting && !isLoading && !isApprovalWaiting && !isApprovalLoading && (
               <>
-                Add {selectedNouns.length > 0 && selectedNouns.length} Noun
+                Add {selectedNouns.length > 0 && selectedNouns.length} Niji
                 {selectedNouns.length === 1 ? '' : 's'} to{' '}
                 {props.isForkingPeriod ? 'fork' : 'escrow'}
               </>
@@ -579,4 +579,4 @@ const AddNounsToForkModal = (props: AddNounsToForkModalProps) => {
     </>
   );
 };
-export default AddNounsToForkModal;
+export default AddNijisToForkModal;

@@ -13,7 +13,7 @@ import * as types from './graphql.js';
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-  '\n    query GetSeeds($first: Int!) {\n      seeds(first: $first) {\n        id\n        background\n        body\n        accessory\n        head\n        glasses\n      }\n    }\n  ': typeof types.GetSeedsDocument;
+  '\n  query GetSeeds($first: Int!) {\n    seeds(first: $first) {\n      id\n      special\n      choker\n      headphone\n      leftHand\n      hat\n      clothing\n      ear\n      back\n      backDecoration\n      background\n      solidBackground\n      hair\n    }\n  }\n': typeof types.GetSeedsDocument;
   '\n    query GetProposal($id: ID!) {\n      proposal(id: $id) {\n        id\n        description\n        status\n        proposalThreshold\n        quorumVotes\n        forVotes\n        againstVotes\n        abstainVotes\n        createdTransactionHash\n        createdBlock\n        createdTimestamp\n        startBlock\n        endBlock\n        updatePeriodEndBlock\n        objectionPeriodEndBlock\n        executionETA\n        targets\n        values\n        signatures\n        calldatas\n        onTimelockV1\n        voteSnapshotBlock\n        proposer {\n          id\n        }\n        signers {\n          id\n        }\n      }\n    }\n  ': typeof types.GetProposalDocument;
   '\n    query GetPartialProposals($first: Int!) {\n      proposals(first: $first, orderBy: createdBlock, orderDirection: asc) {\n        id\n        title\n        status\n        forVotes\n        againstVotes\n        abstainVotes\n        quorumVotes\n        executionETA\n        startBlock\n        endBlock\n        updatePeriodEndBlock\n        objectionPeriodEndBlock\n        onTimelockV1\n        signers {\n          id\n        }\n      }\n    }\n  ': typeof types.GetPartialProposalsDocument;
   '\n    query GetActivePendingUpdatableProposers($first: Int!, $currentBlock: BigInt!) {\n      proposals(\n        first: $first\n        where: {\n          or: [\n            { status: PENDING, endBlock_gt: $currentBlock }\n            { status: ACTIVE, endBlock_gt: $currentBlock }\n          ]\n        }\n      ) {\n        proposer {\n          id\n        }\n        signers {\n          id\n        }\n      }\n    }\n  ': typeof types.GetActivePendingUpdatableProposersDocument;
@@ -22,7 +22,7 @@ type Documents = {
   '\n    query GetCandidateProposal($id: ID!) {\n      proposalCandidate(id: $id) {\n        id\n        slug\n        proposer\n        lastUpdatedTimestamp\n        createdTransactionHash\n        canceled\n        versions {\n          content {\n            title\n          }\n        }\n        latestVersion {\n          content {\n            title\n            description\n            targets\n            values\n            signatures\n            calldatas\n            encodedProposalHash\n            proposalIdToUpdate\n            contentSignatures {\n              id\n              signer {\n                id\n                proposals {\n                  id\n                }\n              }\n              sig\n              expirationTimestamp\n              canceled\n              reason\n            }\n            matchingProposalIds\n          }\n        }\n      }\n    }\n  ': typeof types.GetCandidateProposalDocument;
   '\n    query GetCandidateProposalVersions($id: ID!) {\n      proposalCandidate(id: $id) {\n        id\n        slug\n        proposer\n        lastUpdatedTimestamp\n        canceled\n        createdTransactionHash\n        versions {\n          id\n          createdTimestamp\n          updateMessage\n          content {\n            title\n            description\n            targets\n            values\n            signatures\n            calldatas\n            encodedProposalHash\n          }\n        }\n        latestVersion {\n          id\n        }\n      }\n    }\n  ': typeof types.GetCandidateProposalVersionsDocument;
   '\n    query GetProposalVersions($id: ID!) {\n      proposalVersions(where: { proposal_: { id: $id } }) {\n        id\n        createdAt\n        updateMessage\n        title\n        description\n        targets\n        values\n        signatures\n        calldatas\n        proposal {\n          id\n        }\n      }\n    }\n  ': typeof types.GetProposalVersionsDocument;
-  '\n  query GetAuction($id: ID!) {\n    auction(id: $id) {\n      id\n      amount\n      settled\n      bidder {\n        id\n      }\n      startTime\n      endTime\n      noun {\n        id\n        seed {\n          id\n          background\n          body\n          accessory\n          head\n          glasses\n        }\n        owner {\n          id\n        }\n      }\n      bids {\n        id\n        blockNumber\n        txIndex\n        amount\n      }\n    }\n  }\n': typeof types.GetAuctionDocument;
+  '\n  query GetAuction($id: ID!) {\n    auction(id: $id) {\n      id\n      amount\n      settled\n      bidder {\n        id\n      }\n      startTime\n      endTime\n      noun {\n        id\n        seed {\n          id\n          special\n          choker\n          headphone\n          leftHand\n          hat\n          clothing\n          ear\n          back\n          backDecoration\n          background\n          solidBackground\n          hair\n        }\n        owner {\n          id\n        }\n      }\n      bids {\n        id\n        blockNumber\n        txIndex\n        amount\n      }\n    }\n  }\n': typeof types.GetAuctionDocument;
   '\n    query GetBidsByAuction($auctionId: String!) {\n      bids(where: { auction: $auctionId }) {\n        id\n        amount\n        blockNumber\n        blockTimestamp\n        txIndex\n        bidder {\n          id\n        }\n        noun {\n          id\n        }\n      }\n    }\n  ': typeof types.GetBidsByAuctionDocument;
   '\n    query GetNoun($id: ID!) {\n      noun(id: $id) {\n        id\n        seed {\n          background\n          body\n          accessory\n          head\n          glasses\n        }\n        owner {\n          id\n        }\n      }\n    }\n  ': typeof types.GetNounDocument;
   '\n    query GetNounsIndex {\n      nouns {\n        id\n        owner {\n          id\n        }\n      }\n    }\n  ': typeof types.GetNounsIndexDocument;
@@ -33,8 +33,8 @@ type Documents = {
   '\n    query GetNounDelegationHistory($nounId: String!, $first: Int!) {\n      delegationEvents(where: { noun: $nounId }, first: $first) {\n        id\n        previousDelegate {\n          id\n        }\n        newDelegate {\n          id\n        }\n        blockNumber\n      }\n    }\n  ': typeof types.GetNounDelegationHistoryDocument;
   '\n    query GetCreateTimestampAllProposals {\n      proposals(orderBy: createdTimestamp, orderDirection: asc, first: 1000) {\n        id\n        createdTimestamp\n      }\n    }\n  ': typeof types.GetCreateTimestampAllProposalsDocument;
   '\n    query GetProposalVotes($proposalId: String!) {\n      votes(where: { proposal: $proposalId, votesRaw_gt: 0 }) {\n        supportDetailed\n        voter {\n          id\n        }\n      }\n    }\n  ': typeof types.GetProposalVotesDocument;
-  '\n    query GetDelegateNounsAtBlock($delegates: [ID!]!, $block: Int!) {\n      delegates(where: { id_in: $delegates }, block: { number: $block }) {\n        id\n        nounsRepresented {\n          id\n        }\n      }\n    }\n  ': typeof types.GetDelegateNounsAtBlockDocument;
-  '\n    query GetCurrentlyDelegatedNouns($delegate: ID!) {\n      delegates(where: { id: $delegate }) {\n        id\n        nounsRepresented {\n          id\n        }\n      }\n    }\n  ': typeof types.GetCurrentlyDelegatedNounsDocument;
+  '\n  query GetDelegateNounsAtBlock($delegates: [ID!]!, $block: Int!) {\n    delegates(where: { id_in: $delegates }, block: { number: $block }) {\n      id\n      nijiRepresented {\n        id\n      }\n    }\n  }\n': typeof types.GetDelegateNounsAtBlockDocument;
+  '\n  query GetCurrentlyDelegatedNouns($delegate: ID!) {\n    delegates(where: { id: $delegate }) {\n      id\n      nijiRepresented {\n        id\n      }\n    }\n  }\n': typeof types.GetCurrentlyDelegatedNounsDocument;
   '\n    query GetAdjustedNounSupplyAtPropSnapshot($proposalId: ID!) {\n      proposals(where: { id: $proposalId }) {\n        adjustedTotalSupply\n      }\n    }\n  ': typeof types.GetAdjustedNounSupplyAtPropSnapshotDocument;
   '\n    query GetPropUsingDynamicQuorum($proposalId: ID!) {\n      proposal(id: $proposalId) {\n        quorumCoefficient\n      }\n    }\n  ': typeof types.GetPropUsingDynamicQuorumDocument;
   '\n    query GetProposalFeedbacks($proposalId: ID!) {\n      proposalFeedbacks(where: { proposal_: { id: $proposalId } }) {\n        supportDetailed\n        votes\n        reason\n        createdTimestamp\n        voter {\n          id\n        }\n        proposal {\n          id\n        }\n      }\n    }\n  ': typeof types.GetProposalFeedbacksDocument;
@@ -50,7 +50,7 @@ type Documents = {
   '\n    query GetIsForkActive($currentTimestamp: BigInt!) {\n      forks(where: { executed: true, forkingPeriodEndTimestamp_gt: $currentTimestamp }) {\n        forkID\n        forkingPeriodEndTimestamp\n      }\n    }\n  ': typeof types.GetIsForkActiveDocument;
 };
 const documents: Documents = {
-  '\n    query GetSeeds($first: Int!) {\n      seeds(first: $first) {\n        id\n        background\n        body\n        accessory\n        head\n        glasses\n      }\n    }\n  ':
+  '\n  query GetSeeds($first: Int!) {\n    seeds(first: $first) {\n      id\n      special\n      choker\n      headphone\n      leftHand\n      hat\n      clothing\n      ear\n      back\n      backDecoration\n      background\n      solidBackground\n      hair\n    }\n  }\n':
     types.GetSeedsDocument,
   '\n    query GetProposal($id: ID!) {\n      proposal(id: $id) {\n        id\n        description\n        status\n        proposalThreshold\n        quorumVotes\n        forVotes\n        againstVotes\n        abstainVotes\n        createdTransactionHash\n        createdBlock\n        createdTimestamp\n        startBlock\n        endBlock\n        updatePeriodEndBlock\n        objectionPeriodEndBlock\n        executionETA\n        targets\n        values\n        signatures\n        calldatas\n        onTimelockV1\n        voteSnapshotBlock\n        proposer {\n          id\n        }\n        signers {\n          id\n        }\n      }\n    }\n  ':
     types.GetProposalDocument,
@@ -68,7 +68,7 @@ const documents: Documents = {
     types.GetCandidateProposalVersionsDocument,
   '\n    query GetProposalVersions($id: ID!) {\n      proposalVersions(where: { proposal_: { id: $id } }) {\n        id\n        createdAt\n        updateMessage\n        title\n        description\n        targets\n        values\n        signatures\n        calldatas\n        proposal {\n          id\n        }\n      }\n    }\n  ':
     types.GetProposalVersionsDocument,
-  '\n  query GetAuction($id: ID!) {\n    auction(id: $id) {\n      id\n      amount\n      settled\n      bidder {\n        id\n      }\n      startTime\n      endTime\n      noun {\n        id\n        seed {\n          id\n          background\n          body\n          accessory\n          head\n          glasses\n        }\n        owner {\n          id\n        }\n      }\n      bids {\n        id\n        blockNumber\n        txIndex\n        amount\n      }\n    }\n  }\n':
+  '\n  query GetAuction($id: ID!) {\n    auction(id: $id) {\n      id\n      amount\n      settled\n      bidder {\n        id\n      }\n      startTime\n      endTime\n      noun {\n        id\n        seed {\n          id\n          special\n          choker\n          headphone\n          leftHand\n          hat\n          clothing\n          ear\n          back\n          backDecoration\n          background\n          solidBackground\n          hair\n        }\n        owner {\n          id\n        }\n      }\n      bids {\n        id\n        blockNumber\n        txIndex\n        amount\n      }\n    }\n  }\n':
     types.GetAuctionDocument,
   '\n    query GetBidsByAuction($auctionId: String!) {\n      bids(where: { auction: $auctionId }) {\n        id\n        amount\n        blockNumber\n        blockTimestamp\n        txIndex\n        bidder {\n          id\n        }\n        noun {\n          id\n        }\n      }\n    }\n  ':
     types.GetBidsByAuctionDocument,
@@ -90,9 +90,9 @@ const documents: Documents = {
     types.GetCreateTimestampAllProposalsDocument,
   '\n    query GetProposalVotes($proposalId: String!) {\n      votes(where: { proposal: $proposalId, votesRaw_gt: 0 }) {\n        supportDetailed\n        voter {\n          id\n        }\n      }\n    }\n  ':
     types.GetProposalVotesDocument,
-  '\n    query GetDelegateNounsAtBlock($delegates: [ID!]!, $block: Int!) {\n      delegates(where: { id_in: $delegates }, block: { number: $block }) {\n        id\n        nounsRepresented {\n          id\n        }\n      }\n    }\n  ':
+  '\n  query GetDelegateNounsAtBlock($delegates: [ID!]!, $block: Int!) {\n    delegates(where: { id_in: $delegates }, block: { number: $block }) {\n      id\n      nijiRepresented {\n        id\n      }\n    }\n  }\n':
     types.GetDelegateNounsAtBlockDocument,
-  '\n    query GetCurrentlyDelegatedNouns($delegate: ID!) {\n      delegates(where: { id: $delegate }) {\n        id\n        nounsRepresented {\n          id\n        }\n      }\n    }\n  ':
+  '\n  query GetCurrentlyDelegatedNouns($delegate: ID!) {\n    delegates(where: { id: $delegate }) {\n      id\n      nijiRepresented {\n        id\n      }\n    }\n  }\n':
     types.GetCurrentlyDelegatedNounsDocument,
   '\n    query GetAdjustedNounSupplyAtPropSnapshot($proposalId: ID!) {\n      proposals(where: { id: $proposalId }) {\n        adjustedTotalSupply\n      }\n    }\n  ':
     types.GetAdjustedNounSupplyAtPropSnapshotDocument,
@@ -126,7 +126,7 @@ const documents: Documents = {
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: '\n    query GetSeeds($first: Int!) {\n      seeds(first: $first) {\n        id\n        background\n        body\n        accessory\n        head\n        glasses\n      }\n    }\n  ',
+  source: '\n  query GetSeeds($first: Int!) {\n    seeds(first: $first) {\n      id\n      special\n      choker\n      headphone\n      leftHand\n      hat\n      clothing\n      ear\n      back\n      backDecoration\n      background\n      solidBackground\n      hair\n    }\n  }\n',
 ): typeof import('./graphql.js').GetSeedsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -180,7 +180,7 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: '\n  query GetAuction($id: ID!) {\n    auction(id: $id) {\n      id\n      amount\n      settled\n      bidder {\n        id\n      }\n      startTime\n      endTime\n      noun {\n        id\n        seed {\n          id\n          background\n          body\n          accessory\n          head\n          glasses\n        }\n        owner {\n          id\n        }\n      }\n      bids {\n        id\n        blockNumber\n        txIndex\n        amount\n      }\n    }\n  }\n',
+  source: '\n  query GetAuction($id: ID!) {\n    auction(id: $id) {\n      id\n      amount\n      settled\n      bidder {\n        id\n      }\n      startTime\n      endTime\n      noun {\n        id\n        seed {\n          id\n          special\n          choker\n          headphone\n          leftHand\n          hat\n          clothing\n          ear\n          back\n          backDecoration\n          background\n          solidBackground\n          hair\n        }\n        owner {\n          id\n        }\n      }\n      bids {\n        id\n        blockNumber\n        txIndex\n        amount\n      }\n    }\n  }\n',
 ): typeof import('./graphql.js').GetAuctionDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -246,13 +246,13 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: '\n    query GetDelegateNounsAtBlock($delegates: [ID!]!, $block: Int!) {\n      delegates(where: { id_in: $delegates }, block: { number: $block }) {\n        id\n        nounsRepresented {\n          id\n        }\n      }\n    }\n  ',
+  source: '\n  query GetDelegateNounsAtBlock($delegates: [ID!]!, $block: Int!) {\n    delegates(where: { id_in: $delegates }, block: { number: $block }) {\n      id\n      nijiRepresented {\n        id\n      }\n    }\n  }\n',
 ): typeof import('./graphql.js').GetDelegateNounsAtBlockDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: '\n    query GetCurrentlyDelegatedNouns($delegate: ID!) {\n      delegates(where: { id: $delegate }) {\n        id\n        nounsRepresented {\n          id\n        }\n      }\n    }\n  ',
+  source: '\n  query GetCurrentlyDelegatedNouns($delegate: ID!) {\n    delegates(where: { id: $delegate }) {\n      id\n      nijiRepresented {\n        id\n      }\n    }\n  }\n',
 ): typeof import('./graphql.js').GetCurrentlyDelegatedNounsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.

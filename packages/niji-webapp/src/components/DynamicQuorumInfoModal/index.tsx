@@ -130,7 +130,7 @@ const DynamicQuorumInfoModalOverlay: React.FC<DynamicQuorumInfoModalOverlayProps
             <div className={classes.graphWrapper}>
               {/* Y-Axis label */}
               <div className={classes.yAxisText}>
-                <Trans>Required % of Nouns to Pass</Trans>
+                <Trans>Required % of Nijis to Pass</Trans>
               </div>
 
               {/* Inner graph container */}
@@ -269,7 +269,7 @@ const DynamicQuorumInfoModalOverlay: React.FC<DynamicQuorumInfoModalOverlayProps
             </div>
 
             <div className={classes.xAxisText}>
-              <Trans>% of Nouns Currently Against</Trans>
+              <Trans>% of Nijis Currently Against</Trans>
             </div>
           </div>
 

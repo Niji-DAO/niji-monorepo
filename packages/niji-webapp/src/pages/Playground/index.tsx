@@ -3,7 +3,6 @@ import { type ChangeEvent, type FC, useCallback, useEffect, useRef, useState } f
 import { i18n } from '@lingui/core';
 import { Trans } from '@lingui/react/macro';
 import { buildSVG, PNGCollectionEncoder } from '@niji/sdk';
-import { getNounData, getRandomNounSeed, ImageData } from '@noundry/nouns-assets';
 import { PNG } from 'pngjs';
 import {
   Button,
@@ -20,8 +19,15 @@ import {
 import InfoIcon from '@/assets/icons/Info.svg';
 import Noun from '@/components/LegacyNoun';
 import Link from '@/components/Link';
+import {
+  getNijiData,
+  getRandomNijiSeed,
+  humanizeTraitKey,
+  NijiImageData,
+  nijiTraitKeys,
+} from '@/lib/nijiAssets';
 
-import NounModal from './NounModal';
+import NijiModal from './NijiModal';
 import classes from './Playground.module.css';
 
 interface Trait {
@@ -51,7 +57,7 @@ const nounsProtocolLink = (
 const nounsAssetsLink = (
   <Link
     text="nouns-assets"
-    url="https://github.com/nounsDAO/nouns-monorepo/tree/master/packages/nouns-assets"
+    url="https://github.com/Niji-DAO/niji-monorepo/tree/develop/packages/niji-assets"
     leavesPage={true}
   />
 );
@@ -64,38 +70,22 @@ const nounsSDKLink = (
   />
 );
 
-const DEFAULT_TRAIT_TYPE = 'heads';
+const DEFAULT_TRAIT_TYPE = 'hat';
 
-const encoder = new PNGCollectionEncoder(ImageData.palette);
+const encoder = new PNGCollectionEncoder(NijiImageData.palette);
 
-const traitKeyToTitle: Record<string, string> = {
-  heads: 'head',
-  glasses: 'glasses',
-  bodies: 'body',
-  accessories: 'accessory',
-};
+const traitKeyToTitle = Object.fromEntries(nijiTraitKeys.map(key => [key, key])) as Record<
+  string,
+  string
+>;
 
 const parseTraitName = (partName: string): string =>
   capitalizeFirstLetter(partName.substring(partName.indexOf('-') + 1));
 
 const capitalizeFirstLetter = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
-const traitKeyToLocalizedTraitKeyFirstLetterCapitalized = (s: string) => {
-  switch (s) {
-    case 'background':
-      return <Trans>Background</Trans>;
-    case 'body':
-      return <Trans>Body</Trans>;
-    case 'accessory':
-      return <Trans>Accessory</Trans>;
-    case 'head':
-      return <Trans>Head</Trans>;
-    case 'glasses':
-      return <Trans>Glasses</Trans>;
-    default:
-      throw new Error(`Unknown trait key: ${s}`);
-  }
-};
+const traitKeyToLocalizedTraitKeyFirstLetterCapitalized = (s: string) =>
+  humanizeTraitKey(s as (typeof nijiTraitKeys)[number]);
 
 const Playground: FC = () => {
   const [nounSvgs, setNounSvgs] = useState<string[]>();
@@ -113,23 +103,9 @@ const Playground: FC = () => {
   const generateNounSvg = useCallback(
     (amount: number = 1) => {
       for (let i = 0; i < amount; i++) {
-        const seed = { ...getRandomNounSeed(), ...modSeed };
-
-        // Adjust background index for offset caused by transparent being first
-        if (modSeed?.background !== undefined && modSeed.background > 0) {
-          seed.background = modSeed.background - 1;
-        }
-
-        const { parts, background } = getNounData(seed);
-
-        // Handle transparent background option
-        let finalBackground: string | undefined = background;
-        if (modSeed?.background === 0) {
-          // 0 is the index for 'transparent'
-          finalBackground = undefined;
-        }
-
-        const svg = buildSVG(parts, encoder.data.palette, finalBackground);
+        const seed = { ...getRandomNijiSeed(), ...modSeed };
+        const { parts, background } = getNijiData(seed);
+        const svg = buildSVG(parts, encoder.data.palette, background);
         setNounSvgs(prev => {
           return prev ? [svg, ...prev] : [svg];
         });
@@ -140,13 +116,10 @@ const Playground: FC = () => {
   );
 
   useEffect(() => {
-    const traitTitles = ['background', 'body', 'accessory', 'head', 'glasses'];
-    const traitNames = [
-      ['transparent', 'cool', 'warm'],
-      ...Object.values(ImageData.images).map(i => {
-        return i.map(imageData => imageData.filename);
-      }),
-    ];
+    const traitTitles = [...nijiTraitKeys];
+    const traitNames = traitTitles.map(key =>
+      NijiImageData.images[key].map(imageData => imageData.filename),
+    );
     setTraits(
       traitTitles.map((value, index) => {
         return {
@@ -263,7 +236,7 @@ const Playground: FC = () => {
   const uploadCustomTrait = () => {
     const { type, data, filename } = pendingTrait || {};
     if (type && data && filename) {
-      const images = ImageData.images as Record<string, EncodedImage[]>;
+      const images = NijiImageData.images as Record<string, EncodedImage[]>;
       images[type].unshift({
         filename,
         data,
@@ -285,7 +258,7 @@ const Playground: FC = () => {
   return (
     <>
       {displayNoun && indexOfNounToDisplay !== undefined && nounSvgs && (
-        <NounModal
+        <NijiModal
           onDismiss={() => {
             setDisplayNoun(false);
           }}
@@ -304,8 +277,8 @@ const Playground: FC = () => {
             </h1>
             <p>
               <Trans>
-                The playground was built using the {nounsProtocolLink}. Noun&apos;s traits are
-                determined by the Noun Seed. The seed was generated using {nounsAssetsLink} and
+                The playground was built using the {nounsProtocolLink}. Niji&apos;s traits are
+                determined by the Niji Seed. The seed was generated using {nounsAssetsLink} and
                 rendered using the {nounsSDKLink}.
               </Trans>
             </p>
@@ -320,7 +293,7 @@ const Playground: FC = () => {
                 }}
                 className={classes.primaryBtn}
               >
-                <Trans>Generate Nouns</Trans>
+                <Trans>Generate Nijis</Trans>
               </Button>
             </Col>
             <Row>
@@ -412,7 +385,7 @@ const Playground: FC = () => {
               <Trans>
                 You&apos;ve generated{' '}
                 {i18n.number(Number(nounSvgs ? (nounSvgs.length / 365).toFixed(2) : '0'))} years
-                worth of Nouns
+                worth of Nijis
               </Trans>
             </p>
           </Col>
@@ -430,7 +403,7 @@ const Playground: FC = () => {
                       >
                         <Noun
                           imgPath={`data:image/svg+xml;base64,${btoa(svg)}`}
-                          alt="noun"
+                          alt="niji"
                           className={classes.nounImg}
                           wrapperClassName={classes.nounWrapper}
                         />

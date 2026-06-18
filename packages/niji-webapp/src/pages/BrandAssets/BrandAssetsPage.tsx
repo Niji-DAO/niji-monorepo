@@ -120,7 +120,7 @@ export const BrandAssetsPage = () => {
           </h1>
           <p className="max-w-2xl text-lg text-gray-600">
             <Trans>
-              Download official Nouns DAO brand assets including our iconic noggles in various
+              Download official Niji DAO brand assets including our iconic noggles in various
               formats.
             </Trans>
           </p>
@@ -145,19 +145,19 @@ export const BrandAssetsPage = () => {
         </section>
         <section className="mt-12">
           <h2 className="font-londrina mt-6 text-4xl font-bold">
-            <Trans>Nouns & Traits</Trans>
+            <Trans>Nijis & Traits</Trans>
           </h2>
           <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <SectionCard
               title={t`Go to playground`}
               to="/playground"
               imageSrc={playgroundNouns}
-              description={t`Generate endless Nouns assembled from the onchain artwork`}
+              description={t`Generate endless Nijis assembled from the onchain artwork`}
             />
             <SectionCard
               title={t`Explore traits`}
               imageSrc={traitsImage}
-              description={t`Download the individual traits that compose Nouns`}
+              description={t`Download the individual traits that compose Nijis`}
               to="/traits"
             />
           </div>
@@ -169,7 +169,7 @@ export const BrandAssetsPage = () => {
           <div className="mt-6 items-start gap-6">
             <p className="max-w-2xl text-lg text-gray-600">
               <Trans>
-                The logos, traits and every Noun generated on the playground are{' '}
+                The logos, traits and every Niji generated on the playground are{' '}
                 <a
                   href="https://creativecommons.org/public-domain/cc0/"
                   target="_blank"
