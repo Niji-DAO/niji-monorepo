@@ -53,14 +53,16 @@ export class Image {
       }
     }
 
-    // [palette_index, top, right, bottom, left]
+    // Niji format: palette_index (1 byte) + bounds (top / right / bottom / left, 各 2 bytes = 4 hex chars)
+    // 1 byte (0-255) では 256+ の bounds (e.g. 512x512 PNG) を表現できないため 2 bytes に拡張する。
+    // 既存の Nouns 1-byte 形式とは互換性がない (decodeImage と pair で運用)。
     const metadata = [
-      0,
-      this.bounds.top,
-      this.bounds.right,
-      this.bounds.bottom,
-      this.bounds.left,
-    ].map(v => toPaddedHex(v));
+      toPaddedHex(0, 2),
+      toPaddedHex(this.bounds.top, 4),
+      toPaddedHex(this.bounds.right, 4),
+      toPaddedHex(this.bounds.bottom, 4),
+      toPaddedHex(this.bounds.left, 4),
+    ];
     return `0x${metadata.join('')}${this.encode(indexes)}`;
   }
 

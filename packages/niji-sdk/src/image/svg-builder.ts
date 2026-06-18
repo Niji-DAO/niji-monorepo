@@ -6,14 +6,17 @@ import { DecodedImage } from './types';
  */
 export const decodeImage = (image: string): DecodedImage => {
   const data = image.replace(/^0x/, '');
+  // Niji format: palette_index (1 byte = 2 hex chars) + bounds (各 2 bytes = 4 hex chars × 4) = 18 hex chars header
+  // 1 byte (0-255) では 256+ の bounds (e.g. 512x512 PNG) を表現できないため 2 bytes に拡張済。
+  // 1-byte header の Nouns 形式とは互換性がない。
   const paletteIndex = parseInt(data.substring(0, 2), 16);
   const bounds = {
-    top: parseInt(data.substring(2, 4), 16),
-    right: parseInt(data.substring(4, 6), 16),
-    bottom: parseInt(data.substring(6, 8), 16),
-    left: parseInt(data.substring(8, 10), 16),
+    top: parseInt(data.substring(2, 6), 16),
+    right: parseInt(data.substring(6, 10), 16),
+    bottom: parseInt(data.substring(10, 14), 16),
+    left: parseInt(data.substring(14, 18), 16),
   };
-  const rects = data.substring(10);
+  const rects = data.substring(18);
 
   return {
     paletteIndex,
@@ -40,12 +43,16 @@ const getRectLength = (currentX: number, drawLength: number, rightBound: number)
  * @param parts The RLE part datas
  * @param paletteColors The hex palette colors
  * @param bgColor The hex background color
+ * @param resolution The source image resolution (default 512 for Niji, 32 for Nouns).
+ *   viewBox は `resolution * 10` × `resolution * 10` の pixel grid として生成される。
  */
 export const buildSVG = (
   parts: { data: string }[],
   paletteColors: string[],
   bgColor?: string,
+  resolution: number = 512,
 ): string => {
+  const viewSize = resolution * 10;
   const svgWithoutEndTag = parts.reduce(
     (result, part) => {
       const svgRects: string[] = [];
@@ -83,7 +90,7 @@ export const buildSVG = (
       result += svgRects.join('');
       return result;
     },
-    `<svg width="320" height="320" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="${bgColor ? `#${bgColor}` : 'none'}" />`,
+    `<svg width="${viewSize}" height="${viewSize}" viewBox="0 0 ${viewSize} ${viewSize}" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="${bgColor ? `#${bgColor}` : 'none'}" />`,
   );
 
   return `${svgWithoutEndTag}</svg>`;
