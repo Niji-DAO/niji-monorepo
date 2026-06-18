@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router';
 
 import AuctionActivity from '@/components/AuctionActivity';
 import { LoadingNoun } from '@/components/LegacyNoun';
+import { NijiWithSeed } from '@/components/Niji';
 import NijiContent from '@/components/NijiContent';
-import { StandaloneNijiWithSeed } from '@/components/StandaloneNiji';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { setStateBackgroundColor } from '@/state/slices/application';
 import { RootState } from '@/store';
@@ -47,7 +47,7 @@ const Auction: React.FC<AuctionProps> = props => {
 
   const nounContent = currentAuction && (
     <div className={classes.nounWrapper}>
-      <StandaloneNijiWithSeed
+      <NijiWithSeed
         nounId={BigInt(currentAuction.nounId)}
         onLoadSeed={loadedNounHandler}
         shouldLinkToProfile={false}

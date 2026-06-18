@@ -1,4 +1,4 @@
-import { StandaloneNijiImage } from '@/components/StandaloneNiji';
+import { NijiImage } from '@/components/Niji';
 
 import classes from './CandidateSponsors.module.css';
 
@@ -8,7 +8,7 @@ type CandidateSponsorImageProps = {
 
 const CandidateSponsorImage = ({ nounId }: CandidateSponsorImageProps) => (
   <div className={classes.sponsorAvatar}>
-    <StandaloneNijiImage nounId={nounId} />
+    <NijiImage nounId={nounId} />
   </div>
 );
 
