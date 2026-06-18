@@ -555,6 +555,7 @@ export const nijiTokenAbi = [
 export const nijiTokenAddress = {
   1: '0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03',
   11155111: '0x4C4674bb72a096855496a7204962297bd7e12b85',
+  31337: '0x0000000000000000000000000000000000000000',
 } as const;
 
 /**

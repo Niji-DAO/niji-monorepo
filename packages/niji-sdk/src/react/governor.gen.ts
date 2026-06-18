@@ -1336,6 +1336,7 @@ export const nounsGovernorAbi = [
 export const nounsGovernorAddress = {
   1: '0x6f3E6272A167e8AcCb32072d08E0957F9c79223d',
   11155111: '0x35d2670d7C8931AACdd37C89Ddcb0638c3c44A57',
+  31337: '0x0000000000000000000000000000000000000000',
 } as const;
 
 /**
