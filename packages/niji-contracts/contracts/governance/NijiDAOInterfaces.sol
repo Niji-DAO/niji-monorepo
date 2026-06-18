@@ -34,6 +34,8 @@
 
 pragma solidity ^0.8.19;
 
+import { INijiToken } from '../interfaces/INijiToken.sol';
+
 interface NijiDAOEventsV3 {
     /// @notice An event emitted when a new proposal is created
     event ProposalCreated(
@@ -280,25 +282,7 @@ interface INijiDAOExecutor {
     ) external payable returns (bytes memory);
 }
 
-interface NijiTokenLike {
-    function getPriorVotes(address account, uint256 blockNumber) external view returns (uint96);
-
-    function totalSupply() external view returns (uint256);
-
-    function transferFrom(address from, address to, uint256 tokenId) external;
-
-    function safeTransferFrom(address from, address to, uint256 tokenId) external;
-
-    function balanceOf(address owner) external view returns (uint256 balance);
-
-    function ownerOf(uint256 tokenId) external view returns (address owner);
-
-    function minter() external view returns (address);
-
-    function mint() external returns (uint256);
-
-    function setApprovalForAll(address operator, bool approved) external;
-}
+interface NijiTokenLike is INijiToken {}
 
 interface IForkDAODeployer {
     function deployForkDAO(
@@ -336,7 +320,7 @@ interface INijiDAOForkEscrow {
 
     function forkId() external view returns (uint32);
 
-    function nounsToken() external view returns (NijiTokenLike);
+    function nijiToken() external view returns (NijiTokenLike);
 
     function dao() external view returns (address);
 

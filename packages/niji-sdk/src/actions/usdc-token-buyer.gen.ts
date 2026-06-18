@@ -451,7 +451,7 @@ export const nijiUsdcTokenBuyerConfig = {
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyer = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyer = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
 });
@@ -462,7 +462,7 @@ export const readNounsUsdcTokenBuyer = /*#__PURE__*/ createReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerMaxBps = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerMaxBps = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'MAX_BPS',
@@ -474,7 +474,7 @@ export const readNounsUsdcTokenBuyerMaxBps = /*#__PURE__*/ createReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerAdmin = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerAdmin = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'admin',
@@ -486,7 +486,7 @@ export const readNounsUsdcTokenBuyerAdmin = /*#__PURE__*/ createReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerBaselinePaymentTokenAmount = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerBaselinePaymentTokenAmount = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'baselinePaymentTokenAmount',
@@ -498,7 +498,7 @@ export const readNounsUsdcTokenBuyerBaselinePaymentTokenAmount = /*#__PURE__*/ c
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerBotDiscountBPs = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerBotDiscountBPs = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'botDiscountBPs',
@@ -510,7 +510,7 @@ export const readNounsUsdcTokenBuyerBotDiscountBPs = /*#__PURE__*/ createReadCon
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerEthAmountPerTokenAmount = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerEthAmountPerTokenAmount = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'ethAmountPerTokenAmount',
@@ -522,7 +522,7 @@ export const readNounsUsdcTokenBuyerEthAmountPerTokenAmount = /*#__PURE__*/ crea
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerEthNeeded = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerEthNeeded = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'ethNeeded',
@@ -534,7 +534,7 @@ export const readNounsUsdcTokenBuyerEthNeeded = /*#__PURE__*/ createReadContract
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerMaxAdminBaselinePaymentTokenAmount =
+export const readNijiUsdcTokenBuyerMaxAdminBaselinePaymentTokenAmount =
   /*#__PURE__*/ createReadContract({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -547,7 +547,7 @@ export const readNounsUsdcTokenBuyerMaxAdminBaselinePaymentTokenAmount =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerMaxAdminBotDiscountBPs = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerMaxAdminBotDiscountBPs = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'maxAdminBotDiscountBPs',
@@ -559,7 +559,7 @@ export const readNounsUsdcTokenBuyerMaxAdminBotDiscountBPs = /*#__PURE__*/ creat
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerMinAdminBaselinePaymentTokenAmount =
+export const readNijiUsdcTokenBuyerMinAdminBaselinePaymentTokenAmount =
   /*#__PURE__*/ createReadContract({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -572,7 +572,7 @@ export const readNounsUsdcTokenBuyerMinAdminBaselinePaymentTokenAmount =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerMinAdminBotDiscountBPs = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerMinAdminBotDiscountBPs = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'minAdminBotDiscountBPs',
@@ -584,7 +584,7 @@ export const readNounsUsdcTokenBuyerMinAdminBotDiscountBPs = /*#__PURE__*/ creat
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerOwner = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerOwner = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'owner',
@@ -596,7 +596,7 @@ export const readNounsUsdcTokenBuyerOwner = /*#__PURE__*/ createReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerPaused = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerPaused = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'paused',
@@ -608,7 +608,7 @@ export const readNounsUsdcTokenBuyerPaused = /*#__PURE__*/ createReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerPayer = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerPayer = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'payer',
@@ -620,7 +620,7 @@ export const readNounsUsdcTokenBuyerPayer = /*#__PURE__*/ createReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerPaymentToken = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerPaymentToken = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'paymentToken',
@@ -632,7 +632,7 @@ export const readNounsUsdcTokenBuyerPaymentToken = /*#__PURE__*/ createReadContr
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerPaymentTokenDecimalsDigits = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerPaymentTokenDecimalsDigits = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'paymentTokenDecimalsDigits',
@@ -644,7 +644,7 @@ export const readNounsUsdcTokenBuyerPaymentTokenDecimalsDigits = /*#__PURE__*/ c
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerPrice = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerPrice = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'price',
@@ -656,7 +656,7 @@ export const readNounsUsdcTokenBuyerPrice = /*#__PURE__*/ createReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerPriceFeed = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerPriceFeed = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'priceFeed',
@@ -668,7 +668,7 @@ export const readNounsUsdcTokenBuyerPriceFeed = /*#__PURE__*/ createReadContract
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerTokenAmountNeeded = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerTokenAmountNeeded = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'tokenAmountNeeded',
@@ -680,7 +680,7 @@ export const readNounsUsdcTokenBuyerTokenAmountNeeded = /*#__PURE__*/ createRead
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerTokenAmountNeededAndEthPayout =
+export const readNijiUsdcTokenBuyerTokenAmountNeededAndEthPayout =
   /*#__PURE__*/ createReadContract({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -693,7 +693,7 @@ export const readNounsUsdcTokenBuyerTokenAmountNeededAndEthPayout =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const readNounsUsdcTokenBuyerTokenAmountPerEthAmount = /*#__PURE__*/ createReadContract({
+export const readNijiUsdcTokenBuyerTokenAmountPerEthAmount = /*#__PURE__*/ createReadContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'tokenAmountPerEthAmount',
@@ -705,7 +705,7 @@ export const readNounsUsdcTokenBuyerTokenAmountPerEthAmount = /*#__PURE__*/ crea
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyer = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyer = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
 });
@@ -716,7 +716,7 @@ export const writeNounsUsdcTokenBuyer = /*#__PURE__*/ createWriteContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerBuyEth = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyerBuyEth = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'buyETH',
@@ -728,7 +728,7 @@ export const writeNounsUsdcTokenBuyerBuyEth = /*#__PURE__*/ createWriteContract(
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerPause = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyerPause = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'pause',
@@ -740,7 +740,7 @@ export const writeNounsUsdcTokenBuyerPause = /*#__PURE__*/ createWriteContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerRenounceOwnership = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyerRenounceOwnership = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'renounceOwnership',
@@ -752,7 +752,7 @@ export const writeNounsUsdcTokenBuyerRenounceOwnership = /*#__PURE__*/ createWri
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerSetAdmin = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyerSetAdmin = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'setAdmin',
@@ -764,7 +764,7 @@ export const writeNounsUsdcTokenBuyerSetAdmin = /*#__PURE__*/ createWriteContrac
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerSetBaselinePaymentTokenAmount =
+export const writeNijiUsdcTokenBuyerSetBaselinePaymentTokenAmount =
   /*#__PURE__*/ createWriteContract({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -777,7 +777,7 @@ export const writeNounsUsdcTokenBuyerSetBaselinePaymentTokenAmount =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerSetBotDiscountBPs = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyerSetBotDiscountBPs = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'setBotDiscountBPs',
@@ -789,7 +789,7 @@ export const writeNounsUsdcTokenBuyerSetBotDiscountBPs = /*#__PURE__*/ createWri
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerSetMaxAdminBaselinePaymentTokenAmount =
+export const writeNijiUsdcTokenBuyerSetMaxAdminBaselinePaymentTokenAmount =
   /*#__PURE__*/ createWriteContract({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -802,7 +802,7 @@ export const writeNounsUsdcTokenBuyerSetMaxAdminBaselinePaymentTokenAmount =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerSetMaxAdminBotDiscountBPs = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyerSetMaxAdminBotDiscountBPs = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'setMaxAdminBotDiscountBPs',
@@ -814,7 +814,7 @@ export const writeNounsUsdcTokenBuyerSetMaxAdminBotDiscountBPs = /*#__PURE__*/ c
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerSetMinAdminBaselinePaymentTokenAmount =
+export const writeNijiUsdcTokenBuyerSetMinAdminBaselinePaymentTokenAmount =
   /*#__PURE__*/ createWriteContract({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -827,7 +827,7 @@ export const writeNounsUsdcTokenBuyerSetMinAdminBaselinePaymentTokenAmount =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerSetMinAdminBotDiscountBPs = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyerSetMinAdminBotDiscountBPs = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'setMinAdminBotDiscountBPs',
@@ -839,7 +839,7 @@ export const writeNounsUsdcTokenBuyerSetMinAdminBotDiscountBPs = /*#__PURE__*/ c
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerSetPayer = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyerSetPayer = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'setPayer',
@@ -851,7 +851,7 @@ export const writeNounsUsdcTokenBuyerSetPayer = /*#__PURE__*/ createWriteContrac
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerSetPriceFeed = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyerSetPriceFeed = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'setPriceFeed',
@@ -863,7 +863,7 @@ export const writeNounsUsdcTokenBuyerSetPriceFeed = /*#__PURE__*/ createWriteCon
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerTransferOwnership = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyerTransferOwnership = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'transferOwnership',
@@ -875,7 +875,7 @@ export const writeNounsUsdcTokenBuyerTransferOwnership = /*#__PURE__*/ createWri
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerUnpause = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyerUnpause = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'unpause',
@@ -887,7 +887,7 @@ export const writeNounsUsdcTokenBuyerUnpause = /*#__PURE__*/ createWriteContract
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const writeNounsUsdcTokenBuyerWithdrawEth = /*#__PURE__*/ createWriteContract({
+export const writeNijiUsdcTokenBuyerWithdrawEth = /*#__PURE__*/ createWriteContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'withdrawETH',
@@ -899,7 +899,7 @@ export const writeNounsUsdcTokenBuyerWithdrawEth = /*#__PURE__*/ createWriteCont
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyer = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiUsdcTokenBuyer = /*#__PURE__*/ createSimulateContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
 });
@@ -910,7 +910,7 @@ export const simulateNounsUsdcTokenBuyer = /*#__PURE__*/ createSimulateContract(
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerBuyEth = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiUsdcTokenBuyerBuyEth = /*#__PURE__*/ createSimulateContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'buyETH',
@@ -922,7 +922,7 @@ export const simulateNounsUsdcTokenBuyerBuyEth = /*#__PURE__*/ createSimulateCon
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerPause = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiUsdcTokenBuyerPause = /*#__PURE__*/ createSimulateContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'pause',
@@ -934,7 +934,7 @@ export const simulateNounsUsdcTokenBuyerPause = /*#__PURE__*/ createSimulateCont
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerRenounceOwnership = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiUsdcTokenBuyerRenounceOwnership = /*#__PURE__*/ createSimulateContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'renounceOwnership',
@@ -946,7 +946,7 @@ export const simulateNounsUsdcTokenBuyerRenounceOwnership = /*#__PURE__*/ create
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerSetAdmin = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiUsdcTokenBuyerSetAdmin = /*#__PURE__*/ createSimulateContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'setAdmin',
@@ -958,7 +958,7 @@ export const simulateNounsUsdcTokenBuyerSetAdmin = /*#__PURE__*/ createSimulateC
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerSetBaselinePaymentTokenAmount =
+export const simulateNijiUsdcTokenBuyerSetBaselinePaymentTokenAmount =
   /*#__PURE__*/ createSimulateContract({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -971,7 +971,7 @@ export const simulateNounsUsdcTokenBuyerSetBaselinePaymentTokenAmount =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerSetBotDiscountBPs = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiUsdcTokenBuyerSetBotDiscountBPs = /*#__PURE__*/ createSimulateContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'setBotDiscountBPs',
@@ -983,7 +983,7 @@ export const simulateNounsUsdcTokenBuyerSetBotDiscountBPs = /*#__PURE__*/ create
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerSetMaxAdminBaselinePaymentTokenAmount =
+export const simulateNijiUsdcTokenBuyerSetMaxAdminBaselinePaymentTokenAmount =
   /*#__PURE__*/ createSimulateContract({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -996,7 +996,7 @@ export const simulateNounsUsdcTokenBuyerSetMaxAdminBaselinePaymentTokenAmount =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerSetMaxAdminBotDiscountBPs =
+export const simulateNijiUsdcTokenBuyerSetMaxAdminBotDiscountBPs =
   /*#__PURE__*/ createSimulateContract({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -1009,7 +1009,7 @@ export const simulateNounsUsdcTokenBuyerSetMaxAdminBotDiscountBPs =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerSetMinAdminBaselinePaymentTokenAmount =
+export const simulateNijiUsdcTokenBuyerSetMinAdminBaselinePaymentTokenAmount =
   /*#__PURE__*/ createSimulateContract({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -1022,7 +1022,7 @@ export const simulateNounsUsdcTokenBuyerSetMinAdminBaselinePaymentTokenAmount =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerSetMinAdminBotDiscountBPs =
+export const simulateNijiUsdcTokenBuyerSetMinAdminBotDiscountBPs =
   /*#__PURE__*/ createSimulateContract({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -1035,7 +1035,7 @@ export const simulateNounsUsdcTokenBuyerSetMinAdminBotDiscountBPs =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerSetPayer = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiUsdcTokenBuyerSetPayer = /*#__PURE__*/ createSimulateContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'setPayer',
@@ -1047,7 +1047,7 @@ export const simulateNounsUsdcTokenBuyerSetPayer = /*#__PURE__*/ createSimulateC
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerSetPriceFeed = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiUsdcTokenBuyerSetPriceFeed = /*#__PURE__*/ createSimulateContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'setPriceFeed',
@@ -1059,7 +1059,7 @@ export const simulateNounsUsdcTokenBuyerSetPriceFeed = /*#__PURE__*/ createSimul
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerTransferOwnership = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiUsdcTokenBuyerTransferOwnership = /*#__PURE__*/ createSimulateContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'transferOwnership',
@@ -1071,7 +1071,7 @@ export const simulateNounsUsdcTokenBuyerTransferOwnership = /*#__PURE__*/ create
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerUnpause = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiUsdcTokenBuyerUnpause = /*#__PURE__*/ createSimulateContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'unpause',
@@ -1083,7 +1083,7 @@ export const simulateNounsUsdcTokenBuyerUnpause = /*#__PURE__*/ createSimulateCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const simulateNounsUsdcTokenBuyerWithdrawEth = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiUsdcTokenBuyerWithdrawEth = /*#__PURE__*/ createSimulateContract({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   functionName: 'withdrawETH',
@@ -1095,7 +1095,7 @@ export const simulateNounsUsdcTokenBuyerWithdrawEth = /*#__PURE__*/ createSimula
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchNijiUsdcTokenBuyerEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
 });
@@ -1106,7 +1106,7 @@ export const watchNounsUsdcTokenBuyerEvent = /*#__PURE__*/ createWatchContractEv
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerAdminSetEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchNijiUsdcTokenBuyerAdminSetEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   eventName: 'AdminSet',
@@ -1118,7 +1118,7 @@ export const watchNounsUsdcTokenBuyerAdminSetEvent = /*#__PURE__*/ createWatchCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerBaselinePaymentTokenAmountSetEvent =
+export const watchNijiUsdcTokenBuyerBaselinePaymentTokenAmountSetEvent =
   /*#__PURE__*/ createWatchContractEvent({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -1131,7 +1131,7 @@ export const watchNounsUsdcTokenBuyerBaselinePaymentTokenAmountSetEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerBotDiscountBPsSetEvent =
+export const watchNijiUsdcTokenBuyerBotDiscountBPsSetEvent =
   /*#__PURE__*/ createWatchContractEvent({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -1144,7 +1144,7 @@ export const watchNounsUsdcTokenBuyerBotDiscountBPsSetEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerEthWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchNijiUsdcTokenBuyerEthWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   eventName: 'ETHWithdrawn',
@@ -1156,7 +1156,7 @@ export const watchNounsUsdcTokenBuyerEthWithdrawnEvent = /*#__PURE__*/ createWat
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerMaxAdminBaselinePaymentTokenAmountSetEvent =
+export const watchNijiUsdcTokenBuyerMaxAdminBaselinePaymentTokenAmountSetEvent =
   /*#__PURE__*/ createWatchContractEvent({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -1169,7 +1169,7 @@ export const watchNounsUsdcTokenBuyerMaxAdminBaselinePaymentTokenAmountSetEvent 
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerMaxAdminBotDiscountBPsSetEvent =
+export const watchNijiUsdcTokenBuyerMaxAdminBotDiscountBPsSetEvent =
   /*#__PURE__*/ createWatchContractEvent({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -1182,7 +1182,7 @@ export const watchNounsUsdcTokenBuyerMaxAdminBotDiscountBPsSetEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerMinAdminBaselinePaymentTokenAmountSetEvent =
+export const watchNijiUsdcTokenBuyerMinAdminBaselinePaymentTokenAmountSetEvent =
   /*#__PURE__*/ createWatchContractEvent({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -1195,7 +1195,7 @@ export const watchNounsUsdcTokenBuyerMinAdminBaselinePaymentTokenAmountSetEvent 
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerMinAdminBotDiscountBPsSetEvent =
+export const watchNijiUsdcTokenBuyerMinAdminBotDiscountBPsSetEvent =
   /*#__PURE__*/ createWatchContractEvent({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -1208,7 +1208,7 @@ export const watchNounsUsdcTokenBuyerMinAdminBotDiscountBPsSetEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerOwnershipTransferredEvent =
+export const watchNijiUsdcTokenBuyerOwnershipTransferredEvent =
   /*#__PURE__*/ createWatchContractEvent({
     abi: nijiUsdcTokenBuyerAbi,
     address: nijiUsdcTokenBuyerAddress,
@@ -1221,7 +1221,7 @@ export const watchNounsUsdcTokenBuyerOwnershipTransferredEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerPausedEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchNijiUsdcTokenBuyerPausedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   eventName: 'Paused',
@@ -1233,7 +1233,7 @@ export const watchNounsUsdcTokenBuyerPausedEvent = /*#__PURE__*/ createWatchCont
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerPayerSetEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchNijiUsdcTokenBuyerPayerSetEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   eventName: 'PayerSet',
@@ -1245,7 +1245,7 @@ export const watchNounsUsdcTokenBuyerPayerSetEvent = /*#__PURE__*/ createWatchCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerPriceFeedSetEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchNijiUsdcTokenBuyerPriceFeedSetEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   eventName: 'PriceFeedSet',
@@ -1257,7 +1257,7 @@ export const watchNounsUsdcTokenBuyerPriceFeedSetEvent = /*#__PURE__*/ createWat
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerSoldEthEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchNijiUsdcTokenBuyerSoldEthEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   eventName: 'SoldETH',
@@ -1269,7 +1269,7 @@ export const watchNounsUsdcTokenBuyerSoldEthEvent = /*#__PURE__*/ createWatchCon
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x821176470cFeF1dB78F1e2dbae136f73c36ddd48)
  */
-export const watchNounsUsdcTokenBuyerUnpausedEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchNijiUsdcTokenBuyerUnpausedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: nijiUsdcTokenBuyerAbi,
   address: nijiUsdcTokenBuyerAddress,
   eventName: 'Unpaused',

@@ -39,7 +39,7 @@ const NavBar = () => {
   const location = useLocation();
   const treasuryBalance = useReadNijiTreasuryBalancesInEth({
     query: {
-      select: data => {
+      select: (data: { total: bigint }) => {
         console.log(data);
         return data.total;
       },

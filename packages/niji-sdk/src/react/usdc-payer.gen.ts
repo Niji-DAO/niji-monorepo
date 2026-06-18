@@ -178,7 +178,7 @@ export const nijiUsdcPayerConfig = {
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useReadNounsUsdcPayer = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiUsdcPayer = /*#__PURE__*/ createUseReadContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
 });
@@ -189,7 +189,7 @@ export const useReadNounsUsdcPayer = /*#__PURE__*/ createUseReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useReadNounsUsdcPayerDebtOf = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiUsdcPayerDebtOf = /*#__PURE__*/ createUseReadContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'debtOf',
@@ -201,7 +201,7 @@ export const useReadNounsUsdcPayerDebtOf = /*#__PURE__*/ createUseReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useReadNounsUsdcPayerOwner = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiUsdcPayerOwner = /*#__PURE__*/ createUseReadContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'owner',
@@ -213,7 +213,7 @@ export const useReadNounsUsdcPayerOwner = /*#__PURE__*/ createUseReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useReadNounsUsdcPayerPaymentToken = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiUsdcPayerPaymentToken = /*#__PURE__*/ createUseReadContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'paymentToken',
@@ -225,7 +225,7 @@ export const useReadNounsUsdcPayerPaymentToken = /*#__PURE__*/ createUseReadCont
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useReadNounsUsdcPayerQueue = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiUsdcPayerQueue = /*#__PURE__*/ createUseReadContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'queue',
@@ -237,7 +237,7 @@ export const useReadNounsUsdcPayerQueue = /*#__PURE__*/ createUseReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useReadNounsUsdcPayerQueueAt = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiUsdcPayerQueueAt = /*#__PURE__*/ createUseReadContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'queueAt',
@@ -249,7 +249,7 @@ export const useReadNounsUsdcPayerQueueAt = /*#__PURE__*/ createUseReadContract(
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useReadNounsUsdcPayerTotalDebt = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiUsdcPayerTotalDebt = /*#__PURE__*/ createUseReadContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'totalDebt',
@@ -261,7 +261,7 @@ export const useReadNounsUsdcPayerTotalDebt = /*#__PURE__*/ createUseReadContrac
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useWriteNounsUsdcPayer = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiUsdcPayer = /*#__PURE__*/ createUseWriteContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
 });
@@ -272,7 +272,7 @@ export const useWriteNounsUsdcPayer = /*#__PURE__*/ createUseWriteContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useWriteNounsUsdcPayerPayBackDebt = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiUsdcPayerPayBackDebt = /*#__PURE__*/ createUseWriteContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'payBackDebt',
@@ -284,7 +284,7 @@ export const useWriteNounsUsdcPayerPayBackDebt = /*#__PURE__*/ createUseWriteCon
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useWriteNounsUsdcPayerRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiUsdcPayerRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'renounceOwnership',
@@ -296,7 +296,7 @@ export const useWriteNounsUsdcPayerRenounceOwnership = /*#__PURE__*/ createUseWr
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useWriteNounsUsdcPayerSendOrRegisterDebt = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiUsdcPayerSendOrRegisterDebt = /*#__PURE__*/ createUseWriteContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'sendOrRegisterDebt',
@@ -308,7 +308,7 @@ export const useWriteNounsUsdcPayerSendOrRegisterDebt = /*#__PURE__*/ createUseW
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useWriteNounsUsdcPayerTransferOwnership = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiUsdcPayerTransferOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'transferOwnership',
@@ -320,7 +320,7 @@ export const useWriteNounsUsdcPayerTransferOwnership = /*#__PURE__*/ createUseWr
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useWriteNounsUsdcPayerWithdrawPaymentToken = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiUsdcPayerWithdrawPaymentToken = /*#__PURE__*/ createUseWriteContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'withdrawPaymentToken',
@@ -332,7 +332,7 @@ export const useWriteNounsUsdcPayerWithdrawPaymentToken = /*#__PURE__*/ createUs
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useSimulateNounsUsdcPayer = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiUsdcPayer = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
 });
@@ -343,7 +343,7 @@ export const useSimulateNounsUsdcPayer = /*#__PURE__*/ createUseSimulateContract
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useSimulateNounsUsdcPayerPayBackDebt = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiUsdcPayerPayBackDebt = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'payBackDebt',
@@ -355,7 +355,7 @@ export const useSimulateNounsUsdcPayerPayBackDebt = /*#__PURE__*/ createUseSimul
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useSimulateNounsUsdcPayerRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiUsdcPayerRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'renounceOwnership',
@@ -367,7 +367,7 @@ export const useSimulateNounsUsdcPayerRenounceOwnership = /*#__PURE__*/ createUs
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useSimulateNounsUsdcPayerSendOrRegisterDebt = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiUsdcPayerSendOrRegisterDebt = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'sendOrRegisterDebt',
@@ -379,7 +379,7 @@ export const useSimulateNounsUsdcPayerSendOrRegisterDebt = /*#__PURE__*/ createU
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useSimulateNounsUsdcPayerTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiUsdcPayerTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   functionName: 'transferOwnership',
@@ -391,7 +391,7 @@ export const useSimulateNounsUsdcPayerTransferOwnership = /*#__PURE__*/ createUs
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useSimulateNounsUsdcPayerWithdrawPaymentToken =
+export const useSimulateNijiUsdcPayerWithdrawPaymentToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: nijiUsdcPayerAbi,
     address: nijiUsdcPayerAddress,
@@ -404,7 +404,7 @@ export const useSimulateNounsUsdcPayerWithdrawPaymentToken =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useWatchNounsUsdcPayerEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiUsdcPayerEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
 });
@@ -415,7 +415,7 @@ export const useWatchNounsUsdcPayerEvent = /*#__PURE__*/ createUseWatchContractE
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useWatchNounsUsdcPayerOwnershipTransferredEvent =
+export const useWatchNijiUsdcPayerOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nijiUsdcPayerAbi,
     address: nijiUsdcPayerAddress,
@@ -428,7 +428,7 @@ export const useWatchNounsUsdcPayerOwnershipTransferredEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useWatchNounsUsdcPayerPaidBackDebtEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiUsdcPayerPaidBackDebtEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   eventName: 'PaidBackDebt',
@@ -440,7 +440,7 @@ export const useWatchNounsUsdcPayerPaidBackDebtEvent = /*#__PURE__*/ createUseWa
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useWatchNounsUsdcPayerRegisteredDebtEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiUsdcPayerRegisteredDebtEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiUsdcPayerAbi,
   address: nijiUsdcPayerAddress,
   eventName: 'RegisteredDebt',
@@ -452,6 +452,6 @@ export const useWatchNounsUsdcPayerRegisteredDebtEvent = /*#__PURE__*/ createUse
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x5a2A0951C6b3479DBEe1D5909Aac7B325d300D94)
  */
-export const useWatchNounsUsdcPayerTokensWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent(
+export const useWatchNijiUsdcPayerTokensWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent(
   { abi: nijiUsdcPayerAbi, address: nijiUsdcPayerAddress, eventName: 'TokensWithdrawn' },
 );

@@ -6,10 +6,10 @@ import {
 } from 'wagmi/codegen';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// NounsStream
+// NijiStream
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const nounsStreamAbi = [
+export const nijiStreamAbi = [
   { type: 'error', inputs: [], name: 'AmountExceedsBalance' },
   { type: 'error', inputs: [], name: 'CallerNotPayer' },
   { type: 'error', inputs: [], name: 'CallerNotPayerOrRecipient' },
@@ -212,274 +212,274 @@ export const nounsStreamAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__
  */
-export const useReadNounsStream = /*#__PURE__*/ createUseReadContract({ abi: nounsStreamAbi });
+export const useReadNijiStream = /*#__PURE__*/ createUseReadContract({ abi: nijiStreamAbi });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"elapsedTime"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"elapsedTime"`
  */
-export const useReadNounsStreamElapsedTime = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+export const useReadNijiStreamElapsedTime = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamAbi,
   functionName: 'elapsedTime',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"factory"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"factory"`
  */
 export const useReadNijiStreamFactory = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+  abi: nijiStreamAbi,
   functionName: 'factory',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"payer"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"payer"`
  */
-export const useReadNounsStreamPayer = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+export const useReadNijiStreamPayer = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamAbi,
   functionName: 'payer',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"recipient"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"recipient"`
  */
-export const useReadNounsStreamRecipient = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+export const useReadNijiStreamRecipient = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamAbi,
   functionName: 'recipient',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"recipientActiveBalance"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"recipientActiveBalance"`
  */
-export const useReadNounsStreamRecipientActiveBalance = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+export const useReadNijiStreamRecipientActiveBalance = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamAbi,
   functionName: 'recipientActiveBalance',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"recipientBalance"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"recipientBalance"`
  */
-export const useReadNounsStreamRecipientBalance = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+export const useReadNijiStreamRecipientBalance = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamAbi,
   functionName: 'recipientBalance',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"recipientCancelBalance"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"recipientCancelBalance"`
  */
-export const useReadNounsStreamRecipientCancelBalance = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+export const useReadNijiStreamRecipientCancelBalance = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamAbi,
   functionName: 'recipientCancelBalance',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"remainingBalance"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"remainingBalance"`
  */
-export const useReadNounsStreamRemainingBalance = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+export const useReadNijiStreamRemainingBalance = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamAbi,
   functionName: 'remainingBalance',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"startTime"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"startTime"`
  */
-export const useReadNounsStreamStartTime = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+export const useReadNijiStreamStartTime = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamAbi,
   functionName: 'startTime',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"stopTime"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"stopTime"`
  */
-export const useReadNounsStreamStopTime = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+export const useReadNijiStreamStopTime = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamAbi,
   functionName: 'stopTime',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"token"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"token"`
  */
-export const useReadNounsStreamToken = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+export const useReadNijiStreamToken = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamAbi,
   functionName: 'token',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"tokenAmount"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"tokenAmount"`
  */
-export const useReadNounsStreamTokenAmount = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+export const useReadNijiStreamTokenAmount = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamAbi,
   functionName: 'tokenAmount',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"tokenAndOutstandingBalance"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"tokenAndOutstandingBalance"`
  */
-export const useReadNounsStreamTokenAndOutstandingBalance = /*#__PURE__*/ createUseReadContract({
-  abi: nounsStreamAbi,
+export const useReadNijiStreamTokenAndOutstandingBalance = /*#__PURE__*/ createUseReadContract({
+  abi: nijiStreamAbi,
   functionName: 'tokenAndOutstandingBalance',
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nounsStreamAbi}__
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiStreamAbi}__
  */
-export const useWriteNounsStream = /*#__PURE__*/ createUseWriteContract({ abi: nounsStreamAbi });
+export const useWriteNijiStream = /*#__PURE__*/ createUseWriteContract({ abi: nijiStreamAbi });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"cancel"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"cancel"`
  */
-export const useWriteNounsStreamCancel = /*#__PURE__*/ createUseWriteContract({
-  abi: nounsStreamAbi,
+export const useWriteNijiStreamCancel = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiStreamAbi,
   functionName: 'cancel',
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"initialize"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"initialize"`
  */
-export const useWriteNounsStreamInitialize = /*#__PURE__*/ createUseWriteContract({
-  abi: nounsStreamAbi,
+export const useWriteNijiStreamInitialize = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiStreamAbi,
   functionName: 'initialize',
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"recoverTokens"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"recoverTokens"`
  */
-export const useWriteNounsStreamRecoverTokens = /*#__PURE__*/ createUseWriteContract({
-  abi: nounsStreamAbi,
+export const useWriteNijiStreamRecoverTokens = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiStreamAbi,
   functionName: 'recoverTokens',
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"rescueETH"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"rescueETH"`
  */
-export const useWriteNounsStreamRescueEth = /*#__PURE__*/ createUseWriteContract({
-  abi: nounsStreamAbi,
+export const useWriteNijiStreamRescueEth = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiStreamAbi,
   functionName: 'rescueETH',
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"withdraw"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"withdraw"`
  */
-export const useWriteNounsStreamWithdraw = /*#__PURE__*/ createUseWriteContract({
-  abi: nounsStreamAbi,
+export const useWriteNijiStreamWithdraw = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiStreamAbi,
   functionName: 'withdraw',
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"withdrawAfterCancel"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"withdrawAfterCancel"`
  */
-export const useWriteNounsStreamWithdrawAfterCancel = /*#__PURE__*/ createUseWriteContract({
-  abi: nounsStreamAbi,
+export const useWriteNijiStreamWithdrawAfterCancel = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiStreamAbi,
   functionName: 'withdrawAfterCancel',
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"withdrawFromActiveBalance"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"withdrawFromActiveBalance"`
  */
-export const useWriteNounsStreamWithdrawFromActiveBalance = /*#__PURE__*/ createUseWriteContract({
-  abi: nounsStreamAbi,
+export const useWriteNijiStreamWithdrawFromActiveBalance = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiStreamAbi,
   functionName: 'withdrawFromActiveBalance',
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nounsStreamAbi}__
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiStreamAbi}__
  */
-export const useSimulateNounsStream = /*#__PURE__*/ createUseSimulateContract({
-  abi: nounsStreamAbi,
+export const useSimulateNijiStream = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiStreamAbi,
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"cancel"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"cancel"`
  */
-export const useSimulateNounsStreamCancel = /*#__PURE__*/ createUseSimulateContract({
-  abi: nounsStreamAbi,
+export const useSimulateNijiStreamCancel = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiStreamAbi,
   functionName: 'cancel',
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"initialize"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"initialize"`
  */
-export const useSimulateNounsStreamInitialize = /*#__PURE__*/ createUseSimulateContract({
-  abi: nounsStreamAbi,
+export const useSimulateNijiStreamInitialize = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiStreamAbi,
   functionName: 'initialize',
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"recoverTokens"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"recoverTokens"`
  */
-export const useSimulateNounsStreamRecoverTokens = /*#__PURE__*/ createUseSimulateContract({
-  abi: nounsStreamAbi,
+export const useSimulateNijiStreamRecoverTokens = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiStreamAbi,
   functionName: 'recoverTokens',
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"rescueETH"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"rescueETH"`
  */
-export const useSimulateNounsStreamRescueEth = /*#__PURE__*/ createUseSimulateContract({
-  abi: nounsStreamAbi,
+export const useSimulateNijiStreamRescueEth = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiStreamAbi,
   functionName: 'rescueETH',
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"withdraw"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"withdraw"`
  */
-export const useSimulateNounsStreamWithdraw = /*#__PURE__*/ createUseSimulateContract({
-  abi: nounsStreamAbi,
+export const useSimulateNijiStreamWithdraw = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiStreamAbi,
   functionName: 'withdraw',
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"withdrawAfterCancel"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"withdrawAfterCancel"`
  */
-export const useSimulateNounsStreamWithdrawAfterCancel = /*#__PURE__*/ createUseSimulateContract({
-  abi: nounsStreamAbi,
+export const useSimulateNijiStreamWithdrawAfterCancel = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiStreamAbi,
   functionName: 'withdrawAfterCancel',
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"withdrawFromActiveBalance"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiStreamAbi}__ and `functionName` set to `"withdrawFromActiveBalance"`
  */
-export const useSimulateNounsStreamWithdrawFromActiveBalance =
+export const useSimulateNijiStreamWithdrawFromActiveBalance =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: nounsStreamAbi,
+    abi: nijiStreamAbi,
     functionName: 'withdrawFromActiveBalance',
   });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nounsStreamAbi}__
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiStreamAbi}__
  */
-export const useWatchNounsStreamEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: nounsStreamAbi,
+export const useWatchNijiStreamEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiStreamAbi,
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nounsStreamAbi}__ and `eventName` set to `"ETHRescued"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiStreamAbi}__ and `eventName` set to `"ETHRescued"`
  */
-export const useWatchNounsStreamEthRescuedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: nounsStreamAbi,
+export const useWatchNijiStreamEthRescuedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiStreamAbi,
   eventName: 'ETHRescued',
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nounsStreamAbi}__ and `eventName` set to `"StreamCancelled"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiStreamAbi}__ and `eventName` set to `"StreamCancelled"`
  */
-export const useWatchNounsStreamStreamCancelledEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: nounsStreamAbi,
+export const useWatchNijiStreamStreamCancelledEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiStreamAbi,
   eventName: 'StreamCancelled',
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nounsStreamAbi}__ and `eventName` set to `"TokensRecovered"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiStreamAbi}__ and `eventName` set to `"TokensRecovered"`
  */
-export const useWatchNounsStreamTokensRecoveredEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: nounsStreamAbi,
+export const useWatchNijiStreamTokensRecoveredEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiStreamAbi,
   eventName: 'TokensRecovered',
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nounsStreamAbi}__ and `eventName` set to `"TokensWithdrawn"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiStreamAbi}__ and `eventName` set to `"TokensWithdrawn"`
  */
-export const useWatchNounsStreamTokensWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: nounsStreamAbi,
+export const useWatchNijiStreamTokensWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiStreamAbi,
   eventName: 'TokensWithdrawn',
 });

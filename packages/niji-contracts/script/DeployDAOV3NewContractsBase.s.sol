@@ -8,7 +8,7 @@ import { NijiDAOLogicV4 } from '../contracts/governance/NijiDAOLogicV4.sol';
 import { NijiDAOExecutorProxy } from '../contracts/governance/NijiDAOExecutorProxy.sol';
 import { INijiDAOExecutor } from '../contracts/governance/NijiDAOInterfaces.sol';
 import { NijiDAOForkEscrow } from '../contracts/governance/fork/NijiDAOForkEscrow.sol';
-import { NounsTokenFork } from '../contracts/governance/fork/newdao/token/NounsTokenFork.sol';
+import { NijiTokenFork } from '../contracts/governance/fork/newdao/token/NijiTokenFork.sol';
 import { NijiAuctionHouseFork } from '../contracts/governance/fork/newdao/NijiAuctionHouseFork.sol';
 import { NijiDAOLogicV1Fork } from '../contracts/governance/fork/newdao/governance/NijiDAOLogicV1Fork.sol';
 import { ForkDAODeployer } from '../contracts/governance/fork/ForkDAODeployer.sol';
@@ -81,7 +81,7 @@ contract DeployDAOV3NewContractsBase is Script {
 
         forkEscrow = new NijiDAOForkEscrow(address(daoProxy), address(daoProxy.nouns()));
         forkDeployer = new ForkDAODeployer(
-            address(new NounsTokenFork()),
+            address(new NijiTokenFork()),
             address(new NijiAuctionHouseFork()),
             address(new NijiDAOLogicV1Fork()),
             address(timelockV2Impl),

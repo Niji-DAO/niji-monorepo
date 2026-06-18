@@ -1,5 +1,4 @@
-import type { INounSeed } from '@/wrappers/nounToken';
-import type { EncodedImage } from '@niji/sdk';
+import type { INounSeed } from '@/wrappers/nijiToken';
 
 import { type FC, useEffect, useState } from 'react';
 
@@ -31,6 +30,11 @@ interface TraitItem {
   type: string;
   index: number;
   hexColor?: string;
+}
+
+interface EncodedImage {
+  filename: string;
+  data: string;
 }
 
 const encoder = new PNGCollectionEncoder(ImageData.palette);

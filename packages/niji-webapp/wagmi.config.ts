@@ -37,8 +37,8 @@ const contractConfigs = [
     },
   },
   {
-    name: 'NounsToken',
-    fileName: 'nouns-token',
+    name: 'NijiToken',
+    fileName: 'niji-token',
     address: {
       [mainnet.id]: '0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03',
       [sepolia.id]: '0x4c4674bb72a096855496a7204962297bd7e12b85',
@@ -53,8 +53,8 @@ const contractConfigs = [
     },
   },
   {
-    name: 'NounsDescriptor',
-    fileName: 'nouns-descriptor',
+    name: 'NijiDescriptor',
+    fileName: 'niji-descriptor',
     address: {
       [mainnet.id]: '0x33a9c445fb4fb21f2c030a6b2d3e2f12d017bfac',
       [sepolia.id]: '0x79e04ebcdf1ac2661697b23844149b43acc002d5',

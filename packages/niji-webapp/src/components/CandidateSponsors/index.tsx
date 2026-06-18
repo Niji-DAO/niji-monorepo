@@ -10,7 +10,7 @@ import { useAccount } from 'wagmi';
 
 import { Proposal, ProposalState, useActivePendingUpdatableProposers } from '@/wrappers/nijiDao';
 import { ProposalCandidate } from '@/wrappers/nijiData';
-import { useDelegateNounsAtBlockQuery, useUserVotes } from '@/wrappers/nounToken';
+import { useDelegateNounsAtBlockQuery, useUserVotes } from '@/wrappers/nijiToken';
 
 import classes from './CandidateSponsors.module.css';
 import OriginalSignature from './OriginalSignature';

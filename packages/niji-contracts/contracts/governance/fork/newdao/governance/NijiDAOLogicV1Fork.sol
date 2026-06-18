@@ -98,7 +98,7 @@ import { UUPSUpgradeable } from '@openzeppelin/contracts/proxy/utils/UUPSUpgrade
 import { NijiDAOEventsFork } from './NijiDAOEventsFork.sol';
 import { NijiDAOStorageV1Fork } from './NijiDAOStorageV1Fork.sol';
 import { NijiDAOExecutorV2 } from '../../../NijiDAOExecutorV2.sol';
-import { INounsTokenForkLike } from './INounsTokenForkLike.sol';
+import { INijiTokenForkLike } from './INijiTokenForkLike.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { ReentrancyGuardUpgradeable } from '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
 
@@ -186,7 +186,7 @@ contract NijiDAOLogicV1Fork is UUPSUpgradeable, ReentrancyGuardUpgradeable, Niji
 
         admin = timelock_;
         timelock = NijiDAOExecutorV2(payable(timelock_));
-        nouns = INounsTokenForkLike(nouns_);
+        nouns = INijiTokenForkLike(nouns_);
         votingPeriod = votingPeriod_;
         votingDelay = votingDelay_;
         proposalThresholdBPS = proposalThresholdBPS_;

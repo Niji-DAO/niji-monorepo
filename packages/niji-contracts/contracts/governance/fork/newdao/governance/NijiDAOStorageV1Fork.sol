@@ -3,7 +3,7 @@
 pragma solidity ^0.8.19;
 
 import { NijiDAOExecutorV2 } from '../../../NijiDAOExecutorV2.sol';
-import { INounsTokenForkLike } from './INounsTokenForkLike.sol';
+import { INijiTokenForkLike } from './INijiTokenForkLike.sol';
 
 /**
  * @title Storage for `NijiDAOLogicV1Fork`.
@@ -43,7 +43,7 @@ contract NijiDAOStorageV1Fork {
     NijiDAOExecutorV2 public timelock;
 
     /// @notice The address of the Niji tokens
-    INounsTokenForkLike public nouns;
+    INijiTokenForkLike public nouns;
 
     /// @notice The official record of all proposals ever proposed
     mapping(uint256 => Proposal) internal _proposals;

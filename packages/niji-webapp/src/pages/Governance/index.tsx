@@ -21,7 +21,7 @@ const GovernancePage = () => {
 
   const treasuryBalance = useReadNijiTreasuryBalancesInEth({
     query: {
-      select: balances => {
+      select: (balances: { total: bigint }) => {
         console.log('eth', balances);
         return balances.total;
       },
@@ -29,7 +29,7 @@ const GovernancePage = () => {
   }).data;
   const treasuryBalanceUSD = useReadNijiTreasuryBalancesInUsd({
     query: {
-      select: balances => {
+      select: (balances: Record<string, bigint> & { total: bigint }) => {
         console.log(
           'usd',
           Object.entries(balances).map(([token, value]) => [token, formatUnits(value, 6)]),

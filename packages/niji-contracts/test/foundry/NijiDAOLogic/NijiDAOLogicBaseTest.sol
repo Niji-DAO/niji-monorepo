@@ -7,9 +7,7 @@ import { SigUtils, ERC1271Stub } from '../helpers/SigUtils.sol';
 import { ProxyRegistryMock } from '../helpers/ProxyRegistryMock.sol';
 import { NijiDAOProposals } from '../../../contracts/governance/NijiDAOProposals.sol';
 import { NijiDAOProxyV3 } from '../../../contracts/governance/NijiDAOProxyV3.sol';
-import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
-import { NounsToken } from '../../../contracts/NounsToken.sol';
-import { NounsSeeder } from '../../../contracts/NounsSeeder.sol';
+import { NijiDAOTypes, NijiTokenLike } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
 import { NijiDAOExecutorV2 } from '../../../contracts/governance/NijiDAOExecutorV2.sol';
 import { NijiDAOForkEscrow } from '../../../contracts/governance/fork/NijiDAOForkEscrow.sol';
@@ -65,7 +63,7 @@ abstract contract NijiDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
         uint32 indexed clientId
     );
 
-    NounsToken nounsToken;
+    NijiTokenLike nounsToken;
     INijiDAOLogic dao;
     NijiDAOExecutorV2 timelock;
 
@@ -79,7 +77,7 @@ abstract contract NijiDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
 
     function setUp() public virtual {
         dao = _deployDAOV3();
-        nounsToken = NounsToken(address(dao.nouns()));
+        nounsToken = NijiTokenLike(address(dao.nouns()));
         minter = nounsToken.minter();
         timelock = NijiDAOExecutorV2(payable(address(dao.timelock())));
         forkEscrow = address(dao.forkEscrow());

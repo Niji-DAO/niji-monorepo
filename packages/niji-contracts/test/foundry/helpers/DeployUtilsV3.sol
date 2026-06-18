@@ -12,16 +12,14 @@ import { ERC1967Proxy } from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy
 import { NijiAuctionHouseV3 } from '../../../contracts/NijiAuctionHouseV3.sol';
 import { NijiAuctionHouseProxy } from '../../../contracts/proxies/NijiAuctionHouseProxy.sol';
 import { NijiAuctionHouseProxyAdmin } from '../../../contracts/proxies/NijiAuctionHouseProxyAdmin.sol';
-import { NounsToken } from '../../../contracts/NounsToken.sol';
-import { NounsSeeder } from '../../../contracts/NounsSeeder.sol';
-import { ProxyRegistryMock } from './ProxyRegistryMock.sol';
+import { NijiToken } from '../../../contracts/NijiToken.sol';
 import { ForkDAODeployer } from '../../../contracts/governance/fork/ForkDAODeployer.sol';
-import { NounsTokenFork } from '../../../contracts/governance/fork/newdao/token/NounsTokenFork.sol';
+import { NijiTokenFork } from '../../../contracts/governance/fork/newdao/token/NijiTokenFork.sol';
 import { NijiAuctionHouseFork } from '../../../contracts/governance/fork/newdao/NijiAuctionHouseFork.sol';
 import { NijiDAOLogicV1Fork } from '../../../contracts/governance/fork/newdao/governance/NijiDAOLogicV1Fork.sol';
 import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
-import { INounsToken } from '../../../contracts/interfaces/INounsToken.sol';
+import { INijiToken } from '../../../contracts/interfaces/INijiToken.sol';
 import { WETH } from '../../../contracts/test/WETH.sol';
 import { ChainalysisSanctionsListMock } from './ChainalysisSanctionsListMock.sol';
 
@@ -82,7 +80,7 @@ abstract contract DeployUtilsV3 is DeployUtils {
 
     struct Temp {
         NijiDAOExecutorV2 timelock;
-        NounsToken nounsToken;
+        NijiToken nounsToken;
     }
 
     function _deployDAOV3WithParams(uint256 auctionDuration) internal returns (INijiDAOLogic) {
@@ -91,12 +89,9 @@ abstract contract DeployUtilsV3 is DeployUtils {
         t.timelock.initialize(address(1), TIMELOCK_DELAY);
 
         auctionHouseProxyAdmin = new NijiAuctionHouseProxyAdmin();
-        address predictedTokenAddress = computeCreateAddress(address(this), vm.getNonce(address(this)) + 9);
-        NijiAuctionHouseV3 auctionHouseImpl = new NijiAuctionHouseV3(
-            INounsToken(predictedTokenAddress),
-            address(new WETH()),
-            auctionDuration
-        );
+        t.nounsToken = deployToken(address(0));
+
+        NijiAuctionHouseV3 auctionHouseImpl = new NijiAuctionHouseV3(INijiToken(address(t.nounsToken)), address(new WETH()), auctionDuration);
         NijiAuctionHouseProxy auctionProxy = new NijiAuctionHouseProxy(
             address(auctionHouseImpl),
             address(auctionHouseProxyAdmin),
@@ -104,24 +99,15 @@ abstract contract DeployUtilsV3 is DeployUtils {
         );
         auctionHouseProxyAdmin.transferOwnership(address(t.timelock));
 
-        t.nounsToken = new NounsToken(
-            makeAddr('noundersDAO'),
-            address(auctionProxy),
-            _deployAndPopulateV2(),
-            new NounsSeeder(),
-            new ProxyRegistryMock()
-        );
+        t.nounsToken.setMinter(address(auctionProxy));
         t.nounsToken.transferOwnership(address(t.timelock));
-
-        require(predictedTokenAddress == address(t.nounsToken), 'Token address mismatch');
+        vm.prank(address(t.timelock));
+        t.nounsToken.acceptOwnership();
 
         address daoLogicImplementation = address(new NijiDAOLogicV4());
 
-        uint256 nonce = vm.getNonce(address(this));
-        address predictedForkEscrowAddress = computeCreateAddress(address(this), nonce + 6);
-
         ForkDAODeployer forkDeployer = new ForkDAODeployer(
-            address(new NounsTokenFork()),
+            address(new NijiTokenFork()),
             address(new NijiAuctionHouseFork()),
             address(new NijiDAOLogicV1Fork()),
             address(new NijiDAOExecutorV2()),
@@ -131,6 +117,8 @@ abstract contract DeployUtilsV3 is DeployUtils {
             FORK_DAO_PROPOSAL_THRESHOLD_BPS,
             FORK_DAO_QUORUM_VOTES_BPS
         );
+
+        address predictedForkEscrowAddress = computeCreateAddress(address(this), vm.getNonce(address(this)) + 2);
 
         INijiDAOLogic dao = INijiDAOLogic(
             payable(

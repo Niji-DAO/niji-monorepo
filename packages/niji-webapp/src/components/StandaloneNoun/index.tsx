@@ -8,7 +8,7 @@ import { Link } from 'react-router';
 
 import LegacyNoun from '@/components/LegacyNoun';
 import { setOnDisplayAuctionNounId } from '@/state/slices/onDisplayAuction';
-import { INounSeed, useNounSeed } from '@/wrappers/nounToken';
+import { INounSeed, useNounSeed } from '@/wrappers/nijiToken';
 
 import classes from './StandaloneNoun.module.css';
 

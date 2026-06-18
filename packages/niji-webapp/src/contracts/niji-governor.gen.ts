@@ -852,7 +852,7 @@ export const nijiGovernorAbi = [
     type: 'function',
     inputs: [],
     name: 'nouns',
-    outputs: [{ name: '', internalType: 'contract NounsTokenLike', type: 'address' }],
+    outputs: [{ name: '', internalType: 'contract NijiTokenLike', type: 'address' }],
     stateMutability: 'view',
   },
   {

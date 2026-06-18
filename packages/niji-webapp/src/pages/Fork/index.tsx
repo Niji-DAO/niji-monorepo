@@ -24,7 +24,7 @@ import {
   useForkThresholdBPS,
   useNumTokensInForkEscrow,
 } from '@/wrappers/nijiDao';
-import { useUserEscrowedNounIds, useUserOwnedNounIds } from '@/wrappers/nounToken';
+import { useUserEscrowedNounIds, useUserOwnedNounIds } from '@/wrappers/nijiToken';
 
 import NotFoundPage from '../NotFound';
 

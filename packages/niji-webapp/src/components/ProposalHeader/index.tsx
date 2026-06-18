@@ -25,7 +25,7 @@ import {
   useIsDaoGteV3,
   useProposalVote,
 } from '@/wrappers/nijiDao';
-import { useUserVotesAsOfBlock } from '@/wrappers/nounToken';
+import { useUserVotesAsOfBlock } from '@/wrappers/nijiToken';
 
 import classes from './ProposalHeader.module.css';
 

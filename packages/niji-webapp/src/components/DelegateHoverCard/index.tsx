@@ -6,7 +6,7 @@ import { Spinner } from 'react-bootstrap';
 
 import HorizontalStackedNouns from '@/components/HorizontalStackedNouns';
 import ShortAddress from '@/components/ShortAddress';
-import { useDelegateNounsAtBlockQuery } from '@/wrappers/nounToken';
+import { useDelegateNounsAtBlockQuery } from '@/wrappers/nijiToken';
 
 import classes from './DelegateHoverCard.module.css';
 

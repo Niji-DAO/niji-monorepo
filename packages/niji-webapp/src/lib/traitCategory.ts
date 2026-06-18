@@ -1,6 +1,6 @@
 import { ImageData } from '@noundry/nouns-assets';
 
-import { INounSeed } from '@/wrappers/nounToken';
+import { INounSeed } from '@/wrappers/nijiToken';
 
 export const traitCategory: Record<
   Exclude<keyof INounSeed, 'background'>,

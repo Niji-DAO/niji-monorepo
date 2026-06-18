@@ -9,7 +9,7 @@ import { isAddress } from 'viem';
 
 import linkIcon from '@/assets/icons/Link.svg';
 import EnsOrLongAddress from '@/components/EnsOrLongAddress';
-import { nounsTokenAddress } from '@/contracts';
+import { nijiTokenAddress } from '@/contracts';
 import {
   buildEtherscanAddressLink,
   buildEtherscanHoldingsLink,
@@ -59,7 +59,7 @@ export const transactionIconLink = (content: string) => {
 const ProposalContent: React.FC<ProposalContentProps> = props => {
   const { description, title, details } = props;
   const chainId = defaultChain.id;
-  const daoEtherscanLink = buildEtherscanHoldingsLink(nounsTokenAddress[chainId]);
+  const daoEtherscanLink = buildEtherscanHoldingsLink(nijiTokenAddress[chainId]);
 
   return (
     <>

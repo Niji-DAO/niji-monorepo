@@ -6,7 +6,7 @@ import { INijiDAOForkEscrow, NijiTokenLike } from '../../../contracts/governance
 contract NijiDAOForkEscrowMock is INijiDAOForkEscrow {
     uint32 public forkId;
     address public dao;
-    NijiTokenLike public nounsToken;
+    NijiTokenLike public nijiToken;
 
     /// @dev forkId => tokenId => owner
     mapping(uint32 => mapping(uint256 => address)) public escrowedTokensByForkId;
@@ -14,11 +14,11 @@ contract NijiDAOForkEscrowMock is INijiDAOForkEscrow {
     constructor(
         uint32 forkId_,
         address dao_,
-        NijiTokenLike nounsToken_
+        NijiTokenLike nijiToken_
     ) {
         forkId = forkId_;
         dao = dao_;
-        nounsToken = nounsToken_;
+        nijiToken = nijiToken_;
     }
 
     function markOwner(address owner, uint256[] calldata tokenIds) external {}
@@ -29,9 +29,13 @@ contract NijiDAOForkEscrowMock is INijiDAOForkEscrow {
         return 1;
     }
 
-    function numTokensInEscrow() external view returns (uint256) {}
+    function numTokensInEscrow() external pure returns (uint256) {
+        return 0;
+    }
 
-    function numTokensOwnedByDAO() external view returns (uint256) {}
+    function numTokensOwnedByDAO() external pure returns (uint256) {
+        return 0;
+    }
 
     function withdrawTokens(uint256[] calldata tokenIds, address to) external {}
 

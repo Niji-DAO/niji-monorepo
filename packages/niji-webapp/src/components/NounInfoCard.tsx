@@ -6,7 +6,7 @@ import _AddressIcon from '@/assets/icons/Address.svg';
 import _BidsIcon from '@/assets/icons/Bids.svg';
 import NounInfoRowButton from '@/components/NounInfoRowButton';
 import NounInfoRowHolder from '@/components/NounInfoRowHolder';
-import { nounsTokenAddress } from '@/contracts';
+import { nijiTokenAddress } from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { buildEtherscanTokenLink } from '@/utils/etherscan';
 import { defaultChain } from '@/wagmi';
@@ -21,7 +21,7 @@ const NounInfoCard: React.FC<NounInfoCardProps> = props => {
   const chainId = defaultChain.id;
 
   const etherscanButtonClickHandler = () =>
-    window.open(buildEtherscanTokenLink(nounsTokenAddress[chainId], Number(nounId)));
+    window.open(buildEtherscanTokenLink(nijiTokenAddress[chainId], Number(nounId)));
 
   const lastAuctionNounId = useAppSelector(state => state.onDisplayAuction.lastAuctionNounId);
 

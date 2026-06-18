@@ -54,7 +54,7 @@ import {
   useQueueProposal,
 } from '@/wrappers/nijiDao';
 import { useProposalFeedback } from '@/wrappers/nijiData';
-import { useUserVotes, useUserVotesAsOfBlock } from '@/wrappers/nounToken';
+import { useUserVotes, useUserVotesAsOfBlock } from '@/wrappers/nijiToken';
 import {
   delegateNounsAtBlockDocument,
   proposalVotesDocument,

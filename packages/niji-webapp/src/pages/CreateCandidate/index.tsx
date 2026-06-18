@@ -21,7 +21,7 @@ import { Hex } from '@/utils/types';
 import { defaultChain } from '@/wagmi';
 import { ProposalTransaction, useProposalThreshold } from '@/wrappers/nijiDao';
 import { useCreateProposalCandidate, useGetCreateCandidateCost } from '@/wrappers/nijiData';
-import { useUserVotes } from '@/wrappers/nounToken';
+import { useUserVotes } from '@/wrappers/nijiToken';
 
 import classes from '../CreateProposal/CreateProposal.module.css';
 

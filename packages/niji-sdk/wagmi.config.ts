@@ -38,7 +38,7 @@ const etherscanContractConfigs = [
     },
   },
   {
-    name: 'NounsToken',
+    name: 'NijiToken',
     fileName: 'token',
     address: {
       [mainnet.id]: '0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03',
@@ -54,7 +54,7 @@ const etherscanContractConfigs = [
     },
   },
   {
-    name: 'NounsDescriptor',
+    name: 'NijiDescriptor',
     fileName: 'descriptor',
     address: {
       [mainnet.id]: '0x33a9c445fb4fb21f2c030a6b2d3e2f12d017bfac',
@@ -89,7 +89,7 @@ const etherscanContractConfigs = [
 
 const staticContractConfigs = [
   {
-    name: 'NounsStream',
+    name: 'NijiStream',
     fileName: 'stream',
     abi: streamAbi,
   },

@@ -26,7 +26,7 @@ import {
   useGetUpdateCandidateCost,
   useUpdateProposalCandidate,
 } from '@/wrappers/nijiData';
-import { useUserVotes } from '@/wrappers/nounToken';
+import { useUserVotes } from '@/wrappers/nijiToken';
 
 import classes from '../CreateProposal/CreateProposal.module.css';
 

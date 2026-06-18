@@ -33,7 +33,7 @@ import {
   usePropose,
   useProposeOnTimelockV1,
 } from '@/wrappers/nijiDao';
-import { useUserVotes } from '@/wrappers/nounToken';
+import { useUserVotes } from '@/wrappers/nijiToken';
 
 import classes from './CreateProposal.module.css';
 

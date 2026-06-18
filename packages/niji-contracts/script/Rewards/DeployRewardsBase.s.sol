@@ -6,7 +6,6 @@ import { OptimizedScript } from '../OptimizedScript.s.sol';
 import { Rewards } from '../../contracts/client-incentives/Rewards.sol';
 import { INijiDAOLogic } from '../../contracts/interfaces/INijiDAOLogic.sol';
 import { INijiAuctionHouseV2 } from '../../contracts/interfaces/INijiAuctionHouseV2.sol';
-import { NounsClientTokenDescriptor } from '../../contracts/client-incentives/NounsClientTokenDescriptor.sol';
 import { RewardsDeployer } from './RewardsDeployer.sol';
 
 abstract contract DeployRewardsBase is OptimizedScript {
@@ -27,7 +26,7 @@ abstract contract DeployRewardsBase is OptimizedScript {
             admin: admin,
             auctionHouse: address(auctionHouse),
             erc20: ethToken,
-            descriptor: address(new NounsClientTokenDescriptor())
+            descriptor: address(0)
         });
 
         vm.stopBroadcast();

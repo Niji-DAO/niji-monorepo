@@ -5,9 +5,9 @@ import 'forge-std/Test.sol';
 import { NijiDAOExecutorV2 } from '../../contracts/governance/NijiDAOExecutorV2.sol';
 import { NijiDAOData } from '../../contracts/governance/data/NijiDAOData.sol';
 import { NijiAuctionHouseFork } from '../../contracts/governance/fork/newdao/NijiAuctionHouseFork.sol';
-import { INounsToken } from '../../contracts/interfaces/INounsToken.sol';
+import { INijiToken } from '../../contracts/interfaces/INijiToken.sol';
 import { NijiDAOLogicV1Fork } from '../../contracts/governance/fork/newdao/governance/NijiDAOLogicV1Fork.sol';
-import { NounsTokenFork } from '../../contracts/governance/fork/newdao/token/NounsTokenFork.sol';
+import { NijiTokenFork } from '../../contracts/governance/fork/newdao/token/NijiTokenFork.sol';
 import { INijiDAOForkEscrow } from '../../contracts/governance/NijiDAOInterfaces.sol';
 
 contract InitializersLocked is Test {
@@ -26,7 +26,7 @@ contract InitializersLocked is Test {
     function test_NijiAuctionHouseFork_locks_initializer() public {
         NijiAuctionHouseFork c = new NijiAuctionHouseFork();
         vm.expectRevert('Initializable: contract is already initialized');
-        c.initialize(address(0), INounsToken(address(0)), address(0), 0, 0, 0, 0);
+        c.initialize(address(0), INijiToken(address(0)), address(0), 0, 0, 0, 0);
     }
 
     function test_NijiDAOLogicV1Fork_locks_initializer() public {
@@ -35,8 +35,8 @@ contract InitializersLocked is Test {
         c.initialize(address(0), address(1), 0, 0, 0, 0, new address[](0), 0);
     }
 
-    function test_NounsTokenFork_locks_initializer() public {
-        NounsTokenFork c = new NounsTokenFork();
+    function test_NijiTokenFork_locks_initializer() public {
+        NijiTokenFork c = new NijiTokenFork();
         vm.expectRevert('Initializable: contract is already initialized');
         c.initialize(address(0), address(1), INijiDAOForkEscrow(address(3)), 0, 0, 0, 0);
     }

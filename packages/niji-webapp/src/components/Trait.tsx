@@ -5,7 +5,7 @@ import { ImageData } from '@noundry/nouns-assets';
 import { useQuery } from '@tanstack/react-query';
 
 import { traitCategory } from '@/lib/traitCategory';
-import { INounSeed } from '@/wrappers/nounToken';
+import { INounSeed } from '@/wrappers/nijiToken';
 
 export interface TraitProps extends HTMLAttributes<HTMLImageElement> {
   type: keyof INounSeed;

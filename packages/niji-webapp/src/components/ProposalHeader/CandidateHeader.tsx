@@ -14,7 +14,7 @@ import { Locales } from '@/i18n/locales';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
 import { isMobileScreen } from '@/utils/isMobile';
 import { relativeTimestamp } from '@/utils/timeUtils';
-import { useUserVotesAsOfBlock } from '@/wrappers/nounToken';
+import { useUserVotesAsOfBlock } from '@/wrappers/nijiToken';
 
 import classes from './ProposalHeader.module.css';
 

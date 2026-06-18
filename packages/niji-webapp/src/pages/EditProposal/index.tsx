@@ -28,7 +28,7 @@ import {
   useUpdateProposalTransactions,
 } from '@/wrappers/nijiDao';
 import { useCreateProposalCandidate, useGetCreateCandidateCost } from '@/wrappers/nijiData';
-import { useUserVotes } from '@/wrappers/nounToken';
+import { useUserVotes } from '@/wrappers/nijiToken';
 
 import navBarButtonClasses from '@/components/NavBarButton/NavBarButton.module.css';
 import classes from '@/pages/CreateProposal/CreateProposal.module.css';

@@ -19,7 +19,7 @@ pragma solidity ^0.8.19;
 
 import { NijiDAOTypes, INijiDAOForkEscrow, INijiDAOExecutorV2 } from '../NijiDAOInterfaces.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import { NounsTokenFork } from './newdao/token/NounsTokenFork.sol';
+import { NijiTokenFork } from './newdao/token/NijiTokenFork.sol';
 
 library NijiDAOFork {
     error ForkThresholdNotMet();
@@ -151,7 +151,7 @@ library NijiDAOFork {
             ds.nouns.transferFrom(msg.sender, timelock, tokenIds[i]);
         }
 
-        NounsTokenFork(ds.forkDAOToken).claimDuringForkPeriod(msg.sender, tokenIds);
+        NijiTokenFork(ds.forkDAOToken).claimDuringForkPeriod(msg.sender, tokenIds);
 
         emit JoinFork(forkEscrow.forkId() - 1, msg.sender, tokenIds, proposalIds, reason);
     }

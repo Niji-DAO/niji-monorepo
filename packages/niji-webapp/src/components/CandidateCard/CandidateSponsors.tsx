@@ -3,7 +3,7 @@ import { useState } from 'react';
 import clsx from 'clsx';
 
 import { CandidateSignature } from '@/wrappers/nijiData';
-import { useDelegateNounsAtBlockQuery } from '@/wrappers/nounToken';
+import { useDelegateNounsAtBlockQuery } from '@/wrappers/nijiToken';
 
 import CandidateSponsorImage from './CandidateSponsorImage';
 import classes from './CandidateSponsors.module.css';

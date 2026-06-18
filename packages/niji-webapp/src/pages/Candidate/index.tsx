@@ -31,7 +31,7 @@ import {
   useCandidateFeedback,
   useCandidateProposal,
 } from '@/wrappers/nijiData';
-import { useUserVotes } from '@/wrappers/nounToken';
+import { useUserVotes } from '@/wrappers/nijiToken';
 
 import classes from './Candidate.module.css';
 

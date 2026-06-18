@@ -26,8 +26,8 @@ import { SafeERC20 } from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.s
 import { PausableUpgradeable } from '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
 import { ClientRewardsMemoryMapping } from '../libs/ClientRewardsMemoryMapping.sol';
 import { GasRefund } from '../libs/GasRefund.sol';
-import { INounsClientTokenDescriptor } from './INounsClientTokenDescriptor.sol';
-import { INounsClientTokenTypes } from './INounsClientTokenTypes.sol';
+import { IClientTokenDescriptor } from './IClientTokenDescriptor.sol';
+import { IClientTokenTypes } from './IClientTokenTypes.sol';
 import { OwnableUpgradeable } from '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import { ERC721Upgradeable } from '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
 import { SafeCast } from '@openzeppelin/contracts/utils/math/SafeCast.sol';
@@ -37,7 +37,7 @@ contract Rewards is
     PausableUpgradeable,
     OwnableUpgradeable,
     ERC721Upgradeable,
-    INounsClientTokenTypes
+    IClientTokenTypes
 {
     using SafeERC20 for IERC20;
     using ClientRewardsMemoryMapping for ClientRewardsMemoryMapping.Mapping;
@@ -81,7 +81,7 @@ contract Rewards is
      */
 
     /// @notice Niji DAO proxy contract
-    INijiDAOLogic public immutable nounsDAO;
+    INijiDAOLogic public immutable nijiDAO;
 
     /// @notice Niji Auction House proxy contract
     INijiAuctionHouseV2 public immutable auctionHouse;
@@ -161,8 +161,8 @@ contract Rewards is
         _;
     }
 
-    constructor(address nounsDAO_, address auctionHouse_) initializer {
-        nounsDAO = INijiDAOLogic(nounsDAO_);
+    constructor(address nijiDAO_, address auctionHouse_) initializer {
+        nijiDAO = INijiDAOLogic(nijiDAO_);
         auctionHouse = INijiAuctionHouseV2(auctionHouse_);
     }
 
@@ -170,7 +170,7 @@ contract Rewards is
      * @param owner Address of the owner who has administration permissions as well as contract upgrade permissions
      * @param admin_ Address which has permissions to pause and unpause
      * @param ethToken_ An ETH pegged token (e.g. WETH) which will be used for rewards and gas refunds
-     * @param descriptor_ Address of a INounsClientTokenDescriptor contract to provide tokenURI for the NFTs
+     * @param descriptor_ Address of a client token descriptor contract to provide tokenURI for the NFTs
      */
     function initialize(address owner, address admin_, address ethToken_, address descriptor_) public initializer {
         __Pausable_init_unchained();
@@ -335,12 +335,12 @@ contract Rewards is
         uint32 nextProposalIdToReward_ = $.nextProposalIdToReward;
 
         require(
-            (lastProposalId <= nounsDAO.proposalCount()) && (lastProposalId >= nextProposalIdToReward_),
+            (lastProposalId <= nijiDAO.proposalCount()) && (lastProposalId >= nextProposalIdToReward_),
             'bad lastProposalId'
         );
         require(isSortedAndNoDuplicates(votingClientIds), 'must be sorted & unique');
 
-        NijiDAOTypes.ProposalForRewards[] memory proposals = nounsDAO.proposalDataForRewards({
+        NijiDAOTypes.ProposalForRewards[] memory proposals = nijiDAO.proposalDataForRewards({
             firstProposalId: nextProposalIdToReward_,
             lastProposalId: lastProposalId,
             proposalEligibilityQuorumBps: $.proposalRewardParams.proposalEligibilityQuorumBps,
@@ -500,7 +500,7 @@ contract Rewards is
         for (uint32 i; i < numClientIds; ++i) {
             allClientIds[i] = i;
         }
-        NijiDAOTypes.ProposalForRewards[] memory proposals = nounsDAO.proposalDataForRewards({
+        NijiDAOTypes.ProposalForRewards[] memory proposals = nijiDAO.proposalDataForRewards({
             firstProposalId: $.nextProposalIdToReward,
             lastProposalId: lastProposalId,
             proposalEligibilityQuorumBps: $.proposalRewardParams.proposalEligibilityQuorumBps,
@@ -603,7 +603,7 @@ contract Rewards is
      */
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         RewardsStorage storage $ = _getRewardsStorage();
-        return INounsClientTokenDescriptor($.descriptor).tokenURI(tokenId, $._clientMetadata[uint32(tokenId)]);
+        return IClientTokenDescriptor($.descriptor).tokenURI(tokenId, $._clientMetadata[uint32(tokenId)]);
     }
 
     /**
@@ -684,7 +684,7 @@ contract Rewards is
      */
     function enableProposalRewards() public onlyOwner {
         RewardsStorage storage $ = _getRewardsStorage();
-        uint32 nextProposalIdToReward_ = SafeCast.toUint32(nounsDAO.proposalCount() + 1);
+        uint32 nextProposalIdToReward_ = SafeCast.toUint32(nijiDAO.proposalCount() + 1);
         uint32 nextProposalRewardFirstAuctionId_ = SafeCast.toUint32(auctionHouse.auction().nounId);
         $.nextProposalIdToReward = nextProposalIdToReward_;
         $.nextProposalRewardFirstAuctionId = nextProposalRewardFirstAuctionId_;

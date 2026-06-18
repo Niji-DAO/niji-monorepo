@@ -3,12 +3,11 @@ pragma solidity ^0.8.19;
 
 import { NijiDAOLogicBaseTest } from '../NijiDAOLogic/NijiDAOLogicBaseTest.sol';
 import { Rewards } from '../../../contracts/client-incentives/Rewards.sol';
-import { NounsToken } from '../../../contracts/NounsToken.sol';
+import { IClientTokenTypes } from '../../../contracts/client-incentives/IClientTokenTypes.sol';
 import { INijiAuctionHouseV2 } from '../../../contracts/interfaces/INijiAuctionHouseV2.sol';
 import { NijiAuctionHouseProxy } from '../../../contracts/proxies/NijiAuctionHouseProxy.sol';
 import { ERC20Mock } from '../helpers/ERC20Mock.sol';
 import { RewardsDeployer } from '../../../script/Rewards/RewardsDeployer.sol';
-import { INounsClientTokenTypes } from '../../../contracts/client-incentives/INounsClientTokenTypes.sol';
 import { console } from 'forge-std/console.sol';
 
 abstract contract RewardsBaseTest is NijiDAOLogicBaseTest {
@@ -36,7 +35,7 @@ abstract contract RewardsBaseTest is NijiDAOLogicBaseTest {
 
     function setUp() public virtual override {
         dao = _deployDAOV3WithParams(24 hours);
-        nounsToken = NounsToken(address(dao.nouns()));
+        nounsToken = dao.nouns();
         minter = nounsToken.minter();
 
         auctionHouse = INijiAuctionHouseV2(minter);
@@ -495,7 +494,7 @@ contract OwnerFunctionsTest is RewardsBaseTest {
 contract NFTFunctionsTest is RewardsBaseTest {
     function setUp() public override {
         dao = _deployDAOV3WithParams(24 hours);
-        nounsToken = NounsToken(address(dao.nouns()));
+        nounsToken = dao.nouns();
         minter = nounsToken.minter();
 
         auctionHouse = INijiAuctionHouseV2(minter);
@@ -512,7 +511,7 @@ contract NFTFunctionsTest is RewardsBaseTest {
 
     function test_registerClient_storesMetadata() public {
         uint32 tokenId = rewards.registerClient('Camp', 'https://nouns.camp');
-        INounsClientTokenTypes.ClientMetadata memory md = rewards.clientMetadata(tokenId);
+        IClientTokenTypes.ClientMetadata memory md = rewards.clientMetadata(tokenId);
 
         assertEq(md.name, 'Camp');
         assertEq(md.description, 'https://nouns.camp');
@@ -543,7 +542,7 @@ contract NFTFunctionsTest is RewardsBaseTest {
         uint32 tokenId = rewards.registerClient('name', 'description');
 
         rewards.updateClientMetadata(tokenId, 'newName', 'newDescription');
-        INounsClientTokenTypes.ClientMetadata memory md = rewards.clientMetadata(tokenId);
+        IClientTokenTypes.ClientMetadata memory md = rewards.clientMetadata(tokenId);
 
         assertEq(md.name, 'newName');
         assertEq(md.description, 'newDescription');
