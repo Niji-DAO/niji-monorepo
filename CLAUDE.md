@@ -127,7 +127,7 @@ Pattern: Use `useQuery` with `execute()` function from GraphQL Codegen (see `src
 ```bash
 # From packages/niji-webapp directory
 cp .env.example.local .env    # Setup environment
-pnpm dev                      # Start dev server on port 3000
+pnpm dev                      # Start dev server on port 2424 (strictPort: true、 3000 fallback なし)
 pnpm test:watch               # Run tests in watch mode
 pnpm test:coverage            # Run tests with coverage
 pnpm graphql-codegen          # Generate GraphQL types
