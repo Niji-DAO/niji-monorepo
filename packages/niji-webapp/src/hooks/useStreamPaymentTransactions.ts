@@ -1,0 +1,125 @@
+import type { Address } from '@/utils/types';
+
+import {
+  nijiPayerAbi,
+  nijiPayerAddress,
+  nijiStreamFactoryAbi,
+  nijiStreamFactoryAddress,
+  usdcAddress,
+  wethAddress,
+} from '@niji/sdk/react';
+import { encodeFunctionData, parseAbi, parseEther } from 'viem';
+
+import { ProposalActionModalState } from '@/components/ProposalActionsModal';
+import { SupportedCurrency } from '@/components/ProposalActionsModal/steps/TransferFundsDetailsStep';
+import {
+  formatTokenAmount,
+  getTokenAddressForCurrency,
+} from '@/utils/streamingPaymentUtils/streamingPaymentUtils';
+import { human2ContractUSDCFormat } from '@/utils/usdcUtils';
+import { defaultChain } from '@/wagmi';
+
+interface UseStreamPaymentTransactionsProps {
+  state: ProposalActionModalState;
+  predictedAddress?: Address;
+}
+
+interface Action {
+  address: Address;
+  calldata: `0x${string}`;
+  decodedCalldata: string;
+  signature: string;
+  usdcValue: number;
+  value: string;
+}
+
+const wethTransferAbi = parseAbi(['function transfer(address to, uint256 value) returns (bool)']);
+
+export default function useStreamPaymentTransactions({
+  state,
+  predictedAddress,
+}: UseStreamPaymentTransactionsProps) {
+  const chainId = defaultChain.id;
+
+  if (!predictedAddress) {
+    return [];
+  }
+
+  const fundStreamFunction = 'createStream';
+  const isUSDC = state.TransferFundsCurrency === SupportedCurrency.USDC;
+  const amount = state.amount ?? '0';
+
+  const actions: Action[] = [
+    {
+      address: nijiStreamFactoryAddress[chainId],
+      signature: fundStreamFunction,
+      value: '0',
+      usdcValue: isUSDC ? Number(human2ContractUSDCFormat(amount)) : 0,
+      decodedCalldata: JSON.stringify([
+        state.address,
+        isUSDC ? human2ContractUSDCFormat(amount) : parseEther(amount.toString()).toString(),
+        isUSDC ? usdcAddress[chainId] : wethAddress[chainId],
+        state.streamStartTimestamp,
+        state.streamEndTimestamp,
+        0,
+        predictedAddress,
+      ]),
+      calldata: encodeFunctionData({
+        abi: nijiStreamFactoryAbi,
+        functionName: fundStreamFunction,
+        args: [
+          state.address,
+          formatTokenAmount(Number(amount), state.TransferFundsCurrency),
+          getTokenAddressForCurrency(state.TransferFundsCurrency),
+          BigInt(state.streamStartTimestamp ? state.streamStartTimestamp : 0),
+          BigInt(state.streamEndTimestamp ? state.streamEndTimestamp : 0),
+          0,
+          predictedAddress,
+        ],
+      }),
+    },
+  ];
+
+  if (!isUSDC) {
+    actions.push({
+      address: wethAddress[chainId],
+      signature: 'deposit()',
+      usdcValue: 0,
+      value: amount ? parseEther(amount.toString()).toString() : '0',
+      decodedCalldata: JSON.stringify([]),
+      calldata: '0x',
+    });
+    const wethTransfer = 'transfer';
+    actions.push({
+      address: wethAddress[chainId],
+      signature: wethTransfer,
+      usdcValue: 0,
+      value: '0',
+      decodedCalldata: JSON.stringify([
+        predictedAddress,
+        parseEther((amount ?? 0).toString()).toString(),
+      ]),
+      calldata: encodeFunctionData({
+        abi: wethTransferAbi,
+        functionName: wethTransfer,
+        args: [predictedAddress, parseEther(amount.toString())],
+      }),
+    });
+  } else {
+    const signature = 'sendOrRegisterDebt';
+    actions.push({
+      address: nijiPayerAddress[chainId],
+      value: '0',
+      usdcValue: Number(human2ContractUSDCFormat(amount)),
+      signature: signature,
+      decodedCalldata: JSON.stringify([predictedAddress, human2ContractUSDCFormat(amount)]),
+      calldata: encodeFunctionData({
+        abi: nijiPayerAbi,
+        functionName: signature,
+        args: [predictedAddress, BigInt(human2ContractUSDCFormat(amount))],
+      }),
+    });
+  }
+
+  return actions;
+}

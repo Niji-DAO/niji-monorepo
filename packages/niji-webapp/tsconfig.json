@@ -1,0 +1,31 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "ESNext"],
+    "allowJs": true,
+    "composite": false,
+    "declaration": false,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["@vitest/browser-playwright"],
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    "plugins": [
+      {
+        "name": "@0no-co/graphqlsp",
+        "schema": "./src/subgraphs/schema.graphql"
+      }
+    ],
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src", "src/vite-env.d.ts"]
+}

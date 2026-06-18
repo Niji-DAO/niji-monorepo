@@ -1,0 +1,212 @@
+specVersion: 0.0.3
+description: >-
+  Randomly generated avatar NFTs auctioned daily.
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: NijiAuctionHouse
+    network: {{network}}
+    source:
+      address: '{{nijiAuctionHouse.address}}'
+      abi: NijiAuctionHouse
+      startBlock: {{nijiAuctionHouse.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/niji-auction-house.ts
+      entities:
+        - Account
+        - Auction
+        - Bid
+        - Noun
+      abis:
+        - name: NijiAuctionHouse
+          file: ../niji-contracts/abi/contracts/NijiAuctionHouse.sol/NijiAuctionHouse.json
+      eventHandlers:
+        - event: AuctionCreated(indexed uint256,uint256,uint256)
+          handler: handleAuctionCreated
+        - event: AuctionBid(indexed uint256,address,uint256,bool)
+          handler: handleAuctionBid
+        - event: AuctionExtended(indexed uint256,uint256)
+          handler: handleAuctionExtended
+        - event: AuctionSettled(indexed uint256,address,uint256)
+          handler: handleAuctionSettled
+  - kind: ethereum/contract
+    name: NijiAuctionHouseV2
+    network: {{network}}
+    source:
+      address: '{{nijiAuctionHouse.address}}'
+      abi: NijiAuctionHouseV2
+      startBlock: {{nijiAuctionHouse.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/niji-auction-house.ts
+      entities:
+        - Account
+        - Auction
+        - Bid
+        - Noun
+      abis:
+        - name: NijiAuctionHouseV2
+          file: ../niji-contracts/artifacts/contracts/interfaces/INijiAuctionHouseV2.sol/INijiAuctionHouseV2.json
+      eventHandlers:
+        - event: AuctionBidWithClientId(indexed uint256,uint256,indexed uint32)
+          handler: handleAuctionBidWithClientId
+        - event: AuctionSettledWithClientId(indexed uint256,indexed uint32)
+          handler: handleAuctionSettledWithClientId
+  - kind: ethereum/contract
+    name: NijiToken
+    network: {{network}}
+    source:
+      address: '{{nijiToken.address}}'
+      abi: NijiToken
+      startBlock: {{nijiToken.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/niji-erc-721.ts
+      entities:
+        - Noun
+        - Seed
+        - Account
+        - Delegate
+        - Governance
+      abis:
+        - name: NijiToken
+          file: ../niji-contracts/artifacts/contracts/NijiToken.sol/NijiToken.json
+      eventHandlers:
+        - event: NijiMinted(indexed uint256,indexed address,(uint48,uint48,uint48,uint48,uint48,uint48,uint48,uint48,uint48,uint48,uint48,uint48))
+          handler: handleNijiMinted
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+  - kind: ethereum/contract
+    name: NijiDAO
+    network: {{network}}
+    source:
+      address: '{{nijiDAO.address}}'
+      abi: NijiDAO
+      startBlock: {{nijiDAO.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/niji-dao.ts
+      entities:
+        - Account
+        - Delegate
+        - Proposal
+        - Vote
+        - Governance
+        - ProposalCandidateSignature
+      abis:
+        - name: NijiDAO
+          file: ../niji-contracts/artifacts/contracts/governance/NijiDAOLogicV4.sol/NijiDAOLogicV4.json
+      eventHandlers:
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: ProposalCreatedWithRequirements(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,uint256,uint256,string)
+          handler: handleProposalCreatedWithRequirements
+        - event: ProposalCanceled(uint256)
+          handler: handleProposalCanceled
+        - event: ProposalVetoed(uint256)
+          handler: handleProposalVetoed
+        - event: ProposalQueued(uint256,uint256)
+          handler: handleProposalQueued
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleVoteCast
+        - event: MinQuorumVotesBPSSet(uint16,uint16)
+          handler: handleMinQuorumVotesBPSSet
+        - event: MaxQuorumVotesBPSSet(uint16,uint16)
+          handler: handleMaxQuorumVotesBPSSet        
+        - event: QuorumCoefficientSet(uint32,uint32)
+          handler: handleQuorumCoefficientSet
+        - event: ProposalUpdated(indexed uint256,indexed address,address[],uint256[],string[],bytes[],string,string)
+          handler: handleProposalUpdated
+        - event: ProposalDescriptionUpdated(indexed uint256,indexed address,string,string)
+          handler: handleProposalDescriptionUpdated
+        - event: ProposalTransactionsUpdated(indexed uint256,indexed address,address[],uint256[],string[],bytes[],string)
+          handler: handleProposalTransactionsUpdated
+        - event: ProposalObjectionPeriodSet(indexed uint256,uint256)
+          handler: handleProposalObjectionPeriodSet
+        - event: SignatureCancelled(indexed address,bytes)
+          handler: handleSignatureCanceled
+        - event: EscrowedToFork(indexed uint32,indexed address,uint256[],uint256[],string)
+          handler: handleEscrowedToFork
+        - event: WithdrawFromForkEscrow(indexed uint32,indexed address,uint256[])
+          handler: handleWithdrawFromForkEscrow
+        - event: ExecuteFork(indexed uint32,address,address,uint256,uint256)
+          handler: handleExecuteFork
+        - event: JoinFork(indexed uint32,indexed address,uint256[],uint256[],string)
+          handler: handleJoinFork
+  - kind: ethereum/contract
+    name: NijiDAOV4
+    network: {{network}}
+    source:
+      address: '{{nijiDAO.address}}'
+      abi: NijiDAOV4
+      startBlock: {{nijiDAO.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/niji-dao.ts
+      entities:
+        - Account
+        - Delegate
+        - Proposal
+        - Vote
+        - Governance
+        - ProposalCandidateSignature
+      abis:
+        - name: NijiDAOV4
+          file: ../niji-contracts/artifacts/contracts/governance/NijiDAOLogicV4.sol/NijiDAOLogicV4.json
+      eventHandlers:
+        - event: ProposalCreatedWithRequirements(uint256,address[],uint256,uint256,uint256,indexed uint32)
+          handler: handleProposalCreatedWithRequirementsV4
+        - event: VoteCastWithClientId(indexed address,indexed uint256,indexed uint32)
+          handler: handleVoteCastWithClientId
+  - kind: ethereum/contract
+    name: NijiDAOData
+    network: {{network}}
+    source:
+      address: '{{nijiDAOData.address}}'
+      abi: NijiDAOData
+      startBlock: {{nijiDAOData.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/niji-dao-data.ts
+      entities:
+        - Delegate
+        - ProposalCandidate
+        - ProposalCandidateVersion
+        - ProposalCandidateSignature
+        - ProposalFeedback
+      abis:
+        - name: NijiDAOData
+          file: ../niji-contracts/artifacts/contracts/governance/data/NijiDAOData.sol/NijiDAOData.json
+      eventHandlers:
+        - event: ProposalCandidateCreated(indexed address,address[],uint256[],string[],bytes[],string,string,uint256,bytes32)
+          handler: handleProposalCandidateCreated
+        - event: ProposalCandidateUpdated(indexed address,address[],uint256[],string[],bytes[],string,string,uint256,bytes32,string)
+          handler: handleProposalCandidateUpdated
+        - event: ProposalCandidateCanceled(indexed address,string)
+          handler: handleProposalCandidateCanceled
+        - event: SignatureAdded(indexed address,bytes,uint256,address,string,uint256,bytes32,bytes32,string)
+          handler: handleSignatureAdded
+        - event: FeedbackSent(indexed address,uint256,uint8,string)
+          handler: handleFeedbackSent
+        - event: CandidateFeedbackSent(indexed address,indexed address,string,uint8,string)
+          handler: handleCandidateFeedbackSent

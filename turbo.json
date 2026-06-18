@@ -36,7 +36,7 @@
       "outputs": []
     },
     "dev": {
-      "dependsOn": ["@nouns/assets#build", "@nouns/contracts#build", "@nouns/sdk#build"],
+      "dependsOn": ["@niji/assets#build", "@niji/contracts#build", "@niji/sdk#build"],
       "cache": false,
       "persistent": true
     }

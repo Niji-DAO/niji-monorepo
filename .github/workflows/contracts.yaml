@@ -7,10 +7,10 @@ on:
       - master
       - 'feature/*'
     paths:
-      - 'packages/nouns-contracts/**'
+      - 'packages/niji-contracts/**'
   pull_request:
     paths:
-      - 'packages/nouns-contracts/**'
+      - 'packages/niji-contracts/**'
     branches:
       - '**'
 
@@ -42,15 +42,15 @@ jobs:
             ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
-        run: pnpm install --filter @nouns/contracts
+        run: pnpm install --filter @niji/contracts
 
       - name: Cache Foundry build
         uses: actions/cache@v4
         with:
           path: |
-            packages/nouns-contracts/out
-            packages/nouns-contracts/cache
-          key: ${{ runner.os }}-foundry-${{ hashFiles('packages/nouns-contracts/foundry.toml', 'packages/nouns-contracts/src/**', 'packages/nouns-contracts/test/**') }}
+            packages/niji-contracts/out
+            packages/niji-contracts/cache
+          key: ${{ runner.os }}-foundry-${{ hashFiles('packages/niji-contracts/foundry.toml', 'packages/niji-contracts/src/**', 'packages/niji-contracts/test/**') }}
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -59,7 +59,7 @@ jobs:
 
       - name: Run Forge build
         run: |
-          cd packages/nouns-contracts
+          cd packages/niji-contracts
           forge --version
           forge build --optimize --optimizer-runs 1 --sizes --skip test
 
@@ -67,14 +67,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            packages/nouns-contracts/out 
-            packages/nouns-contracts/cache
+            packages/niji-contracts/out 
+            packages/niji-contracts/cache
             ~/.foundry/cache
-          key: ${{ runner.os }}-foundry-${{ hashFiles('packages/nouns-contracts/foundry.toml', 'packages/nouns-contracts/src/**', 'packages/nouns-contracts/test/**', '~/.foundry/cache/**') }}
+          key: ${{ runner.os }}-foundry-${{ hashFiles('packages/niji-contracts/foundry.toml', 'packages/niji-contracts/src/**', 'packages/niji-contracts/test/**', '~/.foundry/cache/**') }}
 
       - name: Run Forge tests
         env:
           RPC_MAINNET: ${{ secrets.RPC_MAINNET != '' && secrets.RPC_MAINNET || 'https://ethereum-rpc.publicnode.com' }}
         run: |
-          cd packages/nouns-contracts
+          cd packages/niji-contracts
           forge test -vvv --ffi

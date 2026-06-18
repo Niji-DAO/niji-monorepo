@@ -10,16 +10,31 @@ This is a monorepo for Nouns DAO, a generative avatar art collective run by cryp
 - **TypeScript** throughout the codebase
 - **Node.js** 16.x or higher
 
+### TypeScript Configuration
+
+The monorepo uses a unified TypeScript configuration with package-specific overrides:
+
+- **Base configuration** (`tsconfig.base.json`):
+  - `target: ES2022` (Node.js 16+ and all modern browsers)
+  - `module: ESNext` (optimized for bundlers and tree-shaking)
+  - `lib: ["ES2022"]` (modern JavaScript features)
+
+- **CommonJS overrides** (for compatibility):
+  - `packages/niji-contracts`: Uses `module: "CommonJS"` for Hardhat compatibility
+  - `packages/niji-subgraph`: Uses `module: "CommonJS"` for Graph TS compatibility
+
+Packages extending the base: `niji-contracts`, `niji-subgraph`, `niji-webapp`. Standalone configs: `niji-assets`, `niji-sdk`, `niji-docs` (aligned to the same ES2022/ESNext standard).
+
 ## Package Structure
 
 Six main packages with interdependencies:
 
-1. **nouns-assets** - PNG and run-length encoded Noun image data
-2. **nouns-contracts** - Solidity smart contracts for Nouns DAO (uses Hardhat + Foundry)
-3. **nouns-sdk** - Contract addresses, ABIs, instances, and image utilities
-4. **nouns-webapp** - React frontend (Vite + Tailwind + i18n)
-5. **nouns-subgraph** - The Graph subgraph manifests
-6. **nouns-docs** - Next.js 15 documentation site with Nextra 4
+1. **niji-assets** - PNG and run-length encoded Noun image data
+2. **niji-contracts** - Solidity smart contracts for Nouns DAO (uses Hardhat + Foundry)
+3. **niji-sdk** - Contract addresses, ABIs, instances, and image utilities
+4. **niji-webapp** - React frontend (Vite + Tailwind + i18n)
+5. **niji-subgraph** - The Graph subgraph manifests
+6. **niji-docs** - Next.js 15 documentation site with Nextra 4
 
 Build dependencies: webapp depends on assets → contracts → sdk.
 
@@ -42,7 +57,7 @@ pnpm format           # Prettier formatting
 ### Package-Specific Work
 ```bash
 # Work in specific package
-cd packages/nouns-webapp
+cd packages/niji-webapp
 pnpm dev              # Start webapp dev server
 pnpm test             # Run package tests
 pnpm build            # Build package
@@ -50,11 +65,23 @@ pnpm build            # Build package
 
 ## Smart Contract Development
 
-Located in `packages/nouns-contracts/`:
+Located in `packages/niji-contracts/`:
 - Uses both **Hardhat** and **Foundry** for testing/deployment
 - Tests in `test/` (TypeScript) and `test/foundry/` (Solidity)
 - Deployment scripts in `script/`
 - Generated TypeChain types in `typechain/`
+- **TypeScript**: Uses CommonJS module format for Hardhat compatibility
+
+### Contract Testing Stack
+- **ethers v6**: JavaScript/TypeScript Ethereum library (uses native `bigint`, not `BigNumber`)
+- **@nomicfoundation/hardhat-chai-matchers v2**: Waffle replacement. Use `revertedWithCustomError` for custom errors
+- **@nomicfoundation/hardhat-ethers v3**: Hardhat plugin for ethers v6
+- **TypeChain ethers-v6**: TypeChain type generation target
+
+### Hardhat Network Configuration (Gas Benchmarking)
+- **hardfork**: Pinned to `cancun` to avoid Fusaka's 16M tx gas cap (EIP-7825)
+- **blockGasLimit**: Set to 300M (elevated from default 30M) to support large view-function gas benchmarks
+- Gas benchmark tests in `test/niji/NijiGas.test.ts` measure production-size PNG operations (5-20KB per layer)
 
 Key contracts:
 - `NounsToken` - ERC721 for Noun NFTs
@@ -62,15 +89,15 @@ Key contracts:
 - `governance/` - DAO governance contracts
 - `NounsDescriptor` - SVG generation and metadata
 
-## Frontend Architecture (nouns-webapp)
+## Frontend Architecture (niji-webapp)
 
-Located in `packages/nouns-webapp/` - React web application built with Vite, TypeScript, and Wagmi.
+Located in `packages/niji-webapp/` - React web application built with Vite, TypeScript, and Wagmi.
 
 ### Tech Stack
 - **React 18** with **Vite** build tool
 - **Tailwind CSS** + **shadcn/ui** for styling (migrating from CSS Modules + react-bootstrap)
 - **wagmi** for Ethereum interactions
-- **TanStack Query** for server state (replacing Redux + Apollo Client)
+- **TanStack Query** for server state (Apollo Client fully removed)
 - **Lingui** for internationalization
 - **GraphQL Codegen** for type-safe subgraph queries
 
@@ -98,9 +125,9 @@ Pattern: Use `useQuery` with `execute()` function from GraphQL Codegen (see `src
 
 ### Webapp-Specific Commands
 ```bash
-# From packages/nouns-webapp directory
+# From packages/niji-webapp directory
 cp .env.example.local .env    # Setup environment
-pnpm dev                      # Start dev server on port 3000
+pnpm dev                      # Start dev server on port 2424 (strictPort: true、 3000 fallback なし)
 pnpm test:watch               # Run tests in watch mode
 pnpm test:coverage            # Run tests with coverage
 pnpm graphql-codegen          # Generate GraphQL types
@@ -120,9 +147,9 @@ pnpm i18n:compile             # Compile translations
 ## Image System
 
 The image generation system spans multiple packages:
-- `nouns-assets` contains PNG files and encoded data
-- `nouns-sdk` provides SVG building utilities
-- Image encoding scripts in `nouns-assets/scripts/`
+- `niji-assets` contains PNG files and encoded data
+- `niji-sdk` provides SVG building utilities
+- Image encoding scripts in `niji-assets/scripts/`
 
 ## Environment Variables
 
@@ -148,24 +175,26 @@ Each package has its own test setup:
 
 Run `pnpm test` from root to test all packages, or `cd` into specific package for targeted testing.
 
-## Active Migrations (nouns-webapp)
+Note: All packages target ES2022. Contracts and subgraph use CommonJS modules for framework compatibility; other packages use ESNext.
+
+## Active Migrations (niji-webapp)
 
 The webapp is undergoing modernization efforts:
 
 ### State Management Migration
-**From**: Redux Toolkit + Apollo Client  
-**To**: TanStack Query for server state, minimal Redux for UI state  
+**From**: Redux Toolkit
+**To**: TanStack Query for server state, minimal Redux for UI state
 **Guidance**: Prefer TanStack Query for new data fetching, use Redux only for truly global UI state
 
-### Styling Migration  
-**From**: CSS Modules + react-bootstrap  
-**To**: Tailwind CSS + shadcn/ui  
+### Styling Migration
+**From**: CSS Modules + react-bootstrap
+**To**: Tailwind CSS + shadcn/ui
 **Guidance**: Use Tailwind classes and shadcn/ui components for new features
 
-### GraphQL Migration
-**From**: Apollo Client with manual queries  
-**To**: TanStack Query + GraphQL Codegen with typed `execute()` function  
-**Guidance**: New GraphQL queries should use the codegen'd `execute()` pattern
+### GraphQL Migration (Completed)
+Apollo Client has been fully removed. All subgraph queries use TanStack Query + GraphQL Codegen.
+**Pattern**: Use `useSubgraphQuery` hook (`src/hooks/useSubgraphQuery.ts`) with typed codegen documents
+**Documents**: Re-exported with shorter aliases from `src/wrappers/subgraph.ts`
 
 ## Code Generation Dependencies
 
@@ -179,7 +208,7 @@ Always run code generation after:
 - Modifying GraphQL queries
 - Adding new translatable strings
 
-## Feature Flags (nouns-webapp)
+## Feature Flags (niji-webapp)
 
 Feature toggles in `src/config.ts`:
 - `daoGteV3`: DAO v3+ features
@@ -187,9 +216,9 @@ Feature toggles in `src/config.ts`:
 - `candidates`: Proposal candidates system
 - `fork`: Fork-related functionality
 
-## Documentation Site (nouns-docs)
+## Documentation Site (niji-docs)
 
-Located in `packages/nouns-docs/` - Next.js 15 documentation site built with Nextra 4.
+Located in `packages/niji-docs/` - Next.js 15 documentation site built with Nextra 4.
 
 ### Tech Stack
 - **Next.js 15** with App Router
@@ -197,6 +226,7 @@ Located in `packages/nouns-docs/` - Next.js 15 documentation site built with Nex
 - **nextra-theme-docs** for the documentation theme
 - **Pagefind** for search functionality
 - **Lucide Icons** for UI components
+- **TypeScript**: ES2022 target with ESNext modules (bundler module resolution)
 
 ### File Structure
 - `app/layout.tsx` - Root layout with Nextra theme configuration
@@ -213,7 +243,7 @@ Located in `packages/nouns-docs/` - Next.js 15 documentation site built with Nex
 
 ### Docs-Specific Commands
 ```bash
-# From packages/nouns-docs directory
+# From packages/niji-docs directory
 pnpm dev       # Start development server
 pnpm build     # Build application (includes Pagefind search index generation)
 pnpm start     # Start production server
@@ -226,6 +256,6 @@ pnpm start     # Start production server
 ## Local Development with Contracts
 
 For full local development:
-1. Start local blockchain: `cd packages/nouns-contracts && pnpm task:run-local`
+1. Start local blockchain: `cd packages/niji-contracts && pnpm task:run-local`
 2. Use hardhat chain ID (31337) in environment
 3. Import development private key to MetaMask: `0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`

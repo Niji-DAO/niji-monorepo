@@ -1,0 +1,13 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "pnpm install && pnpm build --filter=@niji/api",
+    "watchPatterns": ["/packages/niji-api"]
+  },
+  "deploy": {
+    "startCommand": "pnpm --filter @niji/api -- start --schema $RAILWAY_DEPLOYMENT_ID",
+    "healthcheckPath": "/ready",
+    "healthcheckTimeout": 10800
+  }
+}
