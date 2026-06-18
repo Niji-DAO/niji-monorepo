@@ -41,7 +41,7 @@ contract NijiDAOForkEscrow is IERC721Receiver {
     address public immutable dao;
 
     /// @notice Niji token contract
-    NijiTokenLike public immutable nounsToken;
+    NijiTokenLike public immutable nijiToken;
 
     /**
      * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -60,9 +60,9 @@ contract NijiDAOForkEscrow is IERC721Receiver {
     /// @notice Number of tokens in escrow in the current fork contributing to the fork threshold. They can be unescrowed.
     uint256 public numTokensInEscrow;
 
-    constructor(address dao_, address nounsToken_) {
+    constructor(address dao_, address nijiToken_) {
         dao = dao_;
-        nounsToken = NijiTokenLike(nounsToken_);
+        nijiToken = NijiTokenLike(nijiToken_);
     }
 
     /**
@@ -85,7 +85,7 @@ contract NijiDAOForkEscrow is IERC721Receiver {
      */
 
     /**
-     * @notice Escrows nouns tokens
+     * @notice Escrows Niji tokens
      * @dev Can only be called by the Niji token contract, and initiated by the DAO contract
      * @param operator The address which called the `safeTransferFrom` function, can only be the DAO contract
      * @param from The address which previously owned the token
@@ -97,7 +97,7 @@ contract NijiDAOForkEscrow is IERC721Receiver {
         uint256 tokenId,
         bytes memory
     ) public override returns (bytes4) {
-        if (msg.sender != address(nounsToken)) revert OnlyNijiToken();
+        if (msg.sender != address(nijiToken)) revert OnlyNijiToken();
         if (operator != dao) revert OnlyDAO();
 
         escrowedTokensByForkId[forkId][tokenId] = from;
@@ -108,7 +108,7 @@ contract NijiDAOForkEscrow is IERC721Receiver {
     }
 
     /**
-     * @notice Unescrows nouns tokens
+     * @notice Unescrows Niji tokens
      * @dev Can only be called by the DAO contract
      * @param owner The address which asks to unescrow, must be the address which escrowed the tokens
      * @param tokenIds The ids of the tokens being unescrowed
@@ -117,7 +117,7 @@ contract NijiDAOForkEscrow is IERC721Receiver {
         for (uint256 i = 0; i < tokenIds.length; i++) {
             if (currentOwnerOf(tokenIds[i]) != owner) revert NotOwner();
 
-            nounsToken.transferFrom(address(this), owner, tokenIds[i]);
+            nijiToken.transferFrom(address(this), owner, tokenIds[i]);
             escrowedTokensByForkId[forkId][tokenIds[i]] = address(0);
         }
 
@@ -139,7 +139,7 @@ contract NijiDAOForkEscrow is IERC721Receiver {
     }
 
     /**
-     * @notice Withdraws nouns tokens to the DAO
+     * @notice Withdraws Niji tokens to the DAO
      * @dev Can only be called by the DAO contract
      * @param tokenIds The ids of the tokens being withdrawn
      * @param to The address which will receive the tokens
@@ -148,7 +148,7 @@ contract NijiDAOForkEscrow is IERC721Receiver {
         for (uint256 i = 0; i < tokenIds.length; i++) {
             if (currentOwnerOf(tokenIds[i]) != dao) revert NotOwner();
 
-            nounsToken.transferFrom(address(this), to, tokenIds[i]);
+            nijiToken.transferFrom(address(this), to, tokenIds[i]);
         }
     }
 
@@ -162,7 +162,7 @@ contract NijiDAOForkEscrow is IERC721Receiver {
      * @notice Returns the number of tokens owned by the DAO, excluding the ones in escrow
      */
     function numTokensOwnedByDAO() external view returns (uint256) {
-        return nounsToken.balanceOf(address(this)) - numTokensInEscrow;
+        return nijiToken.balanceOf(address(this)) - numTokensInEscrow;
     }
 
     /**

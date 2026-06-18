@@ -3,13 +3,10 @@ pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
 import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
-import { NounsDescriptorV3 } from '../../../contracts/NounsDescriptorV3.sol';
 import { DeployUtilsFork } from './DeployUtilsFork.sol';
-import { NounsToken } from '../../../contracts/NounsToken.sol';
-import { NounsSeeder } from '../../../contracts/NounsSeeder.sol';
-import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
 import { NijiDAOExecutor } from '../../../contracts/governance/NijiDAOExecutor.sol';
-import { INounsTokenForkLike } from '../../../contracts/governance/fork/newdao/governance/INounsTokenForkLike.sol';
+import { INijiTokenForkLike } from '../../../contracts/governance/fork/newdao/governance/INijiTokenForkLike.sol';
+import { NijiTokenLike } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 import { Utils } from './Utils.sol';
 
 interface DAOLogicFork {
@@ -18,7 +15,7 @@ interface DAOLogicFork {
 
 abstract contract NijiDAOLogicSharedBaseTest is Test, DeployUtilsFork {
     INijiDAOLogic daoProxy;
-    NounsToken nounsToken;
+    NijiTokenLike nounsToken;
     NijiDAOExecutor timelock = new NijiDAOExecutor(address(1), TIMELOCK_DELAY);
     address vetoer = address(0x3);
     address admin = address(0x4);
@@ -31,8 +28,7 @@ abstract contract NijiDAOLogicSharedBaseTest is Test, DeployUtilsFork {
     Utils utils;
 
     function setUp() public virtual {
-        NounsDescriptorV3 descriptor = _deployAndPopulateV3();
-        nounsToken = new NounsToken(noundersDAO, minter, descriptor, new NounsSeeder(), IProxyRegistry(address(0)));
+        nounsToken = NijiTokenLike(address(deployToken(minter)));
 
         daoProxy = deployDAOProxy(address(timelock), address(nounsToken), vetoer);
 
@@ -108,7 +104,7 @@ abstract contract NijiDAOLogicSharedBaseTest is Test, DeployUtilsFork {
     function deployForkDAOProxy() internal returns (INijiDAOLogic) {
         (address treasuryAddress, address tokenAddress, address daoAddress) = _deployForkDAO();
         timelock = NijiDAOExecutor(payable(treasuryAddress));
-        nounsToken = NounsToken(tokenAddress);
+        nounsToken = NijiTokenLike(tokenAddress);
         minter = nounsToken.minter();
 
         INijiDAOLogic dao = INijiDAOLogic(daoAddress);
@@ -120,7 +116,7 @@ abstract contract NijiDAOLogicSharedBaseTest is Test, DeployUtilsFork {
         DAOLogicFork(address(dao))._setQuorumVotesBPS(1000);
         vm.stopPrank();
 
-        vm.warp(INounsTokenForkLike(tokenAddress).forkingPeriodEndTimestamp());
+        vm.warp(INijiTokenForkLike(tokenAddress).forkingPeriodEndTimestamp());
 
         return INijiDAOLogic(daoAddress);
     }

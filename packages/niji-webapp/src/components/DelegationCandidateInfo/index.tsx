@@ -9,7 +9,7 @@ import ShortAddress from '@/components/ShortAddress';
 import { formatShortAddress } from '@/utils/addressAndENSDisplayUtils';
 import { usePickByState } from '@/utils/pickByState';
 import { Address } from '@/utils/types';
-import { useAccountVotes } from '@/wrappers/nounToken';
+import { useAccountVotes } from '@/wrappers/nijiToken';
 
 import { ChangeDelegateState } from '../ChangeDelegatePanel';
 

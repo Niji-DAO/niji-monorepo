@@ -39,7 +39,7 @@ import {
   useProposalThreshold,
   useUpdatableProposalIds,
 } from './nijiDao';
-import { useDelegateNounsAtBlockQuery } from './nounToken';
+import { useDelegateNounsAtBlockQuery } from './nijiToken';
 import {
   candidateFeedbacksDocument,
   candidateProposalDocument,

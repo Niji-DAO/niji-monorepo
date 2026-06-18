@@ -62,9 +62,9 @@ contract NijiDAOData is OwnableUpgradeable, UUPSUpgradeable, NijiDAODataEvents {
     uint256 public constant PRIOR_VOTES_BLOCKS_AGO = 1;
 
     /// @notice The Niji token contract.
-    NijiTokenLike public immutable nounsToken;
+    NijiTokenLike public immutable nijiToken;
     /// @notice The Niji DAO contract.
-    address public immutable nounsDao;
+    address public immutable nijiDao;
     /// @notice The cost non-Nouners must pay in ETH in order to emit a new proposal candidate event from this contract.
     uint256 public createCandidateCost;
     /// @notice The cost non-Nouners must pay in ETH in order to emit a proposal candidate update event from this contract.
@@ -74,9 +74,9 @@ contract NijiDAOData is OwnableUpgradeable, UUPSUpgradeable, NijiDAODataEvents {
     /// @notice The account to send ETH fees to.
     address payable public feeRecipient;
 
-    constructor(address nounsToken_, address nounsDao_) initializer {
-        nounsToken = NijiTokenLike(nounsToken_);
-        nounsDao = nounsDao_;
+    constructor(address nijiToken_, address nijiDao_) initializer {
+        nijiToken = NijiTokenLike(nijiToken_);
+        nijiDao = nijiDao_;
     }
 
     /**
@@ -131,7 +131,7 @@ contract NijiDAOData is OwnableUpgradeable, UUPSUpgradeable, NijiDAODataEvents {
         uint256 proposalIdToUpdate
     ) external payable {
         if (proposalIdToUpdate > 0) {
-            INijiDAO dao = INijiDAO(nounsDao);
+            INijiDAO dao = INijiDAO(nijiDao);
             NijiDAOTypes.ProposalCondensedV3 memory propInfo = dao.proposalsV3(proposalIdToUpdate);
 
             if (block.number > propInfo.updatePeriodEndBlock) revert ProposalToUpdateMustBeUpdatable();
@@ -259,7 +259,7 @@ contract NijiDAOData is OwnableUpgradeable, UUPSUpgradeable, NijiDAODataEvents {
             ? NijiDAOProposals.PROPOSAL_TYPEHASH
             : NijiDAOProposals.UPDATE_PROPOSAL_TYPEHASH;
 
-        bytes32 sigDigest = NijiDAOProposals.sigDigest(typeHash, encodedProp, expirationTimestamp, nounsDao);
+        bytes32 sigDigest = NijiDAOProposals.sigDigest(typeHash, encodedProp, expirationTimestamp, nijiDao);
 
         if (!SignatureChecker.isValidSignatureNow(msg.sender, sigDigest, sig)) revert InvalidSignature();
 
@@ -363,7 +363,7 @@ contract NijiDAOData is OwnableUpgradeable, UUPSUpgradeable, NijiDAODataEvents {
     }
 
     function isNouner(address account) internal view returns (bool) {
-        return nounsToken.getPriorVotes(account, block.number - PRIOR_VOTES_BLOCKS_AGO) > 0;
+        return nijiToken.getPriorVotes(account, block.number - PRIOR_VOTES_BLOCKS_AGO) > 0;
     }
 
     /**

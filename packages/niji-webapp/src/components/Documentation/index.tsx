@@ -4,11 +4,11 @@ import Accordion from 'react-bootstrap/Accordion';
 
 import Link from '@/components/Link';
 import {
-  useReadNounsDescriptorAccessoryCount,
-  useReadNounsDescriptorBackgroundCount,
-  useReadNounsDescriptorBodyCount,
-  useReadNounsDescriptorHeadCount,
-  useReadNounsDescriptorGlassesCount,
+  useReadNijiDescriptorAccessoryCount,
+  useReadNijiDescriptorBackgroundCount,
+  useReadNijiDescriptorBodyCount,
+  useReadNijiDescriptorHeadCount,
+  useReadNijiDescriptorGlassesCount,
 } from '@/contracts';
 import Section from '@/layout/Section';
 import { cn } from '@/lib/utils';
@@ -20,11 +20,11 @@ interface DocumentationProps {
 }
 
 function NounTraits() {
-  const { data: accessoryCount } = useReadNounsDescriptorAccessoryCount();
-  const { data: backgroundCount } = useReadNounsDescriptorBackgroundCount();
-  const { data: bodyCount } = useReadNounsDescriptorBodyCount();
-  const { data: headCount } = useReadNounsDescriptorHeadCount();
-  const { data: glassesCount } = useReadNounsDescriptorGlassesCount();
+  const { data: accessoryCount } = useReadNijiDescriptorAccessoryCount();
+  const { data: backgroundCount } = useReadNijiDescriptorBackgroundCount();
+  const { data: bodyCount } = useReadNijiDescriptorBodyCount();
+  const { data: headCount } = useReadNijiDescriptorHeadCount();
+  const { data: glassesCount } = useReadNijiDescriptorGlassesCount();
 
   return (
     <ul>

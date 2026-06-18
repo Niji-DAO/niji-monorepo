@@ -17,7 +17,7 @@ export const nounsAuctionHouseAbi = [
   {
     type: 'constructor',
     inputs: [
-      { name: '_nouns', internalType: 'contract INounsToken', type: 'address' },
+      { name: '_nouns', internalType: 'contract INijiToken', type: 'address' },
       { name: '_weth', internalType: 'address', type: 'address' },
       { name: '_duration', internalType: 'uint256', type: 'uint256' },
     ],
@@ -315,7 +315,7 @@ export const nounsAuctionHouseAbi = [
     type: 'function',
     inputs: [],
     name: 'nouns',
-    outputs: [{ name: '', internalType: 'contract INounsToken', type: 'address' }],
+    outputs: [{ name: '', internalType: 'contract INijiToken', type: 'address' }],
     stateMutability: 'view',
   },
   {

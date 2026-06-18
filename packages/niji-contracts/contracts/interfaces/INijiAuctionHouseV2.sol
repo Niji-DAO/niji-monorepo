@@ -17,7 +17,7 @@
 
 pragma solidity ^0.8.19;
 
-import { INounsToken as INijiToken } from './INounsToken.sol';
+import { INijiToken } from './INijiToken.sol';
 
 interface INijiAuctionHouseV2 {
     struct AuctionV2 {

@@ -19,11 +19,11 @@ pragma solidity ^0.8.19;
 
 import { ERC1967Proxy } from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
 import { IForkDAODeployer, INijiDAOForkEscrow, NijiDAOTypes } from '../NijiDAOInterfaces.sol';
-import { NounsTokenFork } from './newdao/token/NounsTokenFork.sol';
+import { INijiToken } from '../../interfaces/INijiToken.sol';
+import { NijiTokenFork } from './newdao/token/NijiTokenFork.sol';
 import { NijiAuctionHouseFork } from './newdao/NijiAuctionHouseFork.sol';
 import { NijiDAOExecutorV2 } from '../NijiDAOExecutorV2.sol';
 import { NijiDAOLogicV1Fork } from './newdao/governance/NijiDAOLogicV1Fork.sol';
-import { NounsToken } from '../../NounsToken.sol';
 import { NijiAuctionHouse } from '../../NijiAuctionHouse.sol';
 
 interface INijiDAOForkTokens {
@@ -103,7 +103,7 @@ contract ForkDAODeployer is IForkDAODeployer {
         NijiAuctionHouse originalAuction = getOriginalAuction(forkEscrow);
         NijiDAOExecutorV2 originalTimelock = getOriginalTimelock(forkEscrow);
 
-        NounsTokenFork(token).initialize(
+        NijiTokenFork(token).initialize(
             treasury,
             auction,
             forkEscrow,
@@ -115,7 +115,7 @@ contract ForkDAODeployer is IForkDAODeployer {
 
         NijiAuctionHouseFork(auction).initialize(
             treasury,
-            NounsToken(token),
+            INijiToken(token),
             originalAuction.weth(),
             originalAuction.timeBuffer(),
             originalAuction.reservePrice(),
@@ -151,7 +151,7 @@ contract ForkDAODeployer is IForkDAODeployer {
      * @dev Used to prevent the 'Stack too deep' error in the main deploy function.
      */
     function getOriginalTimelock(INijiDAOForkEscrow forkEscrow) internal view returns (NijiDAOExecutorV2) {
-        NounsToken originalToken = NounsToken(address(forkEscrow.nounsToken()));
+        INijiToken originalToken = INijiToken(address(forkEscrow.nijiToken()));
         return NijiDAOExecutorV2(payable(originalToken.owner()));
     }
 
@@ -159,7 +159,7 @@ contract ForkDAODeployer is IForkDAODeployer {
      * @dev Used to prevent the 'Stack too deep' error in the main deploy function.
      */
     function getOriginalAuction(INijiDAOForkEscrow forkEscrow) internal view returns (NijiAuctionHouse) {
-        NounsToken originalToken = NounsToken(address(forkEscrow.nounsToken()));
+        INijiToken originalToken = INijiToken(address(forkEscrow.nijiToken()));
         return NijiAuctionHouse(originalToken.minter());
     }
 

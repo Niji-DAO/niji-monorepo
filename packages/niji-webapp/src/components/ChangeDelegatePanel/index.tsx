@@ -19,7 +19,7 @@ import {
   useDelegateVotes,
   useNounTokenBalance,
   useUserDelegatee,
-} from '@/wrappers/nounToken';
+} from '@/wrappers/nijiToken';
 
 import classes from './ChangeDelegatePanel.module.css';
 

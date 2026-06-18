@@ -5,7 +5,7 @@ import 'forge-std/Test.sol';
 import { DeployUtilsV3 } from './DeployUtilsV3.sol';
 import { NijiDAOExecutorV2 } from '../../../contracts/governance/NijiDAOExecutorV2.sol';
 import { ForkDAODeployer } from '../../../contracts/governance/fork/ForkDAODeployer.sol';
-import { NounsTokenFork } from '../../../contracts/governance/fork/newdao/token/NounsTokenFork.sol';
+import { NijiTokenFork } from '../../../contracts/governance/fork/newdao/token/NijiTokenFork.sol';
 import { NijiAuctionHouseFork } from '../../../contracts/governance/fork/newdao/NijiAuctionHouseFork.sol';
 import { NijiDAOLogicV1Fork } from '../../../contracts/governance/fork/newdao/governance/NijiDAOLogicV1Fork.sol';
 import { INijiDAOForkEscrow } from '../../../contracts/governance/NijiDAOInterfaces.sol';
@@ -14,7 +14,7 @@ import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
 abstract contract DeployUtilsFork is DeployUtilsV3 {
     function _deployForkDAO(INijiDAOForkEscrow escrow) public returns (address treasury, address token, address dao) {
         ForkDAODeployer deployer = new ForkDAODeployer(
-            address(new NounsTokenFork()),
+            address(new NijiTokenFork()),
             address(new NijiAuctionHouseFork()),
             address(new NijiDAOLogicV1Fork()),
             address(new NijiDAOExecutorV2()),

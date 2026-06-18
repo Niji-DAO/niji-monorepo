@@ -6,7 +6,6 @@ import { ERC20Mock } from '../helpers/ERC20Mock.sol';
 import { Rewards } from '../../../contracts/client-incentives/Rewards.sol';
 import { INijiAuctionHouseV2 } from '../../../contracts/interfaces/INijiAuctionHouseV2.sol';
 import { NijiAuctionHouseProxy } from '../../../contracts/proxies/NijiAuctionHouseProxy.sol';
-import { NounsToken } from '../../../contracts/NounsToken.sol';
 import { RewardsDeployer } from '../../../script/Rewards/RewardsDeployer.sol';
 import 'forge-std/Test.sol';
 
@@ -74,7 +73,7 @@ abstract contract BaseProposalRewardsTest is NijiDAOLogicBaseTest {
 
     function _setUpDAO() internal {
         dao = _deployDAOV3WithParams({ auctionDuration: 24 hours });
-        nounsToken = NounsToken(address(dao.nouns()));
+        nounsToken = dao.nouns();
         minter = nounsToken.minter();
 
         auctionHouse = INijiAuctionHouseV2(minter);

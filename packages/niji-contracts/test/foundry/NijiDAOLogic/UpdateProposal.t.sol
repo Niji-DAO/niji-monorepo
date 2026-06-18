@@ -8,8 +8,6 @@ import { SigUtils, ERC1271Stub } from '../helpers/SigUtils.sol';
 import { NijiDAOProposals } from '../../../contracts/governance/NijiDAOProposals.sol';
 import { NijiDAOProxyV3 } from '../../../contracts/governance/NijiDAOProxyV3.sol';
 import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
-import { NounsToken } from '../../../contracts/NounsToken.sol';
-import { NounsSeeder } from '../../../contracts/NounsSeeder.sol';
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
 import { NijiDAOExecutor } from '../../../contracts/governance/NijiDAOExecutor.sol';
 

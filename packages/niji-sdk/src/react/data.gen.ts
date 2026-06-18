@@ -17,7 +17,7 @@ export const nounsDataAbi = [
   {
     type: 'constructor',
     inputs: [
-      { name: 'nounsToken_', internalType: 'address', type: 'address' },
+      { name: 'nijiToken_', internalType: 'address', type: 'address' },
       { name: 'nounsDao_', internalType: 'address', type: 'address' },
     ],
     stateMutability: 'nonpayable',
@@ -314,8 +314,8 @@ export const nounsDataAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'nounsToken',
-    outputs: [{ name: '', internalType: 'contract NounsTokenLike', type: 'address' }],
+    name: 'nijiToken',
+    outputs: [{ name: '', internalType: 'contract NijiTokenLike', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -574,15 +574,15 @@ export const useReadNijiDataNounsDao = /*#__PURE__*/ createUseReadContract({
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsDataAbi}__ and `functionName` set to `"nounsToken"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nounsDataAbi}__ and `functionName` set to `"nijiToken"`
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useReadNijiDataNounsToken = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiDataNijiToken = /*#__PURE__*/ createUseReadContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
-  functionName: 'nounsToken',
+  functionName: 'nijiToken',
 });
 
 /**

@@ -2,7 +2,7 @@ import { type ChangeEvent, type FC, useCallback, useEffect, useRef, useState } f
 
 import { i18n } from '@lingui/core';
 import { Trans } from '@lingui/react/macro';
-import { buildSVG, EncodedImage, PNGCollectionEncoder } from '@niji/sdk';
+import { buildSVG, PNGCollectionEncoder } from '@niji/sdk';
 import { getNounData, getRandomNounSeed, ImageData } from '@noundry/nouns-assets';
 import { PNG } from 'pngjs';
 import {
@@ -33,6 +33,11 @@ interface PendingCustomTrait {
   type: string;
   data: string;
   filename: string;
+}
+
+interface EncodedImage {
+  filename: string;
+  data: string;
 }
 
 const nounsProtocolLink = (
@@ -219,25 +224,29 @@ const Playground: FC = () => {
           throw new Error('Image must be 32x32');
         }
         const filename = file.name?.replace('.png', '') || 'custom';
-        const data = encoder.encodeImage(filename, {
-          width: png.width,
-          height: png.height,
-          rgbaAt: (x: number, y: number) => {
-            const idx = (png.width * y + x) << 2;
-            const [r, g, b, a] = [
-              png.data[idx],
-              png.data[idx + 1],
-              png.data[idx + 2],
-              png.data[idx + 3],
-            ];
-            return {
-              r,
-              g,
-              b,
-              a,
-            };
+        const data = encoder.encodeImage(
+          filename,
+          {
+            width: png.width,
+            height: png.height,
+            rgbaAt: (x: number, y: number) => {
+              const idx = (png.width * y + x) << 2;
+              const [r, g, b, a] = [
+                png.data[idx],
+                png.data[idx + 1],
+                png.data[idx + 2],
+                png.data[idx + 3],
+              ];
+              return {
+                r,
+                g,
+                b,
+                a,
+              };
+            },
           },
-        });
+          DEFAULT_TRAIT_TYPE,
+        );
         setPendingTrait({
           data,
           filename,

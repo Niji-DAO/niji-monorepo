@@ -8,15 +8,15 @@ import { useAccount } from 'wagmi';
 
 import {
   nijiGovernorAddress,
-  nounsTokenAddress,
-  useReadNounsTokenBalanceOf,
-  useReadNounsTokenDelegates,
-  useReadNounsTokenGetCurrentVotes,
-  useReadNounsTokenGetPriorVotes,
-  useReadNounsTokenIsApprovedForAll,
-  useReadNounsTokenSeeds,
-  useWriteNounsTokenDelegate,
-  useWriteNounsTokenSetApprovalForAll,
+  nijiTokenAddress,
+  useReadNijiTokenBalanceOf,
+  useReadNijiTokenDelegates,
+  useReadNijiTokenGetCurrentVotes,
+  useReadNijiTokenGetPriorVotes,
+  useReadNijiTokenIsApprovedForAll,
+  useReadNijiTokenSeeds,
+  useWriteNijiTokenDelegate,
+  useWriteNijiTokenSetApprovalForAll,
 } from '@/contracts';
 import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import { defaultChain } from '@/wagmi';
@@ -40,7 +40,7 @@ export interface INounSeed {
 
 const chainId = defaultChain.id;
 
-const seedCacheKey = cacheKey(cache.seed, CHAIN_ID, nounsTokenAddress[chainId].toLowerCase());
+const seedCacheKey = cacheKey(cache.seed, CHAIN_ID, nijiTokenAddress[chainId].toLowerCase());
 const isSeedValid = (seed: INounSeed | Record<string, never> | undefined) => {
   const expectedKeys = ['background', 'body', 'accessory', 'head', 'glasses'];
   const hasExpectedKeys = expectedKeys.every(key => (seed || {}).hasOwnProperty(key));
@@ -92,7 +92,7 @@ export const useNounSeed = (nounId: bigint): INounSeed | undefined => {
   const seeds = useNounSeeds();
   const seed = seeds?.[Number(nounId)];
 
-  const { data: response } = useReadNounsTokenSeeds({
+  const { data: response } = useReadNijiTokenSeeds({
     args: [nounId],
     query: { enabled: !seed },
   });
@@ -133,7 +133,7 @@ export const useUserVotes = (): number | undefined => {
 };
 
 export const useAccountVotes = (account?: Address): number | undefined => {
-  const { data: votes } = useReadNounsTokenGetCurrentVotes({
+  const { data: votes } = useReadNijiTokenGetCurrentVotes({
     args: account ? [account] : undefined,
   });
 
@@ -142,7 +142,7 @@ export const useAccountVotes = (account?: Address): number | undefined => {
 
 export const useUserDelegatee = (): string | undefined => {
   const { address } = useAccount();
-  const { data: delegate } = useReadNounsTokenDelegates({
+  const { data: delegate } = useReadNijiTokenDelegates({
     args: address ? [address] : undefined,
     query: { enabled: !!address },
   });
@@ -153,7 +153,7 @@ export const useUserDelegatee = (): string | undefined => {
 export const useUserVotesAsOfBlock = (block: number | undefined): number | undefined => {
   const { address } = useAccount();
   // Check for available votes
-  const { data: votes } = useReadNounsTokenGetPriorVotes({
+  const { data: votes } = useReadNijiTokenGetPriorVotes({
     args: address && block !== undefined ? [address, BigInt(block)] : undefined,
     query: { enabled: !!address && block !== undefined },
   });
@@ -169,7 +169,7 @@ export const useDelegateVotes = () => {
     isSuccess,
     isError,
     error: errorMessage,
-  } = useWriteNounsTokenDelegate();
+  } = useWriteNijiTokenDelegate();
 
   let status = 'None';
   if (isLoading) {
@@ -193,7 +193,7 @@ export const useDelegateVotes = () => {
 };
 
 export const useNounTokenBalance = (address: Address): number | undefined => {
-  const { data: tokenBalance } = useReadNounsTokenBalanceOf({
+  const { data: tokenBalance } = useReadNijiTokenBalanceOf({
     args: [address],
   });
 
@@ -240,7 +240,7 @@ export const useSetApprovalForAll = () => {
     isSuccess,
     isError,
     error,
-  } = useWriteNounsTokenSetApprovalForAll();
+  } = useWriteNijiTokenSetApprovalForAll();
 
   const getApprovalStatus = () => {
     if (isLoading) return 'Mining';
@@ -265,7 +265,7 @@ export const useSetApprovalForAll = () => {
 
 export const useIsApprovedForAll = () => {
   const { address } = useAccount();
-  const { data } = useReadNounsTokenIsApprovedForAll({
+  const { data } = useReadNijiTokenIsApprovedForAll({
     args: address ? [address, nijiGovernorAddress[chainId]] : undefined,
     query: { enabled: !!address },
   });

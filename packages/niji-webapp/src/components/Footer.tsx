@@ -8,9 +8,9 @@ import XIcon from '@/assets/icons/socials/x.svg?react';
 import NogglesLogo from '@/assets/noggles.svg?react';
 import {
   nijiAuctionHouseAddress,
-  nounsDescriptorAddress,
+  nijiDescriptorAddress,
   nijiGovernorAddress,
-  nounsTokenAddress,
+  nijiTokenAddress,
   nijiTreasuryAddress,
 } from '@/contracts';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
@@ -41,7 +41,7 @@ export const Footer = () => {
     {
       category: 'Contracts',
       items: [
-        { label: t`Token`, url: buildEtherscanAddressLink(nounsTokenAddress[defaultChain.id]) },
+        { label: t`Token`, url: buildEtherscanAddressLink(nijiTokenAddress[defaultChain.id]) },
         {
           label: t`Auction`,
           url: buildEtherscanAddressLink(nijiAuctionHouseAddress[defaultChain.id]),
@@ -52,7 +52,7 @@ export const Footer = () => {
         },
         {
           label: t`Descriptor`,
-          url: buildEtherscanAddressLink(nounsDescriptorAddress[defaultChain.id]),
+          url: buildEtherscanAddressLink(nijiDescriptorAddress[defaultChain.id]),
         },
         {
           label: t`Treasury`,

@@ -31,7 +31,7 @@ import {
   useProposalThreshold,
 } from '@/wrappers/nijiDao';
 import { ProposalCandidate, useCandidateProposals } from '@/wrappers/nijiData';
-import { useNounTokenBalance, useUserVotes } from '@/wrappers/nounToken';
+import { useNounTokenBalance, useUserVotes } from '@/wrappers/nijiToken';
 
 import classes from './Proposals.module.css';
 

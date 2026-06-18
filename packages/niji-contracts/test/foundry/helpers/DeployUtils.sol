@@ -3,24 +3,19 @@ pragma solidity ^0.8.19;
 
 import 'forge-std/Test.sol';
 import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
-import { DescriptorHelpers } from './DescriptorHelpers.sol';
-import { NounsDescriptorV2 } from '../../../contracts/NounsDescriptorV2.sol';
-import { NounsDescriptorV3 } from '../../../contracts/NounsDescriptorV3.sol';
-import { SVGRenderer } from '../../../contracts/SVGRenderer.sol';
-import { NounsArt } from '../../../contracts/NounsArt.sol';
+import { NijiArt } from '../../../contracts/NijiArt.sol';
+import { NijiDescriptor } from '../../../contracts/NijiDescriptor.sol';
+import { NijiSeeder } from '../../../contracts/NijiSeeder.sol';
+import { NijiToken } from '../../../contracts/NijiToken.sol';
 import { NijiDAOExecutor } from '../../../contracts/governance/NijiDAOExecutor.sol';
-import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
-import { NounsDescriptor } from '../../../contracts/NounsDescriptor.sol';
-import { NounsSeeder } from '../../../contracts/NounsSeeder.sol';
-import { NounsToken } from '../../../contracts/NounsToken.sol';
-import { Inflator } from '../../../contracts/Inflator.sol';
+import { INijiToken } from '../../../contracts/interfaces/INijiToken.sol';
 import { NijiAuctionHouseProxy } from '../../../contracts/proxies/NijiAuctionHouseProxy.sol';
 import { NijiAuctionHouseProxyAdmin } from '../../../contracts/proxies/NijiAuctionHouseProxyAdmin.sol';
 import { NijiAuctionHouseV3 } from '../../../contracts/NijiAuctionHouseV3.sol';
 import { WETH } from '../../../contracts/test/WETH.sol';
 import { ChainalysisSanctionsListMock } from './ChainalysisSanctionsListMock.sol';
 
-abstract contract DeployUtils is Test, DescriptorHelpers {
+abstract contract DeployUtils is Test {
     uint256 constant TIMELOCK_DELAY = 2 days;
     uint256 constant VOTING_PERIOD = 7_200; // 24 hours
     uint256 constant VOTING_DELAY = 1;
@@ -36,8 +31,10 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
         address noundersDAO,
         address minter
     ) internal returns (NijiAuctionHouseProxy, NijiAuctionHouseProxyAdmin) {
-        NounsToken token = deployToken(noundersDAO, minter);
-        NijiAuctionHouseV3 logic = new NijiAuctionHouseV3(token, address(new WETH()), AUCTION_DURATION);
+        noundersDAO;
+
+        NijiToken token = deployToken(minter);
+        NijiAuctionHouseV3 logic = new NijiAuctionHouseV3(INijiToken(address(token)), address(new WETH()), AUCTION_DURATION);
         NijiAuctionHouseProxyAdmin admin = new NijiAuctionHouseProxyAdmin();
         admin.transferOwnership(owner);
 
@@ -68,47 +65,75 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
     uint256 public constant FORK_DAO_PROPOSAL_THRESHOLD_BPS = 25; // 0.25%
     uint256 public constant FORK_DAO_QUORUM_VOTES_BPS = 1000; // 10%
 
-    function _deployAndPopulateDescriptor() internal returns (NounsDescriptor) {
-        NounsDescriptor descriptor = new NounsDescriptor();
-        _populateDescriptor(descriptor);
+    function _traitNames() internal pure returns (string[] memory traitNames) {
+        traitNames = new string[](12);
+        traitNames[0] = 'special';
+        traitNames[1] = 'choker';
+        traitNames[2] = 'headphone';
+        traitNames[3] = 'leftHand';
+        traitNames[4] = 'hat';
+        traitNames[5] = 'clothing';
+        traitNames[6] = 'ear';
+        traitNames[7] = 'back';
+        traitNames[8] = 'backDecoration';
+        traitNames[9] = 'background';
+        traitNames[10] = 'solidBackground';
+        traitNames[11] = 'hair';
+    }
+
+    function _compositeOrder() internal pure returns (uint256[] memory order) {
+        order = new uint256[](12);
+        order[0] = 10;
+        order[1] = 9;
+        order[2] = 8;
+        order[3] = 0;
+        order[4] = 3;
+        order[5] = 7;
+        order[6] = 5;
+        order[7] = 1;
+        order[8] = 6;
+        order[9] = 11;
+        order[10] = 4;
+        order[11] = 2;
+    }
+
+    function _deployAndPopulateDescriptor() internal returns (NijiDescriptor) {
+        NijiArt art = new NijiArt(address(this), _traitNames());
+        NijiDescriptor descriptor = new NijiDescriptor(address(art), 320, _compositeOrder());
+        _populateArt(art);
         return descriptor;
     }
 
-    function _deployAndPopulateV2() internal returns (NounsDescriptorV2) {
-        NounsDescriptorV2 descriptorV2 = _deployDescriptorV2();
-        _populateDescriptorV2(descriptorV2);
-        return descriptorV2;
+    function _deployAndPopulateV2() internal returns (NijiDescriptor) {
+        return _deployAndPopulateDescriptor();
     }
 
-    function _deployDescriptorV2() internal returns (NounsDescriptorV2) {
-        SVGRenderer renderer = new SVGRenderer();
-        Inflator inflator = new Inflator();
-        NounsDescriptorV2 descriptorV2 = new NounsDescriptorV2(NounsArt(address(0)), renderer);
-        NounsArt art = new NounsArt(address(descriptorV2), inflator);
-        descriptorV2.setArt(art);
-        return descriptorV2;
+    function _deployAndPopulateV3() internal returns (NijiDescriptor) {
+        return _deployAndPopulateDescriptor();
     }
 
-    function _deployAndPopulateV3() internal returns (NounsDescriptorV3) {
-        NounsDescriptorV3 descriptorV3 = _deployDescriptorV3();
-        _populateDescriptorV3(descriptorV3);
-        return descriptorV3;
+    function _populateArt(NijiArt art) internal {
+        bytes[] memory images = new bytes[](3);
+        images[0] = hex'89504e47';
+        images[1] = hex'89504e4700';
+        images[2] = hex'89504e4701';
+
+        for (uint256 i = 0; i < 12; i++) {
+            art.addTraitImages(i, images);
+        }
     }
 
-    function _deployDescriptorV3() internal returns (NounsDescriptorV3) {
-        SVGRenderer renderer = new SVGRenderer();
-        Inflator inflator = new Inflator();
-        NounsDescriptorV3 descriptorV3 = new NounsDescriptorV3(NounsArt(address(0)), renderer);
-        NounsArt art = new NounsArt(address(descriptorV3), inflator);
-        descriptorV3.setArt(art);
-        return descriptorV3;
-    }
+    function deployToken(address minter) internal returns (NijiToken token) {
+        NijiArt art = new NijiArt(address(this), _traitNames());
+        NijiDescriptor descriptor = new NijiDescriptor(address(art), 320, _compositeOrder());
+        _populateArt(art);
 
-    function deployToken(address noundersDAO, address minter) internal returns (NounsToken nounsToken) {
-        IProxyRegistry proxyRegistry = IProxyRegistry(address(3));
-        NounsDescriptorV3 descriptor = _deployAndPopulateV3();
-
-        nounsToken = new NounsToken(noundersDAO, minter, descriptor, new NounsSeeder(), proxyRegistry);
+        NijiSeeder seeder = new NijiSeeder(address(art));
+        token = new NijiToken('Niji', 'NIJI', address(descriptor), address(seeder), 0);
+        token.setMintingActive(true);
+        if (minter != address(0)) {
+            token.setMinter(minter);
+        }
     }
 
     function get1967Implementation(address proxy) internal view returns (address) {

@@ -5,8 +5,8 @@ import { getNounData, ImageData } from '@noundry/nouns-assets';
 import { useQuery } from '@tanstack/react-query';
 
 import loadingNoun from '@/assets/loading-skull-noun.gif';
-import { useReadNounsTokenSeeds } from '@/contracts';
-import { INounSeed } from '@/wrappers/nounToken';
+import { useReadNijiTokenSeeds } from '@/contracts';
+import { INounSeed } from '@/wrappers/nijiToken';
 
 export interface NounProps extends HTMLAttributes<HTMLImageElement> {
   nounId?: bigint;
@@ -27,7 +27,7 @@ export const Noun: FC<NounProps> = ({
 }) => {
   const [shouldShowFallback, setShouldShowFallback] = useState(false);
   const [fallbackStartTime, setFallbackStartTime] = useState<number | null>(null);
-  const { data: fetchedSeed } = useReadNounsTokenSeeds({
+  const { data: fetchedSeed } = useReadNijiTokenSeeds({
     args: [nounId!],
     query: {
       enabled: nounId !== undefined && !providedSeed,

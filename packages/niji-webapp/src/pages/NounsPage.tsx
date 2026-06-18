@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useReadNounsTokenSeeds } from '@/contracts';
+import { useReadNijiTokenSeeds } from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { useBreakpointValues } from '@/hooks/useBreakpointValues';
 import { traitName } from '@/lib/traitName';
@@ -50,7 +50,7 @@ const NounsPage: React.FC<NounsPageProps> = () => {
     },
   ];
 
-  const { data: selectedNounSeed } = useReadNounsTokenSeeds({
+  const { data: selectedNounSeed } = useReadNijiTokenSeeds({
     args: [selectedNounId!],
     query: {
       enabled: selectedNounId !== undefined,

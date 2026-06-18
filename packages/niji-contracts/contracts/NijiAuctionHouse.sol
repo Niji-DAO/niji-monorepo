@@ -29,7 +29,7 @@ import { ReentrancyGuardUpgradeable } from '@openzeppelin/contracts-upgradeable/
 import { OwnableUpgradeable } from '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { INijiAuctionHouse } from './interfaces/INijiAuctionHouse.sol';
-import { INounsToken as INijiToken } from './interfaces/INounsToken.sol';
+import { INijiToken } from './interfaces/INijiToken.sol';
 import { IWETH } from './interfaces/IWETH.sol';
 
 contract NijiAuctionHouse is INijiAuctionHouse, PausableUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable {
