@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.6;
 
-import { NounsAuctionHouseV3 } from '../../../contracts/NounsAuctionHouseV3.sol';
+import { NijiAuctionHouseV3 } from '../../../contracts/NijiAuctionHouseV3.sol';
 
 contract BidderWithGasGriefing {
-    function bid(NounsAuctionHouseV3 auctionHouse, uint256 nounId) public payable {
+    function bid(NijiAuctionHouseV3 auctionHouse, uint256 nounId) public payable {
         auctionHouse.createBid{ value: msg.value }(nounId);
     }
 

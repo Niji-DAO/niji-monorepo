@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 
 import { Backdrop } from '@/components/Modal';
 import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
-import { Proposal, useDynamicQuorumProps } from '@/wrappers/nounsDao';
+import { Proposal, useDynamicQuorumProps } from '@/wrappers/nijiDao';
 import { adjustedNounSupplyAtPropSnapshotDocument } from '@/wrappers/subgraph';
 
 import classes from './DynamicQuorumInfoModal.module.css';

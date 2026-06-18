@@ -11,7 +11,7 @@ task(
   'Populates the descriptor with color palettes and Noun parts; accepts an input JSON with missing properties.',
 )
   .addParam('nounsDescriptor', 'The `NounsDescriptor` contract address')
-  .addParam('daoAddress', 'The `NounsDAOProxy` contract address')
+  .addParam('daoAddress', 'The `NijiDAOProxy` contract address')
   .addParam('imageDataPath', 'The path to the image data JSON file')
   .addParam('proposalTextPath', 'Path to the proposal descriptor text file')
   .setAction(
@@ -117,7 +117,7 @@ task(
         }
       }
 
-      const dao = (await ethers.getContractFactory('NounsDAOLogicV1')).attach(daoAddress);
+      const dao = (await ethers.getContractFactory('NijiDAOLogicV1')).attach(daoAddress);
       const propTx = await dao.propose(targets, values, signatures, calldatas, proposalText);
       await propTx.wait();
 

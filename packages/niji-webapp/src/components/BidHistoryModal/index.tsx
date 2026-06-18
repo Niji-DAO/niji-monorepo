@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 import BidHistoryModalRow from '@/components/BidHistoryModalRow';
 import { StandaloneNounRoundedCorners } from '@/components/StandaloneNoun';
 import { Bid } from '@/utils/types';
-import { Auction } from '@/wrappers/nounsAuction';
+import { Auction } from '@/wrappers/nijiAuction';
 import { useAuctionBids } from '@/wrappers/onDisplayAuction';
 
 import classes from './BidHistoryModal.module.css';

@@ -15,10 +15,7 @@ import remarkBreaks from 'remark-breaks';
 import ProposalTransactionsDiffs from '@/components/ProposalContent/ProposalTransactionsDiffs';
 import Section from '@/layout/Section';
 import { processProposalDescriptionText } from '@/utils/processProposalDescriptionText';
-import {
-  ProposalCandidateVersionContent,
-  useCandidateProposalVersions,
-} from '@/wrappers/nounsData';
+import { ProposalCandidateVersionContent, useCandidateProposalVersions } from '@/wrappers/nijiData';
 
 import ProposalContent from '../../components/ProposalContent';
 import VersionTab from '../ProposalHistory/VersionTab';

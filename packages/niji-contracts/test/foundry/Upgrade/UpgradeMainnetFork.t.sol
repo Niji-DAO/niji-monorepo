@@ -3,18 +3,18 @@ pragma solidity ^0.8.19;
 
 import 'forge-std/Test.sol';
 import { NounsToken } from '../../../contracts/NounsToken.sol';
-import { INounsDAOLogic } from '../../../contracts/interfaces/INounsDAOLogic.sol';
-import { NounsDAOTypes } from '../../../contracts/governance/NounsDAOInterfaces.sol';
-import { NounsAuctionHouseV3 } from '../../../contracts/NounsAuctionHouseV3.sol';
-import { INounsAuctionHouseV2 } from '../../../contracts/interfaces/INounsAuctionHouseV2.sol';
-import { INounsAuctionHouseV3 } from '../../../contracts/interfaces/INounsAuctionHouseV3.sol';
+import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
+import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiAuctionHouseV3 } from '../../../contracts/NijiAuctionHouseV3.sol';
+import { INijiAuctionHouseV2 } from '../../../contracts/interfaces/INijiAuctionHouseV2.sol';
+import { INijiAuctionHouseV3 } from '../../../contracts/interfaces/INijiAuctionHouseV3.sol';
 import { ChainalysisSanctionsListMock } from '../helpers/ChainalysisSanctionsListMock.sol';
 
 abstract contract UpgradeMainnetForkBaseTest is Test {
     address public constant NOUNDERS = 0x2573C60a6D127755aA2DC85e342F7da2378a0Cc5;
     address public constant WHALE = 0x83fCFe8Ba2FEce9578F0BbaFeD4Ebf5E915045B9;
     NounsToken public nouns = NounsToken(0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03);
-    INounsDAOLogic public constant NOUNS_DAO_PROXY_MAINNET = INounsDAOLogic(0x6f3E6272A167e8AcCb32072d08E0957F9c79223d);
+    INijiDAOLogic public constant NOUNS_DAO_PROXY_MAINNET = INijiDAOLogic(0x6f3E6272A167e8AcCb32072d08E0957F9c79223d);
     address public constant CURRENT_DAO_IMPL = 0xe3caa436461DBa00CFBE1749148C9fa7FA1F5344;
     address public constant NOUNS_DAO_DATA_PROXY = 0xf790A5f59678dd733fb3De93493A91f472ca1365;
     address public constant AUCTION_HOUSE_PROXY_MAINNET = 0x830BD73E4184ceF73443C15111a1DF14e495C706;
@@ -61,7 +61,7 @@ abstract contract UpgradeMainnetForkBaseTest is Test {
     }
 
     function voteAndExecuteProposal(uint256 proposalId) internal {
-        NounsDAOTypes.ProposalCondensedV2 memory propInfo = NOUNS_DAO_PROXY_MAINNET.proposals(proposalId);
+        NijiDAOTypes.ProposalCondensedV2 memory propInfo = NOUNS_DAO_PROXY_MAINNET.proposals(proposalId);
 
         vm.roll(propInfo.startBlock + 1);
         vm.prank(proposerAddr, origin);
@@ -79,14 +79,14 @@ abstract contract UpgradeMainnetForkBaseTest is Test {
 }
 
 contract AuctionHouseUpgradeMainnetForkTest is UpgradeMainnetForkBaseTest {
-    address v2NounsAddress;
+    address v2NijiAddress;
     address v2WethAddress;
     address v2Owner;
     uint256 v2Duration;
     uint8 v2MinBidIncrementPercentage;
     uint256 v2ReservePrice;
     uint256 v2TimeBuffer;
-    INounsAuctionHouseV2.AuctionV2View auctionV2State;
+    INijiAuctionHouseV2.AuctionV2View auctionV2State;
     ChainalysisSanctionsListMock sanctionsOracle;
 
     address user1 = makeAddr('user1');
@@ -99,10 +99,10 @@ contract AuctionHouseUpgradeMainnetForkTest is UpgradeMainnetForkBaseTest {
         vm.deal(user2, 100 ether);
 
         // Save AH V2 state before the upgrade
-        INounsAuctionHouseV2 ahv2 = INounsAuctionHouseV2(AUCTION_HOUSE_PROXY_MAINNET);
+        INijiAuctionHouseV2 ahv2 = INijiAuctionHouseV2(AUCTION_HOUSE_PROXY_MAINNET);
         auctionV2State = ahv2.auction();
 
-        v2NounsAddress = address(ahv2.nouns());
+        v2NijiAddress = address(ahv2.nouns());
         v2WethAddress = address(ahv2.weth());
         v2Owner = IOwner(address(ahv2)).owner();
         v2Duration = ahv2.duration();
@@ -110,7 +110,7 @@ contract AuctionHouseUpgradeMainnetForkTest is UpgradeMainnetForkBaseTest {
         v2ReservePrice = ahv2.reservePrice();
         v2TimeBuffer = ahv2.timeBuffer();
 
-        NounsAuctionHouseV3 ahv3 = new NounsAuctionHouseV3(ahv2.nouns(), ahv2.weth(), ahv2.duration());
+        NijiAuctionHouseV3 ahv3 = new NijiAuctionHouseV3(ahv2.nouns(), ahv2.weth(), ahv2.duration());
         sanctionsOracle = new ChainalysisSanctionsListMock();
 
         // Propose upgrade
@@ -139,15 +139,15 @@ contract AuctionHouseUpgradeMainnetForkTest is UpgradeMainnetForkBaseTest {
         voteAndExecuteProposal(proposalId);
     }
     function test_auctionState_survivesUpgrade() public {
-        INounsAuctionHouseV2 auctionV3 = INounsAuctionHouseV2(AUCTION_HOUSE_PROXY_MAINNET);
-        INounsAuctionHouseV2.AuctionV2View memory auctionV3State = auctionV3.auction();
+        INijiAuctionHouseV2 auctionV3 = INijiAuctionHouseV2(AUCTION_HOUSE_PROXY_MAINNET);
+        INijiAuctionHouseV2.AuctionV2View memory auctionV3State = auctionV3.auction();
         assertEq(auctionV3State.nounId, auctionV2State.nounId);
         assertEq(auctionV3State.amount, auctionV2State.amount);
         assertEq(auctionV3State.startTime, auctionV2State.startTime);
         assertEq(auctionV3State.endTime, auctionV2State.endTime);
         assertEq(auctionV3State.bidder, auctionV2State.bidder);
         assertEq(auctionV3State.settled, false);
-        assertEq(address(auctionV3.nouns()), v2NounsAddress);
+        assertEq(address(auctionV3.nouns()), v2NijiAddress);
         assertEq(address(auctionV3.weth()), v2WethAddress);
         assertEq(auctionV3.timeBuffer(), v2TimeBuffer);
         assertEq(auctionV3.reservePrice(), v2ReservePrice);
@@ -158,7 +158,7 @@ contract AuctionHouseUpgradeMainnetForkTest is UpgradeMainnetForkBaseTest {
     }
 
     function test_bidAndSettleInV3_worksAndCapturesSettlementHistory() public {
-        INounsAuctionHouseV2 auctionV2 = INounsAuctionHouseV2(AUCTION_HOUSE_PROXY_MAINNET);
+        INijiAuctionHouseV2 auctionV2 = INijiAuctionHouseV2(AUCTION_HOUSE_PROXY_MAINNET);
         auctionV2.settleCurrentAndCreateNewAuction();
         uint32 clientId = 42;
         uint96 nounId = auctionV2.auction().nounId;
@@ -166,13 +166,13 @@ contract AuctionHouseUpgradeMainnetForkTest is UpgradeMainnetForkBaseTest {
         vm.warp(block.timestamp + auctionV2.auction().endTime);
         uint32 settlementTime = uint32(block.timestamp);
         auctionV2.settleCurrentAndCreateNewAuction();
-        INounsAuctionHouseV2.Settlement[] memory settlements = auctionV2.getSettlementsFromIdtoTimestamp(
+        INijiAuctionHouseV2.Settlement[] memory settlements = auctionV2.getSettlementsFromIdtoTimestamp(
             nounId,
             block.timestamp,
             true
         );
         assertEq(settlements.length, 1);
-        INounsAuctionHouseV2.Settlement memory s = settlements[0];
+        INijiAuctionHouseV2.Settlement memory s = settlements[0];
         assertEq(s.nounId, nounId);
         assertEq(s.winner, address(this));
         assertEq(s.amount, 0.042 ether);
@@ -181,7 +181,7 @@ contract AuctionHouseUpgradeMainnetForkTest is UpgradeMainnetForkBaseTest {
     }
 
     function test_auctionHouseV3_rejectsBidFromSanctionedAddress() public {
-        INounsAuctionHouseV3 auction = INounsAuctionHouseV3(AUCTION_HOUSE_PROXY_MAINNET);
+        INijiAuctionHouseV3 auction = INijiAuctionHouseV3(AUCTION_HOUSE_PROXY_MAINNET);
         auction.settleCurrentAndCreateNewAuction();
         uint96 nounId = auction.auction().nounId;
 
@@ -193,7 +193,7 @@ contract AuctionHouseUpgradeMainnetForkTest is UpgradeMainnetForkBaseTest {
     }
 
     function test_auctionHouseV3_acceptsBidFromNonSanctionedAddress() public {
-        INounsAuctionHouseV3 auction = INounsAuctionHouseV3(AUCTION_HOUSE_PROXY_MAINNET);
+        INijiAuctionHouseV3 auction = INijiAuctionHouseV3(AUCTION_HOUSE_PROXY_MAINNET);
         auction.settleCurrentAndCreateNewAuction();
         uint96 nounId = auction.auction().nounId;
 

@@ -29,7 +29,7 @@ import StreamWithdrawModal from '@/components/StreamWithdrawModal';
 import VoteCard, { VoteCardVariant } from '@/components/VoteCard';
 import VoteModal from '@/components/VoteModal';
 import VoteSignals from '@/components/VoteSignals/VoteSignals';
-import { useReadNounsGovernorQuorumVotes } from '@/contracts';
+import { useReadNijiGovernorQuorumVotes } from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { useActiveLocale } from '@/hooks/useActivateLocale';
 import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
@@ -52,8 +52,8 @@ import {
   useProposal,
   useProposalVersions,
   useQueueProposal,
-} from '@/wrappers/nounsDao';
-import { useProposalFeedback } from '@/wrappers/nounsData';
+} from '@/wrappers/nijiDao';
+import { useProposalFeedback } from '@/wrappers/nijiData';
 import { useUserVotes, useUserVotesAsOfBlock } from '@/wrappers/nounToken';
 import {
   delegateNounsAtBlockDocument,
@@ -196,7 +196,7 @@ const VotePage = () => {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore Type instantiation is excessively deep and possibly infinite.
-  const { data: currentQuorum } = useReadNounsGovernorQuorumVotes({
+  const { data: currentQuorum } = useReadNijiGovernorQuorumVotes({
     args: [proposal !== undefined && proposal.id !== undefined ? BigInt(proposal.id) : 0n],
     query: {
       enabled:

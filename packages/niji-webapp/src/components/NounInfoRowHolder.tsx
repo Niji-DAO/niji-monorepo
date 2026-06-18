@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ExternalLinkIcon } from 'lucide-react';
 
 import ShortAddress from '@/components/ShortAddress';
-import { nounsAuctionHouseAddress } from '@/contracts';
+import { nijiAuctionHouseAddress } from '@/contracts';
 import { cn } from '@/lib/utils';
 import { execute } from '@/subgraphs/execute';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
@@ -48,7 +48,7 @@ const NounInfoRowHolder: React.FC<NounInfoRowHolderProps> = props => {
     <span className={cn('text-muted-foreground block', className)}>
       <Trans>Winner</Trans>{' '}
       <a className="text-muted-foreground" href={etherscanURL} target={'_blank'} rel="noreferrer">
-        {winner.toLowerCase() === nounsAuctionHouseAddress[chainId].toLowerCase() ? (
+        {winner.toLowerCase() === nijiAuctionHouseAddress[chainId].toLowerCase() ? (
           <Trans>Nouns Auction House</Trans>
         ) : (
           shortAddressComponent

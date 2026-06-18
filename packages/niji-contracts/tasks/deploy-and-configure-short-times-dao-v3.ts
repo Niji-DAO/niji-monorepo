@@ -75,7 +75,7 @@ task(
     types.int,
   )
   .setAction(async (args, { run }) => {
-    // Deploy the Nouns DAO contracts and return deployment information
+    // Deploy the Niji DAO contracts and return deployment information
     const contracts = await run('deploy-short-times-dao-v3', args);
 
     // Verify the contracts on Etherscan
@@ -91,18 +91,18 @@ task(
 
     // Transfer ownership of all contract except for the auction house.
     // We must maintain ownership of the auction house to kick off the first auction.
-    const executorAddress = contracts.NounsDAOExecutorProxy.address;
+    const executorAddress = contracts.NijiDAOExecutorProxy.address;
     await contracts.NounsDescriptorV3.instance.transferOwnership(executorAddress);
     await contracts.NounsToken.instance.transferOwnership(executorAddress);
-    await contracts.NounsAuctionHouseProxyAdmin.instance.transferOwnership(executorAddress);
+    await contracts.NijiAuctionHouseProxyAdmin.instance.transferOwnership(executorAddress);
     console.log(
       'Transferred ownership of the descriptor, token, and proxy admin contracts to the executor.',
     );
 
     // Optionally kick off the first auction and transfer ownership of the auction house
-    // to the Nouns DAO executor.
-    const auctionHouse = (contracts.NounsAuctionHouse.instance as any).attach(
-      contracts.NounsAuctionHouseProxy.address,
+    // to the Niji DAO executor.
+    const auctionHouse = (contracts.NijiAuctionHouse.instance as any).attach(
+      contracts.NijiAuctionHouseProxy.address,
     );
     if (args.startAuction) {
       await auctionHouse.unpause({

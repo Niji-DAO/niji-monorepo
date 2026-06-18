@@ -3,7 +3,7 @@ import { compareBids } from '@/utils/compareBids';
 import { generateEmptyNounderAuction, isNounderNoun } from '@/utils/nounderNoun';
 import { Address, Bid, BidEvent } from '@/utils/types';
 
-import { Auction } from './nounsAuction';
+import { Auction } from './nijiAuction';
 
 const deserializeAuction = (reduxSafeAuction: Auction): Auction => {
   return {

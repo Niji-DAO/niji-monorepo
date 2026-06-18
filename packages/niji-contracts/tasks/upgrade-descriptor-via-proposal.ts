@@ -2,7 +2,7 @@ import { task } from 'hardhat/config';
 
 task('upgrade-descriptor-via-proposal', 'Upgrade NounsToken to use Descriptor V3.')
   .addParam('descriptor', 'The `NounsDescriptorV3` contract address')
-  .addParam('dao', 'The `NounsDAOProxy` contract address')
+  .addParam('dao', 'The `NijiDAOProxy` contract address')
   .addParam('token', 'The `NounsToken` contract address')
   .setAction(async ({ descriptor, dao, token }, { ethers }) => {
     const targets = [token as string];
@@ -10,7 +10,7 @@ task('upgrade-descriptor-via-proposal', 'Upgrade NounsToken to use Descriptor V3
     const signatures = ['setDescriptor(address)'];
     const calldatas = [ethers.AbiCoder.defaultAbiCoder().encode(['address'], [descriptor])];
 
-    const gov = (await ethers.getContractFactory('NounsDAOLogicV4')).attach(dao);
+    const gov = (await ethers.getContractFactory('NijiDAOLogicV4')).attach(dao);
     const propTx = await gov['propose(address[],uint256[],string[],bytes[],string)'](
       targets,
       values,

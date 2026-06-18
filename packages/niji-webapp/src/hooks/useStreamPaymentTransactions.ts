@@ -5,10 +5,10 @@ import { encodeFunctionData, parseEther } from 'viem';
 import { ProposalActionModalState } from '@/components/ProposalActionsModal';
 import { SupportedCurrency } from '@/components/ProposalActionsModal/steps/TransferFundsDetailsStep';
 import {
-  nounsPayerAbi,
-  nounsPayerAddress,
-  nounsStreamFactoryAbi,
-  nounsStreamFactoryAddress,
+  nijiPayerAbi,
+  nijiPayerAddress,
+  nijiStreamFactoryAbi,
+  nijiStreamFactoryAddress,
   usdcAddress,
   wethAbi,
   wethAddress,
@@ -50,7 +50,7 @@ export default function useStreamPaymentTransactions({
 
   const actions: Action[] = [
     {
-      address: nounsStreamFactoryAddress[chainId],
+      address: nijiStreamFactoryAddress[chainId],
       signature: fundStreamFunction,
       value: '0',
       usdcValue: isUSDC ? Number(human2ContractUSDCFormat(amount)) : 0,
@@ -64,7 +64,7 @@ export default function useStreamPaymentTransactions({
         predictedAddress,
       ]),
       calldata: encodeFunctionData({
-        abi: nounsStreamFactoryAbi,
+        abi: nijiStreamFactoryAbi,
         functionName: fundStreamFunction,
         args: [
           state.address,
@@ -107,13 +107,13 @@ export default function useStreamPaymentTransactions({
   } else {
     const signature = 'sendOrRegisterDebt';
     actions.push({
-      address: nounsPayerAddress[chainId],
+      address: nijiPayerAddress[chainId],
       value: '0',
       usdcValue: Number(human2ContractUSDCFormat(amount)),
       signature: signature,
       decodedCalldata: JSON.stringify([predictedAddress, human2ContractUSDCFormat(amount)]),
       calldata: encodeFunctionData({
-        abi: nounsPayerAbi,
+        abi: nijiPayerAbi,
         functionName: signature,
         args: [predictedAddress, BigInt(human2ContractUSDCFormat(amount))],
       }),

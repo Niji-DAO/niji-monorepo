@@ -67,7 +67,7 @@ describe('NounsToken', () => {
   });
 
   it('should set name', async () => {
-    expect(await nounsToken.name()).to.eq('Nouns');
+    expect(await nounsToken.name()).to.eq('Niji');
   });
 
   it('should allow minter to mint a noun to itself', async () => {

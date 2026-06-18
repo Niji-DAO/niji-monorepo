@@ -5,9 +5,9 @@ import { Trans } from '@lingui/react/macro';
 import { formatUnits } from 'viem';
 
 import ShortAddress from '@/components/ShortAddress';
-import { nounsTokenBuyerAddress, nounsPayerAddress } from '@/contracts';
+import { nijiTokenBuyerAddress, nijiPayerAddress } from '@/contracts';
 import { defaultChain } from '@/wagmi';
-import { ProposalDetail } from '@/wrappers/nounsDao';
+import { ProposalDetail } from '@/wrappers/nijiDao';
 
 import classes from './ProposalContent.module.css';
 
@@ -44,7 +44,7 @@ export default function ProposalTransaction({ transaction }: Readonly<ProposalTr
       ) : (
         transaction.callData
       )}
-      {transaction.target.toLowerCase() === nounsTokenBuyerAddress[chainId].toLowerCase() &&
+      {transaction.target.toLowerCase() === nijiTokenBuyerAddress[chainId].toLowerCase() &&
         transaction.functionSig === 'transfer' && (
           <div className={classes.txnInfoText}>
             <div className={classes.txnInfoIconWrapper}>
@@ -58,7 +58,7 @@ export default function ProposalTransaction({ transaction }: Readonly<ProposalTr
             </div>
           </div>
         )}
-      {transaction.target.toLowerCase() === nounsPayerAddress[chainId].toLowerCase() &&
+      {transaction.target.toLowerCase() === nijiPayerAddress[chainId].toLowerCase() &&
         transaction.functionSig === 'sendOrRegisterDebt' && (
           <div className={classes.txnInfoText}>
             <div className={classes.txnInfoIconWrapper}>

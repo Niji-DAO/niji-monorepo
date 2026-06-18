@@ -5,7 +5,7 @@ import { ethers, upgrades } from 'hardhat';
 
 import {
   MaliciousBidder__factory as MaliciousBidderFactory,
-  NounsAuctionHouse,
+  NijiAuctionHouse,
   NounsDescriptorV3__factory as NounsDescriptorV3Factory,
   NounsToken,
   WETH,
@@ -13,8 +13,8 @@ import {
 
 import { deployNounsToken, deployWeth, populateDescriptorV2 } from './utils';
 
-describe('NounsAuctionHouse', () => {
-  let nounsAuctionHouse: NounsAuctionHouse;
+describe('NijiAuctionHouse', () => {
+  let nounsAuctionHouse: NijiAuctionHouse;
   let nounsToken: NounsToken;
   let weth: WETH;
   let deployer: SignerWithAddress;
@@ -29,7 +29,7 @@ describe('NounsAuctionHouse', () => {
   const DURATION = 60 * 60 * 24;
 
   async function deploy(deployer?: SignerWithAddress) {
-    const auctionHouseFactory = await ethers.getContractFactory('NounsAuctionHouse', deployer);
+    const auctionHouseFactory = await ethers.getContractFactory('NijiAuctionHouse', deployer);
     return upgrades.deployProxy(
       auctionHouseFactory,
       [
@@ -41,7 +41,7 @@ describe('NounsAuctionHouse', () => {
         DURATION,
       ],
       { unsafeAllow: ['missing-initializer-call', 'incorrect-initializer-order'] },
-    ) as unknown as NounsAuctionHouse;
+    ) as unknown as NijiAuctionHouse;
   }
 
   before(async () => {

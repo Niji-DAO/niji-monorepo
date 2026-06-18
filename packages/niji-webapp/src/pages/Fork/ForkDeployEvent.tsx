@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import { Fork } from '../../wrappers/nounsDao';
+import { Fork } from '../../wrappers/nijiDao';
 
 import classes from './Fork.module.css';
 

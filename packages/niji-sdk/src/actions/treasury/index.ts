@@ -1,13 +1,13 @@
 export * from '../treasury.gen.js';
 
 export {
-  readNounsTreasuryBalancesInEth,
+  readNijiTreasuryBalancesInEth,
   TreasuryBalancesInEthData,
-  ReadNounsTreasuryBalancesInEthOptions,
-} from './readNounsTreasuryBalancesInEth.js';
+  ReadNijiTreasuryBalancesInEthOptions,
+} from './readNijiTreasuryBalancesInEth.js';
 
 export {
-  ReadNounsTreasuryBalancesInUsdOptions,
+  ReadNijiTreasuryBalancesInUsdOptions,
   TreasuryBalancesInUsdData,
-  readNounsTreasuryBalancesInUsd,
-} from './readNounsTreasuryBalancesInUsd.js';
+  readNijiTreasuryBalancesInUsd,
+} from './readNijiTreasuryBalancesInUsd.js';

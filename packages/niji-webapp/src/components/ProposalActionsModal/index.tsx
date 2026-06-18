@@ -3,7 +3,7 @@ import type { Abi } from 'viem';
 import React, { SetStateAction, useState } from 'react';
 
 import { Address } from '@/utils/types';
-import { ProposalTransaction } from '@/wrappers/nounsDao';
+import { ProposalTransaction } from '@/wrappers/nijiDao';
 
 import SolidColorBackgroundModal from '../SolidColorBackgroundModal';
 

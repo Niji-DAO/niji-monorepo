@@ -6,7 +6,7 @@ import { streamAbi } from './src/abis/StreamAbi';
 
 const etherscanContractConfigs = [
   {
-    name: 'NounsGovernor',
+    name: 'NijiGovernor',
     fileName: 'governor',
     address: {
       [mainnet.id]: '0x6f3e6272a167e8accb32072d08e0957f9c79223d',
@@ -14,7 +14,7 @@ const etherscanContractConfigs = [
     },
   },
   {
-    name: 'NounsLegacyTreasury',
+    name: 'NijiLegacyTreasury',
     fileName: 'legacy-treasury',
     address: {
       [mainnet.id]: '0x0BC3807Ec262cB779b38D65b38158acC3bfedE10',
@@ -22,7 +22,7 @@ const etherscanContractConfigs = [
     },
   },
   {
-    name: 'NounsTreasury',
+    name: 'NijiTreasury',
     fileName: 'treasury',
     address: {
       [mainnet.id]: '0xb1a32fc9f9d8b2cf86c068cae13108809547ef71',
@@ -30,7 +30,7 @@ const etherscanContractConfigs = [
     },
   },
   {
-    name: 'NounsData',
+    name: 'NijiData',
     fileName: 'data',
     address: {
       [mainnet.id]: '0xf790a5f59678dd733fb3de93493a91f472ca1365',
@@ -46,7 +46,7 @@ const etherscanContractConfigs = [
     },
   },
   {
-    name: 'NounsAuctionHouse',
+    name: 'NijiAuctionHouse',
     fileName: 'auction-house',
     address: {
       [mainnet.id]: '0x830bd73e4184cef73443c15111a1df14e495c706',
@@ -62,7 +62,7 @@ const etherscanContractConfigs = [
     },
   },
   {
-    name: 'NounsStreamFactory',
+    name: 'NijiStreamFactory',
     fileName: 'stream-factory',
     address: {
       [mainnet.id]: '0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff',
@@ -70,7 +70,7 @@ const etherscanContractConfigs = [
     },
   },
   {
-    name: 'NounsUSDCPayer',
+    name: 'NijiUSDCPayer',
     fileName: 'usdc-payer',
     address: {
       [mainnet.id]: '0xd97Bcd9f47cEe35c0a9ec1dc40C1269afc9E8E1D',
@@ -78,7 +78,7 @@ const etherscanContractConfigs = [
     },
   },
   {
-    name: 'NounsUSDCTokenBuyer',
+    name: 'NijiUSDCTokenBuyer',
     fileName: 'usdc-token-buyer',
     address: {
       [mainnet.id]: '0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5',

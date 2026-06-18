@@ -18,7 +18,7 @@ import ProposalActionModal from '@/components/ProposalActionsModal';
 import ProposalEditor from '@/components/ProposalEditor';
 import ProposalTransactions from '@/components/ProposalTransactions';
 import config from '@/config';
-import { nounsLegacyTreasuryAddress, nounsTokenBuyerAddress } from '@/contracts';
+import { nijiLegacyTreasuryAddress, nijiTokenBuyerAddress } from '@/contracts';
 import Section from '@/layout/Section';
 import { buildEtherscanHoldingsLink } from '@/utils/etherscan';
 import { useEthNeeded } from '@/utils/tokenBuyerContractUtils/tokenBuyer';
@@ -32,7 +32,7 @@ import {
   useProposalThreshold,
   usePropose,
   useProposeOnTimelockV1,
-} from '@/wrappers/nounsDao';
+} from '@/wrappers/nijiDao';
 import { useUserVotes } from '@/wrappers/nounToken';
 
 import classes from './CreateProposal.module.css';
@@ -60,13 +60,13 @@ const CreateProposalPage = () => {
   const { _ } = useLingui();
   const chainId = defaultChain.id;
   const ethNeeded = useEthNeeded(
-    nounsTokenBuyerAddress[chainId] ?? '',
+    nijiTokenBuyerAddress[chainId] ?? '',
     totalUSDCPayment,
-    nounsTokenBuyerAddress[chainId] == undefined || totalUSDCPayment === 0,
+    nijiTokenBuyerAddress[chainId] == undefined || totalUSDCPayment === 0,
   );
   const isDaoGteV3 = useIsDaoGteV3();
   const daoEtherscanLink = buildEtherscanHoldingsLink(
-    nounsLegacyTreasuryAddress[chainId], // This should always point at the V1 executor
+    nijiLegacyTreasuryAddress[chainId], // This should always point at the V1 executor
   );
 
   const handleAddProposalAction = useCallback(
@@ -111,13 +111,13 @@ const CreateProposalPage = () => {
       const hasTokenBuyerTopUp =
         filter(
           proposalTransactions,
-          txn => txn.address.toLowerCase() === nounsTokenBuyerAddress[chainId].toLowerCase(),
+          txn => txn.address.toLowerCase() === nijiTokenBuyerAddress[chainId].toLowerCase(),
         ).length > 0;
 
       // Add a new top up txn if one isn't there already, else add to the existing one
       if (Number(ethNeeded) > 0 && !hasTokenBuyerTopUp) {
         handleAddProposalAction({
-          address: nounsTokenBuyerAddress[chainId],
+          address: nijiTokenBuyerAddress[chainId],
           value: BigInt(ethNeeded ?? 0),
           calldata: '0x' as Hex,
           signature: '',
@@ -127,7 +127,7 @@ const CreateProposalPage = () => {
           const indexOfTokenBuyerTopUp =
             proposalTransactions
               .map((txn, index: number) => {
-                if (txn.address === nounsTokenBuyerAddress[chainId]) {
+                if (txn.address === nijiTokenBuyerAddress[chainId]) {
                   return index;
                 } else {
                   return -1;

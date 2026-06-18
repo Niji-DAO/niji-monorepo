@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { ensCacheKey } from '@/utils/ensLookup';
 import { lookupNNSOrENS } from '@/utils/lookupNNSOrENS';
 import { Address } from '@/utils/types';
-import { Proposal } from '@/wrappers/nounsDao';
+import { Proposal } from '@/wrappers/nijiDao';
 
 import DelegateGroupedNounImageVoteTable from '../DelegateGroupedNounImageVoteTable';
 

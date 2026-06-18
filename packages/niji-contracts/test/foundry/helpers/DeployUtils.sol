@@ -2,21 +2,21 @@
 pragma solidity ^0.8.19;
 
 import 'forge-std/Test.sol';
-import { INounsDAOLogic } from '../../../contracts/interfaces/INounsDAOLogic.sol';
+import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
 import { DescriptorHelpers } from './DescriptorHelpers.sol';
 import { NounsDescriptorV2 } from '../../../contracts/NounsDescriptorV2.sol';
 import { NounsDescriptorV3 } from '../../../contracts/NounsDescriptorV3.sol';
 import { SVGRenderer } from '../../../contracts/SVGRenderer.sol';
 import { NounsArt } from '../../../contracts/NounsArt.sol';
-import { NounsDAOExecutor } from '../../../contracts/governance/NounsDAOExecutor.sol';
+import { NijiDAOExecutor } from '../../../contracts/governance/NijiDAOExecutor.sol';
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
 import { NounsDescriptor } from '../../../contracts/NounsDescriptor.sol';
 import { NounsSeeder } from '../../../contracts/NounsSeeder.sol';
 import { NounsToken } from '../../../contracts/NounsToken.sol';
 import { Inflator } from '../../../contracts/Inflator.sol';
-import { NounsAuctionHouseProxy } from '../../../contracts/proxies/NounsAuctionHouseProxy.sol';
-import { NounsAuctionHouseProxyAdmin } from '../../../contracts/proxies/NounsAuctionHouseProxyAdmin.sol';
-import { NounsAuctionHouseV3 } from '../../../contracts/NounsAuctionHouseV3.sol';
+import { NijiAuctionHouseProxy } from '../../../contracts/proxies/NijiAuctionHouseProxy.sol';
+import { NijiAuctionHouseProxyAdmin } from '../../../contracts/proxies/NijiAuctionHouseProxyAdmin.sol';
+import { NijiAuctionHouseV3 } from '../../../contracts/NijiAuctionHouseV3.sol';
 import { WETH } from '../../../contracts/test/WETH.sol';
 import { ChainalysisSanctionsListMock } from './ChainalysisSanctionsListMock.sol';
 
@@ -35,21 +35,21 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
         address owner,
         address noundersDAO,
         address minter
-    ) internal returns (NounsAuctionHouseProxy, NounsAuctionHouseProxyAdmin) {
+    ) internal returns (NijiAuctionHouseProxy, NijiAuctionHouseProxyAdmin) {
         NounsToken token = deployToken(noundersDAO, minter);
-        NounsAuctionHouseV3 logic = new NounsAuctionHouseV3(token, address(new WETH()), AUCTION_DURATION);
-        NounsAuctionHouseProxyAdmin admin = new NounsAuctionHouseProxyAdmin();
+        NijiAuctionHouseV3 logic = new NijiAuctionHouseV3(token, address(new WETH()), AUCTION_DURATION);
+        NijiAuctionHouseProxyAdmin admin = new NijiAuctionHouseProxyAdmin();
         admin.transferOwnership(owner);
 
         bytes memory data = abi.encodeWithSelector(
-            NounsAuctionHouseV3.initialize.selector,
+            NijiAuctionHouseV3.initialize.selector,
             AUCTION_RESERVE_PRICE,
             AUCTION_TIME_BUFFER,
             AUCTION_MIN_BID_INCREMENT_PRCT,
             new ChainalysisSanctionsListMock()
         );
-        NounsAuctionHouseProxy proxy = new NounsAuctionHouseProxy(address(logic), address(admin), data);
-        NounsAuctionHouseV3 auction = NounsAuctionHouseV3(address(proxy));
+        NijiAuctionHouseProxy proxy = new NijiAuctionHouseProxy(address(logic), address(admin), data);
+        NijiAuctionHouseV3 auction = NijiAuctionHouseV3(address(proxy));
 
         auction.transferOwnership(owner);
         token.setMinter(address(proxy));

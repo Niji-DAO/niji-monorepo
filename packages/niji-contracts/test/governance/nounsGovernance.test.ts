@@ -19,7 +19,7 @@ import {
   address,
 } from '../utils';
 
-describe('Nouns Governance', () => {
+describe('Niji Governance', () => {
   let snapshotId: number;
   let token: NounsToken;
   let tokenCallFromGuy: NounsToken;
@@ -63,7 +63,7 @@ describe('Nouns Governance', () => {
       NounsDescriptorV3Factory.connect(await token.descriptor(), signers.deployer),
     );
 
-    domain = Domain('Nouns', await token.getAddress(), await chainId());
+    domain = Domain('Niji', await token.getAddress(), await chainId());
 
     tokenCallFromGuy = token.connect(signers.account0);
     tokenCallFromDeployer = token;

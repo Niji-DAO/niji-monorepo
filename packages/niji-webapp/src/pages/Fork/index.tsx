@@ -23,7 +23,7 @@ import {
   useForkThreshold,
   useForkThresholdBPS,
   useNumTokensInForkEscrow,
-} from '@/wrappers/nounsDao';
+} from '@/wrappers/nijiDao';
 import { useUserEscrowedNounIds, useUserOwnedNounIds } from '@/wrappers/nounToken';
 
 import NotFoundPage from '../NotFound';

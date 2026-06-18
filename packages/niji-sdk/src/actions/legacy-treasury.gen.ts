@@ -6,7 +6,7 @@ import {
 } from '@wagmi/core/codegen';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// NounsLegacyTreasury
+// NijiLegacyTreasury
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -214,7 +214,7 @@ export const nounsLegacyTreasuryConfig = {
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const readNounsLegacyTreasury = /*#__PURE__*/ createReadContract({
+export const readNijiLegacyTreasury = /*#__PURE__*/ createReadContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
 });
@@ -225,7 +225,7 @@ export const readNounsLegacyTreasury = /*#__PURE__*/ createReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const readNounsLegacyTreasuryGracePeriod = /*#__PURE__*/ createReadContract({
+export const readNijiLegacyTreasuryGracePeriod = /*#__PURE__*/ createReadContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'GRACE_PERIOD',
@@ -237,7 +237,7 @@ export const readNounsLegacyTreasuryGracePeriod = /*#__PURE__*/ createReadContra
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const readNounsLegacyTreasuryMaximumDelay = /*#__PURE__*/ createReadContract({
+export const readNijiLegacyTreasuryMaximumDelay = /*#__PURE__*/ createReadContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'MAXIMUM_DELAY',
@@ -249,7 +249,7 @@ export const readNounsLegacyTreasuryMaximumDelay = /*#__PURE__*/ createReadContr
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const readNounsLegacyTreasuryMinimumDelay = /*#__PURE__*/ createReadContract({
+export const readNijiLegacyTreasuryMinimumDelay = /*#__PURE__*/ createReadContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'MINIMUM_DELAY',
@@ -261,7 +261,7 @@ export const readNounsLegacyTreasuryMinimumDelay = /*#__PURE__*/ createReadContr
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const readNounsLegacyTreasuryAdmin = /*#__PURE__*/ createReadContract({
+export const readNijiLegacyTreasuryAdmin = /*#__PURE__*/ createReadContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'admin',
@@ -273,7 +273,7 @@ export const readNounsLegacyTreasuryAdmin = /*#__PURE__*/ createReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const readNounsLegacyTreasuryDelay = /*#__PURE__*/ createReadContract({
+export const readNijiLegacyTreasuryDelay = /*#__PURE__*/ createReadContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'delay',
@@ -285,7 +285,7 @@ export const readNounsLegacyTreasuryDelay = /*#__PURE__*/ createReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const readNounsLegacyTreasuryPendingAdmin = /*#__PURE__*/ createReadContract({
+export const readNijiLegacyTreasuryPendingAdmin = /*#__PURE__*/ createReadContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'pendingAdmin',
@@ -297,7 +297,7 @@ export const readNounsLegacyTreasuryPendingAdmin = /*#__PURE__*/ createReadContr
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const readNounsLegacyTreasuryQueuedTransactions = /*#__PURE__*/ createReadContract({
+export const readNijiLegacyTreasuryQueuedTransactions = /*#__PURE__*/ createReadContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'queuedTransactions',
@@ -309,7 +309,7 @@ export const readNounsLegacyTreasuryQueuedTransactions = /*#__PURE__*/ createRea
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const writeNounsLegacyTreasury = /*#__PURE__*/ createWriteContract({
+export const writeNijiLegacyTreasury = /*#__PURE__*/ createWriteContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
 });
@@ -320,7 +320,7 @@ export const writeNounsLegacyTreasury = /*#__PURE__*/ createWriteContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const writeNounsLegacyTreasuryAcceptAdmin = /*#__PURE__*/ createWriteContract({
+export const writeNijiLegacyTreasuryAcceptAdmin = /*#__PURE__*/ createWriteContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'acceptAdmin',
@@ -332,7 +332,7 @@ export const writeNounsLegacyTreasuryAcceptAdmin = /*#__PURE__*/ createWriteCont
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const writeNounsLegacyTreasuryCancelTransaction = /*#__PURE__*/ createWriteContract({
+export const writeNijiLegacyTreasuryCancelTransaction = /*#__PURE__*/ createWriteContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'cancelTransaction',
@@ -344,7 +344,7 @@ export const writeNounsLegacyTreasuryCancelTransaction = /*#__PURE__*/ createWri
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const writeNounsLegacyTreasuryExecuteTransaction = /*#__PURE__*/ createWriteContract({
+export const writeNijiLegacyTreasuryExecuteTransaction = /*#__PURE__*/ createWriteContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'executeTransaction',
@@ -356,7 +356,7 @@ export const writeNounsLegacyTreasuryExecuteTransaction = /*#__PURE__*/ createWr
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const writeNounsLegacyTreasuryQueueTransaction = /*#__PURE__*/ createWriteContract({
+export const writeNijiLegacyTreasuryQueueTransaction = /*#__PURE__*/ createWriteContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'queueTransaction',
@@ -368,7 +368,7 @@ export const writeNounsLegacyTreasuryQueueTransaction = /*#__PURE__*/ createWrit
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const writeNounsLegacyTreasurySetDelay = /*#__PURE__*/ createWriteContract({
+export const writeNijiLegacyTreasurySetDelay = /*#__PURE__*/ createWriteContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'setDelay',
@@ -380,7 +380,7 @@ export const writeNounsLegacyTreasurySetDelay = /*#__PURE__*/ createWriteContrac
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const writeNounsLegacyTreasurySetPendingAdmin = /*#__PURE__*/ createWriteContract({
+export const writeNijiLegacyTreasurySetPendingAdmin = /*#__PURE__*/ createWriteContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'setPendingAdmin',
@@ -392,7 +392,7 @@ export const writeNounsLegacyTreasurySetPendingAdmin = /*#__PURE__*/ createWrite
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const simulateNounsLegacyTreasury = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiLegacyTreasury = /*#__PURE__*/ createSimulateContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
 });
@@ -403,7 +403,7 @@ export const simulateNounsLegacyTreasury = /*#__PURE__*/ createSimulateContract(
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const simulateNounsLegacyTreasuryAcceptAdmin = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiLegacyTreasuryAcceptAdmin = /*#__PURE__*/ createSimulateContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'acceptAdmin',
@@ -415,7 +415,7 @@ export const simulateNounsLegacyTreasuryAcceptAdmin = /*#__PURE__*/ createSimula
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const simulateNounsLegacyTreasuryCancelTransaction = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiLegacyTreasuryCancelTransaction = /*#__PURE__*/ createSimulateContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'cancelTransaction',
@@ -427,7 +427,7 @@ export const simulateNounsLegacyTreasuryCancelTransaction = /*#__PURE__*/ create
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const simulateNounsLegacyTreasuryExecuteTransaction = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiLegacyTreasuryExecuteTransaction = /*#__PURE__*/ createSimulateContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'executeTransaction',
@@ -439,7 +439,7 @@ export const simulateNounsLegacyTreasuryExecuteTransaction = /*#__PURE__*/ creat
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const simulateNounsLegacyTreasuryQueueTransaction = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiLegacyTreasuryQueueTransaction = /*#__PURE__*/ createSimulateContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'queueTransaction',
@@ -451,7 +451,7 @@ export const simulateNounsLegacyTreasuryQueueTransaction = /*#__PURE__*/ createS
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const simulateNounsLegacyTreasurySetDelay = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiLegacyTreasurySetDelay = /*#__PURE__*/ createSimulateContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'setDelay',
@@ -463,7 +463,7 @@ export const simulateNounsLegacyTreasurySetDelay = /*#__PURE__*/ createSimulateC
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const simulateNounsLegacyTreasurySetPendingAdmin = /*#__PURE__*/ createSimulateContract({
+export const simulateNijiLegacyTreasurySetPendingAdmin = /*#__PURE__*/ createSimulateContract({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   functionName: 'setPendingAdmin',
@@ -475,7 +475,7 @@ export const simulateNounsLegacyTreasurySetPendingAdmin = /*#__PURE__*/ createSi
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const watchNounsLegacyTreasuryEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchNijiLegacyTreasuryEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
 });
@@ -486,7 +486,7 @@ export const watchNounsLegacyTreasuryEvent = /*#__PURE__*/ createWatchContractEv
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const watchNounsLegacyTreasuryCancelTransactionEvent =
+export const watchNijiLegacyTreasuryCancelTransactionEvent =
   /*#__PURE__*/ createWatchContractEvent({
     abi: nounsLegacyTreasuryAbi,
     address: nounsLegacyTreasuryAddress,
@@ -499,7 +499,7 @@ export const watchNounsLegacyTreasuryCancelTransactionEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const watchNounsLegacyTreasuryExecuteTransactionEvent =
+export const watchNijiLegacyTreasuryExecuteTransactionEvent =
   /*#__PURE__*/ createWatchContractEvent({
     abi: nounsLegacyTreasuryAbi,
     address: nounsLegacyTreasuryAddress,
@@ -512,7 +512,7 @@ export const watchNounsLegacyTreasuryExecuteTransactionEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const watchNounsLegacyTreasuryNewAdminEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchNijiLegacyTreasuryNewAdminEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   eventName: 'NewAdmin',
@@ -524,7 +524,7 @@ export const watchNounsLegacyTreasuryNewAdminEvent = /*#__PURE__*/ createWatchCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const watchNounsLegacyTreasuryNewDelayEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchNijiLegacyTreasuryNewDelayEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   eventName: 'NewDelay',
@@ -536,7 +536,7 @@ export const watchNounsLegacyTreasuryNewDelayEvent = /*#__PURE__*/ createWatchCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const watchNounsLegacyTreasuryNewPendingAdminEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchNijiLegacyTreasuryNewPendingAdminEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: nounsLegacyTreasuryAbi,
   address: nounsLegacyTreasuryAddress,
   eventName: 'NewPendingAdmin',
@@ -548,7 +548,7 @@ export const watchNounsLegacyTreasuryNewPendingAdminEvent = /*#__PURE__*/ create
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0BC3807Ec262cB779b38D65b38158acC3bfedE10)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x332db58b51393f3a6b28d4DD8964234967e1aD33)
  */
-export const watchNounsLegacyTreasuryQueueTransactionEvent = /*#__PURE__*/ createWatchContractEvent(
+export const watchNijiLegacyTreasuryQueueTransactionEvent = /*#__PURE__*/ createWatchContractEvent(
   {
     abi: nounsLegacyTreasuryAbi,
     address: nounsLegacyTreasuryAddress,

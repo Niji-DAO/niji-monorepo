@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import clsx from 'clsx';
 
-import { CandidateSignature } from '@/wrappers/nounsData';
+import { CandidateSignature } from '@/wrappers/nijiData';
 import { useDelegateNounsAtBlockQuery } from '@/wrappers/nounToken';
 
 import CandidateSponsorImage from './CandidateSponsorImage';

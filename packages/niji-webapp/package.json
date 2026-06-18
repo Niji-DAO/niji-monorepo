@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prebuild": "is-ci && exit 0 || (wagmi generate && graphql-codegen-esm --config codegen.config.ts)",
+    "prebuild": "is-ci && exit 0 || (([ -n \"$VITE_ETHERSCAN_API_KEY\" ] && wagmi generate) || true) && (([ -n \"$VITE_SEPOLIA_SUBGRAPH\" ] && graphql-codegen-esm --config codegen.config.ts) || true)",
     "build": "tsc -b && vite build",
     "check": "tsc --noEmit --skipLibCheck",
     "clean": "rimraf dist .netlify",

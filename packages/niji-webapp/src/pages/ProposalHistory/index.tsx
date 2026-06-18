@@ -18,7 +18,7 @@ import ProposalTransactionsDiffs from '@/components/ProposalContent/ProposalTran
 import ProposalStatus from '@/components/ProposalStatus';
 import Section from '@/layout/Section';
 import { processProposalDescriptionText } from '@/utils/processProposalDescriptionText';
-import { useProposal, useProposalVersions } from '@/wrappers/nounsDao';
+import { useProposal, useProposalVersions } from '@/wrappers/nijiDao';
 
 import VersionTab from './VersionTab';
 import classes from './Vote.module.css';

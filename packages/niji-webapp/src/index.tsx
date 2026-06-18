@@ -19,12 +19,12 @@ import { execute } from '@/subgraphs/execute';
 import App from './App';
 import { CHAIN_ID } from './config';
 import {
-  nounsAuctionHouseAddress,
-  useReadNounsAuctionHouseAuction,
-  useWatchNounsAuctionHouseAuctionBidEvent,
-  useWatchNounsAuctionHouseAuctionCreatedEvent,
-  useWatchNounsAuctionHouseAuctionExtendedEvent,
-  useWatchNounsAuctionHouseAuctionSettledEvent,
+  nijiAuctionHouseAddress,
+  useReadNijiAuctionHouseAuction,
+  useWatchNijiAuctionHouseAuctionBidEvent,
+  useWatchNijiAuctionHouseAuctionCreatedEvent,
+  useWatchNijiAuctionHouseAuctionExtendedEvent,
+  useWatchNijiAuctionHouseAuctionSettledEvent,
 } from './contracts';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { LanguageProvider } from './i18n/LanguageProvider';
@@ -53,7 +53,7 @@ const ChainSubscriber: React.FC = () => {
   const chainId = defaultChain.id;
 
   // Fetch the current auction
-  const { data: currentAuction } = useReadNounsAuctionHouseAuction();
+  const { data: currentAuction } = useReadNijiAuctionHouseAuction();
   useEffect(() => {
     if (currentAuction) {
       dispatch(setFullAuction(reduxSafeAuction(currentAuction)));
@@ -71,7 +71,7 @@ const ChainSubscriber: React.FC = () => {
       const fromBlock = latestBlock.number > 7200n ? latestBlock.number - 7200n : 0n;
 
       const logs = await publicClient.getLogs({
-        address: nounsAuctionHouseAddress[chainId],
+        address: nijiAuctionHouseAddress[chainId],
         event: parseAbiItem(
           'event AuctionBid(uint256 indexed nounId, address sender, uint256 value, bool extended)',
         ),
@@ -108,7 +108,7 @@ const ChainSubscriber: React.FC = () => {
   }, [chainId, dispatch, publicClient]);
 
   // Watch for new bids
-  useWatchNounsAuctionHouseAuctionBidEvent({
+  useWatchNijiAuctionHouseAuctionBidEvent({
     onLogs: async logs => {
       for (const {
         args: { extended, nounId, sender, value },
@@ -139,7 +139,7 @@ const ChainSubscriber: React.FC = () => {
   });
 
   // Watch for new auction creation events
-  useWatchNounsAuctionHouseAuctionCreatedEvent({
+  useWatchNijiAuctionHouseAuctionCreatedEvent({
     onLogs: logs => {
       for (const log of logs) {
         const { startTime, endTime, nounId } = log.args;
@@ -162,7 +162,7 @@ const ChainSubscriber: React.FC = () => {
   });
 
   // Watch for new auction extended events
-  useWatchNounsAuctionHouseAuctionExtendedEvent({
+  useWatchNijiAuctionHouseAuctionExtendedEvent({
     onLogs: logs => {
       for (const log of logs) {
         const { endTime, nounId } = log.args;
@@ -177,7 +177,7 @@ const ChainSubscriber: React.FC = () => {
   });
 
   // Watch for auction settlement events
-  useWatchNounsAuctionHouseAuctionSettledEvent({
+  useWatchNijiAuctionHouseAuctionSettledEvent({
     onLogs: logs => {
       for (const log of logs) {
         const { amount, winner, nounId } = log.args;

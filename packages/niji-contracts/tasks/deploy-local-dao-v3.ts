@@ -1,9 +1,9 @@
 import { Contract as EthersContract, Interface, parseUnits } from 'ethers';
 import { task, types } from 'hardhat/config';
 
-import { default as NounsDaoDataABI } from '../abi/contracts/governance/data/NounsDAOData.sol/NounsDAOData.json';
-import { default as NounsDAOExecutorV2ABI } from '../abi/contracts/governance/NounsDAOExecutorV2.sol/NounsDAOExecutorV2.json';
-import { default as NounsAuctionHouseABI } from '../abi/contracts/NounsAuctionHouse.sol/NounsAuctionHouse.json';
+import { default as NijiDaoDataABI } from '../abi/contracts/governance/data/NijiDAOData.sol/NijiDAOData.json';
+import { default as NijiDAOExecutorV2ABI } from '../abi/contracts/governance/NijiDAOExecutorV2.sol/NijiDAOExecutorV2.json';
+import { default as NijiAuctionHouseABI } from '../abi/contracts/NijiAuctionHouse.sol/NijiAuctionHouse.json';
 
 import { ContractNamesDAOV3 } from './types';
 
@@ -81,7 +81,7 @@ task('deploy-local-dao-v3', 'Deploy contracts to hardhat')
       from: deployer.address,
       nonce: nonce + NOUNS_ART_NONCE_OFFSET,
     });
-    const expectedNounsDAOProxyAddress = ethers.getCreateAddress({
+    const expectedNijiDAOProxyAddress = ethers.getCreateAddress({
       from: deployer.address,
       nonce: nonce + GOVERNOR_N_DELEGATOR_NONCE_OFFSET,
     });
@@ -116,16 +116,16 @@ task('deploy-local-dao-v3', 'Deploy contracts to hardhat')
           proxyRegistryAddress,
         ],
       },
-      NounsAuctionHouse: {
+      NijiAuctionHouse: {
         waitForConfirmation: true,
       },
-      NounsAuctionHouseProxyAdmin: {},
-      NounsAuctionHouseProxy: {
+      NijiAuctionHouseProxyAdmin: {},
+      NijiAuctionHouseProxy: {
         args: [
-          () => contracts.NounsAuctionHouse.instance?.target as string,
-          () => contracts.NounsAuctionHouseProxyAdmin.instance?.target as string,
+          () => contracts.NijiAuctionHouse.instance?.target as string,
+          () => contracts.NijiAuctionHouseProxyAdmin.instance?.target as string,
           () =>
-            new Interface(NounsAuctionHouseABI).encodeFunctionData('initialize', [
+            new Interface(NijiAuctionHouseABI).encodeFunctionData('initialize', [
               contracts.NounsToken.instance?.target as string,
               contracts.WETH.instance?.target as string,
               args.auctionTimeBuffer,
@@ -135,34 +135,34 @@ task('deploy-local-dao-v3', 'Deploy contracts to hardhat')
             ]),
         ],
       },
-      NounsDAODynamicQuorum: {},
-      NounsDAOAdmin: {},
-      NounsDAOProposals: {},
-      NounsDAOVotes: {},
-      NounsDAOFork: {},
-      NounsDAOLogicV4: {
+      NijiDAODynamicQuorum: {},
+      NijiDAOAdmin: {},
+      NijiDAOProposals: {},
+      NijiDAOVotes: {},
+      NijiDAOFork: {},
+      NijiDAOLogicV4: {
         libraries: () => ({
-          NounsDAOAdmin: contracts.NounsDAOAdmin.instance?.target as string,
-          NounsDAODynamicQuorum: contracts.NounsDAODynamicQuorum.instance?.target as string,
-          NounsDAOProposals: contracts.NounsDAOProposals.instance?.target as string,
-          NounsDAOVotes: contracts.NounsDAOVotes.instance?.target as string,
-          NounsDAOFork: contracts.NounsDAOFork.instance?.target as string,
+          NijiDAOAdmin: contracts.NijiDAOAdmin.instance?.target as string,
+          NijiDAODynamicQuorum: contracts.NijiDAODynamicQuorum.instance?.target as string,
+          NijiDAOProposals: contracts.NijiDAOProposals.instance?.target as string,
+          NijiDAOVotes: contracts.NijiDAOVotes.instance?.target as string,
+          NijiDAOFork: contracts.NijiDAOFork.instance?.target as string,
         }),
         waitForConfirmation: true,
       },
-      NounsDAOForkEscrow: {
-        args: [expectedNounsDAOProxyAddress, () => contracts.NounsToken.instance?.target as string],
+      NijiDAOForkEscrow: {
+        args: [expectedNijiDAOProxyAddress, () => contracts.NounsToken.instance?.target as string],
       },
       NounsTokenFork: {},
-      NounsAuctionHouseFork: {},
-      NounsDAOLogicV1Fork: {},
-      NounsDAOExecutorV2: {},
-      NounsDAOExecutorProxy: {
+      NijiAuctionHouseFork: {},
+      NijiDAOLogicV1Fork: {},
+      NijiDAOExecutorV2: {},
+      NijiDAOExecutorProxy: {
         args: [
-          () => contracts.NounsDAOExecutorV2.instance?.target as string,
+          () => contracts.NijiDAOExecutorV2.instance?.target as string,
           () =>
-            new Interface(NounsDAOExecutorV2ABI).encodeFunctionData('initialize', [
-              expectedNounsDAOProxyAddress,
+            new Interface(NijiDAOExecutorV2ABI).encodeFunctionData('initialize', [
+              expectedNijiDAOProxyAddress,
               args.timelockDelay,
             ]),
         ],
@@ -170,9 +170,9 @@ task('deploy-local-dao-v3', 'Deploy contracts to hardhat')
       ForkDAODeployer: {
         args: [
           () => contracts.NounsTokenFork.instance?.target as string,
-          () => contracts.NounsAuctionHouseFork.instance?.target as string,
-          () => contracts.NounsDAOLogicV1Fork.instance?.target as string,
-          () => contracts.NounsDAOExecutorV2.instance?.target as string,
+          () => contracts.NijiAuctionHouseFork.instance?.target as string,
+          () => contracts.NijiDAOLogicV1Fork.instance?.target as string,
+          () => contracts.NijiDAOExecutorV2.instance?.target as string,
           60 * 60 * 24 * 30, // 30 days
           36000,
           36000,
@@ -180,15 +180,15 @@ task('deploy-local-dao-v3', 'Deploy contracts to hardhat')
           1000,
         ],
       },
-      NounsDAOProxyV3: {
+      NijiDAOProxyV3: {
         args: [
-          () => contracts.NounsDAOExecutorProxy.instance?.target as string, // timelock
+          () => contracts.NijiDAOExecutorProxy.instance?.target as string, // timelock
           () => contracts.NounsToken.instance?.target as string, // token
-          () => contracts.NounsDAOForkEscrow.instance?.target as string, // forkEscrow
+          () => contracts.NijiDAOForkEscrow.instance?.target as string, // forkEscrow
           () => contracts.ForkDAODeployer.instance?.target as string, // forkDAODeployer
           args.noundersdao || deployer.address, // vetoer
-          () => contracts.NounsDAOExecutorProxy.instance?.target as string, // admin
-          () => contracts.NounsDAOLogicV4.instance?.target as string, // implementation
+          () => contracts.NijiDAOExecutorProxy.instance?.target as string, // admin
+          () => contracts.NijiDAOLogicV4.instance?.target as string, // implementation
           {
             votingPeriod: args.votingPeriod,
             votingDelay: args.votingDelay,
@@ -206,19 +206,19 @@ task('deploy-local-dao-v3', 'Deploy contracts to hardhat')
         waitForConfirmation: true,
       },
       Multicall2: {},
-      NounsDAOData: {
-        args: [() => contracts.NounsToken.instance?.target as string, expectedNounsDAOProxyAddress],
+      NijiDAOData: {
+        args: [() => contracts.NounsToken.instance?.target as string, expectedNijiDAOProxyAddress],
         waitForConfirmation: true,
       },
-      NounsDAODataProxy: {
+      NijiDAODataProxy: {
         args: [
-          () => contracts.NounsDAOData.instance?.target as string,
+          () => contracts.NijiDAOData.instance?.target as string,
           () =>
-            new Interface(NounsDaoDataABI).encodeFunctionData('initialize', [
-              contracts.NounsDAOExecutorProxy.instance?.target as string,
+            new Interface(NijiDaoDataABI).encodeFunctionData('initialize', [
+              contracts.NijiDAOExecutorProxy.instance?.target as string,
               args.createCandidateCost,
               args.updateCandidateCost,
-              expectedNounsDAOProxyAddress,
+              expectedNijiDAOProxyAddress,
             ]),
         ],
       },
@@ -250,7 +250,7 @@ task('deploy-local-dao-v3', 'Deploy contracts to hardhat')
       throw 'wrong address';
     }
 
-    const actualAuctionHouseProxyAddress = contracts.NounsAuctionHouseProxy.instance
+    const actualAuctionHouseProxyAddress = contracts.NijiAuctionHouseProxy.instance
       ?.target as string;
     if (expectedAuctionHouseProxyAddress !== actualAuctionHouseProxyAddress) {
       console.log(
@@ -259,10 +259,10 @@ task('deploy-local-dao-v3', 'Deploy contracts to hardhat')
       throw 'wrong address';
     }
 
-    const actualNounsDAOProxyAddress = contracts.NounsDAOProxyV3.instance?.target as string;
-    if (expectedNounsDAOProxyAddress !== actualNounsDAOProxyAddress) {
+    const actualNijiDAOProxyAddress = contracts.NijiDAOProxyV3.instance?.target as string;
+    if (expectedNijiDAOProxyAddress !== actualNijiDAOProxyAddress) {
       console.log(
-        `wrong dao proxy address expected: ${expectedNounsDAOProxyAddress} actual: ${actualNounsDAOProxyAddress}`,
+        `wrong dao proxy address expected: ${expectedNijiDAOProxyAddress} actual: ${actualNijiDAOProxyAddress}`,
       );
       throw 'wrong address';
     }

@@ -6,20 +6,20 @@ import 'forge-std/Test.sol';
 import { DeployUtilsFork } from '../../helpers/DeployUtilsFork.sol';
 import { NounsToken } from '../../../../contracts/NounsToken.sol';
 import { NounsTokenFork } from '../../../../contracts/governance/fork/newdao/token/NounsTokenFork.sol';
-import { NounsDAOExecutorV2 } from '../../../../contracts/governance/NounsDAOExecutorV2.sol';
-import { NounsDAOLogicV1Fork } from '../../../../contracts/governance/fork/newdao/governance/NounsDAOLogicV1Fork.sol';
-import { NounsAuctionHouseFork } from '../../../../contracts/governance/fork/newdao/NounsAuctionHouseFork.sol';
-import { NounsTokenLike } from '../../../../contracts/governance/NounsDAOInterfaces.sol';
-import { INounsAuctionHouse } from '../../../../contracts/interfaces/INounsAuctionHouse.sol';
-import { INounsDAOLogic } from '../../../../contracts/interfaces/INounsDAOLogic.sol';
+import { NijiDAOExecutorV2 } from '../../../../contracts/governance/NijiDAOExecutorV2.sol';
+import { NijiDAOLogicV1Fork } from '../../../../contracts/governance/fork/newdao/governance/NijiDAOLogicV1Fork.sol';
+import { NijiAuctionHouseFork } from '../../../../contracts/governance/fork/newdao/NijiAuctionHouseFork.sol';
+import { NijiTokenLike } from '../../../../contracts/governance/NijiDAOInterfaces.sol';
+import { INijiAuctionHouse } from '../../../../contracts/interfaces/INijiAuctionHouse.sol';
+import { INijiDAOLogic } from '../../../../contracts/interfaces/INijiDAOLogic.sol';
 
 contract ForkingHappyFlowTest is DeployUtilsFork {
     address minter;
-    INounsDAOLogic daoV3;
+    INijiDAOLogic daoV3;
     NounsToken ogToken;
     NounsTokenFork forkToken;
-    NounsDAOExecutorV2 forkTreasury;
-    NounsDAOLogicV1Fork forkDAO;
+    NijiDAOExecutorV2 forkTreasury;
+    NijiDAOLogicV1Fork forkDAO;
 
     address nounerInEscrow1 = makeAddr('nouner in escrow 1');
     address nounerInEscrow2 = makeAddr('nouner in escrow 2');
@@ -32,7 +32,7 @@ contract ForkingHappyFlowTest is DeployUtilsFork {
         daoV3 = _deployDAOV3();
         ogToken = NounsToken(address(daoV3.nouns()));
         minter = ogToken.minter();
-        dealNouns();
+        dealNiji();
         // Sending the DAO ETH that will be sent to the fork treasury and a key assertion for this test.
         vm.deal(address(daoV3.timelock()), 24 ether);
 
@@ -45,17 +45,17 @@ contract ForkingHappyFlowTest is DeployUtilsFork {
 
         // Execute the fork and get contract addresses for DAO, treasury and token.
         (address forkTreasuryAddress, address forkTokenAddress) = daoV3.executeFork();
-        forkTreasury = NounsDAOExecutorV2(payable(forkTreasuryAddress));
+        forkTreasury = NijiDAOExecutorV2(payable(forkTreasuryAddress));
         forkToken = NounsTokenFork(forkTokenAddress);
-        forkDAO = NounsDAOLogicV1Fork(forkTreasury.admin());
+        forkDAO = NijiDAOLogicV1Fork(forkTreasury.admin());
 
         // Assert the fork treasury has the expected balance, which is the pro rata ETH of the two Nouner accounts that
-        // escrowed above. They have 4 Nouns out of a total supply of 12, so a third. DAO balance was 24 ETH, a third
+        // escrowed above. They have 4 Niji out of a total supply of 12, so a third. DAO balance was 24 ETH, a third
         // of that is 8 ETH.
         assertEqUint(forkTreasuryAddress.balance, 8 ether);
 
         // Governance is blocked during forking period
-        vm.expectRevert(NounsDAOLogicV1Fork.GovernanceBlockedDuringForkingPeriod.selector);
+        vm.expectRevert(NijiDAOLogicV1Fork.GovernanceBlockedDuringForkingPeriod.selector);
         proposeToFork(makeAddr('target'), 0, 'signature', 'data');
 
         // Two additional Nouners join the fork during the forking period.
@@ -69,10 +69,10 @@ contract ForkingHappyFlowTest is DeployUtilsFork {
         // Asserting that delayed governance is working - no one should be able to propose until all fork tokens have
         // been claimed, or until the delay period expires.
         // Later in this test we make sure we CAN propose once all tokens have been claimed.
-        vm.expectRevert(NounsDAOLogicV1Fork.WaitingForTokensToClaimOrExpiration.selector);
+        vm.expectRevert(NijiDAOLogicV1Fork.WaitingForTokensToClaimOrExpiration.selector);
         proposeToFork(makeAddr('target'), 0, 'signature', 'data');
 
-        // Asserting the expected ETH amount was sent. We're now at two thirds of OG Nouns forking, so we expect
+        // Asserting the expected ETH amount was sent. We're now at two thirds of OG Niji forking, so we expect
         // two thirds of the ETH to be sent, which is 16 out of the original 24.
         assertEqUint(forkTreasuryAddress.balance, 16 ether);
 
@@ -80,7 +80,7 @@ contract ForkingHappyFlowTest is DeployUtilsFork {
         // so the next balance assertion is clearly new ETH they received from quitting the fork DAO.
         assertEqUint(nounerInEscrow1.balance, 0);
 
-        // The Nouners that originally escrowed their Nouns, now claiming their new fork tokens.
+        // The Nouners that originally escrowed their Niji, now claiming their new fork tokens.
         vm.prank(nounerInEscrow1);
         forkToken.claimFromEscrow(tokensInEscrow1);
         vm.prank(nounerInEscrow2);
@@ -99,7 +99,7 @@ contract ForkingHappyFlowTest is DeployUtilsFork {
         assertEqUint(nounerInEscrow1.balance, 4 ether);
     }
 
-    function dealNouns() internal {
+    function dealNiji() internal {
         address nounders = ogToken.noundersDAO();
         vm.startPrank(minter);
         for (uint256 i = 0; i < 10; i++) {
@@ -170,12 +170,12 @@ contract ForkingHappyFlowTest is DeployUtilsFork {
 }
 
 abstract contract ForkDAOBase is DeployUtilsFork {
-    INounsDAOLogic originalDAO;
-    NounsTokenLike originalToken;
-    NounsDAOLogicV1Fork forkDAO;
-    NounsDAOExecutorV2 forkTreasury;
+    INijiDAOLogic originalDAO;
+    NijiTokenLike originalToken;
+    NijiDAOLogicV1Fork forkDAO;
+    NijiDAOExecutorV2 forkTreasury;
     NounsTokenFork forkToken;
-    NounsAuctionHouseFork forkAuction;
+    NijiAuctionHouseFork forkAuction;
 
     address originalNouner = makeAddr('original nouner');
     address newNouner = makeAddr('new nouner');
@@ -187,7 +187,7 @@ abstract contract ForkDAOBase is DeployUtilsFork {
         originalToken = originalDAO.nouns();
         address originalMinter = originalToken.minter();
         vm.startPrank(address(originalDAO.timelock()));
-        NounsAuctionHouseFork(originalMinter).unpause();
+        NijiAuctionHouseFork(originalMinter).unpause();
         vm.stopPrank();
 
         vm.deal(originalNouner, 1 ether);
@@ -205,10 +205,10 @@ abstract contract ForkDAOBase is DeployUtilsFork {
 
         (address treasuryAddress, address tokenAddress) = originalDAO.executeFork();
 
-        forkTreasury = NounsDAOExecutorV2(payable(treasuryAddress));
-        forkDAO = NounsDAOLogicV1Fork(forkTreasury.admin());
+        forkTreasury = NijiDAOExecutorV2(payable(treasuryAddress));
+        forkDAO = NijiDAOLogicV1Fork(forkTreasury.admin());
         forkToken = NounsTokenFork(tokenAddress);
-        forkAuction = NounsAuctionHouseFork(forkToken.minter());
+        forkAuction = NijiAuctionHouseFork(forkToken.minter());
 
         forkToken.claimFromEscrow(tokenIds);
         vm.stopPrank();
@@ -220,12 +220,12 @@ abstract contract ForkDAOBase is DeployUtilsFork {
     }
 
     function bidAndSettleOriginalAuction(address buyer) internal {
-        bidAndSettleAuction(NounsAuctionHouseFork(originalToken.minter()), buyer);
+        bidAndSettleAuction(NijiAuctionHouseFork(originalToken.minter()), buyer);
     }
 
-    function bidAndSettleAuction(NounsAuctionHouseFork auctionHouse, address buyer) internal {
+    function bidAndSettleAuction(NijiAuctionHouseFork auctionHouse, address buyer) internal {
         vm.startPrank(buyer);
-        INounsAuctionHouse.Auction memory auction = getAuction(auctionHouse);
+        INijiAuctionHouse.Auction memory auction = getAuction(auctionHouse);
         uint256 newNounId = auction.nounId;
         auctionHouse.createBid{ value: 0.1 ether }(newNounId);
         vm.warp(block.timestamp + auction.endTime);
@@ -235,7 +235,7 @@ abstract contract ForkDAOBase is DeployUtilsFork {
         vm.stopPrank();
     }
 
-    function getAuction(NounsAuctionHouseFork auctionHouse) internal view returns (INounsAuctionHouse.Auction memory) {
+    function getAuction(NijiAuctionHouseFork auctionHouse) internal view returns (INijiAuctionHouse.Auction memory) {
         (
             uint256 nounId,
             uint256 amount,
@@ -245,7 +245,7 @@ abstract contract ForkDAOBase is DeployUtilsFork {
             bool settled
         ) = auctionHouse.auction();
 
-        return INounsAuctionHouse.Auction(nounId, amount, startTime, endTime, bidder, settled);
+        return INijiAuctionHouse.Auction(nounId, amount, startTime, endTime, bidder, settled);
     }
 
     function proposeToForkAndRollToVoting(
@@ -327,7 +327,7 @@ contract ForkDAOCanUpgradeItsTokenTest is ForkDAOPostForkingPeriodBase {
     }
 }
 
-contract ForkDAO_PostFork_NewOGNounsJoin is ForkDAOBase {
+contract ForkDAO_PostFork_NewOGNijiJoin is ForkDAOBase {
     function test_forkAuctionHouseUnpauseWorks() public {
         // buy new nouns on auction
         bidAndSettleOriginalAuction(joiningNouner);

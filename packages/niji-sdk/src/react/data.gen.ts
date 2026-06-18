@@ -6,7 +6,7 @@ import {
 } from 'wagmi/codegen';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// NounsData
+// NijiData
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -508,7 +508,7 @@ export const nounsDataConfig = { address: nounsDataAddress, abi: nounsDataAbi } 
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useReadNounsData = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiData = /*#__PURE__*/ createUseReadContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
 });
@@ -519,7 +519,7 @@ export const useReadNounsData = /*#__PURE__*/ createUseReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useReadNounsDataPriorVotesBlocksAgo = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiDataPriorVotesBlocksAgo = /*#__PURE__*/ createUseReadContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'PRIOR_VOTES_BLOCKS_AGO',
@@ -531,7 +531,7 @@ export const useReadNounsDataPriorVotesBlocksAgo = /*#__PURE__*/ createUseReadCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useReadNounsDataCreateCandidateCost = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiDataCreateCandidateCost = /*#__PURE__*/ createUseReadContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'createCandidateCost',
@@ -543,7 +543,7 @@ export const useReadNounsDataCreateCandidateCost = /*#__PURE__*/ createUseReadCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useReadNounsDataDunaAdmin = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiDataDunaAdmin = /*#__PURE__*/ createUseReadContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'dunaAdmin',
@@ -555,7 +555,7 @@ export const useReadNounsDataDunaAdmin = /*#__PURE__*/ createUseReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useReadNounsDataFeeRecipient = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiDataFeeRecipient = /*#__PURE__*/ createUseReadContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'feeRecipient',
@@ -567,7 +567,7 @@ export const useReadNounsDataFeeRecipient = /*#__PURE__*/ createUseReadContract(
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useReadNounsDataNounsDao = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiDataNounsDao = /*#__PURE__*/ createUseReadContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'nounsDao',
@@ -579,7 +579,7 @@ export const useReadNounsDataNounsDao = /*#__PURE__*/ createUseReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useReadNounsDataNounsToken = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiDataNounsToken = /*#__PURE__*/ createUseReadContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'nounsToken',
@@ -591,7 +591,7 @@ export const useReadNounsDataNounsToken = /*#__PURE__*/ createUseReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useReadNounsDataOwner = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiDataOwner = /*#__PURE__*/ createUseReadContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'owner',
@@ -603,7 +603,7 @@ export const useReadNounsDataOwner = /*#__PURE__*/ createUseReadContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useReadNounsDataPropCandidates = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiDataPropCandidates = /*#__PURE__*/ createUseReadContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'propCandidates',
@@ -615,7 +615,7 @@ export const useReadNounsDataPropCandidates = /*#__PURE__*/ createUseReadContrac
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useReadNounsDataUpdateCandidateCost = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiDataUpdateCandidateCost = /*#__PURE__*/ createUseReadContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'updateCandidateCost',
@@ -627,7 +627,7 @@ export const useReadNounsDataUpdateCandidateCost = /*#__PURE__*/ createUseReadCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsData = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiData = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
 });
@@ -638,7 +638,7 @@ export const useWriteNounsData = /*#__PURE__*/ createUseWriteContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataAddSignature = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataAddSignature = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'addSignature',
@@ -650,7 +650,7 @@ export const useWriteNounsDataAddSignature = /*#__PURE__*/ createUseWriteContrac
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataCancelProposalCandidate = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataCancelProposalCandidate = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'cancelProposalCandidate',
@@ -662,7 +662,7 @@ export const useWriteNounsDataCancelProposalCandidate = /*#__PURE__*/ createUseW
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataCreateProposalCandidate = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataCreateProposalCandidate = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'createProposalCandidate',
@@ -674,7 +674,7 @@ export const useWriteNounsDataCreateProposalCandidate = /*#__PURE__*/ createUseW
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataInitialize = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataInitialize = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'initialize',
@@ -686,7 +686,7 @@ export const useWriteNounsDataInitialize = /*#__PURE__*/ createUseWriteContract(
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataPostDunaAdminMessage = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataPostDunaAdminMessage = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'postDunaAdminMessage',
@@ -698,7 +698,7 @@ export const useWriteNounsDataPostDunaAdminMessage = /*#__PURE__*/ createUseWrit
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataPostVoterMessageToDunaAdmin = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataPostVoterMessageToDunaAdmin = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'postVoterMessageToDunaAdmin',
@@ -710,7 +710,7 @@ export const useWriteNounsDataPostVoterMessageToDunaAdmin = /*#__PURE__*/ create
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'renounceOwnership',
@@ -722,7 +722,7 @@ export const useWriteNounsDataRenounceOwnership = /*#__PURE__*/ createUseWriteCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataSendCandidateFeedback = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataSendCandidateFeedback = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'sendCandidateFeedback',
@@ -734,7 +734,7 @@ export const useWriteNounsDataSendCandidateFeedback = /*#__PURE__*/ createUseWri
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataSendFeedback = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataSendFeedback = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'sendFeedback',
@@ -746,7 +746,7 @@ export const useWriteNounsDataSendFeedback = /*#__PURE__*/ createUseWriteContrac
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataSetCreateCandidateCost = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataSetCreateCandidateCost = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'setCreateCandidateCost',
@@ -758,7 +758,7 @@ export const useWriteNounsDataSetCreateCandidateCost = /*#__PURE__*/ createUseWr
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataSetDunaAdmin = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataSetDunaAdmin = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'setDunaAdmin',
@@ -770,7 +770,7 @@ export const useWriteNounsDataSetDunaAdmin = /*#__PURE__*/ createUseWriteContrac
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataSetFeeRecipient = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataSetFeeRecipient = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'setFeeRecipient',
@@ -782,7 +782,7 @@ export const useWriteNounsDataSetFeeRecipient = /*#__PURE__*/ createUseWriteCont
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataSetUpdateCandidateCost = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataSetUpdateCandidateCost = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'setUpdateCandidateCost',
@@ -794,7 +794,7 @@ export const useWriteNounsDataSetUpdateCandidateCost = /*#__PURE__*/ createUseWr
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataSignalProposalCompliance = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataSignalProposalCompliance = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'signalProposalCompliance',
@@ -806,7 +806,7 @@ export const useWriteNounsDataSignalProposalCompliance = /*#__PURE__*/ createUse
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataTransferOwnership = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataTransferOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'transferOwnership',
@@ -818,7 +818,7 @@ export const useWriteNounsDataTransferOwnership = /*#__PURE__*/ createUseWriteCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataUpdateProposalCandidate = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataUpdateProposalCandidate = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'updateProposalCandidate',
@@ -830,7 +830,7 @@ export const useWriteNounsDataUpdateProposalCandidate = /*#__PURE__*/ createUseW
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataUpgradeTo = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataUpgradeTo = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'upgradeTo',
@@ -842,7 +842,7 @@ export const useWriteNounsDataUpgradeTo = /*#__PURE__*/ createUseWriteContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataUpgradeToAndCall = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataUpgradeToAndCall = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'upgradeToAndCall',
@@ -854,7 +854,7 @@ export const useWriteNounsDataUpgradeToAndCall = /*#__PURE__*/ createUseWriteCon
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWriteNounsDataWithdrawEth = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiDataWithdrawEth = /*#__PURE__*/ createUseWriteContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'withdrawETH',
@@ -866,7 +866,7 @@ export const useWriteNounsDataWithdrawEth = /*#__PURE__*/ createUseWriteContract
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsData = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiData = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
 });
@@ -877,7 +877,7 @@ export const useSimulateNounsData = /*#__PURE__*/ createUseSimulateContract({
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataAddSignature = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataAddSignature = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'addSignature',
@@ -889,7 +889,7 @@ export const useSimulateNounsDataAddSignature = /*#__PURE__*/ createUseSimulateC
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataCancelProposalCandidate = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataCancelProposalCandidate = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'cancelProposalCandidate',
@@ -901,7 +901,7 @@ export const useSimulateNounsDataCancelProposalCandidate = /*#__PURE__*/ createU
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataCreateProposalCandidate = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataCreateProposalCandidate = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'createProposalCandidate',
@@ -913,7 +913,7 @@ export const useSimulateNounsDataCreateProposalCandidate = /*#__PURE__*/ createU
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataInitialize = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataInitialize = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'initialize',
@@ -925,7 +925,7 @@ export const useSimulateNounsDataInitialize = /*#__PURE__*/ createUseSimulateCon
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataPostDunaAdminMessage = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataPostDunaAdminMessage = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'postDunaAdminMessage',
@@ -937,7 +937,7 @@ export const useSimulateNounsDataPostDunaAdminMessage = /*#__PURE__*/ createUseS
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataPostVoterMessageToDunaAdmin =
+export const useSimulateNijiDataPostVoterMessageToDunaAdmin =
   /*#__PURE__*/ createUseSimulateContract({
     abi: nounsDataAbi,
     address: nounsDataAddress,
@@ -950,7 +950,7 @@ export const useSimulateNounsDataPostVoterMessageToDunaAdmin =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'renounceOwnership',
@@ -962,7 +962,7 @@ export const useSimulateNounsDataRenounceOwnership = /*#__PURE__*/ createUseSimu
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataSendCandidateFeedback = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataSendCandidateFeedback = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'sendCandidateFeedback',
@@ -974,7 +974,7 @@ export const useSimulateNounsDataSendCandidateFeedback = /*#__PURE__*/ createUse
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataSendFeedback = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataSendFeedback = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'sendFeedback',
@@ -986,7 +986,7 @@ export const useSimulateNounsDataSendFeedback = /*#__PURE__*/ createUseSimulateC
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataSetCreateCandidateCost = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataSetCreateCandidateCost = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'setCreateCandidateCost',
@@ -998,7 +998,7 @@ export const useSimulateNounsDataSetCreateCandidateCost = /*#__PURE__*/ createUs
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataSetDunaAdmin = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataSetDunaAdmin = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'setDunaAdmin',
@@ -1010,7 +1010,7 @@ export const useSimulateNounsDataSetDunaAdmin = /*#__PURE__*/ createUseSimulateC
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataSetFeeRecipient = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataSetFeeRecipient = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'setFeeRecipient',
@@ -1022,7 +1022,7 @@ export const useSimulateNounsDataSetFeeRecipient = /*#__PURE__*/ createUseSimula
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataSetUpdateCandidateCost = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataSetUpdateCandidateCost = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'setUpdateCandidateCost',
@@ -1034,7 +1034,7 @@ export const useSimulateNounsDataSetUpdateCandidateCost = /*#__PURE__*/ createUs
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataSignalProposalCompliance = /*#__PURE__*/ createUseSimulateContract(
+export const useSimulateNijiDataSignalProposalCompliance = /*#__PURE__*/ createUseSimulateContract(
   { abi: nounsDataAbi, address: nounsDataAddress, functionName: 'signalProposalCompliance' },
 );
 
@@ -1044,7 +1044,7 @@ export const useSimulateNounsDataSignalProposalCompliance = /*#__PURE__*/ create
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'transferOwnership',
@@ -1056,7 +1056,7 @@ export const useSimulateNounsDataTransferOwnership = /*#__PURE__*/ createUseSimu
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataUpdateProposalCandidate = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataUpdateProposalCandidate = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'updateProposalCandidate',
@@ -1068,7 +1068,7 @@ export const useSimulateNounsDataUpdateProposalCandidate = /*#__PURE__*/ createU
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataUpgradeTo = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataUpgradeTo = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'upgradeTo',
@@ -1080,7 +1080,7 @@ export const useSimulateNounsDataUpgradeTo = /*#__PURE__*/ createUseSimulateCont
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataUpgradeToAndCall = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataUpgradeToAndCall = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'upgradeToAndCall',
@@ -1092,7 +1092,7 @@ export const useSimulateNounsDataUpgradeToAndCall = /*#__PURE__*/ createUseSimul
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useSimulateNounsDataWithdrawEth = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiDataWithdrawEth = /*#__PURE__*/ createUseSimulateContract({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   functionName: 'withdrawETH',
@@ -1104,7 +1104,7 @@ export const useSimulateNounsDataWithdrawEth = /*#__PURE__*/ createUseSimulateCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiDataEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsDataAbi,
   address: nounsDataAddress,
 });
@@ -1115,7 +1115,7 @@ export const useWatchNounsDataEvent = /*#__PURE__*/ createUseWatchContractEvent(
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataAdminChangedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiDataAdminChangedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   eventName: 'AdminChanged',
@@ -1127,7 +1127,7 @@ export const useWatchNounsDataAdminChangedEvent = /*#__PURE__*/ createUseWatchCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataBeaconUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiDataBeaconUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   eventName: 'BeaconUpgraded',
@@ -1139,7 +1139,7 @@ export const useWatchNounsDataBeaconUpgradedEvent = /*#__PURE__*/ createUseWatch
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataCandidateFeedbackSentEvent =
+export const useWatchNijiDataCandidateFeedbackSentEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsDataAbi,
     address: nounsDataAddress,
@@ -1152,7 +1152,7 @@ export const useWatchNounsDataCandidateFeedbackSentEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataCreateCandidateCostSetEvent =
+export const useWatchNijiDataCreateCandidateCostSetEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsDataAbi,
     address: nounsDataAddress,
@@ -1165,7 +1165,7 @@ export const useWatchNounsDataCreateCandidateCostSetEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataDunaAdminMessagePostedEvent =
+export const useWatchNijiDataDunaAdminMessagePostedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsDataAbi,
     address: nounsDataAddress,
@@ -1178,7 +1178,7 @@ export const useWatchNounsDataDunaAdminMessagePostedEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataDunaAdminSetEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiDataDunaAdminSetEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   eventName: 'DunaAdminSet',
@@ -1190,7 +1190,7 @@ export const useWatchNounsDataDunaAdminSetEvent = /*#__PURE__*/ createUseWatchCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataEthWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiDataEthWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   eventName: 'ETHWithdrawn',
@@ -1202,7 +1202,7 @@ export const useWatchNounsDataEthWithdrawnEvent = /*#__PURE__*/ createUseWatchCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataFeeRecipientSetEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiDataFeeRecipientSetEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   eventName: 'FeeRecipientSet',
@@ -1214,7 +1214,7 @@ export const useWatchNounsDataFeeRecipientSetEvent = /*#__PURE__*/ createUseWatc
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataFeedbackSentEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiDataFeedbackSentEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   eventName: 'FeedbackSent',
@@ -1226,7 +1226,7 @@ export const useWatchNounsDataFeedbackSentEvent = /*#__PURE__*/ createUseWatchCo
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataOwnershipTransferredEvent = /*#__PURE__*/ createUseWatchContractEvent(
+export const useWatchNijiDataOwnershipTransferredEvent = /*#__PURE__*/ createUseWatchContractEvent(
   { abi: nounsDataAbi, address: nounsDataAddress, eventName: 'OwnershipTransferred' },
 );
 
@@ -1236,7 +1236,7 @@ export const useWatchNounsDataOwnershipTransferredEvent = /*#__PURE__*/ createUs
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataProposalCandidateCanceledEvent =
+export const useWatchNijiDataProposalCandidateCanceledEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsDataAbi,
     address: nounsDataAddress,
@@ -1249,7 +1249,7 @@ export const useWatchNounsDataProposalCandidateCanceledEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataProposalCandidateCreatedEvent =
+export const useWatchNijiDataProposalCandidateCreatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsDataAbi,
     address: nounsDataAddress,
@@ -1262,7 +1262,7 @@ export const useWatchNounsDataProposalCandidateCreatedEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataProposalCandidateUpdatedEvent =
+export const useWatchNijiDataProposalCandidateUpdatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsDataAbi,
     address: nounsDataAddress,
@@ -1275,7 +1275,7 @@ export const useWatchNounsDataProposalCandidateUpdatedEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataProposalComplianceSignaledEvent =
+export const useWatchNijiDataProposalComplianceSignaledEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsDataAbi,
     address: nounsDataAddress,
@@ -1288,7 +1288,7 @@ export const useWatchNounsDataProposalComplianceSignaledEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataSignatureAddedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiDataSignatureAddedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   eventName: 'SignatureAdded',
@@ -1300,7 +1300,7 @@ export const useWatchNounsDataSignatureAddedEvent = /*#__PURE__*/ createUseWatch
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataUpdateCandidateCostSetEvent =
+export const useWatchNijiDataUpdateCandidateCostSetEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsDataAbi,
     address: nounsDataAddress,
@@ -1313,7 +1313,7 @@ export const useWatchNounsDataUpdateCandidateCostSetEvent =
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiDataUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nounsDataAbi,
   address: nounsDataAddress,
   eventName: 'Upgraded',
@@ -1325,7 +1325,7 @@ export const useWatchNounsDataUpgradedEvent = /*#__PURE__*/ createUseWatchContra
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xf790a5f59678dd733fb3de93493a91f472ca1365)
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x9040f720aa8a693f950b9cf94764b4b06079d002)
  */
-export const useWatchNounsDataVoterMessageToDunaAdminPostedEvent =
+export const useWatchNijiDataVoterMessageToDunaAdminPostedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nounsDataAbi,
     address: nounsDataAddress,

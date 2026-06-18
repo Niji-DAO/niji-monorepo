@@ -4,11 +4,11 @@ import { ContractTransactionReceipt } from 'ethers';
 import { ethers } from 'hardhat';
 
 import {
-  NounsDAOLogicV4__factory,
+  NijiDAOLogicV4__factory,
   NounsDescriptorV3__factory,
   NounsToken,
   Voter__factory,
-  INounsDAOLogic,
+  INijiDAOLogic,
 } from '../../typechain';
 import { MaliciousVoter__factory } from '../../typechain/factories/contracts/test/MaliciousVoter__factory';
 import {
@@ -36,7 +36,7 @@ let deployer: SignerWithAddress;
 let user: SignerWithAddress;
 let user2: SignerWithAddress;
 let signers: TestSigners;
-let gov: INounsDAOLogic;
+let gov: INijiDAOLogic;
 let token: NounsToken;
 let snapshotId: number;
 
@@ -82,7 +82,7 @@ describe('V3 Vote Refund', () => {
       expect(r.gasUsed).to.be.gt(0);
       expect(balanceDiff).to.be.closeTo(0n, REFUND_ERROR_MARGIN);
       expectRefundEvent(r, user, await txCostInEth(r));
-      const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
+      const govWithEvents = NijiDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
       await expect(tx).to.emit(govWithEvents, 'VoteCast').withArgs(user.address, 1n, 1, 2, '');
     });
 
@@ -185,7 +185,7 @@ describe('V3 Vote Refund', () => {
       expect(balanceDiff).to.be.closeTo(0n, REFUND_ERROR_MARGIN);
 
       expectRefundEvent(r, user, await txCostInEth(r));
-      const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
+      const govWithEvents = NijiDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
       await expect(tx)
         .to.emit(govWithEvents, 'VoteCast')
         .withArgs(user.address, 1n, 1, 2, 'some reason');
@@ -242,7 +242,7 @@ describe('V3 Vote Refund', () => {
       expect(balanceDiff).to.be.closeTo(await expectedGasUsedCappedDiff(r), REFUND_ERROR_MARGIN);
 
       expectRefundEvent(r, user, MAX_REFUND_GAS_USED * (await latestBasePlusMaxPriority()));
-      const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
+      const govWithEvents = NijiDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
       await expect(tx)
         .to.emit(govWithEvents, 'VoteCast')
         .withArgs(user.address, 1n, 1, 2, LONG_REASON);
@@ -264,7 +264,7 @@ describe('V3 Vote Refund', () => {
       expect(balanceDiff).to.be.closeTo(await expectedBaseFeeCappedDiff(r), REFUND_ERROR_MARGIN);
 
       expectRefundEvent(r, user, r.gasUsed * (MAX_REFUND_BASE_FEE + MAX_PRIORITY_FEE_CAP));
-      const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
+      const govWithEvents = NijiDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
       await expect(tx)
         .to.emit(govWithEvents, 'VoteCast')
         .withArgs(user.address, 1n, 1, 2, 'some reason');
@@ -344,7 +344,7 @@ describe('V3 Vote Refund', () => {
       expect(balanceDiff).to.be.closeTo(0n, REFUND_ERROR_MARGIN);
 
       expectRefundEvent(r, user, await txCostInEth(r));
-      const govWithEvents = NounsDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
+      const govWithEvents = NijiDAOLogicV4__factory.connect(await gov.getAddress(), deployer);
       await expect(tx)
         .to.emit(govWithEvents, 'VoteCast')
         .withArgs(voterAddress, 2n, 1, 1, 'some reason');
@@ -394,7 +394,7 @@ describe('V3 Vote Refund', () => {
     // Not using expect emit because it doesn't support the `closeTo` matcher
     // Using longer event parsing because r.events doesn't work when using the Voter contract
     // to simulate multisig usage; events are returned undefined
-    const daoInterface = NounsDAOLogicV4__factory.createInterface();
+    const daoInterface = NijiDAOLogicV4__factory.createInterface();
     const eventId = ethers.id('RefundableVote(address,uint256,bool)');
     const filtered = r.logs.filter(l => l.topics[0] === eventId);
     const parsed = filtered.map(e => {

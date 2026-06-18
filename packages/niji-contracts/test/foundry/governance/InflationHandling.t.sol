@@ -2,15 +2,15 @@
 pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
-import { INounsDAOLogic } from '../../../contracts/interfaces/INounsDAOLogic.sol';
-import { NounsDAOProposals } from '../../../contracts/governance/NounsDAOProposals.sol';
-import { NounsDAOLogicSharedBaseTest } from '../helpers/NounsDAOLogicSharedBase.t.sol';
-import { NounsDAOProxyV3 } from '../../../contracts/governance/NounsDAOProxyV3.sol';
-import { NounsDAOTypes } from '../../../contracts/governance/NounsDAOInterfaces.sol';
+import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
+import { NijiDAOProposals } from '../../../contracts/governance/NijiDAOProposals.sol';
+import { NijiDAOLogicSharedBaseTest } from '../helpers/NijiDAOLogicSharedBase.t.sol';
+import { NijiDAOProxyV3 } from '../../../contracts/governance/NijiDAOProxyV3.sol';
+import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 import { Utils } from '../helpers/Utils.sol';
 import { DeployUtilsV3 } from '../helpers/DeployUtilsV3.sol';
 
-abstract contract NounsDAOLogicV3InflationHandlingTest is NounsDAOLogicSharedBaseTest, Utils {
+abstract contract NijiDAOLogicV3InflationHandlingTest is NijiDAOLogicSharedBaseTest, Utils {
     uint256 constant proposalThresholdBPS_ = 678; // 6.78%
     uint16 constant minQuorumVotesBPS = 1100; // 11%
     address tokenHolder;
@@ -26,13 +26,13 @@ abstract contract NounsDAOLogicV3InflationHandlingTest is NounsDAOLogicSharedBas
         address timelock,
         address nounsToken,
         address vetoer
-    ) internal override returns (INounsDAOLogic) {
+    ) internal override returns (INijiDAOLogic) {
         return
             _createDAOV3Proxy(
                 timelock,
                 nounsToken,
                 vetoer,
-                NounsDAOTypes.NounsDAOParams({
+                NijiDAOTypes.NijiDAOParams({
                     votingPeriod: votingPeriod,
                     votingDelay: votingDelay,
                     proposalThresholdBPS: proposalThresholdBPS_,
@@ -40,7 +40,7 @@ abstract contract NounsDAOLogicV3InflationHandlingTest is NounsDAOLogicSharedBas
                     objectionPeriodDurationInBlocks: OBJECTION_PERIOD_BLOCKS,
                     proposalUpdatablePeriodInBlocks: 0
                 }),
-                NounsDAOTypes.DynamicQuorumParams({
+                NijiDAOTypes.DynamicQuorumParams({
                     minQuorumVotesBPS: minQuorumVotesBPS,
                     maxQuorumVotesBPS: 2000,
                     quorumCoefficient: 10000
@@ -70,7 +70,7 @@ abstract contract NounsDAOLogicV3InflationHandlingTest is NounsDAOLogicSharedBas
     }
 }
 
-contract NounsDAOLogic3InflationHandling40TotalSupplyTest is NounsDAOLogicV3InflationHandlingTest {
+contract NijiDAOLogic3InflationHandling40TotalSupplyTest is NijiDAOLogicV3InflationHandlingTest {
     function setUp() public virtual override {
         super.setUp();
 
@@ -104,7 +104,7 @@ contract NounsDAOLogic3InflationHandling40TotalSupplyTest is NounsDAOLogicV3Infl
 
         assertEq(nounsToken.getPriorVotes(user1, block.number - 1), 2);
 
-        vm.expectRevert(NounsDAOProposals.VotesBelowProposalThreshold.selector);
+        vm.expectRevert(NijiDAOProposals.VotesBelowProposalThreshold.selector);
         propose(user1, address(0), 0, '', '');
     }
 
@@ -124,7 +124,7 @@ contract NounsDAOLogic3InflationHandling40TotalSupplyTest is NounsDAOLogicV3Infl
     }
 }
 
-abstract contract TotalSupply40WithAProposalState is NounsDAOLogicV3InflationHandlingTest {
+abstract contract TotalSupply40WithAProposalState is NijiDAOLogicV3InflationHandlingTest {
     uint256 proposalId;
 
     function setUp() public virtual override {
@@ -183,7 +183,7 @@ contract SupplyIncreasedStateTest is SupplyIncreasedState {
     }
 
     function testRejectsProposalsPreviouslyAboveThresholdButNowBelowBecauseSupplyIncreased() public {
-        vm.expectRevert(NounsDAOProposals.VotesBelowProposalThreshold.selector);
+        vm.expectRevert(NijiDAOProposals.VotesBelowProposalThreshold.selector);
         propose(user1, address(0), 0, '', '');
     }
 
@@ -207,6 +207,6 @@ contract SupplyIncreasedStateTest is SupplyIncreasedState {
 
         vm.roll(block.number + votingPeriod);
 
-        assertEq(uint256(daoProxy.state(proposalId)), uint256(NounsDAOTypes.ProposalState.Succeeded));
+        assertEq(uint256(daoProxy.state(proposalId)), uint256(NijiDAOTypes.ProposalState.Succeeded));
     }
 }

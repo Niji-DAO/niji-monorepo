@@ -227,7 +227,7 @@ export const readNounsStreamElapsedTime = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link nounsStreamAbi}__ and `functionName` set to `"factory"`
  */
-export const readNounsStreamFactory = /*#__PURE__*/ createReadContract({
+export const readNijiStreamFactory = /*#__PURE__*/ createReadContract({
   abi: nounsStreamAbi,
   functionName: 'factory',
 });

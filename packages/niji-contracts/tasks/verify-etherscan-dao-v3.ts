@@ -6,10 +6,10 @@ import { ContractNamesDAOV3, DeployedContract } from './types';
 // These contracts require a fully qualified name to be passed because
 // they share bytecode with the underlying contract.
 const nameToFullyQualifiedName: Record<string, string> = {
-  NounsAuctionHouseProxy: 'contracts/proxies/NounsAuctionHouseProxy.sol:NounsAuctionHouseProxy',
-  NounsAuctionHouseProxyAdmin: 'contracts/proxies/NounsAuctionHouseProxyAdmin.sol:NounsAuctionHouseProxyAdmin',
-  NounsDAOLogicV3Harness: 'contracts/test/NounsDAOLogicV3Harness.sol:NounsDAOLogicV3Harness',
-  NounsDAOExecutorV2Test: 'contracts/test/NounsDAOExecutorHarness.sol:NounsDAOExecutorV2Test',
+  NijiAuctionHouseProxy: 'contracts/proxies/NijiAuctionHouseProxy.sol:NijiAuctionHouseProxy',
+  NijiAuctionHouseProxyAdmin: 'contracts/proxies/NijiAuctionHouseProxyAdmin.sol:NijiAuctionHouseProxyAdmin',
+  NijiDAOLogicV3Harness: 'contracts/test/NijiDAOLogicV3Harness.sol:NijiDAOLogicV3Harness',
+  NijiDAOExecutorV2Test: 'contracts/test/NijiDAOExecutorHarness.sol:NijiDAOExecutorV2Test',
 };
 
 task('verify-etherscan-dao-v3', 'Verify the Solidity contracts on Etherscan')

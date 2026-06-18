@@ -24,13 +24,13 @@ task('update-configs-dao-v3', 'Write the deployed addresses to the SDK and subgr
         nounsSeeder: contracts.NounsSeeder.address,
         nounsDescriptor: contracts.NounsDescriptorV3.address,
         nftDescriptor: contracts.NFTDescriptorV2.address,
-        nounsAuctionHouse: contracts.NounsAuctionHouse.address,
-        nounsAuctionHouseProxy: contracts.NounsAuctionHouseProxy.address,
-        nounsAuctionHouseProxyAdmin: contracts.NounsAuctionHouseProxyAdmin.address,
-        nounsDaoExecutor: contracts.NounsDAOExecutorProxy.address,
-        nounsDAOProxy: contracts.NounsDAOProxyV3.address,
-        nounsDAOLogicV1: contracts.NounsDAOLogicV4.address,
-        nounsDAOData: contracts.NounsDAODataProxy.address,
+        nounsAuctionHouse: contracts.NijiAuctionHouse.address,
+        nounsAuctionHouseProxy: contracts.NijiAuctionHouseProxy.address,
+        nounsAuctionHouseProxyAdmin: contracts.NijiAuctionHouseProxyAdmin.address,
+        nounsDaoExecutor: contracts.NijiDAOExecutorProxy.address,
+        nounsDAOProxy: contracts.NijiDAOProxyV3.address,
+        nounsDAOLogicV1: contracts.NijiDAOLogicV4.address,
+        nounsDAOData: contracts.NijiDAODataProxy.address,
       };
       writeFileSync(addressesPath, JSON.stringify(addresses, null, 2));
       try {
@@ -40,7 +40,7 @@ task('update-configs-dao-v3', 'Write the deployed addresses to the SDK and subgr
       } catch {
         console.log('Failed to re-build `@niji/sdk`. Please rebuild manually.');
       }
-      console.log('Addresses written to the Nouns SDK.');
+      console.log('Addresses written to the Niji SDK.');
 
       // Generate subgraph config
       const configName = `${network}-fork`;
@@ -62,16 +62,16 @@ task('update-configs-dao-v3', 'Write the deployed addresses to the SDK and subgr
           startBlock: await getDeployBlockNumber(contracts.NounsToken),
         },
         nounsAuctionHouse: {
-          address: contracts.NounsAuctionHouseProxy.address,
-          startBlock: await getDeployBlockNumber(contracts.NounsAuctionHouseProxy),
+          address: contracts.NijiAuctionHouseProxy.address,
+          startBlock: await getDeployBlockNumber(contracts.NijiAuctionHouseProxy),
         },
         nounsDAO: {
-          address: contracts.NounsDAOProxyV3.address,
-          startBlock: await getDeployBlockNumber(contracts.NounsDAOProxyV3),
+          address: contracts.NijiDAOProxyV3.address,
+          startBlock: await getDeployBlockNumber(contracts.NijiDAOProxyV3),
         },
         nounsDAOData: {
-          address: contracts.NounsDAODataProxy.address,
-          startBlock: await getDeployBlockNumber(contracts.NounsDAODataProxy),
+          address: contracts.NijiDAODataProxy.address,
+          startBlock: await getDeployBlockNumber(contracts.NijiDAODataProxy),
         },
       };
       writeFileSync(subgraphConfigPath, JSON.stringify(subgraphConfig, null, 2));

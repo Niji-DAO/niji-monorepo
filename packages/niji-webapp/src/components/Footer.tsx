@@ -7,11 +7,11 @@ import GitHubIcon from '@/assets/icons/socials/github.svg?react';
 import XIcon from '@/assets/icons/socials/x.svg?react';
 import NogglesLogo from '@/assets/noggles.svg?react';
 import {
-  nounsAuctionHouseAddress,
+  nijiAuctionHouseAddress,
   nounsDescriptorAddress,
-  nounsGovernorAddress,
+  nijiGovernorAddress,
   nounsTokenAddress,
-  nounsTreasuryAddress,
+  nijiTreasuryAddress,
 } from '@/contracts';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
 import { defaultChain } from '@/wagmi';
@@ -44,11 +44,11 @@ export const Footer = () => {
         { label: t`Token`, url: buildEtherscanAddressLink(nounsTokenAddress[defaultChain.id]) },
         {
           label: t`Auction`,
-          url: buildEtherscanAddressLink(nounsAuctionHouseAddress[defaultChain.id]),
+          url: buildEtherscanAddressLink(nijiAuctionHouseAddress[defaultChain.id]),
         },
         {
           label: t`Governor`,
-          url: buildEtherscanAddressLink(nounsGovernorAddress[defaultChain.id]),
+          url: buildEtherscanAddressLink(nijiGovernorAddress[defaultChain.id]),
         },
         {
           label: t`Descriptor`,
@@ -56,7 +56,7 @@ export const Footer = () => {
         },
         {
           label: t`Treasury`,
-          url: buildEtherscanAddressLink(nounsTreasuryAddress[defaultChain.id]),
+          url: buildEtherscanAddressLink(nijiTreasuryAddress[defaultChain.id]),
         },
       ],
     },

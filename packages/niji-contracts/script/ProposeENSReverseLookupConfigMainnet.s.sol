@@ -2,7 +2,7 @@
 pragma solidity ^0.8.15;
 
 import 'forge-std/Script.sol';
-import { INounsDAOLogic } from '../contracts/interfaces/INounsDAOLogic.sol';
+import { INijiDAOLogic } from '../contracts/interfaces/INijiDAOLogic.sol';
 
 /**
  * @notice Submits a proposal to configure the ENS reverse lookup for nouns.eth.
@@ -10,8 +10,8 @@ import { INounsDAOLogic } from '../contracts/interfaces/INounsDAOLogic.sol';
  * the msg.sender to ENS.
  */
 contract ProposeENSReverseLookupConfigMainnet is Script {
-    INounsDAOLogic public constant NOUNS_DAO_PROXY_MAINNET =
-        INounsDAOLogic(payable(0x6f3E6272A167e8AcCb32072d08E0957F9c79223d));
+    INijiDAOLogic public constant NOUNS_DAO_PROXY_MAINNET =
+        INijiDAOLogic(payable(0x6f3E6272A167e8AcCb32072d08E0957F9c79223d));
     address public constant ENS_REVERSE_REGISTRAR_MAINNET = 0xa58E81fe9b61B5c3fE2AFD33CF304c454AbFc7Cb;
 
     function run() public returns (uint256 proposalId) {
@@ -27,7 +27,7 @@ contract ProposeENSReverseLookupConfigMainnet is Script {
     }
 
     function propose(
-        INounsDAOLogic daoProxy,
+        INijiDAOLogic daoProxy,
         address reverseRegistrar,
         string memory description
     ) internal returns (uint256 proposalId) {
