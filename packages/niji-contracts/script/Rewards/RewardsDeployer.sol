@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.19;
 
-import { INounsDAOLogic } from '../../contracts/interfaces/INounsDAOLogic.sol';
+import { INijiDAOLogic } from '../../contracts/interfaces/INijiDAOLogic.sol';
 import { Rewards } from '../../contracts/client-incentives/Rewards.sol';
 import { RewardsProxy } from '../../contracts/client-incentives/RewardsProxy.sol';
 
 library RewardsDeployer {
     function deployRewards(
-        INounsDAOLogic dao,
+        INijiDAOLogic dao,
         address admin,
         address auctionHouse,
         address erc20,

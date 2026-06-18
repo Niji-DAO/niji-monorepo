@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.15;
 
-import { NounsTokenLike } from '../../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiTokenLike } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 import { INounsDescriptorMinimal } from '../../../contracts/interfaces/INounsDescriptorMinimal.sol';
 import { INounsSeeder } from '../../../contracts/interfaces/INounsSeeder.sol';
 
-contract NounsTokenLikeMock is NounsTokenLike {
+contract NijiTokenLikeMock is NijiTokenLike {
     address public noundersDAO;
     INounsDescriptorMinimal public descriptor;
     INounsSeeder public seeder;

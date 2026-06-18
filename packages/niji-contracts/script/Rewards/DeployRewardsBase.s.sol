@@ -4,15 +4,15 @@ pragma solidity ^0.8.19;
 import 'forge-std/Script.sol';
 import { OptimizedScript } from '../OptimizedScript.s.sol';
 import { Rewards } from '../../contracts/client-incentives/Rewards.sol';
-import { INounsDAOLogic } from '../../contracts/interfaces/INounsDAOLogic.sol';
-import { INounsAuctionHouseV2 } from '../../contracts/interfaces/INounsAuctionHouseV2.sol';
+import { INijiDAOLogic } from '../../contracts/interfaces/INijiDAOLogic.sol';
+import { INijiAuctionHouseV2 } from '../../contracts/interfaces/INijiAuctionHouseV2.sol';
 import { NounsClientTokenDescriptor } from '../../contracts/client-incentives/NounsClientTokenDescriptor.sol';
 import { RewardsDeployer } from './RewardsDeployer.sol';
 
 abstract contract DeployRewardsBase is OptimizedScript {
     function runInternal(
-        INounsDAOLogic dao,
-        INounsAuctionHouseV2 auctionHouse,
+        INijiDAOLogic dao,
+        INijiAuctionHouseV2 auctionHouse,
         address admin,
         address ethToken
     ) internal returns (Rewards rewards) {

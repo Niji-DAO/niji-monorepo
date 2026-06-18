@@ -2,8 +2,8 @@
 pragma solidity ^0.8.15;
 
 import 'forge-std/Script.sol';
-import { NounsDAOData } from '../contracts/governance/data/NounsDAOData.sol';
-import { NounsDAODataProxy } from '../contracts/governance/data/NounsDAODataProxy.sol';
+import { NijiDAOData } from '../contracts/governance/data/NijiDAOData.sol';
+import { NijiDAODataProxy } from '../contracts/governance/data/NijiDAODataProxy.sol';
 
 interface NounsDAO {
     function nouns() external view returns (address);
@@ -20,12 +20,12 @@ contract DeployDAOV3DataContractsBase is Script {
         timelockV2Proxy = _timelockV2Proxy;
     }
 
-    function run() public returns (NounsDAODataProxy dataProxy) {
+    function run() public returns (NijiDAODataProxy dataProxy) {
         uint256 deployerKey = vm.envUint('DEPLOYER_PRIVATE_KEY');
 
         vm.startBroadcast(deployerKey);
 
-        NounsDAOData dataLogic = new NounsDAOData(daoProxy.nouns(), address(daoProxy));
+        NijiDAOData dataLogic = new NijiDAOData(daoProxy.nouns(), address(daoProxy));
 
         bytes memory initCallData = abi.encodeWithSignature(
             'initialize(address,uint256,uint256,address)',
@@ -34,7 +34,7 @@ contract DeployDAOV3DataContractsBase is Script {
             0,
             address(daoProxy)
         );
-        dataProxy = new NounsDAODataProxy(address(dataLogic), initCallData);
+        dataProxy = new NijiDAODataProxy(address(dataLogic), initCallData);
 
         vm.stopBroadcast();
     }

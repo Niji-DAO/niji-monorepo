@@ -3,8 +3,8 @@ pragma solidity ^0.8.19;
 
 import { DeployRewardsBase } from './DeployRewardsBase.s.sol';
 import { Rewards } from '../../contracts/client-incentives/Rewards.sol';
-import { INounsDAOLogic } from '../../contracts/interfaces/INounsDAOLogic.sol';
-import { INounsAuctionHouseV2 } from '../../contracts/interfaces/INounsAuctionHouseV2.sol';
+import { INijiDAOLogic } from '../../contracts/interfaces/INijiDAOLogic.sol';
+import { INijiAuctionHouseV2 } from '../../contracts/interfaces/INijiAuctionHouseV2.sol';
 
 contract DeployRewardsMainnet is DeployRewardsBase {
     address constant AUCTION_HOUSE_MAINNET = 0x830BD73E4184ceF73443C15111a1DF14e495C706;
@@ -15,8 +15,8 @@ contract DeployRewardsMainnet is DeployRewardsBase {
     function run() public returns (Rewards rewards) {
         return
             super.runInternal({
-                dao: INounsDAOLogic(DAO_PROXY_MAINNET),
-                auctionHouse: INounsAuctionHouseV2(AUCTION_HOUSE_MAINNET),
+                dao: INijiDAOLogic(DAO_PROXY_MAINNET),
+                auctionHouse: INijiAuctionHouseV2(AUCTION_HOUSE_MAINNET),
                 admin: VERBS_SAFE_MAINNET,
                 ethToken: WETH_MAINNET
             });

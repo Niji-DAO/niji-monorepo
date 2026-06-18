@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.15;
 
-import { INijiDAOForkEscrow, NounsTokenLike } from '../../../contracts/governance/NijiDAOInterfaces.sol';
+import { INijiDAOForkEscrow, NijiTokenLike } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 
 contract NijiDAOForkEscrowMock is INijiDAOForkEscrow {
     uint32 public forkId;
     address public dao;
-    NounsTokenLike public nounsToken;
+    NijiTokenLike public nounsToken;
 
     /// @dev forkId => tokenId => owner
     mapping(uint32 => mapping(uint256 => address)) public escrowedTokensByForkId;
@@ -14,7 +14,7 @@ contract NijiDAOForkEscrowMock is INijiDAOForkEscrow {
     constructor(
         uint32 forkId_,
         address dao_,
-        NounsTokenLike nounsToken_
+        NijiTokenLike nounsToken_
     ) {
         forkId = forkId_;
         dao = dao_;

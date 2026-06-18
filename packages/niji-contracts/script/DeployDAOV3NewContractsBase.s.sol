@@ -2,15 +2,15 @@
 pragma solidity ^0.8.15;
 
 import 'forge-std/Script.sol';
-import { NounsDAOExecutorV2 } from '../contracts/governance/NounsDAOExecutorV2.sol';
-import { NounsDAOExecutorV2Test } from '../contracts/test/NounsDAOExecutorHarness.sol';
-import { NounsDAOLogicV4 } from '../contracts/governance/NounsDAOLogicV4.sol';
-import { NounsDAOExecutorProxy } from '../contracts/governance/NounsDAOExecutorProxy.sol';
-import { INounsDAOExecutor } from '../contracts/governance/NounsDAOInterfaces.sol';
-import { NounsDAOForkEscrow } from '../contracts/governance/fork/NounsDAOForkEscrow.sol';
+import { NijiDAOExecutorV2 } from '../contracts/governance/NijiDAOExecutorV2.sol';
+import { NijiDAOExecutorV2Test } from '../contracts/test/NijiDAOExecutorHarness.sol';
+import { NijiDAOLogicV4 } from '../contracts/governance/NijiDAOLogicV4.sol';
+import { NijiDAOExecutorProxy } from '../contracts/governance/NijiDAOExecutorProxy.sol';
+import { INijiDAOExecutor } from '../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiDAOForkEscrow } from '../contracts/governance/fork/NijiDAOForkEscrow.sol';
 import { NounsTokenFork } from '../contracts/governance/fork/newdao/token/NounsTokenFork.sol';
-import { NounsAuctionHouseFork } from '../contracts/governance/fork/newdao/NounsAuctionHouseFork.sol';
-import { NounsDAOLogicV1Fork } from '../contracts/governance/fork/newdao/governance/NounsDAOLogicV1Fork.sol';
+import { NijiAuctionHouseFork } from '../contracts/governance/fork/newdao/NijiAuctionHouseFork.sol';
+import { NijiDAOLogicV1Fork } from '../contracts/governance/fork/newdao/governance/NijiDAOLogicV1Fork.sol';
 import { ForkDAODeployer } from '../contracts/governance/fork/ForkDAODeployer.sol';
 import { ERC20Transferer } from '../contracts/utils/ERC20Transferer.sol';
 
@@ -26,7 +26,7 @@ contract DeployDAOV3NewContractsBase is Script {
     uint256 public constant FORK_DAO_QUORUM_VOTES_BPS = 1000; // 10%
 
     NounsDAO public immutable daoProxy;
-    INounsDAOExecutor public immutable timelockV1;
+    INijiDAOExecutor public immutable timelockV1;
     bool public immutable deployTimelockV2Harness; // should be true only for testnets
 
     constructor(
@@ -37,7 +37,7 @@ contract DeployDAOV3NewContractsBase is Script {
         uint256 _forkDAOVotingDelay
     ) {
         daoProxy = NounsDAO(_daoProxy);
-        timelockV1 = INounsDAOExecutor(_timelockV1);
+        timelockV1 = INijiDAOExecutor(_timelockV1);
         deployTimelockV2Harness = _deployTimelockV2Harness;
         forkDAOVotingPeriod = _forkDAOVotingPeriod;
         forkDAOVotingDelay = _forkDAOVotingDelay;
@@ -46,10 +46,10 @@ contract DeployDAOV3NewContractsBase is Script {
     function run()
         public
         returns (
-            NounsDAOForkEscrow forkEscrow,
+            NijiDAOForkEscrow forkEscrow,
             ForkDAODeployer forkDeployer,
-            NounsDAOLogicV4 daoImpl,
-            NounsDAOExecutorV2 timelockV2,
+            NijiDAOLogicV4 daoImpl,
+            NijiDAOExecutorV2 timelockV2,
             ERC20Transferer erc20Transferer
         )
     {
@@ -65,25 +65,25 @@ contract DeployDAOV3NewContractsBase is Script {
     function deployNewContracts()
         internal
         returns (
-            NounsDAOForkEscrow forkEscrow,
+            NijiDAOForkEscrow forkEscrow,
             ForkDAODeployer forkDeployer,
-            NounsDAOLogicV4 daoImpl,
-            NounsDAOExecutorV2 timelockV2,
+            NijiDAOLogicV4 daoImpl,
+            NijiDAOExecutorV2 timelockV2,
             ERC20Transferer erc20Transferer
         )
     {
-        NounsDAOExecutorV2 timelockV2Impl;
+        NijiDAOExecutorV2 timelockV2Impl;
         if (deployTimelockV2Harness) {
-            timelockV2Impl = new NounsDAOExecutorV2Test();
+            timelockV2Impl = new NijiDAOExecutorV2Test();
         } else {
-            timelockV2Impl = new NounsDAOExecutorV2();
+            timelockV2Impl = new NijiDAOExecutorV2();
         }
 
-        forkEscrow = new NounsDAOForkEscrow(address(daoProxy), address(daoProxy.nouns()));
+        forkEscrow = new NijiDAOForkEscrow(address(daoProxy), address(daoProxy.nouns()));
         forkDeployer = new ForkDAODeployer(
             address(new NounsTokenFork()),
-            address(new NounsAuctionHouseFork()),
-            address(new NounsDAOLogicV1Fork()),
+            address(new NijiAuctionHouseFork()),
+            address(new NijiDAOLogicV1Fork()),
             address(timelockV2Impl),
             DELAYED_GOV_DURATION,
             forkDAOVotingPeriod,
@@ -91,19 +91,19 @@ contract DeployDAOV3NewContractsBase is Script {
             FORK_DAO_PROPOSAL_THRESHOLD_BPS,
             FORK_DAO_QUORUM_VOTES_BPS
         );
-        daoImpl = new NounsDAOLogicV4();
+        daoImpl = new NijiDAOLogicV4();
         timelockV2 = deployAndInitTimelockV2(address(timelockV2Impl));
         erc20Transferer = new ERC20Transferer();
     }
 
-    function deployAndInitTimelockV2(address timelockV2Impl) internal returns (NounsDAOExecutorV2 timelockV2) {
+    function deployAndInitTimelockV2(address timelockV2Impl) internal returns (NijiDAOExecutorV2 timelockV2) {
         bytes memory initCallData = abi.encodeWithSignature(
             'initialize(address,uint256)',
             address(daoProxy),
             timelockV1.delay()
         );
 
-        timelockV2 = NounsDAOExecutorV2(payable(address(new NounsDAOExecutorProxy(timelockV2Impl, initCallData))));
+        timelockV2 = NijiDAOExecutorV2(payable(address(new NijiDAOExecutorProxy(timelockV2Impl, initCallData))));
 
         return timelockV2;
     }

@@ -10,7 +10,7 @@ import { NounsSeeder } from '../../../../contracts/NounsSeeder.sol';
 import { NounsDescriptorV2 } from '../../../../contracts/NounsDescriptorV2.sol';
 import { NounsToken } from '../../../../contracts/NounsToken.sol';
 import { IProxyRegistry } from '../../../../contracts/external/opensea/IProxyRegistry.sol';
-import { NounsTokenLike } from '../../../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiTokenLike } from '../../../../contracts/governance/NijiDAOInterfaces.sol';
 import { ECDSA } from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 import { ERC1967Proxy } from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
 
@@ -45,7 +45,7 @@ abstract contract NounsTokenForkBase is DeployUtilsFork {
         vm.stopPrank();
 
         forkId = 1;
-        escrow = new NijiDAOForkEscrowMock(forkId, originalDAO, NounsTokenLike(address(originalToken)));
+        escrow = new NijiDAOForkEscrowMock(forkId, originalDAO, NijiTokenLike(address(originalToken)));
 
         tokenIds.push(1);
         tokenIds.push(4);

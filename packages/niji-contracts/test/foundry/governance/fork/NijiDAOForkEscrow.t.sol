@@ -3,7 +3,7 @@ pragma solidity ^0.8.15;
 
 import 'forge-std/Test.sol';
 
-import { NijiDAOForkEscrow, NounsTokenLike } from '../../../../contracts/governance/fork/NijiDAOForkEscrow.sol';
+import { NijiDAOForkEscrow, NijiTokenLike } from '../../../../contracts/governance/fork/NijiDAOForkEscrow.sol';
 import { ERC721Mock } from '../../helpers/ERC721Mock.sol';
 import { IERC721 } from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 
@@ -42,7 +42,7 @@ contract ZeroStateTest is ZeroState {
     }
 
     function test_onERC721Received_onlyNounsToken() public {
-        vm.expectRevert(NijiDAOForkEscrow.OnlyNounsToken.selector);
+        vm.expectRevert(NijiDAOForkEscrow.OnlyNijiToken.selector);
         escrow.onERC721Received(address(0), address(0), 0, '');
     }
 

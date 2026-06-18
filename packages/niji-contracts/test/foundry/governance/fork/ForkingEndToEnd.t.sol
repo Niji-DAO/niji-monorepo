@@ -9,7 +9,7 @@ import { NounsTokenFork } from '../../../../contracts/governance/fork/newdao/tok
 import { NijiDAOExecutorV2 } from '../../../../contracts/governance/NijiDAOExecutorV2.sol';
 import { NijiDAOLogicV1Fork } from '../../../../contracts/governance/fork/newdao/governance/NijiDAOLogicV1Fork.sol';
 import { NijiAuctionHouseFork } from '../../../../contracts/governance/fork/newdao/NijiAuctionHouseFork.sol';
-import { NounsTokenLike } from '../../../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiTokenLike } from '../../../../contracts/governance/NijiDAOInterfaces.sol';
 import { INijiAuctionHouse } from '../../../../contracts/interfaces/INijiAuctionHouse.sol';
 import { INijiDAOLogic } from '../../../../contracts/interfaces/INijiDAOLogic.sol';
 
@@ -171,7 +171,7 @@ contract ForkingHappyFlowTest is DeployUtilsFork {
 
 abstract contract ForkDAOBase is DeployUtilsFork {
     INijiDAOLogic originalDAO;
-    NounsTokenLike originalToken;
+    NijiTokenLike originalToken;
     NijiDAOLogicV1Fork forkDAO;
     NijiDAOExecutorV2 forkTreasury;
     NounsTokenFork forkToken;

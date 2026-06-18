@@ -5,7 +5,7 @@ import 'forge-std/Test.sol';
 import { DeployUtilsV3 } from './helpers/DeployUtilsV3.sol';
 import { AuctionHelpers } from './helpers/AuctionHelpers.sol';
 import { INijiDAOLogic } from '../../contracts/interfaces/INijiDAOLogic.sol';
-import { NounsTokenLike, NijiDAOTypes } from '../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiTokenLike, NijiDAOTypes } from '../../contracts/governance/NijiDAOInterfaces.sol';
 import { INijiAuctionHouse } from '../../contracts/interfaces/INijiAuctionHouse.sol';
 import { NijiDAOData } from '../../contracts/governance/data/NijiDAOData.sol';
 import { NijiDAODataEvents } from '../../contracts/governance/data/NijiDAODataEvents.sol';

@@ -11,8 +11,8 @@ import { NijiDAOExecutorV2 } from '../../../../contracts/governance/NijiDAOExecu
 import { NijiDAOLogicV1Fork } from '../../../../contracts/governance/fork/newdao/governance/NijiDAOLogicV1Fork.sol';
 import { NijiDAOStorageV1Fork } from '../../../../contracts/governance/fork/newdao/governance/NijiDAOStorageV1Fork.sol';
 import { NijiDAOForkEscrowMock } from '../../helpers/NijiDAOForkEscrowMock.sol';
-import { NounsTokenLikeMock } from '../../helpers/NounsTokenLikeMock.sol';
-import { NounsTokenLike } from '../../../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiTokenLikeMock } from '../../helpers/NijiTokenLikeMock.sol';
+import { NijiTokenLike } from '../../../../contracts/governance/NijiDAOInterfaces.sol';
 import { ERC20Mock, IERC20Receiver } from '../../helpers/ERC20Mock.sol';
 import { MaliciousForkDAOQuitter } from '../../helpers/MaliciousForkDAOQuitter.sol';
 import { NijiAuctionHouse } from '../../../../contracts/NijiAuctionHouse.sol';
@@ -202,7 +202,7 @@ contract NijiDAOLogicV1Fork_cancelProposalUnderThresholdBugFix_Test is NijiDAOLo
 
 abstract contract ForkWithEscrow is NijiDAOLogicV1ForkBase {
     NijiDAOForkEscrowMock escrow;
-    NounsTokenLike originalToken;
+    NijiTokenLike originalToken;
     INijiDAOLogic originalDAO;
 
     address owner1 = makeAddr('owner1');
