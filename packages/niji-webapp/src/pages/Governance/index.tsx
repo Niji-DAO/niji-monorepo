@@ -3,7 +3,7 @@ import { Trans } from '@lingui/react/macro';
 import {
   useReadNijiTreasuryBalancesInEth,
   useReadNijiTreasuryBalancesInUsd,
-} from '@niji/sdk/react/treasury';
+} from '@niji/sdk/react';
 import clsx from 'clsx';
 import { Col, Row } from 'react-bootstrap';
 import { formatEther, formatUnits } from 'viem';

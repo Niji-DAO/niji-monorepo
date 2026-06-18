@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { nijiAuctionHouseAddress } from '@niji/sdk/react';
 import { useQuery } from '@tanstack/react-query';
 import { ExternalLinkIcon } from 'lucide-react';
 
 import ShortAddress from '@/components/ShortAddress';
-import { nijiAuctionHouseAddress } from '@/contracts';
 import { cn } from '@/lib/utils';
 import { execute } from '@/subgraphs/execute';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';

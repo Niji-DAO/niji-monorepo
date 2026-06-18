@@ -1,18 +1,17 @@
 import type { Address } from '@/utils/types';
 
-import { encodeFunctionData, parseEther } from 'viem';
-
-import { ProposalActionModalState } from '@/components/ProposalActionsModal';
-import { SupportedCurrency } from '@/components/ProposalActionsModal/steps/TransferFundsDetailsStep';
 import {
   nijiPayerAbi,
   nijiPayerAddress,
   nijiStreamFactoryAbi,
   nijiStreamFactoryAddress,
   usdcAddress,
-  wethAbi,
   wethAddress,
-} from '@/contracts';
+} from '@niji/sdk/react';
+import { encodeFunctionData, parseAbi, parseEther } from 'viem';
+
+import { ProposalActionModalState } from '@/components/ProposalActionsModal';
+import { SupportedCurrency } from '@/components/ProposalActionsModal/steps/TransferFundsDetailsStep';
 import {
   formatTokenAmount,
   getTokenAddressForCurrency,
@@ -33,6 +32,8 @@ interface Action {
   usdcValue: number;
   value: string;
 }
+
+const wethTransferAbi = parseAbi(['function transfer(address to, uint256 value) returns (bool)']);
 
 export default function useStreamPaymentTransactions({
   state,
@@ -99,7 +100,7 @@ export default function useStreamPaymentTransactions({
         parseEther((amount ?? 0).toString()).toString(),
       ]),
       calldata: encodeFunctionData({
-        abi: wethAbi,
+        abi: wethTransferAbi,
         functionName: wethTransfer,
         args: [predictedAddress, parseEther(amount.toString())],
       }),

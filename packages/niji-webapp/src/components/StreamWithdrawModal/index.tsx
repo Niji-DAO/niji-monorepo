@@ -3,6 +3,7 @@ import type { Address } from '@/utils/types';
 import React, { useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { usdcAddress } from '@niji/sdk/react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { formatUnits } from 'viem';
@@ -15,7 +16,6 @@ import ModalTitle from '@/components/ModalTitle';
 import { SupportedCurrency } from '@/components/ProposalActionsModal/steps/TransferFundsDetailsStep';
 import SolidColorBackgroundModal from '@/components/SolidColorBackgroundModal';
 import StartOrEndTime from '@/components/StartOrEndTime';
-import { usdcAddress } from '@/contracts';
 import { countDecimals } from '@/utils/numberUtils';
 import { formatTokenAmount } from '@/utils/streamingPaymentUtils/streamingPaymentUtils';
 import { contract2humanUSDCFormat } from '@/utils/usdcUtils';

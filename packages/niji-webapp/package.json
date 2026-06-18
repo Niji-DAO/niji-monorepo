@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prebuild": "is-ci && exit 0 || (([ -n \"$VITE_ETHERSCAN_API_KEY\" ] && wagmi generate) || true) && (([ -n \"$VITE_SEPOLIA_SUBGRAPH\" ] && graphql-codegen-esm --config codegen.config.ts) || true)",
+    "prebuild": "is-ci && exit 0 || (([ -n \"$VITE_SEPOLIA_SUBGRAPH\" ] && graphql-codegen-esm --config codegen.config.ts) || true)",
     "build": "tsc -b && vite build",
     "check": "tsc --noEmit --skipLibCheck",
     "clean": "rimraf dist .netlify",
@@ -126,7 +126,6 @@
     "@types/redux-logger": "^3.0.13",
     "@vitejs/plugin-react": "^5.0.0",
     "@vitest/browser-playwright": "^4.0.0",
-    "@wagmi/cli": "catalog:",
     "autoprefixer": "^10.4.21",
     "dotenv": "catalog:",
     "globals": "^16.1.0",

@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { useReadNijiTokenDelegates } from '@niji/sdk/react';
 import { useAccount } from 'wagmi';
 
 import NavBarButton, { NavBarButtonStyle } from '@/components/NavBarButton';
 import ShortAddress from '@/components/ShortAddress';
-import { useReadNijiTokenDelegates } from '@/contracts';
 import { formatShortAddress } from '@/utils/addressAndENSDisplayUtils';
 
 import classes from './CurrentDelegatePannel.module.css';

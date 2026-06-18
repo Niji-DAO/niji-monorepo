@@ -1,12 +1,12 @@
-import { parseEther, zeroAddress } from 'viem';
-
-import { SupportedCurrency } from '@/components/ProposalActionsModal/steps/TransferFundsDetailsStep';
 import {
   stEthAddress,
   usdcAddress,
   useReadNijiStreamFactoryPredictStreamAddress,
   wethAddress,
-} from '@/contracts';
+} from '@niji/sdk/react';
+import { parseEther, zeroAddress } from 'viem';
+
+import { SupportedCurrency } from '@/components/ProposalActionsModal/steps/TransferFundsDetailsStep';
 import { Address } from '@/utils/types';
 
 interface UsePredictStreamAddressProps {

@@ -1,4 +1,4 @@
-import { useReadNijiTokenBuyerEthNeeded } from '@/contracts';
+import { useReadNijiTokenBuyerEthNeeded } from '@niji/sdk/react';
 
 const BUFFER_BPS = 5_000n;
 

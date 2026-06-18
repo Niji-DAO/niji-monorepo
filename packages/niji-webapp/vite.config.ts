@@ -48,7 +48,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
-    dedupe: ['wagmi'],
+    dedupe: ['@tanstack/react-query', '@wagmi/core', 'viem', 'wagmi'],
   },
   build: {
     rollupOptions: {

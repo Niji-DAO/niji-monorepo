@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { nijiTokenAddress } from '@niji/sdk/react';
 
 import _AddressIcon from '@/assets/icons/Address.svg';
 import _BidsIcon from '@/assets/icons/Bids.svg';
 import NijiInfoRowButton from '@/components/NijiInfoRowButton';
 import NijiInfoRowHolder from '@/components/NijiInfoRowHolder';
-import { nijiTokenAddress } from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { buildEtherscanTokenLink } from '@/utils/etherscan';
 import { defaultChain } from '@/wagmi';
