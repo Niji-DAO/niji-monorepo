@@ -22,7 +22,6 @@ import {
   WithdrawFromForkEscrow,
   ExecuteFork,
   JoinFork,
-  ProposalCreatedOnTimelockV1,
 } from './types/NijiDAO/NijiDAO';
 import {
   VoteCastWithClientId,
@@ -161,12 +160,6 @@ export function saveProposalExtraDetails(parsedProposal: ParsedProposalV3): void
   proposal.signers = signerDelegates;
   proposal.clientId = parsedProposal.clientId.toI32();
 
-  proposal.save();
-}
-
-export function handleProposalCreatedOnTimelockV1(event: ProposalCreatedOnTimelockV1): void {
-  const proposal = getOrCreateProposal(event.params.id.toString());
-  proposal.onTimelockV1 = true;
   proposal.save();
 }
 
