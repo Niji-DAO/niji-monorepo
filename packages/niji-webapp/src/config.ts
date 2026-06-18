@@ -22,7 +22,7 @@ interface CacheBucket {
 export const cache: Record<string, CacheBucket> = {
   seed: {
     name: 'seed',
-    version: 'v1',
+    version: 'v2',
   },
   ens: {
     name: 'ens',

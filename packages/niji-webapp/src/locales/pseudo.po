@@ -14,7 +14,7 @@ msgstr ""
 "Plural-Forms: \n"
 
 #: src/components/Documentation/index.tsx
-msgid "Because 100% of Noun auction proceeds are sent to Nouns DAO, Nounders have chosen to compensate themselves with Nouns. Every 10th Noun for the first 5 years of the project (Noun ids #0, #10, #20, #30 and so on) will be automatically sent to the Nounder's multisig to be vested and shared among the founding members of the project."
+msgid "Niji DUNA is a legally recognized Decentralized Unincorporated Nonprofit Association established in Wyoming via <0/> designed to provide a robust legal framework that aligns with the decentralized nature of Niji DAO. This structure allows Niji DAO to operate with limited liability protection and legal clarity without compromising its decentralized governance ethos."
 msgstr ""
 
 #: src/components/ProposalActionsModal/steps/StreamPaymentsPaymentDetailsStep/index.tsx
@@ -33,8 +33,8 @@ msgstr ""
 msgid "Has"
 msgstr ""
 
-#: src/components/NounInfoRowHolder.tsx
-msgid "Nouns Auction House"
+#: src/pages/Playground/index.tsx
+msgid "Generate Nijis"
 msgstr ""
 
 #: src/pages/Candidate/index.tsx
@@ -53,13 +53,12 @@ msgstr ""
 msgid "You voted <0>Against</0> this proposal"
 msgstr ""
 
-#. placeholder {0}: bodyCount?.toString()
-#: src/components/Documentation/index.tsx
-msgid "bodies ({0})"
-msgstr ""
-
 #: src/pages/EditCandidate/index.tsx
 msgid "This will clear all previous sponsors and feedback votes"
+msgstr ""
+
+#: src/components/Bid/index.tsx
+msgid "Pick the next Niji"
 msgstr ""
 
 #. placeholder {0}: i18n.number((proposalThreshold || 0) + 1)
@@ -99,10 +98,6 @@ msgstr ""
 msgid "Daily Auctions"
 msgstr ""
 
-#: src/pages/Governance/index.tsx
-msgid "This treasury exists for <0>Nouns DAO</0> participants to allocate resources for the long-term growth and prosperity of the Nouns project."
-msgstr ""
-
 #: src/components/Bid/index.tsx
 msgid "Bid"
 msgstr ""
@@ -118,10 +113,6 @@ msgstr ""
 #: src/components/ProposalActionsModal/steps/FunctionCallEnterArgsStep/index.tsx
 #: src/components/ProposalActionsModal/steps/FunctionCallSelectFunctionStep/index.tsx
 msgid "Add Function Call Arguments"
-msgstr ""
-
-#: src/components/NounsIntroSection/index.tsx
-msgid "From a school in Uganda to a coffee shop in LA, from a crypto hub in São Paulo to a deli in Melbourne, Nouns lives wherever creative people bring ideas to life. Explore nounish people, places, and things with <0/>."
 msgstr ""
 
 #: src/components/Footer.tsx
@@ -156,17 +147,25 @@ msgstr ""
 msgid "Invalid Arguments"
 msgstr ""
 
-#: src/components/NounInfoRowHolder.tsx
+#: src/components/DynamicQuorumInfoModal/index.tsx
+msgid "Required % of Nijis to Pass"
+msgstr ""
+
+#: src/components/NijiInfoRowHolder.tsx
 #: src/components/Winner/index.tsx
 msgid "Winner"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "Nijis are an experimental attempt to improve the formation of on-chain avatar communities. While projects such as {cryptopunksLink} have attempted to bootstrap digital community and identity, Nijis attempt to bootstrap identity, community, governance, and a treasury that can be used by the community."
 msgstr ""
 
 #: src/components/ProposalContent/index.tsx
 msgid "This proposal interacts with the <0>original treasury</0>"
 msgstr ""
 
-#: src/components/DynamicQuorumInfoModal/index.tsx
-msgid "Required % of Nouns to Pass"
+#: src/pages/BrandAssets/BrandAssetsPage.tsx
+msgid "Nijis & Traits"
 msgstr ""
 
 #: src/components/ForkStatus/index.tsx
@@ -189,6 +188,10 @@ msgstr ""
 msgid "Compound Governance"
 msgstr ""
 
+#: src/components/Documentation/index.tsx
+msgid "attempt to alter Niji auction cadence for the purpose of maintaining or acquiring a voting majority"
+msgstr ""
+
 #: src/components/ChangeDelegatePanel/index.tsx
 msgid "Delegate {availableVotes} Votes"
 msgstr ""
@@ -205,25 +208,21 @@ msgstr ""
 msgid "Map"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "Nouns are generated randomly based Ethereum block hashes. There are no 'if' statements or other rules governing Noun trait scarcity, which makes all Nouns equally rare. As of this writing, Nouns are made up of:"
-msgstr ""
-
 #: src/components/CandidateSponsors/OriginalSignature.tsx
 msgid "Awaiting signature"
 msgstr ""
 
-#: src/components/NounsIntroSection/index.tsx
-msgid "Build With Nouns. Get Funded."
+#: src/components/NijiContent/index.tsx
+msgid "For this reason, we, the project's founders (‘Nounders’) have chosen to compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to Nounders."
+msgstr ""
+
+#. placeholder {0}: nounId.toString()
+#: src/components/AuctionActivityNijiTitle/index.tsx
+msgid "Niji {0}"
 msgstr ""
 
 #: src/components/Proposals/index.tsx
 msgid "Making a proposal requires {threshold} votes"
-msgstr ""
-
-#: src/pages/Fork/WithdrawNounsButton.tsx
-#: src/pages/Fork/WithdrawNounsButton.tsx
-msgid "Withdraw Nouns from escrow"
 msgstr ""
 
 #: src/components/ProposalActionsModal/steps/SelectProposalActionStep/index.tsx
@@ -246,11 +245,6 @@ msgstr ""
 
 #: src/pages/Nounders/index.tsx
 msgid "3.5 artists, 6.5 technologists"
-msgstr ""
-
-#. placeholder {0}: glassesCount?.toString()
-#: src/components/Documentation/index.tsx
-msgid "glasses ({0})"
 msgstr ""
 
 #: src/components/Documentation/index.tsx
@@ -278,6 +272,10 @@ msgstr ""
 msgid "There are no active forks."
 msgstr ""
 
+#: src/components/Documentation/index.tsx
+msgid "Consequently, the Niji Foundation anticipates being the steward of the veto power until Niji DAO is ready to implement an alternative, and therefore wishes to clarify the conditions under which it would exercise this power."
+msgstr ""
+
 #: src/components/BidHistoryModal/index.tsx
 msgid "Bids for"
 msgstr ""
@@ -298,16 +296,15 @@ msgstr ""
 msgid "or more"
 msgstr ""
 
-#. placeholder {0}: nounId.toString()
-#: src/components/AuctionActivityNounTitle/index.tsx
-msgid "Noun {0}"
-msgstr ""
-
 #: src/pages/Playground/index.tsx
 msgid "Nouns Protocol"
 msgstr ""
 
-#: src/pages/NounsPage.tsx
+#: src/components/Documentation/index.tsx
+msgid "Niji artwork is in the {publicDomainLink}."
+msgstr ""
+
+#: src/pages/NijisPage.tsx
 #: src/pages/Playground/index.tsx
 msgid "Explore"
 msgstr ""
@@ -319,6 +316,10 @@ msgstr ""
 #: src/components/ProposalStatus/index.tsx
 #: src/components/ProposalStatusCopy/index.tsx
 msgid "Queued"
+msgstr ""
+
+#: src/pages/Fork/DeployForkButton.tsx
+msgid "Deploy Niji fork"
 msgstr ""
 
 #: src/components/ProposalHeader/CandidateHeader.tsx
@@ -334,24 +335,16 @@ msgstr ""
 msgid "You've successfully withdrawn {withdrawAmount} {unitForDisplay} to your wallet"
 msgstr ""
 
-#: src/components/AuctionActivity/index.tsx
-msgid "Help mint the next Noun"
+#: src/components/Documentation/index.tsx
+msgid "By adopting the DUNA model, Niji DAO sets a pioneering example for DAOs seeking to balance decentralized autonomy with legal certainty, further solidifying its position at the forefront of decentralized governance innovation."
 msgstr ""
 
 #: src/components/VoteSignals/VoteSignals.tsx
 msgid "Add your feedback"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "The treasury is controlled exclusively by Nouns via governance."
-msgstr ""
-
 #: src/components/ProposalActionsModal/steps/FunctionCallSelectFunctionStep/index.tsx
 msgid "Add Arguments"
-msgstr ""
-
-#: src/components/Holder/index.tsx
-msgid "Failed to fetch Noun info"
 msgstr ""
 
 #: src/pages/EditCandidate/index.tsx
@@ -378,10 +371,6 @@ msgstr ""
 msgid "404: This is not the person, place, or thing you're looking for..."
 msgstr ""
 
-#: src/pages/Playground/index.tsx
-msgid "The playground was built using the {nounsProtocolLink}. Noun's traits are determined by the Noun Seed. The seed was generated using {nounsAssetsLink} and rendered using the {nounsSDKLink}."
-msgstr ""
-
 #: src/components/Footer.tsx
 msgid "Calendar"
 msgstr ""
@@ -394,8 +383,12 @@ msgstr ""
 msgid "Artwork is generative and stored directly on-chain (not IPFS)."
 msgstr ""
 
-#: src/components/AddNounsToForkModal/index.tsx
+#: src/components/AddNijisToForkModal/index.tsx
 msgid "Set approval"
+msgstr ""
+
+#: src/components/Holder/index.tsx
+msgid "Failed to fetch Niji info"
 msgstr ""
 
 #: src/components/AuctionTimer/index.tsx
@@ -406,10 +399,6 @@ msgstr ""
 msgid "Queue"
 msgstr ""
 
-#: src/components/NounsIntroSection/index.tsx
-msgid "Nouns is a global community."
-msgstr ""
-
 #: src/components/Documentation/index.tsx
 msgid "CryptoPunks"
 msgstr ""
@@ -418,18 +407,13 @@ msgstr ""
 msgid "Available to withdraw"
 msgstr ""
 
+#: src/components/Documentation/index.tsx
+msgid "You can experiment with off-chain Niji generation at the {playgroundLink}."
+msgstr ""
+
 #. placeholder {0}: i18n.number(Number(proposalId || '0'))
 #: src/components/VoteModal/index.tsx
 msgid "You've successfully voted on on prop {0}"
-msgstr ""
-
-#: src/components/DelegateHoverCard/index.tsx
-msgid "Voted with<0>{numVotesForProp}</0>Noun"
-msgstr ""
-
-#: src/pages/NounsPage.tsx
-#: src/pages/Playground/index.tsx
-msgid "Body"
 msgstr ""
 
 #: src/components/VoteSignals/VoteSignals.tsx
@@ -486,10 +470,6 @@ msgstr ""
 msgid "<0>Delegated Noun: </0>"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "Consequently, the Nouns Foundation anticipates being the steward of the veto power until Nouns DAO is ready to implement an alternative, and therefore wishes to clarify the conditions under which it would exercise this power."
-msgstr ""
-
 #: src/components/ProposalHeader/index.tsx
 msgid "You voted <0>For</0> this proposal"
 msgstr ""
@@ -506,6 +486,10 @@ msgstr ""
 msgid "Delegate Update Failed"
 msgstr ""
 
+#: src/components/NijisIntroSection/index.tsx
+msgid "There's a way for everyone to get involved with Niji. From whimsical endeavors like naming a frog, to ambitious projects like constructing a giant float for the Rose Parade, or even crypto infrastructure like Prop House. Niji funds projects of all sizes and domains."
+msgstr ""
+
 #: src/components/Footer.tsx
 #: src/pages/Forks/index.tsx
 #: src/pages/Governance/index.tsx
@@ -516,20 +500,16 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "Nouns DUNA"
-msgstr ""
-
-#: src/components/Documentation/index.tsx
-msgid "One Noun is equal to one vote."
-msgstr ""
-
 #: src/components/CandidateSponsors/SignatureForm.tsx
 msgid "Signature request"
 msgstr ""
 
 #: src/components/Proposals/index.tsx
 msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nouns voters, it can be promoted to a proposal."
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "The Niji Auction Contract will act as a self-sufficient Niji generation and distribution mechanism, auctioning one Niji every 24 hours, forever. 100% of auction proceeds (ETH) are automatically deposited in the Niji DAO treasury, where they are governed by Niji owners."
 msgstr ""
 
 #: src/components/ProposalActionsModal/steps/FunctionCallReviewStep/index.tsx
@@ -550,10 +530,6 @@ msgstr ""
 
 #: src/components/Footer.tsx
 msgid "Governor"
-msgstr ""
-
-#: src/components/NounsIntroSection/index.tsx
-msgid "There's a way for everyone to get involved with Nouns. From whimsical endeavors like naming a frog, to ambitious projects like constructing a giant float for the Rose Parade, or even crypto infrastructure like Prop House. Nouns funds projects of all sizes and domains."
 msgstr ""
 
 #: src/components/StreamWithdrawModal/index.tsx
@@ -579,10 +555,6 @@ msgstr ""
 msgid "Proposal Canceled!"
 msgstr ""
 
-#: src/components/NounderNounContent/index.tsx
-msgid "All Noun auction proceeds are sent to the"
-msgstr ""
-
 #: src/components/ProposalActionsModal/steps/FunctionCallReviewStep/index.tsx
 #: src/components/ProposalActionsModal/steps/FunctionCallReviewStep/index.tsx
 #: src/components/ProposalActionsModal/steps/FunctionCallReviewStep/index.tsx
@@ -598,11 +570,8 @@ msgstr ""
 msgid "Nounder's Reward"
 msgstr ""
 
-#: src/components/Footer.tsx
-#: src/components/NavBar/index.tsx
-#: src/components/NavBar/index.tsx
-#: src/pages/Governance/index.tsx
-msgid "Nouns"
+#: src/pages/BrandAssets/BrandAssetsPage.tsx
+msgid "Download official Niji DAO brand assets including our iconic noggles in various formats."
 msgstr ""
 
 #: src/components/Holder/index.tsx
@@ -617,12 +586,16 @@ msgstr ""
 msgid "Review Action Details"
 msgstr ""
 
+#: src/components/Documentation/index.tsx
+msgid "Each time an auction is settled, the settlement transaction will also cause a new Niji to be minted and a new 24 hour auction to begin. "
+msgstr ""
+
 #: src/pages/CreateCandidate/index.tsx
 msgid "Candidate Created!"
 msgstr ""
 
 #: src/components/Documentation/index.tsx
-#: src/components/NounderNounContent/index.tsx
+#: src/components/NijiContent/index.tsx
 #: src/pages/Governance/index.tsx
 msgid "Niji DAO"
 msgstr ""
@@ -635,18 +608,13 @@ msgstr ""
 msgid "Proposal Created!"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "Trait generation is not truly random. Traits can be predicted when minting a Noun on the pending block."
-msgstr ""
-
 #: src/components/ProposalStatus/index.tsx
 #: src/components/ProposalStatusCopy/index.tsx
 msgid "Active"
 msgstr ""
 
-#. placeholder {0}: accessoryCount?.toString()
 #: src/components/Documentation/index.tsx
-msgid "accessories ({0}) "
+msgid "Niji DAO uses a fork of {compoundGovLink}."
 msgstr ""
 
 #: src/pages/EditProposal/index.tsx
@@ -671,10 +639,10 @@ msgstr ""
 msgid "<0>Note: </0>This candidate is an update to <1>Proposal {0}</1>."
 msgstr ""
 
-#: src/components/AddNounsToForkModal/index.tsx
-#: src/components/AddNounsToForkModal/index.tsx
-#: src/components/AddNounsToForkModal/index.tsx
-#: src/components/AddNounsToForkModal/index.tsx
+#: src/components/AddNijisToForkModal/index.tsx
+#: src/components/AddNijisToForkModal/index.tsx
+#: src/components/AddNijisToForkModal/index.tsx
+#: src/components/AddNijisToForkModal/index.tsx
 #: src/components/Bid/index.tsx
 #: src/components/Bid/index.tsx
 #: src/components/CandidateSponsors/SelectSponsorsToPropose.tsx
@@ -695,17 +663,17 @@ msgstr ""
 #: src/pages/Fork/DeployForkButton.tsx
 #: src/pages/Fork/DeployForkButton.tsx
 #: src/pages/Fork/DeployForkButton.tsx
-#: src/pages/Fork/WithdrawNounsButton.tsx
-#: src/pages/Fork/WithdrawNounsButton.tsx
-#: src/pages/Fork/WithdrawNounsButton.tsx
-#: src/pages/Fork/WithdrawNounsButton.tsx
+#: src/pages/Fork/WithdrawNijisButton.tsx
+#: src/pages/Fork/WithdrawNijisButton.tsx
+#: src/pages/Fork/WithdrawNijisButton.tsx
+#: src/pages/Fork/WithdrawNijisButton.tsx
 #: src/pages/Vote/index.tsx
 #: src/pages/Vote/index.tsx
 msgid "Please try again."
 msgstr ""
 
 #: src/components/Documentation/index.tsx
-msgid "Nounders receive rewards in the form of Nouns (10% of supply for first 5 years)."
+msgid "No explicit rules exist for attribute scarcity; all Nijis are equally rare."
 msgstr ""
 
 #: src/pages/Vote/index.tsx
@@ -714,6 +682,11 @@ msgstr ""
 
 #: src/pages/Forks/index.tsx
 msgid "Start a new fork"
+msgstr ""
+
+#: src/pages/Governance/index.tsx
+#: src/pages/NijisPage.tsx
+msgid "Niji"
 msgstr ""
 
 #: src/pages/CreateCandidate/index.tsx
@@ -753,14 +726,14 @@ msgstr ""
 msgid "Delegation"
 msgstr ""
 
+#: src/pages/TraitsPage.tsx
+msgid "Filename"
+msgstr ""
+
 #. placeholder {0}: forkThreshold == null ? '...' : forkThreshold
 #. placeholder {1}: forkThresholdBPS != null ? forkThresholdBPS / 100 : '...'
 #: src/pages/Fork/index.tsx
 msgid "More than {0} Nouns ({1}% of the DAO) are required to pass the threshold"
-msgstr ""
-
-#: src/components/Documentation/index.tsx
-msgid "Nouns DAO uses a fork of {compoundGovLink}."
 msgstr ""
 
 #: src/components/Proposals/index.tsx
@@ -769,15 +742,6 @@ msgstr ""
 
 #: src/components/ProposalActionsModal/steps/StreamPaymentsReviewStep/index.tsx
 msgid "Ending on"
-msgstr ""
-
-#: src/pages/NounsPage.tsx
-#: src/pages/Playground/index.tsx
-msgid "Background"
-msgstr ""
-
-#: src/components/DynamicQuorumInfoModal/index.tsx
-msgid "% of Nouns Currently Against"
 msgstr ""
 
 #: src/components/CreateProposalButton/index.tsx
@@ -797,18 +761,8 @@ msgstr ""
 msgid "m"
 msgstr ""
 
-#. placeholder {0}: headCount?.toString()
-#: src/components/Documentation/index.tsx
-msgid "heads ({0}) "
-msgstr ""
-
 #: src/components/ForkingPeriodTimer/index.tsx
 msgid "minutes"
-msgstr ""
-
-#: src/pages/NounsPage.tsx
-#: src/pages/Playground/index.tsx
-msgid "Accessory"
 msgstr ""
 
 #: src/components/Proposals/index.tsx
@@ -834,12 +788,7 @@ msgid "Fork"
 msgstr ""
 
 #: src/components/Documentation/index.tsx
-msgid "Nouns DAO utilizes a fork of {compoundGovLink} and is the main governing body of the Nouns ecosystem. The Nouns DAO treasury receives 100% of ETH proceeds from daily Noun auctions. Each Noun is an irrevocable member of Nouns DAO and entitled to one vote in all governance matters. Noun votes are non-transferable (if you sell your Noun the vote goes with it) but delegatable, which means you can assign your vote to someone else as long as you own your Noun."
-msgstr ""
-
-#. placeholder {0}: backgroundCount?.toString()
-#: src/components/Documentation/index.tsx
-msgid "backgrounds ({0}) "
+msgid "'Nounders' are the group of ten builders that initiated Niji. Here are the Nounders:"
 msgstr ""
 
 #: src/components/ProposalActionsModal/steps/StreamPaymentsReviewStep/index.tsx
@@ -868,19 +817,6 @@ msgstr ""
 msgid "Proposal {0}"
 msgstr ""
 
-#. placeholder {0}: i18n.number(availableVotes)
-#: src/components/VoteModal/index.tsx
-msgid "Voting with <0>{0}</0> Noun"
-msgstr ""
-
-#: src/components/Documentation/index.tsx
-msgid "Nouns are an experimental attempt to improve the formation of on-chain avatar communities. While projects such as {cryptopunksLink} have attempted to bootstrap digital community and identity, Nouns attempt to bootstrap identity, community, governance, and a treasury that can be used by the community."
-msgstr ""
-
-#: src/components/Documentation/index.tsx
-msgid "By adopting the DUNA model, Nouns DAO sets a pioneering example for DAOs seeking to balance decentralized autonomy with legal certainty, further solidifying its position at the forefront of decentralized governance innovation."
-msgstr ""
-
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Logo"
 msgstr ""
@@ -896,6 +832,11 @@ msgstr ""
 msgid "Back"
 msgstr ""
 
+#. placeholder {0}: nijisRequired !== undefined ? ( <> {nijisRequired} {threshold === 0 ? nijiSingular : nijiPlural} </> ) : ( '...' )
+#: src/pages/Governance/index.tsx
+msgid "Nijis govern <0>Niji DAO</0>. Nijis can vote on proposals or delegate their vote to a third party. A minimum of <1>{0}</1> is required to submit proposals."
+msgstr ""
+
 #: src/components/ByLineHoverCard/index.tsx
 msgid "<0>Delegated Nouns: </0>"
 msgstr ""
@@ -906,10 +847,6 @@ msgstr ""
 
 #: src/components/Documentation/index.tsx
 msgid "public domain"
-msgstr ""
-
-#: src/pages/Nounders/index.tsx
-msgid "The Nounders reward is intended as compensation for our pre and post-launch contributions to the project, and to help us participate meaningfully in governance as the project matures. Since there are 10 Nounders, after 5 years each Nounder could receive up to 1% of the Noun supply."
 msgstr ""
 
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
@@ -942,10 +879,6 @@ msgstr ""
 msgid "This transaction was automatically added to refill the TokenBuyer. Proposers do not receive this ETH."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "No explicit rules exist for attribute scarcity; all Nouns are equally rare."
-msgstr ""
-
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "White monochrome Noggles"
 msgstr ""
@@ -971,20 +904,16 @@ msgstr ""
 msgid "We suggest adding a buffer between when you assume the proposal to be executed and when the stream begins."
 msgstr ""
 
-#: src/pages/BrandAssets/BrandAssetsPage.tsx
-msgid "Nouns & Traits"
-msgstr ""
-
 #: src/pages/Forks/index.tsx
 msgid "Forking is the crypto-native way for groups of token holders to exit together into a new instance of their protocol, resulting in maximal conservation of momentum in the ecosystem."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "While settlement is most heavily incentivized for the winning bidder, it can be triggered by anyone, allowing the system to trustlessly auction Nouns as long as Ethereum is operational and there are interested bidders."
-msgstr ""
-
 #: src/pages/Fork/DeployForkButton.tsx
 msgid "Deploy Fork"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "The Niji Foundation considers the veto an emergency power that should not be exercised in the normal course of business. The Niji Foundation will veto proposals that introduce non-trivial legal or existential risks to the Niji DAO or the Niji Foundation, including (but not necessarily limited to) proposals that:"
 msgstr ""
 
 #: src/pages/EditProposal/index.tsx
@@ -1021,8 +950,16 @@ msgstr ""
 msgid "Note"
 msgstr ""
 
+#: src/components/Documentation/index.tsx
+msgid "All Nijis are members of Niji DAO."
+msgstr ""
+
 #: src/components/DelegationCandidateInfo/index.tsx
 msgid "Now has"
+msgstr ""
+
+#: src/components/NijisIntroSection/index.tsx
+msgid "Build With Niji. Get Funded."
 msgstr ""
 
 #: src/components/Winner/index.tsx
@@ -1033,7 +970,7 @@ msgstr ""
 msgid "Pre-proposal feedback"
 msgstr ""
 
-#: src/components/AddNounsToForkModal/index.tsx
+#: src/components/AddNijisToForkModal/index.tsx
 msgid "Add to escrow"
 msgstr ""
 
@@ -1043,16 +980,12 @@ msgstr ""
 msgid "Executed"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "The Nouns community has undertaken a preliminary exploration of proposal veto alternatives (‘rage quit’ etc.), but it is now clear that this is a difficult problem that will require significantly more research, development and testing before a satisfactory solution can be implemented."
-msgstr ""
-
 #: src/components/ProposalStatus/index.tsx
 msgid "Updatable"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "Nouns are stored directly on Ethereum and do not utilize pointers to other networks such as IPFS. This is possible because Noun parts are compressed and stored on-chain using a custom run-length encoding (RLE), which is a form of lossless compression."
+#: src/pages/Nounders/index.tsx
+msgid "The Nounders reward is intended as compensation for our pre and post-launch contributions to the project, and to help us participate meaningfully in governance as the project matures. Since there are 10 Nounders, after 5 years each Nounder could receive up to 1% of the Niji supply."
 msgstr ""
 
 #: src/components/AuctionTimer/index.tsx
@@ -1060,16 +993,8 @@ msgstr ""
 msgid "Auction ended"
 msgstr ""
 
-#: src/pages/Fork/DeployForkButton.tsx
-msgid "Deploying Nouns fork and beginning the forking period"
-msgstr ""
-
 #: src/components/Proposals/index.tsx
 msgid "Proposals submitted by community members will appear here."
-msgstr ""
-
-#: src/components/Documentation/index.tsx
-msgid "'Nounders' are the group of ten builders that initiated Nouns. Here are the Nounders:"
 msgstr ""
 
 #: src/components/Proposals/index.tsx
@@ -1078,25 +1003,28 @@ msgstr ""
 msgid "Submit Proposal"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "The Nouns Foundation considers the veto an emergency power that should not be exercised in the normal course of business. The Nouns Foundation will veto proposals that introduce non-trivial legal or existential risks to the Nouns DAO or the Nouns Foundation, including (but not necessarily limited to) proposals that:"
-msgstr ""
-
 #: src/components/VoteModal/index.tsx
 msgid "Submit Vote"
 msgstr ""
 
-#. placeholder {0}: nounsRequired !== undefined ? ( <> {nounsRequired} {threshold === 0 ? nounSingular : nounPlural} </> ) : ( '...' )
-#: src/pages/Governance/index.tsx
-msgid "Nouns govern <0>Nouns DAO</0>. Nouns can vote on proposals or delegate their vote to a third party. A minimum of <1>{0}</1> is required to submit proposals."
+#: src/components/Documentation/index.tsx
+msgid "Niji Traits"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "Nijis are generated randomly based Ethereum block hashes. There are no 'if' statements or other rules governing Niji trait scarcity, which makes all Nijis equally rare. As of this writing, Nijis are made up of:"
 msgstr ""
 
 #: src/components/ChangeDelegatePanel/index.tsx
 msgid "Your <0>{availableVotes}</0> votes are being delegated to a new account."
 msgstr ""
 
-#: src/components/NounsIntroSection/index.tsx
+#: src/components/NijisIntroSection/index.tsx
 msgid "Nounspot"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "The Niji community has undertaken a preliminary exploration of proposal veto alternatives (‘rage quit’ etc.), but it is now clear that this is a difficult problem that will require significantly more research, development and testing before a satisfactory solution can be implemented."
 msgstr ""
 
 #: src/components/ProposalStatus/index.tsx
@@ -1104,17 +1032,8 @@ msgstr ""
 msgid "Expired"
 msgstr ""
 
-#. placeholder {0}: i18n.number(Number(nounSvgs ? (nounSvgs.length / 365).toFixed(2) : '0'))
-#: src/pages/Playground/index.tsx
-msgid "You've generated {0} years worth of Nouns"
-msgstr ""
-
-#: src/components/NounInfoCard.tsx
+#: src/components/NijiInfoCard.tsx
 msgid "Bid history"
-msgstr ""
-
-#: src/pages/Nounders/index.tsx
-msgid "All Noun auction proceeds are sent to the Nouns DAO. For this reason, we, the project's founders (‘Nounders’) have chosen to compensate ourselves with Nouns. Every 10th noun for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to individual Nounders."
 msgstr ""
 
 #: src/pages/Vote/index.tsx
@@ -1130,6 +1049,10 @@ msgstr ""
 msgid "Any token holder can signal to fork (exit) in response to a governance proposal. If a {0}quorum of tokens signal to exit, the fork will succeed."
 msgstr ""
 
+#: src/components/NijisIntroSection/index.tsx
+msgid "From a school in Uganda to a coffee shop in LA, from a crypto hub in São Paulo to a deli in Melbourne, Niji lives wherever creative people bring ideas to life. Explore nounish people, places, and things with <0/>."
+msgstr ""
+
 #: src/components/LanguageSelectionModal/index.tsx
 msgid "Select Language"
 msgstr ""
@@ -1137,6 +1060,10 @@ msgstr ""
 #. placeholder {0}: minBidEth(minBid)
 #: src/components/Bid/index.tsx
 msgid "Please place a bid higher than or equal to the minimum bid amount of {0} ETH"
+msgstr ""
+
+#: src/pages/Fork/DeployForkButton.tsx
+msgid "Deploying Niji fork and beginning the forking period"
 msgstr ""
 
 #: src/components/NavBar/index.tsx
@@ -1155,8 +1082,16 @@ msgstr ""
 msgid "Proposed Transactions"
 msgstr ""
 
+#: src/components/Documentation/index.tsx
+msgid "Under Wyoming's DUNA Act, Niji DAO can hold assets, enter into contracts, and participate in legal actions in its own name. Governance remains fully decentralized, with decisions controlled exclusively by Niji holders via on-chain voting. This enables Niji DAO to sustainably fund projects, manage its treasury, and interact confidently within both the digital and physical worlds."
+msgstr ""
+
 #: src/components/ProposalActionsModal/steps/FunctionCallReviewStep/index.tsx
 msgid "Review Function Call Action"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "The Niji Seeder contract is used to determine Niji traits during the minting process. The seeder contract can be replaced to allow for future trait generation algorithm upgrades. Additionally, it can be locked by the Niji DAO to prevent any future updates. Currently, Niji traits are determined using pseudo-random number generation:"
 msgstr ""
 
 #. placeholder {0}: i18n.date(new Date(proposalCreationTimestamp * 1000), { dateStyle: 'long', timeStyle: 'long', })
@@ -1177,7 +1112,11 @@ msgstr ""
 msgid "Vote on Prop {0}"
 msgstr ""
 
-#: src/components/NounInfoCard.tsx
+#: src/components/Documentation/index.tsx
+msgid "Nijis are stored directly on Ethereum and do not utilize pointers to other networks such as IPFS. This is possible because Niji parts are compressed and stored on-chain using a custom run-length encoding (RLE), which is a form of lossless compression."
+msgstr ""
+
+#: src/components/NijiInfoCard.tsx
 msgid "Bids"
 msgstr ""
 
@@ -1185,12 +1124,8 @@ msgstr ""
 msgid "Submit signature"
 msgstr ""
 
-#: src/components/NounInfoCard.tsx
+#: src/components/NijiInfoCard.tsx
 msgid "Etherscan"
-msgstr ""
-
-#: src/components/Documentation/index.tsx
-msgid "Nounder distributions don't interfere with the cadence of 24 hour auctions. Nouns are sent directly to the Nounder's Multisig, and auctions continue on schedule with the next available Noun ID."
 msgstr ""
 
 #: src/components/ProposalContent/index.tsx
@@ -1198,6 +1133,10 @@ msgstr ""
 #: src/pages/CandidateHistoryPage/index.tsx
 #: src/pages/ProposalHistory/index.tsx
 msgid "Description"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "Niji DAO utilizes a fork of {compoundGovLink} and is the main governing body of the Niji ecosystem. The Niji DAO treasury receives 100% of ETH proceeds from daily Niji auctions. Each Niji is an irrevocable member of Niji DAO and entitled to one vote in all governance matters. Niji votes are non-transferable (if you sell your Niji the vote goes with it) but delegatable, which means you can assign your vote to someone else as long as you own your Niji."
 msgstr ""
 
 #: src/components/ChangeDelegatePanel/index.tsx
@@ -1233,8 +1172,16 @@ msgstr ""
 msgid "Update Proposal"
 msgstr ""
 
+#: src/pages/Nounders/index.tsx
+msgid "All Niji auction proceeds are sent to the Niji DAO. For this reason, we, the project's founders (‘Nounders’) have chosen to compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to individual Nounders."
+msgstr ""
+
 #: src/components/BidHistoryBtn/index.tsx
 msgid "View all bids"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "Because 100% of Niji auction proceeds are sent to Niji DAO, Nounders have chosen to compensate themselves with Nijis. Every 10th Niji for the first 5 years of the project (Niji ids #0, #10, #20, #30 and so on) will be automatically sent to the Nounder's multisig to be vested and shared among the founding members of the project."
 msgstr ""
 
 #: src/components/StreamWithdrawModal/index.tsx
@@ -1254,7 +1201,7 @@ msgid "All traits are <0>CC0</0> (Creative Commons Zero), meaning they are in th
 msgstr ""
 
 #: src/components/Documentation/index.tsx
-msgid "Noun Traits"
+msgid "Learn more below, or start creating Nijis off-chain using the {playgroundLink}."
 msgstr ""
 
 #: src/components/ProposalActionsModal/steps/FunctionCallEnterArgsStep/index.tsx
@@ -1271,10 +1218,6 @@ msgstr ""
 msgid "This candidate has met the required threshold, but Nouns voters can still add support until it’s put onchain."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "Learn more below, or start creating Nouns off-chain using the {playgroundLink}."
-msgstr ""
-
 #. placeholder {0}: isForked ? ` #${id}` : ''
 #: src/pages/Fork/index.tsx
 msgid "Niji DAO Fork{0}"
@@ -1289,10 +1232,6 @@ msgstr ""
 msgid "Withdraw from Stream <0/>"
 msgstr ""
 
-#: src/pages/BrandAssets/BrandAssetsPage.tsx
-msgid "Generate endless Nouns assembled from the onchain artwork"
-msgstr ""
-
 #: src/components/Documentation/index.tsx
 msgid "WTF?"
 msgstr ""
@@ -1301,6 +1240,17 @@ msgstr ""
 #. placeholder {1}: proposalThreshold === 0 || proposalThreshold === null ? 'vote' : 'votes'
 #: src/components/ChangeDelegatePanel/index.tsx
 msgid "Your account will have less than {0} {1} after this delegation. Unexecuted props you've created might become cancelable if you don't have enough sponsor votes."
+msgstr ""
+
+#: src/components/NijiContent/index.tsx
+msgid "All Niji auction proceeds are sent to the"
+msgstr ""
+
+#: src/components/Footer.tsx
+#: src/components/NavBar/index.tsx
+#: src/components/NavBar/index.tsx
+#: src/pages/Governance/index.tsx
+msgid "Nijis"
 msgstr ""
 
 #: src/components/AuctionTimer/index.tsx
@@ -1318,8 +1268,8 @@ msgstr ""
 msgid "Proposal"
 msgstr ""
 
-#: src/components/Bid/index.tsx
-msgid "Pick the next Noun"
+#: src/components/Documentation/index.tsx
+msgid "Nounder distributions don't interfere with the cadence of 24 hour auctions. Nijis are sent directly to the Nounder's Multisig, and auctions continue on schedule with the next available Niji ID."
 msgstr ""
 
 #: src/components/VoteModal/index.tsx
@@ -1328,6 +1278,10 @@ msgstr ""
 
 #: src/components/DelegationCandidateInfo/index.tsx
 msgid "Will have"
+msgstr ""
+
+#: src/components/DelegateHoverCard/index.tsx
+msgid "Voted with<0>{numVotesForProp}</0>Niji"
 msgstr ""
 
 #: src/components/VoteSignals/VoteSignals.tsx
@@ -1352,12 +1306,9 @@ msgstr ""
 msgid "Delegate Updated!"
 msgstr ""
 
-#: src/components/NounsIntroSection/index.tsx
-msgid "One Noun, Every Day, Forever."
-msgstr ""
-
-#: src/components/Documentation/index.tsx
-msgid "Noun Seeder Contract"
+#. placeholder {0}: i18n.number(Number(nounSvgs ? (nounSvgs.length / 365).toFixed(2) : '0'))
+#: src/pages/Playground/index.tsx
+msgid "You've generated {0} years worth of Nijis"
 msgstr ""
 
 #: src/components/Footer.tsx
@@ -1369,6 +1320,10 @@ msgstr ""
 
 #: src/components/VoteModal/index.tsx
 msgid "User Already Voted"
+msgstr ""
+
+#: src/pages/Governance/index.tsx
+msgid "This treasury exists for <0>Niji DAO</0> participants to allocate resources for the long-term growth and prosperity of the Niji project."
 msgstr ""
 
 #: src/components/ProposalHeader/CandidateHeader.tsx
@@ -1388,7 +1343,7 @@ msgstr ""
 msgid "Vetoed"
 msgstr ""
 
-#: src/components/AddNounsToForkModal/index.tsx
+#: src/components/AddNijisToForkModal/index.tsx
 msgid "Add as many or as few of your Nouns as you’d like. Additional Nouns can be added during the escrow and forking periods."
 msgstr ""
 
@@ -1396,25 +1351,20 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "Nouns artwork is in the {publicDomainLink}."
-msgstr ""
-
 #: src/components/ChangeDelegatePanel/index.tsx
 msgid "Your <0>{availableVotes}</0> votes have been delegated to a new account."
 msgstr ""
 
-#: src/pages/NounsPage.tsx
 #: src/pages/Playground/index.tsx
-msgid "Head"
+msgid "The playground was built using the {nounsProtocolLink}. Niji's traits are determined by the Niji Seed. The seed was generated using {nounsAssetsLink} and rendered using the {nounsSDKLink}."
+msgstr ""
+
+#: src/components/DynamicQuorumInfoModal/index.tsx
+msgid "% of Nijis Currently Against"
 msgstr ""
 
 #: src/pages/CreateProposal/index.tsx
 msgid "Tip"
-msgstr ""
-
-#: src/components/Documentation/index.tsx
-msgid "You can experiment with off-chain Noun generation at the {playgroundLink}."
 msgstr ""
 
 #: src/components/VoteCard/index.tsx
@@ -1423,18 +1373,10 @@ msgstr ""
 msgid "Abstain"
 msgstr ""
 
-#: src/pages/Fork/DeployForkButton.tsx
-msgid "Deploy Nouns fork"
-msgstr ""
-
 #. placeholder {0}: filteredDelegateGroupedVoteData.length
 #: src/components/VoteCard/index.tsx
 #: src/components/VoteCard/index.tsx
 msgid "{0, plural, one {voter} other {voters}}"
-msgstr ""
-
-#: src/components/Documentation/index.tsx
-msgid "100% of Noun auction proceeds are trustlessly sent to the treasury."
 msgstr ""
 
 #. placeholder {0}: Number(sortedNounIds?.length ?? 0) - MAX_NOUN_IDS_SHOWN
@@ -1480,6 +1422,14 @@ msgstr ""
 msgid "Nounders' Reward"
 msgstr ""
 
+#: src/components/NijisIntroSection/index.tsx
+msgid "Niji is a global community."
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "While settlement is most heavily incentivized for the winning bidder, it can be triggered by anyone, allowing the system to trustlessly auction Nijis as long as Ethereum is operational and there are interested bidders."
+msgstr ""
+
 #: src/pages/CreateProposal/index.tsx
 msgid "Because this proposal contains a USDC fund transfer action we've added an additional additional ETH transaction to refill the TokenBuyer contract. This action allows to continue to trustlessly acquire USDC to fund proposals like this."
 msgstr ""
@@ -1488,16 +1438,13 @@ msgstr ""
 msgid "Voted with<0>{numVotesForProp}</0>Nouns"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "One Noun is trustlessly auctioned every 24 hours, forever."
+#. placeholder {0}: i18n.number(availableVotes)
+#: src/components/VoteModal/index.tsx
+msgid "Voting with <0>{0}</0> Niji"
 msgstr ""
 
 #: src/components/VoteModal/index.tsx
 msgid "Error"
-msgstr ""
-
-#: src/pages/BrandAssets/BrandAssetsPage.tsx
-msgid "Download the individual traits that compose Nouns"
 msgstr ""
 
 #: src/pages/CreateProposal/index.tsx
@@ -1525,20 +1472,8 @@ msgstr ""
 msgid "Explore traits"
 msgstr ""
 
-#: src/components/NounderNounContent/index.tsx
-msgid "For this reason, we, the project's founders (‘Nounders’) have chosen to compensate compensate ourselves with Nouns. Every 10th Noun for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed Nounders."
-msgstr ""
-
-#: src/components/Documentation/index.tsx
-msgid "All Nouns are members of Niji DAO."
-msgstr ""
-
 #: src/pages/Vote/index.tsx
 msgid "Transaction Successful!"
-msgstr ""
-
-#: src/pages/BrandAssets/BrandAssetsPage.tsx
-msgid "The logos, traits and every Noun generated on the playground are <0>CC0</0> (Creative Commons Zero), meaning they are in the public domain and free to use for any purpose without restriction."
 msgstr ""
 
 #: src/components/ChangeDelegatePanel/index.tsx
@@ -1553,21 +1488,16 @@ msgstr ""
 msgid "Token"
 msgstr ""
 
-#: src/pages/Governance/index.tsx
-#: src/pages/NounsPage.tsx
-msgid "Noun"
+#: src/components/Documentation/index.tsx
+msgid "The treasury is controlled exclusively by Nijis via governance."
 msgstr ""
 
-#: src/pages/Playground/index.tsx
-msgid "Generate Nouns"
+#: src/components/Documentation/index.tsx
+msgid "One Niji is trustlessly auctioned every 24 hours, forever."
 msgstr ""
 
 #: src/components/Proposals/index.tsx
 msgid "No candidates found"
-msgstr ""
-
-#: src/components/Documentation/index.tsx
-msgid "The proposal veto right was initially envisioned as a temporary solution to the problem of ‘51% attacks’ on the Nouns DAO treasury. While Nounders initially believed that a healthy distribution of Nouns would be sufficient protection for the DAO, a more complete understanding of the incentives and risks has led to general consensus within the Nounders, the Nouns Foundation, and the wider community that a more robust game-theoretic solution should be implemented before the right is removed."
 msgstr ""
 
 #: src/components/ProposalStatus/index.tsx
@@ -1575,16 +1505,12 @@ msgstr ""
 msgid "Pending"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "attempt to alter Noun auction cadence for the purpose of maintaining or acquiring a voting majority"
-msgstr ""
-
 #: src/components/ChangeDelegatePanel/index.tsx
 msgid "Enter the Ethereum address or ENS name of the account you would like to delegate your votes to."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "Each time an auction is settled, the settlement transaction will also cause a new Noun to be minted and a new 24 hour auction to begin. "
+#: src/pages/BrandAssets/BrandAssetsPage.tsx
+msgid "Generate endless Nijis assembled from the onchain artwork"
 msgstr ""
 
 #. placeholder {0}: dayjs(endDate).fromNow()
@@ -1603,12 +1529,21 @@ msgstr ""
 msgid "Proposal Updated!"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "Under Wyoming's DUNA Act, Nouns DAO can hold assets, enter into contracts, and participate in legal actions in its own name. Governance remains fully decentralized, with decisions controlled exclusively by Noun holders via on-chain voting. This enables Nouns DAO to sustainably fund projects, manage its treasury, and interact confidently within both the digital and physical worlds."
+#: src/pages/Fork/WithdrawNijisButton.tsx
+#: src/pages/Fork/WithdrawNijisButton.tsx
+msgid "Withdraw Nijis from escrow"
 msgstr ""
 
-#: src/pages/NounsPage.tsx
+#: src/components/NijiInfoRowHolder.tsx
+msgid "Niji Auction House"
+msgstr ""
+
+#: src/pages/NijisPage.tsx
 msgid "Go to auction"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "Nounders receive rewards in the form of Nijis (10% of supply for first 5 years)."
 msgstr ""
 
 #: src/components/ForkStatus/index.tsx
@@ -1634,13 +1569,13 @@ msgstr ""
 msgid "More details on how the dynamic threshold works can be found <0>here</0>."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "The Noun Seeder contract is used to determine Noun traits during the minting process. The seeder contract can be replaced to allow for future trait generation algorithm upgrades. Additionally, it can be locked by the Nouns DAO to prevent any future updates. Currently, Noun traits are determined using pseudo-random number generation:"
-msgstr ""
-
 #: src/components/ProposalActionsModal/steps/FunctionCallEnterArgsStep/index.tsx
 #: src/components/ProposalActionsModal/steps/TransferFundsDetailsStep/index.tsx
 msgid "Review and Add"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "100% of Niji auction proceeds are trustlessly sent to the treasury."
 msgstr ""
 
 #: src/components/ProposalHeader/CandidateHeader.tsx
@@ -1675,21 +1610,17 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
-#: src/pages/BrandAssets/BrandAssetsPage.tsx
-msgid "Download official Nouns DAO brand assets including our iconic noggles in various formats."
-msgstr ""
-
 #: src/components/VoteModal/index.tsx
 msgid "There was an error voting for your account."
-msgstr ""
-
-#: src/components/Documentation/index.tsx
-msgid "The Nouns Auction Contract will act as a self-sufficient Noun generation and distribution mechanism, auctioning one Noun every 24 hours, forever. 100% of auction proceeds (ETH) are automatically deposited in the Nouns DAO treasury, where they are governed by Noun owners."
 msgstr ""
 
 #: src/components/ProposalStatus/index.tsx
 #: src/components/ProposalStatusCopy/index.tsx
 msgid "Defeated"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "The proposal veto right was initially envisioned as a temporary solution to the problem of ‘51% attacks’ on the Niji DAO treasury. While Nounders initially believed that a healthy distribution of Nijis would be sufficient protection for the DAO, a more complete understanding of the incentives and risks has led to general consensus within the Nounders, the Niji Foundation, and the wider community that a more robust game-theoretic solution should be implemented before the right is removed."
 msgstr ""
 
 #: src/components/CandidateSponsors/SelectSponsorsToPropose.tsx
@@ -1711,6 +1642,10 @@ msgstr ""
 msgid "Delegate"
 msgstr ""
 
+#: src/components/Documentation/index.tsx
+msgid "Niji DUNA"
+msgstr ""
+
 #: src/components/ProposalActionsModal/steps/SelectProposalActionStep/index.tsx
 msgid "Add Action Details"
 msgstr ""
@@ -1724,16 +1659,16 @@ msgstr ""
 msgid "{0} ETH fee upon submission"
 msgstr ""
 
+#: src/components/Documentation/index.tsx
+msgid "One Niji is equal to one vote."
+msgstr ""
+
 #: src/pages/CandidateHistoryPage/index.tsx
 msgid "Proposal Candidate"
 msgstr ""
 
 #: src/components/Documentation/index.tsx
 msgid "make upgrades to critical smart contracts without undergoing an audit"
-msgstr ""
-
-#: src/pages/Playground/index.tsx
-msgid "Glasses"
 msgstr ""
 
 #: src/components/ProposalActionsModal/steps/StreamPaymentsDateDetailsStep/index.tsx
@@ -1744,8 +1679,16 @@ msgstr ""
 msgid "You have no Votes."
 msgstr ""
 
+#: src/components/Documentation/index.tsx
+msgid "Trait generation is not truly random. Traits can be predicted when minting a Niji on the pending block."
+msgstr ""
+
 #: src/components/StreamWithdrawModal/index.tsx
 msgid "There was an error withdrawing to your wallet."
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "Niji Seeder Contract"
 msgstr ""
 
 #: src/components/VoteCard/index.tsx
@@ -1754,8 +1697,30 @@ msgstr ""
 msgid "For"
 msgstr ""
 
+#: src/components/AuctionActivity/index.tsx
+msgid "Help mint the next Niji"
+msgstr ""
+
+#: src/components/NijisIntroSection/index.tsx
+msgid "One Niji, Every Day, Forever."
+msgstr ""
+
 #: src/components/ProposalActionsModal/steps/FunctionCallReviewStep/index.tsx
 msgid "Function"
+msgstr ""
+
+#: src/pages/BrandAssets/BrandAssetsPage.tsx
+msgid "The logos, traits and every Niji generated on the playground are <0>CC0</0> (Creative Commons Zero), meaning they are in the public domain and free to use for any purpose without restriction."
+msgstr ""
+
+#: src/pages/BrandAssets/BrandAssetsPage.tsx
+msgid "Download the individual traits that compose Nijis"
+msgstr ""
+
+#. placeholder {0}: humanizeTraitKey(traitKey)
+#. placeholder {1}: NijiImageData.images[traitKey].length
+#: src/components/Documentation/index.tsx
+msgid "{0} ({1})"
 msgstr ""
 
 #: src/pages/Vote/index.tsx
@@ -1769,16 +1734,12 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: src/pages/Fork/index.tsx
-msgid "Fork Nouns DAO"
-msgstr ""
-
-#: src/components/NounInfoRowHolder.tsx
+#: src/components/NijiInfoRowHolder.tsx
 msgid "Loading..."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "Nouns DUNA is a legally recognized Decentralized Unincorporated Nonprofit Association established in Wyoming via <0/> designed to provide a robust legal framework that aligns with the decentralized nature of Nouns DAO. This structure allows Nouns DAO to operate with limited liability protection and legal clarity without compromising its decentralized governance ethos."
+#: src/pages/Fork/index.tsx
+msgid "Fork Niji DAO"
 msgstr ""
 
 #: src/pages/EditCandidate/index.tsx
@@ -1794,10 +1755,6 @@ msgstr ""
 msgid "Bid placed."
 msgstr ""
 
-#: src/pages/NounsPage.tsx
-msgid "Noggles"
-msgstr ""
-
 #: src/components/ProposalEditor/index.tsx
 msgid "Candidate"
 msgstr ""
@@ -1810,14 +1767,14 @@ msgstr ""
 msgid "Proposer functions"
 msgstr ""
 
+#: src/components/NijisIntroSection/index.tsx
+msgid "Behold, an infinite work of art! Niji is a community-owned brand that makes a positive impact by funding ideas and fostering collaboration. From collectors and technologists, to non-profits and brands, Niji is for everyone."
+msgstr ""
+
 #: src/components/Banner/index.tsx
 msgid "EVERY DAY,"
 msgstr ""
 
-#: src/components/NounderNounContent/index.tsx
+#: src/components/NijiContent/index.tsx
 msgid "Learn more"
-msgstr ""
-
-#: src/components/NounsIntroSection/index.tsx
-msgid "Behold, an infinite work of art! Nouns is a community-owned brand that makes a positive impact by funding ideas and fostering collaboration. From collectors and technologists, to non-profits and brands, Nouns is for everyone."
 msgstr ""

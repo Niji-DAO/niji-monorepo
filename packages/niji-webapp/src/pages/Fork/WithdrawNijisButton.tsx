@@ -79,9 +79,9 @@ function WithdrawNijisButton(props: Props) {
   const modalContent = (
     <div className={classes.transactionModal}>
       <h2 className={classes.transactionModalTitle}>
-        <Trans>Withdraw Nouns from escrow</Trans>
+        <Trans>Withdraw Nijis from escrow</Trans>
       </h2>
-      <p>Withdrawing {props.tokenIds.map(nounId => `Noun ${nounId}`).join(', ')}</p>
+      <p>Withdrawing {props.tokenIds.map(nounId => `Niji ${nounId}`).join(', ')}</p>
       <p
         className={clsx(
           classes.transactionStatus,
@@ -144,7 +144,7 @@ function WithdrawNijisButton(props: Props) {
         }}
         disabled={isLoading || isWaiting}
       >
-        <Trans>Withdraw Nouns from escrow</Trans>
+        <Trans>Withdraw Nijis from escrow</Trans>
       </button>
       <SolidColorBackgroundModal
         show={props.isWithdrawModalOpen}

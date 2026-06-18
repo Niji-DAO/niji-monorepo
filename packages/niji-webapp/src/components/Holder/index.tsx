@@ -35,7 +35,7 @@ const Holder: React.FC<HolderProps> = props => {
   } else if (error) {
     return (
       <div>
-        <Trans>Failed to fetch Noun info</Trans>
+        <Trans>Failed to fetch Niji info</Trans>
       </div>
     );
   }

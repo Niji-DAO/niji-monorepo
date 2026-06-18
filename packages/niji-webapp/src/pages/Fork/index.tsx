@@ -208,7 +208,7 @@ const ForkPage = () => {
                     <div className={classes.spacer} />
                   </div>
                   <h1>
-                    <Trans>Fork Nouns DAO</Trans>
+                    <Trans>Fork Niji DAO</Trans>
                   </h1>
                   <p className="mb-4">
                     <Trans>

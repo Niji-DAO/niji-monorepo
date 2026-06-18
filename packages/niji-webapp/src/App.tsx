@@ -56,8 +56,6 @@ function App() {
         <NavBar />
         <Routes>
           <Route path="/" element={<AuctionPage />} />
-          <Route path="/auction/:id" element={<Navigate to="/niji/:id" replace />} />
-          <Route path="/niji/:id" element={<Navigate to="/niji/:id" replace />} />
           <Route path="/niji/:id" element={<AuctionPage />} />
           <Route path="/nounders" element={<NoundersPage />} />
           <Route path="/create-proposal" element={<CreateProposalPage />} />
@@ -81,7 +79,6 @@ function App() {
           <Route path="/delegate" element={<DelegatePage />} />
           <Route path="/traits" element={<TraitsPage />} />
           <Route path="/explore" element={<Navigate to="/nijis" replace />} />
-          <Route path="/nijis" element={<Navigate to="/nijis" replace />} />
           <Route path="/nijis" element={<NijisPage />} />
           <Route path="/fork/:id" element={<ForkPage />} />
           <Route path="/fork" element={<ForksPage />} />
