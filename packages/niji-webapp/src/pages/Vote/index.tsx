@@ -16,7 +16,6 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { Button, Card, Col, Row, Spinner } from 'react-bootstrap';
 import { Link, useParams } from 'react-router';
-import ReactTooltip from 'react-tooltip';
 import { isNonNullish } from 'remeda';
 import { toast } from 'sonner';
 import { zeroAddress } from 'viem';
@@ -27,6 +26,7 @@ import ProposalContent from '@/components/ProposalContent';
 import ProposalHeader from '@/components/ProposalHeader';
 import ShortAddress from '@/components/ShortAddress';
 import StreamWithdrawModal from '@/components/StreamWithdrawModal';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import VoteCard, { VoteCardVariant } from '@/components/VoteCard';
 import VoteModal from '@/components/VoteModal';
 import VoteSignals from '@/components/VoteSignals/VoteSignals';
@@ -710,32 +710,36 @@ const VotePage = () => {
                       <Trans>Threshold</Trans>
                     </h1>
                   </div>
-                  {isV2Prop && (
-                    <ReactTooltip
-                      id={'view-dq-info'}
-                      className={classes.delegateHover}
-                      getContent={() => {
-                        return <Trans>View Threshold Info</Trans>;
-                      }}
-                    />
+                  {isV2Prop ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div
+                          onClick={() => setShowDynamicQuorumInfoModal(isV2Prop)}
+                          className={clsx(classes.thresholdInfo, classes.cursorPointer)}
+                        >
+                          <span>
+                            <Trans>Current Threshold</Trans>
+                          </span>
+                          <h3>
+                            <Trans>{i18n.number(Number(currentQuorum ?? 0))} votes</Trans>
+                            <SearchIcon className={cn(classes.dqIcon, 'inline-block')} />
+                          </h3>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className={classes.delegateHover}>
+                        <Trans>View Threshold Info</Trans>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <div className={classes.thresholdInfo}>
+                      <span>
+                        <Trans>Threshold</Trans>
+                      </span>
+                      <h3>
+                        <Trans>{proposal.quorumVotes} votes</Trans>
+                      </h3>
+                    </div>
                   )}
-                  <div
-                    data-for="view-dq-info"
-                    data-tip="View Dynamic Quorum Info"
-                    onClick={() => setShowDynamicQuorumInfoModal(isV2Prop)}
-                    className={clsx(classes.thresholdInfo, isV2Prop ? classes.cursorPointer : '')}
-                  >
-                    <span>
-                      {isV2Prop ? <Trans>Current Threshold</Trans> : <Trans>Threshold</Trans>}
-                    </span>
-                    <h3>
-                      <Trans>
-                        {isV2Prop ? i18n.number(Number(currentQuorum ?? 0)) : proposal.quorumVotes}{' '}
-                        votes
-                      </Trans>
-                      {isV2Prop && <SearchIcon className={cn(classes.dqIcon, 'inline-block')} />}
-                    </h3>
-                  </div>
                 </div>
               </Card.Body>
             </Card>
