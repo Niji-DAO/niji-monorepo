@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { StandaloneNijiCircular } from '@/components/StandaloneNiji';
+import { NijiCircular } from '@/components/Niji';
 
 import classes from './HorizontalStackedNijis.module.css';
 
@@ -23,7 +23,7 @@ const HorizontalStackedNijis: React.FC<HorizontalStackedNounsProps> = ({ nounIds
               }}
               className={classes.nounWrapper}
             >
-              <StandaloneNijiCircular nounId={BigInt(nounId)} border={true} />
+              <NijiCircular nounId={BigInt(nounId)} border={true} />
             </div>
           );
         })

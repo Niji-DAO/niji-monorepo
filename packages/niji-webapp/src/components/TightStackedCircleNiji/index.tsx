@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { LoadingNoun } from '@/components/LegacyNoun';
-import { getNiji } from '@/components/StandaloneNiji';
+import { getNiji } from '@/components/Niji';
 import { useNounSeed } from '@/wrappers/nijiToken';
 
 interface TightStackedCircleNounProps {
