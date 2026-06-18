@@ -197,7 +197,7 @@ describe('NijiToken (edge cases)', () => {
   describe('getTraitIndices full verification', () => {
     it('should return 12-element array matching seed fields', async () => {
       await token.toggleMinting();
-      await token.mint(other.address);
+      await token['mint(address)'](other.address);
 
       const seed = await token.getSeed(0);
       const indices = await token.getTraitIndices(0);
@@ -228,10 +228,10 @@ describe('NijiToken (edge cases)', () => {
       await token.setMinter(minter.address);
 
       // Old minter (owner) should fail
-      await expect(token.mint(other.address)).to.be.revertedWithCustomError(token, 'OnlyMinter');
+      await expect(token['mint(address)'](other.address)).to.be.revertedWithCustomError(token, 'OnlyMinter');
 
       // New minter should succeed
-      await token.connect(minter).mint(other.address);
+      await token.connect(minter)['mint(address)'](other.address);
       expect(await token.ownerOf(0)).to.equal(other.address);
     });
   });
