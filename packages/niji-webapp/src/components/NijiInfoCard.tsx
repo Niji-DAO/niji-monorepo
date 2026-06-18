@@ -11,12 +11,12 @@ import { useAppSelector } from '@/hooks';
 import { buildEtherscanTokenLink } from '@/utils/etherscan';
 import { defaultChain } from '@/wagmi';
 
-interface NounInfoCardProps {
+interface NijiInfoCardProps {
   nounId: bigint;
   bidHistoryOnClickHandler: () => void;
 }
 
-const NijiInfoCard: React.FC<NounInfoCardProps> = props => {
+const NijiInfoCard: React.FC<NijiInfoCardProps> = props => {
   const { nounId, bidHistoryOnClickHandler } = props;
   const chainId = defaultChain.id;
 
