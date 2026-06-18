@@ -1,4 +1,4 @@
-# Nouns DAO docs
+# Niji DAO docs
 
 ## Local Development
 
