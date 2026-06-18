@@ -3,7 +3,6 @@ import { BigNumberish } from '@/utils/types';
 
 // Re-export generated documents with shorter aliases
 export {
-  GetSeedsDocument as seedsDocument,
   GetProposalDocument as proposalDocument,
   GetPartialProposalsDocument as partialProposalsDocument,
   GetActivePendingUpdatableProposersDocument as activePendingUpdatableProposersDocument,
@@ -21,8 +20,6 @@ export {
   GetNounDelegationHistoryDocument as nounDelegationHistoryDocument,
   GetCreateTimestampAllProposalsDocument as createTimestampAllProposalsDocument,
   GetProposalVotesDocument as proposalVotesDocument,
-  GetDelegateNounsAtBlockDocument as delegateNounsAtBlockDocument,
-  GetCurrentlyDelegatedNounsDocument as currentlyDelegatedNounsDocument,
   GetAdjustedNounSupplyAtPropSnapshotDocument as adjustedNounSupplyAtPropSnapshotDocument,
   GetPropUsingDynamicQuorumDocument as propUsingDynamicQuorumDocument,
   GetProposalFeedbacksDocument as proposalFeedbacksDocument,
@@ -56,6 +53,48 @@ export interface IBid {
   };
 }
 
+export const seedsDocument = graphql(`
+  query GetSeeds($first: Int!) {
+    seeds(first: $first) {
+      id
+      special
+      choker
+      headphone
+      leftHand
+      hat
+      clothing
+      ear
+      back
+      backDecoration
+      background
+      solidBackground
+      hair
+    }
+  }
+`);
+
+export const delegateNounsAtBlockDocument = graphql(`
+  query GetDelegateNounsAtBlock($delegates: [ID!]!, $block: Int!) {
+    delegates(where: { id_in: $delegates }, block: { number: $block }) {
+      id
+      nijiRepresented {
+        id
+      }
+    }
+  }
+`);
+
+export const currentlyDelegatedNounsDocument = graphql(`
+  query GetCurrentlyDelegatedNouns($delegate: ID!) {
+    delegates(where: { id: $delegate }) {
+      id
+      nijiRepresented {
+        id
+      }
+    }
+  }
+`);
+
 export const auctionQuery = graphql(`
   query GetAuction($id: ID!) {
     auction(id: $id) {
@@ -71,11 +110,18 @@ export const auctionQuery = graphql(`
         id
         seed {
           id
+          special
+          choker
+          headphone
+          leftHand
+          hat
+          clothing
+          ear
+          back
+          backDecoration
           background
-          body
-          accessory
-          head
-          glasses
+          solidBackground
+          hair
         }
         owner {
           id

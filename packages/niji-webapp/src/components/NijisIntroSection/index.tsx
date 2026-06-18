@@ -5,22 +5,22 @@ import { Link } from 'react-router';
 import LinkComponent from '@/components/Link';
 import Section from '@/layout/Section';
 
-import classes from './NounsIntroSection.module.css';
+import classes from './NijisIntroSection.module.css';
 
-const NounsIntroSection = () => {
+const NijisIntroSection = () => {
   return (
     <>
       <Section fullWidth={false} className={classes.videoSection}>
         <Col lg={6}>
           <div className={classes.textWrapper}>
             <h1>
-              <Trans>One Noun, Every Day, Forever.</Trans>
+              <Trans>One Niji, Every Day, Forever.</Trans>
             </h1>
             <p>
               <Trans>
-                Behold, an infinite work of art! Nouns is a community-owned brand that makes a
+                Behold, an infinite work of art! Niji is a community-owned brand that makes a
                 positive impact by funding ideas and fostering collaboration. From collectors and
-                technologists, to non-profits and brands, Nouns is for everyone.
+                technologists, to non-profits and brands, Niji is for everyone.
               </Trans>
             </p>
           </div>
@@ -67,13 +67,13 @@ const NounsIntroSection = () => {
         <Col lg={6} className={`order-lg-2 order-1`}>
           <div className={`${classes.textWrapper} ${classes.youtubeSectionText}`}>
             <h1>
-              <Trans>Build With Nouns. Get Funded.</Trans>
+              <Trans>Build With Niji. Get Funded.</Trans>
             </h1>
             <p>
               <Trans>
-                There&apos;s a way for everyone to get involved with Nouns. From whimsical endeavors
+                There&apos;s a way for everyone to get involved with Niji. From whimsical endeavors
                 like naming a frog, to ambitious projects like constructing a giant float for the
-                Rose Parade, or even crypto infrastructure like Prop House. Nouns funds projects of
+                Rose Parade, or even crypto infrastructure like Prop House. Niji funds projects of
                 all sizes and domains.
               </Trans>
             </p>
@@ -84,12 +84,12 @@ const NounsIntroSection = () => {
         <Col lg={12}>
           <div className={classes.textWrapper}>
             <h1>
-              <Trans>Nouns is a global community.</Trans>
+              <Trans>Niji is a global community.</Trans>
             </h1>
             <p>
               <Trans>
                 From a school in Uganda to a coffee shop in LA, from a crypto hub in São Paulo to a
-                deli in Melbourne, Nouns lives wherever creative people bring ideas to life. Explore
+                deli in Melbourne, Niji lives wherever creative people bring ideas to life. Explore
                 nounish people, places, and things with{' '}
                 <LinkComponent
                   text={<Trans>Nounspot</Trans>}
@@ -123,4 +123,4 @@ const NounsIntroSection = () => {
   );
 };
 
-export default NounsIntroSection;
+export default NijisIntroSection;

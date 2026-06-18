@@ -17,7 +17,7 @@ import classes from './Governance.module.css';
 const GovernancePage = () => {
   const { data: proposals } = useAllProposals();
   const threshold = useProposalThreshold();
-  const nounsRequired = threshold == null ? undefined : threshold + 1;
+  const nijisRequired = threshold == null ? undefined : threshold + 1;
 
   const treasuryBalance = useReadNijiTreasuryBalancesInEth({
     query: {
@@ -40,16 +40,16 @@ const GovernancePage = () => {
   }).data;
 
   // Note: We have to extract this copy out of the <span> otherwise the Lingui macro gets confused
-  const nounSingular = <Trans>Noun</Trans>;
-  const nounPlural = <Trans>Nouns</Trans>;
+  const nijiSingular = <Trans>Niji</Trans>;
+  const nijiPlural = <Trans>Nijis</Trans>;
   const subHeading = (
     <Trans>
-      Nouns govern <span className={classes.boldText}>Nouns DAO</span>. Nouns can vote on proposals
+      Nijis govern <span className={classes.boldText}>Niji DAO</span>. Nijis can vote on proposals
       or delegate their vote to a third party. A minimum of{' '}
       <span className={classes.boldText}>
-        {nounsRequired !== undefined ? (
+        {nijisRequired !== undefined ? (
           <>
-            {nounsRequired} {threshold === 0 ? nounSingular : nounPlural}
+            {nijisRequired} {threshold === 0 ? nijiSingular : nijiPlural}
           </>
         ) : (
           '...'
@@ -101,16 +101,16 @@ const GovernancePage = () => {
             </Col>
             <Col className={classes.treasuryInfoText}>
               <Trans>
-                This treasury exists for <span className={classes.boldText}>Nouns DAO</span>{' '}
+                This treasury exists for <span className={classes.boldText}>Niji DAO</span>{' '}
                 participants to allocate resources for the long-term growth and prosperity of the
-                Nouns project.
+                Niji project.
               </Trans>
             </Col>
           </Row>
         </Col>
       </Section>
 
-      <Proposals proposals={proposals ?? []} nounsRequired={nounsRequired} />
+      <Proposals proposals={proposals ?? []} nounsRequired={nijisRequired} />
     </>
   );
 };

@@ -4,7 +4,7 @@ import { Image } from 'react-bootstrap';
 
 import { useAppSelector } from '@/hooks';
 
-import classes from './NounInfoRowButton.module.css';
+import classes from './NijiInfoRowButton.module.css';
 
 interface NounInfoRowButtonProps {
   iconImgSource: string;
@@ -12,7 +12,7 @@ interface NounInfoRowButtonProps {
   onClickHandler: () => void;
 }
 
-const NounInfoRowButton: React.FC<NounInfoRowButtonProps> = props => {
+const NijiInfoRowButton: React.FC<NounInfoRowButtonProps> = props => {
   const { iconImgSource, btnText, onClickHandler } = props;
   const isCool = useAppSelector(state => state.application.isCoolBackground);
   return (
@@ -28,4 +28,4 @@ const NounInfoRowButton: React.FC<NounInfoRowButtonProps> = props => {
   );
 };
 
-export default NounInfoRowButton;
+export default NijiInfoRowButton;

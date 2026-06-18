@@ -48,7 +48,7 @@ const ForksPage: React.FC<Props> = () => {
               target="_blank"
               rel="noreferrer"
             >
-              Learn more about Nouns Fork
+              Learn more about Niji Fork
             </a>
           </p>
         </Col>
@@ -73,7 +73,7 @@ const ForksPage: React.FC<Props> = () => {
 
                     return (
                       <Link to={`/fork/${fork.id}`} className={classes.forkCard} key={i}>
-                        <div className={classes.title}>Nouns DAO Fork #{fork.id}</div>
+                        <div className={classes.title}>Niji DAO Fork #{fork.id}</div>
                         <div
                           className={clsx(classes.proposalStatusWrapper, classes.votePillWrapper)}
                         >

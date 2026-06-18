@@ -54,7 +54,7 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
           setNounsInEvent(
             event.tokenIDs?.map((tokenId, i) => {
               return (
-                <Link key={i} to={`/noun/${tokenId}`}>
+                <Link key={i} to={`/niji/${tokenId}`}>
                   <img
                     src={`https://noun.pics/${tokenId}`}
                     alt={`Noun ${tokenId}`}
@@ -85,7 +85,7 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
           setNounsInEvent(
             event.tokenIDs?.map((tokenId, i) => {
               return (
-                <Link key={i} to={`/noun/${tokenId}`}>
+                <Link key={i} to={`/niji/${tokenId}`}>
                   <img
                     src={`https://noun.pics/${tokenId}`}
                     alt={`Noun ${tokenId}`}
@@ -116,7 +116,7 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
           setNounsInEvent(
             event.tokenIDs?.map((tokenId, i) => {
               return (
-                <Link key={i} to={`/noun/${tokenId}`}>
+                <Link key={i} to={`/niji/${tokenId}`}>
                   <img
                     src={`https://noun.pics/${tokenId}`}
                     alt={`Noun ${tokenId}`}

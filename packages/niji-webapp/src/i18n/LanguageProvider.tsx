@@ -6,7 +6,7 @@ import { ReactNode, useCallback } from 'react';
 import { useActiveLocale } from '../hooks/useActivateLocale';
 
 import { SupportedLocale } from './locales';
-import { dynamicActivate, NounsI18nProvider } from './NounsI18nProvider';
+import { dynamicActivate, NijiI18nProvider } from './NijiI18nProvider';
 
 export function LanguageProvider({ children }: Readonly<{ children: ReactNode }>) {
   const locale = useActiveLocale();
@@ -16,8 +16,8 @@ export function LanguageProvider({ children }: Readonly<{ children: ReactNode }>
   }, []);
 
   return (
-    <NounsI18nProvider locale={locale} forceRenderAfterLocaleChange={true} onActivate={onActivate}>
+    <NijiI18nProvider locale={locale} forceRenderAfterLocaleChange={true} onActivate={onActivate}>
       {children}
-    </NounsI18nProvider>
+    </NijiI18nProvider>
   );
 }

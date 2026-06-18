@@ -1,24 +1,17 @@
-import { ImageData } from '@noundry/nouns-assets';
-
-import { traitCategory } from '@/lib/traitCategory';
+import { NijiImageData, humanizeTraitKey } from '@/lib/nijiAssets';
 import { INounSeed } from '@/wrappers/nijiToken';
 
-const capitalizeFirstLetter = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
+const capitalizeWords = (s: string): string =>
+  s.replace(/\b\w/g, char => char.toUpperCase()).replace(/-/g, ' ');
 
 export const traitName = (type: keyof INounSeed, seed: number) => {
-  if (type === 'background') {
-    return ['Cool', 'Warm'][seed];
+  const filename = NijiImageData.images[type][seed]?.filename;
+
+  if (filename === undefined) {
+    return humanizeTraitKey(type);
   }
 
-  let filename = ImageData.images[traitCategory[type]][seed].filename;
-
-  if (type === 'glasses') {
-    filename = filename.replace('square-', '');
-  }
-
-  if (type === 'accessory') {
-    filename = filename.replace('body-', '');
-  }
-
-  return capitalizeFirstLetter(filename.substring(filename.indexOf('-') + 1).replace(/-/g, ' '));
+  return capitalizeWords(
+    filename.includes('-') ? filename.slice(filename.indexOf('-') + 1) : filename,
+  );
 };

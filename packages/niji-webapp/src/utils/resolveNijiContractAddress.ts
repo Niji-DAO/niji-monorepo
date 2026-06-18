@@ -1,15 +1,15 @@
 import { nijiGovernorAddress, nijiAuctionHouseAddress, nijiTreasuryAddress } from '@/contracts';
 import { defaultChain } from '@/wagmi';
 
-export const resolveNounContractAddress = (address: string) => {
+export const resolveNijiContractAddress = (address: string) => {
   const chainId = defaultChain.id;
   switch (address.toLowerCase()) {
     case nijiGovernorAddress[chainId].toLowerCase():
-      return 'Nouns DAO Proxy';
+      return 'Niji DAO Proxy';
     case nijiAuctionHouseAddress[chainId].toLowerCase():
-      return 'Nouns Auction House Proxy';
+      return 'Niji Auction House Proxy';
     case nijiTreasuryAddress[chainId].toLowerCase():
-      return 'Nouns DAO Treasury';
+      return 'Niji DAO Treasury';
     default:
       return undefined;
   }

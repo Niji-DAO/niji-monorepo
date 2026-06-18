@@ -646,7 +646,7 @@ export type Delegate = {
   /** A Delegate is any address that has been delegated with voting tokens by a token holder, id is the blockchain address of said delegate */
   id: Scalars['ID']['output'];
   /** Nouns that this delegate represents */
-  nounsRepresented: Array<Noun>;
+  nijiRepresented: Array<Noun>;
   /** Proposals that the delegate has created */
   proposals: Array<Proposal>;
   /** Token holders that this delegate represents */
@@ -656,7 +656,7 @@ export type Delegate = {
   votes: Array<Vote>;
 };
 
-export type DelegateNounsRepresentedArgs = {
+export type DelegateNijiRepresentedArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<NounOrderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
@@ -716,13 +716,13 @@ export type DelegateFilter = {
   id_lte?: InputMaybe<Scalars['ID']['input']>;
   id_not?: InputMaybe<Scalars['ID']['input']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  nounsRepresented?: InputMaybe<Array<Scalars['String']['input']>>;
-  nounsRepresented_?: InputMaybe<NounFilter>;
-  nounsRepresented_contains?: InputMaybe<Array<Scalars['String']['input']>>;
-  nounsRepresented_contains_nocase?: InputMaybe<Array<Scalars['String']['input']>>;
-  nounsRepresented_not?: InputMaybe<Array<Scalars['String']['input']>>;
-  nounsRepresented_not_contains?: InputMaybe<Array<Scalars['String']['input']>>;
-  nounsRepresented_not_contains_nocase?: InputMaybe<Array<Scalars['String']['input']>>;
+  nijiRepresented?: InputMaybe<Array<Scalars['String']['input']>>;
+  nijiRepresented_?: InputMaybe<NounFilter>;
+  nijiRepresented_contains?: InputMaybe<Array<Scalars['String']['input']>>;
+  nijiRepresented_contains_nocase?: InputMaybe<Array<Scalars['String']['input']>>;
+  nijiRepresented_not?: InputMaybe<Array<Scalars['String']['input']>>;
+  nijiRepresented_not_contains?: InputMaybe<Array<Scalars['String']['input']>>;
+  nijiRepresented_not_contains_nocase?: InputMaybe<Array<Scalars['String']['input']>>;
   or?: InputMaybe<Array<InputMaybe<DelegateFilter>>>;
   proposals_?: InputMaybe<ProposalFilter>;
   tokenHoldersRepresentedAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -741,7 +741,7 @@ export enum DelegateOrderBy {
   DelegatedVotes = 'delegatedVotes',
   DelegatedVotesRaw = 'delegatedVotesRaw',
   Id = 'id',
-  NounsRepresented = 'nounsRepresented',
+  NijiRepresented = 'nijiRepresented',
   Proposals = 'proposals',
   TokenHoldersRepresented = 'tokenHoldersRepresented',
   TokenHoldersRepresentedAmount = 'tokenHoldersRepresentedAmount',
@@ -4057,16 +4057,30 @@ export type QueryVotesArgs = {
 
 export type Seed = {
   __typename?: 'Seed';
-  /** The accessory index */
-  accessory: Scalars['BigInt']['output'];
+  /** The special trait index */
+  special: Scalars['BigInt']['output'];
+  /** The choker trait index */
+  choker: Scalars['BigInt']['output'];
+  /** The headphone trait index */
+  headphone: Scalars['BigInt']['output'];
+  /** The left hand trait index */
+  leftHand: Scalars['BigInt']['output'];
+  /** The hat trait index */
+  hat: Scalars['BigInt']['output'];
+  /** The clothing trait index */
+  clothing: Scalars['BigInt']['output'];
+  /** The ear trait index */
+  ear: Scalars['BigInt']['output'];
+  /** The back trait index */
+  back: Scalars['BigInt']['output'];
+  /** The back decoration trait index */
+  backDecoration: Scalars['BigInt']['output'];
   /** The background index */
   background: Scalars['BigInt']['output'];
-  /** The body index */
-  body: Scalars['BigInt']['output'];
-  /** The glasses index */
-  glasses: Scalars['BigInt']['output'];
-  /** The head index */
-  head: Scalars['BigInt']['output'];
+  /** The solid background trait index */
+  solidBackground: Scalars['BigInt']['output'];
+  /** The hair trait index */
+  hair: Scalars['BigInt']['output'];
   /** The Noun's ERC721 token id */
   id: Scalars['ID']['output'];
 };
@@ -4536,11 +4550,18 @@ export type GetSeedsQuery = {
   seeds: Array<{
     __typename?: 'Seed';
     id: string;
+    special: bigint;
+    choker: bigint;
+    headphone: bigint;
+    leftHand: bigint;
+    hat: bigint;
+    clothing: bigint;
+    ear: bigint;
+    back: bigint;
+    backDecoration: bigint;
     background: bigint;
-    body: bigint;
-    accessory: bigint;
-    head: bigint;
-    glasses: bigint;
+    solidBackground: bigint;
+    hair: bigint;
   }>;
 };
 
@@ -4801,11 +4822,18 @@ export type GetAuctionQuery = {
       seed?: {
         __typename?: 'Seed';
         id: string;
+        special: bigint;
+        choker: bigint;
+        headphone: bigint;
+        leftHand: bigint;
+        hat: bigint;
+        clothing: bigint;
+        ear: bigint;
+        back: bigint;
+        backDecoration: bigint;
         background: bigint;
-        body: bigint;
-        accessory: bigint;
-        head: bigint;
-        glasses: bigint;
+        solidBackground: bigint;
+        hair: bigint;
       } | null;
       owner: { __typename?: 'Account'; id: string };
     };
@@ -4848,11 +4876,18 @@ export type GetNounQuery = {
     id: string;
     seed?: {
       __typename?: 'Seed';
+      special: bigint;
+      choker: bigint;
+      headphone: bigint;
+      leftHand: bigint;
+      hat: bigint;
+      clothing: bigint;
+      ear: bigint;
+      back: bigint;
+      backDecoration: bigint;
       background: bigint;
-      body: bigint;
-      accessory: bigint;
-      head: bigint;
-      glasses: bigint;
+      solidBackground: bigint;
+      hair: bigint;
     } | null;
     owner: { __typename?: 'Account'; id: string };
   } | null;
@@ -5001,7 +5036,7 @@ export type GetDelegateNounsAtBlockQuery = {
   delegates: Array<{
     __typename?: 'Delegate';
     id: string;
-    nounsRepresented: Array<{ __typename?: 'Noun'; id: string }>;
+    nijiRepresented: Array<{ __typename?: 'Noun'; id: string }>;
   }>;
 };
 
@@ -5014,7 +5049,7 @@ export type GetCurrentlyDelegatedNounsQuery = {
   delegates: Array<{
     __typename?: 'Delegate';
     id: string;
-    nounsRepresented: Array<{ __typename?: 'Noun'; id: string }>;
+    nijiRepresented: Array<{ __typename?: 'Noun'; id: string }>;
   }>;
 };
 
@@ -5227,13 +5262,20 @@ export class TypedDocumentString<TResult, TVariables>
 export const GetSeedsDocument = new TypedDocumentString(`
     query GetSeeds($first: Int!) {
   seeds(first: $first) {
-    id
-    background
-    body
-    accessory
-    head
-    glasses
-  }
+        id
+        special
+        choker
+        headphone
+        leftHand
+        hat
+        clothing
+        ear
+        back
+        backDecoration
+        background
+        solidBackground
+        hair
+      }
 }
     `) as unknown as TypedDocumentString<GetSeedsQuery, GetSeedsQueryVariables>;
 export const GetProposalDocument = new TypedDocumentString(`
@@ -5485,13 +5527,20 @@ export const GetAuctionDocument = new TypedDocumentString(`
     noun {
       id
       seed {
-        id
-        background
-        body
-        accessory
-        head
-        glasses
-      }
+          id
+          special
+          choker
+          headphone
+          leftHand
+          hat
+          clothing
+          ear
+          back
+          backDecoration
+          background
+          solidBackground
+          hair
+        }
       owner {
         id
       }
@@ -5527,12 +5576,19 @@ export const GetNounDocument = new TypedDocumentString(`
   noun(id: $id) {
     id
     seed {
-      background
-      body
-      accessory
-      head
-      glasses
-    }
+          special
+          choker
+          headphone
+          leftHand
+          hat
+          clothing
+          ear
+          back
+          backDecoration
+          background
+          solidBackground
+          hair
+        }
     owner {
       id
     }
@@ -5680,7 +5736,7 @@ export const GetDelegateNounsAtBlockDocument = new TypedDocumentString(`
     query GetDelegateNounsAtBlock($delegates: [ID!]!, $block: Int!) {
   delegates(where: {id_in: $delegates}, block: {number: $block}) {
     id
-    nounsRepresented {
+    nijiRepresented {
       id
     }
   }
@@ -5693,7 +5749,7 @@ export const GetCurrentlyDelegatedNounsDocument = new TypedDocumentString(`
     query GetCurrentlyDelegatedNouns($delegate: ID!) {
   delegates(where: {id: $delegate}) {
     id
-    nounsRepresented {
+    nijiRepresented {
       id
     }
   }

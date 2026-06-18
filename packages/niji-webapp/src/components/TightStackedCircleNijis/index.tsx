@@ -1,6 +1,6 @@
 import React from 'react';
 
-import TightStackedCircleNoun from '../TightStackedCircleNoun';
+import TightStackedCircleNiji from '../TightStackedCircleNiji';
 
 interface StackedCircleNounsProps {
   nounIds: Array<number>;
@@ -8,7 +8,7 @@ interface StackedCircleNounsProps {
 
 const MAX_NOUNS_PER_STACK = 3;
 
-const TightStackedCircleNouns: React.FC<StackedCircleNounsProps> = props => {
+const TightStackedCircleNijis: React.FC<StackedCircleNounsProps> = props => {
   const { nounIds } = props;
 
   const shift = 3;
@@ -20,11 +20,11 @@ const TightStackedCircleNouns: React.FC<StackedCircleNounsProps> = props => {
       {nounIds
         .slice(0, MAX_NOUNS_PER_STACK)
         .map((nounId: number, i: number) => {
-          return <TightStackedCircleNoun nounId={nounId} index={i} square={square} shift={shift} />;
+          return <TightStackedCircleNiji nounId={nounId} index={i} square={square} shift={shift} />;
         })
         .reverse()}
     </svg>
   );
 };
 
-export default TightStackedCircleNouns;
+export default TightStackedCircleNijis;

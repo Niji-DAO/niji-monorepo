@@ -2,13 +2,13 @@ import React from 'react';
 
 import { StandaloneNounCircular } from '@/components/StandaloneNoun';
 
-import classes from './HorizontalStackedNouns.module.css';
+import classes from './HorizontalStackedNijis.module.css';
 
 interface HorizontalStackedNounsProps {
   nounIds: string[];
 }
 
-const HorizontalStackedNouns: React.FC<HorizontalStackedNounsProps> = ({ nounIds }) => {
+const HorizontalStackedNijis: React.FC<HorizontalStackedNounsProps> = ({ nounIds }) => {
   return (
     <div className={classes.wrapper}>
       {nounIds
@@ -32,4 +32,4 @@ const HorizontalStackedNouns: React.FC<HorizontalStackedNounsProps> = ({ nounIds
   );
 };
 
-export default HorizontalStackedNouns;
+export default HorizontalStackedNijis;

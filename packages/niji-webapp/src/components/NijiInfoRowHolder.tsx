@@ -18,7 +18,7 @@ interface NounInfoRowHolderProps {
   className?: string;
 }
 
-const NounInfoRowHolder: React.FC<NounInfoRowHolderProps> = props => {
+const NijiInfoRowHolder: React.FC<NounInfoRowHolderProps> = props => {
   const { nounId, className } = props;
 
   const { isLoading, error, data } = useQuery({
@@ -49,7 +49,7 @@ const NounInfoRowHolder: React.FC<NounInfoRowHolderProps> = props => {
       <Trans>Winner</Trans>{' '}
       <a className="text-muted-foreground" href={etherscanURL} target={'_blank'} rel="noreferrer">
         {winner.toLowerCase() === nijiAuctionHouseAddress[chainId].toLowerCase() ? (
-          <Trans>Nouns Auction House</Trans>
+          <Trans>Niji Auction House</Trans>
         ) : (
           shortAddressComponent
         )}
@@ -59,4 +59,4 @@ const NounInfoRowHolder: React.FC<NounInfoRowHolderProps> = props => {
   );
 };
 
-export default NounInfoRowHolder;
+export default NijiInfoRowHolder;

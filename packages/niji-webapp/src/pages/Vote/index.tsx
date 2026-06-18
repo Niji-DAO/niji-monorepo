@@ -37,7 +37,7 @@ import { SUPPORTED_LOCALE_TO_DAYSJS_LOCALE, SupportedLocale } from '@/i18n/local
 import Section from '@/layout/Section';
 import { cn } from '@/lib/utils';
 import { AVERAGE_BLOCK_TIME_IN_SECS } from '@/utils/constants';
-import { getNounVotes } from '@/utils/getNounsVotes';
+import { getNijiVotes } from '@/utils/getNijiVotes';
 import { isProposalUpdatable } from '@/utils/proposals';
 import { parseStreamCreationCallData } from '@/utils/streamingPaymentUtils/streamingPaymentUtils';
 import {
@@ -428,14 +428,14 @@ const VotePage = () => {
 
   const delegates = delegateSnapshot?.delegates;
   const delegateToNounIds = delegates?.reduce<Record<string, string[]>>((acc, curr) => {
-    acc[curr.id] = curr?.nounsRepresented?.map(nr => nr.id) ?? [];
+    acc[curr.id] = curr?.nijiRepresented?.map(nr => nr.id) ?? [];
     return acc;
   }, {});
 
   const data = voters?.votes?.map(v => ({
     delegate: v.voter.id as Address,
     supportDetailed: v.supportDetailed as 0 | 1 | 2,
-    nounsRepresented: delegateToNounIds?.[v.voter.id] ?? [],
+    nijiRepresented: delegateToNounIds?.[v.voter.id] ?? [],
   }));
 
   const [showToast, setShowToast] = useState(true);
@@ -493,7 +493,7 @@ const VotePage = () => {
   if (error || dqError) {
     return <Trans>Failed to fetch</Trans>;
   }
-  const againstNouns = getNounVotes(data, 0);
+  const againstNouns = getNijiVotes(data, 0);
   const isV2Prop = (dqInfo.proposal?.quorumCoefficient ?? 0n) > 0n;
 
   return (

@@ -17,7 +17,7 @@ type Props = {
   setDataFetchPollInterval: (interval: number) => void;
 };
 
-function WithdrawNounsButton(props: Props) {
+function WithdrawNijisButton(props: Props) {
   const { withdrawFromForkEscrow, withdrawFromForkEscrowState } = useWithdrawFromForkEscrow();
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -163,4 +163,4 @@ function WithdrawNounsButton(props: Props) {
   );
 }
 
-export default WithdrawNounsButton;
+export default WithdrawNijisButton;

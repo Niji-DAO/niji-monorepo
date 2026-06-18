@@ -50,7 +50,7 @@ const NavBar = () => {
 
   const useStateBg =
     location.pathname === '/' ||
-    location.pathname.includes('/noun/') ||
+    location.pathname.includes('/niji/') ||
     location.pathname.includes('/auction/');
 
   const stateBasedButtonStyle = isCool ? NavBarButtonStyle.COOL_INFO : NavBarButtonStyle.WARM_INFO;
@@ -102,7 +102,7 @@ const NavBar = () => {
         <Container style={{ maxWidth: 'unset' }}>
           <div className={classes.brandAndTreasuryWrapper}>
             <Navbar.Brand as={Link} to="/" className={classes.navBarBrand}>
-              <NogglesLogo className={classes.navBarLogo} aria-label="Nouns DAO noggles" />
+              <NogglesLogo className={classes.navBarLogo} aria-label="Niji DAO noggles" />
             </Navbar.Brand>
             {Number(CHAIN_ID) !== 1 && (
               <Nav.Item>
@@ -187,12 +187,12 @@ const NavBar = () => {
               </Nav.Link>
               <Nav.Link
                 as={Link}
-                to="/nouns"
+                to="/nijis"
                 className={clsx(classes.nounsNavLink, classes.exploreButton)}
                 onClick={closeNav}
               >
                 <NavBarButton
-                  buttonText={<Trans>Nouns</Trans>}
+                  buttonText={<Trans>Nijis</Trans>}
                   buttonIcon={<NogglesIcon />}
                   buttonStyle={nonWalletButtonStyle}
                 />
@@ -224,9 +224,9 @@ const NavBar = () => {
                       navDropdownClasses.warmInfoSelected,
                     ),
                   )}
-                  href="/nouns"
+                  href="/nijis"
                 >
-                  <Trans>Nouns</Trans>
+                  <Trans>Nijis</Trans>
                 </Dropdown.Item>
                 <Dropdown.Item
                   className={clsx(

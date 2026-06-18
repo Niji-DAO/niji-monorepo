@@ -11,7 +11,7 @@ interface TightStackedCircleNounProps {
   shift: number;
 }
 
-const TightStackedCircleNoun: React.FC<TightStackedCircleNounProps> = ({
+const TightStackedCircleNiji: React.FC<TightStackedCircleNounProps> = ({
   index,
   nounId,
   shift,
@@ -55,4 +55,4 @@ const TightStackedCircleNoun: React.FC<TightStackedCircleNounProps> = ({
   );
 };
 
-export default TightStackedCircleNoun;
+export default TightStackedCircleNiji;

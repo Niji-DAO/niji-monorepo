@@ -632,8 +632,8 @@ type Delegate {
   A Delegate is any address that has been delegated with voting tokens by a token holder, id is the blockchain address of said delegate
   """
   id: ID!
-  """Nouns that this delegate represents"""
-  nounsRepresented(first: Int = 100, orderBy: Noun_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: Noun_filter): [Noun!]!
+  """Niji tokens that this delegate represents"""
+  nijiRepresented(first: Int = 100, orderBy: Noun_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: Noun_filter): [Noun!]!
   """Proposals that the delegate has created"""
   proposals(first: Int = 100, orderBy: Proposal_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: Proposal_filter): [Proposal!]!
   """Token holders that this delegate represents"""
@@ -671,13 +671,13 @@ input Delegate_filter {
   id_lte: ID
   id_not: ID
   id_not_in: [ID!]
-  nounsRepresented: [String!]
-  nounsRepresented_: Noun_filter
-  nounsRepresented_contains: [String!]
-  nounsRepresented_contains_nocase: [String!]
-  nounsRepresented_not: [String!]
-  nounsRepresented_not_contains: [String!]
-  nounsRepresented_not_contains_nocase: [String!]
+  nijiRepresented: [String!]
+  nijiRepresented_: Noun_filter
+  nijiRepresented_contains: [String!]
+  nijiRepresented_contains_nocase: [String!]
+  nijiRepresented_not: [String!]
+  nijiRepresented_not_contains: [String!]
+  nijiRepresented_not_contains_nocase: [String!]
   or: [Delegate_filter]
   proposals_: Proposal_filter
   tokenHoldersRepresentedAmount: Int
@@ -696,7 +696,7 @@ enum Delegate_orderBy {
   delegatedVotes
   delegatedVotesRaw
   id
-  nounsRepresented
+  nijiRepresented
   proposals
   tokenHoldersRepresented
   tokenHoldersRepresentedAmount
@@ -1816,7 +1816,7 @@ enum Governance_orderBy {
 """
 scalar Int8
 
-type Noun {
+type Niji {
   """The Noun's ERC721 token id"""
   id: ID!
   """The owner of the Noun"""
@@ -4145,16 +4145,30 @@ type Query {
 }
 
 type Seed {
-  """The accessory index"""
-  accessory: BigInt!
+  """The special trait index"""
+  special: BigInt!
+  """The choker trait index"""
+  choker: BigInt!
+  """The headphone trait index"""
+  headphone: BigInt!
+  """The left hand trait index"""
+  leftHand: BigInt!
+  """The hat trait index"""
+  hat: BigInt!
+  """The clothing trait index"""
+  clothing: BigInt!
+  """The ear trait index"""
+  ear: BigInt!
+  """The back trait index"""
+  back: BigInt!
+  """The back decoration trait index"""
+  backDecoration: BigInt!
   """The background index"""
   background: BigInt!
-  """The body index"""
-  body: BigInt!
-  """The glasses index"""
-  glasses: BigInt!
-  """The head index"""
-  head: BigInt!
+  """The solid background trait index"""
+  solidBackground: BigInt!
+  """The hair trait index"""
+  hair: BigInt!
   """The Noun's ERC721 token id"""
   id: ID!
 }
@@ -4162,15 +4176,23 @@ type Seed {
 input Seed_filter {
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
-  accessory: BigInt
-  accessory_gt: BigInt
-  accessory_gte: BigInt
-  accessory_in: [BigInt!]
-  accessory_lt: BigInt
-  accessory_lte: BigInt
-  accessory_not: BigInt
-  accessory_not_in: [BigInt!]
   and: [Seed_filter]
+  back: BigInt
+  backDecoration: BigInt
+  backDecoration_gt: BigInt
+  backDecoration_gte: BigInt
+  backDecoration_in: [BigInt!]
+  backDecoration_lt: BigInt
+  backDecoration_lte: BigInt
+  backDecoration_not: BigInt
+  backDecoration_not_in: [BigInt!]
+  back_gt: BigInt
+  back_gte: BigInt
+  back_in: [BigInt!]
+  back_lt: BigInt
+  back_lte: BigInt
+  back_not: BigInt
+  back_not_in: [BigInt!]
   background: BigInt
   background_gt: BigInt
   background_gte: BigInt
@@ -4179,30 +4201,78 @@ input Seed_filter {
   background_lte: BigInt
   background_not: BigInt
   background_not_in: [BigInt!]
-  body: BigInt
-  body_gt: BigInt
-  body_gte: BigInt
-  body_in: [BigInt!]
-  body_lt: BigInt
-  body_lte: BigInt
-  body_not: BigInt
-  body_not_in: [BigInt!]
-  glasses: BigInt
-  glasses_gt: BigInt
-  glasses_gte: BigInt
-  glasses_in: [BigInt!]
-  glasses_lt: BigInt
-  glasses_lte: BigInt
-  glasses_not: BigInt
-  glasses_not_in: [BigInt!]
-  head: BigInt
-  head_gt: BigInt
-  head_gte: BigInt
-  head_in: [BigInt!]
-  head_lt: BigInt
-  head_lte: BigInt
-  head_not: BigInt
-  head_not_in: [BigInt!]
+  choker: BigInt
+  choker_gt: BigInt
+  choker_gte: BigInt
+  choker_in: [BigInt!]
+  choker_lt: BigInt
+  choker_lte: BigInt
+  choker_not: BigInt
+  choker_not_in: [BigInt!]
+  clothing: BigInt
+  clothing_gt: BigInt
+  clothing_gte: BigInt
+  clothing_in: [BigInt!]
+  clothing_lt: BigInt
+  clothing_lte: BigInt
+  clothing_not: BigInt
+  clothing_not_in: [BigInt!]
+  ear: BigInt
+  ear_gt: BigInt
+  ear_gte: BigInt
+  ear_in: [BigInt!]
+  ear_lt: BigInt
+  ear_lte: BigInt
+  ear_not: BigInt
+  ear_not_in: [BigInt!]
+  hair: BigInt
+  hair_gt: BigInt
+  hair_gte: BigInt
+  hair_in: [BigInt!]
+  hair_lt: BigInt
+  hair_lte: BigInt
+  hair_not: BigInt
+  hair_not_in: [BigInt!]
+  hat: BigInt
+  hat_gt: BigInt
+  hat_gte: BigInt
+  hat_in: [BigInt!]
+  hat_lt: BigInt
+  hat_lte: BigInt
+  hat_not: BigInt
+  hat_not_in: [BigInt!]
+  headphone: BigInt
+  headphone_gt: BigInt
+  headphone_gte: BigInt
+  headphone_in: [BigInt!]
+  headphone_lt: BigInt
+  headphone_lte: BigInt
+  headphone_not: BigInt
+  headphone_not_in: [BigInt!]
+  leftHand: BigInt
+  leftHand_gt: BigInt
+  leftHand_gte: BigInt
+  leftHand_in: [BigInt!]
+  leftHand_lt: BigInt
+  leftHand_lte: BigInt
+  leftHand_not: BigInt
+  leftHand_not_in: [BigInt!]
+  solidBackground: BigInt
+  solidBackground_gt: BigInt
+  solidBackground_gte: BigInt
+  solidBackground_in: [BigInt!]
+  solidBackground_lt: BigInt
+  solidBackground_lte: BigInt
+  solidBackground_not: BigInt
+  solidBackground_not_in: [BigInt!]
+  special: BigInt
+  special_gt: BigInt
+  special_gte: BigInt
+  special_in: [BigInt!]
+  special_lt: BigInt
+  special_lte: BigInt
+  special_not: BigInt
+  special_not_in: [BigInt!]
   id: ID
   id_gt: ID
   id_gte: ID
@@ -4215,12 +4285,19 @@ input Seed_filter {
 }
 
 enum Seed_orderBy {
-  accessory
+  back
+  backDecoration
   background
-  body
-  glasses
-  head
+  choker
+  clothing
+  ear
+  hair
+  hat
+  headphone
   id
+  leftHand
+  solidBackground
+  special
 }
 
 """

@@ -1,7 +1,7 @@
 import { AuctionState } from '@/state/slices/auction';
 import { Auction } from '@/wrappers/nijiAuction';
 
-export const isNounderNoun = (nounId: bigint) => {
+export const isNounderNiji = (nounId: bigint) => {
   return nounId % 10n === 0n && nounId <= 1820n;
 };
 

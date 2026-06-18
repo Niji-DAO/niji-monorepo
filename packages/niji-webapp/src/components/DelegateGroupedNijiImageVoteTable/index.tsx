@@ -3,15 +3,15 @@ import React, { useState } from 'react';
 import DelegateHoverCard from '@/components/DelegateHoverCard';
 import { GrayCircle } from '@/components/GrayCircle';
 import HoverCard from '@/components/HoverCard';
-import TightStackedCircleNouns from '@/components/TightStackedCircleNouns';
+import TightStackedCircleNijis from '@/components/TightStackedCircleNijis';
 import VoteCardPager from '@/components/VoteCardPager';
 import { pseudoRandomPredictableShuffle } from '@/utils/pseudoRandomPredictableShuffle';
 
-import classes from './DelegateGroupedNounImageVoteTable.module.css';
+import classes from './DelegateGroupedNijiImageVoteTable.module.css';
 
 interface DelegateGruopedNounImageVoteTableProps {
   filteredDelegateGroupedVoteData:
-    | { delegate: string; supportDetailed: 0 | 1 | 2; nounsRepresented: string[] }[]
+    | { delegate: string; supportDetailed: 0 | 1 | 2; nijiRepresented: string[] }[]
     | undefined;
   propId: number;
   proposalCreationBlock: bigint;
@@ -35,7 +35,7 @@ const DelegateGruopedNounImageVoteTable: React.FC<
     const rowLength = 4;
 
     const paddedNounIds = shuffledDelegatedGroupedNouns
-      .map((data: { delegate: string; supportDetailed: 0 | 1 | 2; nounsRepresented: string[] }) => {
+      .map((data: { delegate: string; supportDetailed: 0 | 1 | 2; nijiRepresented: string[] }) => {
         return (
           <HoverCard
             hoverCardContent={(tip: string) => (
@@ -45,8 +45,8 @@ const DelegateGruopedNounImageVoteTable: React.FC<
             tip={`delegate-${data.delegate}`}
             id="delegateVoteHoverCard"
           >
-            <TightStackedCircleNouns
-              nounIds={data.nounsRepresented.map((nounId: string) => Number(nounId))}
+            <TightStackedCircleNijis
+              nounIds={data.nijiRepresented.map((nounId: string) => Number(nounId))}
             />
           </HoverCard>
         );

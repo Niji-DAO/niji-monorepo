@@ -23,7 +23,7 @@ export interface NounsTransitionProps {
  * Higher order util component wrapping functionality of react-transition-group to play nice with how we style CSS
  * @param props  NounsTransitionProps
  */
-const NounsTransition: React.FC<NounsTransitionProps> = props => {
+const NijisTransition: React.FC<NounsTransitionProps> = props => {
   const {
     children = <></>,
     nodeRef,
@@ -70,4 +70,4 @@ const NounsTransition: React.FC<NounsTransitionProps> = props => {
   );
 };
 
-export default NounsTransition;
+export default NijisTransition;

@@ -7,7 +7,7 @@ interface AuctionActivityNounTitleProps {
   isCool?: boolean;
 }
 
-const AuctionActivityNounTitle: React.FC<AuctionActivityNounTitleProps> = props => {
+const AuctionActivityNijiTitle: React.FC<AuctionActivityNounTitleProps> = props => {
   const { nounId, isCool } = props;
   return (
     <div className="inline-block">
@@ -15,9 +15,9 @@ const AuctionActivityNounTitle: React.FC<AuctionActivityNounTitleProps> = props 
         className="mb-2.5 font-['Londrina_Solid'] text-[68px] md:text-[56px] lg:text-[68px]"
         style={{ color: isCool ? 'var(--brand-cool-dark-text)' : 'var(--brand-warm-dark-text)' }}
       >
-        <Trans>Noun {nounId.toString()}</Trans>
+        <Trans>Niji {nounId.toString()}</Trans>
       </h1>
     </div>
   );
 };
-export default AuctionActivityNounTitle;
+export default AuctionActivityNijiTitle;

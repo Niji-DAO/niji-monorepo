@@ -28,7 +28,7 @@ const CandidateSponsors = ({
   const { data: delegateSnapshot } = useDelegateNounsAtBlockQuery(signerIds, currentBlock ?? 0n);
   const delegates = delegateSnapshot?.delegates;
   const delegateToNounIds = delegates?.reduce<Record<string, string[]>>((acc, curr) => {
-    acc[curr.id] = curr?.nounsRepresented?.map(nr => nr.id) ?? [];
+    acc[curr.id] = curr?.nijiRepresented?.map(nr => nr.id) ?? [];
     return acc;
   }, {});
   const nounIds = Object.values(delegateToNounIds ?? {}).flat();

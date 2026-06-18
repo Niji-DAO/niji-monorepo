@@ -8,7 +8,7 @@ import { Backdrop } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
 import { svg2png } from '@/utils/svg2png';
 
-import classes from './NounModal.module.css';
+import classes from './NijiModal.module.css';
 
 const downloadNounPNG = (png: string) => {
   const downloadEl = document.createElement('a');
@@ -27,7 +27,7 @@ const downloadNounSVG = (svg: string) => {
   URL.revokeObjectURL(url);
 };
 
-const NounModal: React.FC<{ onDismiss: () => void; svg: string }> = props => {
+const NijiModal: React.FC<{ onDismiss: () => void; svg: string }> = props => {
   const { onDismiss, svg } = props;
 
   const [width, setWidth] = useState<number>(window.innerWidth);
@@ -102,4 +102,4 @@ const NounModal: React.FC<{ onDismiss: () => void; svg: string }> = props => {
     </>
   );
 };
-export default NounModal;
+export default NijiModal;

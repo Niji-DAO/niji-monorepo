@@ -1,6 +1,6 @@
 import { useAppSelector } from '@/hooks';
 import { compareBids } from '@/utils/compareBids';
-import { generateEmptyNounderAuction, isNounderNoun } from '@/utils/nounderNoun';
+import { generateEmptyNounderAuction, isNounderNiji } from '@/utils/nounderNiji';
 import { Address, Bid, BidEvent } from '@/utils/types';
 
 import { Auction } from './nijiAuction';
@@ -54,7 +54,7 @@ const useOnDisplayAuction = (): Auction | undefined => {
   }
 
   // nounder auction
-  if (isNounderNoun(BigInt(onDisplayAuctionNounId))) {
+  if (isNounderNiji(BigInt(onDisplayAuctionNounId))) {
     const emptyNounderAuction = generateEmptyNounderAuction(
       BigInt(onDisplayAuctionNounId),
       pastAuctions,

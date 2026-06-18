@@ -4,8 +4,8 @@ import { Trans } from '@lingui/react/macro';
 
 import _AddressIcon from '@/assets/icons/Address.svg';
 import _BidsIcon from '@/assets/icons/Bids.svg';
-import NounInfoRowButton from '@/components/NounInfoRowButton';
-import NounInfoRowHolder from '@/components/NounInfoRowHolder';
+import NijiInfoRowButton from '@/components/NijiInfoRowButton';
+import NijiInfoRowHolder from '@/components/NijiInfoRowHolder';
 import { nijiTokenAddress } from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { buildEtherscanTokenLink } from '@/utils/etherscan';
@@ -16,7 +16,7 @@ interface NounInfoCardProps {
   bidHistoryOnClickHandler: () => void;
 }
 
-const NounInfoCard: React.FC<NounInfoCardProps> = props => {
+const NijiInfoCard: React.FC<NounInfoCardProps> = props => {
   const { nounId, bidHistoryOnClickHandler } = props;
   const chainId = defaultChain.id;
 
@@ -27,9 +27,9 @@ const NounInfoCard: React.FC<NounInfoCardProps> = props => {
 
   return (
     <>
-      <NounInfoRowHolder nounId={nounId} className="mb-3" />
+      <NijiInfoRowHolder nounId={nounId} className="mb-3" />
 
-      <NounInfoRowButton
+      <NijiInfoRowButton
         iconImgSource={_BidsIcon}
         btnText={
           lastAuctionNounId !== undefined && BigInt(lastAuctionNounId) === nounId ? (
@@ -40,7 +40,7 @@ const NounInfoCard: React.FC<NounInfoCardProps> = props => {
         }
         onClickHandler={bidHistoryOnClickHandler}
       />
-      <NounInfoRowButton
+      <NijiInfoRowButton
         iconImgSource={_AddressIcon}
         btnText={<Trans>Etherscan</Trans>}
         onClickHandler={etherscanButtonClickHandler}
@@ -49,4 +49,4 @@ const NounInfoCard: React.FC<NounInfoCardProps> = props => {
   );
 };
 
-export default NounInfoCard;
+export default NijiInfoCard;

@@ -184,7 +184,7 @@ const filterSigners = (
   sigsFiltered?.forEach(signature => {
     const delegateVoteCount =
       delegateSnapshot?.delegates?.find(delegate => delegate.id === signature.signer.id)
-        ?.nounsRepresented.length ?? 0;
+        ?.nijiRepresented.length ?? 0;
     // don't count votes from signers who have active or pending proposals
     // but include them in the list of signers to display with a note that they have an active proposal
     const parentProposalIsUpdatable =
@@ -255,7 +255,7 @@ export const useCandidateProposals = (blockNumber?: bigint) => {
   const candidatesData = map(unmatchedCandidates ?? [], candidate => {
     const proposerVotes =
       proposerDelegates.data?.delegates.find(d => d.id === candidate.proposer.toLowerCase())
-        ?.nounsRepresented?.length ?? 0;
+        ?.nijiRepresented?.length ?? 0;
     return parseSubgraphCandidate(
       candidate,
       proposerVotes,
@@ -296,7 +296,7 @@ export const useCandidateProposal = (
     BigInt(blockNumber ?? 0n),
   );
   const proposerNounVotes =
-    (proposerDelegates.data && proposerDelegates.data.delegates[0]?.nounsRepresented?.length) || 0;
+    (proposerDelegates.data && proposerDelegates.data.delegates[0]?.nijiRepresented?.length) || 0;
   const signersDelegateSnapshot = useDelegateNounsAtBlockQuery(
     allSigners ? deDupeSigners(allSigners) : [],
     BigInt(blockNumber ?? 0),

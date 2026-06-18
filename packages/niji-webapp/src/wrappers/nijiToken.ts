@@ -31,31 +31,72 @@ import {
 } from './subgraph';
 
 export interface INounSeed {
-  accessory: number;
+  special: number;
+  choker: number;
+  headphone: number;
+  leftHand: number;
+  hat: number;
+  clothing: number;
+  ear: number;
+  back: number;
+  backDecoration: number;
   background: number;
-  body: number;
-  glasses: number;
-  head: number;
+  solidBackground: number;
+  hair: number;
 }
 
 const chainId = defaultChain.id;
+const seedKeys = [
+  'special',
+  'choker',
+  'headphone',
+  'leftHand',
+  'hat',
+  'clothing',
+  'ear',
+  'back',
+  'backDecoration',
+  'background',
+  'solidBackground',
+  'hair',
+] as const satisfies readonly (keyof INounSeed)[];
+
+type ContractSeedTuple = readonly bigint[] & Partial<Record<keyof INounSeed, bigint>>;
+
+const toSeedObject = (seed: Seed | ContractSeedTuple | INounSeed): INounSeed => {
+  if ('special' in seed && typeof seed.special === 'number') {
+    return seed as INounSeed;
+  }
+
+  const tupleSeed = seed as Partial<Record<keyof INounSeed, bigint | number>> & {
+    [index: number]: bigint | number | undefined;
+  };
+
+  return {
+    special: Number(tupleSeed.special ?? tupleSeed[0] ?? 0),
+    choker: Number(tupleSeed.choker ?? tupleSeed[1] ?? 0),
+    headphone: Number(tupleSeed.headphone ?? tupleSeed[2] ?? 0),
+    leftHand: Number(tupleSeed.leftHand ?? tupleSeed[3] ?? 0),
+    hat: Number(tupleSeed.hat ?? tupleSeed[4] ?? 0),
+    clothing: Number(tupleSeed.clothing ?? tupleSeed[5] ?? 0),
+    ear: Number(tupleSeed.ear ?? tupleSeed[6] ?? 0),
+    back: Number(tupleSeed.back ?? tupleSeed[7] ?? 0),
+    backDecoration: Number(tupleSeed.backDecoration ?? tupleSeed[8] ?? 0),
+    background: Number(tupleSeed.background ?? tupleSeed[9] ?? 0),
+    solidBackground: Number(tupleSeed.solidBackground ?? tupleSeed[10] ?? 0),
+    hair: Number(tupleSeed.hair ?? tupleSeed[11] ?? 0),
+  };
+};
 
 const seedCacheKey = cacheKey(cache.seed, CHAIN_ID, nijiTokenAddress[chainId].toLowerCase());
 const isSeedValid = (seed: INounSeed | Record<string, never> | undefined) => {
-  const expectedKeys = ['background', 'body', 'accessory', 'head', 'glasses'];
-  const hasExpectedKeys = expectedKeys.every(key => (seed || {}).hasOwnProperty(key));
+  const hasExpectedKeys = seedKeys.every(key => (seed || {}).hasOwnProperty(key));
   const hasValidValues = Object.values(seed || {}).some(v => v !== 0);
   return hasExpectedKeys && hasValidValues;
 };
 const seedArrayToObject = (seeds: (INounSeed & { id: string })[]) => {
   return seeds.reduce<Record<string, INounSeed>>((acc, seed) => {
-    acc[seed.id] = {
-      background: Number(seed.background),
-      body: Number(seed.body),
-      accessory: Number(seed.accessory),
-      head: Number(seed.head),
-      glasses: Number(seed.glasses),
-    };
+    acc[seed.id] = toSeedObject(seed);
     return acc;
   }, {});
 };
@@ -72,15 +113,7 @@ const useNounSeeds = () => {
 
   useEffect(() => {
     if (!cachedSeeds && data?.seeds !== undefined) {
-      const transformedSeeds = data.seeds.map(seed => ({
-        ...seed,
-        accessory: Number(seed.accessory),
-        background: Number(seed.background),
-        body: Number(seed.body),
-        glasses: Number(seed.glasses),
-        head: Number(seed.head),
-        id: seed.id,
-      }));
+      const transformedSeeds = data.seeds.map(seed => ({ ...toSeedObject(seed), id: seed.id }));
       localStorage.setItem(seedCacheKey, JSON.stringify(seedArrayToObject(transformedSeeds)));
     }
   }, [data, cachedSeeds]);
@@ -98,33 +131,18 @@ export const useNounSeed = (nounId: bigint): INounSeed | undefined => {
   });
 
   if (response) {
-    const [background, body, accessory, head, glasses] = response;
-    const seedData = { background, body, accessory, head, glasses };
+    const seedData = toSeedObject(response as unknown as ContractSeedTuple);
     const seedCache = localStorage.getItem(seedCacheKey);
     if (seedCache && isSeedValid(seedData)) {
       const updatedSeedCache = JSON.stringify({
         ...JSON.parse(seedCache),
-        [nounId.toString()]: {
-          accessory: seedData.accessory,
-          background: seedData.background,
-          body: seedData.body,
-          glasses: seedData.glasses,
-          head: seedData.head,
-        },
+        [nounId.toString()]: seedData,
       });
       localStorage.setItem(seedCacheKey, updatedSeedCache);
     }
     return seedData;
   }
-  return seed !== undefined
-    ? {
-        accessory: Number(seed.accessory),
-        background: Number(seed.background),
-        body: Number(seed.body),
-        glasses: Number(seed.glasses),
-        head: Number(seed.head),
-      }
-    : undefined;
+  return seed !== undefined ? toSeedObject(seed) : undefined;
 };
 
 export const useUserVotes = (): number | undefined => {
