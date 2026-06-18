@@ -1975,12 +1975,19 @@ export enum NounOrderBy {
   OwnerTotalTokensHeld = 'owner__totalTokensHeld',
   OwnerTotalTokensHeldRaw = 'owner__totalTokensHeldRaw',
   Seed = 'seed',
-  SeedAccessory = 'seed__accessory',
+  SeedBack = 'seed__back',
+  SeedBackDecoration = 'seed__backDecoration',
   SeedBackground = 'seed__background',
-  SeedBody = 'seed__body',
-  SeedGlasses = 'seed__glasses',
-  SeedHead = 'seed__head',
+  SeedChoker = 'seed__choker',
+  SeedClothing = 'seed__clothing',
+  SeedEar = 'seed__ear',
+  SeedHair = 'seed__hair',
+  SeedHat = 'seed__hat',
+  SeedHeadphone = 'seed__headphone',
   SeedId = 'seed__id',
+  SeedLeftHand = 'seed__leftHand',
+  SeedSolidBackground = 'seed__solidBackground',
+  SeedSpecial = 'seed__special',
   Votes = 'votes',
 }
 
@@ -4075,7 +4082,7 @@ export type Seed = {
   back: Scalars['BigInt']['output'];
   /** The back decoration trait index */
   backDecoration: Scalars['BigInt']['output'];
-  /** The background index */
+  /** The background trait index */
   background: Scalars['BigInt']['output'];
   /** The solid background trait index */
   solidBackground: Scalars['BigInt']['output'];
@@ -4088,15 +4095,23 @@ export type Seed = {
 export type SeedFilter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
-  accessory?: InputMaybe<Scalars['BigInt']['input']>;
-  accessory_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  accessory_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  accessory_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  accessory_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  accessory_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  accessory_not?: InputMaybe<Scalars['BigInt']['input']>;
-  accessory_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   and?: InputMaybe<Array<InputMaybe<SeedFilter>>>;
+  back?: InputMaybe<Scalars['BigInt']['input']>;
+  backDecoration?: InputMaybe<Scalars['BigInt']['input']>;
+  backDecoration_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  backDecoration_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  backDecoration_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  backDecoration_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  backDecoration_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  backDecoration_not?: InputMaybe<Scalars['BigInt']['input']>;
+  backDecoration_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  back_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  back_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  back_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  back_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  back_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  back_not?: InputMaybe<Scalars['BigInt']['input']>;
+  back_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   background?: InputMaybe<Scalars['BigInt']['input']>;
   background_gt?: InputMaybe<Scalars['BigInt']['input']>;
   background_gte?: InputMaybe<Scalars['BigInt']['input']>;
@@ -4105,30 +4120,54 @@ export type SeedFilter = {
   background_lte?: InputMaybe<Scalars['BigInt']['input']>;
   background_not?: InputMaybe<Scalars['BigInt']['input']>;
   background_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  body?: InputMaybe<Scalars['BigInt']['input']>;
-  body_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  body_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  body_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  body_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  body_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  body_not?: InputMaybe<Scalars['BigInt']['input']>;
-  body_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  glasses?: InputMaybe<Scalars['BigInt']['input']>;
-  glasses_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  glasses_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  glasses_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  glasses_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  glasses_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  glasses_not?: InputMaybe<Scalars['BigInt']['input']>;
-  glasses_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  head?: InputMaybe<Scalars['BigInt']['input']>;
-  head_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  head_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  head_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  head_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  head_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  head_not?: InputMaybe<Scalars['BigInt']['input']>;
-  head_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  choker?: InputMaybe<Scalars['BigInt']['input']>;
+  choker_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  choker_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  choker_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  choker_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  choker_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  choker_not?: InputMaybe<Scalars['BigInt']['input']>;
+  choker_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  clothing?: InputMaybe<Scalars['BigInt']['input']>;
+  clothing_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  clothing_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  clothing_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  clothing_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  clothing_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  clothing_not?: InputMaybe<Scalars['BigInt']['input']>;
+  clothing_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  ear?: InputMaybe<Scalars['BigInt']['input']>;
+  ear_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  ear_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  ear_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  ear_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  ear_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  ear_not?: InputMaybe<Scalars['BigInt']['input']>;
+  ear_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  hair?: InputMaybe<Scalars['BigInt']['input']>;
+  hair_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  hair_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  hair_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  hair_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  hair_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  hair_not?: InputMaybe<Scalars['BigInt']['input']>;
+  hair_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  hat?: InputMaybe<Scalars['BigInt']['input']>;
+  hat_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  hat_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  hat_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  hat_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  hat_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  hat_not?: InputMaybe<Scalars['BigInt']['input']>;
+  hat_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  headphone?: InputMaybe<Scalars['BigInt']['input']>;
+  headphone_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  headphone_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  headphone_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  headphone_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  headphone_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  headphone_not?: InputMaybe<Scalars['BigInt']['input']>;
+  headphone_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   id?: InputMaybe<Scalars['ID']['input']>;
   id_gt?: InputMaybe<Scalars['ID']['input']>;
   id_gte?: InputMaybe<Scalars['ID']['input']>;
@@ -4137,16 +4176,47 @@ export type SeedFilter = {
   id_lte?: InputMaybe<Scalars['ID']['input']>;
   id_not?: InputMaybe<Scalars['ID']['input']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  leftHand?: InputMaybe<Scalars['BigInt']['input']>;
+  leftHand_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  leftHand_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  leftHand_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  leftHand_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  leftHand_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  leftHand_not?: InputMaybe<Scalars['BigInt']['input']>;
+  leftHand_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   or?: InputMaybe<Array<InputMaybe<SeedFilter>>>;
+  solidBackground?: InputMaybe<Scalars['BigInt']['input']>;
+  solidBackground_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  solidBackground_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  solidBackground_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  solidBackground_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  solidBackground_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  solidBackground_not?: InputMaybe<Scalars['BigInt']['input']>;
+  solidBackground_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  special?: InputMaybe<Scalars['BigInt']['input']>;
+  special_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  special_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  special_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  special_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  special_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  special_not?: InputMaybe<Scalars['BigInt']['input']>;
+  special_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
 };
 
 export enum SeedOrderBy {
-  Accessory = 'accessory',
+  Back = 'back',
+  BackDecoration = 'backDecoration',
   Background = 'background',
-  Body = 'body',
-  Glasses = 'glasses',
-  Head = 'head',
+  Choker = 'choker',
+  Clothing = 'clothing',
+  Ear = 'ear',
+  Hair = 'hair',
+  Hat = 'hat',
+  Headphone = 'headphone',
   Id = 'id',
+  LeftHand = 'leftHand',
+  SolidBackground = 'solidBackground',
+  Special = 'special',
 }
 
 export type TransferEvent = {
