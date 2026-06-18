@@ -298,7 +298,7 @@ msgstr "或以上"
 
 #: src/pages/Playground/index.tsx
 msgid "Niji Protocol"
-msgstr "Nijis 协议"
+msgstr "Niji 协议"
 
 #: src/components/Documentation/index.tsx
 msgid "Niji artwork is in the {publicDomainLink}."
