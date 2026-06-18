@@ -3,14 +3,14 @@ import ja from 'dayjs/locale/ja';
 import zh from 'dayjs/locale/zh-cn';
 
 export const SUPPORTED_LOCALES = [
-  // order as they appear in the language dropdown
+  // order as they appear in the language dropdown (default first)
+  'ja-JP',
   'en-US',
   'zh-CN',
-  'ja-JP',
 ] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number] | 'pseudo';
 
-export const DEFAULT_LOCALE: SupportedLocale = 'en-US';
+export const DEFAULT_LOCALE: SupportedLocale = 'ja-JP';
 
 export const LOCALE_LABEL: { [locale in SupportedLocale]: string } = {
   'en-US': 'English',
