@@ -3,6 +3,8 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
+    actions: 'src/actions/index.ts',
+    react: 'src/react/index.ts',
     'actions/auction-house': 'src/actions/auction-house.gen.ts',
     'react/auction-house': 'src/react/auction-house.gen.ts',
     'actions/data': 'src/actions/data.gen.ts',

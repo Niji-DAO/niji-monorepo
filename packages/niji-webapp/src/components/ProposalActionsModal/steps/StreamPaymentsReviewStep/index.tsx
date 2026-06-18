@@ -4,6 +4,7 @@ import type { ProposalTransaction } from '@/wrappers/nijiDao';
 import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { nijiGovernorAddress } from '@niji/sdk/react';
 import ReactTooltip from 'react-tooltip';
 
 import ModalBottomButtonRow from '@/components/ModalBottomButtonRow';
@@ -11,7 +12,6 @@ import ModalLabel from '@/components/ModalLabel';
 import ModalTextPrimary from '@/components/ModalTextPrimary';
 import ModalTitle from '@/components/ModalTitle';
 import ShortAddress from '@/components/ShortAddress';
-import { nijiGovernorAddress } from '@/contracts';
 import useStreamPaymentTransactions from '@/hooks/useStreamPaymentTransactions';
 import {
   formatTokenAmount,

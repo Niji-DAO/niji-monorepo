@@ -1,4 +1,11 @@
 import { Trans, useLingui } from '@lingui/react/macro';
+import {
+  nijiAuctionHouseAddress,
+  nijiDescriptorAddress,
+  nijiGovernorAddress,
+  nijiTokenAddress,
+  nijiTreasuryAddress,
+} from '@niji/sdk/react';
 import { Link } from 'react-router';
 
 import DiscordIcon from '@/assets/icons/socials/discord.svg?react';
@@ -6,13 +13,6 @@ import FarcasterIcon from '@/assets/icons/socials/farcaster.svg?react';
 import GitHubIcon from '@/assets/icons/socials/github.svg?react';
 import XIcon from '@/assets/icons/socials/x.svg?react';
 import NogglesLogo from '@/assets/noggles.svg?react';
-import {
-  nijiAuctionHouseAddress,
-  nijiDescriptorAddress,
-  nijiGovernorAddress,
-  nijiTokenAddress,
-  nijiTreasuryAddress,
-} from '@/contracts';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
 import { defaultChain } from '@/wagmi';
 

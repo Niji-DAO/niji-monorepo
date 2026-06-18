@@ -2,10 +2,10 @@ import { Fragment } from 'react';
 
 import { InformationCircleIcon } from '@heroicons/react/solid';
 import { Trans } from '@lingui/react/macro';
+import { nijiPayerAddress, nijiTokenBuyerAddress } from '@niji/sdk/react';
 import { formatUnits } from 'viem';
 
 import ShortAddress from '@/components/ShortAddress';
-import { nijiTokenBuyerAddress, nijiPayerAddress } from '@/contracts';
 import { Address } from '@/utils/types';
 import { defaultChain } from '@/wagmi';
 import { ProposalDetail } from '@/wrappers/nijiDao';

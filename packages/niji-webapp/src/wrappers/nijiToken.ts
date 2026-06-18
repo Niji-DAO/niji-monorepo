@@ -3,9 +3,6 @@ import type { Address } from '@/utils/types';
 
 import { useEffect } from 'react';
 
-import { zeroAddress } from 'viem';
-import { useAccount } from 'wagmi';
-
 import {
   nijiGovernorAddress,
   nijiTokenAddress,
@@ -17,7 +14,10 @@ import {
   useReadNijiTokenSeeds,
   useWriteNijiTokenDelegate,
   useWriteNijiTokenSetApprovalForAll,
-} from '@/contracts';
+} from '@niji/sdk/react';
+import { zeroAddress } from 'viem';
+import { useAccount } from 'wagmi';
+
 import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import { defaultChain } from '@/wagmi';
 

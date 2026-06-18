@@ -17,6 +17,16 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "default": "./dist/react.js"
+    },
+    "./actions": {
+      "types": "./dist/actions.d.ts",
+      "import": "./dist/actions.js",
+      "default": "./dist/actions.js"
+    },
     "./react/treasury": {
       "types": "./dist/react/treasury.d.ts",
       "import": "./dist/react/treasury.js",
@@ -133,6 +143,12 @@
   "types": "dist/index.d.ts",
   "typesVersions": {
     "*": {
+      "react": [
+        "./dist/react.d.ts"
+      ],
+      "actions": [
+        "./dist/actions.d.ts"
+      ],
       "react/treasury": [
         "./dist/react/treasury.d.ts"
       ],

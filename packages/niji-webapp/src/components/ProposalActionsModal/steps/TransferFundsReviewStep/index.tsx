@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { nijiPayerAbi, nijiPayerAddress, stEthAddress } from '@niji/sdk/react';
 import { encodeFunctionData, parseAbi, parseEther } from 'viem';
 
 import ModalBottomButtonRow from '@/components/ModalBottomButtonRow';
 import ModalTitle from '@/components/ModalTitle';
 import ShortAddress from '@/components/ShortAddress';
-import { nijiPayerAbi, stEthAddress, nijiPayerAddress } from '@/contracts';
 import { Address, Hex } from '@/utils/types';
 import { defaultChain } from '@/wagmi';
 

@@ -2,6 +2,14 @@ import type { Address } from './utils/types';
 
 import React, { useEffect } from 'react';
 
+import {
+  nijiAuctionHouseAddress,
+  useReadNijiAuctionHouseAuction,
+  useWatchNijiAuctionHouseAuctionBidEvent,
+  useWatchNijiAuctionHouseAuctionCreatedEvent,
+  useWatchNijiAuctionHouseAuctionExtendedEvent,
+  useWatchNijiAuctionHouseAuctionSettledEvent,
+} from '@niji/sdk/react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRoot } from 'react-dom/client';
@@ -18,14 +26,6 @@ import { execute } from '@/subgraphs/execute';
 
 import App from './App';
 import { CHAIN_ID } from './config';
-import {
-  nijiAuctionHouseAddress,
-  useReadNijiAuctionHouseAuction,
-  useWatchNijiAuctionHouseAuctionBidEvent,
-  useWatchNijiAuctionHouseAuctionCreatedEvent,
-  useWatchNijiAuctionHouseAuctionExtendedEvent,
-  useWatchNijiAuctionHouseAuctionSettledEvent,
-} from './contracts';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { LanguageProvider } from './i18n/LanguageProvider';
 import reportWebVitals from './reportWebVitals';

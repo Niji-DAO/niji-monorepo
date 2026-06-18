@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
+import { nijiAuctionHouseAddress } from '@niji/sdk/react';
 import { Col, Row } from 'react-bootstrap';
 
 import AuctionActivityDateHeadline from '@/components/AuctionActivityDateHeadline';
@@ -19,7 +20,6 @@ import CurrentBid from '@/components/CurrentBid';
 import Holder from '@/components/Holder';
 import NijiInfoCard from '@/components/NijiInfoCard';
 import Winner from '@/components/Winner';
-import { nijiAuctionHouseAddress } from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { RootState } from '@/store';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';

@@ -1,4 +1,5 @@
-import { nijiGovernorAddress, nijiAuctionHouseAddress, nijiTreasuryAddress } from '@/contracts';
+import { nijiGovernorAddress, nijiAuctionHouseAddress, nijiTreasuryAddress } from '@niji/sdk/react';
+
 import { defaultChain } from '@/wagmi';
 
 export const resolveNijiContractAddress = (address: string) => {

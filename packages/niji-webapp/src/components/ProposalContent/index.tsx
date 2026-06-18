@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { nijiTokenAddress } from '@niji/sdk/react';
 import clsx from 'clsx';
 import { Alert, Col, Row } from 'react-bootstrap';
 import ReactMarkdown from 'react-markdown';
@@ -9,7 +10,6 @@ import { isAddress } from 'viem';
 
 import linkIcon from '@/assets/icons/Link.svg';
 import EnsOrLongAddress from '@/components/EnsOrLongAddress';
-import { nijiTokenAddress } from '@/contracts';
 import {
   buildEtherscanAddressLink,
   buildEtherscanHoldingsLink,

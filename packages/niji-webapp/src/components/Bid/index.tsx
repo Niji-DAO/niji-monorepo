@@ -1,16 +1,16 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
+import {
+  useReadNijiAuctionHouseMinBidIncrementPercentage,
+  useWriteNijiAuctionHouseCreateBid,
+  useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction,
+} from '@niji/sdk/react';
 import { Button, Col, FormControl, InputGroup, Spinner } from 'react-bootstrap';
 import { toast } from 'sonner';
 import { formatEther, parseEther } from 'viem';
 
 import SettleManuallyBtn from '@/components/SettleManuallyBtn';
-import {
-  useReadNijiAuctionHouseMinBidIncrementPercentage,
-  useWriteNijiAuctionHouseCreateBid,
-  useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction,
-} from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { useActiveLocale } from '@/hooks/useActivateLocale';
 import { Auction } from '@/wrappers/nijiAuction';

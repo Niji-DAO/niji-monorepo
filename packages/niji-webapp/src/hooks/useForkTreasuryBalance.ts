@@ -1,6 +1,6 @@
+import { useReadStEthBalanceOf } from '@niji/sdk/react';
 import { useBalance } from 'wagmi';
 
-import { useReadStEthBalanceOf } from '@/contracts';
 import { Address } from '@/utils/types';
 
 /**
@@ -14,7 +14,6 @@ function useForkTreasuryBalance(treasuryContractAddress?: Address): bigint {
     address: treasuryContractAddress,
   });
 
-  // @ts-expect-error - Type instantiation too deep
   const { data: stEthBalanceData } = useReadStEthBalanceOf({
     args: treasuryContractAddress ? [treasuryContractAddress] : undefined,
     query: { enabled: !!treasuryContractAddress },

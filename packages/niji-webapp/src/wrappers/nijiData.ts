@@ -7,8 +7,6 @@ import type { Address, Hash, Hex } from '@/utils/types';
 
 import { useMemo } from 'react';
 
-import { filter, isNonNullish, isNullish, map, pipe, sort } from 'remeda';
-
 import {
   useReadNijiDataCreateCandidateCost,
   useReadNijiDataUpdateCandidateCost,
@@ -21,7 +19,9 @@ import {
   useWriteNijiGovernorCancelSig,
   useWriteNijiGovernorProposeBySigs,
   useWriteNijiGovernorUpdateProposalBySigs,
-} from '@/contracts';
+} from '@niji/sdk/react';
+import { filter, isNonNullish, isNullish, map, pipe, sort } from 'remeda';
+
 import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 
 // Query result element types — narrower than full ProposalCandidate

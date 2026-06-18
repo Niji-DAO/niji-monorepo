@@ -25,31 +25,6 @@ interface ProposalStateFields {
 
 import { useMemo } from 'react';
 
-import { useQuery as useReactQuery } from '@tanstack/react-query';
-import {
-  filter,
-  flatMap,
-  forEach,
-  isBigInt,
-  isNonNullish,
-  isNullish,
-  isTruthy,
-  map,
-  pipe,
-  sort,
-} from 'remeda';
-import {
-  type AbiParameter,
-  decodeAbiParameters,
-  decodeEventLog,
-  formatEther,
-  keccak256,
-  parseAbiItem,
-  stringToBytes,
-} from 'viem';
-import { mainnet } from 'viem/chains';
-import { useAccount, useBlockNumber, usePublicClient, useReadContracts } from 'wagmi';
-
 import {
   nijiGovernorAbi,
   nijiGovernorAddress,
@@ -76,7 +51,32 @@ import {
   useWriteNijiGovernorUpdateProposalDescription,
   useWriteNijiGovernorUpdateProposalTransactions,
   useWriteNijiGovernorWithdrawFromForkEscrow,
-} from '@/contracts';
+} from '@niji/sdk/react';
+import { useQuery as useReactQuery } from '@tanstack/react-query';
+import {
+  filter,
+  flatMap,
+  forEach,
+  isBigInt,
+  isNonNullish,
+  isNullish,
+  isTruthy,
+  map,
+  pipe,
+  sort,
+} from 'remeda';
+import {
+  type AbiParameter,
+  decodeAbiParameters,
+  decodeEventLog,
+  formatEther,
+  keccak256,
+  parseAbiItem,
+  stringToBytes,
+} from 'viem';
+import { mainnet } from 'viem/chains';
+import { useAccount, useBlockNumber, usePublicClient, useReadContracts } from 'wagmi';
+
 import { useBlockTimestamp } from '@/hooks/useBlockTimestamp';
 import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import { defaultChain } from '@/wagmi';
