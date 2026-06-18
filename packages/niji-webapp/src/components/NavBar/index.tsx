@@ -1,11 +1,10 @@
 import { useState } from 'react';
 
-import { faFile, faPenToSquare, faPlay, faUsers } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
 import { nijiTreasuryAddress, useReadNijiTreasuryBalancesInEth } from '@niji/sdk/react';
 import clsx from 'clsx';
 import { ConnectKitButton } from 'connectkit';
+import { FileIcon, PlayIcon, SquarePenIcon, UsersIcon } from 'lucide-react';
 import { Container, Dropdown, Nav, Navbar } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router';
 import { formatEther } from 'viem';
@@ -69,11 +68,7 @@ const NavBar = () => {
   ) : null;
 
   const v3DaoNavItem = (
-    <NavDropdown
-      buttonText="DAO"
-      buttonIcon={<FontAwesomeIcon icon={faUsers} />}
-      buttonStyle={nonWalletButtonStyle}
-    >
+    <NavDropdown buttonText="DAO" buttonIcon={<UsersIcon />} buttonStyle={nonWalletButtonStyle}>
       <Dropdown.Item
         className={clsx(
           usePickByState(
@@ -135,7 +130,7 @@ const NavBar = () => {
               <Nav.Link as={Link} to="/vote" className={classes.nounsNavLink} onClick={closeNav}>
                 <NavBarButton
                   buttonText={isDaoGteV3 ? <Trans>Proposals</Trans> : <Trans>DAO</Trans>}
-                  buttonIcon={<FontAwesomeIcon icon={faFile} />}
+                  buttonIcon={<FileIcon />}
                   buttonStyle={nonWalletButtonStyle}
                 />
               </Nav.Link>
@@ -150,7 +145,7 @@ const NavBar = () => {
                     >
                       <NavBarButton
                         buttonText={<Trans>Candidates</Trans>}
-                        buttonIcon={<FontAwesomeIcon icon={faPenToSquare} />}
+                        buttonIcon={<SquarePenIcon />}
                         buttonStyle={nonWalletButtonStyle}
                       />
                     </Nav.Link>
@@ -165,7 +160,7 @@ const NavBar = () => {
                 <Nav.Link as={Link} to="/vote" className={classes.nounsNavLink} onClick={closeNav}>
                   <NavBarButton
                     buttonText={<Trans>DAO</Trans>}
-                    buttonIcon={<FontAwesomeIcon icon={faUsers} />}
+                    buttonIcon={<UsersIcon />}
                     buttonStyle={nonWalletButtonStyle}
                   />
                 </Nav.Link>
@@ -180,7 +175,7 @@ const NavBar = () => {
               >
                 <NavBarButton
                   buttonText={<Trans>Playground</Trans>}
-                  buttonIcon={<FontAwesomeIcon icon={faPlay} />}
+                  buttonIcon={<PlayIcon />}
                   buttonStyle={nonWalletButtonStyle}
                 />
               </Nav.Link>

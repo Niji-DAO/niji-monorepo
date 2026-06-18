@@ -1,11 +1,10 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 
-import { faCircleCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
 import { nijiGovernorAddress } from '@niji/sdk/react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
+import { CircleCheckIcon, XIcon } from 'lucide-react';
 import { Spinner } from 'react-bootstrap';
 import {
   encodeAbiParameters,
@@ -428,11 +427,9 @@ const SignatureForm = (props: Readonly<SignatureFormProps>) => {
                       </span>
                     )}
                     {isGetSignatureTxSuccessful && (
-                      <FontAwesomeIcon icon={faCircleCheck} height={20} width={20} color="green" />
+                      <CircleCheckIcon height={20} width={20} color="green" />
                     )}
-                    {getSignatureErrorMessage && (
-                      <FontAwesomeIcon icon={faXmark} height={20} width={20} color="red" />
-                    )}
+                    {getSignatureErrorMessage && <XIcon height={20} width={20} color="red" />}
                   </strong>
                   <Trans>Signature request</Trans>
                 </li>
@@ -443,11 +440,9 @@ const SignatureForm = (props: Readonly<SignatureFormProps>) => {
                         <Spinner animation="border" />
                       </span>
                     )}
-                    {isTxSuccessful && (
-                      <FontAwesomeIcon icon={faCircleCheck} height={20} width={20} color="green" />
-                    )}
+                    {isTxSuccessful && <CircleCheckIcon height={20} width={20} color="green" />}
                     {(getSignatureErrorMessage || errorMessage) && (
-                      <FontAwesomeIcon icon={faXmark} height={20} width={20} color="red" />
+                      <XIcon height={20} width={20} color="red" />
                     )}
                     {!(
                       isWaiting ||
