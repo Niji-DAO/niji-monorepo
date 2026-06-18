@@ -157,6 +157,7 @@ export const nijiStreamFactoryAbi = [
 export const nijiStreamFactoryAddress = {
   1: '0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff',
   11155111: '0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5',
+  31337: '0x0000000000000000000000000000000000000000',
 } as const;
 
 /**

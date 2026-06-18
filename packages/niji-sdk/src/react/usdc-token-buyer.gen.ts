@@ -430,6 +430,7 @@ export const nijiUsdcTokenBuyerAbi = [
 export const nijiUsdcTokenBuyerAddress = {
   1: '0x4f2aCdc74f6941390d9b1804faBc3E780388cfe5',
   11155111: '0x821176470cFeF1dB78F1e2dbae136f73c36ddd48',
+  31337: '0x0000000000000000000000000000000000000000',
 } as const;
 
 /**
