@@ -11,12 +11,12 @@ import classes from './CurrentBid.module.css';
 
 /**
  * Passible to CurrentBid as `currentBid` prop to indicate that
- * the bid amount is not applicable to this auction. (Nounder Noun)
+ * the bid amount is not applicable to this auction. (Nijider Niji)
  */
 export const BID_N_A = 'n/a';
 
 /**
- * Special Bid type for not applicable auctions (Nounder Nouns)
+ * Special Bid type for not applicable auctions (Nijider Nijis)
  */
 type BidNa = typeof BID_N_A;
 

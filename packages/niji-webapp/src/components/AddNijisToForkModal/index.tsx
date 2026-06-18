@@ -232,7 +232,7 @@ const AddNijisToForkModal = (props: AddNounsToForkModalProps) => {
     <div className={classes.confirmModalContent}>
       <h2 className={classes.modalTitle}>Confirm</h2>
       <p className={classes.modalDescription}>
-        By joining this fork you are giving up your Nouns to be retrieved in the new fork. This
+        By joining this fork you are giving up your Nijis to be retrieved in the new fork. This
         cannot be undone.
       </p>
       <button
@@ -260,18 +260,18 @@ const AddNijisToForkModal = (props: AddNounsToForkModalProps) => {
   const modalContent = (
     <div className={classes.modalContent}>
       <h2 className={classes.modalTitle}>
-        {props.isForkingPeriod ? 'Join fork' : 'Add Nouns to escrow'}
+        {props.isForkingPeriod ? 'Join fork' : 'Add Nijis to escrow'}
       </h2>
 
       <p className={classes.modalDescription}>
         {!props.isForkingPeriod ? (
           <>
             Nouners can withdraw their tokens from escrow as long as the forking period hasn&apos;t
-            started. Nouns in escrow are not eligible to vote or submit proposals.
+            started. Nijis in escrow are not eligible to vote or submit proposals.
           </>
         ) : (
           <>
-            By joining this fork you are giving up your Nouns to be retrieved in the new fork. This
+            By joining this fork you are giving up your Nijis to be retrieved in the new fork. This
             cannot be undone.
           </>
         )}
@@ -340,11 +340,11 @@ const AddNijisToForkModal = (props: AddNounsToForkModalProps) => {
       <div className={classes.sectionHeader}>
         <div className={classes.sectionLabel}>
           <p>
-            <strong>Select Nouns to {props.isForkingPeriod ? 'join fork' : 'to escrow'}</strong>
+            <strong>Select Nijis to {props.isForkingPeriod ? 'join fork' : 'to escrow'}</strong>
           </p>
           <p>
             <Trans>
-              Add as many or as few of your Nouns as you’d like. Additional Nouns can be added
+              Add as many or as few of your Nijis as you’d like. Additional Nijis can be added
               during the escrow and forking periods.
             </Trans>
           </p>
@@ -484,7 +484,7 @@ const AddNijisToForkModal = (props: AddNounsToForkModalProps) => {
                 target="_blank"
                 rel="noreferrer"
               >
-                Your Nouns have been added to {props.isForkingPeriod ? 'the fork' : 'escrow'}
+                Your Nijis have been added to {props.isForkingPeriod ? 'the fork' : 'escrow'}
                 {escrowToForkState.transaction && <img src={link} width={16} alt="link symbol" />}
               </a>
               {props.userEscrowedNouns &&
@@ -496,7 +496,7 @@ const AddNijisToForkModal = (props: AddNounsToForkModalProps) => {
                       clearTransactionState();
                     }}
                   >
-                    Add additional Nouns
+                    Add additional Nijis
                   </button>
                 )}
             </p>
@@ -553,7 +553,7 @@ const AddNijisToForkModal = (props: AddNounsToForkModalProps) => {
         {selectedNouns.length > 0 && !isTxSuccessful && (
           <>
             <p className={classes.selectedNouns}>
-              Adding {selectedNouns.map(nounId => `Noun ${nounId}`).join(', ')}
+              Adding {selectedNouns.map(nounId => `Niji ${nounId}`).join(', ')}
             </p>
           </>
         )}

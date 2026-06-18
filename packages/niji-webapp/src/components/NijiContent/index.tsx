@@ -110,10 +110,10 @@ const NijiContent: React.FC<NijiContentProps> = props => {
               </Link>
               .{' '}
               <Trans>
-                For this reason, we, the project&#39;s founders (‘Nounders’) have chosen to
+                For this reason, we, the project&#39;s founders (‘Nijiders’) have chosen to
                 compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the
                 project will be sent to our multisig (5/10), where it will be vested and distributed
-                to Nounders.
+                to Nijiders.
               </Trans>
             </li>
           </ul>

@@ -92,7 +92,7 @@ const NijisIntroSection = () => {
                 deli in Melbourne, Niji lives wherever creative people bring ideas to life. Explore
                 nounish people, places, and things with{' '}
                 <LinkComponent
-                  text={<Trans>Nounspot</Trans>}
+                  text={<Trans>Nijispot</Trans>}
                   url="https://nounspot.com"
                   leavesPage={true}
                 />
@@ -109,7 +109,7 @@ const NijisIntroSection = () => {
             allow="geolocation"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            title="Nounspot Map"
+            title="Nijispot Map"
           ></iframe>
           <small className={`${classes.videoSubtitle} text-muted`}>
             Built by{' '}

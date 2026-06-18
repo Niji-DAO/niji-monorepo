@@ -92,17 +92,22 @@ async function main() {
     process.exit(1);
   }
 
-  console.log('=== regenerate niji-data-rle.json (2-byte bounds + 256 palette) ===');
+  console.log('=== regenerate niji-data-rle.json (2-byte bounds + 256 palette slots) ===');
   console.log(`image root: ${IMAGE_ROOT}`);
-  console.log(`resolution: ${NIJI_RESOLUTION}, palette size: ${NIJI_PALETTE_SIZE}`);
+  console.log(`resolution: ${NIJI_RESOLUTION}, palette slots: ${NIJI_PALETTE_SIZE} (1 transparent + ${NIJI_PALETTE_SIZE - 1} colors)`);
 
   console.log('\n[1] listing trait files...');
   const allFiles = listTraitFiles();
   console.log(`  total: ${allFiles.length} images`);
 
-  console.log('\n[2] building global 256-color palette...');
+  // palette index は RLE で 1 byte (0-255 = 256 entries) に詰めるため、
+  // transparent placeholder (index 0) + 実 color 255 = 計 256 entries で構成する。
+  // 256 色フル + placeholder = 257 にすると index 256 = `toPaddedHex(256, 2) = '100'`
+  // (3 hex chars) になり tuple alignment が壊れる (#143-follow-up)。
+  const COLOR_COUNT = NIJI_PALETTE_SIZE - 1;
+  console.log(`\n[2] building global ${COLOR_COUNT}-color palette (+1 transparent slot)...`);
   const inputPaths = allFiles.map((f) => f.filepath);
-  const globalPalette = await buildGlobalPalette(inputPaths, NIJI_RESOLUTION);
+  const globalPalette = await buildGlobalPalette(inputPaths, NIJI_RESOLUTION, COLOR_COUNT);
   console.log(`  palette: ${globalPalette.length} colors`);
 
   console.log('\n[3] encoding each image (quantize → RLE)...');

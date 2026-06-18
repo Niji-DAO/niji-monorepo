@@ -50,7 +50,7 @@ const ForkPage = () => {
   const [currentEscrowPercentage, setCurrentEscrowPercentage] = useState(0);
   const [dataFetchPollInterval, setDataFetchPollInterval] = useState(0);
   const [forkStatusLabel, setForkStatusLabel] = useState('Escrow');
-  const [addNounsButtonLabel, setAddNounsButtonLabel] = useState('Add Nouns to escrow');
+  const [addNounsButtonLabel, setAddNounsButtonLabel] = useState('Add Nijis to escrow');
 
   // Hooks
   const adjustedTotalSupply = useAdjustedTotalSupply();
@@ -128,11 +128,11 @@ const ForkPage = () => {
     } else if (!timestamp && forkDetails?.data?.tokensInEscrowCount) {
       // 'escrow'
       setForkStatusLabel('Escrow');
-      setAddNounsButtonLabel('Add Nouns to escrow');
+      setAddNounsButtonLabel('Add Nijis to escrow');
     } else {
       // 'pre-escrow'
       setForkStatusLabel('Pre-escrow');
-      setAddNounsButtonLabel('Add Nouns to Start Escrow Period');
+      setAddNounsButtonLabel('Add Nijis to Start Escrow Period');
     }
   };
 
@@ -253,7 +253,7 @@ const ForkPage = () => {
                 {!isForked && !isForkPeriodActive && (
                   <p className={classes.note}>
                     <Trans>
-                      More than {forkThreshold == null ? '...' : forkThreshold} Nouns{' '}
+                      More than {forkThreshold == null ? '...' : forkThreshold} Nijis{' '}
                       {`(${forkThresholdBPS != null ? forkThresholdBPS / 100 : '...'}% of the DAO)`}{' '}
                       are required to pass the threshold
                     </Trans>
@@ -432,7 +432,7 @@ const ForkPage = () => {
                       <p>
                         Your Niji{userEscrowedNounIds.data.length > 1 && 's'} in escrow:{' '}
                         <strong>
-                          {userEscrowedNounIds.data.map(nounId => `Noun ${nounId}`).join(', ')}
+                          {userEscrowedNounIds.data.map(nounId => `Niji ${nounId}`).join(', ')}
                         </strong>
                       </p>
                     </div>
@@ -468,13 +468,13 @@ const ForkPage = () => {
             isModalOpen={isModalOpen}
             isConfirmModalOpen={isConfirmModalOpen}
             isForkingPeriod={isForkPeriodActive}
-            title={'Add Nouns to escrow'}
+            title={'Add Nijis to escrow'}
             description={
-              "Nouners can withdraw their tokens from escrow as long as the forking period hasn't started. Nouns in escrow are not eligible to vote or submit proposals."
+              "Nouners can withdraw their tokens from escrow as long as the forking period hasn't started. Nijis in escrow are not eligible to vote or submit proposals."
             }
-            selectLabel={'Select Nouns to escrow'}
+            selectLabel={'Select Nijis to escrow'}
             selectDescription={
-              'Add as many or as few of your Nouns as you’d like.  Additional Nouns can be added during the escrow period.'
+              'Add as many or as few of your Nijis as you’d like.  Additional Nijis can be added during the escrow period.'
             }
             account={account}
             ownedNouns={userOwnedNounIds.data}

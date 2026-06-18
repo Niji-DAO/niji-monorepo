@@ -117,7 +117,7 @@ const VoteModal = ({
           </Trans>
         ) : (
           <Trans>
-            Voting with <span className={classes.bold}>{i18n.number(availableVotes)}</span> Nouns
+            Voting with <span className={classes.bold}>{i18n.number(availableVotes)}</span> Nijis
           </Trans>
         )}
       </div>

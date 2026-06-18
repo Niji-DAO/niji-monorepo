@@ -115,7 +115,7 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
                 </li>
                 <li>
                   <Trans>
-                    Nounders receive rewards in the form of Nijis (10% of supply for first 5 years).
+                    Nijiders receive rewards in the form of Nijis (10% of supply for first 5 years).
                   </Trans>
                 </li>
               </ul>
@@ -213,10 +213,10 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
               <p>
                 <Trans>
                   The proposal veto right was initially envisioned as a temporary solution to the
-                  problem of ‘51% attacks’ on the Niji DAO treasury. While Nounders initially
+                  problem of ‘51% attacks’ on the Niji DAO treasury. While Nijiders initially
                   believed that a healthy distribution of Nijis would be sufficient protection for
                   the DAO, a more complete understanding of the incentives and risks has led to
-                  general consensus within the Nounders, the Niji Foundation, and the wider
+                  general consensus within the Nijiders, the Niji Foundation, and the wider
                   community that a more robust game-theoretic solution should be implemented before
                   the right is removed.
                 </Trans>
@@ -344,13 +344,13 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
           </Accordion.Item>
           <Accordion.Item eventKey="8" className={classes.accordionItem}>
             <Accordion.Header className={classes.accordionHeader}>
-              <Trans>Nounder&apos;s Reward</Trans>
+              <Trans>Nijider&apos;s Reward</Trans>
             </Accordion.Header>
             <Accordion.Body>
               <p>
                 <Trans>
-                  &apos;Nounders&apos; are the group of ten builders that initiated Niji. Here are
-                  the Nounders:
+                  &apos;Nijiders&apos; are the group of ten builders that initiated Niji. Here are
+                  the Nijiders:
                 </Trans>
               </p>
               <ul>
@@ -399,17 +399,17 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
               </ul>
               <p>
                 <Trans>
-                  Because 100% of Niji auction proceeds are sent to Niji DAO, Nounders have chosen
+                  Because 100% of Niji auction proceeds are sent to Niji DAO, Nijiders have chosen
                   to compensate themselves with Nijis. Every 10th Niji for the first 5 years of the
                   project (Niji ids #0, #10, #20, #30 and so on) will be automatically sent to the
-                  Nounder&apos;s multisig to be vested and shared among the founding members of the
+                  Nijider&apos;s multisig to be vested and shared among the founding members of the
                   project.
                 </Trans>
               </p>
               <p>
                 <Trans>
-                  Nounder distributions don&apos;t interfere with the cadence of 24 hour auctions.
-                  Nijis are sent directly to the Nounder&apos;s Multisig, and auctions continue on
+                  Nijider distributions don&apos;t interfere with the cadence of 24 hour auctions.
+                  Nijis are sent directly to the Nijider&apos;s Multisig, and auctions continue on
                   schedule with the next available Niji ID.
                 </Trans>
               </p>

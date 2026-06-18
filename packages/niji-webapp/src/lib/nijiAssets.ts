@@ -27,6 +27,8 @@ export interface NijiData {
 
 export const NijiImageData = imageData;
 
+// SSOT — packages/niji-contracts/scripts/niji-encoder.ts の `NIJI_TRAITS` (id 0..11)。
+// 順序が trait id の昇順 = NijiArt ストレージ index と一致する必要がある。
 export const nijiTraitKeys = [
   'special',
   'choker',
@@ -42,6 +44,10 @@ export const nijiTraitKeys = [
   'hair',
 ] as const satisfies readonly (keyof NijiSeed)[];
 
+// SSOT — packages/niji-contracts/scripts/niji-encoder.ts の `NIJI_COMPOSITE_ORDER`
+// = [10, 9, 8, 0, 3, 7, 5, 1, 6, 11, 4, 2]、 NIJI_TRAITS[id] の name で表記したもの。
+// 配列順 = SVG z-order (先頭が最背面、 末尾が最前面)。 contracts の NijiDescriptor
+// と integer index <-> string name の表現が違うだけで意味は同じ。
 const compositeOrder = [
   'solidBackground',
   'background',

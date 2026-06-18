@@ -183,7 +183,7 @@ function VoteSignals({
             {!isCandidate && (
               <p className="m-0 p-0 text-base font-[PT_Root_UI] text-[var(--brand-gray-light-text)]">
                 <Trans>
-                  Nouns voters can cast voting signals to give proposers of pending proposals an
+                  Nijis voters can cast voting signals to give proposers of pending proposals an
                   idea of how they intend to vote and helpful guidance on proposal changes to change
                   their vote.
                 </Trans>
@@ -360,7 +360,7 @@ function VoteSignals({
           {isCandidate && (
             <p className="m-0 mt-2 p-0 text-base text-sm font-[PT_Root_UI] leading-tight text-[var(--brand-gray-light-text)]">
               <Trans>
-                Nouns voters can cast voting signals to give proposers of pending proposals an idea
+                Nijis voters can cast voting signals to give proposers of pending proposals an idea
                 of how they intend to vote and helpful guidance on proposal changes to change their
                 vote.
               </Trans>

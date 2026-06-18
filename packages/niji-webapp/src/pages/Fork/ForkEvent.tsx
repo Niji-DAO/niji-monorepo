@@ -48,8 +48,8 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
           setActionLabel('added');
           setNounCount(
             event.tokenIDs?.length > 1
-              ? `${event.tokenIDs?.length} Nouns`
-              : `Noun ${event.tokenIDs?.[0]}`,
+              ? `${event.tokenIDs?.length} Nijis`
+              : `Niji ${event.tokenIDs?.[0]}`,
           );
           setNounsInEvent(
             event.tokenIDs?.map((tokenId, i) => {
@@ -57,7 +57,7 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
                 <Link key={i} to={`/niji/${tokenId}`}>
                   <img
                     src={`https://noun.pics/${tokenId}`}
-                    alt={`Noun ${tokenId}`}
+                    alt={`Niji ${tokenId}`}
                     className={classes.nounImage}
                   />
                 </Link>
@@ -79,8 +79,8 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
           setActionLabel('joined with');
           setNounCount(
             event.tokenIDs?.length > 1
-              ? `${event.tokenIDs?.length} Nouns`
-              : `Noun ${event.tokenIDs?.[0]}`,
+              ? `${event.tokenIDs?.length} Nijis`
+              : `Niji ${event.tokenIDs?.[0]}`,
           );
           setNounsInEvent(
             event.tokenIDs?.map((tokenId, i) => {
@@ -88,7 +88,7 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
                 <Link key={i} to={`/niji/${tokenId}`}>
                   <img
                     src={`https://noun.pics/${tokenId}`}
-                    alt={`Noun ${tokenId}`}
+                    alt={`Niji ${tokenId}`}
                     className={classes.nounImage}
                   />
                 </Link>
@@ -110,8 +110,8 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
           setActionLabel('removed');
           setNounCount(
             event.tokenIDs?.length > 1
-              ? `${event.tokenIDs?.length} Nouns`
-              : `Noun ${event.tokenIDs?.[0]}`,
+              ? `${event.tokenIDs?.length} Nijis`
+              : `Niji ${event.tokenIDs?.[0]}`,
           );
           setNounsInEvent(
             event.tokenIDs?.map((tokenId, i) => {
@@ -119,7 +119,7 @@ const ForkEvent = ({ event, isOnlyEvent }: Props) => {
                 <Link key={i} to={`/niji/${tokenId}`}>
                   <img
                     src={`https://noun.pics/${tokenId}`}
-                    alt={`Noun ${tokenId}`}
+                    alt={`Niji ${tokenId}`}
                     className={classes.nounImage}
                   />
                 </Link>

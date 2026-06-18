@@ -68,7 +68,7 @@ const NoundersPage = () => {
   return (
     <div className="[&_a]:text-foreground mx-auto max-w-3xl p-4 [&_a:hover]:text-red-600 [&_h1]:font-['Londrina_Solid'] [&_h2]:font-['Londrina_Solid'] [&_h3]:font-['Londrina_Solid'] [&_img]:w-1/2 [&_img]:rounded-full">
       <h2 className="mb-8">
-        <Trans>The Nounders</Trans>
+        <Trans>The Nijiders</Trans>
       </h2>
       <h3 className="mb-8">
         <Trans>3.5 artists, 6.5 technologists</Trans>
@@ -109,21 +109,21 @@ const NoundersPage = () => {
         ))}
       </div>
       <h3>
-        <Trans>Nounders&apos; Reward</Trans>
+        <Trans>Nijiders&apos; Reward</Trans>
       </h3>
       <p className="text-justify">
         <Trans>
           All Niji auction proceeds are sent to the Niji DAO. For this reason, we, the
-          project&apos;s founders (‘Nounders’) have chosen to compensate ourselves with Nijis. Every
+          project&apos;s founders (‘Nijiders’) have chosen to compensate ourselves with Nijis. Every
           10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where
-          it will be vested and distributed to individual Nounders.
+          it will be vested and distributed to individual Nijiders.
         </Trans>
       </p>
       <p className="text-justify">
         <Trans>
-          The Nounders reward is intended as compensation for our pre and post-launch contributions
+          The Nijiders reward is intended as compensation for our pre and post-launch contributions
           to the project, and to help us participate meaningfully in governance as the project
-          matures. Since there are 10 Nounders, after 5 years each Nounder could receive up to 1% of
+          matures. Since there are 10 Nijiders, after 5 years each Nijider could receive up to 1% of
           the Niji supply.
         </Trans>
       </p>

@@ -113,7 +113,7 @@ function WithdrawNijisButton(props: Props) {
         )}
         {isTxSuccessful && (
           <>
-            Success! Your Nouns have been withdrawn.
+            Success! Your Nijis have been withdrawn.
             {withdrawFromForkEscrowState.transaction.hash && (
               <a
                 href={`${buildEtherscanTxLink(withdrawFromForkEscrowState.transaction.hash)}`}

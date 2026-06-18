@@ -69,7 +69,7 @@ export const Footer = () => {
       url: 'https://farcaster.xyz/~/channel/nijis',
       icon: <FarcasterIcon className="size-6" />,
     },
-    { alt: 'GitHub', url: 'https://github.com/nounsDAO', icon: <GitHubIcon className="size-6" /> },
+    { alt: 'GitHub', url: 'https://github.com/Niji-DAO', icon: <GitHubIcon className="size-6" /> },
     {
       alt: 'Discord',
       url: 'https://discord.gg/Z47Qpz26Fe',

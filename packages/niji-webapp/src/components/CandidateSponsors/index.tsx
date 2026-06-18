@@ -189,7 +189,7 @@ const CandidateSponsors: React.FC<CandidateSponsorsProps> = props => {
                   <p className={classes.subhead}>
                     {isThresholdMet && !props.isUpdateToProposal ? (
                       <Trans>
-                        This candidate has met the required threshold, but Nouns voters can still
+                        This candidate has met the required threshold, but Nijis voters can still
                         add support until it’s put onchain.
                       </Trans>
                     ) : (
@@ -200,7 +200,7 @@ const CandidateSponsors: React.FC<CandidateSponsorsProps> = props => {
                           </Trans>
                         ) : (
                           <Trans>
-                            Proposal candidates must meet the required Nouns vote threshold.
+                            Proposal candidates must meet the required Nijis vote threshold.
                           </Trans>
                         )}
                       </>
@@ -312,7 +312,7 @@ const CandidateSponsors: React.FC<CandidateSponsorsProps> = props => {
                                   <div className={classes.withoutVotesMsg}>
                                     <p>
                                       <Trans>
-                                        Sponsoring a proposal requires at least one Noun vote
+                                        Sponsoring a proposal requires at least one Niji vote
                                       </Trans>
                                     </p>
                                   </div>

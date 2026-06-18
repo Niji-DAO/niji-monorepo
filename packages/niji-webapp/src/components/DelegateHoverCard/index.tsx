@@ -61,7 +61,7 @@ const DelegateHoverCard: React.FC<DelegateHoverCardProps> = props => {
           </Trans>
         ) : (
           <Trans>
-            Voted with<span className={classes.bold}>{numVotesForProp}</span>Nouns
+            Voted with<span className={classes.bold}>{numVotesForProp}</span>Nijis
           </Trans>
         )}
       </div>

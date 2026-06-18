@@ -46,9 +46,9 @@ interface EncodedImage {
   data: string;
 }
 
-const nounsProtocolLink = (
+const nijiProtocolLink = (
   <Link
-    text={<Trans>Nouns Protocol</Trans>}
+    text={<Trans>Niji Protocol</Trans>}
     url="https://www.notion.so/Noun-Protocol-32e4f0bf74fe433e927e2ea35e52a507"
     leavesPage={true}
   />
@@ -56,16 +56,16 @@ const nounsProtocolLink = (
 
 const nijiAssetsLink = (
   <Link
-    text="nouns-assets"
+    text="niji-assets"
     url="https://github.com/Niji-DAO/niji-monorepo/tree/develop/packages/niji-assets"
     leavesPage={true}
   />
 );
 
-const nounsSDKLink = (
+const nijiSDKLink = (
   <Link
-    text="nouns-sdk"
-    url="https://github.com/nounsDAO/nouns-monorepo/tree/master/packages/nouns-sdk"
+    text="niji-sdk"
+    url="https://github.com/Niji-DAO/niji-monorepo/tree/develop/packages/niji-sdk"
     leavesPage={true}
   />
 );
@@ -277,9 +277,9 @@ const Playground: FC = () => {
             </h1>
             <p>
               <Trans>
-                The playground was built using the {nounsProtocolLink}. Niji&apos;s traits are
+                The playground was built using the {nijiProtocolLink}. Niji&apos;s traits are
                 determined by the Niji Seed. The seed was generated using {nijiAssetsLink} and
-                rendered using the {nounsSDKLink}.
+                rendered using the {nijiSDKLink}.
               </Trans>
             </p>
           </Col>
