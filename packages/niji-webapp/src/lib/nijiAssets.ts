@@ -73,7 +73,7 @@ export const humanizeTraitKey = (key: keyof NijiSeed) => {
 export const getNijiData = (seed: NijiSeed): NijiData => ({
   parts: compositeOrder
     .map(key => NijiImageData.images[key][seed[key]])
-    .filter((part): part is EncodedImage => part !== undefined),
+    .filter((part): part is EncodedImage => part != null && typeof part.data === 'string'),
 });
 
 export const getRandomNijiSeed = (): NijiSeed => {
