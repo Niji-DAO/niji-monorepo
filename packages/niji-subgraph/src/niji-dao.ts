@@ -2,10 +2,9 @@ import { Bytes, log, ethereum, store, BigInt, Address } from '@graphprotocol/gra
 
 import { ParsedProposalV3, extractTitle } from './custom-types/ParsedProposalV3';
 import {
-  NounsDAO,
+  NijiDAO,
   ProposalCreated,
   ProposalCreatedWithRequirements,
-  ProposalCreatedWithRequirements1,
   ProposalCanceled,
   ProposalQueued,
   ProposalExecuted,
@@ -23,13 +22,11 @@ import {
   WithdrawFromForkEscrow,
   ExecuteFork,
   JoinFork,
-  ProposalCreatedOnTimelockV1,
-  VoteSnapshotBlockSwitchProposalIdSet,
-} from './types/NounsDAO/NounsDAO';
+} from './types/NijiDAO/NijiDAO';
 import {
   VoteCastWithClientId,
   ProposalCreatedWithRequirements1 as ProposalCreatedWithRequirementsV4,
-} from './types/NounsDAOV4/NounsDAOV4';
+} from './types/NijiDAOV4/NijiDAOV4';
 import {
   Proposal,
   ProposalCandidateSignature,
@@ -91,8 +88,8 @@ export function handleProposalCreated(event: ProposalCreated): void {
 
   const governance = getGovernanceEntity();
   proposal.totalSupply = governance.totalTokenHolders;
-  const nounsDAO = NounsDAO.bind(event.address);
-  const adjustedSupplyResult = nounsDAO.try_adjustedTotalSupply();
+  const nijiDAO = NijiDAO.bind(event.address);
+  const adjustedSupplyResult = nijiDAO.try_adjustedTotalSupply();
 
   if (!adjustedSupplyResult.reverted) {
     proposal.adjustedTotalSupply = adjustedSupplyResult.value;
@@ -126,15 +123,9 @@ export function handleProposalCreated(event: ProposalCreated): void {
 }
 
 export function handleProposalCreatedWithRequirements(
-  event: ProposalCreatedWithRequirements1,
-): void {
-  saveProposalExtraDetails(ParsedProposalV3.fromV1Event(event));
-}
-
-export function handleProposalCreatedWithRequirementsV3(
   event: ProposalCreatedWithRequirements,
 ): void {
-  saveProposalExtraDetails(ParsedProposalV3.fromV3Event(event));
+  saveProposalExtraDetails(ParsedProposalV3.fromV1Event(event));
 }
 
 export function handleProposalCreatedWithRequirementsV4(
@@ -169,12 +160,6 @@ export function saveProposalExtraDetails(parsedProposal: ParsedProposalV3): void
   proposal.signers = signerDelegates;
   proposal.clientId = parsedProposal.clientId.toI32();
 
-  proposal.save();
-}
-
-export function handleProposalCreatedOnTimelockV1(event: ProposalCreatedOnTimelockV1): void {
-  const proposal = getOrCreateProposal(event.params.id.toString());
-  proposal.onTimelockV1 = true;
   proposal.save();
 }
 
@@ -305,7 +290,7 @@ export function handleVoteCast(event: VoteCast): void {
   vote.votes = event.params.votes;
   vote.support = event.params.support == 1;
   vote.supportDetailed = event.params.support;
-  vote.nouns = voter.nounsRepresented;
+  vote.nouns = voter.nijiRepresented;
   vote.blockNumber = event.block.number;
   vote.blockTimestamp = event.block.timestamp;
   vote.transactionHash = event.transaction.hash;
@@ -527,14 +512,6 @@ export function handleJoinFork(event: JoinFork): void {
   }
 
   fork.save();
-}
-
-export function handleVoteSnapshotBlockSwitchProposalIdSet(
-  event: VoteSnapshotBlockSwitchProposalIdSet,
-): void {
-  const governance = getGovernanceEntity();
-  governance.voteSnapshotBlockSwitchProposalId = event.params.newVoteSnapshotBlockSwitchProposalId;
-  governance.save();
 }
 
 function genericUniqueId(event: ethereum.Event): string {

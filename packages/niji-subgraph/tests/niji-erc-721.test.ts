@@ -14,7 +14,7 @@ import {
   handleDelegateChanged,
   handleDelegateVotesChanged,
   handleTransfer,
-} from '../src/nouns-erc-721';
+} from '../src/niji-erc-721';
 import { BIGINT_ONE, BIGINT_ZERO } from '../src/utils/constants';
 import { getOrCreateDelegate, getOrCreateAccount } from '../src/utils/helpers';
 
@@ -38,7 +38,7 @@ afterEach(() => {
   clearStore();
 });
 
-describe('nouns-erc-721', () => {
+describe('niji-erc-721', () => {
   describe('Delegate changes', () => {
     beforeEach(() => {
       const delegate = getOrCreateDelegate(someAddress.toHexString());
@@ -77,7 +77,7 @@ describe('nouns-erc-721', () => {
         'delegate',
         popularDelegate.toHexString(),
       );
-      assert.fieldEquals('Delegate', popularDelegate.toHexString(), 'nounsRepresented', '[1]');
+      assert.fieldEquals('Delegate', popularDelegate.toHexString(), 'nijiRepresented', '[1]');
 
       const randomDelegateIncreateVoteEvent = createDelegateVotesChangedEvent(
         txHash,
@@ -135,7 +135,7 @@ describe('nouns-erc-721', () => {
         'delegate',
         popularDelegate.toHexString(),
       );
-      assert.fieldEquals('Delegate', popularDelegate.toHexString(), 'nounsRepresented', '[]');
+      assert.fieldEquals('Delegate', popularDelegate.toHexString(), 'nijiRepresented', '[]');
       assert.fieldEquals('Delegate', popularDelegate.toHexString(), 'delegatedVotes', '0');
     });
 

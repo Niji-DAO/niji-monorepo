@@ -5,25 +5,25 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: NounsAuctionHouse
+    name: NijiAuctionHouse
     network: {{network}}
     source:
-      address: '{{nounsAuctionHouse.address}}'
-      abi: NounsAuctionHouse
-      startBlock: {{nounsAuctionHouse.startBlock}}
+      address: '{{nijiAuctionHouse.address}}'
+      abi: NijiAuctionHouse
+      startBlock: {{nijiAuctionHouse.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/nouns-auction-house.ts
+      file: ./src/niji-auction-house.ts
       entities:
         - Account
         - Auction
         - Bid
         - Noun
       abis:
-        - name: NounsAuctionHouse
-          file: ../nouns-contracts/abi/contracts/NounsAuctionHouse.sol/NounsAuctionHouse.json
+        - name: NijiAuctionHouse
+          file: ../niji-contracts/abi/contracts/NijiAuctionHouse.sol/NijiAuctionHouse.json
       eventHandlers:
         - event: AuctionCreated(indexed uint256,uint256,uint256)
           handler: handleAuctionCreated
@@ -34,42 +34,42 @@ dataSources:
         - event: AuctionSettled(indexed uint256,address,uint256)
           handler: handleAuctionSettled
   - kind: ethereum/contract
-    name: NounsAuctionHouseV2
+    name: NijiAuctionHouseV2
     network: {{network}}
     source:
-      address: '{{nounsAuctionHouse.address}}'
-      abi: NounsAuctionHouseV2
-      startBlock: {{nounsAuctionHouse.startBlock}}
+      address: '{{nijiAuctionHouse.address}}'
+      abi: NijiAuctionHouseV2
+      startBlock: {{nijiAuctionHouse.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/nouns-auction-house.ts
+      file: ./src/niji-auction-house.ts
       entities:
         - Account
         - Auction
         - Bid
         - Noun
       abis:
-        - name: NounsAuctionHouseV2
-          file: ../nouns-contracts/abi/contracts/NounsAuctionHouseV2.json
+        - name: NijiAuctionHouseV2
+          file: ../niji-contracts/artifacts/contracts/interfaces/INijiAuctionHouseV2.sol/INijiAuctionHouseV2.json
       eventHandlers:
         - event: AuctionBidWithClientId(indexed uint256,uint256,indexed uint32)
           handler: handleAuctionBidWithClientId
         - event: AuctionSettledWithClientId(indexed uint256,indexed uint32)
           handler: handleAuctionSettledWithClientId
   - kind: ethereum/contract
-    name: NounsToken
+    name: NijiToken
     network: {{network}}
     source:
-      address: '{{nounsToken.address}}'
-      abi: NounsToken
-      startBlock: {{nounsToken.startBlock}}
+      address: '{{nijiToken.address}}'
+      abi: NijiToken
+      startBlock: {{nijiToken.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/nouns-erc-721.ts
+      file: ./src/niji-erc-721.ts
       entities:
         - Noun
         - Seed
@@ -77,11 +77,11 @@ dataSources:
         - Delegate
         - Governance
       abis:
-        - name: NounsToken
-          file: ../nouns-contracts/abi/contracts/NounsToken.sol/NounsToken.json
+        - name: NijiToken
+          file: ../niji-contracts/artifacts/contracts/NijiToken.sol/NijiToken.json
       eventHandlers:
-        - event: NounCreated(indexed uint256,(uint48,uint48,uint48,uint48,uint48))
-          handler: handleNounCreated
+        - event: NijiMinted(indexed uint256,indexed address,(uint48,uint48,uint48,uint48,uint48,uint48,uint48,uint48,uint48,uint48,uint48,uint48))
+          handler: handleNijiMinted
         - event: DelegateChanged(indexed address,indexed address,indexed address)
           handler: handleDelegateChanged
         - event: DelegateVotesChanged(indexed address,uint256,uint256)
@@ -89,17 +89,17 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
   - kind: ethereum/contract
-    name: NounsDAO
+    name: NijiDAO
     network: {{network}}
     source:
-      address: '{{nounsDAO.address}}'
-      abi: NounsDAO
-      startBlock: {{nounsDAO.startBlock}}
+      address: '{{nijiDAO.address}}'
+      abi: NijiDAO
+      startBlock: {{nijiDAO.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/nouns-dao.ts
+      file: ./src/niji-dao.ts
       entities:
         - Account
         - Delegate
@@ -108,17 +108,13 @@ dataSources:
         - Governance
         - ProposalCandidateSignature
       abis:
-        - name: NounsDAO
-          file: ../nouns-contracts/abi/contracts/governance/NounsDAOLogicV3.sol/NounsDAOLogicV3.json
+        - name: NijiDAO
+          file: ../niji-contracts/artifacts/contracts/governance/NijiDAOLogicV4.sol/NijiDAOLogicV4.json
       eventHandlers:
         - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
           handler: handleProposalCreated
         - event: ProposalCreatedWithRequirements(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,uint256,uint256,string)
           handler: handleProposalCreatedWithRequirements
-        - event: ProposalCreatedWithRequirements(uint256,address,address[],address[],uint256[],string[],bytes[],uint256,uint256,uint256,uint256,uint256,string)
-          handler: handleProposalCreatedWithRequirementsV3
-        - event: ProposalCreatedOnTimelockV1(uint256)
-          handler: handleProposalCreatedOnTimelockV1
         - event: ProposalCanceled(uint256)
           handler: handleProposalCanceled
         - event: ProposalVetoed(uint256)
@@ -153,20 +149,18 @@ dataSources:
           handler: handleExecuteFork
         - event: JoinFork(indexed uint32,indexed address,uint256[],uint256[],string)
           handler: handleJoinFork
-        - event: VoteSnapshotBlockSwitchProposalIdSet(uint256,uint256)
-          handler: handleVoteSnapshotBlockSwitchProposalIdSet
   - kind: ethereum/contract
-    name: NounsDAOV4
+    name: NijiDAOV4
     network: {{network}}
     source:
-      address: '{{nounsDAO.address}}'
-      abi: NounsDAOV4
-      startBlock: {{nounsDAO.startBlock}}
+      address: '{{nijiDAO.address}}'
+      abi: NijiDAOV4
+      startBlock: {{nijiDAO.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/nouns-dao.ts
+      file: ./src/niji-dao.ts
       entities:
         - Account
         - Delegate
@@ -175,25 +169,25 @@ dataSources:
         - Governance
         - ProposalCandidateSignature
       abis:
-        - name: NounsDAOV4
-          file: ../nouns-contracts/abi/contracts/governance/NounsDAOLogicV4.json
+        - name: NijiDAOV4
+          file: ../niji-contracts/artifacts/contracts/governance/NijiDAOLogicV4.sol/NijiDAOLogicV4.json
       eventHandlers:
         - event: ProposalCreatedWithRequirements(uint256,address[],uint256,uint256,uint256,indexed uint32)
           handler: handleProposalCreatedWithRequirementsV4
         - event: VoteCastWithClientId(indexed address,indexed uint256,indexed uint32)
           handler: handleVoteCastWithClientId
   - kind: ethereum/contract
-    name: NounsDAOData
+    name: NijiDAOData
     network: {{network}}
     source:
-      address: '{{nounsDAOData.address}}'
-      abi: NounsDAOData
-      startBlock: {{nounsDAOData.startBlock}}
+      address: '{{nijiDAOData.address}}'
+      abi: NijiDAOData
+      startBlock: {{nijiDAOData.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/nouns-dao-data.ts
+      file: ./src/niji-dao-data.ts
       entities:
         - Delegate
         - ProposalCandidate
@@ -201,8 +195,8 @@ dataSources:
         - ProposalCandidateSignature
         - ProposalFeedback
       abis:
-        - name: NounsDAOData
-          file: ../nouns-contracts/abi/contracts/governance/data/NounsDAOData.sol/NounsDAOData.json
+        - name: NijiDAOData
+          file: ../niji-contracts/artifacts/contracts/governance/data/NijiDAOData.sol/NijiDAOData.json
       eventHandlers:
         - event: ProposalCandidateCreated(indexed address,address[],uint256[],string[],bytes[],string,string,uint256,bytes32)
           handler: handleProposalCandidateCreated

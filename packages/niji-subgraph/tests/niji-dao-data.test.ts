@@ -9,7 +9,7 @@ import {
   log,
 } from 'matchstick-as/assembly/index';
 
-import { handleProposalCandidateCreated, handleSignatureAdded } from '../src/nouns-dao-data';
+import { handleProposalCandidateCreated, handleSignatureAdded } from '../src/niji-dao-data';
 import {
   ProposalCandidate,
   ProposalCandidateContent,
@@ -39,7 +39,7 @@ const title = 'Original Title';
 const slug = 'some slug';
 const encodedProposalHash = Bytes.fromI32(1234);
 
-describe('nouns-dao-data', () => {
+describe('niji-dao-data', () => {
   beforeEach(() => {
     const proposerDelegate = getOrCreateDelegate(proposerWithDelegate.toHexString());
     proposerDelegate.tokenHoldersRepresentedAmount = 1;

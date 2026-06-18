@@ -45,20 +45,41 @@ type Seed @entity(immutable: true) {
   "The Noun's ERC721 token id"
   id: ID!
 
-  "The background index"
+  "The special trait index"
+  special: BigInt!
+
+  "The choker trait index"
+  choker: BigInt!
+
+  "The headphone trait index"
+  headphone: BigInt!
+
+  "The left hand trait index"
+  leftHand: BigInt!
+
+  "The hat trait index"
+  hat: BigInt!
+
+  "The clothing trait index"
+  clothing: BigInt!
+
+  "The ear trait index"
+  ear: BigInt!
+
+  "The back trait index"
+  back: BigInt!
+
+  "The back decoration trait index"
+  backDecoration: BigInt!
+
+  "The background trait index"
   background: BigInt!
 
-  "The body index"
-  body: BigInt!
+  "The solid background trait index"
+  solidBackground: BigInt!
 
-  "The accessory index"
-  accessory: BigInt!
-
-  "The head index"
-  head: BigInt!
-
-  "The glasses index"
-  glasses: BigInt!
+  "The hair trait index"
+  hair: BigInt!
 }
 
 type Noun @entity(immutable: false) {
@@ -145,25 +166,25 @@ enum ProposalStatus {
 }
 
 type Account @entity(immutable: false) {
-  "An Account is any address that holds any amount of Nouns, the id used is the blockchain address."
+  "An Account is any address that holds any amount of Niji tokens, the id used is the blockchain address."
   id: ID!
 
   "Delegate address of the token holder which will participate in votings. Delegates don't need to hold any tokens and can even be the token holder itself."
   delegate: Delegate
 
-  "Noun balance of this address expressed in the smallest unit of the Nouns ERC721 Token"
+  "Noun balance of this address expressed in the smallest unit of the Niji ERC721 Token"
   tokenBalanceRaw: BigInt!
 
-  "Noun balance of this address expressed as a BigInt normalized value for the Nouns ERC721 Token"
+  "Noun balance of this address expressed as a BigInt normalized value for the Niji ERC721 Token"
   tokenBalance: BigInt!
 
-  "Total amount of Nouns ever held by this address expressed in the smallest unit of the Nouns ERC721 Token"
+  "Total amount of Niji tokens ever held by this address expressed in the smallest unit of the Niji ERC721 Token"
   totalTokensHeldRaw: BigInt!
 
-  "Total amount of Nouns ever held by this address expressed as a BigInt normalized value for the Nouns ERC721 Token"
+  "Total amount of Niji tokens ever held by this address expressed as a BigInt normalized value for the Niji ERC721 Token"
   totalTokensHeld: BigInt!
 
-  "The Nouns owned by this account"
+  "The Noun tokens owned by this account"
   nouns: [Noun!]!
 }
 
@@ -171,10 +192,10 @@ type Delegate @entity(immutable: false) {
   "A Delegate is any address that has been delegated with voting tokens by a token holder, id is the blockchain address of said delegate"
   id: ID!
 
-  "Amount of votes delegated to this delegate to be used on proposal votings expressed in the smallest unit of the Nouns ERC721 Token"
+  "Amount of votes delegated to this delegate to be used on proposal votings expressed in the smallest unit of the Niji ERC721 Token"
   delegatedVotesRaw: BigInt!
 
-  "Amount of votes delegated to this delegate to be used on proposal votings expressed as a BigInt normalized value for the Nouns ERC721 Token"
+  "Amount of votes delegated to this delegate to be used on proposal votings expressed as a BigInt normalized value for the Niji ERC721 Token"
   delegatedVotes: BigInt!
 
   tokenHoldersRepresentedAmount: Int!
@@ -182,8 +203,8 @@ type Delegate @entity(immutable: false) {
   "Token holders that this delegate represents"
   tokenHoldersRepresented: [Account!]! @derivedFrom(field: "delegate")
 
-  "Nouns that this delegate represents"
-  nounsRepresented: [Noun!]!
+  "Niji token NFTs that this delegate represents"
+  nijiRepresented: [Noun!]!
 
   "Votes that a delegate has made in different proposals"
   votes: [Vote!]! @derivedFrom(field: "voter")
@@ -292,9 +313,6 @@ type Proposal @entity(immutable: false) {
   "Feedback posts associated to this proposal"
   feedbackPosts: [ProposalFeedback!]! @derivedFrom(field: "proposal")
 
-  "True if the proposal was created via proposeOnTimelockV1"
-  onTimelockV1: Boolean
-
   "The block at which voting balance snapshots are taken for this proposal"
   voteSnapshotBlock: BigInt!
 
@@ -385,10 +403,10 @@ type Vote @entity(immutable: true) {
   "The integer support value: against (0), for (1), or abstain (2)"
   supportDetailed: Int!
 
-  "Amount of votes in favour or against expressed in the smallest unit of the Nouns ERC721 Token"
+  "Amount of votes in favour or against expressed in the smallest unit of the Niji ERC721 Token"
   votesRaw: BigInt!
 
-  "Amount of votes in favour or against expressed as a BigInt normalized value for the Nouns ERC721 Token"
+  "Amount of votes in favour or against expressed as a BigInt normalized value for the Niji ERC721 Token"
   votes: BigInt!
 
   "The optional vote reason"
@@ -397,7 +415,7 @@ type Vote @entity(immutable: true) {
   "Delegate that emitted the vote"
   voter: Delegate!
 
-  "The Nouns used to vote"
+  "The Noun tokens used to vote"
   nouns: [Noun!]
 
   "Proposal that is being voted on"
@@ -435,10 +453,10 @@ type Governance @entity(immutable: false) {
   "Total number of delegates that held delegated votes"
   totalDelegates: BigInt!
 
-  "Total number of votes delegated expressed in the smallest unit of the Nouns ERC721 Token"
+  "Total number of votes delegated expressed in the smallest unit of the Niji ERC721 Token"
   delegatedVotesRaw: BigInt!
 
-  "Total number of votes delegated expressed as a BigInt normalized value for the Nouns ERC721 Token"
+  "Total number of votes delegated expressed as a BigInt normalized value for the Niji ERC721 Token"
   delegatedVotes: BigInt!
 
   "Number of proposals currently queued for execution"

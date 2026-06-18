@@ -5,11 +5,11 @@ import {
   AuctionCreated,
   AuctionExtended,
   AuctionSettled,
-} from './types/NounsAuctionHouse/NounsAuctionHouse';
+} from './types/NijiAuctionHouse/NijiAuctionHouse';
 import {
   AuctionSettledWithClientId,
   AuctionBidWithClientId,
-} from './types/NounsAuctionHouseV2/NounsAuctionHouseV2';
+} from './types/NijiAuctionHouseV2/NijiAuctionHouseV2';
 import { Auction, Noun, Bid } from './types/schema';
 import { getOrCreateAccount } from './utils/helpers';
 

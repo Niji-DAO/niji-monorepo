@@ -28,7 +28,7 @@ import {
   handleProposalExecuted,
   handleProposalQueued,
   saveProposalExtraDetails,
-} from '../src/nouns-dao';
+} from '../src/niji-dao';
 import { EscrowDeposit, EscrowedNoun, Proposal, ProposalVersion } from '../src/types/schema';
 import {
   BIGINT_10K,
@@ -49,7 +49,7 @@ import {
 
 import {
   createProposalCreatedWithRequirementsEventV1,
-  createProposalCreatedWithRequirementsEventV3,
+  createProposalCreatedWithRequirementsEventV4,
   createVoteCastEvent,
   stubProposalCreatedWithRequirementsEventInput,
   createMinQuorumVotesBPSSetEvent,
@@ -85,7 +85,7 @@ afterEach(() => {
   clearStore();
 });
 
-describe('nouns-dao', () => {
+describe('niji-dao', () => {
   beforeEach(() => {
     const delegate = getOrCreateDelegate(proposerWithDelegate.toHexString());
     delegate.tokenHoldersRepresentedAmount = 1;
@@ -601,16 +601,18 @@ describe('ParsedProposalV3', () => {
 
       assert.i32Equals(parsedProposal.signers.length, 0);
     });
-    test('fromV3Event', () => {
+    test('fromV4Event', () => {
       const propEventInput = stubProposalCreatedWithRequirementsEventInput();
       propEventInput.signers = [Address.fromString(SOME_ADDRESS), proposerWithDelegate];
-      const newPropEvent = createProposalCreatedWithRequirementsEventV3(propEventInput);
+      propEventInput.clientId = BigInt.fromI32(7);
+      const newPropEvent = createProposalCreatedWithRequirementsEventV4(propEventInput);
 
-      const parsedProposal = ParsedProposalV3.fromV3Event(newPropEvent);
+      const parsedProposal = ParsedProposalV3.fromV4Event(newPropEvent);
 
       assert.i32Equals(parsedProposal.signers.length, 2);
       assert.stringEquals(parsedProposal.signers[0], SOME_ADDRESS);
       assert.stringEquals(parsedProposal.signers[1], proposerWithDelegate.toHexString());
+      assert.bigIntEquals(parsedProposal.clientId, BigInt.fromI32(7));
     });
   });
 });
