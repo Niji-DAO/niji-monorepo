@@ -402,29 +402,32 @@ export function useDynamicQuorumProps(block: bigint): DynamicQuorumParams | unde
 
 export function useHasVotedOnProposal(proposalId: bigint): boolean {
   const { address } = useAccount();
-  const { data: receipt } = useReadNijiGovernorGetReceipt({
-    // wagmi の generic 推論が args の型を深く展開しすぎて TS2589 になるため、
-    // explicit cast で深い推論を抑止する (実 runtime 型は変わらない)。
-    args: [proposalId, address!] as never,
+  // wagmi の generic 推論が深く展開しすぎて TS2589 になるため、 hook 呼出を any 経由で迂回する。
+  // 実 runtime 型は変わらず、 receipt は { hasVoted: boolean } を返す。
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const useReceipt = useReadNijiGovernorGetReceipt as any;
+  const { data: receipt } = useReceipt({
+    args: [proposalId, address!],
     query: { enabled: Boolean(proposalId && address) },
   });
 
-  return receipt?.hasVoted ?? false;
+  return (receipt as { hasVoted?: boolean } | undefined)?.hasVoted ?? false;
 }
 
 export function useProposalVote(proposalId: bigint): 'Against' | 'For' | 'Abstain' | '' {
   const { address } = useAccount();
   const enabled = Boolean(proposalId) && Boolean(address);
 
-  /**
-   * @ts-expect-error wagmi hook's return type might be inferred incorrectly or too broadly
-   */
-  const { data: receipt } = useReadNijiGovernorGetReceipt({
+  // wagmi の generic 推論が深く展開しすぎて TS2589 になるため、 hook 呼出を any 経由で迂回する。
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const useReceipt = useReadNijiGovernorGetReceipt as any;
+  const { data: receipt } = useReceipt({
     args: [proposalId, address!],
     query: { enabled },
   });
 
-  const voteStatus = receipt ? Number(receipt.support) : -1;
+  const typedReceipt = receipt as { support?: number | bigint } | undefined;
+  const voteStatus = typedReceipt ? Number(typedReceipt.support) : -1;
 
   if (voteStatus === 0) return 'Against';
   if (voteStatus === 1) return 'For';
