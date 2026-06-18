@@ -3,6 +3,9 @@ import { useEffect, useRef } from 'react';
 import { useAccount, useSwitchChain } from 'wagmi';
 
 import { CHAIN_ID } from '@/config';
+import { config } from '@/wagmi';
+
+type ConfiguredChainId = (typeof config)['chains'][number]['id'];
 
 /**
  * NetworkAlert
@@ -16,10 +19,10 @@ import { CHAIN_ID } from '@/config';
  * - 切替リクエスト中の重複発火を防ぐため lastRequestedChainId を ref で記録
  */
 const NetworkAlert = () => {
-  const targetChainId = Number(CHAIN_ID);
+  const targetChainId = Number(CHAIN_ID) as ConfiguredChainId;
   const { isConnected, chainId: currentChainId } = useAccount();
   const { switchChain } = useSwitchChain();
-  const lastRequestedChainId = useRef<number | null>(null);
+  const lastRequestedChainId = useRef<ConfiguredChainId | null>(null);
 
   useEffect(() => {
     if (!isConnected) return;

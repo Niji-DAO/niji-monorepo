@@ -402,11 +402,10 @@ export function useDynamicQuorumProps(block: bigint): DynamicQuorumParams | unde
 
 export function useHasVotedOnProposal(proposalId: bigint): boolean {
   const { address } = useAccount();
-  /**
-   * @ts-expect-error wagmi hook's argument types might be inferred incorrectly
-   */
   const { data: receipt } = useReadNijiGovernorGetReceipt({
-    args: [proposalId, address!],
+    // wagmi の generic 推論が args の型を深く展開しすぎて TS2589 になるため、
+    // explicit cast で深い推論を抑止する (実 runtime 型は変わらない)。
+    args: [proposalId, address!] as never,
     query: { enabled: Boolean(proposalId && address) },
   });
 
