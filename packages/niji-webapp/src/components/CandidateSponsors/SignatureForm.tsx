@@ -78,7 +78,7 @@ const SignatureForm = (props: Readonly<SignatureFormProps>) => {
   const chainId = defaultChain.id;
 
   const [domain, setDomain] = useState({
-    name: 'Nouns DAO',
+    name: 'Niji DAO',
     chainId,
     verifyingContract: nijiGovernorAddress[chainId],
   });

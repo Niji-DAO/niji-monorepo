@@ -248,7 +248,7 @@ const ForkPage = () => {
                   <div className={classes.spacer} />
                 </div>
                 <h1>
-                  <Trans>Nouns DAO Fork{isForked ? ` #${id}` : ''}</Trans>
+                  <Trans>Niji DAO Fork{isForked ? ` #${id}` : ''}</Trans>
                 </h1>
                 {!isForked && !isForkPeriodActive && (
                   <p className={classes.note}>
