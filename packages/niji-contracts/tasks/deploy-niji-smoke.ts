@@ -31,7 +31,7 @@ import {
   pickRepresentative,
 } from '../scripts/niji-encoder';
 
-const SOURCE_DIR = path.join(__dirname, '../../niji-assets/_archive/work/quality-test/source');
+const SOURCE_DIR = path.join(__dirname, '../../niji-assets/images_niji');
 const DEPLOY_LOG_DIR = path.join(__dirname, '../deploy');
 
 interface SelectedFile {

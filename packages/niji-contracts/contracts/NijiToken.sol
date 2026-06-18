@@ -244,23 +244,32 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Convert seed to trait indices array
     /// @param seed The seed struct
     /// @return Array of trait indices
+    /// @dev NijiSeeder._pickTrait は trait image 数が 0 の時 type(uint256).max を返すが、
+    ///      Seed struct は uint48 cast で受けるため値が type(uint48).max (=0xffffffffffff) に潰れる。
+    ///      Descriptor 側の SKIP_LAYER は type(uint256).max のため、 ここで cast 戻しを行う。
     function _seedToTraitIndices(INijiSeeder.Seed memory seed) internal pure returns (uint256[] memory) {
         uint256[] memory indices = new uint256[](12);
 
-        indices[0] = seed.special;
-        indices[1] = seed.choker;
-        indices[2] = seed.headphone;
-        indices[3] = seed.leftHand;
-        indices[4] = seed.hat;
-        indices[5] = seed.clothing;
-        indices[6] = seed.ear;
-        indices[7] = seed.back;
-        indices[8] = seed.backDecoration;
-        indices[9] = seed.background;
-        indices[10] = seed.solidBackground;
-        indices[11] = seed.hair;
+        indices[0] = _expandTraitIndex(seed.special);
+        indices[1] = _expandTraitIndex(seed.choker);
+        indices[2] = _expandTraitIndex(seed.headphone);
+        indices[3] = _expandTraitIndex(seed.leftHand);
+        indices[4] = _expandTraitIndex(seed.hat);
+        indices[5] = _expandTraitIndex(seed.clothing);
+        indices[6] = _expandTraitIndex(seed.ear);
+        indices[7] = _expandTraitIndex(seed.back);
+        indices[8] = _expandTraitIndex(seed.backDecoration);
+        indices[9] = _expandTraitIndex(seed.background);
+        indices[10] = _expandTraitIndex(seed.solidBackground);
+        indices[11] = _expandTraitIndex(seed.hair);
 
         return indices;
+    }
+
+    /// @dev Expand a uint48 trait index back to uint256, mapping type(uint48).max to SKIP_LAYER (type(uint256).max).
+    function _expandTraitIndex(uint48 v) private pure returns (uint256) {
+        if (v == type(uint48).max) return type(uint256).max;
+        return uint256(v);
     }
 
     /// @notice Get the seed for a token
