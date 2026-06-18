@@ -470,7 +470,7 @@ const ForkPage = () => {
             isForkingPeriod={isForkPeriodActive}
             title={'Add Nijis to escrow'}
             description={
-              "Nouners can withdraw their tokens from escrow as long as the forking period hasn't started. Nijis in escrow are not eligible to vote or submit proposals."
+              "Niji holders can withdraw their tokens from escrow as long as the forking period hasn't started. Nijis in escrow are not eligible to vote or submit proposals."
             }
             selectLabel={'Select Nijis to escrow'}
             selectDescription={

@@ -297,7 +297,7 @@ msgid "or more"
 msgstr "或以上"
 
 #: src/pages/Playground/index.tsx
-msgid "Nijis Protocol"
+msgid "Niji Protocol"
 msgstr "Nijis 协议"
 
 #: src/components/Documentation/index.tsx

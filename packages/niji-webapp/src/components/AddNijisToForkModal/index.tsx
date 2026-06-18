@@ -266,8 +266,8 @@ const AddNijisToForkModal = (props: AddNounsToForkModalProps) => {
       <p className={classes.modalDescription}>
         {!props.isForkingPeriod ? (
           <>
-            Nouners can withdraw their tokens from escrow as long as the forking period hasn&apos;t
-            started. Nijis in escrow are not eligible to vote or submit proposals.
+            Niji holders can withdraw their tokens from escrow as long as the forking period
+            hasn&apos;t started. Nijis in escrow are not eligible to vote or submit proposals.
           </>
         ) : (
           <>

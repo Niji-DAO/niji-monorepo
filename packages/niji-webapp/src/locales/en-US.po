@@ -297,8 +297,8 @@ msgid "or more"
 msgstr "or more"
 
 #: src/pages/Playground/index.tsx
-msgid "Nijis Protocol"
-msgstr "Nijis Protocol"
+msgid "Niji Protocol"
+msgstr "Niji Protocol"
 
 #: src/components/Documentation/index.tsx
 msgid "Niji artwork is in the {publicDomainLink}."

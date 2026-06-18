@@ -302,7 +302,7 @@ msgid "or more"
 msgstr "かそれ以上"
 
 #: src/pages/Playground/index.tsx
-msgid "Nijis Protocol"
+msgid "Niji Protocol"
 msgstr "Nijiプロトコル"
 
 #: src/components/Documentation/index.tsx
