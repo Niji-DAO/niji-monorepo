@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ReactTooltip from 'react-tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface HoverCardProps {
   hoverCardContent: (dataTip: string) => React.ReactNode;
@@ -10,21 +10,18 @@ interface HoverCardProps {
 }
 
 const HoverCard: React.FC<HoverCardProps> = props => {
-  const { hoverCardContent, tip, id } = props;
+  const { hoverCardContent, tip } = props;
 
   return (
-    <>
-      <ReactTooltip
-        id={id}
-        arrowColor={'rgba(0,0,0,0)'}
+    <Tooltip>
+      <TooltipTrigger asChild>{props.children}</TooltipTrigger>
+      <TooltipContent
+        sideOffset={4}
         className="!box-border !h-fit !w-max !min-w-[217px] !rounded-xl !border !border-gray-200 !bg-white !text-black !shadow-sm"
-        effect={'solid'}
-        getContent={hoverCardContent}
-      />
-      <div data-tip={tip} data-for={id}>
-        {props.children}
-      </div>
-    </>
+      >
+        {hoverCardContent(tip)}
+      </TooltipContent>
+    </Tooltip>
   );
 };
 
