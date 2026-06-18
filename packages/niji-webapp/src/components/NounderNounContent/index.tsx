@@ -106,7 +106,7 @@ const NounderNounContent: React.FC<NounderNounContentProps> = props => {
             >
               <Trans>All Noun auction proceeds are sent to the</Trans>{' '}
               <Link to="/vote" className={nounContentClasses.link}>
-                <Trans>Nouns DAO</Trans>
+                <Trans>Niji DAO</Trans>
               </Link>
               .{' '}
               <Trans>

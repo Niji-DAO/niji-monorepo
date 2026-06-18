@@ -114,7 +114,7 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
                   <Trans>Settlement of one auction kicks off the next.</Trans>
                 </li>
                 <li>
-                  <Trans>All Nouns are members of Nouns DAO.</Trans>
+                  <Trans>All Nouns are members of Niji DAO.</Trans>
                 </li>
                 <li>
                   <Trans>Nouns DAO uses a fork of {compoundGovLink}.</Trans>
@@ -173,7 +173,7 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
           </Accordion.Item>
           <Accordion.Item eventKey="2" className={classes.accordionItem}>
             <Accordion.Header className={classes.accordionHeader}>
-              <Trans>Nouns DAO</Trans>
+              <Trans>Niji DAO</Trans>
             </Accordion.Header>
             <Accordion.Body>
               <Trans>

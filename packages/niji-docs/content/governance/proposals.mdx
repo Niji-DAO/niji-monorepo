@@ -20,8 +20,8 @@ import {
 import { wagmiConfig } from '@/config';
 
 import {
-  readNounsGovernorMinQuorumVotes,
-  readNounsGovernorMaxQuorumVotes,
+  readNijiGovernorMinQuorumVotes,
+  readNijiGovernorMaxQuorumVotes,
 } from '@niji/sdk/governor';
 
 import { Table } from 'nextra/components';
@@ -58,9 +58,9 @@ Proposals are approved by simple majority (that is, more **FOR** votes than **AG
 
 Dynamic Quorum is a mechanism that makes proposals harder to pass as more members vote against them. The core principle is simple: more **AGAINST** votes → **higher** quorum.
 
-- A proposal with `0` against votes has a quorum of <code className="nextra-code">{readNounsGovernorMinQuorumVotes(wagmiConfig, {})}</code> votes
+- A proposal with `0` against votes has a quorum of <code className="nextra-code">{readNijiGovernorMinQuorumVotes(wagmiConfig, {})}</code> votes
 - The quorum increases by <code className="nextra-code">{quorumIncreasePerAgainstVote()}</code> vote per against vote
-- The quorum reaches the max of <code className="nextra-code">{readNounsGovernorMaxQuorumVotes(wagmiConfig, {})}</code> votes with <code className="nextra-code">{maxQuorumAgainstVotes()}</code> against votes
+- The quorum reaches the max of <code className="nextra-code">{readNijiGovernorMaxQuorumVotes(wagmiConfig, {})}</code> votes with <code className="nextra-code">{maxQuorumAgainstVotes()}</code> against votes
 - **ABSTAIN** votes do not affect the quorum.
 
 > [!NOTE]

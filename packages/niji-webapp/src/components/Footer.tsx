@@ -20,7 +20,7 @@ export const Footer = () => {
   const { t } = useLingui();
   const categories: { category: string; items: { label: string; url: string }[] }[] = [
     {
-      category: 'Nouns DAO',
+      category: 'Niji DAO',
       items: [
         { label: t`Calendar`, url: '/calendar' },
         { label: t`Governance`, url: '/vote' },

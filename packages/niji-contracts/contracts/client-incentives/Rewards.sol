@@ -174,7 +174,7 @@ contract Rewards is
      */
     function initialize(address owner, address admin_, address ethToken_, address descriptor_) public initializer {
         __Pausable_init_unchained();
-        __ERC721_init('Niji Client Token', 'NOUNSCLIENT');
+        __ERC721_init('Niji Client Token', 'NIJICLIENT');
 
         RewardsStorage storage $ = _getRewardsStorage();
         $.nextTokenId = 1;
