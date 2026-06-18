@@ -10,6 +10,7 @@ pragma solidity ^0.8.20;
 import { ERC721 } from '@openzeppelin/contracts-v5/token/ERC721/ERC721.sol';
 import { ERC721Enumerable } from '@openzeppelin/contracts-v5/token/ERC721/extensions/ERC721Enumerable.sol';
 import { ERC721Votes } from '@openzeppelin/contracts-v5/token/ERC721/extensions/ERC721Votes.sol';
+import { IVotes } from '@openzeppelin/contracts-v5/governance/utils/IVotes.sol';
 import { EIP712 } from '@openzeppelin/contracts-v5/utils/cryptography/EIP712.sol';
 import { Ownable2Step, Ownable } from '@openzeppelin/contracts-v5/access/Ownable2Step.sol';
 import { ReentrancyGuard } from '@openzeppelin/contracts-v5/utils/ReentrancyGuard.sol';
@@ -143,6 +144,7 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
         address _seeder,
         uint256 _maxSupply
     ) ERC721(_name, _symbol) EIP712(_name, '1') Ownable(msg.sender) {
+        if (bytes(_name).length == 0) revert EmptyAddress();
         if (_descriptor == address(0)) revert DescriptorNotSet();
         if (_seeder == address(0)) revert SeederNotSet();
 
@@ -165,6 +167,16 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
         if (maxSupply > 0 && _currentTokenId >= maxSupply) revert MaxSupplyReached();
 
         return _mintTo(to);
+    }
+
+    /// @notice Mint a new Niji to msg.sender (legacy NounsDAO governance compat for auction house)
+    /// @dev Auction house contracts (NijiAuctionHouse / NijiAuctionHouseV3 / NijiAuctionHouseFork) call `nouns.mint()` and expect to receive the token (then auction off via transferFrom).
+    /// @return tokenId The minted token ID
+    function mint() external onlyMinter nonReentrant returns (uint256) {
+        if (!isMintingActive) revert MintingNotActive();
+        if (maxSupply > 0 && _currentTokenId >= maxSupply) revert MaxSupplyReached();
+
+        return _mintTo(msg.sender);
     }
 
     /// @notice Mint multiple Nijis to an address
@@ -383,12 +395,39 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     }
 
     /// @dev Multi-inheritance override for `supportsInterface` (ERC721Enumerable + ERC721).
+    ///      Also advertises `IVotes` so on-chain ERC165 probes (Governor / aggregators) can detect Votes support.
     function supportsInterface(bytes4 interfaceId)
         public
         view
         override(ERC721, ERC721Enumerable)
         returns (bool)
     {
-        return super.supportsInterface(interfaceId);
+        return interfaceId == type(IVotes).interfaceId || super.supportsInterface(interfaceId);
+    }
+
+    // =============================================================
+    //                 GOVERNANCE SIGNATURE ADAPTERS
+    // =============================================================
+
+    /// @notice Legacy NounsDAO signature for historical vote balance lookup.
+    /// @dev Wraps `ERC721Votes.getPastVotes(address,uint256)` to return uint96 (the storage type used by NijiDAOVotes / NijiDAOProposals).
+    ///      Reverts if balance exceeds uint96 (defense-in-depth — actual ERC721Votes votes are bounded by total supply which is far below 2^96).
+    /// @param account The voter address
+    /// @param blockNumber The historical block to query
+    /// @return The voting power at `blockNumber` as uint96
+    function getPriorVotes(address account, uint256 blockNumber) external view returns (uint96) {
+        uint256 votes = getPastVotes(account, blockNumber);
+        require(votes <= type(uint96).max, 'NijiToken: votes overflow uint96');
+        return uint96(votes);
+    }
+
+    /// @notice Legacy NounsDAO signature for current vote balance.
+    /// @dev Wraps `ERC721Votes.getVotes(address)` to return uint96 for governance signature compatibility.
+    /// @param account The voter address
+    /// @return The current voting power as uint96
+    function getCurrentVotes(address account) external view returns (uint96) {
+        uint256 votes = getVotes(account);
+        require(votes <= type(uint96).max, 'NijiToken: votes overflow uint96');
+        return uint96(votes);
     }
 }

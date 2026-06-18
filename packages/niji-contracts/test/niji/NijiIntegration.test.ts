@@ -87,7 +87,7 @@ describe('NijiIntegration', () => {
 
   describe('full flow: mint → tokenURI → attributes', () => {
     it('should produce valid tokenURI with attributes after mint', async () => {
-      await token.mint(minter.address);
+      await token['mint(address)'](minter.address);
 
       const uri = await token.tokenURI(0);
       const json = decodeTokenURI(uri);
@@ -111,7 +111,7 @@ describe('NijiIntegration', () => {
 
   describe('descriptor swap after mint', () => {
     it('should use new descriptor for tokenURI', async () => {
-      await token.mint(minter.address);
+      await token['mint(address)'](minter.address);
 
       // Deploy new descriptor with different resolution
       const newArt = await deployNijiArt(owner.address);
@@ -140,7 +140,7 @@ describe('NijiIntegration', () => {
 
   describe('seeder swap: existing seeds unchanged', () => {
     it('should preserve seed of already-minted tokens after seeder change', async () => {
-      await token.mint(minter.address);
+      await token['mint(address)'](minter.address);
       const seedBefore = await token.getSeed(0);
 
       // Swap seeder
@@ -163,10 +163,10 @@ describe('NijiIntegration', () => {
       await token.setMinter(minter.address);
 
       // Old minter (owner) should fail
-      await expect(token.mint(newOwner.address)).to.be.revertedWithCustomError(token, 'OnlyMinter');
+      await expect(token['mint(address)'](newOwner.address)).to.be.revertedWithCustomError(token, 'OnlyMinter');
 
       // New minter should succeed
-      await token.connect(minter).mint(newOwner.address);
+      await token.connect(minter)['mint(address)'](newOwner.address);
       expect(await token.ownerOf(0)).to.equal(newOwner.address);
     });
   });
@@ -210,7 +210,7 @@ describe('NijiIntegration', () => {
       expect(await limitedToken.remainingSupply()).to.equal(0);
 
       // 6th should revert
-      await expect(limitedToken.mint(minter.address)).to.be.revertedWithCustomError(
+      await expect(limitedToken['mint(address)'](minter.address)).to.be.revertedWithCustomError(
         limitedToken,
         'MaxSupplyReached',
       );

@@ -85,7 +85,7 @@ describe('NijiToken', () => {
     });
 
     it('should mint token to recipient', async () => {
-      await expect(token.mint(other.address))
+      await expect(token['mint(address)'](other.address))
         .to.emit(token, 'Transfer')
         .withArgs(ethers.ZeroAddress, other.address, 0);
 
@@ -94,11 +94,11 @@ describe('NijiToken', () => {
     });
 
     it('should emit NijiMinted event', async () => {
-      await expect(token.mint(other.address)).to.emit(token, 'NijiMinted');
+      await expect(token['mint(address)'](other.address)).to.emit(token, 'NijiMinted');
     });
 
     it('should store seed for token', async () => {
-      await token.mint(other.address);
+      await token['mint(address)'](other.address);
       const seed = await token.getSeed(0);
 
       // Seed should have valid values
@@ -109,14 +109,14 @@ describe('NijiToken', () => {
     it('should revert if minting is not active', async () => {
       await token.toggleMinting(); // Turn off
 
-      await expect(token.mint(other.address)).to.be.revertedWithCustomError(
+      await expect(token['mint(address)'](other.address)).to.be.revertedWithCustomError(
         token,
         'MintingNotActive',
       );
     });
 
     it('should revert if caller is not minter', async () => {
-      await expect(token.connect(other).mint(other.address)).to.be.revertedWithCustomError(
+      await expect(token.connect(other)['mint(address)'](other.address)).to.be.revertedWithCustomError(
         token,
         'OnlyMinter',
       );
@@ -133,8 +133,8 @@ describe('NijiToken', () => {
       );
       await limitedToken.toggleMinting();
 
-      await limitedToken.mint(other.address);
-      await expect(limitedToken.mint(other.address)).to.be.revertedWithCustomError(
+      await limitedToken['mint(address)'](other.address);
+      await expect(limitedToken['mint(address)'](other.address)).to.be.revertedWithCustomError(
         limitedToken,
         'MaxSupplyReached',
       );
@@ -162,7 +162,7 @@ describe('NijiToken', () => {
   describe('tokenURI', () => {
     beforeEach(async () => {
       await token.toggleMinting();
-      await token.mint(other.address);
+      await token['mint(address)'](other.address);
     });
 
     it('should return valid tokenURI', async () => {
@@ -199,7 +199,7 @@ describe('NijiToken', () => {
   describe('getSeed', () => {
     beforeEach(async () => {
       await token.toggleMinting();
-      await token.mint(other.address);
+      await token['mint(address)'](other.address);
     });
 
     it('should return seed for token', async () => {
@@ -217,7 +217,7 @@ describe('NijiToken', () => {
   describe('getTraitIndices', () => {
     beforeEach(async () => {
       await token.toggleMinting();
-      await token.mint(other.address);
+      await token['mint(address)'](other.address);
     });
 
     it('should return trait indices array', async () => {
@@ -275,7 +275,7 @@ describe('NijiToken', () => {
       await token.setMinter(minter.address);
       await token.toggleMinting();
 
-      await token.connect(minter).mint(other.address);
+      await token.connect(minter)['mint(address)'](other.address);
       expect(await token.ownerOf(0)).to.equal(other.address);
     });
   });
@@ -395,7 +395,7 @@ describe('NijiToken', () => {
   describe('exists', () => {
     beforeEach(async () => {
       await token.toggleMinting();
-      await token.mint(other.address);
+      await token['mint(address)'](other.address);
     });
 
     it('should return true for existing token', async () => {
@@ -412,7 +412,7 @@ describe('NijiToken', () => {
       expect(await token.remainingSupply()).to.equal(MAX_SUPPLY);
 
       await token.toggleMinting();
-      await token.mint(other.address);
+      await token['mint(address)'](other.address);
 
       expect(await token.remainingSupply()).to.equal(MAX_SUPPLY - 1);
     });
