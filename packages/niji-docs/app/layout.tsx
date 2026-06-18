@@ -16,8 +16,8 @@ import XIcon from '@/public/images/socials/x.svg?react';
 import '../globals.css';
 
 export const metadata = {
-  title: 'Nouns DAO Docs',
-  description: 'Documentation for Nouns DAO',
+  title: 'Niji DAO Docs',
+  description: 'Documentation for Niji DAO',
 };
 
 const llmsTxtUri = config.baseUri + '/llms.txt';
@@ -37,7 +37,7 @@ const footer = (
   <Footer>
     <div className="flex w-full flex-wrap items-center justify-between gap-10">
       <span>
-        {new Date().getFullYear()} Nouns DAO · made with{' '}
+        {new Date().getFullYear()} Niji DAO · made with{' '}
         <img src={'/images/general/logo.svg'} style={{ height: '12px', display: 'inline-block' }} />
       </span>
       <div className="flex gap-6">

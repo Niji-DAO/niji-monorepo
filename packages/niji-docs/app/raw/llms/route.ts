@@ -71,9 +71,9 @@ export async function GET() {
 
     const markdown = generateMarkdownFromPageMap(pageMap, baseUrl);
 
-    const content = `# Nouns DAO Documentation
+    const content = `# Niji DAO Documentation
 
-Nouns DAO is a Decentralized Autonomous Organization (DAO) empowering Nouns NFT owners to shape and govern the project by voting on proposals funded by the Treasury. Nouns NFTs are auctioned daily, and the proceeds go to the Nouns Treasury.
+Niji DAO is a Decentralized Autonomous Organization (DAO) empowering Niji NFT owners to shape and govern the project by voting on proposals funded by the Treasury. Niji NFTs are auctioned daily, and the proceeds go to the Niji Treasury.
 
 ${markdown}`;
 
