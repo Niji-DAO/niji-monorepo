@@ -54,7 +54,7 @@ const nounsProtocolLink = (
   />
 );
 
-const nounsAssetsLink = (
+const nijiAssetsLink = (
   <Link
     text="nouns-assets"
     url="https://github.com/Niji-DAO/niji-monorepo/tree/develop/packages/niji-assets"
@@ -278,7 +278,7 @@ const Playground: FC = () => {
             <p>
               <Trans>
                 The playground was built using the {nounsProtocolLink}. Niji&apos;s traits are
-                determined by the Niji Seed. The seed was generated using {nounsAssetsLink} and
+                determined by the Niji Seed. The seed was generated using {nijiAssetsLink} and
                 rendered using the {nounsSDKLink}.
               </Trans>
             </p>

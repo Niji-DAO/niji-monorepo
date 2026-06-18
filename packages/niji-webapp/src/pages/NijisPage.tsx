@@ -212,14 +212,14 @@ const NijisPage: React.FC<NijisPageProps> = () => {
       {/* Selected Noun Details */}
       <motion.div layout className="border-border flex h-full flex-col border-l">
         <div className="bg-muted/40 flex h-full flex-col">
-          {/* Noun Image */}
+          {/* Niji Image */}
           <Niji
             nounId={selectedNijiId != undefined ? BigInt(selectedNijiId) : undefined}
             loadingNounFallback
             className="mx-auto size-[288px] object-cover"
           />
 
-          {/* Noun Info Header */}
+          {/* Niji Info Header */}
           <div className="bg-muted mx-2 flex items-center justify-between rounded-t-2xl px-3 py-2 shadow-sm">
             <Button
               variant="ghost"
