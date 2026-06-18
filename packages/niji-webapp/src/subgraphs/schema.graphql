@@ -1894,12 +1894,19 @@ enum Noun_orderBy {
   owner__totalTokensHeld
   owner__totalTokensHeldRaw
   seed
-  seed__accessory
+  seed__back
+  seed__backDecoration
   seed__background
-  seed__body
-  seed__glasses
-  seed__head
+  seed__choker
+  seed__clothing
+  seed__ear
+  seed__hair
+  seed__hat
+  seed__headphone
   seed__id
+  seed__leftHand
+  seed__solidBackground
+  seed__special
   votes
 }
 
@@ -4163,7 +4170,7 @@ type Seed {
   back: BigInt!
   """The back decoration trait index"""
   backDecoration: BigInt!
-  """The background index"""
+  """The background trait index"""
   background: BigInt!
   """The solid background trait index"""
   solidBackground: BigInt!
