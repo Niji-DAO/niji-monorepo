@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { LoadingNoun } from '@/components/LegacyNoun';
-import { getNoun } from '@/components/StandaloneNoun';
+import { getNiji } from '@/components/StandaloneNiji';
 import { useNounSeed } from '@/wrappers/nijiToken';
 
 interface TightStackedCircleNounProps {
@@ -23,8 +23,8 @@ const TightStackedCircleNiji: React.FC<TightStackedCircleNounProps> = ({
     return <LoadingNoun />;
   }
 
-  const nounData = getNoun(BigInt(nounId), seed);
-  const image = nounData.image;
+  const nijiData = getNiji(BigInt(nounId), seed);
+  const image = nijiData.image;
 
   return (
     <g key={index}>

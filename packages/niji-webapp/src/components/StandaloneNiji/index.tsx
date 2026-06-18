@@ -10,25 +10,25 @@ import { getNijiData, NijiImageData } from '@/lib/nijiAssets';
 import { setOnDisplayAuctionNounId } from '@/state/slices/onDisplayAuction';
 import { INounSeed, useNounSeed } from '@/wrappers/nijiToken';
 
-import classes from './StandaloneNoun.module.css';
+import classes from './StandaloneNiji.module.css';
 
 import nounClasses from '@/components/LegacyNoun/Noun.module.css';
 
-interface StandaloneNounProps {
+interface StandaloneNijiProps {
   nounId: bigint;
 }
-interface StandaloneCircularNounProps {
+interface StandaloneCircularNijiProps {
   nounId: bigint;
   border?: boolean;
 }
 
-interface StandaloneNounWithSeedProps {
+interface StandaloneNijiWithSeedProps {
   nounId: bigint;
   onLoadSeed?: (seed: INounSeed) => void;
   shouldLinkToProfile: boolean;
 }
 
-export const getNoun = (nounId: string | bigint, seed: INounSeed) => {
+export const getNiji = (nounId: string | bigint, seed: INounSeed) => {
   const id = nounId.toString();
   const name = `Niji ${id}`;
   const description = `Niji ${id} is a member of the Niji DAO`;
@@ -45,21 +45,21 @@ export const getNoun = (nounId: string | bigint, seed: INounSeed) => {
 /**
  * @deprecated Use [Noun](../Noun.tsx) instead
  */
-export const StandaloneNounImage: FC<StandaloneNounProps> = (props: StandaloneNounProps) => {
+export const StandaloneNijiImage: FC<StandaloneNijiProps> = (props: StandaloneNijiProps) => {
   const { nounId } = props;
   const seed = useNounSeed(nounId);
-  const noun = seed && getNoun(nounId, seed);
+  const niji = seed && getNiji(nounId, seed);
 
-  return <Image src={noun ? noun.image : ''} fluid />;
+  return <Image src={niji ? niji.image : ''} fluid />;
 };
 
 /**
  * @deprecated Use [Noun](../Noun.tsx) instead
  */
-const StandaloneNoun: FC<StandaloneNounProps> = (props: StandaloneNounProps) => {
+const StandaloneNiji: FC<StandaloneNijiProps> = (props: StandaloneNijiProps) => {
   const { nounId } = props;
   const seed = useNounSeed(nounId);
-  const noun = seed && getNoun(nounId, seed);
+  const niji = seed && getNiji(nounId, seed);
 
   const dispatch = useDispatch();
 
@@ -70,10 +70,10 @@ const StandaloneNoun: FC<StandaloneNounProps> = (props: StandaloneNounProps) => 
   return (
     <Link
       to={'/niji/' + nounId.toString()}
-      className={classes.clickableNoun}
+      className={classes.clickableNiji}
       onClick={onClickHandler}
     >
-      <LegacyNoun imgPath={noun ? noun.image : ''} alt={noun ? noun.description : 'Noun'} />
+      <LegacyNoun imgPath={niji ? niji.image : ''} alt={niji ? niji.description : 'Niji'} />
     </Link>
   );
 };
@@ -81,12 +81,12 @@ const StandaloneNoun: FC<StandaloneNounProps> = (props: StandaloneNounProps) => 
 /**
  * @deprecated Use [Noun](../Noun.tsx) instead
  */
-export const StandaloneNounCircular: FC<StandaloneCircularNounProps> = (
-  props: StandaloneCircularNounProps,
+export const StandaloneNijiCircular: FC<StandaloneCircularNijiProps> = (
+  props: StandaloneCircularNijiProps,
 ) => {
   const { nounId, border } = props;
   const seed = useNounSeed(nounId);
-  const noun = seed && getNoun(nounId, seed);
+  const niji = seed && getNiji(nounId, seed);
 
   const dispatch = useDispatch();
   const onClickHandler = () => {
@@ -94,17 +94,17 @@ export const StandaloneNounCircular: FC<StandaloneCircularNounProps> = (
   };
 
   if (!seed || nounId == undefined)
-    return <LegacyNoun imgPath="" alt="Noun" wrapperClassName={nounClasses.circularNounWrapper} />;
+    return <LegacyNoun imgPath="" alt="Niji" wrapperClassName={nounClasses.circularNounWrapper} />;
 
   return (
     <Link
       to={'/niji/' + nounId.toString()}
-      className={classes.clickableNoun}
+      className={classes.clickableNiji}
       onClick={onClickHandler}
     >
       <LegacyNoun
-        imgPath={noun ? noun.image : ''}
-        alt={noun ? noun.description : 'Noun'}
+        imgPath={niji ? niji.image : ''}
+        alt={niji ? niji.description : 'Niji'}
         wrapperClassName={nounClasses.circularNounWrapper}
         className={border === true ? nounClasses.circleWithBorder : nounClasses.circular}
       />
@@ -115,12 +115,12 @@ export const StandaloneNounCircular: FC<StandaloneCircularNounProps> = (
 /**
  * @deprecated Use [Noun](../Noun.tsx) instead
  */
-export const StandaloneNounRoundedCorners: FC<StandaloneNounProps> = (
-  props: StandaloneNounProps,
+export const StandaloneNijiRoundedCorners: FC<StandaloneNijiProps> = (
+  props: StandaloneNijiProps,
 ) => {
   const { nounId } = props;
   const seed = useNounSeed(nounId);
-  const noun = seed && getNoun(nounId, seed);
+  const niji = seed && getNiji(nounId, seed);
 
   const dispatch = useDispatch();
   const onClickHandler = () => {
@@ -130,12 +130,12 @@ export const StandaloneNounRoundedCorners: FC<StandaloneNounProps> = (
   return (
     <Link
       to={'/niji/' + nounId.toString()}
-      className={classes.clickableNoun}
+      className={classes.clickableNiji}
       onClick={onClickHandler}
     >
       <LegacyNoun
-        imgPath={noun ? noun.image : ''}
-        alt={noun ? noun.description : 'Noun'}
+        imgPath={niji ? niji.image : ''}
+        alt={niji ? niji.description : 'Niji'}
         className={nounClasses.rounded}
       />
     </Link>
@@ -145,11 +145,11 @@ export const StandaloneNounRoundedCorners: FC<StandaloneNounProps> = (
 /**
  * @deprecated Use [Noun](../Noun.tsx) instead
  */
-export const StandaloneNounWithSeed: FC<StandaloneNounWithSeedProps> = ({
+export const StandaloneNijiWithSeed: FC<StandaloneNijiWithSeedProps> = ({
   nounId,
   onLoadSeed,
   shouldLinkToProfile,
-}: StandaloneNounWithSeedProps) => {
+}: StandaloneNijiWithSeedProps) => {
   const dispatch = useDispatch();
   const seed = useNounSeed(nounId);
   const seedIsInvalid = Object.values(seed || {}).every(v => v === 0);
@@ -161,25 +161,25 @@ export const StandaloneNounWithSeed: FC<StandaloneNounWithSeedProps> = ({
   }, [seed, seedIsInvalid, onLoadSeed]);
 
   if (!seed || seedIsInvalid || nounId == undefined || !onLoadSeed)
-    return <LegacyNoun imgPath="" alt="Noun" />;
+    return <LegacyNoun imgPath="" alt="Niji" />;
 
   const onClickHandler = () => {
     dispatch(setOnDisplayAuctionNounId(Number(nounId)));
   };
 
-  const { image, description } = getNoun(nounId, seed);
+  const { image, description } = getNiji(nounId, seed);
 
-  const noun = <LegacyNoun imgPath={image} alt={description} />;
-  const nounWithLink = (
+  const niji = <LegacyNoun imgPath={image} alt={description} />;
+  const nijiWithLink = (
     <Link
       to={'/niji/' + nounId.toString()}
-      className={classes.clickableNoun}
+      className={classes.clickableNiji}
       onClick={onClickHandler}
     >
-      {noun}
+      {niji}
     </Link>
   );
-  return shouldLinkToProfile ? nounWithLink : noun;
+  return shouldLinkToProfile ? nijiWithLink : niji;
 };
 
-export default StandaloneNoun;
+export default StandaloneNiji;

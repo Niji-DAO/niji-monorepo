@@ -5,7 +5,7 @@ import { Trans } from '@lingui/react/macro';
 import ReactDOM from 'react-dom';
 
 import BidHistoryModalRow from '@/components/BidHistoryModalRow';
-import { StandaloneNounRoundedCorners } from '@/components/StandaloneNoun';
+import { StandaloneNijiRoundedCorners } from '@/components/StandaloneNiji';
 import { Bid } from '@/utils/types';
 import { Auction } from '@/wrappers/nijiAuction';
 import { useAuctionBids } from '@/wrappers/onDisplayAuction';
@@ -40,7 +40,7 @@ const BidHistoryModalOverlay: React.FC<BidHistoryModalOverlayProps> = ({ auction
         <div className={classes.content}>
           <div className={classes.header}>
             <div className={classes.nounWrapper}>
-              <StandaloneNounRoundedCorners nounId={BigInt(auction && auction.nounId)} />
+              <StandaloneNijiRoundedCorners nounId={BigInt(auction && auction.nounId)} />
             </div>
 
             <div className={classes.title}>
