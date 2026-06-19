@@ -1,0 +1,76 @@
+@use "import" as i;
+
+/* メディアクエリ
+------------------------------------------------------------*/
+$sizes: xxl, xl, lg, md, sm, xs;  
+
+$breakpoint: ( 
+  'xs': 'screen and (max-width: 321px)',
+  'sm': 'screen and (max-width: 376px)',
+  'md': 'screen and (max-width: 501px)',
+  'lg': 'screen and (max-width: 961px)',
+  'f': 'screen and (max-width: 1061px)',
+  'xl': 'screen and (max-width: 1281px)',
+  'xxl': 'screen and (min-width: 1282px)',
+  'pc': 'screen and (min-width: 962px)'
+) !default;
+
+@mixin mq($size: md) {
+  @media #{ map-get( $breakpoint, $size ) } {
+    @content;
+  }
+}
+
+/* フォントサイズ
+------------------------------------------------------------*/
+@mixin fz($size: 16) {
+  font-size: ($size / 10) + rem;
+}
+
+/* textstyle
+------------------------------------------------------------*/
+@mixin heading {
+  font-family: i.$font-family-heading;
+  letter-spacing: i.$kerming-heading;
+  color: i.$color-heading;
+  font-weight: normal;
+}
+@mixin heading-sub {
+  font-family: i.$font-family-eng;
+  letter-spacing: i.$kerming-heading-sub;
+  color: i.$color-main;
+  font-weight: 700;
+}
+
+/* btn
+------------------------------------------------------------*/
+@mixin btn_base {
+  color: i.$color-main;
+  border: 1px solid i.$color-main;
+  display: inline-block;
+  text-align: center;
+  border-radius: 4px;
+  transition: all .3s;
+  &:hover {
+    background: i.$color-main;
+    color: #fff;
+    opacity: 1;
+  }
+}
+@mixin btn_base02 {
+  color: #27355c;
+  display: block;
+  text-align: center;
+  border: 1px solid #27355c;
+  transition: all .3s cubic-bezier(0.48, 0.18, 0, 0.98) 0s;
+}
+
+
+/* tel_link
+------------------------------------------------------------*/
+@mixin tel_link {
+  @media (min-width: 751px) {
+      pointer-events: none;
+      cursor: default;
+  }
+}

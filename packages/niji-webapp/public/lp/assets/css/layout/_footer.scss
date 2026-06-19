@@ -1,0 +1,75 @@
+@use "../foundation/import" as i;
+@use "../foundation/mixin" as m;
+
+footer {
+    margin: 12vw 0 0;
+    background: #3c3a3f;
+    color: #fff;
+
+    @include m.mq('lg'){
+        margin: 24vw 0 0;
+        padding: 0 0 16vw;
+    }
+
+    p {
+        color: #797480;
+    }
+
+    a {
+        color: #fff;
+    }
+
+    .footer_inner {
+        padding: 4vw clamp(20px,8vw,80px) 4vw;
+        display: flex;
+        justify-content: flex-end;
+
+        @include m.mq('lg'){
+            padding: 8vw clamp(20px,8vw,80px) 8vw;
+            @include m.fz(12);
+        }
+
+        .social_list {
+
+            .tw {
+                width: 28px;
+
+                @include m.mq('lg'){
+                    margin: 0 auto;
+                    width: 24px;
+                }
+            }
+        }
+    }
+
+    address {
+        padding: 0 0 6vw;
+        text-align: center;
+        @include m.fz(14);
+
+        @include m.mq('lg'){
+            padding: 0 0 10vw;
+            @include m.fz(12);
+        }
+    }
+}
+
+.launch_bt_fixed {
+    display: none;
+
+    @include m.mq('lg'){
+        padding: 20px;
+        display: block;
+        font-weight: 900;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        border-radius: 0;
+        background: i.$color-accent;
+        text-decoration: none;
+        color: #fff;
+        z-index: 1000;
+        text-align: center;
+    }
+    
+}

@@ -570,7 +570,7 @@ export const nijiDescriptorAbi = [
 export const nijiDescriptorAddress = {
   1: '0x33A9c445fb4FB21f2c030A6b2d3e2F12D017BFAC',
   11155111: '0x79E04ebCDf1ac2661697B23844149b43acc002d5',
-  31337: '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82',
+  31337: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
 } as const;
 
 /**

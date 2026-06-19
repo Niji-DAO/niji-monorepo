@@ -99,7 +99,7 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
   .addOptionalParam('maxsupply', 'Max token supply (0 = unlimited)', '0')
   .addFlag('skipImages', 'Skip uploading images')
   .addFlag('skipToken', 'Skip deploying token contract')
-  .setAction(async (args, { ethers }) => {
+  .setAction(async (args, { ethers, network }) => {
     const RESOLUTION = parseInt(args.resolution);
     const MAX_SUPPLY = parseInt(args.maxsupply);
     const PALETTE_SIZE = 256;
@@ -300,6 +300,87 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     console.log('└──────────────────────────────────────────────────────────────┘\n');
 
     // =========================================
+    // STEP 7.5: Deploy AuctionHouse stack (local 31337 only)
+    // =========================================
+    let auctionProxyAddr: string | null = null;
+    let wethAddr: string | null = null;
+    if (token && network.name === 'localhost') {
+      console.log('┌─ STEP 7.5: Deploy AuctionHouse (V3 + Proxy + WETH) ────────────┐');
+
+      // 31337 local 用パラメータ — 検証しやすさ優先で 1 時間枠 (e2e 走らせる時間を確保)
+      const AUCTION_DURATION = 60 * 60; // 60 分
+      const AUCTION_RESERVE_PRICE = ethers.parseEther('0.001'); // 0.001 ETH
+      const AUCTION_TIME_BUFFER = 60; // 1 分
+      const AUCTION_MIN_BID_INCREMENT_PRCT = 2; // 2%
+
+      // WETH (test 用 mock)
+      const WETH = await ethers.getContractFactory('WETH');
+      const weth = await WETH.deploy();
+      await weth.waitForDeployment();
+      wethAddr = await weth.getAddress();
+      console.log(`│ WETH:                       ${wethAddr}`);
+
+      // ChainalysisSanctionsList mock
+      const SanctionsMock = await ethers.getContractFactory('ChainalysisSanctionsListMock');
+      const sanctions = await SanctionsMock.deploy();
+      await sanctions.waitForDeployment();
+      const sanctionsAddr = await sanctions.getAddress();
+      console.log(`│ ChainalysisSanctionsMock:   ${sanctionsAddr}`);
+
+      // AuctionHouse impl (logic)
+      const AuctionHouseV3 = await ethers.getContractFactory('NijiAuctionHouseV3');
+      const tokenAddrLocal = await token.getAddress();
+      const auctionLogic = await AuctionHouseV3.deploy(tokenAddrLocal, wethAddr, AUCTION_DURATION);
+      await auctionLogic.waitForDeployment();
+      const auctionLogicAddr = await auctionLogic.getAddress();
+      console.log(`│ NijiAuctionHouseV3 (logic): ${auctionLogicAddr}`);
+
+      // ProxyAdmin
+      const ProxyAdmin = await ethers.getContractFactory('NijiAuctionHouseProxyAdmin');
+      const proxyAdmin = await ProxyAdmin.deploy();
+      await proxyAdmin.waitForDeployment();
+      const proxyAdminAddr = await proxyAdmin.getAddress();
+      console.log(`│ NijiAuctionHouseProxyAdmin: ${proxyAdminAddr}`);
+
+      // initialize calldata + Proxy deploy
+      const initData = AuctionHouseV3.interface.encodeFunctionData('initialize', [
+        AUCTION_RESERVE_PRICE,
+        AUCTION_TIME_BUFFER,
+        AUCTION_MIN_BID_INCREMENT_PRCT,
+        sanctionsAddr,
+      ]);
+      const Proxy = await ethers.getContractFactory('NijiAuctionHouseProxy');
+      const proxy = await Proxy.deploy(auctionLogicAddr, proxyAdminAddr, initData);
+      await proxy.waitForDeployment();
+      auctionProxyAddr = await proxy.getAddress();
+      console.log(`│ NijiAuctionHouseProxy:      ${auctionProxyAddr}`);
+
+      // NijiToken.setMinter(proxy) — proxy 経由でしか mint できないように
+      const setMinterTx = await token.setMinter(auctionProxyAddr);
+      await setMinterTx.wait();
+      console.log(`│ NijiToken.setMinter → proxy`);
+
+      // NijiToken.setMintingActive(true) — auction の初回 _createAuction が mint() を
+      // 呼ぶときに `MintingNotActive` で revert しないように先に有効化する。
+      const setMintingTx = await (token as any).setMintingActive(true);
+      await setMintingTx.wait();
+      console.log(`│ NijiToken.setMintingActive(true)`);
+
+      // proxy.unpause() で auction を開始 (V3 IF を proxy address で wrap)
+      // TransparentUpgradeableProxy 経由なので deployer (= EOA、 proxyAdmin owner)
+      // から呼ぶ際は impl にフォールバック、 impl の owner = deployer (initialize で
+      // __Ownable_init() 時に msg.sender 記録) のため unpause が通る。
+      const auctionAtProxy = AuctionHouseV3.attach(auctionProxyAddr).connect(deployer);
+      const ownerAddr = await (auctionAtProxy as any).owner();
+      console.log(`│ AuctionHouse owner: ${ownerAddr}`);
+      const unpauseTx = await (auctionAtProxy as any).unpause();
+      await unpauseTx.wait();
+      console.log(`│ AuctionHouse.unpause() → auction #0 started`);
+
+      console.log('└──────────────────────────────────────────────────────────────┘\n');
+    }
+
+    // =========================================
     // STEP 8: Test tokenURI
     // =========================================
     if (samplePngs.size > 0) {
@@ -347,8 +428,13 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     console.log(`║ NijiArt:        ${artAddr}  ║`);
     console.log(`║ NijiDescriptor: ${descAddrFinal}  ║`);
     console.log(`║ NijiSeeder:     ${seederAddr}  ║`);
-    if (token) {
-      console.log(`║ NijiToken:      ${await token.getAddress()}  ║`);
+    const tokenAddrFinal = token ? await token.getAddress() : null;
+    if (tokenAddrFinal) {
+      console.log(`║ NijiToken:      ${tokenAddrFinal}  ║`);
+    }
+    if (auctionProxyAddr) {
+      console.log(`║ AuctionHouse:   ${auctionProxyAddr}  ║`);
+      console.log(`║ WETH:           ${wethAddr}  ║`);
     }
     console.log('╠═══════════════════════════════════════════════════════════════╣');
     console.log(`║ Resolution:     ${RESOLUTION}x${RESOLUTION}`);
@@ -357,11 +443,35 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     console.log(`║ ETH Spent:      ${ethers.formatEther(balance - balanceAfter)} ETH`);
     console.log('╚═══════════════════════════════════════════════════════════════╝');
 
+    // Persist deploy log JSON for downstream sdk address sync
+    const deployLog = {
+      timestamp: new Date().toISOString(),
+      network: network.name,
+      chainId: Number((await ethers.provider.getNetwork()).chainId),
+      deployer: deployer.address,
+      contracts: {
+        NijiArt: artAddr,
+        NijiDescriptor: descAddrFinal,
+        NijiSeeder: seederAddr,
+        NijiToken: tokenAddrFinal,
+        NijiAuctionHouseProxy: auctionProxyAddr,
+        WETH: wethAddr,
+      },
+    };
+    const deployLogDir = path.join(__dirname, '../deploy');
+    fs.mkdirSync(deployLogDir, { recursive: true });
+    const ts = new Date().toISOString().replace(/[:.]/g, '-');
+    const logPath = path.join(deployLogDir, `${network.name}-${ts}-full.json`);
+    fs.writeFileSync(logPath, JSON.stringify(deployLog, null, 2));
+    console.log(`\n📝 Deploy log: ${logPath}`);
+
     // Return addresses for scripting
     return {
       art: artAddr,
       descriptor: descAddrFinal,
       seeder: seederAddr,
-      token: token ? await token.getAddress() : null,
+      token: tokenAddrFinal,
+      auctionHouse: auctionProxyAddr,
+      weth: wethAddr,
     };
   });
