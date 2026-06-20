@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ブロックチェーンインデクサー比較レポート 2026</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  body {
+    font-family: 'Noto Sans JP', 'Inter', sans-serif;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  @media print {
+    .page-break { page-break-after: always; }
+    .no-break { page-break-inside: avoid; }
+  }
+
+  .gradient-bg {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  }
+
+  .gradient-accent {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  }
+
+  .bar-chart {
+    height: 24px;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+
+  .score-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 13px;
+  }
+
+  th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+
+  .risk-high { color: #dc2626; font-weight: 600; }
+  .risk-medium { color: #f59e0b; font-weight: 600; }
+  .risk-low { color: #10b981; font-weight: 600; }
+</style>
+</head>
+<body class="bg-white text-gray-800">
+
+<!-- ====== COVER PAGE ====== -->
+<div class="gradient-bg min-h-screen flex flex-col justify-center items-center text-white px-16 relative overflow-hidden">
+  <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+  <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+
+  <div class="text-center z-10">
+    <div class="text-sm font-medium tracking-widest text-blue-300 mb-6">リサーチレポート</div>
+    <h1 class="text-5xl font-bold mb-4 leading-tight">
+      ブロックチェーンインデクサー<br>比較レポート
+    </h1>
+    <div class="w-24 h-1 gradient-accent mx-auto my-8 rounded-full"></div>
+    <p class="text-xl text-gray-300 mb-2">Niji DAO インデクサー選定調査</p>
+    <p class="text-lg text-gray-400">13サービス評価 / 7次元分析</p>
+  </div>
+
+  <div class="absolute bottom-12 text-center z-10">
+    <p class="text-sm text-gray-400">2026年2月28日</p>
+    <p class="text-xs text-gray-500 mt-1">Niji DAO向け作成</p>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ====== TABLE OF CONTENTS ====== -->
+<div class="px-16 py-12">
+  <h2 class="text-3xl font-bold text-gray-900 mb-8">目次</h2>
+  <div class="space-y-3">
+    <div class="flex items-center gap-3 py-2 border-b border-gray-100">
+      <span class="text-blue-600 font-bold w-8">01</span>
+      <span class="text-gray-700 font-medium">エグゼクティブサマリー</span>
+      <span class="flex-1 border-b border-dotted border-gray-300 mx-2"></span>
+      <span class="text-gray-400 text-sm">3</span>
+    </div>
+    <div class="flex items-center gap-3 py-2 border-b border-gray-100">
+      <span class="text-blue-600 font-bold w-8">02</span>
+      <span class="text-gray-700 font-medium">評価対象</span>
+      <span class="flex-1 border-b border-dotted border-gray-300 mx-2"></span>
+      <span class="text-gray-400 text-sm">4</span>
+    </div>
+    <div class="flex items-center gap-3 py-2 border-b border-gray-100">
+      <span class="text-blue-600 font-bold w-8">03</span>
+      <span class="text-gray-700 font-medium">パフォーマンスベンチマーク</span>
+      <span class="flex-1 border-b border-dotted border-gray-300 mx-2"></span>
+      <span class="text-gray-400 text-sm">5</span>
+    </div>
+    <div class="flex items-center gap-3 py-2 border-b border-gray-100">
+      <span class="text-blue-600 font-bold w-8">04</span>
+      <span class="text-gray-700 font-medium">技術評価</span>
+      <span class="flex-1 border-b border-dotted border-gray-300 mx-2"></span>
+      <span class="text-gray-400 text-sm">6</span>
+    </div>
+    <div class="flex items-center gap-3 py-2 border-b border-gray-100">
+      <span class="text-blue-600 font-bold w-8">05</span>
+      <span class="text-gray-700 font-medium">コスト比較</span>
+      <span class="flex-1 border-b border-dotted border-gray-300 mx-2"></span>
+      <span class="text-gray-400 text-sm">8</span>
+    </div>
+    <div class="flex items-center gap-3 py-2 border-b border-gray-100">
+      <span class="text-blue-600 font-bold w-8">06</span>
+      <span class="text-gray-700 font-medium">普及度 &amp; 採用状況</span>
+      <span class="flex-1 border-b border-dotted border-gray-300 mx-2"></span>
+      <span class="text-gray-400 text-sm">9</span>
+    </div>
+    <div class="flex items-center gap-3 py-2 border-b border-gray-100">
+      <span class="text-blue-600 font-bold w-8">07</span>
+      <span class="text-gray-700 font-medium">リスク分析</span>
+      <span class="flex-1 border-b border-dotted border-gray-300 mx-2"></span>
+      <span class="text-gray-400 text-sm">10</span>
+    </div>
+    <div class="flex items-center gap-3 py-2 border-b border-gray-100">
+      <span class="text-blue-600 font-bold w-8">08</span>
+      <span class="text-gray-700 font-medium">総合ランキング &amp; 推奨</span>
+      <span class="flex-1 border-b border-dotted border-gray-300 mx-2"></span>
+      <span class="text-gray-400 text-sm">11</span>
+    </div>
+    <div class="flex items-center gap-3 py-2 border-b border-gray-100">
+      <span class="text-blue-600 font-bold w-8">09</span>
+      <span class="text-gray-700 font-medium">付録: 出典</span>
+      <span class="flex-1 border-b border-dotted border-gray-300 mx-2"></span>
+      <span class="text-gray-400 text-sm">12</span>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ====== SECTION 1: EXECUTIVE SUMMARY ====== -->
+<div class="px-16 py-12">
+  <div class="flex items-center gap-3 mb-8">
+    <span class="gradient-accent text-white text-sm font-bold px-3 py-1 rounded-full">01</span>
+    <h2 class="text-3xl font-bold text-gray-900">エグゼクティブサマリー</h2>
+  </div>
+
+  <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-lg mb-8">
+    <p class="text-blue-900 font-medium mb-2">背景</p>
+    <p class="text-blue-800 text-sm leading-relaxed">
+      Niji DAOはBaseチェーン上にNouns型ガバナンスDAOを構築している。本レポートは13のブロックチェーンインデクサーを7つの次元（パフォーマンス、信頼性、DX、コスト、普及度、リスク、Baseチェーン対応）で評価し、最適なインデクシングソリューションを特定する。現在の業界は買収（PonderのMonad買収、SubsquidのRezolve AI買収）やサービス終了（Alchemy Subgraphs）による大幅な統合が進んでいる。
+    </p>
+  </div>
+
+  <div class="grid grid-cols-3 gap-6 mb-8">
+    <div class="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl p-5 border border-yellow-200">
+      <div class="text-3xl font-bold text-yellow-600 mb-1">#1</div>
+      <div class="font-semibold text-gray-800 mb-1">Goldsky</div>
+      <div class="text-xs text-gray-500">無料 / マネージド / Graph互換</div>
+      <div class="mt-2 text-xs text-gray-600">コスト、信頼性、使いやすさのバランスが最も良い。Graph互換のサブグラフ定義。無料StarterプランでDAO規模には十分。</div>
+    </div>
+    <div class="bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl p-5 border border-gray-200">
+      <div class="text-3xl font-bold text-gray-500 mb-1">#2</div>
+      <div class="font-semibold text-gray-800 mb-1">Envio HyperIndex</div>
+      <div class="text-xs text-gray-500">$70/月 / 最速 / TypeScript</div>
+      <div class="mt-2 text-xs text-gray-600">技術的に最も優れ、The Graphの143倍高速なインデクシング。Uniswap V4の公式採用。V3テストフレームワークによるガバナンスデータの正確性検証。</div>
+    </div>
+    <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-5 border border-orange-200">
+      <div class="text-3xl font-bold text-orange-400 mb-1">#3</div>
+      <div class="font-semibold text-gray-800 mb-1">The Graph Studio</div>
+      <div class="text-xs text-gray-500">$0-1/月 / 最大のエコシステム</div>
+      <div class="mt-2 text-xs text-gray-600">342K Xフォロワーと15,000以上のアクティブサブグラフを持つ最も成熟したサービス。イベント欠損や停止に関する既知の信頼性問題あり。</div>
+    </div>
+  </div>
+
+  <div class="bg-gray-50 rounded-xl p-6">
+    <p class="font-semibold text-gray-700 mb-3">主な発見事項</p>
+    <ul class="text-sm text-gray-600 space-y-2">
+      <li class="flex items-start gap-2"><span class="text-blue-500 mt-0.5">&#9679;</span> The Graphにはデータ欠損やサブグラフ停止の問題が記録されており、Nouns DAOはPonderをセカンダリインデクサーとして追加した</li>
+      <li class="flex items-start gap-2"><span class="text-blue-500 mt-0.5">&#9679;</span> PonderはMonad買収後に開発が実質停止している（2026年2月のコミットは1件のみ）</li>
+      <li class="flex items-start gap-2"><span class="text-blue-500 mt-0.5">&#9679;</span> Envioはオープンソースではない（カスタムEULA、HyperSyncのソース非公開）が、技術的パフォーマンスは最高</li>
+      <li class="flex items-start gap-2"><span class="text-blue-500 mt-0.5">&#9679;</span> Goldskyは3つのサブグラフワーカーとGraph互換定義を含む無料プランを提供</li>
+      <li class="flex items-start gap-2"><span class="text-blue-500 mt-0.5">&#9679;</span> Base上のNouns型DAO（月間約1,860イベント）であれば、ほとんどの無料プランで十分</li>
+    </ul>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ====== SECTION 2: EVALUATION TARGETS ====== -->
+<div class="px-16 py-12">
+  <div class="flex items-center gap-3 mb-8">
+    <span class="gradient-accent text-white text-sm font-bold px-3 py-1 rounded-full">02</span>
+    <h2 class="text-3xl font-bold text-gray-900">評価対象</h2>
+  </div>
+
+  <p class="text-gray-600 text-sm mb-6">13のブロックチェーンインデクサーを複数の次元で評価した。サービスは完全分散型プロトコルからマネージドSaaSプラットフォームまで多岐にわたる。</p>
+
+  <table class="no-break">
+    <thead>
+      <tr>
+        <th>サービス</th>
+        <th>タイプ</th>
+        <th>ライセンス</th>
+        <th>言語</th>
+        <th>Base対応</th>
+        <th>ステータス</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="font-medium">The Graph</td><td>分散型プロトコル</td><td>MIT / Apache-2.0</td><td>Rust / AssemblyScript</td><td class="text-green-600">&#10003;</td><td class="text-green-600">稼働中</td></tr>
+      <tr class="bg-gray-50"><td class="font-medium">Goldsky</td><td>マネージドSaaS</td><td>Proprietary</td><td>Graph互換</td><td class="text-green-600">&#10003;</td><td class="text-green-600">稼働中</td></tr>
+      <tr><td class="font-medium">Envio HyperIndex</td><td>マネージド + セルフホスト</td><td>Custom EULA</td><td>TypeScript / ReScript</td><td class="text-green-600">&#10003;</td><td class="text-green-600">稼働中</td></tr>
+      <tr class="bg-gray-50"><td class="font-medium">Ponder</td><td>OSSフレームワーク</td><td>MIT</td><td>TypeScript</td><td class="text-green-600">&#10003;</td><td class="risk-high">開発停滞</td></tr>
+      <tr><td class="font-medium">Subsquid (SQD)</td><td>分散型 + SDK</td><td>Apache-2.0 / AGPL-3.0</td><td>TypeScript</td><td class="text-green-600">&#10003;</td><td class="risk-medium">買収済み</td></tr>
+      <tr class="bg-gray-50"><td class="font-medium">SubQuery</td><td>分散型 + SDK</td><td>GPL-3.0</td><td>TypeScript</td><td class="text-green-600">&#10003;</td><td class="text-green-600">稼働中</td></tr>
+      <tr><td class="font-medium">Ormi</td><td>マネージドSaaS</td><td>Proprietary</td><td>Graph互換</td><td class="text-green-600">&#10003;</td><td class="text-green-600">稼働中</td></tr>
+      <tr class="bg-gray-50"><td class="font-medium">Rindexer</td><td>OSSフレームワーク</td><td>MIT</td><td>Rust / YAML</td><td class="text-green-600">&#10003;</td><td class="risk-high">重大バグ</td></tr>
+      <tr><td class="font-medium">Shovel</td><td>OSSツール</td><td>MIT</td><td>Go</td><td class="text-green-600">&#10003;</td><td class="text-green-600">稼働中</td></tr>
+      <tr class="bg-gray-50"><td class="font-medium">Shadow</td><td>補完ツール</td><td>Apache-2.0 / MIT</td><td>Rust</td><td class="text-green-600">&#10003;</td><td class="text-green-600">稼働中</td></tr>
+      <tr><td class="font-medium">Sentio</td><td>マネージドSaaS</td><td>Proprietary</td><td>TypeScript</td><td class="text-green-600">&#10003;</td><td class="text-green-600">稼働中</td></tr>
+      <tr class="bg-gray-50"><td class="font-medium">Flair</td><td>マネージドSaaS</td><td>Proprietary</td><td>TypeScript</td><td class="text-green-600">&#10003;</td><td class="text-green-600">稼働中</td></tr>
+      <tr><td class="font-medium text-gray-400">Alchemy Subgraphs</td><td class="text-gray-400">マネージドSaaS</td><td class="text-gray-400">-</td><td class="text-gray-400">-</td><td class="text-gray-400">-</td><td class="risk-high">終了 (2025年12月)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ====== SECTION 2.5: SERVICE PROFILES ====== -->
+<div class="px-16 py-12">
+  <div class="mb-6">
+    <h3 class="text-lg font-semibold text-gray-800 mb-2">各サービスの特徴</h3>
+    <p class="text-gray-500 text-xs mb-6">評価対象13サービスの概要。分散型プロトコル、マネージドSaaS、OSSフレームワークなど、アーキテクチャの異なるサービスが混在している。</p>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <!-- The Graph -->
+    <div class="border border-gray-200 rounded-lg p-4 no-break">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-white bg-indigo-500 px-2 py-0.5 rounded">分散型</span>
+        <span class="font-semibold text-gray-800">The Graph</span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">ブロックチェーンインデクサーの事実上の標準。GRTトークンによる分散型ネットワークで、インデクサーがサブグラフをホストする。Uniswap、Aave等の主要DeFiプロトコルが採用。AssemblyScriptでサブグラフを記述するため学習コストがやや高い。15,000以上のアクティブサブグラフと最大のエコシステムを持つが、イベント欠損やサブグラフ停止といった信頼性の課題が報告されている。</p>
+    </div>
+
+    <!-- Goldsky -->
+    <div class="border border-yellow-200 bg-yellow-50/30 rounded-lg p-4 no-break">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-white bg-yellow-500 px-2 py-0.5 rounded">SaaS</span>
+        <span class="font-semibold text-gray-800">Goldsky</span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">Felicis・Dragonfly Capital等から$22M調達のマネージドインデクサー。The Graphのサブグラフ定義をそのまま利用でき、移行コストが極めて低い。Alchemy Subgraphs終了時の公式移行先に指定された。Mirror機能でClickHouse等への直接データパイプラインも提供。Polymarket、Zora、Optimism等が採用。無料Starterプランで3ワーカーまで利用可能。</p>
+    </div>
+
+    <!-- Envio -->
+    <div class="border border-gray-200 rounded-lg p-4 no-break">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-white bg-blue-500 px-2 py-0.5 rounded">ハイブリッド</span>
+        <span class="font-semibold text-gray-800">Envio HyperIndex</span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">独自のHyperSyncデータレイヤーにより、The Graph比約400倍の圧倒的なインデックス速度を実現。TypeScriptでインデクサーを記述し、V3ではVitestベースのテストフレームワークを提供。Uniswap V4の公式インデクサーに採用された。ただしHyperSyncのソースコードは非公開（Custom EULA）で、ベンダーロックインのリスクがある。チーム規模は1〜10人と小さい。</p>
+    </div>
+
+    <!-- Ponder -->
+    <div class="border border-gray-200 rounded-lg p-4 no-break">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-white bg-green-500 px-2 py-0.5 rounded">OSS</span>
+        <span class="font-semibold text-gray-800">Ponder</span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">TypeScriptネイティブのOSSインデクサーフレームワーク。開発者体験が最も優れており、ホットリロード・完全な型安全性・組み込みテストフレームワーク・GraphQL自動生成を備える。Nouns DAOがThe Graphの信頼性問題を補完するために採用。しかし2025年末にチームがMonad Foundationに買収され、2026年2月時点で開発がほぼ停止（月1コミット）。MITライセンスのためフォークは可能。</p>
+    </div>
+
+    <!-- Subsquid -->
+    <div class="border border-gray-200 rounded-lg p-4 no-break">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-white bg-purple-500 px-2 py-0.5 rounded">分散型</span>
+        <span class="font-semibold text-gray-800">Subsquid (SQD)</span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">SQD Networkという分散型データレイクを基盤とするインデクサー。TypeScript SDKによるバッチ処理モデルで、The Graph比約53倍高速。100以上のチェーンに対応し、EVM・Substrate・Solanaをサポート。2025年10月にRezolve AI（NASDAQ: RZLV）に約$10Mで買収され、AI転換リスクが懸念される。Apache-2.0 SDKは独立利用可能。</p>
+    </div>
+
+    <!-- SubQuery -->
+    <div class="border border-gray-200 rounded-lg p-4 no-break">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-white bg-teal-500 px-2 py-0.5 rounded">分散型</span>
+        <span class="font-semibold text-gray-800">SubQuery</span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">Polkadot/Substrateエコシステムから発祥し、現在は230以上のチェーンに対応する分散型インデクサー。SubQuery Networkによるトークンインセンティブモデルを採用。SDK 4.0でマルチスレッド対応とストアキャッシュレイヤーを導入し、パフォーマンスを向上。$16M調達、Discord約38Kメンバーの大規模コミュニティを持つ。</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <!-- Ormi -->
+    <div class="border border-gray-200 rounded-lg p-4 no-break">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-white bg-orange-500 px-2 py-0.5 rounded">SaaS</span>
+        <span class="font-semibold text-gray-800">Ormi</span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">Graph互換のマネージドサブグラフホスティング。sub-30msクエリレイテンシ、4,000 RPS、99.9% SLAを公約する高性能サービス。Pendle（$6B TVL）、Aura Finance等のDeFiプロトコルが採用。Google Cloudから$300K支援を受けている。チーム5人と小規模だが、$50B以上のTVLを支える実績がある。</p>
+    </div>
+
+    <!-- Rindexer -->
+    <div class="border border-gray-200 rounded-lg p-4 no-break">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded">OSS</span>
+        <span class="font-semibold text-gray-800">Rindexer</span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">Rustで書かれた高速OSSインデクサー。ノーコード（YAML設定のみ）とカスタムRustハンドラーの両方に対応。Envio比では33倍低速だが、The Graph比12倍高速。ただしReorg処理が未実装、イベント欠損バグ(#264)、メモリリーク(#282)等の重大な品質問題があり、開発者1人のバスファクター1。本番環境には非推奨。</p>
+    </div>
+
+    <!-- Shovel -->
+    <div class="border border-gray-200 rounded-lg p-4 no-break">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-white bg-green-500 px-2 py-0.5 rounded">OSS</span>
+        <span class="font-semibold text-gray-800">Shovel</span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">IndexSupplyが開発するGoベースの軽量OSSインデクサー。JSONの設定ファイルのみでEthereumデータをPostgreSQLに直接書き込む、シンプルなETLツール。コード不要のアプローチで導入が容易。Ethereum全履歴のNFT Transferイベントを5分以内にインデックスできる性能を持つ。GraphQLは非搭載で、SQLで直接クエリする設計。</p>
+    </div>
+
+    <!-- Shadow -->
+    <div class="border border-gray-200 rounded-lg p-4 no-break">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-white bg-gray-600 px-2 py-0.5 rounded">補完</span>
+        <span class="font-semibold text-gray-800">Shadow</span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">他のインデクサーを補完する独自ツール。「Shadow Fork」により、既存のスマートコントラクトにカスタムイベントを追加し、オンチェーンで実行・インデックスできる。コントラクトを再デプロイせずにイベントを追加できるため、既存プロトコルの分析に有用。P95 5秒未満のレイテンシでリアルタイム処理。単体インデクサーではなく、他サービスとの併用が前提。</p>
+    </div>
+
+    <!-- Sentio -->
+    <div class="border border-gray-200 rounded-lg p-4 no-break">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-white bg-blue-600 px-2 py-0.5 rounded">SaaS</span>
+        <span class="font-semibold text-gray-800">Sentio</span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">インデクシングだけでなく、モニタリング・アラート・分析ダッシュボードを統合した包括的なWeb3データプラットフォーム。大規模並列処理により従来比最大100倍高速なインデックスを実現。EVM、Solana、Aptos等マルチチェーン対応。TypeScriptでプロセッサを記述し、SQLベースのクエリを提供。オブザーバビリティツールとしての側面が強い。</p>
+    </div>
+
+    <!-- Flair -->
+    <div class="border border-gray-200 rounded-lg p-4 no-break">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-white bg-pink-500 px-2 py-0.5 rounded">SaaS</span>
+        <span class="font-semibold text-gray-800">Flair</span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">リアルタイムストリーム処理に特化したインデクサー。集計・ロールアップ等のデータ変換をストリーミングで実行し、水平スケール可能なアーキテクチャ。TypeScriptでハンドラーを記述。定量的なパフォーマンスデータは公開されていないが、並列・分散処理パラダイムによる高スケーラビリティを謳っている。</p>
+    </div>
+  </div>
+
+  <!-- Alchemy Subgraphs (Sunset) -->
+  <div class="border border-red-200 bg-red-50/30 rounded-lg p-4 no-break">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="text-xs font-bold text-white bg-red-400 px-2 py-0.5 rounded">終了</span>
+      <span class="font-semibold text-gray-400">Alchemy Subgraphs</span>
+    </div>
+    <p class="text-xs text-gray-500 leading-relaxed">Alchemyが提供していたマネージドサブグラフホスティングサービス。2025年12月にサービスを終了し、Goldskyへの公式移行パスを提供。この終了がGoldskyの市場ポジション強化につながった。</p>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ====== SECTION 3: PERFORMANCE BENCHMARKS ====== -->
+<div class="px-16 py-12">
+  <div class="flex items-center gap-3 mb-8">
+    <span class="gradient-accent text-white text-sm font-bold px-3 py-1 rounded-full">03</span>
+    <h2 class="text-3xl font-bold text-gray-900">パフォーマンスベンチマーク</h2>
+  </div>
+
+  <p class="text-gray-600 text-sm mb-6">インデクシング速度・クエリレイテンシ・スループット等のパフォーマンスデータを網羅。同一条件ベンチマークと各社公式データの両方を掲載。</p>
+
+  <!-- 3.1 Unified Benchmark -->
+  <div class="mb-6 no-break">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">3.1 同一条件ベンチマーク（Envio Open Indexer Benchmark）</h3>
+    <p class="text-xs text-gray-500 mb-3">1分間のバックフィル時のインデクシング速度をblocks/秒で計測（ERC20 Transferイベント、RocketPoolトークン）。参加6サービスのみ。</p>
+  </div>
+
+  <div class="bg-gray-50 rounded-xl p-6 mb-8 no-break">
+    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">インデックス速度 (blocks/sec)</h3>
+
+    <div class="space-y-3">
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-24 text-right">Envio</span>
+        <div class="flex-1 bg-gray-200 rounded-full h-7 overflow-hidden">
+          <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full flex items-center justify-end pr-3" style="width: 100%">
+            <span class="text-xs font-bold text-white">79,609</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-24 text-right">Subsquid</span>
+        <div class="flex-1 bg-gray-200 rounded-full h-7 overflow-hidden">
+          <div class="bg-gradient-to-r from-purple-400 to-purple-500 h-full rounded-full flex items-center justify-end pr-3" style="width: 13.3%">
+            <span class="text-xs font-bold text-white">10,626</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-24 text-right">Rindexer</span>
+        <div class="flex-1 bg-gray-200 rounded-full h-7 overflow-hidden">
+          <div class="bg-gradient-to-r from-orange-400 to-orange-500 h-full rounded-full flex items-center justify-end pr-3" style="width: 3%">
+            <span class="text-xs font-bold text-white">2,399</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-24 text-right">Ponder</span>
+        <div class="flex-1 bg-gray-200 rounded-full h-7 overflow-hidden">
+          <div class="bg-gradient-to-r from-green-400 to-green-500 h-full rounded-full flex items-center justify-end pr-3" style="width: 1.5%">
+            <span class="text-xs font-bold text-white ml-12">519</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-24 text-right">The Graph</span>
+        <div class="flex-1 bg-gray-200 rounded-full h-7 overflow-hidden">
+          <div class="bg-gradient-to-r from-gray-400 to-gray-500 h-full rounded-full flex items-center justify-end pr-3" style="width: 0.8%">
+            <span class="text-xs font-bold text-white ml-12">~200</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-24 text-right">SubQuery</span>
+        <div class="flex-1 bg-gray-200 rounded-full h-7 overflow-hidden">
+          <div class="bg-gradient-to-r from-red-400 to-red-500 h-full rounded-full flex items-center justify-end pr-3" style="width: 0.5%">
+            <span class="text-xs font-bold text-white ml-12">105</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="text-xs text-gray-400 mt-4">注: Envioは標準RPCではなくHyperSync（プロプライエタリデータレイヤー）を使用。他のインデクサーはRPCを使用。</p>
+  </div>
+
+  <!-- Relative Speed Table -->
+  <div class="no-break">
+    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">相対パフォーマンス（vs The Graph）</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>インデクサー</th>
+          <th>blocks/sec</th>
+          <th>vs The Graph</th>
+          <th>vs Envio</th>
+          <th>データソース</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="font-medium">Envio</td><td>79,609</td><td class="text-green-600 font-semibold">約400倍高速</td><td>-</td><td>HyperSync (プロプライエタリ)</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Subsquid</td><td>10,626</td><td class="text-green-600 font-semibold">約53倍高速</td><td>7.5倍低速</td><td>SQD Network</td></tr>
+        <tr><td class="font-medium">Rindexer</td><td>2,399</td><td class="text-green-600">約12倍高速</td><td>33倍低速</td><td>RPC</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Ponder</td><td>519</td><td class="text-green-600">約2.6倍高速</td><td>153倍低速</td><td>RPC</td></tr>
+        <tr><td class="font-medium">The Graph</td><td>~200</td><td>基準</td><td>400倍低速</td><td>RPC / Archive</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">SubQuery</td><td>105</td><td class="text-red-600">約0.5倍</td><td>758倍低速</td><td>RPC</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3.2 Official Performance Data -->
+  <div class="mt-8 mb-6 no-break">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">3.2 各社公式パフォーマンスデータ</h3>
+    <p class="text-xs text-gray-500 mb-3">上記ベンチマーク未参加のサービスを含む、各社が公式に発表しているパフォーマンスデータ。計測条件が異なるため直接比較はできないが、各サービスの性能傾向を把握できる。</p>
+  </div>
+
+  <div class="no-break mb-8">
+    <table>
+      <thead>
+        <tr>
+          <th>サービス</th>
+          <th>インデックス速度</th>
+          <th>クエリレイテンシ</th>
+          <th>スループット</th>
+          <th>出典</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="font-medium">Goldsky</td><td class="text-sm">350K〜6.3M rows/min<br><span class="text-xs text-gray-400">（Mirror, ClickHouse書込み）</span></td><td class="text-green-600 font-semibold">sub-5ms</td><td class="text-sm">Xai: 100+ events/sec</td><td class="text-xs text-gray-400">Goldsky Docs, Xai Case Study</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Ormi</td><td class="text-sm">競合比最大5倍高速<br><span class="text-xs text-gray-400">（Somnia: 14ブロック/120ms遅延）</span></td><td class="text-green-600 font-semibold">sub-30ms<br><span class="text-xs text-gray-400">（スキーマ間: sub-10ms）</span></td><td class="text-sm font-semibold">4,000 RPS</td><td class="text-xs text-gray-400">Ormi Labs Blog</td></tr>
+        <tr><td class="font-medium">Sentio</td><td class="text-sm">従来比最大100倍高速<br><span class="text-xs text-gray-400">（大規模並列処理）</span></td><td class="text-sm text-gray-500">非公開</td><td class="text-sm text-gray-500">非公開</td><td class="text-xs text-gray-400">Sentio公式, sentio-benchmark</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">SubQuery</td><td class="text-sm">The Graph比3.9倍高速<br><span class="text-xs text-gray-400">（SDK 4.0, POAP）</span></td><td class="text-sm text-gray-500">非公開</td><td class="text-sm text-gray-500">非公開</td><td class="text-xs text-gray-400">SubQuery Medium</td></tr>
+        <tr><td class="font-medium">Shadow</td><td class="text-sm">チェーンヘッドから数秒以内<br><span class="text-xs text-gray-400">（P95 &lt; 5秒）</span></td><td class="text-sm text-gray-500">非公開</td><td class="text-sm text-gray-500">非公開</td><td class="text-xs text-gray-400">Shadow Docs</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Shovel</td><td class="text-sm">全NFT Transfer: 5分以内<br><span class="text-xs text-gray-400">（Ethereum全履歴）</span></td><td class="text-sm text-gray-500">非公開</td><td class="text-sm text-gray-500">非公開</td><td class="text-xs text-gray-400">IndexSupply</td></tr>
+        <tr><td class="font-medium">Flair</td><td class="text-sm text-gray-400">定量データなし</td><td class="text-sm text-gray-400">定量データなし</td><td class="text-sm text-gray-400">定量データなし</td><td class="text-xs text-gray-400">-</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Goldsky Mirror Detail -->
+  <div class="bg-gray-50 rounded-xl p-6 no-break">
+    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Goldsky Mirror バックフィル性能（パイプラインサイズ別）</h3>
+    <div class="space-y-2">
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-12 text-right">XXL</span>
+        <div class="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+          <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 h-full rounded-full flex items-center justify-end pr-3" style="width: 100%">
+            <span class="text-xs font-bold text-white">6.3M rows/min</span>
+          </div>
+        </div>
+        <span class="text-xs text-gray-500 w-12">3分</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-12 text-right">XL</span>
+        <div class="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+          <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 h-full rounded-full flex items-center justify-end pr-3" style="width: 55.6%">
+            <span class="text-xs font-bold text-white">3.5M rows/min</span>
+          </div>
+        </div>
+        <span class="text-xs text-gray-500 w-12">約5分</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-12 text-right">L</span>
+        <div class="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+          <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 h-full rounded-full flex items-center justify-end pr-3" style="width: 33.3%">
+            <span class="text-xs font-bold text-white">2.1M rows/min</span>
+          </div>
+        </div>
+        <span class="text-xs text-gray-500 w-12">9分</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-12 text-right">M</span>
+        <div class="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+          <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 h-full rounded-full flex items-center px-3" style="width: 15.1%">
+            <span class="text-xs font-bold text-gray-700 ml-8">950K rows/min</span>
+          </div>
+        </div>
+        <span class="text-xs text-gray-500 w-12">20分</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-12 text-right">S</span>
+        <div class="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+          <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 h-full rounded-full" style="width: 5.6%"></div>
+        </div>
+        <span class="text-xs text-gray-500 w-24">350K rows/min</span>
+      </div>
+    </div>
+    <p class="text-xs text-gray-400 mt-3">計測条件: Ethereum全ブロック約1,850万行、ClickHouse Cloud（720 GiB RAM, 180 vCPU）。出典: Goldsky Docs</p>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ====== SECTION 4: TECHNICAL EVALUATION ====== -->
+<div class="px-16 py-12">
+  <div class="flex items-center gap-3 mb-8">
+    <span class="gradient-accent text-white text-sm font-bold px-3 py-1 rounded-full">04</span>
+    <h2 class="text-3xl font-bold text-gray-900">技術評価</h2>
+  </div>
+
+  <!-- Reliability -->
+  <div class="mb-8 no-break">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">4.1 信頼性 &amp; Reorg処理</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>サービス</th>
+          <th>信頼性</th>
+          <th>Reorg処理</th>
+          <th>既知の問題</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="font-medium">The Graph</td><td><span class="score-badge bg-yellow-100 text-yellow-700">B+</span></td><td>自動（実績あり）</td><td class="risk-high text-xs">イベント欠損、サブグラフ停止、非決定的エラー</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Goldsky</td><td><span class="score-badge bg-green-100 text-green-700">A-</span></td><td>自動</td><td class="text-xs text-gray-500">99.9%稼働率（自称）</td></tr>
+        <tr><td class="font-medium">Envio</td><td><span class="score-badge bg-green-100 text-green-700">A</span></td><td>自動 + 設定可能</td><td class="text-xs text-gray-500">V3でロールバック機構を再設計</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Ponder</td><td><span class="score-badge bg-yellow-100 text-yellow-700">B+</span></td><td>自動</td><td class="risk-high text-xs">サイレント同期停止 (#2264)、未対応</td></tr>
+        <tr><td class="font-medium">Subsquid</td><td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td><td>自動ロールバック</td><td class="risk-medium text-xs">原因不明のプロセッサ停止（11件のコメント）</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Ormi</td><td><span class="score-badge bg-green-100 text-green-700">A+</span></td><td>自動</td><td class="text-xs text-gray-500">99.9% SLA、30ms未満のクエリ</td></tr>
+        <tr><td class="font-medium">Rindexer</td><td><span class="score-badge bg-red-100 text-red-700">D</span></td><td class="risk-high">未実装</td><td class="risk-high text-xs">イベント欠損 (#264)、メモリリーク (#282)、RPCストール (#342)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Developer Experience -->
+  <div class="mb-8 no-break">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">4.2 開発者体験</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>サービス</th>
+          <th>DXスコア</th>
+          <th>言語</th>
+          <th>ホットリロード</th>
+          <th>型安全性</th>
+          <th>テストフレームワーク</th>
+          <th>GraphQL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="font-medium">Ponder</td><td><span class="score-badge bg-blue-100 text-blue-700">S</span></td><td>TypeScript</td><td class="text-green-600">&#10003;</td><td class="text-green-600">&#10003;</td><td class="text-green-600">組み込み</td><td class="text-green-600">自動生成</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Envio</td><td><span class="score-badge bg-green-100 text-green-700">A</span></td><td>TypeScript</td><td class="text-green-600">&#10003;</td><td class="text-green-600">&#10003;</td><td class="text-green-600">Vitest (V3)</td><td class="text-green-600">Hasura</td></tr>
+        <tr><td class="font-medium">Subsquid</td><td><span class="score-badge bg-yellow-100 text-yellow-700">B+</span></td><td>TypeScript</td><td class="text-green-600">&#10003;</td><td class="text-green-600">&#10003;</td><td class="text-red-400">非組み込み</td><td class="text-green-600">組み込み</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">The Graph</td><td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td><td>AssemblyScript</td><td class="text-red-400">&#10007;</td><td class="text-yellow-500">部分的</td><td class="text-yellow-500">Matchstick</td><td class="text-green-600">組み込み</td></tr>
+        <tr><td class="font-medium">Rindexer</td><td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td><td>Rust / YAML</td><td class="text-yellow-500">ノーコードのみ</td><td class="text-green-600">&#10003;</td><td class="text-red-400">なし</td><td class="text-green-600">PostGraphile</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- OSS & Licensing -->
+  <div class="no-break">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">4.3 ライセンス &amp; ベンダーロックイン</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>サービス</th>
+          <th>ライセンス</th>
+          <th>セルフホスト</th>
+          <th>ベンダーロックイン</th>
+          <th>フォーク可能</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="font-medium">The Graph</td><td>MIT / Apache-2.0</td><td class="text-green-600">完全</td><td class="risk-low">なし</td><td class="text-green-600">&#10003;</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Ponder</td><td>MIT</td><td class="text-green-600">完全</td><td class="risk-low">なし</td><td class="text-green-600">&#10003;</td></tr>
+        <tr><td class="font-medium">Subsquid SDK</td><td>Apache-2.0</td><td class="text-green-600">完全</td><td class="risk-low">低</td><td class="text-green-600">&#10003;</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Rindexer</td><td>MIT</td><td class="text-green-600">完全</td><td class="risk-low">なし</td><td class="text-green-600">&#10003;</td></tr>
+        <tr><td class="font-medium">Envio</td><td>Custom EULA</td><td class="text-yellow-500">部分的*</td><td class="risk-high">高</td><td class="text-red-400">&#10007;</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Goldsky</td><td>Proprietary</td><td class="text-red-400">不可</td><td class="risk-medium">中</td><td class="text-red-400">&#10007;</td></tr>
+        <tr><td class="font-medium">Ormi</td><td>Proprietary</td><td class="text-red-400">不可</td><td class="risk-medium">中</td><td class="text-red-400">&#10007;</td></tr>
+      </tbody>
+    </table>
+    <p class="text-xs text-gray-400 mt-2">* EnvioのセルフホスティングにはHyperSync APIトークン（価格非公開）が必要。HyperSyncなしではRPCにフォールバック（2000倍低速）。</p>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ====== SECTION 5: COST COMPARISON ====== -->
+<div class="px-16 py-12">
+  <div class="flex items-center gap-3 mb-8">
+    <span class="gradient-accent text-white text-sm font-bold px-3 py-1 rounded-full">05</span>
+    <h2 class="text-3xl font-bold text-gray-900">コスト比較</h2>
+  </div>
+
+  <p class="text-gray-600 text-sm mb-6">Base chain上のNouns型DAOの月額コスト（約1,860イベント/月、約1万〜5万クエリ/月）</p>
+
+  <!-- Cost Table -->
+  <div class="no-break mb-8">
+    <table>
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>プラン</th>
+          <th>月額コスト</th>
+          <th>RPC込み</th>
+          <th>DB込み</th>
+          <th>運用負荷</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="bg-green-50"><td class="font-medium">The Graph Studio</td><td>Free (100K queries/mo)</td><td class="text-green-700 font-bold">$0-1</td><td class="text-green-600">&#10003;</td><td class="text-green-600">&#10003;</td><td>なし</td></tr>
+        <tr class="bg-green-50"><td class="font-medium">Goldsky Starter</td><td>3 workers free</td><td class="text-green-700 font-bold">$0</td><td class="text-green-600">&#10003;</td><td class="text-green-600">&#10003;</td><td>なし</td></tr>
+        <tr><td class="font-medium">Ponder + Railway</td><td>Hobby plan</td><td class="font-bold">$5-10</td><td class="text-yellow-500">Alchemy free</td><td class="text-green-600">&#10003;</td><td>低</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Subsquid Self-host</td><td>VPS + SQD Network</td><td class="font-bold">$10-15</td><td class="text-green-600">SQD free</td><td>自己管理</td><td>中</td></tr>
+        <tr><td class="font-medium">Ponder + DigitalOcean</td><td>Droplet + Managed DB</td><td class="font-bold">$21</td><td class="text-yellow-500">Alchemy free</td><td class="text-green-600">マネージド</td><td>低〜中</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">SQD Cloud</td><td>Collocated</td><td class="font-bold">~$16</td><td class="text-green-600">&#10003;</td><td class="text-green-600">&#10003;</td><td>なし</td></tr>
+        <tr><td class="font-medium">Graph Self-host</td><td>VPS + IPFS + PostgreSQL</td><td class="font-bold">$30-95</td><td class="text-red-400">Separate</td><td>自己管理</td><td>高</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Envio</td><td>Production Small</td><td class="font-bold">$70</td><td class="text-green-600">HyperSync</td><td class="text-green-600">&#10003;</td><td>なし</td></tr>
+        <tr><td class="font-medium">SQD Cloud</td><td>Dedicated Small</td><td class="font-bold">~$117</td><td class="text-green-600">&#10003;</td><td class="text-green-600">&#10003;</td><td>なし</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Cost Visualization -->
+  <div class="bg-gray-50 rounded-xl p-6 no-break">
+    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">月額コスト可視化（USD）</h3>
+    <div class="space-y-2">
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-32 text-right">The Graph Studio</span>
+        <div class="flex-1 bg-gray-200 rounded h-5 overflow-hidden">
+          <div class="bg-green-500 h-full rounded" style="width: 1%"></div>
+        </div>
+        <span class="text-xs font-bold text-gray-700 w-12">$0-1</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-32 text-right">Goldsky</span>
+        <div class="flex-1 bg-gray-200 rounded h-5 overflow-hidden">
+          <div class="bg-green-500 h-full rounded" style="width: 0.5%"></div>
+        </div>
+        <span class="text-xs font-bold text-gray-700 w-12">$0</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-32 text-right">Ponder + Railway</span>
+        <div class="flex-1 bg-gray-200 rounded h-5 overflow-hidden">
+          <div class="bg-blue-400 h-full rounded" style="width: 8%"></div>
+        </div>
+        <span class="text-xs font-bold text-gray-700 w-12">$5-10</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-32 text-right">SQD Cloud</span>
+        <div class="flex-1 bg-gray-200 rounded h-5 overflow-hidden">
+          <div class="bg-purple-400 h-full rounded" style="width: 14%"></div>
+        </div>
+        <span class="text-xs font-bold text-gray-700 w-12">~$16</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-32 text-right">Envio</span>
+        <div class="flex-1 bg-gray-200 rounded h-5 overflow-hidden">
+          <div class="bg-orange-400 h-full rounded" style="width: 60%"></div>
+        </div>
+        <span class="text-xs font-bold text-gray-700 w-12">$70</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-gray-600 w-32 text-right">SQD Dedicated</span>
+        <div class="flex-1 bg-gray-200 rounded h-5 overflow-hidden">
+          <div class="bg-red-400 h-full rounded" style="width: 100%"></div>
+        </div>
+        <span class="text-xs font-bold text-gray-700 w-12">~$117</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Estimation -->
+  <div class="mt-8 bg-blue-50 rounded-xl p-6 no-break">
+    <h3 class="text-sm font-semibold text-blue-700 mb-3">Niji DAO イベント量推定（Base Chain）</h3>
+    <div class="grid grid-cols-3 gap-4 text-center">
+      <div>
+        <div class="text-2xl font-bold text-blue-600">~62</div>
+        <div class="text-xs text-blue-500">イベント / 日</div>
+      </div>
+      <div>
+        <div class="text-2xl font-bold text-blue-600">~1,860</div>
+        <div class="text-xs text-blue-500">イベント / 月</div>
+      </div>
+      <div>
+        <div class="text-2xl font-bold text-blue-600">~22,630</div>
+        <div class="text-xs text-blue-500">イベント / 年</div>
+      </div>
+    </div>
+    <p class="text-xs text-blue-500 mt-3">内訳: NounsToken (~18/day) + AuctionHouse (~13/day) + DAOLogic (~31/day)</p>
+  </div>
+</div>
+
+<!-- ====== SECTION 6: POPULARITY & ADOPTION ====== -->
+<div class="px-16 py-12">
+  <div class="flex items-center gap-3 mb-8">
+    <span class="gradient-accent text-white text-sm font-bold px-3 py-1 rounded-full">06</span>
+    <h2 class="text-3xl font-bold text-gray-900">普及度 &amp; 採用状況</h2>
+  </div>
+
+  <!-- X Followers -->
+  <div class="mb-8 no-break">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">6.1 ブランド認知度（Xフォロワー）</h3>
+    <div class="bg-gray-50 rounded-xl p-6">
+      <div class="space-y-3">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium text-gray-600 w-24 text-right">The Graph</span>
+          <div class="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+            <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 h-full rounded-full flex items-center justify-end pr-3" style="width: 100%">
+              <span class="text-xs font-bold text-white">342K</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium text-gray-600 w-24 text-right">SQD</span>
+          <div class="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-400 to-purple-500 h-full rounded-full flex items-center justify-end pr-3" style="width: 50.6%">
+              <span class="text-xs font-bold text-white">173K</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium text-gray-600 w-24 text-right">SubQuery</span>
+          <div class="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+            <div class="bg-gradient-to-r from-teal-400 to-teal-500 h-full rounded-full flex items-center justify-end pr-3" style="width: 31%">
+              <span class="text-xs font-bold text-white">106K</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium text-gray-600 w-24 text-right">Goldsky</span>
+          <div class="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 h-full rounded-full flex items-center px-3" style="width: 3.4%">
+              <span class="text-xs font-bold text-gray-700 ml-8">11.6K</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium text-gray-600 w-24 text-right">Envio</span>
+          <div class="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-400 to-blue-500 h-full rounded-full" style="width: 1.2%"></div>
+          </div>
+          <span class="text-xs text-gray-500">4.2K</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium text-gray-600 w-24 text-right">Ponder</span>
+          <div class="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+            <div class="bg-gradient-to-r from-green-400 to-green-500 h-full rounded-full" style="width: 0.5%"></div>
+          </div>
+          <span class="text-xs text-gray-500">1.8K</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium text-gray-600 w-24 text-right">Ormi</span>
+          <div class="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+            <div class="bg-gradient-to-r from-orange-400 to-orange-500 h-full rounded-full" style="width: 0.4%"></div>
+          </div>
+          <span class="text-xs text-gray-500">1.5K</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GitHub & npm -->
+  <div class="mb-8 no-break">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">6.2 開発者エコシステム</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>GitHub スター</th>
+          <th>コントリビューター</th>
+          <th>npm週間DL</th>
+          <th>コミュニティ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="font-medium">The Graph</td><td>3,114</td><td>116</td><td class="font-semibold">~20,000</td><td>Discord ~39K</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">SubQuery</td><td>18,855*</td><td>57</td><td>~1,187</td><td>Discord ~38K</td></tr>
+        <tr><td class="font-medium">Subsquid</td><td>1,318</td><td>32</td><td>~2,627</td><td>-</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Ponder</td><td>1,040</td><td>91</td><td>~621</td><td>Telegram</td></tr>
+        <tr><td class="font-medium">Envio</td><td>486</td><td>20</td><td>~4,056</td><td>-</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Goldsky</td><td>N/A</td><td>N/A</td><td>N/A</td><td>-</td></tr>
+        <tr><td class="font-medium">Ormi</td><td>N/A</td><td>N/A</td><td>N/A</td><td>-</td></tr>
+      </tbody>
+    </table>
+    <p class="text-xs text-gray-400 mt-2">* SubQueryの異常に高いスター数はエンゲージメントキャンペーンで水増しされている可能性あり</p>
+  </div>
+
+  <!-- Notable Customers -->
+  <div class="no-break">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">6.3 主要顧客</h3>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="font-semibold text-gray-700 mb-2">The Graph</div>
+        <p class="text-xs text-gray-500">Uniswap, Aave, Synthetix, Balancer, Aragon, Gnosis, Decentraland, Livepeer</p>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="font-semibold text-gray-700 mb-2">Goldsky</div>
+        <p class="text-xs text-gray-500">Polymarket, Zora, Optimism, POAP, Immutable</p>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="font-semibold text-gray-700 mb-2">Envio</div>
+        <p class="text-xs text-gray-500">Uniswap V4 (official), AAVE, Compound, Sablier, Velodrome/Aerodrome</p>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="font-semibold text-gray-700 mb-2">Ormi</div>
+        <p class="text-xs text-gray-500">Pendle ($6B TVL), Aura Finance, Ostium, Dolomite</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Funding & Team -->
+  <div class="mt-6 no-break">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">6.4 資金調達 &amp; チーム規模</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>総調達額</th>
+          <th>主要投資家</th>
+          <th>チーム規模</th>
+          <th>設立</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="font-medium">The Graph</td><td class="font-semibold">~$60M + $205M ecosystem</td><td>Multicoin, Coinbase, Tiger Global</td><td>43-143</td><td>2018</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Goldsky</td><td class="font-semibold">$22M</td><td>Felicis, Dragonfly Capital</td><td>~30</td><td>2021</td></tr>
+        <tr><td class="font-medium">Subsquid</td><td>$17.5M + $10M acquisition</td><td>Blockchange, Hypersphere</td><td>不明</td><td>~2020</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">SubQuery</td><td>~$16M</td><td>Arrington Capital, DCG</td><td>~28</td><td>2021</td></tr>
+        <tr><td class="font-medium">Envio</td><td>シード（非公開）</td><td>-</td><td>1-10</td><td>~2023</td></tr>
+        <tr class="bg-gray-50"><td class="font-medium">Ponder</td><td>Monadに買収</td><td>Monad Foundation</td><td>3</td><td>~2022</td></tr>
+        <tr><td class="font-medium">Ormi</td><td>$300K (Google Cloud)</td><td>Google Cloud</td><td>5</td><td>2022</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ====== SECTION 7: RISK ANALYSIS ====== -->
+
+<div class="px-16 py-12">
+  <div class="flex items-center gap-3 mb-8">
+    <span class="gradient-accent text-white text-sm font-bold px-3 py-1 rounded-full">07</span>
+    <h2 class="text-3xl font-bold text-gray-900">リスク分析</h2>
+  </div>
+
+  <div class="no-break mb-8">
+    <table>
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>リスク要因</th>
+          <th>深刻度</th>
+          <th>軽減策</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="font-medium" rowspan="2">The Graph</td>
+          <td>イベント欠損 / サブグラフ停止</td>
+          <td class="risk-high">高</td>
+          <td class="text-xs">デュアルインデクサー構成（例: + Ponder）</td>
+        </tr>
+        <tr>
+          <td>Hosted Service終了（2026年）</td>
+          <td class="risk-medium">中</td>
+          <td class="text-xs">Studio / Goldskyへ移行</td>
+        </tr>
+        <tr class="bg-gray-50">
+          <td class="font-medium">Goldsky</td>
+          <td>プロプライエタリ / ベンダーロックイン</td>
+          <td class="risk-medium">中</td>
+          <td class="text-xs">Graph互換サブグラフは移植可能</td>
+        </tr>
+        <tr>
+          <td class="font-medium" rowspan="2">Envio</td>
+          <td>プロプライエタリライセンス、HyperSyncロックイン</td>
+          <td class="risk-high">高</td>
+          <td class="text-xs">RPCフォールバック可能（2000倍低速）</td>
+        </tr>
+        <tr>
+          <td>小規模チーム（1〜10人）</td>
+          <td class="risk-medium">中</td>
+          <td class="text-xs">成長中、Uniswap V4の採用が有効性を証明</td>
+        </tr>
+        <tr class="bg-gray-50">
+          <td class="font-medium" rowspan="2">Ponder</td>
+          <td>開発実質停止（Monad買収）</td>
+          <td class="risk-high">致命的</td>
+          <td class="text-xs">MITライセンスによりフォーク可能</td>
+        </tr>
+        <tr class="bg-gray-50">
+          <td>サイレント同期停止バグ (#2264、未解決)</td>
+          <td class="risk-high">高</td>
+          <td class="text-xs">外部モニタリングが必要</td>
+        </tr>
+        <tr>
+          <td class="font-medium">Subsquid</td>
+          <td>Rezolve AI買収、AI転換リスク</td>
+          <td class="risk-high">高</td>
+          <td class="text-xs">Apache-2.0 SDKにより独立利用可能</td>
+        </tr>
+        <tr class="bg-gray-50">
+          <td class="font-medium">Rindexer</td>
+          <td>バスファクター1、イベント欠損バグ (#264)</td>
+          <td class="risk-high">致命的</td>
+          <td class="text-xs">本番環境には非推奨</td>
+        </tr>
+        <tr>
+          <td class="font-medium">Ormi</td>
+          <td>小規模チーム（5人）、最小限の資金</td>
+          <td class="risk-medium">中</td>
+          <td class="text-xs">$50B以上のTVL顧客基盤が有効性を証明</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- The Graph Reliability Issues Detail -->
+  <div class="bg-red-50 border-l-4 border-red-500 p-5 rounded-r-lg no-break">
+    <p class="font-semibold text-red-800 mb-2">The Graph の既知の信頼性問題</p>
+    <ul class="text-sm text-red-700 space-y-1">
+      <li>&#8226; 異なるブロック間でのイベント欠損 (graph-node #3891)</li>
+      <li>&#8226; 誤ったリオーグ検出によるサブグラフの恒久的停止 (#5586)</li>
+      <li>&#8226; Uniswapサブグラフの本番障害（ポストモーテム文書化済み）</li>
+      <li>&#8226; 回復不能な非決定的エラー (#3708, #5607)</li>
+      <li>&#8226; PostgreSQLインデックスロックによるメモリ枯渇 (#764)</li>
+      <li>&#8226; Nouns DAOはこれらのリスク軽減のためPonderをセカンダリインデクサーとして追加</li>
+    </ul>
+  </div>
+
+  <!-- Acquisition Timeline -->
+  <div class="mt-8 bg-gray-50 rounded-xl p-6 no-break">
+    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">業界統合タイムライン</h3>
+    <div class="relative">
+      <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+      <div class="space-y-4 ml-10">
+        <div class="relative">
+          <div class="absolute -left-8 top-1 w-3 h-3 bg-red-500 rounded-full"></div>
+          <div class="text-xs text-gray-400">2025年10月</div>
+          <div class="text-sm font-medium text-gray-700">SubsquidがRezolve AI (NASDAQ: RZLV) に約$10Mで買収される</div>
+        </div>
+        <div class="relative">
+          <div class="absolute -left-8 top-1 w-3 h-3 bg-red-500 rounded-full"></div>
+          <div class="text-xs text-gray-400">2025年12月</div>
+          <div class="text-sm font-medium text-gray-700">Alchemy Subgraphsが終了。Goldskyへの公式移行パスを提供。</div>
+        </div>
+        <div class="relative">
+          <div class="absolute -left-8 top-1 w-3 h-3 bg-red-500 rounded-full"></div>
+          <div class="text-xs text-gray-400">2026年2月</div>
+          <div class="text-sm font-medium text-gray-700">PonderチームがMonad Foundationに買収される。開発が停滞。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 8: FINAL RANKING ====== -->
+<div class="px-16 py-12">
+  <div class="flex items-center gap-3 mb-8">
+    <span class="gradient-accent text-white text-sm font-bold px-3 py-1 rounded-full">08</span>
+    <h2 class="text-3xl font-bold text-gray-900">総合ランキング &amp; 推奨</h2>
+  </div>
+
+  <!-- Scorecard -->
+  <div class="mb-8 no-break">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">8.1 多次元スコアカード</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>順位</th>
+          <th>Service</th>
+          <th>速度</th>
+          <th>信頼性</th>
+          <th>DX</th>
+          <th>コスト</th>
+          <th>普及度</th>
+          <th>リスク</th>
+          <th>総合</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="bg-yellow-50">
+          <td class="font-bold text-yellow-600">1</td>
+          <td class="font-bold">Goldsky</td>
+          <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+          <td><span class="score-badge bg-green-100 text-green-700">A-</span></td>
+          <td><span class="score-badge bg-green-100 text-green-700">A-</span></td>
+          <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+          <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+          <td><span class="score-badge bg-green-100 text-green-700">A-</span></td>
+          <td class="font-bold text-yellow-600 text-lg">A+</td>
+        </tr>
+        <tr>
+          <td class="font-bold text-gray-500">2</td>
+          <td class="font-bold">Envio</td>
+          <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+          <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+          <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+          <td class="font-bold text-gray-500 text-lg">A</td>
+        </tr>
+        <tr class="bg-gray-50">
+          <td class="font-bold text-orange-400">3</td>
+          <td class="font-bold">The Graph</td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">B+</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+          <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+          <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+          <td class="font-bold text-orange-400 text-lg">B+</td>
+        </tr>
+        <tr>
+          <td class="font-bold text-gray-400">4</td>
+          <td class="font-bold">Ormi</td>
+          <td><span class="score-badge bg-green-100 text-green-700">A+</span></td>
+          <td><span class="score-badge bg-green-100 text-green-700">A+</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">B+</span></td>
+          <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+          <td class="font-bold text-gray-400 text-lg">B+</td>
+        </tr>
+        <tr class="bg-gray-50">
+          <td class="font-bold text-gray-400">5</td>
+          <td class="font-bold">Ponder</td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">B+</span></td>
+          <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+          <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+          <td><span class="score-badge bg-red-100 text-red-700">D</span></td>
+          <td class="font-bold text-gray-400 text-lg">B</td>
+        </tr>
+        <tr>
+          <td class="font-bold text-gray-400">6</td>
+          <td class="font-bold">Subsquid</td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">B+</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">B+</span></td>
+          <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+          <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+          <td><span class="score-badge bg-red-100 text-red-700">D</span></td>
+          <td class="font-bold text-gray-400 text-lg">B</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Recommendation -->
+  <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-8 border border-blue-200 no-break">
+    <h3 class="text-xl font-bold text-blue-900 mb-4">Niji DAOへの推奨</h3>
+
+    <div class="space-y-4">
+      <div class="flex gap-4">
+        <div class="w-10 h-10 gradient-accent rounded-lg flex items-center justify-center text-white font-bold flex-shrink-0">1</div>
+        <div>
+          <div class="font-semibold text-blue-900">第1推奨: Goldsky（無料Starterプラン）</div>
+          <p class="text-sm text-blue-700 mt-1">Graph互換のサブグラフ定義により移植性を確保。無料枠でDAO規模のイベント量に十分対応。マネージドサービスにより運用負荷をゼロに。Alchemyの公式移行先として安定性が実証済み。</p>
+        </div>
+      </div>
+
+      <div class="flex gap-4">
+        <div class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center text-gray-600 font-bold flex-shrink-0">2</div>
+        <div>
+          <div class="font-semibold text-gray-800">代替案: Envio HyperIndex（$70/月）</div>
+          <p class="text-sm text-gray-600 mt-1">最高のパフォーマンスとVitestベースのテストを重視する場合に最適。自動テストによるガバナンスデータの正確性確保に優れる。TypeScriptネイティブの開発体験。</p>
+        </div>
+      </div>
+
+      <div class="flex gap-4">
+        <div class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center text-gray-600 font-bold flex-shrink-0">3</div>
+        <div>
+          <div class="font-semibold text-gray-800">フォールバック: The Graph Studio（$0-1/月）</div>
+          <p class="text-sm text-gray-600 mt-1">最大のエコシステムと豊富なドキュメント・コミュニティサポート。既知の信頼性問題は外部モニタリングで軽減すべき。重要なガバナンスデータにはデュアルインデクサー構成を検討。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ====== SECTION 9: APPENDIX ====== -->
+<div class="px-16 py-12">
+  <div class="flex items-center gap-3 mb-8">
+    <span class="gradient-accent text-white text-sm font-bold px-3 py-1 rounded-full">09</span>
+    <h2 class="text-3xl font-bold text-gray-900">付録: 出典</h2>
+  </div>
+
+  <div class="text-xs text-gray-600 space-y-1 columns-2">
+    <p>&#8226; Envio Open Indexer Benchmark - github.com/enviodev/open-indexer-benchmark</p>
+    <p>&#8226; Envio Benchmarking Results - docs.envio.dev/blog/indexer-benchmarking-results</p>
+    <p>&#8226; Envio Pricing - envio.dev/pricing</p>
+    <p>&#8226; Envio Licensing - docs.envio.dev/docs/HyperIndex/licensing</p>
+    <p>&#8226; Envio Supported Networks - docs.envio.dev/docs/HyperIndex/supported-networks</p>
+    <p>&#8226; Envio HyperSync API Tokens - docs.envio.dev/docs/HyperSync/api-tokens</p>
+    <p>&#8226; Envio Developer Update Feb 2026 - docs.envio.dev/blog</p>
+    <p>&#8226; Sablier Case Study - docs.envio.dev/blog/case-study-sablier</p>
+    <p>&#8226; The Graph Studio Pricing - thegraph.com/studio-pricing</p>
+    <p>&#8226; The Graph Billing Docs - thegraph.com/docs/en/subgraphs/billing</p>
+    <p>&#8226; The Graph Network Expansion - thegraph.com/blog/the-graph-network-expansion-40-chains</p>
+    <p>&#8226; State of The Graph Q3 2025 (Messari) - messari.io/report/state-of-the-graph-q3-2025</p>
+    <p>&#8226; Uniswap Subgraph Post-mortem - thegraph.com/blog/uniswap-subgraph-post-mortem</p>
+    <p>&#8226; graph-node Issues #3891, #5586, #3708, #5607 - github.com/graphprotocol/graph-node</p>
+    <p>&#8226; Goldsky Pricing - goldsky.com/pricing</p>
+    <p>&#8226; Goldsky Pricing Docs - docs.goldsky.com/pricing/summary</p>
+    <p>&#8226; Goldsky TechCrunch - techcrunch.com/2022/09/13/goldsky</p>
+    <p>&#8226; Alchemy Subgraphs Deprecation - alchemy.com/docs/alchemy-subgraphs/deprecation-notice</p>
+    <p>&#8226; Ponder GitHub - github.com/ponder-sh/ponder</p>
+    <p>&#8226; Ponder Migration Guide - ponder.sh/docs/getting-started/migrate-subgraph</p>
+    <p>&#8226; Monad acquires Ponder - blog.monad.xyz/blog/ponder-team-joins</p>
+    <p>&#8226; Subsquid Squid SDK - github.com/subsquid/squid-sdk</p>
+    <p>&#8226; Rezolve AI acquires Subsquid - rezolve.com/press-releases</p>
+    <p>&#8226; SQD Cloud Pricing - docs.sqd.ai/cloud/pricing</p>
+    <p>&#8226; SQD Self-hosting - docs.sqd.ai/sdk/resources/self-hosting</p>
+    <p>&#8226; SubQuery GitHub - github.com/subquery/subql</p>
+    <p>&#8226; Rindexer GitHub - github.com/joshstevens19/rindexer</p>
+    <p>&#8226; Ormi Labs - ormilabs.com</p>
+    <p>&#8226; Best Blockchain Indexers 2026 (Ormi) - blog.ormilabs.com</p>
+    <p>&#8226; Best Blockchain Indexers 2026 (GetBlock) - getblock.io/blog/best-blockchain-indexers</p>
+    <p>&#8226; Top Blockchain Indexers (QuickNode) - quicknode.com/builders-guide</p>
+    <p>&#8226; Chainstack Subgraph Platforms - chainstack.com/top-5-hosted-subgraph-indexing-platforms-2026</p>
+    <p>&#8226; Base Data Indexers - docs.base.org/base-chain/tools/data-indexers</p>
+    <p>&#8226; Railway Pricing - railway.com/pricing</p>
+    <p>&#8226; Alchemy Pricing - alchemy.com/pricing</p>
+  </div>
+
+  <div class="mt-12 pt-8 border-t border-gray-200 text-center">
+    <p class="text-xs text-gray-400">本レポートは2026年2月28日に作成されました</p>
+    <p class="text-xs text-gray-400">データの正確性はレポート作成日時点のものです。市場状況は変動する場合があります。</p>
+    <p class="text-xs text-gray-400 mt-2">Niji DAO向け Claude Code作成</p>
+  </div>
+</div>
+
+</body>
+</html>

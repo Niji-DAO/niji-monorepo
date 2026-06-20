@@ -1,0 +1,2301 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DApps運営秘密鍵管理ソリューション 比較レポート</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+      body {
+        font-family: 'Noto Sans JP', 'Inter', sans-serif;
+      }
+
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      @media print {
+        .page-break {
+          page-break-after: always;
+        }
+        .no-break {
+          page-break-inside: avoid;
+        }
+      }
+
+      .gradient-bg {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      }
+
+      .gradient-accent {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      }
+
+      .score-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th,
+      td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 13px;
+      }
+
+      th {
+        background-color: #f8fafc;
+        font-weight: 600;
+        color: #475569;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.05em;
+      }
+
+      .risk-high {
+        color: #dc2626;
+        font-weight: 600;
+      }
+      .risk-medium {
+        color: #f59e0b;
+        font-weight: 600;
+      }
+      .risk-low {
+        color: #10b981;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body class="bg-white text-gray-800">
+    <!-- ====== COVER PAGE ====== -->
+    <div
+      class="gradient-bg relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-16 text-white"
+    >
+      <div
+        class="absolute right-0 top-0 h-96 w-96 -translate-y-1/2 translate-x-1/2 rounded-full bg-blue-500/10 blur-3xl"
+      ></div>
+      <div
+        class="absolute bottom-0 left-0 h-96 w-96 -translate-x-1/2 translate-y-1/2 rounded-full bg-purple-500/10 blur-3xl"
+      ></div>
+
+      <div class="z-10 text-center">
+        <div class="mb-6 text-sm font-medium tracking-widest text-blue-300">リサーチレポート</div>
+        <h1 class="mb-4 text-5xl font-bold leading-tight">
+          DApps運営秘密鍵管理<br />ソリューション比較
+        </h1>
+        <div class="gradient-accent mx-auto my-8 h-1 w-24 rounded-full"></div>
+        <p class="mb-2 text-xl text-gray-300">
+          MPC / HSM / マルチシグ / クラウドKMS — 10ソリューションの多次元比較
+        </p>
+        <p class="text-lg text-gray-400">10候補 × 7評価軸</p>
+      </div>
+
+      <div class="absolute bottom-12 z-10 text-center">
+        <p class="text-sm text-gray-400">2026年3月</p>
+        <p class="mt-1 text-xs text-gray-500">Generated with Claude Code</p>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ====== TABLE OF CONTENTS ====== -->
+    <div class="mx-auto max-w-4xl px-12 py-16">
+      <h2 class="mb-8 text-3xl font-bold text-gray-900">目次</h2>
+      <div class="space-y-3 text-base">
+        <div class="flex items-end">
+          <span class="font-semibold text-gray-800">1. エグゼクティブサマリー</span>
+          <span class="mx-2 mb-1 flex-1 border-b border-dotted border-gray-300"></span>
+          <span class="text-gray-500">3</span>
+        </div>
+        <div class="flex items-end">
+          <span class="font-semibold text-gray-800">2. 評価対象一覧</span>
+          <span class="mx-2 mb-1 flex-1 border-b border-dotted border-gray-300"></span>
+          <span class="text-gray-500">5</span>
+        </div>
+        <div class="flex items-end">
+          <span class="font-semibold text-gray-800">3. セキュリティ</span>
+          <span class="mx-2 mb-1 flex-1 border-b border-dotted border-gray-300"></span>
+          <span class="text-gray-500">9</span>
+        </div>
+        <div class="flex items-end">
+          <span class="font-semibold text-gray-800">4. パフォーマンス</span>
+          <span class="mx-2 mb-1 flex-1 border-b border-dotted border-gray-300"></span>
+          <span class="text-gray-500">11</span>
+        </div>
+        <div class="flex items-end">
+          <span class="font-semibold text-gray-800">5. コスト</span>
+          <span class="mx-2 mb-1 flex-1 border-b border-dotted border-gray-300"></span>
+          <span class="text-gray-500">13</span>
+        </div>
+        <div class="flex items-end">
+          <span class="font-semibold text-gray-800">6. 開発者体験（DX）</span>
+          <span class="mx-2 mb-1 flex-1 border-b border-dotted border-gray-300"></span>
+          <span class="text-gray-500">15</span>
+        </div>
+        <div class="flex items-end">
+          <span class="font-semibold text-gray-800">7. 運用モデル</span>
+          <span class="mx-2 mb-1 flex-1 border-b border-dotted border-gray-300"></span>
+          <span class="text-gray-500">17</span>
+        </div>
+        <div class="flex items-end">
+          <span class="font-semibold text-gray-800">8. エコシステム</span>
+          <span class="mx-2 mb-1 flex-1 border-b border-dotted border-gray-300"></span>
+          <span class="text-gray-500">19</span>
+        </div>
+        <div class="flex items-end">
+          <span class="font-semibold text-gray-800">9. リスク分析</span>
+          <span class="mx-2 mb-1 flex-1 border-b border-dotted border-gray-300"></span>
+          <span class="text-gray-500">21</span>
+        </div>
+        <div class="flex items-end">
+          <span class="font-semibold text-gray-800">10. 総合ランキング & 推奨</span>
+          <span class="mx-2 mb-1 flex-1 border-b border-dotted border-gray-300"></span>
+          <span class="text-gray-500">23</span>
+        </div>
+        <div class="flex items-end">
+          <span class="font-semibold text-gray-800">付録: 出典</span>
+          <span class="mx-2 mb-1 flex-1 border-b border-dotted border-gray-300"></span>
+          <span class="text-gray-500">25</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ====== 1. EXECUTIVE SUMMARY ====== -->
+    <div class="mx-auto max-w-4xl px-12 py-16">
+      <h2 class="mb-8 text-3xl font-bold text-gray-900">1. エグゼクティブサマリー</h2>
+
+      <!-- Background Box -->
+      <div class="mb-8 rounded-r-lg border-l-4 border-blue-500 bg-blue-50 p-6">
+        <h3 class="mb-3 text-lg font-semibold text-blue-900">背景</h3>
+        <p class="leading-relaxed text-blue-800">
+          DApps（分散型アプリケーション）の運営において、秘密鍵の管理はセキュリティの根幹をなす最重要課題である。2025年2月のBybitハック（約14億ドルの被害）に代表される大規模インシデントは、単一の秘密鍵管理に依存する危険性を改めて浮き彫りにした。本レポートでは、MPC（マルチパーティ計算）、HSM（ハードウェアセキュリティモジュール）、スマートコントラクトマルチシグ、クラウドKMSなど異なるアプローチを採用する10のソリューションを、7つの評価軸で多次元比較し、DApp運営者に最適な鍵管理戦略を提案する。
+        </p>
+      </div>
+
+      <!-- Top 3 Recommendations -->
+      <h3 class="mb-4 text-xl font-bold text-gray-900">Top 3 推奨</h3>
+      <div class="mb-8 grid grid-cols-3 gap-4">
+        <!-- Gold -->
+        <div
+          class="no-break rounded-xl border border-yellow-200 bg-gradient-to-b from-yellow-50 to-white p-5 text-center"
+        >
+          <div class="mb-2 text-3xl">&#x1F947;</div>
+          <div class="text-lg font-bold text-gray-900">Fireblocks</div>
+          <div class="mb-3 mt-1 text-xs font-semibold text-yellow-700">エンタープライズ最適</div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            MPC-CMP +
+            SGX/TEEの組み合わせで業界最高水準のセキュリティを実現。1,800+機関が採用し$10T超の資産を処理した実績。80+チェーン対応でDeFi/NFT運営に最適。
+          </p>
+        </div>
+        <!-- Silver -->
+        <div
+          class="no-break rounded-xl border border-gray-200 bg-gradient-to-b from-gray-100 to-white p-5 text-center"
+        >
+          <div class="mb-2 text-3xl">&#x1F948;</div>
+          <div class="text-lg font-bold text-gray-900">Safe</div>
+          <div class="mb-3 mt-1 text-xs font-semibold text-gray-500">DAO / 分散管理最適</div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            スマートコントラクトマルチシグの業界標準。$600B+の資産を保全、Ethereum
+            Foundation等200+プロジェクトが採用。無料で利用可能、ERC-4337対応。
+          </p>
+        </div>
+        <!-- Bronze -->
+        <div
+          class="no-break rounded-xl border border-orange-200 bg-gradient-to-b from-orange-50 to-white p-5 text-center"
+        >
+          <div class="mb-2 text-3xl">&#x1F949;</div>
+          <div class="text-lg font-bold text-gray-900">AWS KMS</div>
+          <div class="mb-3 mt-1 text-xs font-semibold text-orange-700">コスト効率最適</div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            FIPS 140-3 Level
+            3認証済みHSMでsecp256k1をネイティブサポート。月額$1〜$16と圧倒的低コスト。IAM/CloudTrailによるエンタープライズ級の監査体制。
+          </p>
+        </div>
+      </div>
+
+      <!-- Key Findings -->
+      <h3 class="mb-4 text-xl font-bold text-gray-900">主な発見事項</h3>
+      <ul class="space-y-2 text-sm text-gray-700">
+        <li class="flex items-start gap-2">
+          <span class="mt-0.5 text-blue-500">&#9679;</span>
+          <span
+            ><strong>MPCが主流に：</strong
+            >Fireblocks、Dfns、Safeheron、BitGoなど主要プロバイダがMPCを採用。単一障害点を排除しつつ柔軟な署名ポリシーを実現。</span
+          >
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-0.5 text-blue-500">&#9679;</span>
+          <span
+            ><strong>クラウドKMSの台頭：</strong>AWS KMS/GCP Cloud
+            KMSがsecp256k1をネイティブサポート。月額$1程度でFIPS認証済みHSM保護が利用可能に。</span
+          >
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-0.5 text-blue-500">&#9679;</span>
+          <span
+            ><strong>Safeの圧倒的シェア：</strong>オンチェーンマルチシグ分野でSafe（旧Gnosis
+            Safe）が事実上の標準。$600B+の資産保全実績。ただしBybit事件でUI層の脆弱性が露呈。</span
+          >
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-0.5 text-blue-500">&#9679;</span>
+          <span
+            ><strong>OZ Defenderの撤退：</strong>OpenZeppelin
+            Defenderが2026年7月にサービス終了を発表。OSS版への移行が進行中。新規採用は非推奨。</span
+          >
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-0.5 text-blue-500">&#9679;</span>
+          <span
+            ><strong>コストの二極化：</strong>Safe（無料）/ AWS
+            KMS（〜$16/月）の低コスト群と、Fireblocks（$699+/月）/
+            BitGo（非公開）のエンタープライズ群に二極化。</span
+          >
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="mt-0.5 text-blue-500">&#9679;</span>
+          <span
+            ><strong>多層防御が最善策：</strong
+            >単一のソリューションに依存せず、「Safe（マルチシグ）+ AWS
+            KMS/Fireblocks（各署名者の鍵保護）」のような多層構成が最もセキュア。</span
+          >
+        </li>
+      </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ====== 2. EVALUATION TARGETS ====== -->
+    <div class="mx-auto max-w-4xl px-12 py-16">
+      <h2 class="mb-8 text-3xl font-bold text-gray-900">2. 評価対象一覧</h2>
+
+      <div class="no-break mb-10 overflow-x-auto">
+        <table>
+          <thead>
+            <tr>
+              <th>サービス名</th>
+              <th>カテゴリ</th>
+              <th>鍵管理方式</th>
+              <th>提供形態</th>
+              <th>設立/リリース</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">Fireblocks</td>
+              <td>
+                <span
+                  class="inline-block rounded bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700"
+                  >MPC</span
+                >
+              </td>
+              <td>MPC-CMP + SGX/TEE</td>
+              <td>SaaS / ハイブリッド</td>
+              <td>2018年</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">BitGo</td>
+              <td>
+                <span
+                  class="inline-block rounded bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700"
+                  >MPC</span
+                >
+              </td>
+              <td>マルチシグ + MPC</td>
+              <td>SaaS</td>
+              <td>2013年</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safeheron</td>
+              <td>
+                <span
+                  class="inline-block rounded bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700"
+                  >MPC</span
+                >
+              </td>
+              <td>MPC-TSS + TEE（OSS）</td>
+              <td>SaaS / セルフホスト</td>
+              <td>2019年</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Turnkey</td>
+              <td>
+                <span
+                  class="inline-block rounded bg-teal-100 px-2 py-0.5 text-xs font-medium text-teal-700"
+                  >TEE</span
+                >
+              </td>
+              <td>TEE / AWS Nitro</td>
+              <td>SaaS</td>
+              <td>2022年</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Dfns</td>
+              <td>
+                <span
+                  class="inline-block rounded bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700"
+                  >MPC</span
+                >
+              </td>
+              <td>MPC + HSM + TEE</td>
+              <td>SaaS / ハイブリッド / オンプレ</td>
+              <td>2020年</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">AWS KMS + CloudHSM</td>
+              <td>
+                <span
+                  class="inline-block rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700"
+                  >Cloud KMS</span
+                >
+              </td>
+              <td>HSM（FIPS 140-3 L3）</td>
+              <td>マネージドサービス</td>
+              <td>2014年（KMS）</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">GCP Cloud KMS</td>
+              <td>
+                <span
+                  class="inline-block rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700"
+                  >Cloud KMS</span
+                >
+              </td>
+              <td>HSM（FIPS 140-2 L3）</td>
+              <td>マネージドサービス</td>
+              <td>2017年</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safe（旧Gnosis Safe）</td>
+              <td>
+                <span
+                  class="inline-block rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+                  >スマートコントラクト</span
+                >
+              </td>
+              <td>オンチェーンマルチシグ</td>
+              <td>オンチェーン / 無料</td>
+              <td>2018年</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">OZ Defender</td>
+              <td>
+                <span
+                  class="inline-block rounded bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700"
+                  >運用プラットフォーム</span
+                >
+              </td>
+              <td>Relayer鍵管理</td>
+              <td>SaaS <span class="text-xs text-red-500">（終了予定）</span></td>
+              <td>2020年</td>
+            </tr>
+            <tr>
+              <td class="font-semibold">HashiCorp Vault</td>
+              <td>
+                <span
+                  class="inline-block rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700"
+                  >セルフホスト</span
+                >
+              </td>
+              <td>Shamir's Secret Sharing</td>
+              <td>OSS / Enterprise / HCP</td>
+              <td>2015年</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Service Profile Cards -->
+      <h3 class="mb-6 text-xl font-bold text-gray-900">各候補の特徴紹介</h3>
+
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Fireblocks -->
+        <div class="no-break rounded-lg border border-gray-200 p-4">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-base font-bold text-gray-900">Fireblocks</span>
+            <span
+              class="inline-block rounded bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700"
+              >MPC</span
+            >
+          </div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            MPC-CMP（マルチパーティ計算）とIntel
+            SGX/TEE（信頼された実行環境）を組み合わせた、機関投資家向け暗号資産インフラのリーダー。1,800以上の機関が利用し、累計$10兆超の資産を処理。80以上のブロックチェーンに対応し、DeFiプロトコル連携やガバナンス機能も統合。SOC
+            2 Type II取得。
+          </p>
+        </div>
+
+        <!-- BitGo -->
+        <div class="no-break rounded-lg border border-gray-200 p-4">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-base font-bold text-gray-900">BitGo</span>
+            <span
+              class="inline-block rounded bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700"
+              >MPC</span
+            >
+          </div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            2013年設立のデジタル資産インフラの老舗。マルチシグとMPCの両方をサポートし、Assets on
+            Platformは$104B超。2026年にIPO準備中との報道あり。OCC（通貨監督庁）認可の信託会社であり、米国の規制に準拠した唯一のカストディソリューションの一つ。600以上の機関が利用。
+          </p>
+        </div>
+
+        <!-- Safeheron -->
+        <div class="no-break rounded-lg border border-gray-200 p-4">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-base font-bold text-gray-900">Safeheron</span>
+            <span
+              class="inline-block rounded bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700"
+              >MPC</span
+            >
+          </div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            MPC-TSSとTEEを組み合わせた鍵管理をオープンソースで提供する稀有なプロバイダ。セルフカストディとSaaSの両方に対応し、170以上の機関が利用。累計$15.1Mの資金調達。無料スタータープランがあり、中小規模のDApp運営者にとってエントリーしやすい。
+          </p>
+        </div>
+
+        <!-- Turnkey -->
+        <div class="no-break rounded-lg border border-gray-200 p-4">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-base font-bold text-gray-900">Turnkey</span>
+            <span
+              class="inline-block rounded bg-teal-100 px-2 py-0.5 text-xs font-medium text-teal-700"
+              >TEE</span
+            >
+          </div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            AWS Nitro
+            Enclavesベースの信頼された実行環境（TEE）で秘密鍵を保護するWallet-as-a-Service。50〜100msの高速署名と$0.01〜$0.10/署名の低コストが特徴。5,000万以上のウォレットを管理。パスキー認証に対応し、エンドユーザー向けの組み込みウォレットにも最適。YC出身でSeries
+            Aまで$18.5M調達。
+          </p>
+        </div>
+
+        <!-- Dfns -->
+        <div class="no-break rounded-lg border border-gray-200 p-4">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-base font-bold text-gray-900">Dfns</span>
+            <span
+              class="inline-block rounded bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700"
+              >MPC</span
+            >
+          </div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            MPC、HSM、TEEを柔軟に組み合わせた「Key Orchestration
+            Service」を提供するWaaSプラットフォーム。SaaS/ハイブリッド/フルオンプレミスの3つのデプロイモデルに対応。IBMの「Digital
+            Asset Haven」のコア技術パートナー。Fidelity International、ABN
+            AMROなど金融機関を含む324社が採用。SOC 2 Type II + ISO 27001取得。累計$29.5M調達。
+          </p>
+        </div>
+
+        <!-- AWS KMS -->
+        <div class="no-break rounded-lg border border-gray-200 p-4">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-base font-bold text-gray-900">AWS KMS + CloudHSM</span>
+            <span
+              class="inline-block rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700"
+              >Cloud KMS</span
+            >
+          </div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            FIPS 140-3 Level
+            3認証済みHSM上でsecp256k1をネイティブサポートするAWSのフルマネージド鍵管理サービス。IAM/CloudTrailによる堅牢なアクセス制御と監査機能を標準提供。月額$1〜$16の圧倒的な低コスト。CloudHSMは専用テナントで最大7,000
+            ops/secのスループット。BYOK（鍵インポート）にも対応。
+          </p>
+        </div>
+
+        <!-- GCP Cloud KMS -->
+        <div class="no-break rounded-lg border border-gray-200 p-4">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-base font-bold text-gray-900">GCP Cloud KMS</span>
+            <span
+              class="inline-block rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700"
+              >Cloud KMS</span
+            >
+          </div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            FIPS 140-2 Level
+            3認証済みHSM上でsecp256k1をサポートするGoogleのフルマネージド鍵管理サービス。HSM保護レベルでのみSECP256K1が利用可能。月額約$1と低コストだが、keccak256ダイジェストは非公式ワークアラウンドが必要。IAM/Cloud
+            Audit Logsとの統合でエンタープライズ級の運用が可能。
+          </p>
+        </div>
+
+        <!-- Safe -->
+        <div class="no-break rounded-lg border border-gray-200 p-4">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-base font-bold text-gray-900">Safe（旧Gnosis Safe）</span>
+            <span
+              class="inline-block rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+              >スマートコントラクト</span
+            >
+          </div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            EVM互換チェーン上で動作するスマートコントラクトベースのマルチシグウォレット。M-of-N閾値署名でトランザクションを承認・実行し、$600B超の資産を保全する業界標準。Ethereum
+            Foundation、Uniswap
+            DAO、Aave等200+プロジェクトが採用。ERC-4337/パスキー認証にも対応。無料で利用可能。
+          </p>
+        </div>
+
+        <!-- OZ Defender -->
+        <div class="no-break rounded-lg border border-gray-200 p-4">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-base font-bold text-gray-900">OpenZeppelin Defender</span>
+            <span
+              class="inline-block rounded bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700"
+              >運用プラットフォーム</span
+            >
+            <span
+              class="inline-block rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700"
+              >終了予定</span
+            >
+          </div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            スマートコントラクトの運用・監視・自動化を統合提供するSaaSプラットフォーム。Relayerによる鍵管理とトランザクション自動化、Monitorによるオンチェーン監視、Safe統合のガバナンス管理を提供。Compound/Aave等が採用。<strong>ただし2026年7月にサービス終了が確定しており、新規採用は非推奨。</strong>OSS版への移行が進行中。
+          </p>
+        </div>
+
+        <!-- HashiCorp Vault -->
+        <div class="no-break rounded-lg border border-gray-200 p-4">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-base font-bold text-gray-900">HashiCorp Vault</span>
+            <span
+              class="inline-block rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700"
+              >セルフホスト</span
+            >
+          </div>
+          <p class="text-xs leading-relaxed text-gray-600">
+            汎用シークレット管理の業界標準。Shamir's Secret
+            SharingによるSeal/Unsealメカニズムと、Transit Secrets Engineによる「Encryption as a
+            Service」を提供。Ethereumプラグインでsecp256k1署名に対応するが、<strong>主要プラグインが約4年間メンテナンスされていない</strong>点が最大の懸念。2024年にIBMが$6.4Bで買収。セルフホストの運用複雑性が高い。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ====== 3. SECURITY ====== -->
+    <div class="mx-auto max-w-4xl px-12 py-16">
+      <h2 class="mb-8 text-3xl font-bold text-gray-900">3. セキュリティ</h2>
+
+      <p class="mb-6 text-sm text-gray-600">
+        DApp運営における秘密鍵管理の最重要評価軸。鍵管理方式（MPC/HSM/TEE/マルチシグ）、認証方式、コンプライアンス認証取得状況、過去のインシデント有無を比較する。
+      </p>
+
+      <!-- Key Management Architecture Comparison -->
+      <h3 class="mb-4 text-lg font-bold text-gray-900">3.1 鍵管理アーキテクチャ比較</h3>
+
+      <div class="no-break mb-8 overflow-x-auto">
+        <table class="text-xs">
+          <thead>
+            <tr>
+              <th>サービス</th>
+              <th>鍵管理方式</th>
+              <th>FIPS認証</th>
+              <th>SOC 2</th>
+              <th>ISO 27001</th>
+              <th>評価</th>
+              <th>判定根拠</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">Fireblocks</td>
+              <td>MPC-CMP + SGX/TEE</td>
+              <td>-</td>
+              <td>Type II</td>
+              <td>取得済み</td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td>
+                MPC-CMPとSGX/TEEの二重保護で単一障害点を完全排除。SOC 2 Type II + ISO
+                27001取得。$10T+処理でインシデントゼロの実績。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safe</td>
+              <td>オンチェーンマルチシグ</td>
+              <td>N/A</td>
+              <td>N/A</td>
+              <td>N/A</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                $600B+保全の最長実績。コントラクト自体はOpenZeppelin等の複数回監査を通過。ただしBybit事件でUI層リスクが顕在化（コントラクト側の脆弱性ではない）。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">BitGo</td>
+              <td>マルチシグ + MPC</td>
+              <td>-</td>
+              <td>Type II</td>
+              <td>-</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                OCC認可信託会社で規制準拠が最も高い。SOC 2 Type
+                II取得。マルチシグ+MPCの二層保護。$104B AoPの長期実績。ISO未取得がSに達しない理由。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Dfns</td>
+              <td>MPC + HSM + TEE</td>
+              <td>PKCS#11 HSM</td>
+              <td>Type II</td>
+              <td>取得済み</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                MPC+HSM+TEE三重保護。SOC 2 Type II（KPMG監査、例外ゼロ）+ ISO
+                27001/27017/27018。侵害ゼロ。処理額$26BはFireblocksの$10T+比で実績が少なくSに未達。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">AWS KMS</td>
+              <td>HSM（マネージド）</td>
+              <td>140-3 L3</td>
+              <td>取得済み</td>
+              <td>取得済み</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                FIPS 140-3 Level 3（最新規格の最高レベル）。鍵は揮発メモリ上のみで使用。AWS全体のSOC
+                2/ISO取得。ブロックチェーン固有の鍵分散（MPC等）がないためSに未達。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Turnkey</td>
+              <td>TEE / AWS Nitro</td>
+              <td>-</td>
+              <td>Type II</td>
+              <td>-</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                AWS Nitro Enclavesで鍵をOS/ハイパーバイザからも隔離。SOC 2 Type
+                II取得。50M+ウォレットの実績。FIPS認証なし・ISO未取得がSに達しない理由。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">GCP Cloud KMS</td>
+              <td>HSM（マネージド）</td>
+              <td>140-2 L3</td>
+              <td>取得済み</td>
+              <td>取得済み</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                FIPS 140-2 Level 3（AWS KMSの140-3より旧規格）。GCP全体のSOC
+                2/ISO取得。<strong>keccak256非公式ワークアラウンドが必要</strong>で、GCPの仕様変更で機能停止するリスクがBの主因。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safeheron</td>
+              <td>MPC-TSS + TEE（OSS）</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                MPC-TSS+TEEの技術アーキテクチャ自体は堅牢。OSSで透明性が高い。ただし<strong
+                  >SOC 2・ISO 27001等の第三者認証を未取得</strong
+                >で、コンプライアンス要件を満たせない。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">HashiCorp Vault</td>
+              <td>Shamir's Secret Sharing</td>
+              <td>Auto Unseal連携</td>
+              <td>-</td>
+              <td>-</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                Shamir分割+AES-256-GCM二重暗号化は堅牢だが、<strong>Seal鍵の喪失で全データ永久ロック</strong>のリスク。自社でSOC
+                2等を取得しておらず、ブロックチェーン署名はプラグイン依存。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">OZ Defender</td>
+              <td>Relayerボールト</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td><span class="score-badge bg-red-100 text-red-700">D</span></td>
+              <td>
+                <strong>2026年7月にサービス終了確定</strong
+                >。鍵のインポート/エクスポート不可でRelayerに付与した特権ロールが管理不能になるリスク。FIPS/SOC
+                2/ISO全て未取得。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Security Architecture Types -->
+      <h3 class="mb-4 text-lg font-bold text-gray-900">3.2 アーキテクチャ別の特徴</h3>
+
+      <div class="mb-8 grid grid-cols-2 gap-4">
+        <div class="no-break rounded-lg bg-purple-50 p-4">
+          <h4 class="mb-2 text-sm font-bold text-purple-900">MPC（マルチパーティ計算）</h4>
+          <p class="text-xs leading-relaxed text-purple-800">
+            秘密鍵を複数のシェアに分割し、各シェアを異なるノードで保管。署名時に完全な秘密鍵を再構築せずに分散的に署名を生成。<strong>単一障害点の完全排除</strong>が最大の利点。Fireblocks（MPC-CMP）、Dfns（KU23）、Safeheron（MPC-TSS）がそれぞれ独自プロトコルを実装。
+          </p>
+        </div>
+        <div class="no-break rounded-lg bg-blue-50 p-4">
+          <h4 class="mb-2 text-sm font-bold text-blue-900">
+            HSM（ハードウェアセキュリティモジュール）
+          </h4>
+          <p class="text-xs leading-relaxed text-blue-800">
+            FIPS認証済みの耐タンパーハードウェア上で鍵を生成・保管・使用。鍵はHSM外にエクスポート不可。AWS
+            KMS（FIPS 140-3 L3）、GCP Cloud KMS（FIPS 140-2
+            L3）が代表例。<strong>規制要件への適合</strong>が最大の利点。ただしブロックチェーン固有機能は提供しない。
+          </p>
+        </div>
+        <div class="no-break rounded-lg bg-teal-50 p-4">
+          <h4 class="mb-2 text-sm font-bold text-teal-900">TEE（信頼された実行環境）</h4>
+          <p class="text-xs leading-relaxed text-teal-800">
+            CPU内の隔離された実行環境（Intel SGX、AWS
+            Nitro等）で鍵操作を実行。OSやハイパーバイザからもアクセス不可。Turnkeyが純粋TEEアプローチを採用。Fireblocks、Dfnsは<strong>MPCとTEEの組み合わせ</strong>でさらに堅牢化。高速な署名処理が可能。
+          </p>
+        </div>
+        <div class="no-break rounded-lg bg-green-50 p-4">
+          <h4 class="mb-2 text-sm font-bold text-green-900">スマートコントラクトマルチシグ</h4>
+          <p class="text-xs leading-relaxed text-green-800">
+            オンチェーンのスマートコントラクトがM-of-N署名の検証と実行を管理。Safeが事実上の標準。<strong>トラストレスかつ透明性が高い</strong>が、各署名者の秘密鍵管理は別途必要。Bybit事件はスマートコントラクトの脆弱性ではなくUI層の侵害だった点に留意。
+          </p>
+        </div>
+      </div>
+
+      <!-- Incident History -->
+      <div class="no-break mb-6 rounded-lg border border-red-200 bg-red-50 p-5">
+        <h4 class="mb-2 text-sm font-bold text-red-900">
+          重要インシデント: Bybitハック（2025年2月）
+        </h4>
+        <p class="text-xs leading-relaxed text-red-800">
+          約$1.4Bの被害。Safe{Wallet}開発者のマシンが北朝鮮Lazarusグループにより侵害され、UIに悪意あるJavaScriptが注入された。署名者が見ている画面と実際のトランザクション内容が異なるように改ざんされ、マルチシグの全署名者が騙された。<strong
+            >教訓：マルチシグでも署名者全員が騙されれば防御不能。トランザクション内容の独立検証が必須。</strong
+          >
+        </p>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ====== 4. PERFORMANCE ====== -->
+    <div class="mx-auto max-w-4xl px-12 py-16">
+      <h2 class="mb-8 text-3xl font-bold text-gray-900">4. パフォーマンス</h2>
+
+      <p class="mb-6 text-sm text-gray-600">
+        署名速度、レイテンシ、スループットを比較する。DApp運営では、DEXやMEV等のタイムクリティカルな用途と、DAO運営のようなレイテンシ非重視の用途で要件が大きく異なる。
+      </p>
+
+      <!-- Signing Latency Chart -->
+      <h3 class="mb-4 text-lg font-bold text-gray-900">4.1 署名レイテンシ比較</h3>
+
+      <div class="no-break mb-8 space-y-3">
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-right text-xs font-medium text-gray-600">Turnkey</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-blue-500 to-blue-600 pr-3"
+              style="width: 15%"
+            >
+              <span class="text-xs font-bold text-white">50-100ms</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-right text-xs font-medium text-gray-600">Dfns</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-blue-500 to-blue-600 pr-3"
+              style="width: 18%"
+            >
+              <span class="text-xs font-bold text-white">&lt;100ms</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-right text-xs font-medium text-gray-600">HashiCorp Vault</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-blue-400 to-blue-500 pr-3"
+              style="width: 10%"
+            >
+              <span class="text-xs font-bold text-white">1-5ms*</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-right text-xs font-medium text-gray-600">AWS KMS</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-yellow-400 to-yellow-500 pr-3"
+              style="width: 40%"
+            >
+              <span class="text-xs font-bold text-white">200-300ms</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-right text-xs font-medium text-gray-600">GCP Cloud KMS</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-orange-400 to-orange-500 pr-3"
+              style="width: 70%"
+            >
+              <span class="text-xs font-bold text-white">500-1000ms</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-right text-xs font-medium text-gray-600">Fireblocks</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-gray-400 to-gray-500 pr-3"
+              style="width: 25%"
+            >
+              <span class="text-xs font-bold text-white">非公開（sub-sec）</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="mb-8 text-xs text-gray-500">
+        * HashiCorp Vault: secp256k1署名自体は1-5msだが、HTTP
+        APIオーバーヘッド含む。Safe、BitGo、Safeheron、OZ Defenderは署名レイテンシの公開データなし。
+      </p>
+
+      <!-- Throughput -->
+      <h3 class="mb-4 text-lg font-bold text-gray-900">4.2 スループット比較</h3>
+
+      <div class="no-break mb-8 overflow-x-auto">
+        <table class="text-xs">
+          <thead>
+            <tr>
+              <th>サービス</th>
+              <th>スループット</th>
+              <th>SLA/可用性</th>
+              <th>スコア</th>
+              <th>判定根拠</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">Turnkey</td>
+              <td>50M+ウォレット管理実績</td>
+              <td>非公開</td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td>
+                TEE内署名で低レイテンシ（<200ms）。5,000万ウォレット管理の実績が大規模スループットを実証。Coinbase等の高負荷ユースケースを支えるインフラ。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">AWS CloudHSM</td>
+              <td>最大7,000 ops/sec（6 HSMクラスタ）</td>
+              <td>99.999%（SLA）</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                6台クラスタ構成で最大7,000 ops/sec。AWS公式SLA
+                99.999%。専用HSMのため安定した性能保証。スケールアウトもHSM追加で対応可能。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">AWS KMS</td>
+              <td>1,000 req/sec（ECC、リージョンごと）</td>
+              <td>99.999%（SLA）</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                ECC署名は1,000 req/sec/リージョン。マルチリージョンで線形スケール可能。SLA
+                99.999%はクラウドKMS最高水準。大半のDApp運用で十分な容量。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Fireblocks</td>
+              <td>大規模機関の処理実績（具体値非公開）</td>
+              <td>非公開</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                1,800+機関・$10T+累計処理の実績から高スループットと判断。具体的QPS値は非公開だが、Galaxy
+                Digital等の大量取引を処理。SLA非公開のためSではなくA。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Dfns</td>
+              <td>10署名/sec（ECDSA）、数千リクエスト/sec</td>
+              <td>99.95%</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                ECDSA署名10/secは公式値。読み取りは数千req/sec対応。SLA
+                99.95%明示。MPC署名は複数ノード間通信が必要なため単体HSMより遅いが、実用十分。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">GCP Cloud KMS</td>
+              <td>最大500 QPS（HSM）</td>
+              <td>99.5-99.9%</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                HSM鍵は最大500 QPS（AWS
+                KMSの半分）。SLAも99.5〜99.9%でAWS（99.999%）に劣る。GCPのHSMクォータはプロジェクト単位で上限緩和申請が必要な点もマイナス。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safe</td>
+              <td>3.26億tx/年（2025年実績）</td>
+              <td>N/A（オンチェーン）</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                処理量自体は年間3.26億txと大きいが、マルチシグはオンチェーン実行のためブロック確認待ちが発生。バッチ処理やリアルタイム大量署名には不向き。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">OZ Defender</td>
+              <td>50 tx/分（Relayerあたり）</td>
+              <td>非公開</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                Relayerあたり50
+                tx/分は明確な上限。複数Relayer並列で拡張可能だが、サービス終了予定（2026/7）のため投資対効果が低い。SLA非公開。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safeheron</td>
+              <td>非公開</td>
+              <td>非公開</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td>
+                スループット・SLAともに非公開。170+機関利用の実績はあるが、定量データがないため客観評価不能。情報開示の姿勢自体がリスク要因。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">HashiCorp Vault</td>
+              <td>CPUバウンド（プラグイン依存）</td>
+              <td>セルフホスト依存</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td>
+                Ethereum署名プラグインは約4年未メンテでパフォーマンス最適化なし。HSMバックエンドなしのソフトウェア署名はCPUバウンド。SLAはセルフホストのため運用者の責任。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ====== 5. COST ====== -->
+    <div class="mx-auto max-w-4xl px-12 py-16">
+      <h2 class="mb-8 text-3xl font-bold text-gray-900">5. コスト</h2>
+
+      <p class="mb-6 text-sm text-gray-600">
+        料金プラン、無料枠、従量課金の詳細を比較する。初期コスト・月額コスト・トランザクションあたりのコストをそれぞれ評価。
+      </p>
+
+      <!-- Cost Comparison Table -->
+      <div class="no-break mb-8 overflow-x-auto">
+        <table class="text-xs">
+          <thead>
+            <tr>
+              <th>サービス</th>
+              <th>最低月額</th>
+              <th>トランザクション課金</th>
+              <th>無料枠</th>
+              <th>スコア</th>
+              <th>判定根拠</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">Safe</td>
+              <td>$0（ガス代のみ）</td>
+              <td>ガス代のみ</td>
+              <td>全機能無料</td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td>
+                ソフトウェア利用料完全無料。コストはオンチェーンガス代のみ。L2（Arbitrum,
+                Base等）では$0.01未満/tx。OSSのため将来的な料金変更リスクもゼロ。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">AWS KMS</td>
+              <td>$1.00/鍵/月</td>
+              <td>$0.15/1万回（ECC署名）</td>
+              <td>2万リクエスト/月</td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td>
+                鍵1本+月10万署名で約$2.50/月。2万リクエスト/月の無料枠あり。FIPS 140-3
+                HSM保護をこの価格で提供するのは破格。価格体系が明確で予算計画が容易。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">GCP Cloud KMS</td>
+              <td>$1.00/鍵/月</td>
+              <td>$0.03/1万回</td>
+              <td>なし</td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td>
+                署名単価$0.03/1万回はAWS
+                KMS（$0.15）の1/5。鍵1本+月10万署名で約$1.30/月。無料枠はないが、絶対額が十分に低い。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Turnkey</td>
+              <td>$0.01-0.10/署名</td>
+              <td>従量課金</td>
+              <td>無料サンドボックス</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                Web3特化の従量課金で初期投資不要。月10万署名で$1,000〜$10,000と利用量次第で幅あり。無料サンドボックスで開発・テスト可能。大量署名時はクラウドKMSより割高。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safeheron</td>
+              <td>$0（Starter）</td>
+              <td>非公開</td>
+              <td>無料スターター</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                Starterプラン無料でMPC機能が利用可能。ただしPro/Enterprise版の料金が非公開のため、スケール時のコスト予測が困難。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Dfns</td>
+              <td>$50/月（Starter）</td>
+              <td>なし</td>
+              <td>30日無料トライアル</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                最低$50/月は小規模プロジェクトには高め。ただし署名数による従量課金なしの定額制で、大量署名時は逆にコスパが良い。Growth/Scale版は要問合せ。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">HashiCorp Vault</td>
+              <td>$0（OSS）/ $1,100+（HCP）</td>
+              <td>なし</td>
+              <td>OSS版無料</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                OSS版は無料だがインフラ運用コスト（サーバー、監視、バックアップ）が隠れコスト。HCPマネージド版は$1,100+/月と高額。運用人件費を含めた総コストは大きい。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">OZ Defender</td>
+              <td>$0（Builder）/ 非公開（Pro）</td>
+              <td>非公開</td>
+              <td>Free Tier</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td>
+                Free
+                Tierあるが機能制限大。Pro版の料金非公開で予算計画不能。2026/7サービス終了のため、移行コスト（新規鍵生成+オンチェーン権限移譲）が確実に発生する。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Fireblocks</td>
+              <td>$699+/月</td>
+              <td>あり</td>
+              <td>無料サンドボックス</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td>
+                最低$699/月は10候補中で最も高い固定費。さらにトランザクション課金が加算。エンタープライズ向けの価格設定で、小〜中規模プロジェクトには過剰投資。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">BitGo</td>
+              <td>非公開（エンタープライズ）</td>
+              <td>非公開</td>
+              <td>テスト環境あり</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td>
+                料金体系が完全非公開でコスト見積もり不能。エンタープライズ向けの営業交渉が必要。テスト環境は無料だが本番利用のハードルが高い。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Cost Scenarios -->
+      <h3 class="mb-4 text-lg font-bold text-gray-900">5.1 月額コストシミュレーション</h3>
+      <p class="mb-4 text-xs text-gray-500">鍵1本、月間10万署名の場合のランニングコスト（概算）</p>
+
+      <div class="no-break mb-8 space-y-3">
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-right text-xs font-medium text-gray-600">Safe</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-green-500 to-green-600 pr-3"
+              style="width: 3%"
+            >
+              <span class="ml-2 whitespace-nowrap text-xs font-bold text-white">$0+ガス</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-right text-xs font-medium text-gray-600">GCP Cloud KMS</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-green-500 to-green-600 pr-3"
+              style="width: 3%"
+            >
+              <span class="ml-2 whitespace-nowrap text-xs font-bold text-white">~$1.30</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-right text-xs font-medium text-gray-600">AWS KMS</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-green-500 to-green-600 pr-3"
+              style="width: 3%"
+            >
+              <span class="ml-2 whitespace-nowrap text-xs font-bold text-white">~$2.50</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-right text-xs font-medium text-gray-600">Dfns (Starter)</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-blue-500 to-blue-600 pr-3"
+              style="width: 8%"
+            >
+              <span class="text-xs font-bold text-white">$50+</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-right text-xs font-medium text-gray-600">Fireblocks</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-orange-500 to-orange-600 pr-3"
+              style="width: 70%"
+            >
+              <span class="text-xs font-bold text-white">$699+</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-32 text-right text-xs font-medium text-gray-600">HCP Vault</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-red-500 to-red-600 pr-3"
+              style="width: 100%"
+            >
+              <span class="text-xs font-bold text-white">$1,100+</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="no-break rounded-r-lg border-l-4 border-yellow-400 bg-yellow-50 p-4 text-xs text-yellow-800"
+      >
+        <strong>注:</strong> Safe のコストはガス代のみで、L2（Arbitrum,
+        Base等）では1トランザクションあたり$0.01未満で実行可能。AWS
+        CloudHSM（専用テナント）は最低$2,116/月。コスト最適化にはKMS（共有テナント）の利用が推奨。
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ====== 6. DX ====== -->
+    <div class="mx-auto max-w-4xl px-12 py-16">
+      <h2 class="mb-8 text-3xl font-bold text-gray-900">6. 開発者体験（DX）</h2>
+
+      <p class="mb-6 text-sm text-gray-600">
+        SDK対応言語、API設計、ドキュメント品質、統合の容易さを比較する。
+      </p>
+
+      <div class="no-break mb-8 overflow-x-auto">
+        <table class="text-xs">
+          <thead>
+            <tr>
+              <th>サービス</th>
+              <th>SDK言語</th>
+              <th>API設計</th>
+              <th>ドキュメント</th>
+              <th>Ethereum統合</th>
+              <th>スコア</th>
+              <th>判定根拠</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">Safe</td>
+              <td>TypeScript</td>
+              <td>Protocol/API/Relay/Auth Kit</td>
+              <td>充実</td>
+              <td>ネイティブ</td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td>
+                Protocol Kit/API Kit/Relay Kit/Auth
+                Kitと用途別に分離されたSDK設計。TypeScript完全対応でEthereum開発者のDXに最適化。公式チュートリアルと実装例が豊富。OSSのためソース確認も容易。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Fireblocks</td>
+              <td>TS, Python, Go, Java, C++, C#, PHP</td>
+              <td>REST API + SDK</td>
+              <td>充実</td>
+              <td>ネイティブ</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                7言語SDK対応は最多。Ethereumネイティブ統合でトランザクション構築→署名→送信がSDK内で完結。API
+                Referenceと開発者ポータルが充実。ただしSaaS契約が必要で即座に試せない点がS未満。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Turnkey</td>
+              <td>TS, Go</td>
+              <td>REST API + SDK</td>
+              <td>良好</td>
+              <td>ネイティブ</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                TypeScript
+                SDKがviem/ethers.jsと統合済み。パスキー認証のサンプルアプリが豊富。対応言語は2つと少ないが、Web3開発の主要言語をカバー。ドキュメントは良好だが網羅性でFireblocksに劣る。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Dfns</td>
+              <td>TS, Go, Python, Swift, Kotlin, Dart</td>
+              <td>REST API (420+ EP)</td>
+              <td>良好</td>
+              <td>ネイティブ</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                6言語SDK+420以上のAPIエンドポイントは豊富。モバイル（Swift/Kotlin/Dart）対応はユニーク。Ethereumネイティブ統合。ただしAPI数が多い分、学習コストがやや高い。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">OZ Defender</td>
+              <td>TypeScript</td>
+              <td>SDK + Hardhat統合</td>
+              <td>充実</td>
+              <td>ネイティブ</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                Hardhat/Foundryとの統合が深く、既存のスマートコントラクト開発フローにシームレスに組み込み可能。ドキュメント充実。ただしサービス終了予定（2026/7）のため、新規学習投資のROIが疑問。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">AWS KMS</td>
+              <td>TS, Python, Go, Java, .NET, Ruby</td>
+              <td>AWS SDK</td>
+              <td>充実</td>
+              <td>要変換（DER→r,s,v）</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                6言語SDK、AWSドキュメントは業界最高水準。ただしEthereum署名にはDER→{r,s,v}変換、EIP-2対応、v値復元の自前実装が必要。汎用KMSのためWeb3固有の概念（ガス、ノンス管理等）は非サポート。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">BitGo</td>
+              <td>TS, Go</td>
+              <td>REST API + SDK</td>
+              <td>良好</td>
+              <td>ネイティブ</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                Ethereumネイティブ対応でSDKの基本機能は良好。ただし対応言語が2つと少なく、エンタープライズ向けのため営業プロセスを経ないとSDKアクセスが限定的。コミュニティリソースも少ない。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">GCP Cloud KMS</td>
+              <td>C#, Go, Java, Node.js, Python, Ruby, PHP</td>
+              <td>GCP SDK</td>
+              <td>充実</td>
+              <td>要ワークアラウンド</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                7言語SDK対応でGCPドキュメントは充実。しかしEthereum統合にはkeccak256ハッシュの非公式ワークアラウンド（prehash→raw署名）が必要。GCPの仕様変更でワークアラウンドが機能しなくなるリスクがBの主因。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safeheron</td>
+              <td>非公開</td>
+              <td>非公開</td>
+              <td>限定的</td>
+              <td>非公開</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td>
+                SDK・API仕様が公開されておらず、ドキュメントも限定的。評価のための情報が不足。MPC-TSSのOSSコンポーネントはGitHubにあるが、プロダクト統合のガイドが乏しい。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">HashiCorp Vault</td>
+              <td>Go, Python, Ruby, Java, .NET, Node.js</td>
+              <td>REST API + CLI</td>
+              <td>充実（本体）</td>
+              <td>プラグイン依存（未メンテ）</td>
+              <td><span class="score-badge bg-red-100 text-red-700">D</span></td>
+              <td>
+                Vault本体のSDK・ドキュメントは充実だが、Ethereum署名プラグイン（immutability/vault-ethereum）は約4年間メンテナンスされていない。最新のEIPに未対応で、EIP-1559やEIP-4844トランザクションの署名ができない可能性。実質的に使えない。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mb-4 text-lg font-bold text-gray-900">6.1 Ethereum統合の難易度</h3>
+
+      <div class="mb-6 grid grid-cols-3 gap-3">
+        <div class="no-break rounded-lg border border-green-200 bg-green-50 p-3">
+          <h4 class="mb-1 text-xs font-bold text-green-800">ネイティブ対応</h4>
+          <p class="text-xs text-green-700">Fireblocks, Safe, Turnkey, Dfns, BitGo, OZ Defender</p>
+          <p class="mt-1 text-xs text-gray-500">
+            SDKがEthereumトランザクション署名をそのままサポート
+          </p>
+        </div>
+        <div class="no-break rounded-lg border border-yellow-200 bg-yellow-50 p-3">
+          <h4 class="mb-1 text-xs font-bold text-yellow-800">変換が必要</h4>
+          <p class="text-xs text-yellow-700">AWS KMS, GCP Cloud KMS</p>
+          <p class="mt-1 text-xs text-gray-500">DER→{r,s,v}変換、EIP-2対応、v値復元の実装が必要</p>
+        </div>
+        <div class="no-break rounded-lg border border-red-200 bg-red-50 p-3">
+          <h4 class="mb-1 text-xs font-bold text-red-800">プラグイン依存</h4>
+          <p class="text-xs text-red-700">HashiCorp Vault</p>
+          <p class="mt-1 text-xs text-gray-500">Ethereum署名プラグインが約4年未メンテナンス</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ====== 7. OPERATIONS MODEL ====== -->
+    <div class="mx-auto max-w-4xl px-12 py-16">
+      <h2 class="mb-8 text-3xl font-bold text-gray-900">7. 運用モデル</h2>
+
+      <p class="mb-6 text-sm text-gray-600">
+        SaaS/セルフホスト、対応チェーン数、マルチシグ/MPC対応、ポリシーエンジン、デプロイメントモデルを比較する。
+      </p>
+
+      <div class="no-break mb-8 overflow-x-auto">
+        <table class="text-xs">
+          <thead>
+            <tr>
+              <th>サービス</th>
+              <th>提供形態</th>
+              <th>対応チェーン</th>
+              <th>ポリシーエンジン</th>
+              <th>鍵エクスポート</th>
+              <th>スコア</th>
+              <th>判定根拠</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">Fireblocks</td>
+              <td>SaaS / ハイブリッド</td>
+              <td>80+</td>
+              <td>TAP（承認ポリシー）</td>
+              <td>可能</td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td>
+                80+チェーン対応は最多級。TAP（Transaction Authorization
+                Policy）で金額・宛先・時間帯による細粒度の承認ルール設定が可能。SaaS/ハイブリッド/オンプレ選択可能で柔軟。鍵エクスポートも対応。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safe</td>
+              <td>オンチェーン</td>
+              <td>主要EVM全て</td>
+              <td>Guard / モジュール</td>
+              <td>N/A（オンチェーン）</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                オンチェーンのためベンダー非依存。Guard/モジュールでプログラマブルなポリシー設定可能。EVM限定だがDAO運営ではEVMが主流。オンチェーンゆえ鍵エクスポートの概念がなく、SaaS障害リスクもない。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Dfns</td>
+              <td>SaaS / ハイブリッド / オンプレ</td>
+              <td>62</td>
+              <td>プログラマブル</td>
+              <td>可能</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                62チェーン対応でマルチチェーン運用に十分。SaaS/ハイブリッド/オンプレの3形態から選択可能で柔軟性が高い。プログラマブルポリシーと鍵エクスポート対応。チェーン数でFireblocksに劣るためA。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">BitGo</td>
+              <td>SaaS</td>
+              <td>800+コイン</td>
+              <td>承認ワークフロー</td>
+              <td>可能</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                800+コイン対応は全候補中最多。OCC認可の信託会社として規制対応済み。承認ワークフローと鍵エクスポートに対応。SaaS限定でオンプレ不可のためS未満。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Turnkey</td>
+              <td>SaaS</td>
+              <td>主要チェーン対応</td>
+              <td>ポリシーエンジン</td>
+              <td>可能</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                主要チェーンに対応しDApp運用で不足なし。ポリシーエンジンで承認ルール設定可能。鍵エクスポート対応でロックイン回避。SaaS限定、対応チェーン数の具体値非公開のためA。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">AWS KMS</td>
+              <td>マネージド</td>
+              <td>汎用（secp256k1）</td>
+              <td>IAMポリシー</td>
+              <td>不可（BYOK可）</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                IAMポリシーはAWS標準で強力だが、ブロックチェーン固有のポリシー（金額閾値、宛先制限等）は自前実装が必要。鍵エクスポート不可（BYOKで事前インポートは可能）。チェーン固有の対応なし。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safeheron</td>
+              <td>SaaS / セルフホスト</td>
+              <td>44+</td>
+              <td>承認フロー</td>
+              <td>セルフカストディ</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                44+チェーン対応とセルフカストディ（鍵シェアを自分で保持）は評価できる。ただし承認フローの詳細仕様が非公開で、ポリシーのカスタマイズ性が不明。情報不足がB評価の一因。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">GCP Cloud KMS</td>
+              <td>マネージド</td>
+              <td>汎用（secp256k1）</td>
+              <td>IAMポリシー</td>
+              <td>不可</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                GCP
+                IAMポリシーは基本的だがブロックチェーン固有のポリシーは自前実装。鍵エクスポート完全不可（AWS
+                KMSのBYOKに相当する機能なし）でベンダーロックインが強い。keccak256ワークアラウンドが仕様変更で使えなくなるリスク。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">OZ Defender</td>
+              <td>SaaS（終了予定）</td>
+              <td>30+</td>
+              <td>Actions/Monitor</td>
+              <td>不可</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td>
+                Actions/Monitorによるオンチェーン監視・自動化は優秀だが、2026/7サービス終了が確定。鍵エクスポート不可のため終了時に管理不能リスク。新規採用は非推奨。既存ユーザーは移行計画が急務。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">HashiCorp Vault</td>
+              <td>セルフホスト / HCP</td>
+              <td>プラグイン依存</td>
+              <td>ACL / Sentinel</td>
+              <td>設定次第</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td>
+                ACL/Sentinelポリシーは強力だが、ブロックチェーン対応は約4年未メンテのプラグイン依存。セルフホストの運用負荷が大きい。対応チェーンはプラグイン次第で保証なし。IBM買収後のBSLライセンス変更もリスク。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mb-4 text-lg font-bold text-gray-900">7.1 推奨アーキテクチャ: 多層防御モデル</h3>
+
+      <div class="no-break rounded-lg border border-blue-200 bg-blue-50 p-5">
+        <p class="mb-3 text-sm font-semibold text-blue-900">
+          Safe（マルチシグ）+ MPC/HSM（各署名者の鍵保護）
+        </p>
+        <div class="space-y-2 text-xs text-blue-800">
+          <p>
+            <strong>レイヤー1:</strong> Safe マルチシグ（例: 3-of-5）でオンチェーンガバナンスを制御
+          </p>
+          <p>
+            <strong>レイヤー2:</strong> 各署名者がFireblocks / AWS KMS / Turnkey等で個別に鍵を保護
+          </p>
+          <p><strong>レイヤー3:</strong> タイムロック + ガーディアンによるリカバリ機構</p>
+          <p class="mt-3 text-blue-600">
+            この構成により、単一ソリューションの障害がトレジャリ全体に波及するリスクを最小化できる。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ====== 8. ECOSYSTEM ====== -->
+    <div class="mx-auto max-w-4xl px-12 py-16">
+      <h2 class="mb-8 text-3xl font-bold text-gray-900">8. エコシステム</h2>
+
+      <p class="mb-6 text-sm text-gray-600">
+        パートナーシップ、導入企業数、コミュニティ活動、GitHub活動を比較する。
+      </p>
+
+      <!-- Ecosystem Scale Chart -->
+      <h3 class="mb-4 text-lg font-bold text-gray-900">8.1 導入規模比較</h3>
+
+      <div class="no-break mb-8 space-y-3">
+        <div class="flex items-center gap-3">
+          <span class="w-28 text-right text-xs font-medium text-gray-600">Safe</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-green-500 to-green-600 pr-3"
+              style="width: 100%"
+            >
+              <span class="text-xs font-bold text-white">$600B+ TVL, 200+プロジェクト</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-28 text-right text-xs font-medium text-gray-600">Fireblocks</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-purple-500 to-purple-600 pr-3"
+              style="width: 90%"
+            >
+              <span class="text-xs font-bold text-white">1,800+機関, $10T+処理</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-28 text-right text-xs font-medium text-gray-600">BitGo</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-blue-500 to-blue-600 pr-3"
+              style="width: 60%"
+            >
+              <span class="text-xs font-bold text-white">600+機関, $104B AoP</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-28 text-right text-xs font-medium text-gray-600">AWS KMS</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-orange-500 to-orange-600 pr-3"
+              style="width: 55%"
+            >
+              <span class="text-xs font-bold text-white">AWSエコシステム全体</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-28 text-right text-xs font-medium text-gray-600">Dfns</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-blue-400 to-blue-500 pr-3"
+              style="width: 25%"
+            >
+              <span class="text-xs font-bold text-white">324社, $26B処理</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-28 text-right text-xs font-medium text-gray-600">Safeheron</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-blue-300 to-blue-400 pr-3"
+              style="width: 15%"
+            >
+              <span class="text-xs font-bold text-white">170+機関</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="w-28 text-right text-xs font-medium text-gray-600">Turnkey</span>
+          <div class="h-7 flex-1 overflow-hidden rounded-full bg-gray-200">
+            <div
+              class="flex h-full items-center justify-end rounded-full bg-gradient-to-r from-teal-400 to-teal-500 pr-3"
+              style="width: 35%"
+            >
+              <span class="text-xs font-bold text-white">50M+ウォレット</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Adopters -->
+      <h3 class="mb-4 text-lg font-bold text-gray-900">8.2 主要採用企業</h3>
+
+      <div class="no-break mb-8 overflow-x-auto">
+        <table class="text-xs">
+          <thead>
+            <tr>
+              <th>サービス</th>
+              <th>主な採用企業・プロジェクト</th>
+              <th>スコア</th>
+              <th>判定根拠</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">Safe</td>
+              <td>Ethereum Foundation, Uniswap DAO, Aave, MakerDAO, Worldcoin, Circle, Ledger</td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td>
+                Ethereum Foundation・Uniswap
+                DAO・Aave・MakerDAO等、暗号資産エコシステムの最重要プロジェクトが採用。$600B+
+                TVLの実績。200+プロジェクト統合。DeFi・DAO分野で事実上の標準。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Fireblocks</td>
+              <td>BNY Mellon, ANZ, Galaxy Digital, Revolut, BlockFi</td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td>
+                BNY
+                Mellon（世界最大カストディ銀行）、ANZ（豪州4大銀行）等のTradFi大手が採用。1,800+機関顧客、$10T+累計処理。伝統金融のブロックチェーン参入の標準インフラ。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">BitGo</td>
+              <td>Bitstamp, Pantera Capital, Copper, OCC認可信託</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                600+機関顧客、$104B
+                AoP（資産残高）。OCC認可の信託会社として規制対応済み。Bitstamp等の大手取引所も採用。ただし採用企業のブランド力でFireblocksに劣る。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">AWS KMS</td>
+              <td>Kaleido, ConsenSys Web3Signer, Fireblocks（内部利用）</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                Fireblocks自体がHSMバックエンドにAWS KMSを内部利用。ConsenSys Web3SignerもAWS
+                KMS対応。AWSエコシステム全体の信頼性。直接的なDApp採用事例は少ないがインフラ層として広く浸透。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Dfns</td>
+              <td>Fidelity International, ABN AMRO, Zodia Custody, IBM, Circle, MoonPay</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                Fidelity International・ABN
+                AMRO等の金融機関が採用。324社・$26B処理の実績。ただしFireblocks/BitGoと比べると規模が1-2桁小さく、Series
+                A段階のため成長途上。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Turnkey</td>
+              <td>Goldfinch, Brave Wallet, Rainbow（推定）</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                50M+ウォレット管理実績は印象的だが、公開されている採用企業が限定的（Goldfinch,
+                Brave）。推定ベースの情報が多く、エコシステムの透明性でA級に届かない。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safeheron</td>
+              <td>170+金融機関（個別名は限定公開）</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                170+金融機関の利用実績を主張するが、個別の採用企業名がほとんど公開されていない。検証困難なため、数字の信頼性に疑問が残る。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">OZ Defender</td>
+              <td>Compound, Aave, dYdX, Balancer（レガシー）</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                Compound・Aave・dYdX等のDeFi大手が過去に採用。しかしサービス終了発表（2026/7）後、各プロジェクトは移行を進行中。今後の新規採用は見込めない。レガシーとしてのB。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">GCP Cloud KMS</td>
+              <td>Valora（Celo）, Google Cloud Validator</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td>
+                ブロックチェーン分野での採用事例が極めて少ない。Valora（Celoウォレット）とGoogle
+                Cloud自身のバリデータ程度。GCP自体は巨大だが、Web3エコシステムでの存在感はAWSに大きく劣る。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">HashiCorp Vault</td>
+              <td>Kaleido, Santander（2019年債券発行）</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td>
+                ブロックチェーン分野の採用事例が古い（Santanderは2019年）。Kaleido以外の近年の事例が見当たらない。Vault本体は広く使われているが、Ethereum鍵管理での実績はほぼない。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ====== 9. RISK ANALYSIS ====== -->
+    <div class="mx-auto max-w-4xl px-12 py-16">
+      <h2 class="mb-8 text-3xl font-bold text-gray-900">9. リスク分析</h2>
+
+      <p class="mb-6 text-sm text-gray-600">
+        ベンダーロックイン、資金調達状況、既知の問題、サービス継続性リスクを包括的に分析する。
+      </p>
+
+      <div class="no-break mb-8 overflow-x-auto">
+        <table class="text-xs">
+          <thead>
+            <tr>
+              <th>サービス</th>
+              <th>ベンダーロックイン</th>
+              <th>継続性リスク</th>
+              <th>技術的リスク</th>
+              <th>総合</th>
+              <th>判定根拠</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">Safe</td>
+              <td><span class="risk-low">低</span>（オンチェーン）</td>
+              <td><span class="risk-low">低</span>（$600B TVL）</td>
+              <td><span class="risk-medium">中</span>（UI攻撃リスク）</td>
+              <td><span class="risk-low">低</span></td>
+              <td>
+                オンチェーンコントラクトのためベンダー依存なし。$600B
+                TVLの巨大エコシステムで継続性リスク低。ただし2024年のUI経由の攻撃事例（Radiant
+                Capital等）があり、フロントエンドの信頼性に中リスク。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">AWS KMS</td>
+              <td><span class="risk-medium">中</span>（鍵エクスポート不可）</td>
+              <td><span class="risk-low">低</span>（AWS安定性）</td>
+              <td><span class="risk-low">低</span></td>
+              <td><span class="risk-low">低</span></td>
+              <td>
+                鍵エクスポート不可がロックインリスク（BYOK利用で軽減可能）。AWS自体のサービス継続性は疑う余地なし。HSM技術は枯れており技術的リスクも低い。総合的に低リスク。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Fireblocks</td>
+              <td><span class="risk-low">低</span>（鍵エクスポート可）</td>
+              <td><span class="risk-low">低</span>（$1B評価）</td>
+              <td><span class="risk-low">低</span></td>
+              <td><span class="risk-low">低</span></td>
+              <td>
+                鍵エクスポート対応でロックイン回避可能。Series
+                E・$8B評価で財務安定。MPC-CMP+SGXの多層防御で技術的リスク低。1,800+機関の実運用実績が信頼性を裏付ける。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">BitGo</td>
+              <td><span class="risk-low">低</span>（鍵エクスポート可）</td>
+              <td><span class="risk-low">低</span>（OCC認可）</td>
+              <td><span class="risk-low">低</span></td>
+              <td><span class="risk-low">低</span></td>
+              <td>
+                鍵エクスポート対応。OCC認可の信託会社で規制面の安定性が高い。2026年IPO準備中で事業拡大局面。$170M+の調達実績。技術的にも大きな懸念なし。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">GCP Cloud KMS</td>
+              <td><span class="risk-medium">中</span>（鍵エクスポート不可）</td>
+              <td><span class="risk-low">低</span>（GCP安定性）</td>
+              <td><span class="risk-medium">中</span>（keccak256非公式）</td>
+              <td><span class="risk-medium">中</span></td>
+              <td>
+                鍵エクスポート完全不可（AWS
+                KMSのBYOKに相当する機能なし）。GCPの継続性は問題ないが、keccak256署名に必要な非公式ワークアラウンドがGCPのAPI仕様変更で使えなくなるリスク。この技術的リスクが中評価の主因。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Dfns</td>
+              <td><span class="risk-low">低</span>（鍵エクスポート可）</td>
+              <td><span class="risk-medium">中</span>（Series A）</td>
+              <td><span class="risk-low">低</span></td>
+              <td><span class="risk-medium">中</span></td>
+              <td>
+                鍵エクスポート対応でロックイン回避可。ただしSeries
+                A段階（$29.5M調達）でFireblocks等と比べ財務基盤が薄い。事業継続が市場環境に依存。技術的には堅実なMPC実装。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Turnkey</td>
+              <td><span class="risk-low">低</span>（鍵エクスポート可）</td>
+              <td><span class="risk-medium">中</span>（Series A）</td>
+              <td><span class="risk-low">低</span></td>
+              <td><span class="risk-medium">中</span></td>
+              <td>
+                鍵エクスポート対応。Series
+                A段階（$18.5M調達）で財務基盤はDfns同様に薄い。a16z出資で投資家の信頼はあるが、長期的な事業継続はまだ不透明。TEE技術自体は堅牢。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safeheron</td>
+              <td><span class="risk-low">低</span>（OSS + セルフカストディ）</td>
+              <td><span class="risk-medium">中</span>（小規模）</td>
+              <td><span class="risk-low">低</span></td>
+              <td><span class="risk-medium">中</span></td>
+              <td>
+                OSSコンポーネント+セルフカストディでロックイン低。$15.1M調達のSeries
+                A段階で事業規模が小さく、市場変動に脆弱。MPC-TSS OSSの技術的リスクは低い。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">HashiCorp Vault</td>
+              <td><span class="risk-medium">中</span>（BSLライセンス）</td>
+              <td><span class="risk-low">低</span>（IBM買収済み）</td>
+              <td><span class="risk-high">高</span>（プラグイン未メンテ）</td>
+              <td><span class="risk-medium">中</span></td>
+              <td>
+                IBM買収（$6.4B）で継続性は安定だが、BSLライセンス変更でフォーク不自由。Ethereum署名プラグイン（immutability/vault-ethereum）が約4年未メンテで、最新EIPに未対応。技術的リスク高が総合を押し上げ。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-semibold">OZ Defender</td>
+              <td><span class="risk-high">致命的</span>（鍵エクスポート不可）</td>
+              <td><span class="risk-high">致命的</span>（2026/7終了）</td>
+              <td><span class="risk-high">高</span></td>
+              <td><span class="risk-high">致命的</span></td>
+              <td>
+                2026年7月のサービス完全停止が確定。Relayerの秘密鍵はインポート/エクスポート不可のため、Defenderに特権ロールを付与したコントラクトはシャットダウン時に管理不能になる。新規採用は絶対に非推奨。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Critical Risk Warnings -->
+      <div class="no-break mb-6 rounded-lg border border-red-300 bg-red-50 p-5">
+        <h4 class="mb-2 text-sm font-bold text-red-900">致命的リスク: OpenZeppelin Defender</h4>
+        <p class="text-xs text-red-800">
+          2025年6月にサービス終了を正式発表。2025年6月30日に新規登録停止、<strong>2026年7月1日に完全シャットダウン</strong>。Relayerの秘密鍵はインポート/エクスポート不可のため、Defenderに特権ロールを付与したコントラクトはシャットダウン時に管理不能になるリスクがある。新規採用は非推奨。
+        </p>
+      </div>
+
+      <div class="no-break mb-6 rounded-lg border border-yellow-300 bg-yellow-50 p-5">
+        <h4 class="mb-2 text-sm font-bold text-yellow-900">
+          注意: クラウドKMSのベンダーロックイン
+        </h4>
+        <p class="text-xs text-yellow-800">
+          AWS KMS / GCP Cloud
+          KMSともに、HSM内で生成した鍵はエクスポート不可。ベンダー移行時は「新しい鍵を生成→オンチェーンで権限を移譲」が必要。AWS
+          KMSはBYOK（鍵インポート）に対応しているため、バックアップコピーを保持することでリスク軽減が可能。GCPのkeccak256ワークアラウンドはGCPの仕様変更で機能しなくなる可能性がある。
+        </p>
+      </div>
+
+      <h3 class="mb-4 text-lg font-bold text-gray-900">9.1 資金調達・財務状況</h3>
+
+      <div class="no-break overflow-x-auto">
+        <table class="text-xs">
+          <thead>
+            <tr>
+              <th>サービス</th>
+              <th>累計調達額</th>
+              <th>直近ラウンド</th>
+              <th>財務安定性</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold">Fireblocks</td>
+              <td>$1B+</td>
+              <td>Series E（$8B評価）</td>
+              <td><span class="risk-low">安定</span></td>
+            </tr>
+            <tr>
+              <td class="font-semibold">BitGo</td>
+              <td>$170M+</td>
+              <td>IPO準備中（2026年）</td>
+              <td><span class="risk-low">安定</span></td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safe</td>
+              <td>ARR $10M+（2025年）</td>
+              <td>トークン収益モデル</td>
+              <td><span class="risk-low">安定</span></td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Dfns</td>
+              <td>$29.5M</td>
+              <td>Series A（$16M, 2025年）</td>
+              <td><span class="risk-medium">成長中</span></td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Turnkey</td>
+              <td>$18.5M</td>
+              <td>Series A</td>
+              <td><span class="risk-medium">成長中</span></td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Safeheron</td>
+              <td>$15.1M</td>
+              <td>Series A</td>
+              <td><span class="risk-medium">成長中</span></td>
+            </tr>
+            <tr>
+              <td class="font-semibold">HashiCorp Vault</td>
+              <td>IBM買収 $6.4B（2024年）</td>
+              <td>IBM Software部門</td>
+              <td><span class="risk-low">安定</span></td>
+            </tr>
+            <tr>
+              <td class="font-semibold">AWS KMS / GCP KMS</td>
+              <td>N/A（メガクラウド）</td>
+              <td>N/A</td>
+              <td><span class="risk-low">安定</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ====== 10. RANKING & RECOMMENDATIONS ====== -->
+    <div class="mx-auto max-w-4xl px-12 py-16">
+      <h2 class="mb-8 text-3xl font-bold text-gray-900">10. 総合ランキング & 推奨</h2>
+
+      <!-- Multi-dimensional Scorecard -->
+      <h3 class="mb-4 text-lg font-bold text-gray-900">10.1 多次元スコアカード</h3>
+
+      <div class="no-break mb-8 overflow-x-auto">
+        <table class="text-xs">
+          <thead>
+            <tr>
+              <th>サービス</th>
+              <th>セキュリティ</th>
+              <th>性能</th>
+              <th>コスト</th>
+              <th>DX</th>
+              <th>運用</th>
+              <th>生態系</th>
+              <th>リスク</th>
+              <th>総評</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="bg-yellow-50/50">
+              <td class="font-bold">Fireblocks</td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                セキュリティ・運用・エコシステムで最高評価。コストが唯一の弱点（$699+/月）。予算が許す大規模運用で第一推奨。
+              </td>
+            </tr>
+            <tr class="bg-gray-50/50">
+              <td class="font-bold">Safe</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                コスト・DX・エコシステムで最高評価。性能Bはオンチェーン実行のブロック待ち。マルチシグのガバナンスレイヤーとして全構成で推奨。
+              </td>
+            </tr>
+            <tr class="bg-orange-50/50">
+              <td class="font-bold">AWS KMS</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                コスパ最強（$2.50/月）でセキュリティ・性能も高水準。DX/運用のBはEthereum固有の変換が必要な点。Safe併用でコスト効率の高い構成が可能。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-bold">Turnkey</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                性能S（50M+ウォレット実績）で全軸バランス良好。エコシステム・リスクのBはSeries
+                A段階の財務規模と公開事例の少なさ。スタートアップ向けに最適。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-bold">Dfns</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                6言語SDK・420+ APIで技術力は高い。コストB（$50+/月）とエコシステムB（Series
+                A段階）が弱点。モバイル対応が必要なケースで優位。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-bold">BitGo</td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td>
+                800+コイン対応・OCC認可で運用とエコシステムが強み。コストC（料金非公開のエンタープライズ向け）が弱点。規制対応重視の機関向け。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-bold">GCP Cloud KMS</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-blue-100 text-blue-700">S</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                コストSだがB評価が5軸。keccak256非公式ワークアラウンド、鍵エクスポート不可、Web3エコシステムの薄さが全体を引き下げ。GCPに既存投資がある場合のみ検討。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-bold">Safeheron</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td>
+                OSSのMPC-TSSでコストAだが、情報非公開が多く性能C・DX
+                C。セルフカストディ志向で独自要件がある場合に限定的に有用。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-bold">HashiCorp Vault</td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-red-100 text-red-700">D</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td>
+                DXがD（Ethereumプラグイン4年未メンテ）で実質的にブロックチェーン鍵管理として使用困難。汎用シークレット管理としては優秀だが、この用途では非推奨。
+              </td>
+            </tr>
+            <tr>
+              <td class="font-bold">OZ Defender</td>
+              <td><span class="score-badge bg-red-100 text-red-700">D</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td><span class="score-badge bg-green-100 text-green-700">A</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">C</span></td>
+              <td><span class="score-badge bg-yellow-100 text-yellow-700">B</span></td>
+              <td><span class="score-badge bg-red-100 text-red-700">D</span></td>
+              <td>
+                DXはA（Hardhat統合が秀逸）だが、セキュリティD（鍵エクスポート不可）・リスクD（2026/7終了確定）で新規採用は不可。既存ユーザーは即座に移行計画を策定すべき。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Recommendations -->
+      <h3 class="mb-4 text-lg font-bold text-gray-900">10.2 ユースケース別推奨</h3>
+
+      <div class="space-y-4">
+        <!-- Recommendation 1 -->
+        <div class="no-break rounded-r-lg border-l-4 border-yellow-500 bg-yellow-50 p-5">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-xl font-bold text-yellow-700">1</span>
+            <span class="text-lg font-bold text-gray-900">エンタープライズ / 大規模DApp運営</span>
+          </div>
+          <p class="mb-2 text-sm text-gray-700"><strong>推奨: Fireblocks + Safe</strong></p>
+          <p class="text-xs text-gray-600">
+            Fireblocksの MPC-CMP + SGX による最高水準のセキュリティと、Safe
+            のマルチシグによるオンチェーンガバナンスを組み合わせる。各署名者がFireblocksで個別に鍵を保護し、Safe
+            で閾値承認を制御。月額$699+の投資に見合う、$10T+の実績に裏付けされた安心感。
+          </p>
+        </div>
+
+        <!-- Recommendation 2 -->
+        <div class="no-break rounded-r-lg border-l-4 border-blue-500 bg-blue-50 p-5">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-xl font-bold text-blue-700">2</span>
+            <span class="text-lg font-bold text-gray-900">中規模DApp / DAOトレジャリ管理</span>
+          </div>
+          <p class="mb-2 text-sm text-gray-700"><strong>推奨: Safe + AWS KMS</strong></p>
+          <p class="text-xs text-gray-600">
+            Safe のマルチシグをメインのガバナンスレイヤーとし、各署名者がAWS
+            KMSで鍵を保護。月額$2〜$16の低コストでFIPS
+            140-3認証済みHSM保護を実現。IAM/CloudTrailによる監査機能も標準搭載。コスト意識の高いチームに最適。
+          </p>
+        </div>
+
+        <!-- Recommendation 3 -->
+        <div class="no-break rounded-r-lg border-l-4 border-green-500 bg-green-50 p-5">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-xl font-bold text-green-700">3</span>
+            <span class="text-lg font-bold text-gray-900">スタートアップ / 個人プロジェクト</span>
+          </div>
+          <p class="mb-2 text-sm text-gray-700"><strong>推奨: Safe + Turnkey</strong></p>
+          <p class="text-xs text-gray-600">
+            Safe の無料マルチシグで基本的なガバナンスを確保し、Turnkey
+            の低コスト署名（$0.01〜$0.10/署名）で鍵保護を実現。パスキー認証にも対応しており、エンドユーザー向けの組み込みウォレット用途にも展開可能。開発スピードとセキュリティのバランスが良い。
+          </p>
+        </div>
+
+        <!-- Fallback -->
+        <div class="no-break rounded-r-lg border-l-4 border-gray-400 bg-gray-50 p-5">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="text-xl font-bold text-gray-500">Alt</span>
+            <span class="text-lg font-bold text-gray-900">規制準拠が最優先の場合</span>
+          </div>
+          <p class="mb-2 text-sm text-gray-700"><strong>推奨: BitGo + Safe</strong></p>
+          <p class="text-xs text-gray-600">
+            BitGoはOCC（通貨監督庁）認可の信託会社であり、米国の規制要件に最も準拠したソリューション。$104BのAssets
+            on
+            Platformとトレジャリ保険を標準提供。規制当局への説明責任が重い金融機関や、RWA（実世界資産）トークン化プロジェクトに最適。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ====== APPENDIX: SOURCES ====== -->
+    <div class="mx-auto max-w-4xl px-12 py-16">
+      <h2 class="mb-8 text-3xl font-bold text-gray-900">付録: 出典</h2>
+
+      <div class="grid grid-cols-2 gap-x-8 gap-y-1 text-xs text-gray-600">
+        <div class="mb-4">
+          <h4 class="mb-2 font-bold text-gray-800">Fireblocks</h4>
+          <ul class="space-y-1">
+            <li>Fireblocks公式サイト - fireblocks.com</li>
+            <li>Fireblocks MPC-CMP ホワイトペーパー</li>
+            <li>SOC 2 Type II認証情報</li>
+          </ul>
+        </div>
+        <div class="mb-4">
+          <h4 class="mb-2 font-bold text-gray-800">BitGo</h4>
+          <ul class="space-y-1">
+            <li>BitGo公式サイト - bitgo.com</li>
+            <li>OCC信託認可情報</li>
+            <li>BitGo IPO報道（2026年）</li>
+          </ul>
+        </div>
+        <div class="mb-4">
+          <h4 class="mb-2 font-bold text-gray-800">Safeheron</h4>
+          <ul class="space-y-1">
+            <li>Safeheron公式サイト - safeheron.com</li>
+            <li>GitHub: safeheron</li>
+            <li>Crunchbase: Safeheron資金調達</li>
+          </ul>
+        </div>
+        <div class="mb-4">
+          <h4 class="mb-2 font-bold text-gray-800">Turnkey</h4>
+          <ul class="space-y-1">
+            <li>Turnkey公式サイト - turnkey.com</li>
+            <li>Turnkey Documentation - docs.turnkey.com</li>
+            <li>Y Combinator: Turnkey</li>
+          </ul>
+        </div>
+        <div class="mb-4">
+          <h4 class="mb-2 font-bold text-gray-800">Dfns</h4>
+          <ul class="space-y-1">
+            <li>Dfns公式サイト - dfns.co</li>
+            <li>Dfns Security - dfns.co/security</li>
+            <li>Dfns Documentation - docs.dfns.co</li>
+            <li>SOC 2 renewed by KPMG</li>
+            <li>Series A: $16M (Further Ventures)</li>
+            <li>IBM Digital Asset Haven</li>
+          </ul>
+        </div>
+        <div class="mb-4">
+          <h4 class="mb-2 font-bold text-gray-800">AWS KMS + CloudHSM</h4>
+          <ul class="space-y-1">
+            <li>AWS KMS Documentation</li>
+            <li>AWS CloudHSM Documentation</li>
+            <li>AWS KMS FIPS 140-3 Level 3認証</li>
+            <li>AWS Blog: Ethereum accounts with KMS</li>
+            <li>AWS KMS Pricing</li>
+            <li>CloudHSM Performance Information</li>
+          </ul>
+        </div>
+        <div class="mb-4">
+          <h4 class="mb-2 font-bold text-gray-800">GCP Cloud KMS</h4>
+          <ul class="space-y-1">
+            <li>GCP Cloud KMS Documentation</li>
+            <li>Cloud HSM Architecture</li>
+            <li>FIPS 140-2 Level 3 Certificate #4399</li>
+            <li>viem-account-hsm-gcp (Valora)</li>
+            <li>GCP KMS Pricing</li>
+          </ul>
+        </div>
+        <div class="mb-4">
+          <h4 class="mb-2 font-bold text-gray-800">Safe（旧Gnosis Safe）</h4>
+          <ul class="space-y-1">
+            <li>Safe公式サイト - safe.global</li>
+            <li>Safe Documentation - docs.safe.global</li>
+            <li>Messari: State of Safe Q1 2025</li>
+            <li>Cyfrin: Bybit Exploit Analysis</li>
+            <li>Ethereum Foundation Treasury Migration</li>
+            <li>Safe Global Revenue Report 2025</li>
+          </ul>
+        </div>
+        <div class="mb-4">
+          <h4 class="mb-2 font-bold text-gray-800">OpenZeppelin Defender</h4>
+          <ul class="space-y-1">
+            <li>OpenZeppelin Defender Docs</li>
+            <li>Defender Sunset Announcement (2025/6)</li>
+            <li>Defender Sunset FAQ</li>
+            <li>OZ OSS Relayer/Monitor Release</li>
+          </ul>
+        </div>
+        <div class="mb-4">
+          <h4 class="mb-2 font-bold text-gray-800">HashiCorp Vault</h4>
+          <ul class="space-y-1">
+            <li>HashiCorp Vault Documentation</li>
+            <li>vault-plugin-secrets-ethsign (Kaleido)</li>
+            <li>quorum-hashicorp-vault-plugin (ConsenSys)</li>
+            <li>IBM HashiCorp買収 ($6.4B, 2024)</li>
+            <li>Vault Performance Benchmark (Medium)</li>
+            <li>BSL License FAQ</li>
+          </ul>
+        </div>
+        <div class="mb-4">
+          <h4 class="mb-2 font-bold text-gray-800">業界レポート・分析</h4>
+          <ul class="space-y-1">
+            <li>NCC Group: Bybit Hack Technical Analysis</li>
+            <li>BleepingComputer: Lazarus Hack Report</li>
+            <li>Infisical: HashiCorp Vault Pricing Guide</li>
+            <li>StablecoinInsider: Dfns Complete Review</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="mt-16 border-t border-gray-200 pt-6 text-center">
+        <p class="text-xs text-gray-400">
+          DApps運営秘密鍵管理ソリューション 比較レポート | 2026年3月
+        </p>
+        <p class="mt-1 text-xs text-gray-400">
+          本レポートは公開情報に基づく調査であり、投資助言を構成するものではありません。
+        </p>
+        <p class="mt-1 text-xs text-gray-400">Generated with Claude Code</p>
+      </div>
+    </div>
+  </body>
+</html>
