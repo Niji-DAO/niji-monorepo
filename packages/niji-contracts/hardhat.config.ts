@@ -57,6 +57,15 @@ const config: HardhatUserConfig = {
       hardfork: 'cancun', // Pin to Cancun — Hardhat 2.28+ defaults to Fusaka which caps tx gas at 16M (EIP-7825)
       blockGasLimit: 300_000_000, // 300M — elevated for gas benchmarking (NijiGas.test.ts)
     },
+    localhost: {
+      url: 'http://127.0.0.1:8547',
+      chainId: 31337,
+      // anvil の default account 0 の private key (chain 31337 / anvil 標準鍵)
+      accounts: [
+        process.env.WALLET_PRIVATE_KEY ||
+          '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
+      ],
+    },
   },
   etherscan: {
     apiKey: {

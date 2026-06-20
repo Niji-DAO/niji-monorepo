@@ -10,18 +10,31 @@
 }
 
 .navBarLogo {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  object-fit: contain;
 }
 
 .navBarCustom {
   padding-bottom: 1rem;
 }
 
+/* React Bootstrap の <Navbar.Collapse> が controlled expanded=false で
+   visibility: collapse を残してしまい右半分が見えなくなる問題の workaround。
+   1200px 以上 (xl breakpoint) では visibility:visible を強制する。 */
+@media (min-width: 1200px) {
+  .navBarCustom :global(.navbar-collapse) {
+    visibility: visible !important;
+  }
+}
+
 @media (max-width: 992px) {
   .navBarLogo {
-    width: 75px;
-    height: 75px;
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    object-fit: contain;
   }
 
   .navBarCustom {
@@ -84,6 +97,30 @@
 .testnetImg {
   width: auto;
   height: 45px;
+}
+
+.navGroupRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.testnetBadge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  background-color: #ff2261;
+  color: #ffffff;
+  font-family: 'PT Root UI', sans-serif;
+  font-weight: bold;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  border-radius: 6px;
+  line-height: 1;
+  vertical-align: middle;
+  user-select: none;
 }
 
 .addressNavLink {

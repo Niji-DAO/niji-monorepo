@@ -125,7 +125,9 @@ export const useNounSeed = (nounId: bigint): INounSeed | undefined => {
   const seeds = useNounSeeds();
   const seed = seeds?.[Number(nounId)];
 
+  // wallet 未接続でも default chain で seed を取得できるよう chainId を明示する。
   const { data: response } = useReadNijiTokenSeeds({
+    chainId: defaultChain.id,
     args: [nounId],
     query: { enabled: !seed },
   });

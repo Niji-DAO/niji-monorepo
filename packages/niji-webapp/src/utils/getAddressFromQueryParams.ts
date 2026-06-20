@@ -3,14 +3,13 @@ import { isAddress } from 'viem';
 /**
  * Get address from query param
  *
- * @param paramName query param name i.e. for the URL nouns.wtf/delegate?to=0xabv... to would be the paramName
- * @param useLocationResult string returned by react-router-v5 useLocation
+ * @param paramName query param name e.g. for the URL `/delegate?to=0xabc...` `to` is the paramName
+ * @param useLocationResult string returned by react-router useLocation
  */
 export const getAddressFromQueryParams = (
   paramName: string,
   useLocationResult: string,
 ): string | undefined => {
-  console.log(useLocationResult);
   const splitLocationResult = useLocationResult
     .split('=')
     .map((s: string) => s.replace('?', '').replace('&', ''));

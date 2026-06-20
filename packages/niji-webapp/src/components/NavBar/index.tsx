@@ -1,6 +1,13 @@
 import { useState } from 'react';
 
-import { faFile, faPenToSquare, faPlay, faUsers } from '@fortawesome/free-solid-svg-icons';
+import {
+  faFaucetDrip,
+  faFile,
+  faHouse,
+  faPenToSquare,
+  faPlay,
+  faUsers,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
 import { nijiTreasuryAddress, useReadNijiTreasuryBalancesInEth } from '@niji/sdk/react';
@@ -11,8 +18,7 @@ import { Link, useLocation } from 'react-router';
 import { formatEther } from 'viem';
 
 import NogglesIcon from '@/assets/icons/Noggles.svg?react';
-import NogglesLogo from '@/assets/noggles.svg?react';
-import testnetNoun from '@/assets/testnet-noun.png';
+import nijiLogo from '@/assets/niji-lp/fav_180.png';
 import NavBarButton, { NavBarButtonStyle } from '@/components/NavBarButton';
 import NavBarTreasury from '@/components/NavBarTreasury';
 import NavDropdown from '@/components/NavDropdown';
@@ -38,10 +44,7 @@ const NavBar = () => {
   const location = useLocation();
   const treasuryBalance = useReadNijiTreasuryBalancesInEth({
     query: {
-      select: (data: { total: bigint }) => {
-        console.log(data);
-        return data.total;
-      },
+      select: (data: { total: bigint }) => data.total,
     },
   }).data;
   const daoEtherscanLink = buildEtherscanAddressLink(nijiTreasuryAddress[chainId]);
@@ -96,19 +99,17 @@ const NavBar = () => {
         expand="xl"
         style={{ backgroundColor: `${useStateBg ? stateBgColor : 'white'}` }}
         className={classes.navBarCustom}
-        expanded={isNavExpanded}
+        // `expanded` を渡すと controlled mode になり、 React Bootstrap の expand="xl"
+        // (1200px 以上で自動展開) が無効化される。 viewport 1440px の desktop でも
+        // navbar-collapse が `visibility: collapse` で残ってしまい右半分が消える。
+        // mobile toggle は Navbar.Toggle の onClick で setIsNavExpanded を呼び、
+        // 表示状態は uncontrolled に bootstrap CSS query に委ねる方が安全。
       >
         <Container style={{ maxWidth: 'unset' }}>
           <div className={classes.brandAndTreasuryWrapper}>
             <Navbar.Brand as={Link} to="/" className={classes.navBarBrand}>
-              <NogglesLogo className={classes.navBarLogo} aria-label="Niji DAO noggles" />
+              <img src={nijiLogo} className={classes.navBarLogo} alt="Niji DAO" />
             </Navbar.Brand>
-            {Number(CHAIN_ID) !== 1 && (
-              <Nav.Item>
-                <img className={classes.testnetImg} src={testnetNoun} alt="testnet noun" />
-                TESTNET
-              </Nav.Item>
-            )}
             <Nav.Item>
               {treasuryBalance !== undefined ? (
                 <Nav.Link
@@ -132,6 +133,32 @@ const NavBar = () => {
           />
           <Navbar.Collapse className="justify-content-end z-10">
             <div className={clsx(responsiveUiUtilsClasses.mobileOnly)}>
+              {Number(CHAIN_ID) !== 1 && (
+                <span className={classes.testnetBadge} aria-label="testnet">
+                  TESTNET
+                </span>
+              )}
+              <Nav.Link href="/lp/" className={classes.nounsNavLink} onClick={closeNav}>
+                <NavBarButton
+                  buttonText={<Trans>LP</Trans>}
+                  buttonIcon={<FontAwesomeIcon icon={faHouse} />}
+                  buttonStyle={nonWalletButtonStyle}
+                />
+              </Nav.Link>
+              {Number(CHAIN_ID) === 31337 && (
+                <Nav.Link
+                  as={Link}
+                  to="/faucet"
+                  className={classes.nounsNavLink}
+                  onClick={closeNav}
+                >
+                  <NavBarButton
+                    buttonText={<Trans>Faucet</Trans>}
+                    buttonIcon={<FontAwesomeIcon icon={faFaucetDrip} />}
+                    buttonStyle={nonWalletButtonStyle}
+                  />
+                </Nav.Link>
+              )}
               <Nav.Link as={Link} to="/vote" className={classes.nounsNavLink} onClick={closeNav}>
                 <NavBarButton
                   buttonText={isDaoGteV3 ? <Trans>Proposals</Trans> : <Trans>DAO</Trans>}
@@ -158,7 +185,28 @@ const NavBar = () => {
                 </>
               )}
             </div>
-            <div className={clsx(responsiveUiUtilsClasses.desktopOnly)}>
+            <div className={clsx(responsiveUiUtilsClasses.desktopOnly, classes.navGroupRow)}>
+              {Number(CHAIN_ID) !== 1 && (
+                <span className={classes.testnetBadge} aria-label="testnet">
+                  TESTNET
+                </span>
+              )}
+              <Nav.Link href="/lp/" className={classes.nounsNavLink}>
+                <NavBarButton
+                  buttonText={<Trans>LP</Trans>}
+                  buttonIcon={<FontAwesomeIcon icon={faHouse} />}
+                  buttonStyle={nonWalletButtonStyle}
+                />
+              </Nav.Link>
+              {Number(CHAIN_ID) === 31337 && (
+                <Nav.Link as={Link} to="/faucet" className={classes.nounsNavLink}>
+                  <NavBarButton
+                    buttonText={<Trans>Faucet</Trans>}
+                    buttonIcon={<FontAwesomeIcon icon={faFaucetDrip} />}
+                    buttonStyle={nonWalletButtonStyle}
+                  />
+                </Nav.Link>
+              )}
               {isDaoGteV3 ? (
                 v3DaoNavItem
               ) : (
@@ -208,6 +256,18 @@ const NavBar = () => {
                   buttonStyle={nonWalletButtonStyle}
                 />
               </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/crystal-ball"
+                className={clsx(classes.nounsNavLink, classes.exploreButton)}
+                onClick={closeNav}
+              >
+                <NavBarButton
+                  buttonText={<Trans>Crystal Ball</Trans>}
+                  buttonIcon={<NogglesIcon />}
+                  buttonStyle={nonWalletButtonStyle}
+                />
+              </Nav.Link>
             </div>
             <div className={clsx(responsiveUiUtilsClasses.desktopOnly)}>
               <NavDropdown
@@ -250,6 +310,18 @@ const NavBar = () => {
                   href="/playground"
                 >
                   Playground
+                </Dropdown.Item>
+                <Dropdown.Item
+                  className={clsx(
+                    usePickByState(
+                      navDropdownClasses.whiteInfoSelectedBottom,
+                      navDropdownClasses.coolInfoSelected,
+                      navDropdownClasses.warmInfoSelected,
+                    ),
+                  )}
+                  href="/crystal-ball"
+                >
+                  Crystal Ball 🔮
                 </Dropdown.Item>
               </NavDropdown>
             </div>

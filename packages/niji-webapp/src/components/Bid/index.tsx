@@ -173,8 +173,8 @@ const Bid: React.FC<BidProps> = props => {
   const isDisabled = isPlacingBid || isSettlingAuction || !activeAccount;
 
   const crytalBallBtnOnClickHandler = () => {
-    // Open Crystal Ball in a new tab
-    window.open('https://www.nouns.game/crystal-ball', '_blank', 'noopener,noreferrer')?.focus();
+    // Niji 自前の Crystal Ball page (/crystal-ball) を新タブで開く
+    window.open('/crystal-ball', '_blank', 'noopener,noreferrer')?.focus();
   };
 
   const isWalletConnected = activeAccount !== undefined;

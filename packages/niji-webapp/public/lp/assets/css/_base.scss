@@ -1,0 +1,199 @@
+@use "foundation/import" as i;
+@use "foundation/mixin" as m;
+
+
+/* 共通
+------------------------------------------------------------*/
+
+html {
+    font-size: 62.5%;
+    overflow-x: hidden;
+}
+
+body {
+	font-family: i.$font-family;
+    background: i.$color-bg;
+    overflow-x: hidden;
+}
+
+html>/**/body {
+	@include m.fz(16);
+    color: i.$color-text;
+    line-height: 2.0;
+    font-feature-settings: "palt";
+}
+
+img {
+    display: block;
+    width: 100%;
+}
+
+
+/* link
+------------------------------------------------------------*/
+
+a,button {
+	transition: all .4s;
+}
+
+/* a:hover,a:active,button:hover{
+     opacity: 0.5;
+} */
+
+a {
+    color: i.$color-link;
+    text-decoration: underline;
+
+    &:hover, &:active {
+        opacity: 0.5;
+
+        @include m.mq('md'){
+            opacity: 1 !important;
+        }
+    }
+
+    button {
+
+        &:hover, &:active {
+            opacity: 0.5;
+
+            @include m.mq('md'){
+                opacity: 1 !important;
+            }
+        }
+    }
+}
+
+a img {
+	transition: all .4s;
+}
+
+.hover-highlight {
+
+    &:hover {
+        opacity: 1;
+        filter: brightness(70%) contrast(140%);
+    }
+}
+
+
+
+/* 表示・非表示
+------------------------------------------------------------*/
+
+.pc {
+    display: block !important;
+}
+
+.sp {
+    display: none !important;
+}
+
+.pc {
+    @include m.mq('lg'){
+        display: none !important;
+    }
+}
+
+.sp {
+    @include m.mq('lg'){
+        display: block !important;
+    }
+}
+
+
+/* 改行
+------------------------------------------------------------*/
+
+.br-pc {
+    @include m.mq('lg'){
+
+        &::before {
+            content: "\A" ;
+            white-space: pre ;
+        }
+    }
+}
+
+.br_sp {
+    @include m.mq('pc'){
+
+        &::before {
+            content: "\A" ;
+            white-space: pre ;
+        }
+    }
+}
+
+
+/* 共通
+------------------------------------------------------------*/
+
+.txt-c {
+    text-align: center;
+}
+
+.txt-r {
+    text-align: right;
+}
+
+.txt-sm {
+    @include m.fz(12);
+}
+
+.color-accent {
+    color: i.$color-accent;
+}
+
+ul.sup {
+    margin: 0 0 0 1.1em;
+    padding: 1vw 0 0 !important;
+
+    li {
+
+        &::before {
+            margin: 0 0 0 -1.1em;
+            content: "※";
+        }
+    }
+    
+    @include m.mq('xl'){
+        padding: 2vw 0 0 !important;
+    }
+    @include m.mq('md'){
+        padding: 4vw 0 0 !important;
+        @include m.fz(12);
+    }
+}
+
+.video-wrapper {
+    margin: 0 auto;
+    padding: 6vw 0 0;
+    max-width: 900px;
+
+    @include m.mq('lg'){
+        padding: 12vw 0 0;
+    }
+}
+
+#video {
+    top:0;
+    width: 100%;
+    
+}
+
+.strong {
+    font-weight: bold;
+    color: i.$color-main;
+}
+
+.clearfix {
+	display:inline-block;
+    &::after {
+	content:".";
+	display:block;
+	clear:both;
+	height:0;
+	visibility:hidden;
+    }
+}

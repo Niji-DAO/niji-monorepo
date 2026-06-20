@@ -22,7 +22,12 @@ i18n.cache
 .context/
 
 # niji encoder working copy of source images (13MB, regeneratable)
-packages/nouns-assets/_archive/work/
+packages/niji-assets/_archive/work/
 
 # niji deploy artifacts (deploy log JSON kept selectively, but render PNG / SVG / metadata are large)
-packages/nouns-contracts/deploy/
+packages/niji-contracts/deploy/
+
+# generated test outputs / playwright traces / forge artifacts
+packages/niji-assets/test_output/
+packages/niji-webapp/test-results/
+packages/niji-contracts/test-results/

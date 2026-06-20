@@ -1,0 +1,150 @@
+@use "../foundation/import" as i;
+@use "../foundation/mixin" as m;
+
+header {
+
+	h1 {
+		width: 230px;
+		height: 230px;
+		background-color: i.$color-accent;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: fixed;
+		top: 0;
+		left: 0;
+		transition: all .4s;
+		z-index: 1000;
+
+		&:hover {
+			cursor: pointer;
+		}
+
+		@include m.mq('lg'){
+			width: 24vw;
+			height: 24vw;
+		}
+
+		img {
+			width: 90px;
+
+			@include m.mq('lg'){
+				width: 60%;
+			}
+		}
+
+		.arrow {
+			position: absolute;
+			width: 10px;
+			bottom: 14px;
+			opacity: 0;
+		}
+	}
+
+	.active {
+
+		.arrow {
+			opacity: 1;
+		}
+	}
+
+	.header_r {
+		padding: 24px;
+		position: fixed;
+		right: 0;
+		z-index: 200;
+		width: 100%;
+		display: flex;
+		justify-content: flex-end;
+		gap: 20px;
+
+		@include m.mq('lg'){
+			position: absolute;
+		}
+	}
+
+	.launch_bt {
+		padding: 10px 26px;
+		border-radius: 6px;
+		background: i.$color-accent;
+		color: #fff;
+		text-decoration: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 900;
+
+		@include m.mq('lg'){
+			padding: 6px 20px;
+			font-size: 14px;
+		}
+	}
+
+	.tw {
+		display: block;
+		width: 53px;
+
+		@include m.mq('lg'){
+			width: 40px;
+		}
+
+		img {
+			width: 100%;
+			display: block;
+		}
+	}
+}
+
+.open {
+
+	.menu {
+		transition: all .5s;
+		visibility: visible;
+		opacity: 1;
+	}
+}
+
+.menu {
+	position: fixed;
+	display: table;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	min-width: 100%;
+	min-height: 100%;
+	-webkit-transition: all .5s;
+	transition: all .5s;
+	visibility: hidden;
+	opacity: 0;
+	z-index: 1000;
+
+	.menuInner {
+		display: table-cell;
+		vertical-align: middle;
+		text-align: left;
+
+		ul {
+			text-align: left;
+			letter-spacing: 2px;
+
+			li {
+
+				a {
+					margin: 2px 0;
+					padding: 0 10px;
+					color: #fff;
+					text-align: left;
+					text-decoration: none;
+					background: i.$color-main;
+					display: inline-block;
+					@include m.fz(18);
+
+					@include m.mq('lg'){
+						@include m.fz(14);
+					}
+				}
+			}
+		}
+	}
+}

@@ -5,7 +5,6 @@ import { isNumber } from 'remeda';
 
 import Auction from '@/components/Auction';
 import Documentation from '@/components/Documentation';
-import NijisIntroSection from '@/components/NijisIntroSection';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { setOnDisplayAuctionNounId } from '@/state/slices/onDisplayAuction';
 import { nounPath } from '@/utils/history';
@@ -52,7 +51,6 @@ const AuctionPage: React.FC<AuctionPageProps> = () => {
   return (
     <>
       <Auction auction={onDisplayAuction} />
-      <NijisIntroSection />
       <Documentation backgroundColor={backgroundColor} />
     </>
   );

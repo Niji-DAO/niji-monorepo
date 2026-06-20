@@ -60,7 +60,7 @@ const Holder: React.FC<HolderProps> = props => {
     </a>
   );
 
-  const nounderNounContent = 'nounders.eth';
+  const nounderNounContent = 'niji.eth';
 
   return (
     <>

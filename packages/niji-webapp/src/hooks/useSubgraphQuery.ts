@@ -2,6 +2,7 @@ import type { TypedDocumentString } from '@/subgraphs/graphql';
 
 import { useQuery } from '@tanstack/react-query';
 
+import config from '@/config';
 import { execute } from '@/subgraphs/execute';
 
 interface UseSubgraphQueryOptions<TResult, TVariables> {
@@ -19,6 +20,9 @@ export function useSubgraphQuery<TResult, TVariables>({
   enabled = true,
   refetchInterval,
 }: UseSubgraphQueryOptions<TResult, TVariables>) {
+  // subgraph endpoint が空なら query を発火させない (local 31337 で subgraph 未起動時)
+  const subgraphEnabled = !!config.app.subgraphApiUri;
+
   const result = useQuery({
     queryKey,
     queryFn: () => {
@@ -28,7 +32,7 @@ export function useSubgraphQuery<TResult, TVariables>({
       ) => Promise<TResult>;
       return exec(document, variables);
     },
-    enabled,
+    enabled: enabled && subgraphEnabled,
     refetchInterval: refetchInterval ?? false,
   });
 

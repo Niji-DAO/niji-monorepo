@@ -21,9 +21,11 @@ import CandidatePage from '@/pages/Candidate';
 import CandidateHistoryPage from '@/pages/CandidateHistoryPage';
 import CreateCandidatePage from '@/pages/CreateCandidate';
 import CreateProposalPage from '@/pages/CreateProposal';
+import CrystalBallPage from '@/pages/CrystalBall';
 import DelegatePage from '@/pages/DelegatePage';
 import EditCandidatePage from '@/pages/EditCandidate';
 import EditProposalPage from '@/pages/EditProposal';
+import FaucetPage from '@/pages/Faucet';
 import ForkPage from '@/pages/Fork';
 import ForksPage from '@/pages/Forks';
 import GovernancePage from '@/pages/Governance';
@@ -84,6 +86,8 @@ function App() {
           <Route path="/fork" element={<ForksPage />} />
           <Route path="/brand" element={<BrandAssetsPage />} />
           <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/crystal-ball" element={<CrystalBallPage />} />
+          {Number(CHAIN_ID) === 31337 && <Route path="/faucet" element={<FaucetPage />} />}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <Footer />

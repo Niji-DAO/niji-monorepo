@@ -74,7 +74,6 @@ import {
   parseAbiItem,
   stringToBytes,
 } from 'viem';
-import { mainnet } from 'viem/chains';
 import { useAccount, useBlockNumber, usePublicClient, useReadContracts } from 'wagmi';
 
 import { useBlockTimestamp } from '@/hooks/useBlockTimestamp';
@@ -543,9 +542,9 @@ export function useFormattedProposalCreatedLogs(skip: boolean, fromBlockOverride
   let fromBlock: bigint;
   if (fromBlockOverride != null) {
     fromBlock = BigInt(fromBlockOverride);
-  } else if (chainId === mainnet.id) {
-    fromBlock = 12985453n;
   } else {
+    // anvil (31337) / Base Sepolia (84532) は genesis から logs を取れるので 0n。
+    // 旧 Nouns mainnet 開始ブロック (12985453n) は撤廃済。
     fromBlock = 0n;
   }
 

@@ -22,7 +22,7 @@ const NijiInfoRowHolder: React.FC<NounInfoRowHolderProps> = props => {
   const { nounId, className } = props;
 
   const { isLoading, error, data } = useQuery({
-    queryKey: ['auction', nounId],
+    queryKey: ['auction', nounId.toString()],
     queryFn: () => execute(auctionQuery, { id: nounId.toString() }),
   });
 

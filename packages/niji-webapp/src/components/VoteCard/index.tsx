@@ -82,7 +82,10 @@ const VoteCard: React.FC<VoteCardProps> = props => {
         return;
       }
 
-      lookupNNSOrENS(publicClient, delegateInfo.delegate)
+      // viem PublicClient generic 型がチェーン縮小で wagmi 戻り値型と一致しないため as any で迂回
+      // (実体は同じ PublicClient、 単に型推論の問題)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      lookupNNSOrENS(publicClient as any, delegateInfo.delegate)
         .then(name => {
           // Store data as mapping of address_Expiration => address or ENS
           if (name) {
