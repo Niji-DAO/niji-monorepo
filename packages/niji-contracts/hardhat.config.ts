@@ -58,7 +58,7 @@ const config: HardhatUserConfig = {
       blockGasLimit: 300_000_000, // 300M — elevated for gas benchmarking (NijiGas.test.ts)
     },
     localhost: {
-      url: 'http://127.0.0.1:8545',
+      url: 'http://127.0.0.1:8547',
       chainId: 31337,
       // anvil の default account 0 の private key (chain 31337 / anvil 標準鍵)
       accounts: [

@@ -49,6 +49,11 @@ msgstr ""
 msgid "Update proposal"
 msgstr ""
 
+#: src/components/VoteSignals/VoteSignals.tsx
+#: src/components/VoteSignals/VoteSignals.tsx
+msgid "Nijis voters can cast voting signals to give proposers of pending proposals an idea of how they intend to vote and helpful guidance on proposal changes to change their vote."
+msgstr ""
+
 #: src/components/ProposalHeader/index.tsx
 msgid "You voted <0>Against</0> this proposal"
 msgstr ""
@@ -80,8 +85,8 @@ msgid "Proposal functions"
 msgstr ""
 
 #: src/components/CandidateSponsors/index.tsx
-msgid "Proposal candidates must meet the required Nouns vote threshold."
-msgstr ""
+#~ msgid "Proposal candidates must meet the required Nouns vote threshold."
+#~ msgstr ""
 
 #: src/components/Documentation/index.tsx
 #: src/components/Footer.tsx
@@ -121,10 +126,9 @@ msgstr ""
 msgid "Treasury"
 msgstr ""
 
-#. placeholder {0}: i18n.number(availableVotes)
 #: src/components/VoteModal/index.tsx
-msgid "Voting with <0>{0}</0> Nouns"
-msgstr ""
+#~ msgid "Voting with <0>{0}</0> Nouns"
+#~ msgstr ""
 
 #: src/pages/Vote/index.tsx
 msgid "Ended"
@@ -140,8 +144,8 @@ msgid "Candidates"
 msgstr ""
 
 #: src/components/CurrentDelegatePannel/index.tsx
-msgid "Noun votes are not transferable, but are <0>delegatable</0>, which means you can assign your vote to someone else as long as you own your Noun."
-msgstr ""
+#~ msgid "Noun votes are not transferable, but are <0>delegatable</0>, which means you can assign your vote to someone else as long as you own your Noun."
+#~ msgstr ""
 
 #: src/components/ProposalActionsModal/steps/FunctionCallEnterArgsStep/index.tsx
 msgid "Invalid Arguments"
@@ -162,6 +166,10 @@ msgstr ""
 
 #: src/components/ProposalContent/index.tsx
 msgid "This proposal interacts with the <0>original treasury</0>"
+msgstr ""
+
+#: src/components/Proposals/index.tsx
+msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nijis voters, it can be promoted to a proposal."
 msgstr ""
 
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
@@ -213,8 +221,8 @@ msgid "Awaiting signature"
 msgstr ""
 
 #: src/components/NijiContent/index.tsx
-msgid "For this reason, we, the project's founders (‘Nounders’) have chosen to compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to Nounders."
-msgstr ""
+#~ msgid "For this reason, we, the project's founders (‘Nounders’) have chosen to compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to Nounders."
+#~ msgstr ""
 
 #. placeholder {0}: nounId.toString()
 #: src/components/AuctionActivityNijiTitle/index.tsx
@@ -223,6 +231,10 @@ msgstr ""
 
 #: src/components/Proposals/index.tsx
 msgid "Making a proposal requires {threshold} votes"
+msgstr ""
+
+#: src/components/AddNijisToForkModal/index.tsx
+msgid "Add as many or as few of your Nijis as you’d like. Additional Nijis can be added during the escrow and forking periods."
 msgstr ""
 
 #: src/components/ProposalActionsModal/steps/SelectProposalActionStep/index.tsx
@@ -281,12 +293,12 @@ msgid "Bids for"
 msgstr ""
 
 #: src/pages/CreateCandidate/index.tsx
-msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nouns voters, it can be promoted to a proposal. "
-msgstr ""
+#~ msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nouns voters, it can be promoted to a proposal. "
+#~ msgstr ""
 
 #: src/components/DynamicQuorumInfoModal/index.tsx
-msgid "The Threshold (minimum number of For votes required to pass a proposal) is set as a function of the number of Against votes a proposal has received. It increases linearly as a function of the % of Nouns voting against a prop, varying between Min Threshold and Max Threshold."
-msgstr ""
+#~ msgid "The Threshold (minimum number of For votes required to pass a proposal) is set as a function of the number of Against votes a proposal has received. It increases linearly as a function of the % of Nouns voting against a prop, varying between Min Threshold and Max Threshold."
+#~ msgstr ""
 
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Go to playground"
@@ -297,8 +309,8 @@ msgid "or more"
 msgstr ""
 
 #: src/pages/Playground/index.tsx
-msgid "Nouns Protocol"
-msgstr ""
+#~ msgid "Nouns Protocol"
+#~ msgstr ""
 
 #: src/components/Documentation/index.tsx
 msgid "Niji artwork is in the {publicDomainLink}."
@@ -328,11 +340,15 @@ msgid "You have no votes."
 msgstr ""
 
 #: src/components/CandidateSponsors/index.tsx
-msgid "Sponsoring a proposal requires at least one Noun vote"
-msgstr ""
+#~ msgid "Sponsoring a proposal requires at least one Noun vote"
+#~ msgstr ""
 
 #: src/components/StreamWithdrawModal/index.tsx
 msgid "You've successfully withdrawn {withdrawAmount} {unitForDisplay} to your wallet"
+msgstr ""
+
+#: src/pages/CreateCandidate/index.tsx
+msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nijis voters, it can be promoted to a proposal. "
 msgstr ""
 
 #: src/components/Documentation/index.tsx
@@ -399,6 +415,10 @@ msgstr ""
 msgid "Queue"
 msgstr ""
 
+#: src/components/CurrentDelegatePannel/index.tsx
+msgid "Niji votes are not transferable, but are <0>delegatable</0>, which means you can assign your vote to someone else as long as you own your Niji."
+msgstr ""
+
 #: src/components/Documentation/index.tsx
 msgid "CryptoPunks"
 msgstr ""
@@ -411,6 +431,11 @@ msgstr ""
 msgid "You can experiment with off-chain Niji generation at the {playgroundLink}."
 msgstr ""
 
+#. placeholder {0}: i18n.number(availableVotes)
+#: src/components/VoteModal/index.tsx
+msgid "Voting with <0>{0}</0> Nijis"
+msgstr ""
+
 #. placeholder {0}: i18n.number(Number(proposalId || '0'))
 #: src/components/VoteModal/index.tsx
 msgid "You've successfully voted on on prop {0}"
@@ -418,7 +443,12 @@ msgstr ""
 
 #: src/components/VoteSignals/VoteSignals.tsx
 #: src/components/VoteSignals/VoteSignals.tsx
-msgid "Nouns voters can cast voting signals to give proposers of pending proposals an idea of how they intend to vote and helpful guidance on proposal changes to change their vote."
+#~ msgid "Nouns voters can cast voting signals to give proposers of pending proposals an idea of how they intend to vote and helpful guidance on proposal changes to change their vote."
+#~ msgstr ""
+
+#: src/components/NavBar/index.tsx
+#: src/components/NavBar/index.tsx
+msgid "Faucet"
 msgstr ""
 
 #: src/components/VoteModal/index.tsx
@@ -437,6 +467,10 @@ msgstr ""
 #. placeholder {0}: mins + 1
 #: src/components/SettleManuallyBtn/index.tsx
 msgid "You can settle manually in {0} minutes"
+msgstr ""
+
+#: src/components/NijisIntroSection/index.tsx
+msgid "Nijispot"
 msgstr ""
 
 #: src/pages/Candidate/index.tsx
@@ -467,8 +501,8 @@ msgid "Create Proposal"
 msgstr ""
 
 #: src/components/ByLineHoverCard/index.tsx
-msgid "<0>Delegated Noun: </0>"
-msgstr ""
+#~ msgid "<0>Delegated Noun: </0>"
+#~ msgstr ""
 
 #: src/components/ProposalHeader/index.tsx
 msgid "You voted <0>For</0> this proposal"
@@ -500,16 +534,28 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#: src/components/CandidateSponsors/index.tsx
+msgid "Sponsoring a proposal requires at least one Niji vote"
+msgstr ""
+
 #: src/components/CandidateSponsors/SignatureForm.tsx
 msgid "Signature request"
 msgstr ""
 
-#: src/components/Proposals/index.tsx
-msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nouns voters, it can be promoted to a proposal."
+#: src/components/ByLineHoverCard/index.tsx
+msgid "<0>Delegated Nijis: </0>"
 msgstr ""
+
+#: src/components/Proposals/index.tsx
+#~ msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nouns voters, it can be promoted to a proposal."
+#~ msgstr ""
 
 #: src/components/Documentation/index.tsx
 msgid "The Niji Auction Contract will act as a self-sufficient Niji generation and distribution mechanism, auctioning one Niji every 24 hours, forever. 100% of auction proceeds (ETH) are automatically deposited in the Niji DAO treasury, where they are governed by Niji owners."
+msgstr ""
+
+#: src/pages/Playground/index.tsx
+msgid "The playground was built using the {nijiProtocolLink}. Niji's traits are determined by the Niji Seed. The seed was generated using {nijiAssetsLink} and rendered using the {nijiSDKLink}."
 msgstr ""
 
 #: src/components/ProposalActionsModal/steps/FunctionCallReviewStep/index.tsx
@@ -541,6 +587,15 @@ msgstr ""
 msgid "Remove sponsorship"
 msgstr ""
 
+#. placeholder {0}: i18n.date(new Date(proposalCreationTimestamp * 1000), { dateStyle: 'long', timeStyle: 'long', })
+#: src/components/ProposalHeader/index.tsx
+msgid "Only Nijis you owned or were delegated to you before {0} are eligible to vote."
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "Nijider distributions don't interfere with the cadence of 24 hour auctions. Nijis are sent directly to the Nijider's Multisig, and auctions continue on schedule with the next available Niji ID."
+msgstr ""
+
 #: src/components/CandidateSponsors/Signature.tsx
 msgid "Re-signed"
 msgstr ""
@@ -567,8 +622,8 @@ msgid "Version"
 msgstr ""
 
 #: src/components/Documentation/index.tsx
-msgid "Nounder's Reward"
-msgstr ""
+#~ msgid "Nounder's Reward"
+#~ msgstr ""
 
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Download official Niji DAO brand assets including our iconic noggles in various formats."
@@ -576,6 +631,14 @@ msgstr ""
 
 #: src/components/Holder/index.tsx
 msgid "Held by"
+msgstr ""
+
+#: src/pages/Nounders/index.tsx
+msgid "The Nijiders"
+msgstr ""
+
+#: src/components/NijiContent/index.tsx
+msgid "送信中…"
 msgstr ""
 
 #: src/pages/Candidate/index.tsx
@@ -598,6 +661,10 @@ msgstr ""
 #: src/components/NijiContent/index.tsx
 #: src/pages/Governance/index.tsx
 msgid "Niji DAO"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "Nijider's Reward"
 msgstr ""
 
 #: src/pages/Vote/index.tsx
@@ -631,14 +698,20 @@ msgid "Did not re-sign"
 msgstr ""
 
 #: src/pages/Nounders/index.tsx
-msgid "The Nounders"
-msgstr ""
+#~ msgid "The Nounders"
+#~ msgstr ""
 
 #. placeholder {0}: candidate?.proposalIdToUpdate
 #: src/pages/Candidate/index.tsx
 msgid "<0>Note: </0>This candidate is an update to <1>Proposal {0}</1>."
 msgstr ""
 
+#. placeholder {0}: forkThreshold == null ? '...' : forkThreshold
+#. placeholder {1}: forkThresholdBPS != null ? forkThresholdBPS / 100 : '...'
+#: src/pages/Fork/index.tsx
+msgid "More than {0} Nijis ({1}% of the DAO) are required to pass the threshold"
+msgstr ""
+
 #: src/components/AddNijisToForkModal/index.tsx
 #: src/components/AddNijisToForkModal/index.tsx
 #: src/components/AddNijisToForkModal/index.tsx
@@ -649,6 +722,7 @@ msgstr ""
 #: src/components/CandidateSponsors/SelectSponsorsToPropose.tsx
 #: src/components/CandidateSponsors/SubmitUpdateProposal.tsx
 #: src/components/CandidateSponsors/SubmitUpdateProposal.tsx
+#: src/components/NijiContent/index.tsx
 #: src/components/VoteModal/index.tsx
 #: src/components/VoteModal/index.tsx
 #: src/components/VoteSignals/VoteSignals.tsx
@@ -711,10 +785,18 @@ msgstr ""
 msgid "You provided <0>{0}</0> feedback {1}"
 msgstr ""
 
+#: src/components/NijiContent/index.tsx
+msgid "For this reason, we, the project's founders (‘Nijiders’) have chosen to compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to Nijiders."
+msgstr ""
+
 #: src/components/VoteCard/index.tsx
 #: src/components/VoteModal/index.tsx
 #: src/components/VoteSignals/VoteSignals.tsx
 msgid "Against"
+msgstr ""
+
+#: src/pages/Nounders/index.tsx
+msgid "The Nijiders reward is intended as compensation for our pre and post-launch contributions to the project, and to help us participate meaningfully in governance as the project matures. Since there are 10 Nijiders, after 5 years each Nijider could receive up to 1% of the Niji supply."
 msgstr ""
 
 #: src/components/ProposalStatus/index.tsx
@@ -730,11 +812,9 @@ msgstr ""
 msgid "Filename"
 msgstr ""
 
-#. placeholder {0}: forkThreshold == null ? '...' : forkThreshold
-#. placeholder {1}: forkThresholdBPS != null ? forkThresholdBPS / 100 : '...'
 #: src/pages/Fork/index.tsx
-msgid "More than {0} Nouns ({1}% of the DAO) are required to pass the threshold"
-msgstr ""
+#~ msgid "More than {0} Nouns ({1}% of the DAO) are required to pass the threshold"
+#~ msgstr ""
 
 #: src/components/Proposals/index.tsx
 msgid "About Proposal Candidates"
@@ -788,8 +868,8 @@ msgid "Fork"
 msgstr ""
 
 #: src/components/Documentation/index.tsx
-msgid "'Nounders' are the group of ten builders that initiated Niji. Here are the Nounders:"
-msgstr ""
+#~ msgid "'Nounders' are the group of ten builders that initiated Niji. Here are the Nounders:"
+#~ msgstr ""
 
 #: src/components/ProposalActionsModal/steps/StreamPaymentsReviewStep/index.tsx
 msgid "Stream"
@@ -838,8 +918,8 @@ msgid "Nijis govern <0>Niji DAO</0>. Nijis can vote on proposals or delegate the
 msgstr ""
 
 #: src/components/ByLineHoverCard/index.tsx
-msgid "<0>Delegated Nouns: </0>"
-msgstr ""
+#~ msgid "<0>Delegated Nouns: </0>"
+#~ msgstr ""
 
 #: src/components/EditProposalButton/index.tsx
 msgid "Update Proposal Candidate"
@@ -852,6 +932,10 @@ msgstr ""
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 #: src/pages/TraitsPage.tsx
 msgid "License"
+msgstr ""
+
+#: src/pages/TraitsPage.tsx
+msgid "Browse and download all available Niji traits."
 msgstr ""
 
 #: src/components/Proposals/index.tsx
@@ -908,6 +992,10 @@ msgstr ""
 msgid "Forking is the crypto-native way for groups of token holders to exit together into a new instance of their protocol, resulting in maximal conservation of momentum in the ecosystem."
 msgstr ""
 
+#: src/pages/Nounders/index.tsx
+msgid "All Niji auction proceeds are sent to the Niji DAO. For this reason, we, the project's founders (‘Nijiders’) have chosen to compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to individual Nijiders."
+msgstr ""
+
 #: src/pages/Fork/DeployForkButton.tsx
 msgid "Deploy Fork"
 msgstr ""
@@ -950,6 +1038,10 @@ msgstr ""
 msgid "Note"
 msgstr ""
 
+#: src/components/ByLineHoverCard/index.tsx
+msgid "<0>Delegated Niji: </0>"
+msgstr ""
+
 #: src/components/Documentation/index.tsx
 msgid "All Nijis are members of Niji DAO."
 msgstr ""
@@ -985,12 +1077,16 @@ msgid "Updatable"
 msgstr ""
 
 #: src/pages/Nounders/index.tsx
-msgid "The Nounders reward is intended as compensation for our pre and post-launch contributions to the project, and to help us participate meaningfully in governance as the project matures. Since there are 10 Nounders, after 5 years each Nounder could receive up to 1% of the Niji supply."
-msgstr ""
+#~ msgid "The Nounders reward is intended as compensation for our pre and post-launch contributions to the project, and to help us participate meaningfully in governance as the project matures. Since there are 10 Nounders, after 5 years each Nounder could receive up to 1% of the Niji supply."
+#~ msgstr ""
 
 #: src/components/AuctionTimer/index.tsx
 #: src/components/AuctionTimer/index.tsx
 msgid "Auction ended"
+msgstr ""
+
+#: src/components/CandidateSponsors/index.tsx
+msgid "Proposal candidates must meet the required Nijis vote threshold."
 msgstr ""
 
 #: src/components/Proposals/index.tsx
@@ -1020,8 +1116,8 @@ msgid "Your <0>{availableVotes}</0> votes are being delegated to a new account."
 msgstr ""
 
 #: src/components/NijisIntroSection/index.tsx
-msgid "Nounspot"
-msgstr ""
+#~ msgid "Nounspot"
+#~ msgstr ""
 
 #: src/components/Documentation/index.tsx
 msgid "The Niji community has undertaken a preliminary exploration of proposal veto alternatives (‘rage quit’ etc.), but it is now clear that this is a difficult problem that will require significantly more research, development and testing before a satisfactory solution can be implemented."
@@ -1094,12 +1190,12 @@ msgstr ""
 msgid "The Niji Seeder contract is used to determine Niji traits during the minting process. The seeder contract can be replaced to allow for future trait generation algorithm upgrades. Additionally, it can be locked by the Niji DAO to prevent any future updates. Currently, Niji traits are determined using pseudo-random number generation:"
 msgstr ""
 
-#. placeholder {0}: i18n.date(new Date(proposalCreationTimestamp * 1000), { dateStyle: 'long', timeStyle: 'long', })
 #: src/components/ProposalHeader/index.tsx
-msgid "Only Nouns you owned or were delegated to you before {0} are eligible to vote."
-msgstr ""
+#~ msgid "Only Nouns you owned or were delegated to you before {0} are eligible to vote."
+#~ msgstr ""
 
 #: src/components/Bid/index.tsx
+#: src/components/NijiContent/index.tsx
 msgid "Settled auction successfully!"
 msgstr ""
 
@@ -1173,16 +1269,16 @@ msgid "Update Proposal"
 msgstr ""
 
 #: src/pages/Nounders/index.tsx
-msgid "All Niji auction proceeds are sent to the Niji DAO. For this reason, we, the project's founders (‘Nounders’) have chosen to compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to individual Nounders."
-msgstr ""
+#~ msgid "All Niji auction proceeds are sent to the Niji DAO. For this reason, we, the project's founders (‘Nounders’) have chosen to compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to individual Nounders."
+#~ msgstr ""
 
 #: src/components/BidHistoryBtn/index.tsx
 msgid "View all bids"
 msgstr ""
 
 #: src/components/Documentation/index.tsx
-msgid "Because 100% of Niji auction proceeds are sent to Niji DAO, Nounders have chosen to compensate themselves with Nijis. Every 10th Niji for the first 5 years of the project (Niji ids #0, #10, #20, #30 and so on) will be automatically sent to the Nounder's multisig to be vested and shared among the founding members of the project."
-msgstr ""
+#~ msgid "Because 100% of Niji auction proceeds are sent to Niji DAO, Nounders have chosen to compensate themselves with Nijis. Every 10th Niji for the first 5 years of the project (Niji ids #0, #10, #20, #30 and so on) will be automatically sent to the Nounder's multisig to be vested and shared among the founding members of the project."
+#~ msgstr ""
 
 #: src/components/StreamWithdrawModal/index.tsx
 msgid "Withdraw"
@@ -1215,7 +1311,12 @@ msgid "Add Streaming Payment Action"
 msgstr ""
 
 #: src/components/CandidateSponsors/index.tsx
-msgid "This candidate has met the required threshold, but Nouns voters can still add support until it’s put onchain."
+#~ msgid "This candidate has met the required threshold, but Nouns voters can still add support until it’s put onchain."
+#~ msgstr ""
+
+#: src/components/NavBar/index.tsx
+#: src/components/NavBar/index.tsx
+msgid "LP"
 msgstr ""
 
 #. placeholder {0}: isForked ? ` #${id}` : ''
@@ -1234,6 +1335,10 @@ msgstr ""
 
 #: src/components/Documentation/index.tsx
 msgid "WTF?"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "Nijiders receive rewards in the form of Nijis (10% of supply for first 5 years)."
 msgstr ""
 
 #. placeholder {0}: (proposalThreshold ?? 0) + 1
@@ -1268,9 +1373,13 @@ msgstr ""
 msgid "Proposal"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "Nounder distributions don't interfere with the cadence of 24 hour auctions. Nijis are sent directly to the Nounder's Multisig, and auctions continue on schedule with the next available Niji ID."
+#: src/components/DelegateHoverCard/index.tsx
+msgid "Voted with<0>{numVotesForProp}</0>Nijis"
 msgstr ""
+
+#: src/components/Documentation/index.tsx
+#~ msgid "Nounder distributions don't interfere with the cadence of 24 hour auctions. Nijis are sent directly to the Nounder's Multisig, and auctions continue on schedule with the next available Niji ID."
+#~ msgstr ""
 
 #: src/components/VoteModal/index.tsx
 msgid "Gas spent on voting will be refunded to you."
@@ -1293,6 +1402,10 @@ msgstr ""
 msgid "Starts {0}"
 msgstr ""
 
+#: src/components/Documentation/index.tsx
+msgid "The proposal veto right was initially envisioned as a temporary solution to the problem of ‘51% attacks’ on the Niji DAO treasury. While Nijiders initially believed that a healthy distribution of Nijis would be sufficient protection for the DAO, a more complete understanding of the incentives and risks has led to general consensus within the Nijiders, the Niji Foundation, and the wider community that a more robust game-theoretic solution should be implemented before the right is removed."
+msgstr ""
+
 #: src/components/CurrentDelegatePannel/index.tsx
 msgid "Current Delegate"
 msgstr ""
@@ -1309,6 +1422,10 @@ msgstr ""
 #. placeholder {0}: i18n.number(Number(nounSvgs ? (nounSvgs.length / 365).toFixed(2) : '0'))
 #: src/pages/Playground/index.tsx
 msgid "You've generated {0} years worth of Nijis"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "Because 100% of Niji auction proceeds are sent to Niji DAO, Nijiders have chosen to compensate themselves with Nijis. Every 10th Niji for the first 5 years of the project (Niji ids #0, #10, #20, #30 and so on) will be automatically sent to the Nijider's multisig to be vested and shared among the founding members of the project."
 msgstr ""
 
 #: src/components/Footer.tsx
@@ -1344,8 +1461,8 @@ msgid "Vetoed"
 msgstr ""
 
 #: src/components/AddNijisToForkModal/index.tsx
-msgid "Add as many or as few of your Nouns as you’d like. Additional Nouns can be added during the escrow and forking periods."
-msgstr ""
+#~ msgid "Add as many or as few of your Nouns as you’d like. Additional Nouns can be added during the escrow and forking periods."
+#~ msgstr ""
 
 #: src/components/ProposalEditor/index.tsx
 msgid "Preview"
@@ -1356,8 +1473,8 @@ msgid "Your <0>{availableVotes}</0> votes have been delegated to a new account."
 msgstr ""
 
 #: src/pages/Playground/index.tsx
-msgid "The playground was built using the {nounsProtocolLink}. Niji's traits are determined by the Niji Seed. The seed was generated using {nounsAssetsLink} and rendered using the {nounsSDKLink}."
-msgstr ""
+#~ msgid "The playground was built using the {nounsProtocolLink}. Niji's traits are determined by the Niji Seed. The seed was generated using {nounsAssetsLink} and rendered using the {nounsSDKLink}."
+#~ msgstr ""
 
 #: src/components/DynamicQuorumInfoModal/index.tsx
 msgid "% of Nijis Currently Against"
@@ -1393,8 +1510,8 @@ msgid "Starting on"
 msgstr ""
 
 #: src/pages/TraitsPage.tsx
-msgid "Browse and download all available Noun traits."
-msgstr ""
+#~ msgid "Browse and download all available Noun traits."
+#~ msgstr ""
 
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Colored Noggles"
@@ -1419,8 +1536,8 @@ msgid "You can settle manually in 1 minute"
 msgstr ""
 
 #: src/pages/Nounders/index.tsx
-msgid "Nounders' Reward"
-msgstr ""
+#~ msgid "Nounders' Reward"
+#~ msgstr ""
 
 #: src/components/NijisIntroSection/index.tsx
 msgid "Niji is a global community."
@@ -1435,8 +1552,8 @@ msgid "Because this proposal contains a USDC fund transfer action we've added an
 msgstr ""
 
 #: src/components/DelegateHoverCard/index.tsx
-msgid "Voted with<0>{numVotesForProp}</0>Nouns"
-msgstr ""
+#~ msgid "Voted with<0>{numVotesForProp}</0>Nouns"
+#~ msgstr ""
 
 #. placeholder {0}: i18n.number(availableVotes)
 #: src/components/VoteModal/index.tsx
@@ -1463,13 +1580,20 @@ msgstr ""
 msgid "Forks"
 msgstr ""
 
-#. placeholder {0}: createCandidateCost ? formatEther(createCandidateCost) : '0'
 #: src/pages/CreateCandidate/index.tsx
-msgid "Submissions are free for Nouns voters. Non-voters can submit for a {0} ETH fee."
+#~ msgid "Submissions are free for Nouns voters. Non-voters can submit for a {0} ETH fee."
+#~ msgstr ""
+
+#: src/components/DynamicQuorumInfoModal/index.tsx
+msgid "The Threshold (minimum number of For votes required to pass a proposal) is set as a function of the number of Against votes a proposal has received. It increases linearly as a function of the % of Nijis voting against a prop, varying between Min Threshold and Max Threshold."
 msgstr ""
 
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Explore traits"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "'Nijiders' are the group of ten builders that initiated Niji. Here are the Nijiders:"
 msgstr ""
 
 #: src/pages/Vote/index.tsx
@@ -1542,9 +1666,18 @@ msgstr ""
 msgid "Go to auction"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
-msgid "Nounders receive rewards in the form of Nijis (10% of supply for first 5 years)."
+#. placeholder {0}: createCandidateCost ? formatEther(createCandidateCost) : '0'
+#: src/pages/CreateCandidate/index.tsx
+msgid "Submissions are free for Nijis voters. Non-voters can submit for a {0} ETH fee."
 msgstr ""
+
+#: src/components/CandidateSponsors/index.tsx
+msgid "This candidate has met the required threshold, but Nijis voters can still add support until it’s put onchain."
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+#~ msgid "Nounders receive rewards in the form of Nijis (10% of supply for first 5 years)."
+#~ msgstr ""
 
 #: src/components/ForkStatus/index.tsx
 #: src/components/ProposalStatus/index.tsx
@@ -1620,8 +1753,8 @@ msgid "Defeated"
 msgstr ""
 
 #: src/components/Documentation/index.tsx
-msgid "The proposal veto right was initially envisioned as a temporary solution to the problem of ‘51% attacks’ on the Niji DAO treasury. While Nounders initially believed that a healthy distribution of Nijis would be sufficient protection for the DAO, a more complete understanding of the incentives and risks has led to general consensus within the Nounders, the Niji Foundation, and the wider community that a more robust game-theoretic solution should be implemented before the right is removed."
-msgstr ""
+#~ msgid "The proposal veto right was initially envisioned as a temporary solution to the problem of ‘51% attacks’ on the Niji DAO treasury. While Nounders initially believed that a healthy distribution of Nijis would be sufficient protection for the DAO, a more complete understanding of the incentives and risks has led to general consensus within the Nounders, the Niji Foundation, and the wider community that a more robust game-theoretic solution should be implemented before the right is removed."
+#~ msgstr ""
 
 #: src/components/CandidateSponsors/SelectSponsorsToPropose.tsx
 msgid "Choose sponsors"
@@ -1657,6 +1790,10 @@ msgstr ""
 #. placeholder {0}: createCandidateCost ? formatEther(createCandidateCost) : '0'
 #: src/pages/CreateCandidate/index.tsx
 msgid "{0} ETH fee upon submission"
+msgstr ""
+
+#: src/pages/Nounders/index.tsx
+msgid "Nijiders' Reward"
 msgstr ""
 
 #: src/components/Documentation/index.tsx
@@ -1777,4 +1914,8 @@ msgstr ""
 
 #: src/components/NijiContent/index.tsx
 msgid "Learn more"
+msgstr ""
+
+#: src/pages/Playground/index.tsx
+msgid "Niji Protocol"
 msgstr ""

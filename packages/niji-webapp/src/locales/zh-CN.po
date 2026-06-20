@@ -49,6 +49,11 @@ msgstr "异议期已触发"
 msgid "Update proposal"
 msgstr "更新提案"
 
+#: src/components/VoteSignals/VoteSignals.tsx
+#: src/components/VoteSignals/VoteSignals.tsx
+msgid "Nijis voters can cast voting signals to give proposers of pending proposals an idea of how they intend to vote and helpful guidance on proposal changes to change their vote."
+msgstr "Nijis 投票者可以发出投票信号，这既能让待定提案的提出者预估到他们的投票倾向，也能为提案修改提供宝贵指引，以争取（或引导）投票者转变其最终投票。"
+
 #: src/components/ProposalHeader/index.tsx
 msgid "You voted <0>Against</0> this proposal"
 msgstr "您对此提案投了<0>反对</0>票"
@@ -78,10 +83,6 @@ msgstr "审核流支付操作"
 #: src/pages/Vote/index.tsx
 msgid "Proposal functions"
 msgstr "提案功能"
-
-#: src/components/CandidateSponsors/index.tsx
-msgid "Proposal candidates must meet the required Nijis vote threshold."
-msgstr "候选提案必须达到所需的 Niji 投票门槛。"
 
 #: src/components/Documentation/index.tsx
 #: src/components/Footer.tsx
@@ -121,11 +122,6 @@ msgstr "添加函数调用参数"
 msgid "Treasury"
 msgstr "金库"
 
-#. placeholder {0}: i18n.number(availableVotes)
-#: src/components/VoteModal/index.tsx
-msgid "Voting with <0>{0}</0> Nijis"
-msgstr "使用 <0>{0}</0> 个 Nijis 投票"
-
 #: src/pages/Vote/index.tsx
 msgid "Ended"
 msgstr "已结束"
@@ -138,10 +134,6 @@ msgstr "选择签名"
 #: src/components/NavBar/index.tsx
 msgid "Candidates"
 msgstr "候选提案"
-
-#: src/components/CurrentDelegatePannel/index.tsx
-msgid "Niji votes are not transferable, but are <0>delegatable</0>, which means you can assign your vote to someone else as long as you own your Niji."
-msgstr "Niji 投票不可转让，但可<0>委托</0>，只要拥有 Niji，就可将投票权委托给他人。"
 
 #: src/components/ProposalActionsModal/steps/FunctionCallEnterArgsStep/index.tsx
 msgid "Invalid Arguments"
@@ -163,6 +155,10 @@ msgstr ""
 #: src/components/ProposalContent/index.tsx
 msgid "This proposal interacts with the <0>original treasury</0>"
 msgstr "此提案将与<0>原始金库</0>进行交互"
+
+#: src/components/Proposals/index.tsx
+msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nijis voters, it can be promoted to a proposal."
+msgstr "任何人都可创建提案候选。若候选获得足够签名，即可成为正式提案。"
 
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Nijis & Traits"
@@ -212,10 +208,6 @@ msgstr "地图"
 msgid "Awaiting signature"
 msgstr "等待签名"
 
-#: src/components/NijiContent/index.tsx
-msgid "For this reason, we, the project's founders (‘Nijiders’) have chosen to compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to Nijiders."
-msgstr ""
-
 #. placeholder {0}: nounId.toString()
 #: src/components/AuctionActivityNijiTitle/index.tsx
 msgid "Niji {0}"
@@ -224,6 +216,10 @@ msgstr ""
 #: src/components/Proposals/index.tsx
 msgid "Making a proposal requires {threshold} votes"
 msgstr "提出提案需要 {threshold} 票"
+
+#: src/components/AddNijisToForkModal/index.tsx
+msgid "Add as many or as few of your Nijis as you’d like. Additional Nijis can be added during the escrow and forking periods."
+msgstr "根据您的喜好添加任意数量的 Nijis。在托管和分叉期间可以添加更多的 Nijis。"
 
 #: src/components/ProposalActionsModal/steps/SelectProposalActionStep/index.tsx
 msgid "Add Proposal Action"
@@ -280,14 +276,6 @@ msgstr ""
 msgid "Bids for"
 msgstr "竞拍记录："
 
-#: src/pages/CreateCandidate/index.tsx
-msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nijis voters, it can be promoted to a proposal. "
-msgstr "任何人都可创建提案候选。若候选人获得足够的 Niji 投票签名，即可升级为正式提案。"
-
-#: src/components/DynamicQuorumInfoModal/index.tsx
-msgid "The Threshold (minimum number of For votes required to pass a proposal) is set as a function of the number of Against votes a proposal has received. It increases linearly as a function of the % of Nijis voting against a prop, varying between Min Threshold and Max Threshold."
-msgstr "门槛（通过提案所需的最少支持票数）取决于提案的反对票数。它会随反对比例线性增加，介于最小门槛与最大门槛之间。"
-
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Go to playground"
 msgstr "前往游乐场"
@@ -295,10 +283,6 @@ msgstr "前往游乐场"
 #: src/components/Bid/index.tsx
 msgid "or more"
 msgstr "或以上"
-
-#: src/pages/Playground/index.tsx
-msgid "Niji Protocol"
-msgstr "Niji 协议"
 
 #: src/components/Documentation/index.tsx
 msgid "Niji artwork is in the {publicDomainLink}."
@@ -327,13 +311,13 @@ msgstr ""
 msgid "You have no votes."
 msgstr "您没有可投的票。"
 
-#: src/components/CandidateSponsors/index.tsx
-msgid "Sponsoring a proposal requires at least one Niji vote"
-msgstr "赞助提案至少需要一个 Niji 投票"
-
 #: src/components/StreamWithdrawModal/index.tsx
 msgid "You've successfully withdrawn {withdrawAmount} {unitForDisplay} to your wallet"
 msgstr "您已成功提取 {withdrawAmount} {unitForDisplay} 到您的钱包"
+
+#: src/pages/CreateCandidate/index.tsx
+msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nijis voters, it can be promoted to a proposal. "
+msgstr "任何人都可创建提案候选。若候选人获得足够的 Niji 投票签名，即可升级为正式提案。"
 
 #: src/components/Documentation/index.tsx
 msgid "By adopting the DUNA model, Niji DAO sets a pioneering example for DAOs seeking to balance decentralized autonomy with legal certainty, further solidifying its position at the forefront of decentralized governance innovation."
@@ -399,6 +383,10 @@ msgstr "秒"
 msgid "Queue"
 msgstr "排队"
 
+#: src/components/CurrentDelegatePannel/index.tsx
+msgid "Niji votes are not transferable, but are <0>delegatable</0>, which means you can assign your vote to someone else as long as you own your Niji."
+msgstr "Niji 投票不可转让，但可<0>委托</0>，只要拥有 Niji，就可将投票权委托给他人。"
+
 #: src/components/Documentation/index.tsx
 msgid "CryptoPunks"
 msgstr "CryptoPunks"
@@ -411,15 +399,20 @@ msgstr "可提取"
 msgid "You can experiment with off-chain Niji generation at the {playgroundLink}."
 msgstr ""
 
+#. placeholder {0}: i18n.number(availableVotes)
+#: src/components/VoteModal/index.tsx
+msgid "Voting with <0>{0}</0> Nijis"
+msgstr "使用 <0>{0}</0> 个 Nijis 投票"
+
 #. placeholder {0}: i18n.number(Number(proposalId || '0'))
 #: src/components/VoteModal/index.tsx
 msgid "You've successfully voted on on prop {0}"
 msgstr "您已成功对提案 {0} 进行投票"
 
-#: src/components/VoteSignals/VoteSignals.tsx
-#: src/components/VoteSignals/VoteSignals.tsx
-msgid "Nijis voters can cast voting signals to give proposers of pending proposals an idea of how they intend to vote and helpful guidance on proposal changes to change their vote."
-msgstr "Nijis 投票者可以发出投票信号，这既能让待定提案的提出者预估到他们的投票倾向，也能为提案修改提供宝贵指引，以争取（或引导）投票者转变其最终投票。"
+#: src/components/NavBar/index.tsx
+#: src/components/NavBar/index.tsx
+msgid "Faucet"
+msgstr ""
 
 #: src/components/VoteModal/index.tsx
 msgid "Thank you for voting."
@@ -438,6 +431,10 @@ msgstr "门槛（通过提案所需的最低支持票数）是反对票数的函
 #: src/components/SettleManuallyBtn/index.tsx
 msgid "You can settle manually in {0} minutes"
 msgstr "您可在 {0} 分钟内手动结算"
+
+#: src/components/NijisIntroSection/index.tsx
+msgid "Nijispot"
+msgstr "Nijispot"
 
 #: src/pages/Candidate/index.tsx
 msgid "<0>Note: </0>This proposal candidate has been proposed onchain."
@@ -465,10 +462,6 @@ msgstr "结束于 {0}"
 #: src/pages/CreateProposal/index.tsx
 msgid "Create Proposal"
 msgstr "创建提案"
-
-#: src/components/ByLineHoverCard/index.tsx
-msgid "<0>Delegated Niji: </0>"
-msgstr "<0>已委托 Niji：</0>"
 
 #: src/components/ProposalHeader/index.tsx
 msgid "You voted <0>For</0> this proposal"
@@ -500,16 +493,24 @@ msgstr "治理"
 msgid "Cancel"
 msgstr "取消"
 
+#: src/components/CandidateSponsors/index.tsx
+msgid "Sponsoring a proposal requires at least one Niji vote"
+msgstr "赞助提案至少需要一个 Niji 投票"
+
 #: src/components/CandidateSponsors/SignatureForm.tsx
 msgid "Signature request"
 msgstr "签名请求"
 
-#: src/components/Proposals/index.tsx
-msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nijis voters, it can be promoted to a proposal."
-msgstr "任何人都可创建提案候选。若候选获得足够签名，即可成为正式提案。"
+#: src/components/ByLineHoverCard/index.tsx
+msgid "<0>Delegated Nijis: </0>"
+msgstr "<0>委托的 Nijis：</0>"
 
 #: src/components/Documentation/index.tsx
 msgid "The Niji Auction Contract will act as a self-sufficient Niji generation and distribution mechanism, auctioning one Niji every 24 hours, forever. 100% of auction proceeds (ETH) are automatically deposited in the Niji DAO treasury, where they are governed by Niji owners."
+msgstr ""
+
+#: src/pages/Playground/index.tsx
+msgid "The playground was built using the {nijiProtocolLink}. Niji's traits are determined by the Niji Seed. The seed was generated using {nijiAssetsLink} and rendered using the {nijiSDKLink}."
 msgstr ""
 
 #: src/components/ProposalActionsModal/steps/FunctionCallReviewStep/index.tsx
@@ -541,6 +542,15 @@ msgstr "从流支付中提取"
 msgid "Remove sponsorship"
 msgstr "移除支持"
 
+#. placeholder {0}: i18n.date(new Date(proposalCreationTimestamp * 1000), { dateStyle: 'long', timeStyle: 'long', })
+#: src/components/ProposalHeader/index.tsx
+msgid "Only Nijis you owned or were delegated to you before {0} are eligible to vote."
+msgstr "只有您在 {0} 之前拥有或被委托的 Nijis 才可投票。"
+
+#: src/components/Documentation/index.tsx
+msgid "Nijider distributions don't interfere with the cadence of 24 hour auctions. Nijis are sent directly to the Nijider's Multisig, and auctions continue on schedule with the next available Niji ID."
+msgstr ""
+
 #: src/components/CandidateSponsors/Signature.tsx
 msgid "Re-signed"
 msgstr "重新签名"
@@ -566,10 +576,6 @@ msgstr "无"
 msgid "Version"
 msgstr "版本"
 
-#: src/components/Documentation/index.tsx
-msgid "Nijider's Reward"
-msgstr "Nijiders 奖励"
-
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Download official Niji DAO brand assets including our iconic noggles in various formats."
 msgstr ""
@@ -577,6 +583,14 @@ msgstr ""
 #: src/components/Holder/index.tsx
 msgid "Held by"
 msgstr "由…持有"
+
+#: src/pages/Nounders/index.tsx
+msgid "The Nijiders"
+msgstr "Nijiders"
+
+#: src/components/NijiContent/index.tsx
+msgid "送信中…"
+msgstr ""
 
 #: src/pages/Candidate/index.tsx
 msgid "Edit"
@@ -599,6 +613,10 @@ msgstr "候选已创建！"
 #: src/pages/Governance/index.tsx
 msgid "Niji DAO"
 msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "Nijider's Reward"
+msgstr "Nijiders 奖励"
 
 #: src/pages/Vote/index.tsx
 msgid "View Threshold Info"
@@ -630,15 +648,17 @@ msgstr "添加转账操作"
 msgid "Did not re-sign"
 msgstr "未重新签名"
 
-#: src/pages/Nounders/index.tsx
-msgid "The Nijiders"
-msgstr "Nijiders"
-
 #. placeholder {0}: candidate?.proposalIdToUpdate
 #: src/pages/Candidate/index.tsx
 msgid "<0>Note: </0>This candidate is an update to <1>Proposal {0}</1>."
 msgstr "<0>注意：</0>此候选项为对 <1>提案 {0}</1> 的更新。"
 
+#. placeholder {0}: forkThreshold == null ? '...' : forkThreshold
+#. placeholder {1}: forkThresholdBPS != null ? forkThresholdBPS / 100 : '...'
+#: src/pages/Fork/index.tsx
+msgid "More than {0} Nijis ({1}% of the DAO) are required to pass the threshold"
+msgstr "需要超过 {0} 个 Niji（占 DAO 的 {1}%）才能通过门槛"
+
 #: src/components/AddNijisToForkModal/index.tsx
 #: src/components/AddNijisToForkModal/index.tsx
 #: src/components/AddNijisToForkModal/index.tsx
@@ -649,6 +669,7 @@ msgstr "<0>注意：</0>此候选项为对 <1>提案 {0}</1> 的更新。"
 #: src/components/CandidateSponsors/SelectSponsorsToPropose.tsx
 #: src/components/CandidateSponsors/SubmitUpdateProposal.tsx
 #: src/components/CandidateSponsors/SubmitUpdateProposal.tsx
+#: src/components/NijiContent/index.tsx
 #: src/components/VoteModal/index.tsx
 #: src/components/VoteModal/index.tsx
 #: src/components/VoteSignals/VoteSignals.tsx
@@ -711,11 +732,19 @@ msgstr "已拥有"
 msgid "You provided <0>{0}</0> feedback {1}"
 msgstr "您已提供 <0>{0}</0> 条反馈 {1}"
 
+#: src/components/NijiContent/index.tsx
+msgid "For this reason, we, the project's founders (‘Nijiders’) have chosen to compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to Nijiders."
+msgstr ""
+
 #: src/components/VoteCard/index.tsx
 #: src/components/VoteModal/index.tsx
 #: src/components/VoteSignals/VoteSignals.tsx
 msgid "Against"
 msgstr "反对"
+
+#: src/pages/Nounders/index.tsx
+msgid "The Nijiders reward is intended as compensation for our pre and post-launch contributions to the project, and to help us participate meaningfully in governance as the project matures. Since there are 10 Nijiders, after 5 years each Nijider could receive up to 1% of the Niji supply."
+msgstr ""
 
 #: src/components/ProposalStatus/index.tsx
 #: src/components/ProposalStatusCopy/index.tsx
@@ -729,12 +758,6 @@ msgstr "委托"
 #: src/pages/TraitsPage.tsx
 msgid "Filename"
 msgstr ""
-
-#. placeholder {0}: forkThreshold == null ? '...' : forkThreshold
-#. placeholder {1}: forkThresholdBPS != null ? forkThresholdBPS / 100 : '...'
-#: src/pages/Fork/index.tsx
-msgid "More than {0} Nijis ({1}% of the DAO) are required to pass the threshold"
-msgstr "需要超过 {0} 个 Niji（占 DAO 的 {1}%）才能通过门槛"
 
 #: src/components/Proposals/index.tsx
 msgid "About Proposal Candidates"
@@ -787,10 +810,6 @@ msgstr "由于本提案涉及 USDC 资金转移，我们增加了一笔额外的
 msgid "Fork"
 msgstr "分叉"
 
-#: src/components/Documentation/index.tsx
-msgid "'Nijiders' are the group of ten builders that initiated Niji. Here are the Nijiders:"
-msgstr ""
-
 #: src/components/ProposalActionsModal/steps/StreamPaymentsReviewStep/index.tsx
 msgid "Stream"
 msgstr "流支付"
@@ -837,10 +856,6 @@ msgstr "返回"
 msgid "Nijis govern <0>Niji DAO</0>. Nijis can vote on proposals or delegate their vote to a third party. A minimum of <1>{0}</1> is required to submit proposals."
 msgstr ""
 
-#: src/components/ByLineHoverCard/index.tsx
-msgid "<0>Delegated Nijis: </0>"
-msgstr "<0>委托的 Nijis：</0>"
-
 #: src/components/EditProposalButton/index.tsx
 msgid "Update Proposal Candidate"
 msgstr "更新提案候选"
@@ -853,6 +868,10 @@ msgstr "公共领域"
 #: src/pages/TraitsPage.tsx
 msgid "License"
 msgstr "许可证"
+
+#: src/pages/TraitsPage.tsx
+msgid "Browse and download all available Niji traits."
+msgstr "浏览并下载所有可用的名词特征。"
 
 #: src/components/Proposals/index.tsx
 msgid "Connect wallet to make a proposal."
@@ -908,6 +927,10 @@ msgstr "我们建议，在您预估的提案执行时间和流支付开始时间
 msgid "Forking is the crypto-native way for groups of token holders to exit together into a new instance of their protocol, resulting in maximal conservation of momentum in the ecosystem."
 msgstr "分叉为代币持有者群体提供了一种加密原生途径，使他们能够共同过渡到协议的新实例中，从而最大限度地维系生态系统的发展势头。"
 
+#: src/pages/Nounders/index.tsx
+msgid "All Niji auction proceeds are sent to the Niji DAO. For this reason, we, the project's founders (‘Nijiders’) have chosen to compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to individual Nijiders."
+msgstr ""
+
 #: src/pages/Fork/DeployForkButton.tsx
 msgid "Deploy Fork"
 msgstr "部署分叉"
@@ -950,6 +973,10 @@ msgstr "提案已执行！"
 msgid "Note"
 msgstr "注意"
 
+#: src/components/ByLineHoverCard/index.tsx
+msgid "<0>Delegated Niji: </0>"
+msgstr "<0>已委托 Niji：</0>"
+
 #: src/components/Documentation/index.tsx
 msgid "All Nijis are members of Niji DAO."
 msgstr ""
@@ -984,14 +1011,14 @@ msgstr "已执行"
 msgid "Updatable"
 msgstr "可更新"
 
-#: src/pages/Nounders/index.tsx
-msgid "The Nijiders reward is intended as compensation for our pre and post-launch contributions to the project, and to help us participate meaningfully in governance as the project matures. Since there are 10 Nijiders, after 5 years each Nijider could receive up to 1% of the Niji supply."
-msgstr ""
-
 #: src/components/AuctionTimer/index.tsx
 #: src/components/AuctionTimer/index.tsx
 msgid "Auction ended"
 msgstr "拍卖已结束"
+
+#: src/components/CandidateSponsors/index.tsx
+msgid "Proposal candidates must meet the required Nijis vote threshold."
+msgstr "候选提案必须达到所需的 Niji 投票门槛。"
 
 #: src/components/Proposals/index.tsx
 msgid "Proposals submitted by community members will appear here."
@@ -1018,10 +1045,6 @@ msgstr ""
 #: src/components/ChangeDelegatePanel/index.tsx
 msgid "Your <0>{availableVotes}</0> votes are being delegated to a new account."
 msgstr "您的 <0>{availableVotes}</0> 票正在委托给新账户。"
-
-#: src/components/NijisIntroSection/index.tsx
-msgid "Nijispot"
-msgstr "Nijispot"
 
 #: src/components/Documentation/index.tsx
 msgid "The Niji community has undertaken a preliminary exploration of proposal veto alternatives (‘rage quit’ etc.), but it is now clear that this is a difficult problem that will require significantly more research, development and testing before a satisfactory solution can be implemented."
@@ -1094,12 +1117,8 @@ msgstr "审核函数调用操作"
 msgid "The Niji Seeder contract is used to determine Niji traits during the minting process. The seeder contract can be replaced to allow for future trait generation algorithm upgrades. Additionally, it can be locked by the Niji DAO to prevent any future updates. Currently, Niji traits are determined using pseudo-random number generation:"
 msgstr ""
 
-#. placeholder {0}: i18n.date(new Date(proposalCreationTimestamp * 1000), { dateStyle: 'long', timeStyle: 'long', })
-#: src/components/ProposalHeader/index.tsx
-msgid "Only Nijis you owned or were delegated to you before {0} are eligible to vote."
-msgstr "只有您在 {0} 之前拥有或被委托的 Nijis 才可投票。"
-
 #: src/components/Bid/index.tsx
+#: src/components/NijiContent/index.tsx
 msgid "Settled auction successfully!"
 msgstr "成功结算拍卖！"
 
@@ -1172,17 +1191,9 @@ msgstr "过期于 {0}"
 msgid "Update Proposal"
 msgstr "更新提案"
 
-#: src/pages/Nounders/index.tsx
-msgid "All Niji auction proceeds are sent to the Niji DAO. For this reason, we, the project's founders (‘Nijiders’) have chosen to compensate ourselves with Nijis. Every 10th Niji for the first 5 years of the project will be sent to our multisig (5/10), where it will be vested and distributed to individual Nijiders."
-msgstr ""
-
 #: src/components/BidHistoryBtn/index.tsx
 msgid "View all bids"
 msgstr "查看所有出价"
-
-#: src/components/Documentation/index.tsx
-msgid "Because 100% of Niji auction proceeds are sent to Niji DAO, Nijiders have chosen to compensate themselves with Nijis. Every 10th Niji for the first 5 years of the project (Niji ids #0, #10, #20, #30 and so on) will be automatically sent to the Nijider's multisig to be vested and shared among the founding members of the project."
-msgstr ""
 
 #: src/components/StreamWithdrawModal/index.tsx
 msgid "Withdraw"
@@ -1214,9 +1225,10 @@ msgstr "无需参数 "
 msgid "Add Streaming Payment Action"
 msgstr "添加流支付操作"
 
-#: src/components/CandidateSponsors/index.tsx
-msgid "This candidate has met the required threshold, but Nijis voters can still add support until it’s put onchain."
-msgstr "此候选（方案/提案）已满足了必要的支持门槛，但在其最终被部署到链上之前，Nijis 的投票者们依然有机会为其追加支持"
+#: src/components/NavBar/index.tsx
+#: src/components/NavBar/index.tsx
+msgid "LP"
+msgstr ""
 
 #. placeholder {0}: isForked ? ` #${id}` : ''
 #: src/pages/Fork/index.tsx
@@ -1235,6 +1247,10 @@ msgstr "从流中提取 <0/>"
 #: src/components/Documentation/index.tsx
 msgid "WTF?"
 msgstr "什么情况？"
+
+#: src/components/Documentation/index.tsx
+msgid "Nijiders receive rewards in the form of Nijis (10% of supply for first 5 years)."
+msgstr ""
 
 #. placeholder {0}: (proposalThreshold ?? 0) + 1
 #. placeholder {1}: proposalThreshold === 0 || proposalThreshold === null ? 'vote' : 'votes'
@@ -1268,9 +1284,9 @@ msgstr "此交易通过 DAO 的支付合约向 <0/> 发送 {0} USDC。"
 msgid "Proposal"
 msgstr "提案"
 
-#: src/components/Documentation/index.tsx
-msgid "Nijider distributions don't interfere with the cadence of 24 hour auctions. Nijis are sent directly to the Nijider's Multisig, and auctions continue on schedule with the next available Niji ID."
-msgstr ""
+#: src/components/DelegateHoverCard/index.tsx
+msgid "Voted with<0>{numVotesForProp}</0>Nijis"
+msgstr "使用<0>{numVotesForProp}</0>个 Nijis 进行投票"
 
 #: src/components/VoteModal/index.tsx
 msgid "Gas spent on voting will be refunded to you."
@@ -1293,6 +1309,10 @@ msgstr "投票前反馈"
 msgid "Starts {0}"
 msgstr "{0}开始"
 
+#: src/components/Documentation/index.tsx
+msgid "The proposal veto right was initially envisioned as a temporary solution to the problem of ‘51% attacks’ on the Niji DAO treasury. While Nijiders initially believed that a healthy distribution of Nijis would be sufficient protection for the DAO, a more complete understanding of the incentives and risks has led to general consensus within the Nijiders, the Niji Foundation, and the wider community that a more robust game-theoretic solution should be implemented before the right is removed."
+msgstr ""
+
 #: src/components/CurrentDelegatePannel/index.tsx
 msgid "Current Delegate"
 msgstr "当前委托人"
@@ -1309,6 +1329,10 @@ msgstr "委托已更新！"
 #. placeholder {0}: i18n.number(Number(nounSvgs ? (nounSvgs.length / 365).toFixed(2) : '0'))
 #: src/pages/Playground/index.tsx
 msgid "You've generated {0} years worth of Nijis"
+msgstr ""
+
+#: src/components/Documentation/index.tsx
+msgid "Because 100% of Niji auction proceeds are sent to Niji DAO, Nijiders have chosen to compensate themselves with Nijis. Every 10th Niji for the first 5 years of the project (Niji ids #0, #10, #20, #30 and so on) will be automatically sent to the Nijider's multisig to be vested and shared among the founding members of the project."
 msgstr ""
 
 #: src/components/Footer.tsx
@@ -1343,10 +1367,6 @@ msgstr "在 Etherscan 上查看"
 msgid "Vetoed"
 msgstr "已否决"
 
-#: src/components/AddNijisToForkModal/index.tsx
-msgid "Add as many or as few of your Nijis as you’d like. Additional Nijis can be added during the escrow and forking periods."
-msgstr "根据您的喜好添加任意数量的 Nijis。在托管和分叉期间可以添加更多的 Nijis。"
-
 #: src/components/ProposalEditor/index.tsx
 msgid "Preview"
 msgstr "预览"
@@ -1356,8 +1376,8 @@ msgid "Your <0>{availableVotes}</0> votes have been delegated to a new account."
 msgstr "您的 <0>{availableVotes}</0> 票已委托给一个新账户。"
 
 #: src/pages/Playground/index.tsx
-msgid "The playground was built using the {nounsProtocolLink}. Niji's traits are determined by the Niji Seed. The seed was generated using {nounsAssetsLink} and rendered using the {nounsSDKLink}."
-msgstr ""
+#~ msgid "The playground was built using the {nounsProtocolLink}. Niji's traits are determined by the Niji Seed. The seed was generated using {nounsAssetsLink} and rendered using the {nounsSDKLink}."
+#~ msgstr ""
 
 #: src/components/DynamicQuorumInfoModal/index.tsx
 msgid "% of Nijis Currently Against"
@@ -1392,10 +1412,6 @@ msgstr "更新中..."
 msgid "Starting on"
 msgstr "开始于"
 
-#: src/pages/TraitsPage.tsx
-msgid "Browse and download all available Niji traits."
-msgstr "浏览并下载所有可用的名词特征。"
-
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Colored Noggles"
 msgstr "彩色眼镜"
@@ -1418,10 +1434,6 @@ msgstr "描述符"
 msgid "You can settle manually in 1 minute"
 msgstr "您可以在 1 分钟内手动结算"
 
-#: src/pages/Nounders/index.tsx
-msgid "Nijiders' Reward"
-msgstr "Nijiders 奖励"
-
 #: src/components/NijisIntroSection/index.tsx
 msgid "Niji is a global community."
 msgstr ""
@@ -1433,10 +1445,6 @@ msgstr ""
 #: src/pages/CreateProposal/index.tsx
 msgid "Because this proposal contains a USDC fund transfer action we've added an additional additional ETH transaction to refill the TokenBuyer contract. This action allows to continue to trustlessly acquire USDC to fund proposals like this."
 msgstr "由于此提案包含 USDC 资金转移操作，我们添加了一个额外的 ETH 交易以补充 TokenBuyer 合约。此操作允许继续无信任地获取 USDC 以资助此类提案。"
-
-#: src/components/DelegateHoverCard/index.tsx
-msgid "Voted with<0>{numVotesForProp}</0>Nijis"
-msgstr "使用<0>{numVotesForProp}</0>个 Nijis 进行投票"
 
 #. placeholder {0}: i18n.number(availableVotes)
 #: src/components/VoteModal/index.tsx
@@ -1463,14 +1471,17 @@ msgstr "添加流支付日期详情"
 msgid "Forks"
 msgstr "分叉"
 
-#. placeholder {0}: createCandidateCost ? formatEther(createCandidateCost) : '0'
-#: src/pages/CreateCandidate/index.tsx
-msgid "Submissions are free for Nijis voters. Non-voters can submit for a {0} ETH fee."
-msgstr "Nijis 投票者提交是免费的。非投票者可以支付 {0} ETH 的费用提交。"
+#: src/components/DynamicQuorumInfoModal/index.tsx
+msgid "The Threshold (minimum number of For votes required to pass a proposal) is set as a function of the number of Against votes a proposal has received. It increases linearly as a function of the % of Nijis voting against a prop, varying between Min Threshold and Max Threshold."
+msgstr "门槛（通过提案所需的最少支持票数）取决于提案的反对票数。它会随反对比例线性增加，介于最小门槛与最大门槛之间。"
 
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Explore traits"
 msgstr "探索特征"
+
+#: src/components/Documentation/index.tsx
+msgid "'Nijiders' are the group of ten builders that initiated Niji. Here are the Nijiders:"
+msgstr ""
 
 #: src/pages/Vote/index.tsx
 msgid "Transaction Successful!"
@@ -1542,9 +1553,14 @@ msgstr ""
 msgid "Go to auction"
 msgstr "前往拍卖"
 
-#: src/components/Documentation/index.tsx
-msgid "Nijiders receive rewards in the form of Nijis (10% of supply for first 5 years)."
-msgstr ""
+#. placeholder {0}: createCandidateCost ? formatEther(createCandidateCost) : '0'
+#: src/pages/CreateCandidate/index.tsx
+msgid "Submissions are free for Nijis voters. Non-voters can submit for a {0} ETH fee."
+msgstr "Nijis 投票者提交是免费的。非投票者可以支付 {0} ETH 的费用提交。"
+
+#: src/components/CandidateSponsors/index.tsx
+msgid "This candidate has met the required threshold, but Nijis voters can still add support until it’s put onchain."
+msgstr "此候选（方案/提案）已满足了必要的支持门槛，但在其最终被部署到链上之前，Nijis 的投票者们依然有机会为其追加支持"
 
 #: src/components/ForkStatus/index.tsx
 #: src/components/ProposalStatus/index.tsx
@@ -1619,10 +1635,6 @@ msgstr "您的账户投票时出现错误。"
 msgid "Defeated"
 msgstr "不通过"
 
-#: src/components/Documentation/index.tsx
-msgid "The proposal veto right was initially envisioned as a temporary solution to the problem of ‘51% attacks’ on the Niji DAO treasury. While Nijiders initially believed that a healthy distribution of Nijis would be sufficient protection for the DAO, a more complete understanding of the incentives and risks has led to general consensus within the Nijiders, the Niji Foundation, and the wider community that a more robust game-theoretic solution should be implemented before the right is removed."
-msgstr ""
-
 #: src/components/CandidateSponsors/SelectSponsorsToPropose.tsx
 msgid "Choose sponsors"
 msgstr "选择赞助商"
@@ -1658,6 +1670,10 @@ msgstr "仅对您可见"
 #: src/pages/CreateCandidate/index.tsx
 msgid "{0} ETH fee upon submission"
 msgstr "提交时需支付 {0} ETH 费用"
+
+#: src/pages/Nounders/index.tsx
+msgid "Nijiders' Reward"
+msgstr "Nijiders 奖励"
 
 #: src/components/Documentation/index.tsx
 msgid "One Niji is equal to one vote."
@@ -1778,3 +1794,7 @@ msgstr "每一天，"
 #: src/components/NijiContent/index.tsx
 msgid "Learn more"
 msgstr "了解更多"
+
+#: src/pages/Playground/index.tsx
+msgid "Niji Protocol"
+msgstr "Niji 协议"

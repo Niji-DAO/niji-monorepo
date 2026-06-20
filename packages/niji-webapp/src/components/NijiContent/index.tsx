@@ -1,8 +1,12 @@
+import type { Auction as IAuction } from '@/wrappers/nijiAuction';
+
 import React, { useCallback, useEffect } from 'react';
 
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction } from '@niji/sdk/react';
 import { Col, Row } from 'react-bootstrap';
 import { Link } from 'react-router';
+import { toast } from 'sonner';
 
 import AuctionActivityDateHeadline from '@/components/AuctionActivityDateHeadline';
 import AuctionActivityNijiTitle from '@/components/AuctionActivityNijiTitle';
@@ -10,6 +14,7 @@ import AuctionActivityWrapper from '@/components/AuctionActivityWrapper';
 import AuctionNavigation from '@/components/AuctionNavigation';
 import AuctionTitleAndNavWrapper from '@/components/AuctionTitleAndNavWrapper';
 import CurrentBid, { BID_N_A } from '@/components/CurrentBid';
+import SettleManuallyBtn from '@/components/SettleManuallyBtn';
 import Winner from '@/components/Winner';
 import { useAppSelector } from '@/hooks';
 
@@ -26,6 +31,7 @@ interface NijiContentProps {
   isLastAuction: boolean;
   onPrevAuctionClick: () => void;
   onNextAuctionClick: () => void;
+  auction?: IAuction;
 }
 
 const NijiContent: React.FC<NijiContentProps> = props => {
@@ -36,9 +42,39 @@ const NijiContent: React.FC<NijiContentProps> = props => {
     isLastAuction,
     onPrevAuctionClick,
     onNextAuctionClick,
+    auction,
   } = props;
 
   const isCool = useAppSelector(state => state.application.isCoolBackground);
+  const activeAccount = useAppSelector(state => state.account.activeAccount);
+  const { t } = useLingui();
+
+  // Nijider 枠 (Niji 0 / 10 / ...) は通常 auction と違って bid がないので、
+  // auction.endTime を過ぎたら誰でも settleCurrentAndCreateNewAuction() を呼んで
+  // 次の auction を開始できる必要がある。 Bid component と同様の settle 経路を
+  // Nijider 用 NijiContent にも組み込む。
+  const auctionEnded =
+    auction !== undefined && Math.floor(Date.now() / 1000) >= Number(auction.endTime);
+  const isWalletConnected = activeAccount !== undefined;
+
+  const {
+    writeContract: settleAuction,
+    isPending: isSettling,
+    isSuccess: didSettle,
+    isError: didSettleFail,
+    error: settleError,
+  } = useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction();
+
+  useEffect(() => {
+    if (didSettle) toast.success(t`Settled auction successfully!`);
+  }, [didSettle, t]);
+  useEffect(() => {
+    if (didSettleFail) toast.error(settleError?.message || t`Please try again.`);
+  }, [didSettleFail, settleError, t]);
+
+  const settleAuctionHandler = () => {
+    settleAuction({});
+  };
 
   // Page through Nijis via keyboard
   // handle what happens on key press
@@ -129,6 +165,14 @@ const NijiContent: React.FC<NijiContentProps> = props => {
               <Trans>Learn more</Trans> →
             </Link>
           </div>
+          {auctionEnded && isWalletConnected && auction !== undefined && (
+            <SettleManuallyBtn settleAuctionHandler={settleAuctionHandler} auction={auction} />
+          )}
+          {isSettling && (
+            <p className="mt-2 text-center text-xs text-slate-600">
+              <Trans>送信中…</Trans>
+            </p>
+          )}
         </Col>
       </Row>
     </AuctionActivityWrapper>

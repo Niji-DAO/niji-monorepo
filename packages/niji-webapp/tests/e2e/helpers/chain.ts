@@ -11,7 +11,7 @@ export const anvil = defineChain({
   id: 31337,
   name: 'Anvil',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-  rpcUrls: { default: { http: ['http://127.0.0.1:8545'] } },
+  rpcUrls: { default: { http: ['http://127.0.0.1:8547'] } },
 });
 
 /**
@@ -20,7 +20,7 @@ export const anvil = defineChain({
  * ハードコードする。
  */
 export const ADDRESSES = {
-  AuctionHouseProxy: '0x59b670e9fA9D0A427751Af201D676719a970857b',
+  AuctionHouseProxy: '0x1Dbbf529D78d6507B0dd71F6c02f41138d828990',
   NijiToken: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
   NijiArt: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   NijiDescriptor: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
@@ -114,7 +114,7 @@ export async function increaseTime(seconds: number) {
   const block = await publicClient.getBlock();
   const next = Number(block.timestamp) + seconds;
   const rpc = (method: string, params: unknown[]) =>
-    fetch('http://127.0.0.1:8545', {
+    fetch('http://127.0.0.1:8547', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),

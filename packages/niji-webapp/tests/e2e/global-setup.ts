@@ -5,8 +5,11 @@ import { setTimeout as sleep } from 'node:timers/promises';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const ANVIL_PORT = 8547;
+const ANVIL_RPC = `http://127.0.0.1:${ANVIL_PORT}`;
+
 async function rpcCall(method: string, params: unknown[] = []) {
-  const res = await fetch('http://127.0.0.1:8545', {
+  const res = await fetch(ANVIL_RPC, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
@@ -27,26 +30,38 @@ async function waitForAnvil(maxMs = 10_000) {
 }
 
 /**
- * Playwright globalSetup — anvil を kill して再起動 (= chain クリーン状態) +
- * deploy-niji-full を 1 回実行する。 spec 間で state を共有する設計のため、 全
- * test 直列実行 (workers: 1 + fullyParallel: false) の頭で 1 回だけ走る。
+ * Playwright globalSetup — Niji 固有の deploy が hardhat task (`hardhat
+ * deploy-niji-full --network localhost`) なので、 kiwa の runE2EPrepareEnv ではなく
+ * 自前で anvil 8547 を立てて hardhat task を spawn する。 spec 間で state を共有する
+ * 設計のため、 全 test 直列実行 (workers: 1 + fullyParallel: false) の頭で 1 回だけ走る。
+ *
+ * SKIP_GLOBAL_SETUP=1 のときは「既に anvil + webapp + deploy 済」 を前提に skip。
+ * (ad-hoc 単発 spec を既存環境にぶつけたい時に使う)
  */
 export default async function globalSetup() {
+  if (process.env.SKIP_GLOBAL_SETUP === '1') {
+    console.log('[e2e globalSetup] SKIP_GLOBAL_SETUP=1 — skipping anvil restart + deploy');
+    return;
+  }
   const start = Date.now();
 
-  // 1) 既存 anvil を pkill (port 8545)
-  spawnSync('pkill', ['-f', 'anvil --port 8545']);
+  // 1) 既存 anvil を pkill (port 8547)
+  spawnSync('pkill', ['-f', `anvil --port ${ANVIL_PORT}`]);
   await sleep(500);
 
   // 2) anvil を起動
-  const anvilProc = spawn('anvil', ['--port', '8545', '--chain-id', '31337', '--host', '127.0.0.1'], {
-    stdio: ['ignore', 'pipe', 'pipe'],
-    detached: true,
-  });
+  const anvilProc = spawn(
+    'anvil',
+    ['--port', String(ANVIL_PORT), '--chain-id', '31337', '--host', '127.0.0.1'],
+    {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      detached: true,
+    },
+  );
   anvilProc.unref();
   await waitForAnvil();
 
-  // 3) deploy-niji-full
+  // 3) deploy-niji-full (hardhat task)
   const repoRoot = path.resolve(__dirname, '../../../..');
   const contractsDir = path.join(repoRoot, 'packages/niji-contracts');
   const result = spawnSync(

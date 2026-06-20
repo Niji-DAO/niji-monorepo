@@ -4,12 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prebuild": "is-ci && exit 0 || (([ -n \"$VITE_SEPOLIA_SUBGRAPH\" ] && graphql-codegen-esm --config codegen.config.ts) || true)",
+    "prebuild": "is-ci && exit 0 || (([ -n \"$VITE_BASE_SEPOLIA_SUBGRAPH\" ] && graphql-codegen-esm --config codegen.config.ts) || true)",
     "build": "tsc -b && vite build",
+    "build:base-sepolia": "tsc -b && vite build --mode base-sepolia",
     "check": "tsc --noEmit --skipLibCheck",
     "clean": "rimraf dist .netlify",
-    "dev": "vite",
-    "dev:sepolia": "vite --mode sepolia",
+    "dev": "VITE_CHAIN_ID=31337 vite",
+    "dev:base-sepolia": "vite --mode base-sepolia",
     "graphql-codegen": "graphql-codegen-esm --config codegen.config.ts",
     "graphql-codegen:watch": "graphql-codegen-esm --config codegen.config.ts --watch",
     "i18n:ai-translate": "pnpm dlx lingo.dev i18n",
@@ -20,7 +21,8 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "test:e2e": "playwright test"
   },
   "browserslist": [
     ">0.2%",
@@ -145,6 +147,8 @@
     "vite-plugin-inspect": "^11.3.0",
     "vite-plugin-node-polyfills": "^0.25.0",
     "vite-plugin-svgr": "^4.5.0",
-    "vitest": "^4.0.0"
+    "vitest": "^4.0.0",
+    "@kiwa-test/core": "^0.1.0",
+    "viem": "^2"
   }
 }

@@ -45,7 +45,7 @@ Then add an RPC provider to MetaMask to point to your local simnet.
 4.  Enter the following:
 
          Network Name: Hardhat
-         New RPC URL: http://localhost:8545
+         New RPC URL: http://localhost:8547
          Chain ID: 31337
 
 Select the network and connect to your local Nouns webapp to interact with simnet

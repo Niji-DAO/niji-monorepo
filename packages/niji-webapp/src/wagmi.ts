@@ -1,41 +1,50 @@
 import { find, pipe } from 'remeda';
-import { createConfig, http, fallback, webSocket } from 'wagmi';
-import { hardhat, mainnet, sepolia } from 'wagmi/chains';
+import { createConfig, createStorage, http, fallback, webSocket } from 'wagmi';
+import { baseSepolia, hardhat } from 'wagmi/chains';
 import { coinbaseWallet, injected, walletConnect } from 'wagmi/connectors';
 
 import { CHAIN_ID, WALLET_CONNECT_V2_PROJECT_ID } from './config';
+
+// Niji webapp は dev (anvil 31337) と prod (Base Sepolia 84532) の 2 chain のみを
+// サポートする。 旧 Nouns 由来の mainnet / sepolia 設定は撤廃。
+const SUPPORTED_CHAINS = [hardhat, baseSepolia] as const;
 
 const activeChainId = Number(CHAIN_ID);
 
 const activeChain =
   pipe(
-    [mainnet, sepolia, hardhat],
+    [...SUPPORTED_CHAINS],
     find(chain => chain.id === activeChainId),
-  ) ?? sepolia;
+  ) ?? hardhat;
 
 const transports = {
-  [mainnet.id]: fallback([
-    ...(import.meta.env.VITE_MAINNET_WSRPC !== undefined
-      ? [webSocket(import.meta.env.VITE_MAINNET_WSRPC)]
+  [hardhat.id]: http(import.meta.env.VITE_HARDHAT_JSONRPC ?? 'http://127.0.0.1:8547'),
+  [baseSepolia.id]: fallback([
+    ...(import.meta.env.VITE_BASE_SEPOLIA_WSRPC !== undefined
+      ? [webSocket(import.meta.env.VITE_BASE_SEPOLIA_WSRPC)]
       : []),
-    ...(import.meta.env.VITE_MAINNET_JSONRPC !== undefined
-      ? [http(import.meta.env.VITE_MAINNET_JSONRPC)]
-      : []),
+    ...(import.meta.env.VITE_BASE_SEPOLIA_JSONRPC !== undefined
+      ? [http(import.meta.env.VITE_BASE_SEPOLIA_JSONRPC)]
+      : [http('https://sepolia.base.org')]),
   ]),
-  [sepolia.id]: fallback([
-    ...(import.meta.env.VITE_SEPOLIA_WSRPC !== undefined
-      ? [webSocket(import.meta.env.VITE_SEPOLIA_WSRPC)]
-      : []),
-    ...(import.meta.env.VITE_SEPOLIA_JSONRPC !== undefined
-      ? [http(import.meta.env.VITE_SEPOLIA_JSONRPC)]
-      : []),
-  ]),
-  [hardhat.id]: http(import.meta.env.VITE_HARDHAT_JSONRPC ?? 'http://127.0.0.1:8545'),
 };
 
+// wagmi の localStorage に旧 chain (mainnet/sepolia) 接続 cache が残ると、
+// autoReconnect でその cache を読みに行って isConnected=false + sepolia 表示
+// 状態に永遠に陥る。 storage key を版指定して revoke することで旧 cache を捨てる。
+const wagmiStorage =
+  typeof window !== 'undefined'
+    ? createStorage({
+        storage: window.localStorage,
+        key: 'niji-wagmi.v2',
+      })
+    : undefined;
+
 export const config = createConfig({
-  chains: [mainnet, sepolia, hardhat],
+  chains: SUPPORTED_CHAINS,
   transports,
+  storage: wagmiStorage,
+  multiInjectedProviderDiscovery: true,
   connectors: [
     injected(),
     walletConnect({

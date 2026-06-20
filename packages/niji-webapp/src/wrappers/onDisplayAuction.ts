@@ -49,7 +49,10 @@ const useOnDisplayAuction = (): Auction | undefined => {
   }
 
   // current auction
-  if (BigInt(onDisplayAuctionNounId) === lastAuctionNounId) {
+  // lastAuctionNounId は redux store 上 string、 onDisplayAuctionNounId は number、
+  // 元実装は BigInt(string) === string で常に false に落ちて current 経路に入れな
+  // かったため、 両辺を BigInt 化して比較する。
+  if (BigInt(onDisplayAuctionNounId) === BigInt(lastAuctionNounId)) {
     return deserializeAuction(currentAuction);
   }
 

@@ -722,6 +722,9 @@ importers:
       '@graphql-codegen/typescript-operations':
         specifier: ^4.6.0
         version: 4.6.1(encoding@0.1.13)(graphql@16.11.0)
+      '@kiwa-test/core':
+        specifier: ^0.1.0
+        version: 0.1.2(@playwright/test@1.54.1)(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
       '@lingui/babel-plugin-lingui-macro':
         specifier: ^5.9.0
         version: 5.9.2(babel-plugin-macros@3.1.0)(typescript@5.9.2)
@@ -2835,6 +2838,13 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@kiwa-test/core@0.1.2':
+    resolution: {integrity: sha512-d2wT8Ou9Gwi38RterFJV/OCRwf0+9MP9PERcHT1XIhGgCD5999c8ilwoq9Y2jHTPIeKBh/i8lRJzVM2BV+V4Mg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@playwright/test': ^1.49.0
+      viem: ^2
 
   '@leichtgewicht/ip-codec@2.0.5':
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
@@ -18439,6 +18449,12 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@kiwa-test/core@0.1.2(@playwright/test@1.54.1)(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))':
+    dependencies:
+      '@playwright/test': 1.54.1
+      viem: 2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76)
+      zod: 3.25.76
 
   '@leichtgewicht/ip-codec@2.0.5': {}
 

@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
 import dayjs from 'dayjs';
 
-import { CHAIN_ID } from '@/config';
 import { Auction } from '@/wrappers/nijiAuction';
 
 import classes from './SettleManuallyBtn.module.css';
@@ -27,12 +26,11 @@ const SettleManuallyBtn: React.FC<{
 
   // timer logic
   useEffect(() => {
-    // Allow immediate manual settlement when testing
-    if (CHAIN_ID !== 1) {
-      setSettleEnabled(true);
-      setAuctionTimer(0);
-      return;
-    }
+    // anvil (31337) も Base Sepolia (84532) も test 環境なので即時 manual settle 許可。
+    // mainnet を撤廃したので常に即時 settle 可。
+    setSettleEnabled(true);
+    setAuctionTimer(0);
+    return;
 
     // prettier-ignore
     const timeLeft = MINS_TO_ENABLE_MANUAL_SETTLEMENT * 60 - (dayjs().unix() - (auction && Number(auction.endTime)));

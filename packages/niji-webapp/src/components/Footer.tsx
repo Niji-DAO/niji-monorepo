@@ -22,19 +22,17 @@ export const Footer = () => {
     {
       category: 'Niji DAO',
       items: [
+        { label: t`LP`, url: '/lp/' },
         { label: t`Calendar`, url: '/calendar' },
         { label: t`Governance`, url: '/vote' },
         { label: t`Brand Assets`, url: '/brand' },
         { label: t`Playground`, url: '/playground' },
         { label: t`Nijis`, url: '/nijis' },
         { label: t`Traits`, url: '/traits' },
+        { label: t`Crystal Ball`, url: '/crystal-ball' },
         {
           label: t`Forks`,
           url: '/fork',
-        },
-        {
-          label: t`Map`,
-          url: 'https://nounspot.com',
         },
       ],
     },
@@ -63,7 +61,7 @@ export const Footer = () => {
   ];
 
   const socialItems: { alt: string; url: string; icon: React.ReactNode }[] = [
-    { alt: 'X', url: 'https://x.com/nounsdao', icon: <XIcon className="size-6 p-0.5" /> },
+    { alt: 'X', url: 'https://x.com/niji_dao', icon: <XIcon className="size-6 p-0.5" /> },
     {
       alt: 'Farcaster',
       url: 'https://farcaster.xyz/~/channel/nijis',

@@ -21,21 +21,12 @@ const GovernancePage = () => {
 
   const treasuryBalance = useReadNijiTreasuryBalancesInEth({
     query: {
-      select: (balances: { total: bigint }) => {
-        console.log('eth', balances);
-        return balances.total;
-      },
+      select: (balances: { total: bigint }) => balances.total,
     },
   }).data;
   const treasuryBalanceUSD = useReadNijiTreasuryBalancesInUsd({
     query: {
-      select: (balances: Record<string, bigint> & { total: bigint }) => {
-        console.log(
-          'usd',
-          Object.entries(balances).map(([token, value]) => [token, formatUnits(value, 6)]),
-        );
-        return balances.total;
-      },
+      select: (balances: Record<string, bigint> & { total: bigint }) => balances.total,
     },
   }).data;
 

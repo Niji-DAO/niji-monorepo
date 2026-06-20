@@ -25,8 +25,9 @@ import { store } from '@/store';
 import { execute } from '@/subgraphs/execute';
 
 import App from './App';
-import { CHAIN_ID } from './config';
+import config, { CHAIN_ID } from './config';
 import { useAppDispatch, useAppSelector } from './hooks';
+import { useChainPastAuctions } from './hooks/useChainPastAuctions';
 import { LanguageProvider } from './i18n/LanguageProvider';
 import reportWebVitals from './reportWebVitals';
 import {
@@ -45,7 +46,30 @@ import { nounPath } from './utils/history';
 import { defaultChain, config as wagmiConfig } from './wagmi';
 import { latestAuctionsQuery } from './wrappers/subgraph';
 
-const queryClient = new QueryClient();
+// ConnectKit 内部 / 旧コードが `ensName` `ensAvatar` 系 wagmi query を呼んでも、
+// anvil 31337 / Base Sepolia には ENS が無いため必ず失敗する。 viem は失敗時に
+// `eth.merkle.io` 等の mainnet public RPC へ fallback retry し、 CORS error を
+// console に大量に吐き続けるので、 queryClient 層で ens query を強制 disable する。
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
+queryClient.getQueryCache().subscribe(event => {
+  if (event.type === 'added') {
+    const key = event.query.queryKey;
+    if (
+      Array.isArray(key) &&
+      typeof key[0] === 'string' &&
+      (key[0] === 'ensName' || key[0] === 'ensAvatar' || key[0] === 'ensAddress')
+    ) {
+      // 強制 disable + 即時 cancel (ENS は本 webapp の対象 chain でサポート外)
+      event.query.cancel();
+    }
+  }
+});
 
 const ChainSubscriber: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -53,13 +77,23 @@ const ChainSubscriber: React.FC = () => {
   const chainId = defaultChain.id;
 
   // Fetch the current auction
-  const { data: currentAuction } = useReadNijiAuctionHouseAuction();
+  // wallet 未接続でも default chain で read できるよう chainId を明示する。
+  const { data: currentAuction } = useReadNijiAuctionHouseAuction({ chainId });
+  const onDisplayAuctionNounId = useAppSelector(
+    state => state.onDisplayAuction.onDisplayAuctionNounId,
+  );
   useEffect(() => {
     if (currentAuction) {
       dispatch(setFullAuction(reduxSafeAuction(currentAuction)));
       dispatch(setLastAuctionNounId(Number(currentAuction.nounId)));
+      // 初回 mount 時に AuctionCreated event を取り逃がしている場合、
+      // onDisplayAuctionNounId が undefined のままで AuctionActivity が初期表示
+      // されないので、 ここで現在 auction の nounId を補填する。
+      if (onDisplayAuctionNounId === undefined) {
+        dispatch(setOnDisplayAuctionNounId(Number(currentAuction.nounId)));
+      }
     }
-  }, [currentAuction, dispatch]);
+  }, [currentAuction, dispatch, onDisplayAuctionNounId]);
 
   // Fetch the previous 24 hours of bids
   useEffect(() => {
@@ -197,9 +231,15 @@ const ChainSubscriber: React.FC = () => {
 
 const PastAuctions: React.FC = () => {
   const latestAuctionId = useAppSelector(state => state.onDisplayAuction.lastAuctionNounId);
+  const dispatch = useAppDispatch();
+
+  // subgraph URL が設定されていない (anvil dev 等) ときは chain 直叩きで past
+  // auction を構築する。 prod (Base Sepolia) では従来通り subgraph 経路。
+  const useChainFallback = !config.app.subgraphApiUri;
 
   const { data: auctions } = useQuery({
     queryKey: ['latestAuctions'],
+    enabled: !useChainFallback,
     queryFn: async () =>
       await Promise.all([
         execute(latestAuctionsQuery, { first: 1000 }),
@@ -207,13 +247,17 @@ const PastAuctions: React.FC = () => {
       ]).then(([page1, page2]) => [...page1.auctions, ...page2.auctions]),
   });
 
-  const dispatch = useAppDispatch();
+  const { data: chainAuctions } = useChainPastAuctions();
 
   useEffect(() => {
-    if (auctions) {
+    if (useChainFallback) {
+      if (chainAuctions) {
+        dispatch(addPastAuctions(chainAuctions));
+      }
+    } else if (auctions) {
       dispatch(addPastAuctions({ auctions }));
     }
-  }, [auctions, latestAuctionId, dispatch]);
+  }, [auctions, chainAuctions, useChainFallback, latestAuctionId, dispatch]);
 
   return <></>;
 };

@@ -1,17 +1,17 @@
-import { parseAbiItem, PublicClient } from 'viem';
+import { parseAbiItem } from 'viem';
 
 import { Address } from '@/utils/types';
 
 /**
- * look up NNS or ENS (NNS first, ENS fallback)
- * @param client
+ * look up NNS or ENS (NNS first, ENS fallback).
+ * viem の PublicClient 型は chains narrow で wagmi 戻り値型と衝突しがちなので
+ * client は any 受けし readContract 経由で抽象化する。
+ * @param client viem PublicClient (any 受け)
  * @param target wallet address
  * @returns name or null
  */
-export async function lookupNNSOrENS(
-  client: PublicClient,
-  target: Address,
-): Promise<string | null> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function lookupNNSOrENS(client: any, target: Address): Promise<string | null> {
   // try NNS
   try {
     const name = await client.readContract({

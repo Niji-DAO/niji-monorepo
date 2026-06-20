@@ -120,7 +120,10 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     // =========================================
     // STEP 1: Prepare PNG data
     // =========================================
-    let samplePngs: Map<number, Buffer> = new Map();
+    // local 31337 では各 trait dir 内の全 PNG を upload して絵柄 variation を作る
+    // (1 trait 1 image だと _pickTrait(N) % 1 = 0 で常に同じ trait しか選ばれない)。
+    // mainnet deploy では別途 trait pruning が必要。
+    let samplePngs: Map<number, Buffer[]> = new Map();
     let palette: ColorInfo[] = [];
 
     if (!args.skipImages) {
@@ -161,14 +164,13 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
       palette = medianCutPalette(Array.from(colorMap.values()), PALETTE_SIZE);
       console.log(`│ ${colorMap.size} unique colors → ${palette.length} palette colors`);
 
-      console.log('│ Processing sample images...');
+      console.log('│ Processing all images per trait...');
       for (const trait of TRAIT_DIRS) {
         const traitFiles = allFiles.filter(f => f.traitId === trait.id);
         if (traitFiles.length === 0) continue;
 
-        let bestBuf: Buffer | null = null;
-        let bestOpaque = 0;
-        for (const sf of traitFiles.slice(0, 5)) {
+        const bufs: Buffer[] = [];
+        for (const sf of traitFiles) {
           const { data } = await sharp(sf.inputPath)
             .resize(RESOLUTION, RESOLUTION, {
               kernel: 'lanczos3',
@@ -192,21 +194,22 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
             data[j + 1] = palette[idx].g;
             data[j + 2] = palette[idx].b;
           }
+          // 全 transparent はスキップ (mint で空 SVG にならないように)
           let opaque = 0;
           for (let j = 3; j < data.length; j += 4) if (data[j] > 0) opaque++;
-          if (opaque > bestOpaque) {
-            bestOpaque = opaque;
-            bestBuf = await sharp(data, {
-              raw: { width: RESOLUTION, height: RESOLUTION, channels: 4 },
-            })
-              .png({ compressionLevel: 9, palette: true, colors: PALETTE_SIZE })
-              .toBuffer();
-          }
+          if (opaque === 0) continue;
+          const buf = await sharp(data, {
+            raw: { width: RESOLUTION, height: RESOLUTION, channels: 4 },
+          })
+            .png({ compressionLevel: 9, palette: true, colors: PALETTE_SIZE })
+            .toBuffer();
+          bufs.push(buf);
         }
-        if (bestBuf) {
-          samplePngs.set(trait.id, bestBuf);
+        if (bufs.length > 0) {
+          samplePngs.set(trait.id, bufs);
+          const totalKB = bufs.reduce((sum, b) => sum + b.length, 0) / 1024;
           console.log(
-            `│   ${trait.name.padEnd(16)} ${(bestBuf.length / 1024).toFixed(1).padStart(6)}KB`,
+            `│   ${trait.name.padEnd(16)} ${bufs.length.toString().padStart(3)} images, ${totalKB.toFixed(1).padStart(7)}KB`,
           );
         }
       }
@@ -266,23 +269,34 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     if (!args.skipImages && samplePngs.size > 0) {
       console.log('┌─ STEP 6: Upload PNG Data (SSTORE2) ───────────────────────────┐');
       let totalDeployGas = 0n;
+      let totalImages = 0;
 
       for (const trait of TRAIT_DIRS) {
-        const pngBuf = samplePngs.get(trait.id);
-        if (!pngBuf) continue;
+        const pngBufs = samplePngs.get(trait.id);
+        if (!pngBufs || pngBufs.length === 0) continue;
 
-        try {
-          const tx = await art.addTraitImage(trait.id, pngBuf, { gasLimit: 5000000 });
-          const receipt = await tx.wait();
-          totalDeployGas = totalDeployGas + receipt!.gasUsed;
-          console.log(
-            `│ ${trait.name.padEnd(16)} ${pngBuf.length.toString().padStart(6)}B → ${receipt!.gasUsed.toLocaleString().padStart(10)} gas`,
-          );
-        } catch (e: any) {
-          console.error(`│ ${trait.name.padEnd(16)} FAILED: ${e.message.slice(0, 50)}`);
+        let traitGas = 0n;
+        let traitOk = 0;
+        for (const pngBuf of pngBufs) {
+          try {
+            const tx = await art.addTraitImage(trait.id, pngBuf, { gasLimit: 5000000 });
+            const receipt = await tx.wait();
+            traitGas = traitGas + receipt!.gasUsed;
+            traitOk++;
+            totalImages++;
+          } catch (e: any) {
+            console.error(
+              `│ ${trait.name.padEnd(16)} 1 image FAILED: ${e.message.slice(0, 50)}`,
+            );
+          }
         }
+        totalDeployGas = totalDeployGas + traitGas;
+        console.log(
+          `│ ${trait.name.padEnd(16)} ${traitOk.toString().padStart(3)}/${pngBufs.length.toString().padStart(3)} images → ${traitGas.toLocaleString().padStart(12)} gas`,
+        );
       }
-      console.log(`│ Total upload gas: ${totalDeployGas.toLocaleString()}`);
+      console.log(`│ Total uploaded images: ${totalImages}`);
+      console.log(`│ Total upload gas:      ${totalDeployGas.toLocaleString()}`);
       console.log('└──────────────────────────────────────────────────────────────┘\n');
     }
 
@@ -307,10 +321,13 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     if (token && network.name === 'localhost') {
       console.log('┌─ STEP 7.5: Deploy AuctionHouse (V3 + Proxy + WETH) ────────────┐');
 
-      // 31337 local 用パラメータ — 検証しやすさ優先で 1 時間枠 (e2e 走らせる時間を確保)
-      const AUCTION_DURATION = 60 * 60; // 60 分
+      // 31337 local 用パラメータ — dev で auction を回しまくる用に 1 分枠
+      // (Niji 0 / 任意の auction の endTime を 1 分で越えさせ Bid.tsx の auctionEnded を
+      // すぐ true にして既存の SettleManuallyBtn を表示させる狙い、 auto-settler が
+      // 5s polling で速やかに次 auction に進める)
+      const AUCTION_DURATION = 60; // 1 分
       const AUCTION_RESERVE_PRICE = ethers.parseEther('0.001'); // 0.001 ETH
-      const AUCTION_TIME_BUFFER = 60; // 1 分
+      const AUCTION_TIME_BUFFER = 10; // 10 秒 (1 分 auction に合わせる、 snipe 延長は最小限)
       const AUCTION_MIN_BID_INCREMENT_PRCT = 2; // 2%
 
       // WETH (test 用 mock)

@@ -61,7 +61,11 @@ const Auction: React.FC<AuctionProps> = props => {
     </div>
   );
 
-  const currentAuctionActivityContent = currentAuction && lastNounId && (
+  // lastNounId は number 型で、 nounId 0 (= falsy) の時 `&&` 演算子が「0」 を
+  // 返してしまい React が literal "0" を描画する問題があった。 0 が valid な
+  // auction id (Niji #0) であるため undefined チェックで真偽化する。
+  const hasLastNounId = lastNounId !== undefined && lastNounId !== null;
+  const currentAuctionActivityContent = currentAuction && hasLastNounId && (
     <AuctionActivity
       auction={currentAuction}
       isFirstAuction={currentAuction.nounId === 0n}
@@ -71,7 +75,7 @@ const Auction: React.FC<AuctionProps> = props => {
       displayGraphDepComps={true}
     />
   );
-  const nounderNounContent = currentAuction && lastNounId && (
+  const nounderNounContent = currentAuction && hasLastNounId && (
     <NijiContent
       mintTimestamp={BigInt(currentAuction.startTime)}
       nounId={BigInt(currentAuction.nounId)}
@@ -79,6 +83,7 @@ const Auction: React.FC<AuctionProps> = props => {
       isLastAuction={currentAuction.nounId === BigInt(lastNounId)}
       onPrevAuctionClick={prevAuctionHandler}
       onNextAuctionClick={nextAuctionHandler}
+      auction={currentAuction}
     />
   );
 
