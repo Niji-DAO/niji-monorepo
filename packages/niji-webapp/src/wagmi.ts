@@ -4,6 +4,7 @@ import { baseSepolia, hardhat } from 'wagmi/chains';
 import { coinbaseWallet, injected, walletConnect } from 'wagmi/connectors';
 
 import { CHAIN_ID, WALLET_CONNECT_V2_PROJECT_ID } from './config';
+import { ANVIL_RPC_URL } from './constants/anvil';
 
 // Niji webapp は dev (anvil 31337) と prod (Base Sepolia 84532) の 2 chain のみを
 // サポートする。 旧 Nouns 由来の mainnet / sepolia 設定は撤廃。
@@ -18,7 +19,7 @@ const activeChain =
   ) ?? hardhat;
 
 const transports = {
-  [hardhat.id]: http(import.meta.env.VITE_HARDHAT_JSONRPC ?? 'http://127.0.0.1:8547'),
+  [hardhat.id]: http(import.meta.env.VITE_HARDHAT_JSONRPC ?? ANVIL_RPC_URL),
   [baseSepolia.id]: fallback([
     ...(import.meta.env.VITE_BASE_SEPOLIA_WSRPC !== undefined
       ? [webSocket(import.meta.env.VITE_BASE_SEPOLIA_WSRPC)]

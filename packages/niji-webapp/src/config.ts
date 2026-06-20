@@ -1,5 +1,7 @@
 import { baseSepolia, hardhat } from 'viem/chains';
 
+import { ANVIL_PORT, ANVIL_RPC_URL } from './constants/anvil';
+
 interface ContractParameters {
   executor: {
     GRACE_PERIOD_SECONDS: number;
@@ -44,8 +46,8 @@ export const WALLET_CONNECT_V2_PROJECT_ID = import.meta.env.VITE_WALLET_CONNECT_
 
 const app: Record<SupportedChains, AppConfig> = {
   [hardhat.id]: {
-    jsonRpcUri: import.meta.env.VITE_HARDHAT_JSONRPC ?? 'http://127.0.0.1:8547',
-    wsRpcUri: 'ws://127.0.0.1:8547',
+    jsonRpcUri: import.meta.env.VITE_HARDHAT_JSONRPC ?? ANVIL_RPC_URL,
+    wsRpcUri: `ws://127.0.0.1:${ANVIL_PORT}`,
     // local 31337 は subgraph をローカル起動した時のみ参照。 未起動なら空でも UI は
     // chain 直叩きで動作する (PastAuctions が空配列で初期化されるだけ)。
     subgraphApiUri: import.meta.env.VITE_HARDHAT_SUBGRAPH ?? '',
