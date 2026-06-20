@@ -194,10 +194,19 @@ const ModalContent: React.FC<{
         />
       );
     default:
+      // 想定外 step (state machine 漏れ) は SELECT_ACTION_TYPE と同じ起点 step に
+      // フォールバック。 placeholder no-op handler だと button が動かないため
+      // case SELECT_ACTION_TYPE と同じ valid handler を渡す (Issue #169 F-6)。
       return (
         <SelectProposalActionStep
-          onNextBtnClick={() => console.log('')}
-          onPrevBtnClick={() => console.log('')}
+          onNextBtnClick={(
+            e?: React.MouseEvent | ProposalActionCreationStep | ProposalTransaction,
+          ) => {
+            if (e && typeof e !== 'object') {
+              setStep(e);
+            }
+          }}
+          onPrevBtnClick={onDismiss}
           state={state}
           setState={setState}
         />

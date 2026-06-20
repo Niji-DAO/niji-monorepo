@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { Dropdown } from 'react-bootstrap';
 
 import NavBarButton, { NavBarButtonStyle } from '@/components/NavBarButton';
-import { usePickByState } from '@/utils/colorResponsiveUIUtils';
+import { usePickByStateColor } from '@/utils/colorResponsiveUIUtils';
 
 import classes from './NavDropdown.module.css';
 
@@ -23,13 +23,13 @@ const NavDropDown: React.FC<NavDropDownProps> = props => {
 
   const [buttonUp, setButtonUp] = useState(false);
 
-  const statePrimaryButtonClass = usePickByState(
+  const statePrimaryButtonClass = usePickByStateColor(
     navDropdownClasses.whiteInfo,
     navDropdownClasses.coolInfo,
     navDropdownClasses.warmInfo,
   );
 
-  const stateSelectedDropdownClass = usePickByState(
+  const stateSelectedDropdownClass = usePickByStateColor(
     navDropdownClasses.whiteInfoSelected,
     navDropdownClasses.dropdownActive,
     navDropdownClasses.dropdownActive,
