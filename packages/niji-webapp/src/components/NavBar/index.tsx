@@ -26,7 +26,7 @@ import NavLocaleSwitcher from '@/components/NavLocaleSwitcher';
 import ShortAddress from '@/components/ShortAddress';
 import config, { CHAIN_ID } from '@/config';
 import { useAppSelector } from '@/hooks';
-import { usePickByState } from '@/utils/colorResponsiveUIUtils';
+import { usePickByStateColor } from '@/utils/colorResponsiveUIUtils';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
 import { defaultChain } from '@/wagmi';
 import { useIsDaoGteV3 } from '@/wrappers/nijiDao';
@@ -60,7 +60,7 @@ const NavBar = () => {
   const nonWalletButtonStyle = !useStateBg ? NavBarButtonStyle.WHITE_INFO : stateBasedButtonStyle;
 
   const closeNav = () => setIsNavExpanded(false);
-  const buttonClasses = usePickByState(
+  const buttonClasses = usePickByStateColor(
     navDropdownClasses.whiteInfoSelectedBottom,
     navDropdownClasses.coolInfoSelected,
     navDropdownClasses.warmInfoSelected,
@@ -79,7 +79,7 @@ const NavBar = () => {
     >
       <Dropdown.Item
         className={clsx(
-          usePickByState(
+          usePickByStateColor(
             navDropdownClasses.whiteInfoSelectedBottom,
             navDropdownClasses.coolInfoSelected,
             navDropdownClasses.warmInfoSelected,
@@ -277,7 +277,7 @@ const NavBar = () => {
               >
                 <Dropdown.Item
                   className={clsx(
-                    usePickByState(
+                    usePickByStateColor(
                       navDropdownClasses.whiteInfoSelectedBottom,
                       navDropdownClasses.coolInfoSelected,
                       navDropdownClasses.warmInfoSelected,
@@ -289,7 +289,7 @@ const NavBar = () => {
                 </Dropdown.Item>
                 <Dropdown.Item
                   className={clsx(
-                    usePickByState(
+                    usePickByStateColor(
                       navDropdownClasses.whiteInfoSelectedBottom,
                       navDropdownClasses.coolInfoSelected,
                       navDropdownClasses.warmInfoSelected,
@@ -301,7 +301,7 @@ const NavBar = () => {
                 </Dropdown.Item>
                 <Dropdown.Item
                   className={clsx(
-                    usePickByState(
+                    usePickByStateColor(
                       navDropdownClasses.whiteInfoSelectedBottom,
                       navDropdownClasses.coolInfoSelected,
                       navDropdownClasses.warmInfoSelected,
@@ -313,7 +313,7 @@ const NavBar = () => {
                 </Dropdown.Item>
                 <Dropdown.Item
                   className={clsx(
-                    usePickByState(
+                    usePickByStateColor(
                       navDropdownClasses.whiteInfoSelectedBottom,
                       navDropdownClasses.coolInfoSelected,
                       navDropdownClasses.warmInfoSelected,

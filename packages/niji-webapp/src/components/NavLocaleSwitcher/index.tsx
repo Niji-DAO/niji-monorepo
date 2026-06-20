@@ -11,7 +11,7 @@ import LanguageSelectionModal from '@/components/LanguageSelectionModal';
 import NavBarButton, { NavBarButtonStyle } from '@/components/NavBarButton';
 import { activeLocaleAtom } from '@/i18n/activeLocaleAtom';
 import { LOCALE_LABEL, SUPPORTED_LOCALES, SupportedLocale } from '@/i18n/locales';
-import { usePickByState } from '@/utils/colorResponsiveUIUtils';
+import { usePickByStateColor } from '@/utils/colorResponsiveUIUtils';
 
 import classes from './NavLocalSwitcher.module.css';
 
@@ -52,25 +52,25 @@ const NavLocaleSwitcher: React.FC<NavLocalSwitcherProps> = props => {
   const [showLanguagePickerModal, setShowLanguagePickerModal] = useState(false);
   const [activeLocale, setActiveLocale] = useAtom(activeLocaleAtom);
 
-  const statePrimaryButtonClass = usePickByState(
+  const statePrimaryButtonClass = usePickByStateColor(
     navDropdownClasses.whiteInfo,
     navDropdownClasses.coolInfo,
     navDropdownClasses.warmInfo,
   );
 
-  const stateSelectedDropdownClass = usePickByState(
+  const stateSelectedDropdownClass = usePickByStateColor(
     navDropdownClasses.whiteInfoSelected,
     navDropdownClasses.dropdownActive,
     navDropdownClasses.dropdownActive,
   );
 
-  const buttonStyleTop = usePickByState(
+  const buttonStyleTop = usePickByStateColor(
     navDropdownClasses.whiteInfoSelectedTop,
     navDropdownClasses.coolInfoSelected,
     navDropdownClasses.warmInfoSelected,
   );
 
-  const buttonStyleBottom = usePickByState(
+  const buttonStyleBottom = usePickByStateColor(
     navDropdownClasses.whiteInfoSelectedBottom,
     navDropdownClasses.coolInfoSelected,
     navDropdownClasses.warmInfoSelected,
