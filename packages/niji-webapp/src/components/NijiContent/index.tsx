@@ -7,6 +7,7 @@ import { useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction } from '@niji/
 import { Col, Row } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
+import { useBlock } from 'wagmi';
 
 import AuctionActivityDateHeadline from '@/components/AuctionActivityDateHeadline';
 import AuctionActivityNijiTitle from '@/components/AuctionActivityNijiTitle';
@@ -53,8 +54,16 @@ const NijiContent: React.FC<NijiContentProps> = props => {
   // auction.endTime を過ぎたら誰でも settleCurrentAndCreateNewAuction() を呼んで
   // 次の auction を開始できる必要がある。 Bid component と同様の settle 経路を
   // Nijider 用 NijiContent にも組み込む。
+  //
+  // endTime 判定は **chain 上の block.timestamp** で行う (Date.now() は browser local
+  // 時刻で anvil evm_increaseTime とズレるため Issue #172 m-1)。 useBlock は polling で
+  // chain block 進行に追従する。
+  const { data: latestBlock } = useBlock({ watch: true });
+  const chainNow = latestBlock?.timestamp;
   const auctionEnded =
-    auction !== undefined && Math.floor(Date.now() / 1000) >= Number(auction.endTime);
+    auction !== undefined &&
+    chainNow !== undefined &&
+    chainNow >= BigInt(auction.endTime.toString());
   const isWalletConnected = activeAccount !== undefined;
 
   const {

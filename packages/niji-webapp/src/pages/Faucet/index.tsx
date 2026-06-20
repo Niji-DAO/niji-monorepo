@@ -16,9 +16,9 @@ import { useAccount, useBalance, usePublicClient } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CHAIN_ID } from '@/config';
+import { ANVIL_RPC_URL } from '@/constants/anvil';
 
-const ANVIL_RPC_URL =
-  (import.meta.env.VITE_HARDHAT_JSONRPC as string | undefined) ?? 'http://127.0.0.1:8547';
+const ANVIL_RPC = (import.meta.env.VITE_HARDHAT_JSONRPC as string | undefined) ?? ANVIL_RPC_URL;
 
 // anvil --mnemonic 'test test test test test test test test test test test junk' で生成される
 // 10 個の標準アカウント (HD path m/44'/60'/0'/0/{0..9})。 各アカウントは起動時に 10000 ETH を保有。
@@ -81,7 +81,7 @@ const truncate = (value: string, head = 6, tail = 4) =>
   value.length <= head + tail + 1 ? value : `${value.slice(0, head)}…${value.slice(-tail)}`;
 
 async function anvilRpc(method: string, params: unknown[]): Promise<unknown> {
-  const res = await fetch(ANVIL_RPC_URL, {
+  const res = await fetch(ANVIL_RPC, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params }),
