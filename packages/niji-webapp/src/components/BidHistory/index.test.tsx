@@ -8,9 +8,9 @@ import { useAuctionBids } from '@/wrappers/onDisplayAuction';
 
 import BidHistory from './index';
 
-// Mock dependencies
-vi.mock('@/hooks', () => ({
-  useAppSelector: () => true, // Mock isCool to be true
+// Mock dependencies (isCoolBackgroundAtom 経由の Jotai を mock)
+vi.mock('jotai/react', () => ({
+  useAtomValue: () => true, // Mock isCool to be true
 }));
 
 vi.mock('@/wrappers/onDisplayAuction', () => ({
