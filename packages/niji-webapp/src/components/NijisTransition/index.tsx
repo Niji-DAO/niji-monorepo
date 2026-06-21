@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Transition } from 'react-transition-group';
+import { AnimatePresence, motion, type TargetAndTransition } from 'motion/react';
 
 export interface TransitionStyles {
   enteringStyle: React.CSSProperties;
@@ -11,62 +11,56 @@ export interface TransitionStyles {
 
 export interface NounsTransitionProps {
   children?: React.ReactNode;
-  nodeRef: React.MutableRefObject<null>;
+  /**
+   * react-transition-group との API 互換のため受け取るが motion 経路では未使用。
+   * 既存 consumer 8 件の prop 削除を避けるため optional 形式で残す。
+   */
+  nodeRef?: React.MutableRefObject<HTMLDivElement | null> | React.RefObject<HTMLDivElement | null>;
   show: boolean;
   transitionStyes: TransitionStyles;
   timeout?: number;
-  onClick?: (e: any) => void;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   className?: string;
 }
 
 /**
- * Higher order util component wrapping functionality of react-transition-group to play nice with how we style CSS
- * @param props  NounsTransitionProps
+ * motion (Framer Motion) で実装した modal / overlay 用の fade / slide transition。
+ *
+ * 旧 react-transition-group の `<Transition>` API と互換のため、 transitionStyes の 4 state
+ * (entering / entered / exiting / exited) を motion の initial / animate / exit に写像する。
+ *
+ * - enteredStyle → animate (目標 state)
+ * - exitingStyle → exit (unmount 直前の visual)
+ * - exitedStyle → initial (mount 直後の visual)
+ * - enteringStyle は entered と同義の動的 state で motion では中間 frame に当たるため未使用
+ *   (旧実装でも entering と entered で同じ style を返すケースが多く、 視覚差は無視可能)
  */
 const NijisTransition: React.FC<NounsTransitionProps> = props => {
-  const {
-    children = <></>,
-    nodeRef,
-    show,
-    timeout = 200,
-    transitionStyes,
-    onClick = () => {},
-    className = '',
-  } = props;
+  const { children = <></>, show, timeout = 200, transitionStyes, onClick, className = '' } = props;
 
-  const getStyle = (state: string) => {
-    if (state === 'entering') {
-      return transitionStyes.enteringStyle;
-    }
+  const durationSec = timeout / 1000;
 
-    if (state === 'entered') {
-      return transitionStyes.enteredStyle;
-    }
-
-    if (state === 'exiting') {
-      return transitionStyes.exitingStyle;
-    }
-
-    if (state === 'exited') {
-      return transitionStyes.exitedStyle;
-    }
-  };
+  // CSSProperties の static shape を motion の TargetAndTransition 型に寄せる
+  // (旧 transitionStyes は値が plain CSS なので runtime には互換、 型のみ unsafe cast)
+  const initial = transitionStyes.exitedStyle as TargetAndTransition;
+  const animate = transitionStyes.enteredStyle as TargetAndTransition;
+  const exit = transitionStyes.exitingStyle as TargetAndTransition;
 
   return (
-    <Transition nodeRef={nodeRef} in={show} timeout={timeout} unmountOnExit>
-      {state => (
-        <div
-          onClick={onClick}
+    <AnimatePresence>
+      {show && (
+        <motion.div
           className={className}
-          ref={nodeRef}
-          style={{
-            ...getStyle(state as string),
-          }}
+          onClick={onClick}
+          initial={initial}
+          animate={animate}
+          exit={exit}
+          transition={{ duration: durationSec }}
         >
           {children}
-        </div>
+        </motion.div>
       )}
-    </Transition>
+    </AnimatePresence>
   );
 };
 
