@@ -568,9 +568,6 @@ importers:
       abitype:
         specifier: ^1.0.8
         version: 1.0.8(typescript@5.9.2)(zod@3.25.76)
-      axios:
-        specifier: '>=0.30.0'
-        version: 1.10.0
       bad-words:
         specifier: ^3.0.4
         version: 3.0.4
@@ -23549,14 +23546,6 @@ snapshots:
 
   aws4@1.11.0: {}
 
-  axios@1.10.0:
-    dependencies:
-      follow-redirects: 1.15.9
-      form-data: 4.0.3
-      proxy-from-env: 1.1.0
-    transitivePeerDependencies:
-      - debug
-
   axios@1.10.0(debug@4.4.1):
     dependencies:
       follow-redirects: 1.15.9(debug@4.4.1)
@@ -26610,8 +26599,6 @@ snapshots:
   folder-walker@3.2.0:
     dependencies:
       from2: 2.3.0
-
-  follow-redirects@1.15.9: {}
 
   follow-redirects@1.15.9(debug@4.4.0):
     optionalDependencies:

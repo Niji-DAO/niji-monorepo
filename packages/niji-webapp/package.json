@@ -55,7 +55,6 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@wagmi/core": "catalog:",
     "abitype": "^1.0.8",
-    "axios": "^0.30.0",
     "bad-words": "^3.0.4",
     "blo": "^2.0.0",
     "bootstrap": "^5.3.6",
