@@ -1,4 +1,4 @@
-import imageData from '../../../niji-assets/_archive/src/niji-data-rle.json';
+import imageData from '../../../niji-assets/src/niji-data-rle.json';
 
 export interface NijiSeed {
   special: number;
