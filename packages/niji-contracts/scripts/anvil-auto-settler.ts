@@ -9,16 +9,66 @@
  *     pnpm -w exec tsx packages/niji-contracts/scripts/anvil-auto-settler.ts
  *
  * 環境変数 — ANVIL_RPC (default http://127.0.0.1:8547)
- *           AUCTION_HOUSE (default 0x59b670...857b、 fresh anvil 上の決定論的 address)
+ *           AUCTION_HOUSE (省略時は deploy log `deploy/localhost-*-full.json` の最新から
+ *                          `NijiAuctionHouseProxy` を動的読込。 PR #193 の SDK 31337 sync と同じ pattern)
  *           DEPLOYER_PK (必須、 default なし — repo に anvil mnemonic 鍵を残さないため
  *                        OSS secret scanner / 010-env-guard の誤検知を予防)
  *           POLL_MS (default 5000)
  */
 
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { ethers } from 'ethers';
 
+// CommonJS module 配下のため `__dirname` は global 利用可能。 tsx + CommonJS 解釈で安定。
+
+/**
+ * `packages/niji-contracts/deploy/localhost-*-full.json` の最新を読んで
+ * NijiAuctionHouseProxy address を返す。 見つからない場合は undefined。
+ */
+function loadLatestAuctionHouseFromDeployLog(): string | undefined {
+  const deployDir = path.join(__dirname, '../deploy');
+  if (!fs.existsSync(deployDir)) return undefined;
+  const files = fs
+    .readdirSync(deployDir)
+    .filter(f => /^localhost-.*-full\.json$/.test(f))
+    .sort()
+    .reverse();
+  if (files.length === 0) return undefined;
+  const latest = path.join(deployDir, files[0]);
+  try {
+    const json = JSON.parse(fs.readFileSync(latest, 'utf-8')) as {
+      contracts?: { NijiAuctionHouseProxy?: string };
+    };
+    return json.contracts?.NijiAuctionHouseProxy;
+  } catch {
+    return undefined;
+  }
+}
+
 const RPC = process.env.ANVIL_RPC ?? 'http://127.0.0.1:8547';
-const AUCTION_HOUSE = process.env.AUCTION_HOUSE ?? '0x1Dbbf529D78d6507B0dd71F6c02f41138d828990';
+
+let AUCTION_HOUSE: string;
+let AUCTION_HOUSE_SOURCE: 'env' | 'deploy-log' | 'none';
+if (process.env.AUCTION_HOUSE) {
+  AUCTION_HOUSE = process.env.AUCTION_HOUSE;
+  AUCTION_HOUSE_SOURCE = 'env';
+} else {
+  const fromLog = loadLatestAuctionHouseFromDeployLog();
+  if (fromLog) {
+    AUCTION_HOUSE = fromLog;
+    AUCTION_HOUSE_SOURCE = 'deploy-log';
+  } else {
+    console.error(
+      '[auto-settler] AUCTION_HOUSE が解決できません。 以下のいずれかで指定してください:\n' +
+        '  1) pnpm exec hardhat deploy-niji-full --network localhost を先に実行 (deploy log から自動取得)\n' +
+        '  2) AUCTION_HOUSE=0x... を env で明示指定',
+    );
+    process.exit(2);
+  }
+}
+
 const DEPLOYER_PK = process.env.DEPLOYER_PK ?? '';
 if (!DEPLOYER_PK) {
   console.error(
@@ -102,7 +152,7 @@ async function tick(): Promise<void> {
 async function main(): Promise<void> {
   const net = await provider.getNetwork();
   console.log(
-    `[auto-settler] start — RPC=${RPC} chainId=${net.chainId} AuctionHouse=${AUCTION_HOUSE} poll=${POLL_MS}ms`,
+    `[auto-settler] start — RPC=${RPC} chainId=${net.chainId} AuctionHouse=${AUCTION_HOUSE} (source=${AUCTION_HOUSE_SOURCE}) poll=${POLL_MS}ms`,
   );
 
   while (!stopping) {
