@@ -8,7 +8,7 @@ import advanced from 'dayjs/plugin/advancedFormat';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { Col, Row } from 'react-bootstrap';
-import ReactDiffViewer from 'react-diff-viewer';
+import ReactDiffViewer from 'react-diff-viewer-continued';
 import ReactMarkdown from 'react-markdown';
 import { Link, useParams } from 'react-router';
 import remarkBreaks from 'remark-breaks';
