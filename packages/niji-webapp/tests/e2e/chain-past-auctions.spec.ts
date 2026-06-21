@@ -15,7 +15,7 @@
 import { expect } from '@playwright/test';
 import { dappE2eTest as test } from '@kiwa-test/core';
 
-import { increaseTime, revertChain, snapshotChain } from './helpers/chain';
+import { increaseTime, revertChain, seedPastAuctions, snapshotChain } from './helpers/chain';
 
 const CHAIN_HOOK_POLL_MS = 11_000;
 
@@ -48,40 +48,56 @@ test.describe('chain-past-auctions (subgraph 未起動 fallback)', () => {
   });
 
   test('TC-002 状態遷移: 前ボタン 1 回で過去 Niji へ遷移', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
-    await page.waitForTimeout(CHAIN_HOOK_POLL_MS);
+    const snapId = await snapshotChain();
+    try {
+      // navigation 系は過去 auction >= 1 件が前提。 seed で 1 件 settle 進めて
+      // ←ボタンが active になる状態を作る (Issue #197)。
+      await seedPastAuctions(1);
 
-    const before = page.url();
-    const leftArrow = page.getByRole('button', { name: '←' }).first();
-    await leftArrow.waitFor({ timeout: 5_000 });
-    await leftArrow.click();
-    await page.waitForTimeout(1_500);
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
+      await page.waitForTimeout(CHAIN_HOOK_POLL_MS);
 
-    expect(page.url()).not.toBe(before);
-    expect(page.url()).toMatch(/\/niji\/\d+$/);
+      const before = page.url();
+      const leftArrow = page.getByRole('button', { name: '←' }).first();
+      await leftArrow.waitFor({ timeout: 5_000 });
+      await leftArrow.click();
+      await page.waitForTimeout(1_500);
 
-    const hasSvgImg = await page.evaluate(() =>
-      Array.from(document.querySelectorAll('img')).some(
-        i => i.src.startsWith('data:image/svg+xml;base64,') && i.src.length > 1000,
-      ),
-    );
-    expect(hasSvgImg).toBe(true);
+      expect(page.url()).not.toBe(before);
+      expect(page.url()).toMatch(/\/niji\/\d+$/);
+
+      const hasSvgImg = await page.evaluate(() =>
+        Array.from(document.querySelectorAll('img')).some(
+          i => i.src.startsWith('data:image/svg+xml;base64,') && i.src.length > 1000,
+        ),
+      );
+      expect(hasSvgImg).toBe(true);
+    } finally {
+      await revertChain(snapId);
+    }
   });
 
   test('TC-003 状態遷移: 次ボタンで最新 Niji に戻る', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
-    await page.waitForTimeout(CHAIN_HOOK_POLL_MS);
+    const snapId = await snapshotChain();
+    try {
+      await seedPastAuctions(1);
 
-    await page.getByRole('button', { name: '←' }).first().click();
-    await page.waitForTimeout(1_500);
-    const prevUrl = page.url();
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
+      await page.waitForTimeout(CHAIN_HOOK_POLL_MS);
 
-    await page.getByRole('button', { name: '→' }).first().click();
-    await page.waitForTimeout(1_500);
+      await page.getByRole('button', { name: '←' }).first().click();
+      await page.waitForTimeout(1_500);
+      const prevUrl = page.url();
 
-    expect(page.url()).not.toBe(prevUrl);
+      await page.getByRole('button', { name: '→' }).first().click();
+      await page.waitForTimeout(1_500);
+
+      expect(page.url()).not.toBe(prevUrl);
+    } finally {
+      await revertChain(snapId);
+    }
   });
 
   test('TC-004 正常系: /niji/0 直接 navigate で Nijider 枠が描画', async ({ page }) => {
@@ -110,24 +126,32 @@ test.describe('chain-past-auctions (subgraph 未起動 fallback)', () => {
   });
 
   test('TC-005 状態遷移: 前ボタン 3 連打で連続して過去 Niji へ', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
-    await page.waitForTimeout(CHAIN_HOOK_POLL_MS);
+    const snapId = await snapshotChain();
+    try {
+      // 3 連打分の遷移を確認するため過去 auction を 3 件 seed
+      await seedPastAuctions(3);
 
-    let lastUrl = page.url();
-    let movements = 0;
-    const leftArrow = page.getByRole('button', { name: '←' }).first();
-    for (let i = 0; i < 3; i++) {
-      const disabled = await leftArrow.isDisabled().catch(() => true);
-      if (disabled) break;
-      await leftArrow.click();
-      await page.waitForTimeout(1_500);
-      if (page.url() !== lastUrl) {
-        movements++;
-        lastUrl = page.url();
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
+      await page.waitForTimeout(CHAIN_HOOK_POLL_MS);
+
+      let lastUrl = page.url();
+      let movements = 0;
+      const leftArrow = page.getByRole('button', { name: '←' }).first();
+      for (let i = 0; i < 3; i++) {
+        const disabled = await leftArrow.isDisabled().catch(() => true);
+        if (disabled) break;
+        await leftArrow.click();
+        await page.waitForTimeout(1_500);
+        if (page.url() !== lastUrl) {
+          movements++;
+          lastUrl = page.url();
+        }
       }
+      expect(movements).toBeGreaterThanOrEqual(1);
+    } finally {
+      await revertChain(snapId);
     }
-    expect(movements).toBeGreaterThanOrEqual(1);
   });
 
   test('TC-006 境界値: /niji/0 で前ボタンが disabled', async ({ page }) => {
@@ -151,45 +175,59 @@ test.describe('chain-past-auctions (subgraph 未起動 fallback)', () => {
   });
 
   test('TC-008 UI feature 網羅: ArrowLeft キーで navigation', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
-    await page.waitForTimeout(CHAIN_HOOK_POLL_MS);
+    const snapId = await snapshotChain();
+    try {
+      await seedPastAuctions(1);
 
-    const before = page.url();
-    await page.keyboard.press('ArrowLeft');
-    await page.waitForTimeout(1_500);
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
+      await page.waitForTimeout(CHAIN_HOOK_POLL_MS);
 
-    // AuctionNavigation の useCallback は first key で空 navigate→次キーで実遷移する hack を
-    // 持つので 2 回押す
-    if (page.url() === before) {
+      const before = page.url();
       await page.keyboard.press('ArrowLeft');
       await page.waitForTimeout(1_500);
+
+      // AuctionNavigation の useCallback は first key で空 navigate→次キーで実遷移する hack を
+      // 持つので 2 回押す
+      if (page.url() === before) {
+        await page.keyboard.press('ArrowLeft');
+        await page.waitForTimeout(1_500);
+      }
+      expect(page.url()).toMatch(/\/niji\/\d+$/);
+    } finally {
+      await revertChain(snapId);
     }
-    expect(page.url()).toMatch(/\/niji\/\d+$/);
   });
 
   test('TC-010 冪等性: 直接 URL と前ボタン経由で同一 Niji を描画', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
-    await page.waitForTimeout(CHAIN_HOOK_POLL_MS);
+    const snapId = await snapshotChain();
+    try {
+      await seedPastAuctions(1);
 
-    // 前ボタンで 1 つ戻った URL を取得
-    await page.getByRole('button', { name: '←' }).first().click();
-    await page.waitForTimeout(1_500);
-    const viaPrev = page.url();
-    const match = viaPrev.match(/\/niji\/(\d+)$/);
-    expect(match).not.toBeNull();
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
+      await page.waitForTimeout(CHAIN_HOOK_POLL_MS);
 
-    // 直接 URL navigate
-    await page.goto(viaPrev, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(CHAIN_HOOK_POLL_MS);
+      // 前ボタンで 1 つ戻った URL を取得
+      await page.getByRole('button', { name: '←' }).first().click();
+      await page.waitForTimeout(1_500);
+      const viaPrev = page.url();
+      const match = viaPrev.match(/\/niji\/(\d+)$/);
+      expect(match).not.toBeNull();
 
-    const hasSvgImg = await page.evaluate(() =>
-      Array.from(document.querySelectorAll('img')).some(
-        i => i.src.startsWith('data:image/svg+xml;base64,') && i.src.length > 1000,
-      ),
-    );
-    expect(hasSvgImg).toBe(true);
+      // 直接 URL navigate
+      await page.goto(viaPrev, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(CHAIN_HOOK_POLL_MS);
+
+      const hasSvgImg = await page.evaluate(() =>
+        Array.from(document.querySelectorAll('img')).some(
+          i => i.src.startsWith('data:image/svg+xml;base64,') && i.src.length > 1000,
+        ),
+      );
+      expect(hasSvgImg).toBe(true);
+    } finally {
+      await revertChain(snapId);
+    }
   });
 
   // TC-011 は anvil chain time を進めて auto-settler の settle 動作を観察する。
