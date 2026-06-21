@@ -2,12 +2,13 @@ import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { nijiTokenAddress } from '@niji/sdk/react';
+import { useAtomValue } from 'jotai/react';
 
 import _AddressIcon from '@/assets/icons/Address.svg';
 import _BidsIcon from '@/assets/icons/Bids.svg';
 import NijiInfoRowButton from '@/components/NijiInfoRowButton';
 import NijiInfoRowHolder from '@/components/NijiInfoRowHolder';
-import { useAppSelector } from '@/hooks';
+import { lastAuctionNounIdAtom } from '@/state/atoms/onDisplayAuctionAtom';
 import { buildEtherscanTokenLink } from '@/utils/etherscan';
 import { defaultChain } from '@/wagmi';
 
@@ -23,7 +24,7 @@ const NijiInfoCard: React.FC<NijiInfoCardProps> = props => {
   const etherscanButtonClickHandler = () =>
     window.open(buildEtherscanTokenLink(nijiTokenAddress[chainId], Number(nounId)));
 
-  const lastAuctionNounId = useAppSelector(state => state.onDisplayAuction.lastAuctionNounId);
+  const lastAuctionNounId = useAtomValue(lastAuctionNounIdAtom);
 
   return (
     <>

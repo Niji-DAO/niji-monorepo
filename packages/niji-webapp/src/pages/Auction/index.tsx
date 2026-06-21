@@ -1,12 +1,16 @@
 import React, { useEffect } from 'react';
 
+import { useAtomValue, useSetAtom } from 'jotai/react';
 import { useNavigate, useParams } from 'react-router';
 import { isNumber } from 'remeda';
 
 import Auction from '@/components/Auction';
 import Documentation from '@/components/Documentation';
-import { useAppDispatch, useAppSelector } from '@/hooks';
-import { setOnDisplayAuctionNounId } from '@/state/slices/onDisplayAuction';
+import { useAppSelector } from '@/hooks';
+import {
+  lastAuctionNounIdAtom,
+  onDisplayAuctionNounIdAtom,
+} from '@/state/atoms/onDisplayAuctionAtom';
 import { nounPath } from '@/utils/history';
 import useOnDisplayAuction from '@/wrappers/onDisplayAuction';
 
@@ -15,17 +19,17 @@ type AuctionPageProps = object;
 const AuctionPage: React.FC<AuctionPageProps> = () => {
   const { id: auctionId } = useParams<{ id: string }>();
   const onDisplayAuction = useOnDisplayAuction();
-  const lastAuctionNounId = useAppSelector(state => state.onDisplayAuction.lastAuctionNounId);
+  const lastAuctionNounId = useAtomValue(lastAuctionNounIdAtom);
+  const setOnDisplayAuctionNounId = useSetAtom(onDisplayAuctionNounIdAtom);
   const onDisplayAuctionNounId = Number(onDisplayAuction?.nounId);
 
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!lastAuctionNounId) return;
     if (auctionId === undefined) {
       if (onDisplayAuctionNounId === Number(lastAuctionNounId)) return;
-      dispatch(setOnDisplayAuctionNounId(Number(lastAuctionNounId)));
+      setOnDisplayAuctionNounId(Number(lastAuctionNounId));
       return;
     }
 
@@ -39,9 +43,9 @@ const AuctionPage: React.FC<AuctionPageProps> = () => {
     }
 
     if (Number(auctionId) !== onDisplayAuctionNounId) {
-      dispatch(setOnDisplayAuctionNounId(Number(auctionId)));
+      setOnDisplayAuctionNounId(Number(auctionId));
     }
-  }, [auctionId, lastAuctionNounId, dispatch, navigate, onDisplayAuctionNounId]);
+  }, [auctionId, lastAuctionNounId, navigate, onDisplayAuctionNounId, setOnDisplayAuctionNounId]);
 
   const isCoolBackground = useAppSelector(state => state.application.isCoolBackground);
   const backgroundColor = isCoolBackground

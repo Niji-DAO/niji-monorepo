@@ -1,7 +1,10 @@
 import { useAtomValue } from 'jotai/react';
 
-import { useAppSelector } from '@/hooks';
 import { auctionAtom } from '@/state/atoms/auctionAtom';
+import {
+  lastAuctionNounIdAtom,
+  onDisplayAuctionNounIdAtom,
+} from '@/state/atoms/onDisplayAuctionAtom';
 import { pastAuctionsAtom } from '@/state/atoms/pastAuctionsAtom';
 import { compareBids } from '@/utils/compareBids';
 import { generateEmptyNounderAuction, isNounderNiji } from '@/utils/nounderNiji';
@@ -38,9 +41,7 @@ const deserializeBids = (reduxSafeBids: BidEvent[]): Bid[] => {
 const useOnDisplayAuction = (): Auction | undefined => {
   const auctionState = useAtomValue(auctionAtom);
   const lastAuctionNounId = auctionState.activeAuction?.nounId;
-  const onDisplayAuctionNounId = useAppSelector(
-    state => state.onDisplayAuction.onDisplayAuctionNounId,
-  );
+  const onDisplayAuctionNounId = useAtomValue(onDisplayAuctionNounIdAtom);
   const currentAuction = auctionState.activeAuction;
   const pastAuctions = useAtomValue(pastAuctionsAtom);
 
@@ -83,7 +84,7 @@ const useOnDisplayAuction = (): Auction | undefined => {
 };
 
 export const useAuctionBids = (auctionNounId: bigint): Bid[] | undefined => {
-  const lastAuctionNounId = useAppSelector(state => state.onDisplayAuction.lastAuctionNounId);
+  const lastAuctionNounId = useAtomValue(lastAuctionNounIdAtom);
   const lastAuctionBids = useAtomValue(auctionAtom).bids;
   const pastAuctions = useAtomValue(pastAuctionsAtom);
 

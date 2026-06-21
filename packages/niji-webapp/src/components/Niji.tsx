@@ -2,12 +2,12 @@ import { FC, ImgHTMLAttributes, useEffect, useState } from 'react';
 
 import { buildSVG } from '@niji/sdk';
 import { useQuery } from '@tanstack/react-query';
+import { useSetAtom } from 'jotai/react';
 import { Link } from 'react-router';
 
 import loadingNoun from '@/assets/loading-skull-noun.gif';
-import { useAppDispatch } from '@/hooks';
 import { getNijiData, NijiImageData } from '@/lib/nijiAssets';
-import { setOnDisplayAuctionNounId } from '@/state/slices/onDisplayAuction';
+import { onDisplayAuctionNounIdAtom } from '@/state/atoms/onDisplayAuctionAtom';
 import { INounSeed, useNounSeed } from '@/wrappers/nijiToken';
 
 import nounClasses from '@/components/LegacyNoun/Noun.module.css';
@@ -136,7 +136,7 @@ const LinkedNiji: FC<LinkedNijiProps> = ({
   alt,
   ...props
 }) => {
-  const dispatch = useAppDispatch();
+  const setOnDisplayAuctionNounId = useSetAtom(onDisplayAuctionNounIdAtom);
 
   const image = (
     <div className={joinClassNames(nounClasses.imgWrapper, wrapperClassName)}>
@@ -155,7 +155,7 @@ const LinkedNiji: FC<LinkedNijiProps> = ({
   }
 
   const onClickHandler = () => {
-    dispatch(setOnDisplayAuctionNounId(Number(nounId)));
+    setOnDisplayAuctionNounId(Number(nounId));
   };
 
   return (

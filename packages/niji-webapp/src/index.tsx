@@ -12,7 +12,7 @@ import {
 } from '@niji/sdk/react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { useSetAtom } from 'jotai/react';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai/react';
 import { createRoot } from 'react-dom/client';
 import { Provider as ReduxProvider } from 'react-redux';
 import { parseAbiItem } from 'viem';
@@ -27,7 +27,6 @@ import { execute } from '@/subgraphs/execute';
 
 import App from './App';
 import config, { CHAIN_ID } from './config';
-import { useAppDispatch, useAppSelector } from './hooks';
 import { useChainPastAuctions } from './hooks/useChainPastAuctions';
 import { LanguageProvider } from './i18n/LanguageProvider';
 import reportWebVitals from './reportWebVitals';
@@ -41,8 +40,11 @@ import {
   reduxSafeAuction,
   reduxSafeBid,
 } from './state/atoms/auctionAtom';
+import {
+  lastAuctionNounIdAtom,
+  onDisplayAuctionNounIdAtom,
+} from './state/atoms/onDisplayAuctionAtom';
 import { pastAuctionsAtom, subgraphAuctionsToReduxSafe } from './state/atoms/pastAuctionsAtom';
-import { setLastAuctionNounId, setOnDisplayAuctionNounId } from './state/slices/onDisplayAuction';
 import { nounPath } from './utils/history';
 import { defaultChain, config as wagmiConfig } from './wagmi';
 import { latestAuctionsQuery } from './wrappers/subgraph';
@@ -73,30 +75,34 @@ queryClient.getQueryCache().subscribe(event => {
 });
 
 const ChainSubscriber: React.FC = () => {
-  const dispatch = useAppDispatch();
   const setAuction = useSetAtom(auctionAtom);
+  const [onDisplayAuctionNounId, setOnDisplayAuctionNounId] = useAtom(onDisplayAuctionNounIdAtom);
+  const setLastAuctionNounId = useSetAtom(lastAuctionNounIdAtom);
   const publicClient = usePublicClient();
   const chainId = defaultChain.id;
 
   // Fetch the current auction
   // wallet 未接続でも default chain で read できるよう chainId を明示する。
   const { data: currentAuction } = useReadNijiAuctionHouseAuction({ chainId });
-  const onDisplayAuctionNounId = useAppSelector(
-    state => state.onDisplayAuction.onDisplayAuctionNounId,
-  );
   useEffect(() => {
     if (currentAuction) {
       const payload = reduxSafeAuction(currentAuction);
       setAuction(prev => applyFullAuction(prev, payload));
-      dispatch(setLastAuctionNounId(Number(currentAuction.nounId)));
+      setLastAuctionNounId(Number(currentAuction.nounId));
       // 初回 mount 時に AuctionCreated event を取り逃がしている場合、
       // onDisplayAuctionNounId が undefined のままで AuctionActivity が初期表示
       // されないので、 ここで現在 auction の nounId を補填する。
       if (onDisplayAuctionNounId === undefined) {
-        dispatch(setOnDisplayAuctionNounId(Number(currentAuction.nounId)));
+        setOnDisplayAuctionNounId(Number(currentAuction.nounId));
       }
     }
-  }, [currentAuction, dispatch, onDisplayAuctionNounId, setAuction]);
+  }, [
+    currentAuction,
+    onDisplayAuctionNounId,
+    setAuction,
+    setLastAuctionNounId,
+    setOnDisplayAuctionNounId,
+  ]);
 
   // Fetch the previous 24 hours of bids
   useEffect(() => {
@@ -183,8 +189,8 @@ const ChainSubscriber: React.FC = () => {
         setAuction(prev => applyActiveAuction(prev, createPayload));
         const nounIdNumber = Number(nounId);
         window.location.href = nounPath(nounIdNumber);
-        dispatch(setOnDisplayAuctionNounId(nounIdNumber));
-        dispatch(setLastAuctionNounId(nounIdNumber));
+        setOnDisplayAuctionNounId(nounIdNumber);
+        setLastAuctionNounId(nounIdNumber);
       }
     },
   });
@@ -222,7 +228,7 @@ const ChainSubscriber: React.FC = () => {
 };
 
 const PastAuctions: React.FC = () => {
-  const latestAuctionId = useAppSelector(state => state.onDisplayAuction.lastAuctionNounId);
+  const latestAuctionId = useAtomValue(lastAuctionNounIdAtom);
   const setPastAuctions = useSetAtom(pastAuctionsAtom);
 
   // subgraph URL が空 (anvil dev で local subgraph 未起動 等) なら chain fallback を primary

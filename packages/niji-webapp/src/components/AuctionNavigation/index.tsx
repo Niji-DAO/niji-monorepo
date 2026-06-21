@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect } from 'react';
 
+import { useAtomValue } from 'jotai/react';
 import { useNavigate } from 'react-router';
 
 import { useAppSelector } from '@/hooks';
+import { lastAuctionNounIdAtom } from '@/state/atoms/onDisplayAuctionAtom';
 import useOnDisplayAuction from '@/wrappers/onDisplayAuction';
 
 import classes from './AuctionNavigation.module.css';
@@ -19,7 +21,7 @@ const AuctionNavigation: React.FC<AuctionNavigationProps> = props => {
   const isCool = useAppSelector(state => state.application.stateBackgroundColor) === '#d5d7e1';
   const navigate = useNavigate();
   const onDisplayAuction = useOnDisplayAuction();
-  const lastAuctionNounId = useAppSelector(state => state.onDisplayAuction.lastAuctionNounId);
+  const lastAuctionNounId = useAtomValue(lastAuctionNounIdAtom);
   const onDisplayAuctionNounId = Number(onDisplayAuction?.nounId);
 
   // Page through Nijis via a keyboard

@@ -3,12 +3,10 @@ import { combineReducers } from 'redux';
 import { createLogger } from 'redux-logger';
 
 import application from '@/state/slices/application';
-import onDisplayAuction from '@/state/slices/onDisplayAuction';
 
 const createRootReducer = () =>
   combineReducers({
     application,
-    onDisplayAuction,
   });
 const loggerMiddleware = createLogger();
 
