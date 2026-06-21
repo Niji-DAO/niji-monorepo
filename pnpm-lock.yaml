@@ -435,7 +435,7 @@ importers:
         version: 2.3.1(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)
       '@wagmi/core':
         specifier: 'catalog:'
-        version: 2.18.0(@tanstack/query-core@5.85.3)(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(typescript@5.9.2)(use-sync-external-store@1.4.0(react@19.1.0))(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
+        version: 2.18.0(@tanstack/query-core@5.85.3)(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(typescript@5.9.2)(use-sync-external-store@1.5.0(react@19.1.0))(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
       dotenv:
         specifier: 'catalog:'
         version: 16.5.0
@@ -523,9 +523,6 @@ importers:
       '@niji/sdk':
         specifier: workspace:*
         version: link:../niji-sdk
-      '@noundry/nouns-assets':
-        specifier: ^1.17.0
-        version: 1.17.0
       '@radix-ui/react-dialog':
         specifier: ^1.1.14
         version: 1.1.14(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -552,10 +549,7 @@ importers:
         version: 6.6.3
       '@wagmi/core':
         specifier: 'catalog:'
-        version: 2.18.0(@tanstack/query-core@5.85.3)(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(typescript@5.9.2)(use-sync-external-store@1.5.0(react@19.1.0))(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
-      abitype:
-        specifier: ^1.0.8
-        version: 1.0.8(typescript@5.9.2)(zod@3.25.76)
+        version: 2.18.0(@tanstack/query-core@5.85.3)(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(typescript@5.9.2)(use-sync-external-store@1.4.0(react@19.1.0))(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
       bad-words:
         specifier: ^3.0.4
         version: 3.0.4
@@ -607,9 +601,6 @@ importers:
       pngjs:
         specifier: ^6.0.0
         version: 6.0.0
-      postcss-normalize:
-        specifier: ^13.0.1
-        version: 13.0.1(browserslist@4.25.1)(postcss@8.5.3)
       react:
         specifier: 'catalog:'
         version: 19.1.0
@@ -634,9 +625,6 @@ importers:
       react-router-dom:
         specifier: ^7.6.0
         version: 7.6.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      react-swipeable:
-        specifier: ^7.0.0
-        version: 7.0.2(react@19.1.0)
       remark-breaks:
         specifier: ^4.0.0
         version: 4.0.0
@@ -652,9 +640,6 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.2)))
-      type-fest:
-        specifier: ^4.41.0
-        version: 4.41.0
       viem:
         specifier: 'catalog:'
         version: 2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76)
@@ -1659,9 +1644,6 @@ packages:
     resolution: {integrity: sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==}
     engines: {node: '>=18'}
 
-  '@csstools/normalize.css@12.1.1':
-    resolution: {integrity: sha512-YAYeJ+Xqh7fUou1d1j9XHl44BmsuThiTr4iNrgCQ3J27IbhXsxXDGZ1cXv8Qvs99d4rBbLiSKy3+WZiet32PcQ==}
-
   '@dabh/diagnostics@2.0.3':
     resolution: {integrity: sha512-hrlQOIi7hAfzsMqlGSFyVucrx38O+j6wiGOf//H2ecvIEqYN4ADBSS2iLMh5UFyDunCNniUIPk/q3riFv45xRA==}
 
@@ -2086,14 +2068,8 @@ packages:
   '@ethersproject/rlp@5.8.0':
     resolution: {integrity: sha512-LqZgAznqDbiEunaUvykH2JAoXTT9NV0Atqk8rQN9nx9SEgThA/WMx5DnW8a9FOufo//6FZOCHZ+XiClzgbqV9Q==}
 
-  '@ethersproject/sha2@5.8.0':
-    resolution: {integrity: sha512-dDOUrXr9wF/YFltgTBYS0tKslPEKr6AekjqDW2dbn1L1xmjGR+9GiKu4ajxovnrDbwxAKdHjW8jNcwfz8PAz4A==}
-
   '@ethersproject/signing-key@5.8.0':
     resolution: {integrity: sha512-LrPW2ZxoigFi6U6aVkFN/fa9Yx/+4AtIUe4/HACTvKJdhm0eeb107EVCIQcrLZkxaSIgc/eCrX8Q1GtbH+9n3w==}
-
-  '@ethersproject/solidity@5.8.0':
-    resolution: {integrity: sha512-4CxFeCgmIWamOHwYN9d+QWGxye9qQLilpgTU0XhYs1OahkclF+ewO+3V1U0mvpiuQxm5EHHmv8f7ClVII8EHsA==}
 
   '@ethersproject/strings@5.8.0':
     resolution: {integrity: sha512-qWEAk0MAvl0LszjdfnZ2uC8xbR2wdv4cDabyHiBh3Cldq/T8dPH3V4BbBsAYJUeonwD+8afVXld274Ls+Y1xXg==}
@@ -3541,9 +3517,6 @@ packages:
   '@nomicfoundation/solidity-analyzer@0.1.1':
     resolution: {integrity: sha512-1LMtXj1puAxyFusBgUIy5pZk3073cNXYnXUpuNKFghHbIit/xZgbk0AokpUADbNm3gyD6bFWl3LRFh3dhVdREg==}
     engines: {node: '>= 12'}
-
-  '@noundry/nouns-assets@1.17.0':
-    resolution: {integrity: sha512-S/nj49AVoxZOzTO/CWZ2NltbQD0EOJSvj4nTzC9u/Pwbyj2KZfPFUsktABlU1Y5s8d5xELwjkME/GbN5a/Saeg==}
 
   '@oclif/core@4.3.0':
     resolution: {integrity: sha512-lIzHY+JMP6evrS5E/sGijNnwrCoNtGy8703jWXcMuPOYKiFhWoAqnIm1BGgoRgmxczkbSfRsHUL/lwsSgh74Lw==}
@@ -12269,13 +12242,6 @@ packages:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
 
-  postcss-browser-comments@6.0.1:
-    resolution: {integrity: sha512-VE5mVLOW+L31a+Eyi7i5j7PmzOydObKLA9VwGBpTZy2OYB3XY1E7/xHxv4tURtEI/qb5h2TyyGHPhZ31sXOEXg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      browserslist: ^4.23.1
-      postcss: '>=8.4.31'
-
   postcss-import@15.1.0:
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
     engines: {node: '>=14.0.0'}
@@ -12322,13 +12288,6 @@ packages:
     resolution: {integrity: sha512-HQbt28KulC5AJzG+cZtj9kvKB93CFCdLvog1WFLf1D+xmMvPGlBstkpTEZfK5+AN9hfJocyBFCNiqyS48bpgzQ==}
     engines: {node: '>=12.0'}
     peerDependencies:
-      postcss: '>=8.4.31'
-
-  postcss-normalize@13.0.1:
-    resolution: {integrity: sha512-oGfXG7IQ44FUIMFco2N2Uz71UotM+tZ9trEmT1bHIUR5gAplyG3RnHqpMDEcCx1r+1bwBJTrI5uhiQr4YOpqhQ==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      browserslist: '>= 4'
       postcss: '>=8.4.31'
 
   postcss-selector-parser@6.1.2:
@@ -12791,11 +12750,6 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
-
-  react-swipeable@7.0.2:
-    resolution: {integrity: sha512-v1Qx1l+aC2fdxKa9aKJiaU/ZxmJ5o98RMoFwUqAAzVWUcxgfHFXDDruCKXhw6zIYXm6V64JiHgP9f6mlME5l8w==}
-    peerDependencies:
-      react: ^16.8.3 || ^17 || ^18 || ^19.0.0 || ^19.0.0-rc
 
   react-transition-group@4.4.5:
     resolution: {integrity: sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==}
@@ -13268,9 +13222,6 @@ packages:
 
   safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
-
-  sanitize.css@13.0.0:
-    resolution: {integrity: sha512-ZRwKbh/eQ6w9vmTjkuG0Ioi3HBwPFce0O+v//ve+aOq1oeCy7jMV2qzzAlpsNuqpqCBjjriM1lbtZbF/Q8jVyA==}
 
   saxes@6.0.0:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
@@ -16871,8 +16822,6 @@ snapshots:
 
   '@csstools/css-tokenizer@3.0.4': {}
 
-  '@csstools/normalize.css@12.1.1': {}
-
   '@dabh/diagnostics@2.0.3':
     dependencies:
       colorspace: 1.1.4
@@ -17365,12 +17314,6 @@ snapshots:
       '@ethersproject/bytes': 5.8.0
       '@ethersproject/logger': 5.8.0
 
-  '@ethersproject/sha2@5.8.0':
-    dependencies:
-      '@ethersproject/bytes': 5.8.0
-      '@ethersproject/logger': 5.8.0
-      hash.js: 1.1.7
-
   '@ethersproject/signing-key@5.8.0':
     dependencies:
       '@ethersproject/bytes': 5.8.0
@@ -17379,15 +17322,6 @@ snapshots:
       bn.js: 5.2.2
       elliptic: 6.6.1
       hash.js: 1.1.7
-
-  '@ethersproject/solidity@5.8.0':
-    dependencies:
-      '@ethersproject/bignumber': 5.8.0
-      '@ethersproject/bytes': 5.8.0
-      '@ethersproject/keccak256': 5.8.0
-      '@ethersproject/logger': 5.8.0
-      '@ethersproject/sha2': 5.8.0
-      '@ethersproject/strings': 5.8.0
 
   '@ethersproject/strings@5.8.0':
     dependencies:
@@ -19454,11 +19388,6 @@ snapshots:
       '@nomicfoundation/solidity-analyzer-win32-arm64-msvc': 0.1.1
       '@nomicfoundation/solidity-analyzer-win32-ia32-msvc': 0.1.1
       '@nomicfoundation/solidity-analyzer-win32-x64-msvc': 0.1.1
-
-  '@noundry/nouns-assets@1.17.0':
-    dependencies:
-      '@ethersproject/bignumber': 5.8.0
-      '@ethersproject/solidity': 5.8.0
 
   '@oclif/core@4.3.0':
     dependencies:
@@ -30762,11 +30691,6 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
-  postcss-browser-comments@6.0.1(browserslist@4.25.1)(postcss@8.5.3):
-    dependencies:
-      browserslist: 4.25.1
-      postcss: 8.5.3
-
   postcss-import@15.1.0(postcss@8.5.3):
     dependencies:
       postcss: 8.5.3
@@ -30800,14 +30724,6 @@ snapshots:
     dependencies:
       postcss: 8.5.3
       postcss-selector-parser: 6.1.2
-
-  postcss-normalize@13.0.1(browserslist@4.25.1)(postcss@8.5.3):
-    dependencies:
-      '@csstools/normalize.css': 12.1.1
-      browserslist: 4.25.1
-      postcss: 8.5.3
-      postcss-browser-comments: 6.0.1(browserslist@4.25.1)(postcss@8.5.3)
-      sanitize.css: 13.0.0
 
   postcss-selector-parser@6.1.2:
     dependencies:
@@ -31264,10 +31180,6 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 19.1.8
-
-  react-swipeable@7.0.2(react@19.1.0):
-    dependencies:
-      react: 19.1.0
 
   react-transition-group@4.4.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
@@ -31901,8 +31813,6 @@ snapshots:
   safe-stable-stringify@2.5.0: {}
 
   safer-buffer@2.1.2: {}
-
-  sanitize.css@13.0.0: {}
 
   saxes@6.0.0:
     dependencies:
