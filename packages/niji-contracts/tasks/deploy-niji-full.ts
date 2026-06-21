@@ -482,6 +482,37 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     fs.writeFileSync(logPath, JSON.stringify(deployLog, null, 2));
     console.log(`\n📝 Deploy log: ${logPath}`);
 
+    // chainId 31337 (anvil / hardhat) のときだけ SDK gen.ts の 31337 entry を実 deploy
+    // address に書き換える。 wagmi.config.ts は mainnet/sepolia のみを宣言しており
+    // 31337 は test 用 patch entry のため、 deploy 結果と drift しないよう毎回同期する。
+    if (deployLog.chainId === 31337) {
+      const sdkActionsDir = path.join(__dirname, '../../niji-sdk/src/actions');
+      const sdkReactDir = path.join(__dirname, '../../niji-sdk/src/react');
+      const targets: { file: string; addr: string }[] = [
+        { file: 'auction-house.gen.ts', addr: auctionProxyAddr ?? '' },
+        { file: 'token.gen.ts', addr: tokenAddrFinal ?? '' },
+        { file: 'descriptor.gen.ts', addr: descAddrFinal },
+      ];
+      let patched = 0;
+      for (const { file, addr } of targets) {
+        if (!addr) continue;
+        for (const baseDir of [sdkActionsDir, sdkReactDir]) {
+          const fp = path.join(baseDir, file);
+          if (!fs.existsSync(fp)) continue;
+          const orig = fs.readFileSync(fp, 'utf-8');
+          const patchedSrc = orig.replace(
+            /(\n\s*31337:\s*)'0x[0-9a-fA-F]{40}'/,
+            `$1'${addr}'`,
+          );
+          if (patchedSrc !== orig) {
+            fs.writeFileSync(fp, patchedSrc);
+            patched++;
+          }
+        }
+      }
+      console.log(`📝 SDK 31337 address sync: ${patched} file(s) updated`);
+    }
+
     // Return addresses for scripting
     return {
       art: artAddr,
