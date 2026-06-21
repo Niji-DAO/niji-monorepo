@@ -17,7 +17,6 @@ import CandidateSponsors from '@/components/CandidateSponsors';
 import ProposalCandidateContent from '@/components/ProposalContent/ProposalCandidateContent';
 import CandidateHeader from '@/components/ProposalHeader/CandidateHeader';
 import VoteSignals from '@/components/VoteSignals/VoteSignals';
-import { useAppSelector } from '@/hooks';
 import Section from '@/layout/Section';
 import { checkHasActiveOrPendingProposalOrCandidate } from '@/utils/proposals';
 import {
@@ -48,7 +47,7 @@ const CandidatePage = () => {
     boolean | undefined
   >(undefined);
   const { cancelCandidate, cancelCandidateState } = useCancelCandidate();
-  const activeAccount = useAppSelector(state => state.account.activeAccount);
+  const { address: activeAccount } = useAccount();
   const isWalletConnected = activeAccount !== undefined;
   const { data: currentBlock } = useBlockNumber();
   const { data: candidateData, refetch: candidateRefetch } = useCandidateProposal(
@@ -58,7 +57,7 @@ const CandidatePage = () => {
     currentBlock,
   );
   const [candidate, setCandidate] = useState<typeof candidateData>(undefined);
-  const { address: account } = useAccount();
+  const account = activeAccount;
   const threshold = useProposalThreshold();
   const userVotes = useUserVotes();
   const latestProposalId = useProposalCount();

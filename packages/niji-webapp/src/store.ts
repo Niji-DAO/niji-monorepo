@@ -2,14 +2,12 @@ import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 import { createLogger } from 'redux-logger';
 
-import account from '@/state/slices/account';
 import application from '@/state/slices/application';
 import auction from '@/state/slices/auction';
 import onDisplayAuction from '@/state/slices/onDisplayAuction';
 
 const createRootReducer = () =>
   combineReducers({
-    account,
     application,
     auction,
     onDisplayAuction,

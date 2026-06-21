@@ -7,7 +7,7 @@ import { useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction } from '@niji/
 import { Col, Row } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
-import { useBlock } from 'wagmi';
+import { useAccount, useBlock } from 'wagmi';
 
 import AuctionActivityDateHeadline from '@/components/AuctionActivityDateHeadline';
 import AuctionActivityNijiTitle from '@/components/AuctionActivityNijiTitle';
@@ -47,7 +47,7 @@ const NijiContent: React.FC<NijiContentProps> = props => {
   } = props;
 
   const isCool = useAppSelector(state => state.application.isCoolBackground);
-  const activeAccount = useAppSelector(state => state.account.activeAccount);
+  const { address: activeAccount } = useAccount();
   const { t } = useLingui();
 
   // Nijider 枠 (Niji 0 / 10 / ...) は通常 auction と違って bid がないので、

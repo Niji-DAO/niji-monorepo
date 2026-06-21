@@ -30,7 +30,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import VoteCard, { VoteCardVariant } from '@/components/VoteCard';
 import VoteModal from '@/components/VoteModal';
 import VoteSignals from '@/components/VoteSignals/VoteSignals';
-import { useAppSelector } from '@/hooks';
 import { useActiveLocale } from '@/hooks/useActivateLocale';
 import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import { SUPPORTED_LOCALE_TO_DAYSJS_LOCALE, SupportedLocale } from '@/i18n/locales';
@@ -405,7 +404,7 @@ const VotePage = () => {
     }
   }, [forkActiveState.data, setIsForkActive]);
 
-  const activeAccount = useAppSelector(state => state.account.activeAccount);
+  const activeAccount = account;
   const {
     loading,
     error,

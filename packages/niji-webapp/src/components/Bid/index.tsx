@@ -9,9 +9,9 @@ import {
 import { Button, Col, FormControl, InputGroup, Spinner } from 'react-bootstrap';
 import { toast } from 'sonner';
 import { formatEther, parseEther } from 'viem';
+import { useAccount } from 'wagmi';
 
 import SettleManuallyBtn from '@/components/SettleManuallyBtn';
-import { useAppSelector } from '@/hooks';
 import { useActiveLocale } from '@/hooks/useActivateLocale';
 import { Auction } from '@/wrappers/nijiAuction';
 
@@ -55,11 +55,11 @@ interface BidProps {
 }
 
 const Bid: React.FC<BidProps> = props => {
-  const activeAccount = useAppSelector(state => state.account.activeAccount);
+  const { address: activeAccount } = useAccount();
   const { auction, auctionEnded } = props;
   const activeLocale = useActiveLocale();
 
-  const account = useAppSelector(state => state.account.activeAccount);
+  const account = activeAccount;
 
   const bidInputRef = useRef<HTMLInputElement>(null);
 
