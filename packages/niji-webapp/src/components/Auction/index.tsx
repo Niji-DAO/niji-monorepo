@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useAtomValue } from 'jotai/react';
+import { useAtomValue, useSetAtom } from 'jotai/react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 
@@ -8,10 +8,8 @@ import AuctionActivity from '@/components/AuctionActivity';
 import { LoadingNoun } from '@/components/LegacyNoun';
 import { NijiWithSeed } from '@/components/Niji';
 import NijiContent from '@/components/NijiContent';
-import { useAppDispatch, useAppSelector } from '@/hooks';
+import { stateBackgroundColorAtom } from '@/state/atoms/applicationAtom';
 import { lastAuctionNounIdAtom } from '@/state/atoms/onDisplayAuctionAtom';
-import { setStateBackgroundColor } from '@/state/slices/application';
-import { RootState } from '@/store';
 import { nounPath } from '@/utils/history';
 import { beige, grey } from '@/utils/nounBgColors';
 import { isNounderNiji } from '@/utils/nounderNiji';
@@ -28,12 +26,12 @@ const Auction: React.FC<AuctionProps> = props => {
   const { auction: currentAuction } = props;
 
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const stateBgColor = useAppSelector((state: RootState) => state.application.stateBackgroundColor);
+  const stateBgColor = useAtomValue(stateBackgroundColorAtom);
+  const setStateBackgroundColor = useSetAtom(stateBackgroundColorAtom);
   const lastNounId = useAtomValue(lastAuctionNounIdAtom);
 
   const loadedNounHandler = (seed: INounSeed) => {
-    dispatch(setStateBackgroundColor(seed.background === 0 ? grey : beige));
+    setStateBackgroundColor(seed.background === 0 ? grey : beige);
   };
 
   const prevAuctionHandler = () => {

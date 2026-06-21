@@ -2,12 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 import { createLogger } from 'redux-logger';
 
-import application from '@/state/slices/application';
-
-const createRootReducer = () =>
-  combineReducers({
-    application,
-  });
+const createRootReducer = () => combineReducers({});
 const loggerMiddleware = createLogger();
 
 export const store = configureStore({

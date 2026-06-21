@@ -1,8 +1,9 @@
 import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { useAtomValue } from 'jotai/react';
 
-import { useAppSelector } from '@/hooks';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 
 import bidBtnClasses from './BidHistoryBtn.module.css';
 
@@ -11,7 +12,7 @@ interface BidHistoryBtnProps {
 }
 
 const BidHistoryBtn: React.FC<BidHistoryBtnProps> = ({ onClick }) => {
-  const isCool = useAppSelector(state => state.application.stateBackgroundColor) === '#d5d7e1';
+  const isCool = useAtomValue(isCoolBackgroundAtom);
 
   return (
     <div

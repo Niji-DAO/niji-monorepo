@@ -4,6 +4,7 @@ import { Trans } from '@lingui/react/macro';
 import { nijiTreasuryAddress, useReadNijiTreasuryBalancesInEth } from '@niji/sdk/react';
 import clsx from 'clsx';
 import { ConnectKitButton } from 'connectkit';
+import { useAtomValue } from 'jotai/react';
 import { Droplet, File, House, Play, SquarePen, Users } from 'lucide-react';
 import { Container, Dropdown, Nav, Navbar } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router';
@@ -17,7 +18,7 @@ import NavDropdown from '@/components/NavDropdown';
 import NavLocaleSwitcher from '@/components/NavLocaleSwitcher';
 import ShortAddress from '@/components/ShortAddress';
 import config, { CHAIN_ID } from '@/config';
-import { useAppSelector } from '@/hooks';
+import { isCoolBackgroundAtom, stateBackgroundColorAtom } from '@/state/atoms/applicationAtom';
 import { usePickByStateColor } from '@/utils/colorResponsiveUIUtils';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
 import { defaultChain } from '@/wagmi';
@@ -31,8 +32,8 @@ import responsiveUiUtilsClasses from '@/utils/ResponsiveUIUtils.module.css';
 const NavBar = () => {
   const chainId = defaultChain.id;
   const isDaoGteV3 = useIsDaoGteV3();
-  const stateBgColor = useAppSelector(state => state.application.stateBackgroundColor);
-  const isCool = useAppSelector(state => state.application.isCoolBackground);
+  const stateBgColor = useAtomValue(stateBackgroundColorAtom);
+  const isCool = useAtomValue(isCoolBackgroundAtom);
   const location = useLocation();
   const treasuryBalance = useReadNijiTreasuryBalancesInEth({
     query: {

@@ -6,7 +6,7 @@ import { isNumber } from 'remeda';
 
 import Auction from '@/components/Auction';
 import Documentation from '@/components/Documentation';
-import { useAppSelector } from '@/hooks';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 import {
   lastAuctionNounIdAtom,
   onDisplayAuctionNounIdAtom,
@@ -47,7 +47,7 @@ const AuctionPage: React.FC<AuctionPageProps> = () => {
     }
   }, [auctionId, lastAuctionNounId, navigate, onDisplayAuctionNounId, setOnDisplayAuctionNounId]);
 
-  const isCoolBackground = useAppSelector(state => state.application.isCoolBackground);
+  const isCoolBackground = useAtomValue(isCoolBackgroundAtom);
   const backgroundColor = isCoolBackground
     ? 'var(--brand-cool-background)'
     : 'var(--brand-warm-background)';

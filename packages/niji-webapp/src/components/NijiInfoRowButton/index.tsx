@@ -1,8 +1,9 @@
 import React from 'react';
 
+import { useAtomValue } from 'jotai/react';
 import { Image } from 'react-bootstrap';
 
-import { useAppSelector } from '@/hooks';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 
 import classes from './NijiInfoRowButton.module.css';
 
@@ -14,7 +15,7 @@ interface NounInfoRowButtonProps {
 
 const NijiInfoRowButton: React.FC<NounInfoRowButtonProps> = props => {
   const { iconImgSource, btnText, onClickHandler } = props;
-  const isCool = useAppSelector(state => state.application.isCoolBackground);
+  const isCool = useAtomValue(isCoolBackgroundAtom);
   return (
     <div
       className={isCool ? classes.nounButtonCool : classes.nounButtonWarm}

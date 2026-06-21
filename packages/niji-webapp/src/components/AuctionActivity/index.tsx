@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { nijiAuctionHouseAddress } from '@niji/sdk/react';
+import { useAtomValue } from 'jotai/react';
 import { Info } from 'lucide-react';
 import { Col, Row } from 'react-bootstrap';
 
@@ -19,8 +20,7 @@ import CurrentBid from '@/components/CurrentBid';
 import Holder from '@/components/Holder';
 import NijiInfoCard from '@/components/NijiInfoCard';
 import Winner from '@/components/Winner';
-import { useAppSelector } from '@/hooks';
-import { RootState } from '@/store';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
 import { defaultChain } from '@/wagmi';
 import { Auction } from '@/wrappers/nijiAuction';
@@ -53,7 +53,7 @@ const AuctionActivity: React.FC<AuctionActivityProps> = (props: AuctionActivityP
     displayGraphDepComps,
   } = props;
 
-  const isCool = useAppSelector((state: RootState) => state.application.isCoolBackground);
+  const isCool = useAtomValue(isCoolBackgroundAtom);
 
   const [auctionEnded, setAuctionEnded] = useState(false);
   const [auctionTimer, setAuctionTimer] = useState(false);

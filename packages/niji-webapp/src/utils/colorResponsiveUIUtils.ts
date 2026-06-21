@@ -1,6 +1,7 @@
+import { useAtomValue } from 'jotai/react';
 import { useLocation } from 'react-router';
 
-import { useAppSelector } from '../hooks';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 
 export const shouldUseStateBg = (location: { pathname: string }) => {
   return (
@@ -21,7 +22,7 @@ export const shouldUseStateBg = (location: { pathname: string }) => {
 export const usePickByStateColor = (whiteState: any, coolState: any, warmState: any) => {
   const location = useLocation();
   const useStateBg = shouldUseStateBg(location);
-  const isCoolState = useAppSelector(state => state.application.isCoolBackground);
+  const isCoolState = useAtomValue(isCoolBackgroundAtom);
 
   if (!useStateBg) {
     return whiteState;

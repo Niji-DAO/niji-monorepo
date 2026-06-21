@@ -1,7 +1,9 @@
 import React from 'react';
 
+import { useAtomValue } from 'jotai/react';
+
 import { BidHistoryItem } from '@/components/BidHistoryItem';
-import { useAppSelector } from '@/hooks';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 import { Bid } from '@/utils/types';
 import { useAuctionBids } from '@/wrappers/onDisplayAuction';
 
@@ -13,7 +15,7 @@ interface BidHistoryProps {
 
 const BidHistory: React.FC<BidHistoryProps> = props => {
   const { auctionId, max, classes } = props;
-  const isCool = useAppSelector(state => state.application.isCoolBackground);
+  const isCool = useAtomValue(isCoolBackgroundAtom);
   const bids = useAuctionBids(BigInt(auctionId));
   const bidContent =
     bids &&

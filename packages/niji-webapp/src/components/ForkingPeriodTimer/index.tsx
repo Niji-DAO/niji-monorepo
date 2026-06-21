@@ -5,8 +5,9 @@ import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import { useAtomValue } from 'jotai/react';
 
-import { useAppSelector } from '@/hooks';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 
 import classes from './AuctionTimer.module.css';
 
@@ -48,7 +49,7 @@ const ForkingPeriodTimer: React.FC<ForkingPeriodTimerProps> = props => {
   const flooredSeconds = Math.floor(timerDuration.seconds());
   const flooredHours = Math.floor(timerDuration.hours());
   const flooredDays = Math.floor(timerDuration.days());
-  const isCool = useAppSelector(state => state.application.isCoolBackground);
+  const isCool = useAtomValue(isCoolBackgroundAtom);
 
   if (props.isPeriodEnded) return null;
 

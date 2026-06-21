@@ -3,8 +3,9 @@ import React from 'react';
 import { i18n } from '@lingui/core';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { useAtomValue } from 'jotai/react';
 
-import { useAppSelector } from '@/hooks';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 
 import classes from './AuctionActivityDateHeadline.module.css';
 
@@ -13,7 +14,7 @@ dayjs.extend(utc);
 type AuctionActivityDateHeadlineProps = { startTime: bigint };
 const AuctionActivityDateHeadline: React.FC<AuctionActivityDateHeadlineProps> = props => {
   const { startTime } = props;
-  const isCool = useAppSelector(state => state.application.isCoolBackground);
+  const isCool = useAtomValue(isCoolBackgroundAtom);
   const auctionStartTimeUTC = dayjs(Number(startTime) * 1000)
     .utc()
     .format('MMMM DD, YYYY');

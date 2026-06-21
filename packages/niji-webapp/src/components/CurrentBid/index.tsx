@@ -2,10 +2,11 @@ import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
+import { useAtomValue } from 'jotai/react';
 import { Col, Row } from 'react-bootstrap';
 
 import TruncatedAmount from '@/components/TruncatedAmount';
-import { useAppSelector } from '@/hooks';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 
 import classes from './CurrentBid.module.css';
 
@@ -27,7 +28,7 @@ interface CurrentBidProps {
 
 const CurrentBid: React.FC<CurrentBidProps> = props => {
   const { currentBid, auctionEnded } = props;
-  const isCool = useAppSelector(state => state.application.isCoolBackground);
+  const isCool = useAtomValue(isCoolBackgroundAtom);
   const titleContent = auctionEnded ? <Trans>Winning bid</Trans> : <Trans>Current bid</Trans>;
 
   return (
