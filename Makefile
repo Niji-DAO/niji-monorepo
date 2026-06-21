@@ -24,7 +24,7 @@ WEBAPP_PID := $(LOG_DIR)/webapp.pid
 WEBAPP_ENV := $(ROOT)/packages/niji-webapp/.env
 WEBAPP_ENV_EXAMPLE := $(ROOT)/packages/niji-webapp/.env.example.local
 
-ANVIL_PORT := 8545
+ANVIL_PORT := 8547
 WEBAPP_PORT := 2424
 
 .PHONY: help dev dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg
