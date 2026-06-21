@@ -1,10 +1,9 @@
 import React, { ReactNode, useCallback, useEffect, useState, useMemo } from 'react';
 
-import { faCircleCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MinusCircleIcon } from '@heroicons/react/solid';
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
+import { CheckCircle2, X } from 'lucide-react';
 import { FormControl, FormSelect, FormText, InputGroup, Spinner } from 'react-bootstrap';
 import { map } from 'remeda';
 
@@ -512,12 +511,8 @@ const AddNijisToForkModal = (props: AddNounsToForkModalProps) => {
                       <Spinner animation="border" />
                     </span>
                   )}
-                  {isApprovalTxSuccessful && (
-                    <FontAwesomeIcon icon={faCircleCheck} height={20} width={20} color="green" />
-                  )}
-                  {approvalErrorMessage && (
-                    <FontAwesomeIcon icon={faXmark} height={20} width={20} color="red" />
-                  )}
+                  {isApprovalTxSuccessful && <CheckCircle2 height={20} width={20} color="green" />}
+                  {approvalErrorMessage && <X height={20} width={20} color="red" />}
                 </strong>
                 <Trans>Set approval</Trans>
               </li>
@@ -528,11 +523,9 @@ const AddNijisToForkModal = (props: AddNounsToForkModalProps) => {
                       <Spinner animation="border" />
                     </span>
                   )}
-                  {isTxSuccessful && (
-                    <FontAwesomeIcon icon={faCircleCheck} height={20} width={20} color="green" />
-                  )}
+                  {isTxSuccessful && <CheckCircle2 height={20} width={20} color="green" />}
                   {(errorMessage || approvalErrorMessage) && (
-                    <FontAwesomeIcon icon={faXmark} height={20} width={20} color="red" />
+                    <X height={20} width={20} color="red" />
                   )}
                   {!(
                     isWaiting ||

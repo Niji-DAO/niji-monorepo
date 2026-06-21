@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
 import { nijiAuctionHouseAddress } from '@niji/sdk/react';
+import { Info } from 'lucide-react';
 import { Col, Row } from 'react-bootstrap';
 
 import AuctionActivityDateHeadline from '@/components/AuctionActivityDateHeadline';
@@ -138,7 +137,7 @@ const AuctionActivity: React.FC<AuctionActivityProps> = (props: AuctionActivityP
         {auctionEnded && (
           <Row className={classes.activityRow}>
             <Col lg={12} className={classes.nextNounLink}>
-              <FontAwesomeIcon icon={faInfoCircle} />
+              <Info className="inline-block h-4 w-4" />
               <a href={'/crystal-ball'} target={'_blank'} rel="noreferrer">
                 <Trans>Help mint the next Niji</Trans>
               </a>

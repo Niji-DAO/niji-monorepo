@@ -1,18 +1,10 @@
 import { useState } from 'react';
 
-import {
-  faFaucetDrip,
-  faFile,
-  faHouse,
-  faPenToSquare,
-  faPlay,
-  faUsers,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
 import { nijiTreasuryAddress, useReadNijiTreasuryBalancesInEth } from '@niji/sdk/react';
 import clsx from 'clsx';
 import { ConnectKitButton } from 'connectkit';
+import { Droplet, File, House, Play, SquarePen, Users } from 'lucide-react';
 import { Container, Dropdown, Nav, Navbar } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router';
 import { formatEther } from 'viem';
@@ -74,7 +66,7 @@ const NavBar = () => {
   const v3DaoNavItem = (
     <NavDropdown
       buttonText="DAO"
-      buttonIcon={<FontAwesomeIcon icon={faUsers} />}
+      buttonIcon={<Users className="h-4 w-4" />}
       buttonStyle={nonWalletButtonStyle}
     >
       <Dropdown.Item
@@ -141,7 +133,7 @@ const NavBar = () => {
               <Nav.Link href="/lp/" className={classes.nounsNavLink} onClick={closeNav}>
                 <NavBarButton
                   buttonText={<Trans>LP</Trans>}
-                  buttonIcon={<FontAwesomeIcon icon={faHouse} />}
+                  buttonIcon={<House className="h-4 w-4" />}
                   buttonStyle={nonWalletButtonStyle}
                 />
               </Nav.Link>
@@ -154,7 +146,7 @@ const NavBar = () => {
                 >
                   <NavBarButton
                     buttonText={<Trans>Faucet</Trans>}
-                    buttonIcon={<FontAwesomeIcon icon={faFaucetDrip} />}
+                    buttonIcon={<Droplet className="h-4 w-4" />}
                     buttonStyle={nonWalletButtonStyle}
                   />
                 </Nav.Link>
@@ -162,7 +154,7 @@ const NavBar = () => {
               <Nav.Link as={Link} to="/vote" className={classes.nounsNavLink} onClick={closeNav}>
                 <NavBarButton
                   buttonText={isDaoGteV3 ? <Trans>Proposals</Trans> : <Trans>DAO</Trans>}
-                  buttonIcon={<FontAwesomeIcon icon={faFile} />}
+                  buttonIcon={<File className="h-4 w-4" />}
                   buttonStyle={nonWalletButtonStyle}
                 />
               </Nav.Link>
@@ -177,7 +169,7 @@ const NavBar = () => {
                     >
                       <NavBarButton
                         buttonText={<Trans>Candidates</Trans>}
-                        buttonIcon={<FontAwesomeIcon icon={faPenToSquare} />}
+                        buttonIcon={<SquarePen className="h-4 w-4" />}
                         buttonStyle={nonWalletButtonStyle}
                       />
                     </Nav.Link>
@@ -194,7 +186,7 @@ const NavBar = () => {
               <Nav.Link href="/lp/" className={classes.nounsNavLink}>
                 <NavBarButton
                   buttonText={<Trans>LP</Trans>}
-                  buttonIcon={<FontAwesomeIcon icon={faHouse} />}
+                  buttonIcon={<House className="h-4 w-4" />}
                   buttonStyle={nonWalletButtonStyle}
                 />
               </Nav.Link>
@@ -202,7 +194,7 @@ const NavBar = () => {
                 <Nav.Link as={Link} to="/faucet" className={classes.nounsNavLink}>
                   <NavBarButton
                     buttonText={<Trans>Faucet</Trans>}
-                    buttonIcon={<FontAwesomeIcon icon={faFaucetDrip} />}
+                    buttonIcon={<Droplet className="h-4 w-4" />}
                     buttonStyle={nonWalletButtonStyle}
                   />
                 </Nav.Link>
@@ -213,7 +205,7 @@ const NavBar = () => {
                 <Nav.Link as={Link} to="/vote" className={classes.nounsNavLink} onClick={closeNav}>
                   <NavBarButton
                     buttonText={<Trans>DAO</Trans>}
-                    buttonIcon={<FontAwesomeIcon icon={faUsers} />}
+                    buttonIcon={<Users className="h-4 w-4" />}
                     buttonStyle={nonWalletButtonStyle}
                   />
                 </Nav.Link>
@@ -228,7 +220,7 @@ const NavBar = () => {
               >
                 <NavBarButton
                   buttonText={<Trans>Playground</Trans>}
-                  buttonIcon={<FontAwesomeIcon icon={faPlay} />}
+                  buttonIcon={<Play className="h-4 w-4" />}
                   buttonStyle={nonWalletButtonStyle}
                 />
               </Nav.Link>

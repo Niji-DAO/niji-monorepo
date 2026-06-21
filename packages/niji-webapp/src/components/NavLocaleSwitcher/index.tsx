@@ -1,10 +1,9 @@
 import React, { HTMLAttributes, useState } from 'react';
 
-import { faCheck, faGlobe, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
 import { useAtom } from 'jotai/react';
+import { Check, ChevronDown, ChevronUp, Globe } from 'lucide-react';
 import { Dropdown } from 'react-bootstrap';
 
 import LanguageSelectionModal from '@/components/LanguageSelectionModal';
@@ -94,10 +93,14 @@ const NavLocaleSwitcher: React.FC<NavLocalSwitcherProps> = props => {
       >
         <div className={navDropdownClasses.button}>
           <div className={navDropdownClasses.dropdownBtnContent}>
-            {<FontAwesomeIcon icon={faGlobe} />}
+            <Globe className="inline-block h-4 w-4" />
           </div>
           <div className={buttonUp ? navDropdownClasses.arrowUp : navDropdownClasses.arrowDown}>
-            <FontAwesomeIcon icon={buttonUp ? faSortUp : faSortDown} />{' '}
+            {buttonUp ? (
+              <ChevronUp className="inline-block h-4 w-4" />
+            ) : (
+              <ChevronDown className="inline-block h-4 w-4" />
+            )}{' '}
           </div>
         </div>
       </div>
@@ -118,7 +121,7 @@ const NavLocaleSwitcher: React.FC<NavLocalSwitcherProps> = props => {
       >
         <NavBarButton
           buttonText={<Trans>Language</Trans>}
-          buttonIcon={<FontAwesomeIcon icon={faGlobe} />}
+          buttonIcon={<Globe className="h-4 w-4" />}
           buttonStyle={buttonStyle}
         />
       </div>
@@ -161,9 +164,7 @@ const NavLocaleSwitcher: React.FC<NavLocalSwitcherProps> = props => {
                 onClick={() => setActiveLocale(locale)}
               >
                 {LOCALE_LABEL[locale]}
-                {activeLocale === locale && (
-                  <FontAwesomeIcon icon={faCheck} height={24} width={24} />
-                )}
+                {activeLocale === locale && <Check height={24} width={24} />}
               </div>
             );
           })}

@@ -1,9 +1,8 @@
 import { FC } from 'react';
 
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
 import { useAtom } from 'jotai/react';
+import { Check } from 'lucide-react';
 
 import Modal from '@/components/Modal';
 import { activeLocaleAtom } from '@/i18n/activeLocaleAtom';
@@ -34,9 +33,7 @@ const LanguageSelectionModal: FC<LanguageSelectionModalProps> = ({ onDismiss }) 
             }}
           >
             {LOCALE_LABEL[locale]}
-            {locale === activeLocale && (
-              <FontAwesomeIcon icon={faCheck} height={24} width={24} className={classes.icon} />
-            )}
+            {locale === activeLocale && <Check height={24} width={24} className={classes.icon} />}
           </div>
         );
       })}

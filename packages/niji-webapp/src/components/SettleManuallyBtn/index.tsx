@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
 import dayjs from 'dayjs';
+import { Info } from 'lucide-react';
 
 import { Auction } from '@/wrappers/nijiAuction';
 
@@ -66,7 +65,7 @@ const SettleManuallyBtn: React.FC<{
           </>
         ) : (
           <>
-            <FontAwesomeIcon icon={faInfoCircle} />
+            <Info className="inline-block h-4 w-4" />
             {mins !== 0 ? (
               <Trans>You can settle manually in {mins + 1} minutes</Trans>
             ) : (
