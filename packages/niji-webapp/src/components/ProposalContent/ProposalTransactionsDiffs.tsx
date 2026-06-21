@@ -1,4 +1,4 @@
-import ReactDiffViewer from 'react-diff-viewer';
+import ReactDiffViewer from 'react-diff-viewer-continued';
 import { Hex } from 'viem';
 
 import { Address } from '@/utils/types';
