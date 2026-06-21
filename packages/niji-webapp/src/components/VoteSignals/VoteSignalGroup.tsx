@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
+import { ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { VoteSignalDetail } from '@/wrappers/nijiData';
@@ -58,7 +57,7 @@ const VoteSignalGroup = (props: Props) => {
               ease: 'easeInOut',
             }}
           >
-            <FontAwesomeIcon icon={faChevronDown} />
+            <ChevronDown className="inline-block h-4 w-4" />
           </motion.div>
         )}
       </button>

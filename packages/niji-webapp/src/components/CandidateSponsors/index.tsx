@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
+import { CheckCircle2 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Link } from 'react-router';
 import { useAccount } from 'wagmi';
@@ -134,7 +133,7 @@ const CandidateSponsors: React.FC<CandidateSponsorsProps> = props => {
       <div className={classes.wrapper}>
         {isThresholdMet && (
           <p className={classes.thresholdMet}>
-            <FontAwesomeIcon icon={faCircleCheck} /> Sponsor threshold met
+            <CheckCircle2 className="inline-block h-4 w-4" /> Sponsor threshold met
           </p>
         )}
         <div
