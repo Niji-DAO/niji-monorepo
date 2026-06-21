@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import dayjs from 'dayjs';
 import en from 'dayjs/locale/en';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useAtom } from 'jotai/react';
 import { Alert, Button, Col, Container, Row, Spinner } from 'react-bootstrap';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { filter, find, last } from 'remeda';
@@ -16,11 +17,10 @@ import CandidateCard from '@/components/CandidateCard';
 import DelegationModal from '@/components/DelegationModal';
 import ProposalStatus from '@/components/ProposalStatus';
 import config from '@/config';
-import { useAppDispatch, useAppSelector } from '@/hooks';
 import { useActiveLocale } from '@/hooks/useActivateLocale';
 import { SUPPORTED_LOCALE_TO_DAYSJS_LOCALE, SupportedLocale } from '@/i18n/locales';
 import Section from '@/layout/Section';
-import { setCandidates } from '@/state/slices/candidates';
+import { candidatesAtom } from '@/state/atoms/candidatesAtom';
 import { AVERAGE_BLOCK_TIME_IN_SECS } from '@/utils/constants';
 import { isMobileScreen } from '@/utils/isMobile';
 import { isProposalUpdatable } from '@/utils/proposals';
@@ -108,8 +108,7 @@ const Proposals = ({ proposals, nounsRequired }: ProposalsProps) => {
   const { address: account } = useAccount();
   const navigate = useNavigate();
   const { data: candidatesData, refetch: refetchCandidates } = useCandidateProposals(blockNumber);
-  const dispatch = useAppDispatch();
-  const candidates = useAppSelector(state => state.candidates.data);
+  const [candidates, setCandidates] = useAtom(candidatesAtom);
   const connectedAccountNounVotes = useUserVotes() ?? 0;
   const isMobile = isMobileScreen();
   const activeLocale = useActiveLocale();
@@ -131,10 +130,10 @@ const Proposals = ({ proposals, nounsRequired }: ProposalsProps) => {
         (candidate): candidate is ProposalCandidate => candidate !== undefined,
       );
       if (filteredCandidates.length > 0) {
-        dispatch(setCandidates(filteredCandidates));
+        setCandidates(filteredCandidates);
       }
     })();
-  }, [candidates, candidatesData, refetchCandidates, dispatch]);
+  }, [candidates, candidatesData, refetchCandidates, setCandidates]);
 
   useEffect(() => {
     if (hash === '#candidates') {
