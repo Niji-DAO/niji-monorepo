@@ -1,4 +1,4 @@
-import { AuctionState } from '@/state/slices/auction';
+import { AuctionState } from '@/state/atoms/auctionAtom';
 import { Auction } from '@/wrappers/nijiAuction';
 
 export const isNounderNiji = (nounId: bigint) => {

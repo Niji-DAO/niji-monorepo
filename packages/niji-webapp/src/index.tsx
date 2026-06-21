@@ -31,17 +31,17 @@ import { useAppDispatch, useAppSelector } from './hooks';
 import { useChainPastAuctions } from './hooks/useChainPastAuctions';
 import { LanguageProvider } from './i18n/LanguageProvider';
 import reportWebVitals from './reportWebVitals';
-import { pastAuctionsAtom, subgraphAuctionsToReduxSafe } from './state/atoms/pastAuctionsAtom';
 import {
-  appendBid,
+  auctionAtom,
+  applyActiveAuction,
+  applyAppendBid,
+  applyAuctionExtended,
+  applyAuctionSettled,
+  applyFullAuction,
   reduxSafeAuction,
   reduxSafeBid,
-  reduxSafeNewAuction,
-  setActiveAuction,
-  setAuctionExtended,
-  setAuctionSettled,
-  setFullAuction,
-} from './state/slices/auction';
+} from './state/atoms/auctionAtom';
+import { pastAuctionsAtom, subgraphAuctionsToReduxSafe } from './state/atoms/pastAuctionsAtom';
 import { setLastAuctionNounId, setOnDisplayAuctionNounId } from './state/slices/onDisplayAuction';
 import { nounPath } from './utils/history';
 import { defaultChain, config as wagmiConfig } from './wagmi';
@@ -74,6 +74,7 @@ queryClient.getQueryCache().subscribe(event => {
 
 const ChainSubscriber: React.FC = () => {
   const dispatch = useAppDispatch();
+  const setAuction = useSetAtom(auctionAtom);
   const publicClient = usePublicClient();
   const chainId = defaultChain.id;
 
@@ -85,7 +86,8 @@ const ChainSubscriber: React.FC = () => {
   );
   useEffect(() => {
     if (currentAuction) {
-      dispatch(setFullAuction(reduxSafeAuction(currentAuction)));
+      const payload = reduxSafeAuction(currentAuction);
+      setAuction(prev => applyFullAuction(prev, payload));
       dispatch(setLastAuctionNounId(Number(currentAuction.nounId)));
       // 初回 mount 時に AuctionCreated event を取り逃がしている場合、
       // onDisplayAuctionNounId が undefined のままで AuctionActivity が初期表示
@@ -94,7 +96,7 @@ const ChainSubscriber: React.FC = () => {
         dispatch(setOnDisplayAuctionNounId(Number(currentAuction.nounId)));
       }
     }
-  }, [currentAuction, dispatch, onDisplayAuctionNounId]);
+  }, [currentAuction, dispatch, onDisplayAuctionNounId, setAuction]);
 
   // Fetch the previous 24 hours of bids
   useEffect(() => {
@@ -125,22 +127,19 @@ const ChainSubscriber: React.FC = () => {
         });
         const timestamp = block.timestamp;
 
-        dispatch(
-          appendBid(
-            reduxSafeBid({
-              nounId: Number(nounId),
-              sender: sender as Address,
-              value: Number(value),
-              extended: extended !== undefined,
-              transactionHash: transactionHash ?? '',
-              transactionIndex: transactionIndex ?? 0,
-              timestamp,
-            }),
-          ),
-        );
+        const bidPayload = reduxSafeBid({
+          nounId: Number(nounId),
+          sender: sender as Address,
+          value: Number(value),
+          extended: extended !== undefined,
+          transactionHash: transactionHash ?? '',
+          transactionIndex: transactionIndex ?? 0,
+          timestamp,
+        });
+        setAuction(prev => applyAppendBid(prev, bidPayload));
       }
     })();
-  }, [chainId, dispatch, publicClient]);
+  }, [chainId, publicClient, setAuction]);
 
   // Watch for new bids
   useWatchNijiAuctionHouseAuctionBidEvent({
@@ -156,19 +155,16 @@ const ChainSubscriber: React.FC = () => {
         });
         const timestamp = block.timestamp;
 
-        dispatch(
-          appendBid(
-            reduxSafeBid({
-              nounId: Number(nounId),
-              sender: sender as Address,
-              value: Number(value),
-              extended: extended !== undefined,
-              transactionHash: transactionHash ?? '',
-              transactionIndex: transactionIndex ?? 0,
-              timestamp,
-            }),
-          ),
-        );
+        const bidPayload = reduxSafeBid({
+          nounId: Number(nounId),
+          sender: sender as Address,
+          value: Number(value),
+          extended: extended !== undefined,
+          transactionHash: transactionHash ?? '',
+          transactionIndex: transactionIndex ?? 0,
+          timestamp,
+        });
+        setAuction(prev => applyAppendBid(prev, bidPayload));
       }
     },
   });
@@ -178,16 +174,13 @@ const ChainSubscriber: React.FC = () => {
     onLogs: logs => {
       for (const log of logs) {
         const { startTime, endTime, nounId } = log.args;
-        dispatch(
-          setActiveAuction(
-            reduxSafeNewAuction({
-              nounId: Number(nounId),
-              startTime: Number(startTime),
-              endTime: Number(endTime),
-              settled: false,
-            }),
-          ),
-        );
+        const createPayload = {
+          nounId: Number(nounId),
+          startTime: Number(startTime),
+          endTime: Number(endTime),
+          settled: false,
+        };
+        setAuction(prev => applyActiveAuction(prev, createPayload));
         const nounIdNumber = Number(nounId);
         window.location.href = nounPath(nounIdNumber);
         dispatch(setOnDisplayAuctionNounId(nounIdNumber));
@@ -201,12 +194,11 @@ const ChainSubscriber: React.FC = () => {
     onLogs: logs => {
       for (const log of logs) {
         const { endTime, nounId } = log.args;
-        dispatch(
-          setAuctionExtended({
-            nounId: Number(nounId),
-            endTime: Number(endTime),
-          }),
-        );
+        const extendedPayload = {
+          nounId: Number(nounId),
+          endTime: Number(endTime),
+        };
+        setAuction(prev => applyAuctionExtended(prev, extendedPayload));
       }
     },
   });
@@ -216,13 +208,12 @@ const ChainSubscriber: React.FC = () => {
     onLogs: logs => {
       for (const log of logs) {
         const { amount, winner, nounId } = log.args;
-        dispatch(
-          setAuctionSettled({
-            nounId: Number(nounId),
-            amount: Number(amount),
-            winner: winner as Address,
-          }),
-        );
+        const settledPayload = {
+          nounId: Number(nounId),
+          amount: Number(amount),
+          winner: winner as Address,
+        };
+        setAuction(prev => applyAuctionSettled(prev, settledPayload));
       }
     },
   });
