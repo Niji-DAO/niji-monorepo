@@ -81,6 +81,24 @@ async function fetchChainPastAuctions(
     client.getLogs({ address: auctionHouse, event: AUCTION_BID, fromBlock: 0n, toBlock: 'latest' }),
   ]);
 
+  // bid event に出てくる unique blockNumber を集めて Promise.all で batch 取得 (Issue #179)。
+  // 同 block に複数 bid がある場合は 1 回しか fetch しない、 RPC call 数を最小化。
+  type BidLog = (typeof bids)[number];
+  const blockSet = new Set<bigint>();
+  for (const b of bids as BidLog[]) {
+    if (b.blockNumber !== null && b.blockNumber !== undefined) {
+      blockSet.add(b.blockNumber);
+    }
+  }
+  const uniqueBlocks: bigint[] = Array.from(blockSet);
+  const blockTimestamps = new Map<bigint, bigint>();
+  await Promise.all(
+    uniqueBlocks.map(async (bn: bigint) => {
+      const block = await client.getBlock({ blockNumber: bn });
+      blockTimestamps.set(bn, block.timestamp);
+    }),
+  );
+
   // nounId 別に bid 履歴を集約
   const bidsByNoun = new Map<
     bigint,
@@ -102,7 +120,7 @@ async function fetchChainPastAuctions(
       amount: value,
       sender,
       blockNumber: log.blockNumber!,
-      blockTimestamp: 0n, // block timestamp は別途 fetch 必要、 dev 用途では 0 で十分
+      blockTimestamp: blockTimestamps.get(log.blockNumber!) ?? 0n,
       txHash: log.transactionHash!,
       txIndex: BigInt(log.transactionIndex!),
     });
