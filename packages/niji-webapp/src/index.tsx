@@ -233,13 +233,15 @@ const PastAuctions: React.FC = () => {
   const latestAuctionId = useAppSelector(state => state.onDisplayAuction.lastAuctionNounId);
   const dispatch = useAppDispatch();
 
-  // subgraph URL が設定されていない (anvil dev 等) ときは chain 直叩きで past
-  // auction を構築する。 prod (Base Sepolia) では従来通り subgraph 経路。
-  const useChainFallback = !config.app.subgraphApiUri;
+  // subgraph URL が空 (anvil dev で local subgraph 未起動 等) なら chain fallback を primary
+  // として常用、 prod (Base Sepolia 等) は subgraph 経路を primary とし、 useQuery が error
+  // を返した時のみ chain fallback を opt-in 有効化して degrade 動作させる。
+  const useChainPrimary = !config.app.subgraphApiUri;
 
-  const { data: auctions } = useQuery({
+  const { data: auctions, error: subgraphError } = useQuery({
     queryKey: ['latestAuctions'],
-    enabled: !useChainFallback,
+    enabled: !useChainPrimary,
+    retry: 2,
     queryFn: async () =>
       await Promise.all([
         execute(latestAuctionsQuery, { first: 1000 }),
@@ -247,17 +249,19 @@ const PastAuctions: React.FC = () => {
       ]).then(([page1, page2]) => [...page1.auctions, ...page2.auctions]),
   });
 
-  const { data: chainAuctions } = useChainPastAuctions();
+  // chain fallback の起動条件 ... ① subgraph URL 未設定 (dev primary) OR ② subgraph error 検出
+  const chainFallbackEnabled = useChainPrimary || subgraphError !== null;
+  const { data: chainAuctions } = useChainPastAuctions(chainFallbackEnabled);
 
   useEffect(() => {
-    if (useChainFallback) {
+    if (chainFallbackEnabled) {
       if (chainAuctions) {
         dispatch(addPastAuctions(chainAuctions));
       }
     } else if (auctions) {
       dispatch(addPastAuctions({ auctions }));
     }
-  }, [auctions, chainAuctions, useChainFallback, latestAuctionId, dispatch]);
+  }, [auctions, chainAuctions, chainFallbackEnabled, latestAuctionId, dispatch]);
 
   return <></>;
 };
