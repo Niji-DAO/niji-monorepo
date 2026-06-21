@@ -31,3 +31,6 @@ packages/niji-contracts/deploy/
 packages/niji-assets/test_output/
 packages/niji-webapp/test-results/
 packages/niji-contracts/test-results/
+
+# foundry forge script --broadcast の自動生成 deploy 履歴 (niji deploy は packages/niji-contracts/deploy/ で別管理)
+packages/niji-contracts/broadcast/
