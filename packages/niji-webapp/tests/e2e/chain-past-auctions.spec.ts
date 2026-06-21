@@ -15,7 +15,7 @@
 import { expect } from '@playwright/test';
 import { dappE2eTest as test } from '@kiwa-test/core';
 
-import { increaseTime } from './helpers/chain';
+import { increaseTime, revertChain, snapshotChain } from './helpers/chain';
 
 const CHAIN_HOOK_POLL_MS = 11_000;
 
@@ -192,10 +192,10 @@ test.describe('chain-past-auctions (subgraph 未起動 fallback)', () => {
     expect(hasSvgImg).toBe(true);
   });
 
-  // TC-011 は anvil chain time を 2 回 +10 分 進めて auto-settler の連続 settle を観察する
-  // 設計だが、 1 分 duration auction (PR #168 で変更) と相まって browser の wagmi reconnect
-  // race が flaky を生む。 follow-up Issue で chain time 進行を seal して動作観察に変更予定。
-  test.fixme('TC-011 並行処理: 30 秒間開きっぱなしで auto-settler が走っても破綻しない', async ({
+  // TC-011 は anvil chain time を進めて auto-settler の settle 動作を観察する。
+  // 過去 30s waitForTimeout + 連続 increaseTime で wagmi reconnect race が flaky だったため、
+  // snapshot/revert で chain state を test 範囲内に閉じる (Issue #181)。
+  test('TC-011 並行処理: chain 時計進行下で auto-settler が走っても webapp が破綻しない', async ({
     page,
   }) => {
     const consoleErrors: string[] = [];
@@ -204,25 +204,29 @@ test.describe('chain-past-auctions (subgraph 未起動 fallback)', () => {
     });
     page.on('pageerror', err => consoleErrors.push(`pageerror: ${err.message}`));
 
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
+    const snapId = await snapshotChain();
+    try {
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
 
-    // 5 分 duration を強制超えさせるため anvil の chain 時計を 10 分進める
-    // (auto-settler が並走しているなら 5s polling で連続 settle が走る)
-    await increaseTime(600);
-    await page.waitForTimeout(10_000);
-    await increaseTime(600);
-    await page.waitForTimeout(10_000);
+      // chain 時計を 70 秒進めて 1 分 duration auction を 1 回 endTime 越え状態に
+      // auto-settler が 5s polling で settle するのを最大 12 秒待つ
+      await increaseTime(70);
+      await page.waitForTimeout(12_000);
 
-    // BigInt error / pageerror が出ていないこと
-    expect(consoleErrors.filter(e => /BigInt|pageerror/i.test(e))).toEqual([]);
-    // 何らかの Niji 画像が引き続き描画されている
-    const hasSvgImg = await page.evaluate(() =>
-      Array.from(document.querySelectorAll('img')).some(
-        i => i.src.startsWith('data:image/svg+xml;base64,') && i.src.length > 1000,
-      ),
-    );
-    expect(hasSvgImg).toBe(true);
+      // BigInt error / pageerror が出ていないこと
+      expect(consoleErrors.filter(e => /BigInt|pageerror/i.test(e))).toEqual([]);
+      // 何らかの Niji 画像が引き続き描画されている
+      const hasSvgImg = await page.evaluate(() =>
+        Array.from(document.querySelectorAll('img')).some(
+          i => i.src.startsWith('data:image/svg+xml;base64,') && i.src.length > 1000,
+        ),
+      );
+      expect(hasSvgImg).toBe(true);
+    } finally {
+      // 他 test に chain time 進行を漏らさないよう必ず snapshot に revert
+      await revertChain(snapId);
+    }
   });
 
   test('TC-012 回帰: BigInt serialize error が出ない', async ({ page }) => {

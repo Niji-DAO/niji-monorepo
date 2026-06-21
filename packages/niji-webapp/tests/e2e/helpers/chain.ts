@@ -109,6 +109,32 @@ export const tokenAbi = [
   },
 ] as const;
 
+/** anvil_snapshot で chain state を保存し snapshot id を返す (Hex)。 */
+export async function snapshotChain(): Promise<`0x${string}`> {
+  const rpc = (method: string, params: unknown[]) =>
+    fetch('http://127.0.0.1:8547', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+    });
+  const res = await rpc('evm_snapshot', []);
+  const body = (await res.json()) as { result: `0x${string}` };
+  return body.result;
+}
+
+/** anvil_revert で保存した snapshot に chain state を戻す。 */
+export async function revertChain(snapshotId: `0x${string}`): Promise<boolean> {
+  const rpc = (method: string, params: unknown[]) =>
+    fetch('http://127.0.0.1:8547', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+    });
+  const res = await rpc('evm_revert', [snapshotId]);
+  const body = (await res.json()) as { result: boolean };
+  return body.result;
+}
+
 /** anvil_setNextBlockTimestamp + mine で chain 時刻を進める。 */
 export async function increaseTime(seconds: number) {
   const block = await publicClient.getBlock();
