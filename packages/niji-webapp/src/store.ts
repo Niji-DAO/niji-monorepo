@@ -5,7 +5,6 @@ import { createLogger } from 'redux-logger';
 import account from '@/state/slices/account';
 import application from '@/state/slices/application';
 import auction from '@/state/slices/auction';
-import candidates from '@/state/slices/candidates';
 import onDisplayAuction from '@/state/slices/onDisplayAuction';
 import pastAuctions from '@/state/slices/pastAuctions';
 
@@ -14,7 +13,6 @@ const createRootReducer = () =>
     account,
     application,
     auction,
-    candidates,
     pastAuctions,
     onDisplayAuction,
   });
