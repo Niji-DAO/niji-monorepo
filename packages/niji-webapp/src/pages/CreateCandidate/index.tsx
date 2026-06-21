@@ -7,7 +7,6 @@ import { nijiTokenBuyerAddress } from '@niji/sdk/react';
 import clsx from 'clsx';
 import { Alert, Button, Col } from 'react-bootstrap';
 import { Link } from 'react-router';
-import { withStepProgress } from 'react-stepz';
 import { toast } from 'sonner';
 import { formatEther } from 'viem';
 
@@ -269,4 +268,4 @@ const CreateCandidatePage = () => {
   );
 };
 
-export default withStepProgress(CreateCandidatePage);
+export default CreateCandidatePage;

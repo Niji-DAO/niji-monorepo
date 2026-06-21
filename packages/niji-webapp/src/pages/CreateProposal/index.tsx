@@ -9,7 +9,6 @@ import { nijiLegacyTreasuryAddress, nijiTokenBuyerAddress } from '@niji/sdk/reac
 import clsx from 'clsx';
 import { Alert, Button, Col, Form } from 'react-bootstrap';
 import { Link } from 'react-router';
-import { withStepProgress } from 'react-stepz';
 import { filter } from 'remeda';
 import { toast } from 'sonner';
 import { useAccount } from 'wagmi';
@@ -359,4 +358,4 @@ const CreateProposalPage = () => {
   );
 };
 
-export default withStepProgress(CreateProposalPage);
+export default CreateProposalPage;

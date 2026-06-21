@@ -16,7 +16,6 @@ import { buildEtherscanApiQuery } from '@/utils/etherscan';
 import { ProposalActionModalStepProps } from '../..';
 
 import 'bs-custom-file-input';
-import 'react-stepz/dist/index.css';
 
 const FunctionCallSelectFunctionStep: React.FC<ProposalActionModalStepProps> = props => {
   const { onNextBtnClick, onPrevBtnClick, state, setState } = props;
