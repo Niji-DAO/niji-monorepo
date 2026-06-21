@@ -1,4 +1,4 @@
-import type { AuctionState } from '@/state/slices/auction';
+import type { AuctionState } from '@/state/atoms/auctionAtom';
 
 import { atom } from 'jotai/vanilla';
 

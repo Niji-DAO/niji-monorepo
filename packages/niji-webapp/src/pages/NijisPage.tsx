@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Trans } from '@lingui/react/macro';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { useAtomValue } from 'jotai/react';
 import { motion } from 'motion/react';
 import { range } from 'remeda';
 
@@ -15,10 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useAppSelector } from '@/hooks';
 import { useBreakpointValues } from '@/hooks/useBreakpointValues';
 import { humanizeTraitKey, nijiTraitKeys } from '@/lib/nijiAssets';
 import { traitName } from '@/lib/traitName';
+import { auctionAtom } from '@/state/atoms/auctionAtom';
 import { Auction as IAuction } from '@/wrappers/nijiAuction';
 import { useNounSeed } from '@/wrappers/nijiToken';
 
@@ -36,7 +37,7 @@ const sortOptions = [
 ] as const;
 
 const NijisPage: React.FC<NijisPageProps> = () => {
-  const currentAuction: IAuction | undefined = useAppSelector(state => state.auction.activeAuction);
+  const currentAuction: IAuction | undefined = useAtomValue(auctionAtom).activeAuction;
   const currentAuctionNijiId = currentAuction ? BigInt(currentAuction.nounId) : undefined;
   const nijiCount = currentAuctionNijiId !== undefined ? Number(currentAuctionNijiId) + 1 : -1;
   const [sortOrder, setSortOrder] =
