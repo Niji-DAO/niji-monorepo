@@ -12,6 +12,9 @@ interface AppConfig {
   wsRpcUri: string;
   subgraphApiUri: string;
   enableHistory: boolean;
+  // chain log paginate の起点。 prod (Base Sepolia / mainnet) は数十万 block の
+  // 全 scan を防ぐため必須、 dev (anvil) は未設定で 0 から scan する。
+  deployBlock: bigint | undefined;
 }
 
 type SupportedChains = typeof hardhat.id | typeof baseSepolia.id;
@@ -44,6 +47,15 @@ export const ETHERSCAN_API_KEY = import.meta.env.VITE_ETHERSCAN_API_KEY ?? '';
 
 export const WALLET_CONNECT_V2_PROJECT_ID = import.meta.env.VITE_WALLET_CONNECT_V2_PROJECT_ID ?? '';
 
+function parseDeployBlock(raw: string | undefined): bigint | undefined {
+  if (!raw) return undefined;
+  try {
+    return BigInt(raw);
+  } catch {
+    return undefined;
+  }
+}
+
 const app: Record<SupportedChains, AppConfig> = {
   [hardhat.id]: {
     jsonRpcUri: import.meta.env.VITE_HARDHAT_JSONRPC ?? ANVIL_RPC_URL,
@@ -52,12 +64,17 @@ const app: Record<SupportedChains, AppConfig> = {
     // chain 直叩きで動作する (PastAuctions が空配列で初期化されるだけ)。
     subgraphApiUri: import.meta.env.VITE_HARDHAT_SUBGRAPH ?? '',
     enableHistory: import.meta.env.VITE_ENABLE_HISTORY === 'true',
+    // anvil は block 数が少ないので env 未設定で 0 から scan、 dev 体験を優先。
+    deployBlock: parseDeployBlock(import.meta.env.VITE_HARDHAT_DEPLOY_BLOCK),
   },
   [baseSepolia.id]: {
     jsonRpcUri: import.meta.env.VITE_BASE_SEPOLIA_JSONRPC ?? 'https://sepolia.base.org',
     wsRpcUri: import.meta.env.VITE_BASE_SEPOLIA_WSRPC ?? '',
     subgraphApiUri: import.meta.env.VITE_BASE_SEPOLIA_SUBGRAPH ?? '',
     enableHistory: import.meta.env.VITE_ENABLE_HISTORY === 'true',
+    // prod は subgraph 障害時のみ chain fallback。 deploy block 未設定だと全 chain scan
+    // で RPC が即枯渇するため、 fallback 起動時に WARN を出して 0 から scan する。
+    deployBlock: parseDeployBlock(import.meta.env.VITE_BASE_SEPOLIA_DEPLOY_BLOCK),
   },
 };
 
