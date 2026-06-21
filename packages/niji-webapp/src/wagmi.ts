@@ -1,10 +1,22 @@
 import { find, pipe } from 'remeda';
+import { defineChain } from 'viem';
 import { createConfig, createStorage, http, fallback, webSocket } from 'wagmi';
-import { baseSepolia, hardhat } from 'wagmi/chains';
+import { baseSepolia, hardhat as viemHardhat } from 'wagmi/chains';
 import { coinbaseWallet, injected, walletConnect } from 'wagmi/connectors';
 
 import { CHAIN_ID, WALLET_CONNECT_V2_PROJECT_ID } from './config';
 import { ANVIL_RPC_URL } from './constants/anvil';
+
+// viem 標準 hardhat chain は rpcUrls.default.http = ['http://127.0.0.1:8545'] 固定だが、
+// Niji webapp は anvil を 8547 で起動するため、 wagmi が hardhat chain を chain registry
+// から resolve するときに 8545 を見て ECONNREFUSED を起こす。 chain registry 側の
+// rpcUrls を ANVIL_RPC_URL に override した local 版 hardhat に差し替えて root cause 解消。
+const hardhat = defineChain({
+  ...viemHardhat,
+  rpcUrls: {
+    default: { http: [ANVIL_RPC_URL] },
+  },
+});
 
 // Niji webapp は dev (anvil 31337) と prod (Base Sepolia 84532) の 2 chain のみを
 // サポートする。 旧 Nouns 由来の mainnet / sepolia 設定は撤廃。
