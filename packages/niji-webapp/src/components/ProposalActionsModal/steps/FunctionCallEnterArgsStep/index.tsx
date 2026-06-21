@@ -8,7 +8,6 @@ import { Col, FormControl, FormGroup, InputGroup, Row } from 'react-bootstrap';
 import { encodeFunctionData, getAbiItem } from 'viem';
 
 import 'bs-custom-file-input';
-import 'react-stepz/dist/index.css';
 
 import ModalBottomButtonRow from '@/components/ModalBottomButtonRow';
 import ModalTitle from '@/components/ModalTitle';
