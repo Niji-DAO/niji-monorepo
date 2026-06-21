@@ -5,6 +5,7 @@ import React from 'react';
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
 import { Col, Row } from 'react-bootstrap';
+import { useAccount } from 'wagmi';
 
 import ShortAddress from '@/components/ShortAddress';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -21,7 +22,7 @@ interface WinnerProps {
 
 const Winner: React.FC<WinnerProps> = props => {
   const { winner, isNounders } = props;
-  const activeAccount = useAppSelector(state => state.account.activeAccount);
+  const { address: activeAccount } = useAccount();
 
   const isCool = useAppSelector(state => state.application.isCoolBackground);
 

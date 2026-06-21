@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
@@ -13,7 +11,6 @@ import NavBar from '@/components/NavBar';
 import NetworkAlert from '@/components/NetworkAlert';
 import { Toaster } from '@/components/ui/sonner';
 import { CHAIN_ID } from '@/config';
-import { useAppDispatch } from '@/hooks';
 import AuctionPage from '@/pages/Auction';
 import { BrandAssetsPage } from '@/pages/BrandAssets/BrandAssetsPage';
 import { CalendarPage } from '@/pages/CalendarPage';
@@ -36,20 +33,13 @@ import Playground from '@/pages/Playground';
 import ProposalHistory from '@/pages/ProposalHistory';
 import TraitsPage from '@/pages/TraitsPage';
 import VotePage from '@/pages/Vote';
-import { setActiveAccount } from '@/state/slices/account';
 
 import classes from './App.module.css';
 
 function App() {
-  const { address: account, chainId } = useAccount();
+  const { chainId } = useAccount();
 
-  const dispatch = useAppDispatch();
   dayjs.extend(relativeTime);
-
-  useEffect(() => {
-    // Local account array updated
-    dispatch(setActiveAccount(account));
-  }, [account, dispatch]);
 
   return (
     <div className={`${classes.wrapper}`}>
