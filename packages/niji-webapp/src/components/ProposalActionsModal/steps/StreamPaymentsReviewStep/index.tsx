@@ -5,13 +5,13 @@ import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { nijiGovernorAddress } from '@niji/sdk/react';
-import ReactTooltip from 'react-tooltip';
 
 import ModalBottomButtonRow from '@/components/ModalBottomButtonRow';
 import ModalLabel from '@/components/ModalLabel';
 import ModalTextPrimary from '@/components/ModalTextPrimary';
 import ModalTitle from '@/components/ModalTitle';
 import ShortAddress from '@/components/ShortAddress';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import useStreamPaymentTransactions from '@/hooks/useStreamPaymentTransactions';
 import {
   formatTokenAmount,
@@ -45,14 +45,6 @@ const StreamPaymentsReviewStep: React.FC<FinalProposalActionStepProps> = props =
 
   return (
     <>
-      <ReactTooltip
-        id={'address-tooltip'}
-        effect={'solid'}
-        className={classes.hover}
-        getContent={() => {
-          return state.address;
-        }}
-      />
       <ModalTitle>
         <Trans>Review Streaming Payment Action</Trans>
       </ModalTitle>
@@ -70,9 +62,14 @@ const StreamPaymentsReviewStep: React.FC<FinalProposalActionStepProps> = props =
         <Trans>To</Trans>
       </ModalLabel>
       <ModalTextPrimary>
-        <span data-for="address-tooltip" data-tip="address">
-          <ShortAddress address={state.address} />
-        </span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span>
+              <ShortAddress address={state.address} />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent className={classes.hover}>{state.address}</TooltipContent>
+        </Tooltip>
       </ModalTextPrimary>
 
       <ModalLabel>
