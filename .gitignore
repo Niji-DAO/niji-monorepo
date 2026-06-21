@@ -21,9 +21,6 @@ i18n.cache
 # session scratch (Claude Code, local-only working dir)
 .context/
 
-# niji encoder working copy of source images (13MB, regeneratable)
-packages/niji-assets/_archive/work/
-
 # niji deploy artifacts (deploy log JSON kept selectively, but render PNG / SVG / metadata are large)
 packages/niji-contracts/deploy/
 

@@ -2,7 +2,7 @@
  * niji-data-rle.json を新 schema (2-byte bounds, 256-color quantized palette) で再生成する。
  *
  * 入力 ... packages/niji-assets/images_niji/{NN_カテゴリ名}/*.png
- * 出力 ... packages/niji-assets/_archive/src/niji-data-rle.json
+ * 出力 ... packages/niji-assets/src/niji-data-rle.json
  *
  * 処理 ...
  *   1. 全 PNG を 512x512 RGBA に resize (sharp)
@@ -36,7 +36,7 @@ const __dirname = path.dirname(__filename);
 
 const ROOT = path.resolve(__dirname, '..');
 const IMAGE_ROOT = path.join(ROOT, 'images_niji');
-const OUTPUT = path.join(ROOT, '_archive/src/niji-data-rle.json');
+const OUTPUT = path.join(ROOT, 'src/niji-data-rle.json');
 
 const TRAIT_MAP = [
   { dir: '01_スペシャル', key: 'special' },
