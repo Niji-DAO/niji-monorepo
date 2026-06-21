@@ -197,3 +197,32 @@ export async function readAuction() {
     functionName: 'auctionStorage',
   })) as readonly [bigint, number, bigint, number, number, `0x${string}`, boolean];
 }
+
+/**
+ * 過去 auction を n 件 settle 済の状態に進める helper。 各 settle で
+ *
+ *   1) auction の endTime を 5s 越えるまで chain 時計を warp
+ *   2) deployer wallet から settleCurrentAndCreateNewAuction を呼ぶ
+ *   3) tx receipt 待ち
+ *
+ * を繰り返し、 chain 上に過去 N 件 + 現在 active 1 件の auction を準備する。
+ * 呼出側は snapshot/revert と組み合わせて test 範囲内に閉じる前提。
+ *
+ * @param n 進める settle 回数 (= 生成される過去 auction の件数)
+ */
+export async function seedPastAuctions(n: number): Promise<void> {
+  if (n <= 0) return;
+  const { client } = makeWallet(ANVIL_KEYS.deployer);
+  for (let i = 0; i < n; i++) {
+    const [, , , , endTime] = await readAuction();
+    const now = Number((await publicClient.getBlock()).timestamp);
+    const delta = endTime > now ? endTime - now + 5 : 5;
+    await increaseTime(delta);
+    const tx = await client.writeContract({
+      address: ADDRESSES.AuctionHouseProxy,
+      abi: auctionAbi,
+      functionName: 'settleCurrentAndCreateNewAuction',
+    });
+    await publicClient.waitForTransactionReceipt({ hash: tx });
+  }
+}
