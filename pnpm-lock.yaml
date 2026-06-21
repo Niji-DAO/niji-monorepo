@@ -435,7 +435,7 @@ importers:
         version: 2.3.1(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)
       '@wagmi/core':
         specifier: 'catalog:'
-        version: 2.18.0(@tanstack/query-core@5.85.3)(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(typescript@5.9.2)(use-sync-external-store@1.5.0(react@19.1.0))(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
+        version: 2.18.0(@tanstack/query-core@5.85.3)(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(typescript@5.9.2)(use-sync-external-store@1.4.0(react@19.1.0))(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
       dotenv:
         specifier: 'catalog:'
         version: 16.5.0
@@ -564,7 +564,7 @@ importers:
         version: 6.6.3
       '@wagmi/core':
         specifier: 'catalog:'
-        version: 2.18.0(@tanstack/query-core@5.85.3)(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(typescript@5.9.2)(use-sync-external-store@1.4.0(react@19.1.0))(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
+        version: 2.18.0(@tanstack/query-core@5.85.3)(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(typescript@5.9.2)(use-sync-external-store@1.5.0(react@19.1.0))(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
       abitype:
         specifier: ^1.0.8
         version: 1.0.8(typescript@5.9.2)(zod@3.25.76)
@@ -704,9 +704,6 @@ importers:
       '@0no-co/graphqlsp':
         specifier: ^1.12.16
         version: 1.13.0(graphql@16.11.0)(typescript@5.9.2)
-      '@graphprotocol/graph-ts':
-        specifier: ^0.38.1
-        version: 0.38.1
       '@graphql-codegen/cli':
         specifier: ^5.0.6
         version: 5.0.7(@parcel/watcher@2.5.1)(@types/node@22.19.11)(bufferutil@4.0.9)(crossws@0.3.4)(encoding@0.1.13)(enquirer@2.3.6)(graphql@16.11.0)(typescript@5.9.2)(utf-8-validate@5.0.7)
@@ -27860,7 +27857,7 @@ snapshots:
 
   is-bun-module@2.0.0:
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.4
 
   is-callable@1.2.7: {}
 
@@ -28619,7 +28616,7 @@ snapshots:
     dependencies:
       cli-truncate: 4.0.0
       colorette: 2.0.20
-      eventemitter3: 5.0.1
+      eventemitter3: 5.0.4
       log-update: 6.1.0
       rfdc: 1.4.1
       wrap-ansi: 9.0.0
