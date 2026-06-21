@@ -6,14 +6,12 @@ import account from '@/state/slices/account';
 import application from '@/state/slices/application';
 import auction from '@/state/slices/auction';
 import onDisplayAuction from '@/state/slices/onDisplayAuction';
-import pastAuctions from '@/state/slices/pastAuctions';
 
 const createRootReducer = () =>
   combineReducers({
     account,
     application,
     auction,
-    pastAuctions,
     onDisplayAuction,
   });
 const loggerMiddleware = createLogger();

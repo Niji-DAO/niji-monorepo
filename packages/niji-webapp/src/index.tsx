@@ -12,6 +12,7 @@ import {
 } from '@niji/sdk/react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { useSetAtom } from 'jotai/react';
 import { createRoot } from 'react-dom/client';
 import { Provider as ReduxProvider } from 'react-redux';
 import { parseAbiItem } from 'viem';
@@ -30,6 +31,7 @@ import { useAppDispatch, useAppSelector } from './hooks';
 import { useChainPastAuctions } from './hooks/useChainPastAuctions';
 import { LanguageProvider } from './i18n/LanguageProvider';
 import reportWebVitals from './reportWebVitals';
+import { pastAuctionsAtom, subgraphAuctionsToReduxSafe } from './state/atoms/pastAuctionsAtom';
 import {
   appendBid,
   reduxSafeAuction,
@@ -41,7 +43,6 @@ import {
   setFullAuction,
 } from './state/slices/auction';
 import { setLastAuctionNounId, setOnDisplayAuctionNounId } from './state/slices/onDisplayAuction';
-import { addPastAuctions } from './state/slices/pastAuctions';
 import { nounPath } from './utils/history';
 import { defaultChain, config as wagmiConfig } from './wagmi';
 import { latestAuctionsQuery } from './wrappers/subgraph';
@@ -231,7 +232,7 @@ const ChainSubscriber: React.FC = () => {
 
 const PastAuctions: React.FC = () => {
   const latestAuctionId = useAppSelector(state => state.onDisplayAuction.lastAuctionNounId);
-  const dispatch = useAppDispatch();
+  const setPastAuctions = useSetAtom(pastAuctionsAtom);
 
   // subgraph URL が空 (anvil dev で local subgraph 未起動 等) なら chain fallback を primary
   // として常用、 prod (Base Sepolia 等) は subgraph 経路を primary とし、 useQuery が error
@@ -256,12 +257,12 @@ const PastAuctions: React.FC = () => {
   useEffect(() => {
     if (chainFallbackEnabled) {
       if (chainAuctions) {
-        dispatch(addPastAuctions(chainAuctions));
+        setPastAuctions(subgraphAuctionsToReduxSafe(chainAuctions));
       }
     } else if (auctions) {
-      dispatch(addPastAuctions({ auctions }));
+      setPastAuctions(subgraphAuctionsToReduxSafe({ auctions }));
     }
-  }, [auctions, chainAuctions, chainFallbackEnabled, latestAuctionId, dispatch]);
+  }, [auctions, chainAuctions, chainFallbackEnabled, latestAuctionId, setPastAuctions]);
 
   return <></>;
 };
