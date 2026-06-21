@@ -1,19 +1,25 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { AuctionState } from '@/state/slices/auction';
+
+import { atom } from 'jotai/vanilla';
 
 import { GetLatestAuctionsQuery } from '@/subgraphs/graphql';
 import { Address } from '@/utils/types';
 
-import { AuctionState } from './auction';
+/**
+ * 過去 auction list の view state。
+ *
+ * 旧 Redux slice (state/slices/pastAuctions.ts) の `pastAuctions: AuctionState[]` を Jotai
+ * atom に 1:1 移行したもの (Issue #213、 Phase 1 決定 Q1 = TanStack Query + Jotai)。 fetch は
+ * subgraph (TanStack Query) または `useChainPastAuctions` (chain fallback) で行い、 結果を
+ * `subgraphAuctionsToReduxSafe()` で整形してから本 atom に書き込む。
+ */
+export const pastAuctionsAtom = atom<AuctionState[]>([]);
 
-interface PastAuctionsState {
-  pastAuctions: AuctionState[];
-}
-
-const initialState: PastAuctionsState = {
-  pastAuctions: [],
-};
-
-const reduxSafePastAuctions = (data: GetLatestAuctionsQuery): AuctionState[] => {
+/**
+ * subgraph 形 `GetLatestAuctionsQuery` を AuctionState[] に変換する純粋関数。 旧 slice 内の
+ * `reduxSafePastAuctions` をそのまま atom file に移植 (BigInt → string 整形を含む)。
+ */
+export const subgraphAuctionsToReduxSafe = (data: GetLatestAuctionsQuery): AuctionState[] => {
   const auctions = data.auctions;
   if (!auctions) return [];
   return auctions.map(auction => {
@@ -40,17 +46,3 @@ const reduxSafePastAuctions = (data: GetLatestAuctionsQuery): AuctionState[] => 
     };
   });
 };
-
-const pastAuctionsSlice = createSlice({
-  name: 'pastAuctions',
-  initialState: initialState,
-  reducers: {
-    addPastAuctions: (state, action: PayloadAction<GetLatestAuctionsQuery>) => {
-      state.pastAuctions = reduxSafePastAuctions(action.payload);
-    },
-  },
-});
-
-export const { addPastAuctions } = pastAuctionsSlice.actions;
-
-export default pastAuctionsSlice.reducer;

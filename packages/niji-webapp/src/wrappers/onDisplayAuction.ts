@@ -1,4 +1,7 @@
+import { useAtomValue } from 'jotai/react';
+
 import { useAppSelector } from '@/hooks';
+import { pastAuctionsAtom } from '@/state/atoms/pastAuctionsAtom';
 import { compareBids } from '@/utils/compareBids';
 import { generateEmptyNounderAuction, isNounderNiji } from '@/utils/nounderNiji';
 import { Address, Bid, BidEvent } from '@/utils/types';
@@ -37,7 +40,7 @@ const useOnDisplayAuction = (): Auction | undefined => {
     state => state.onDisplayAuction.onDisplayAuctionNounId,
   );
   const currentAuction = useAppSelector(state => state.auction.activeAuction);
-  const pastAuctions = useAppSelector(state => state.pastAuctions.pastAuctions);
+  const pastAuctions = useAtomValue(pastAuctionsAtom);
 
   if (
     onDisplayAuctionNounId === undefined ||
@@ -80,7 +83,7 @@ const useOnDisplayAuction = (): Auction | undefined => {
 export const useAuctionBids = (auctionNounId: bigint): Bid[] | undefined => {
   const lastAuctionNounId = useAppSelector(state => state.onDisplayAuction.lastAuctionNounId);
   const lastAuctionBids = useAppSelector(state => state.auction.bids);
-  const pastAuctions = useAppSelector(state => state.pastAuctions.pastAuctions);
+  const pastAuctions = useAtomValue(pastAuctionsAtom);
 
   // auction requested is active auction
   if (lastAuctionNounId === Number(auctionNounId)) {
