@@ -4,13 +4,14 @@ import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
+import { useAtomValue } from 'jotai/react';
 import { Col, Row } from 'react-bootstrap';
 import { useAccount } from 'wagmi';
 
 import ShortAddress from '@/components/ShortAddress';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useAppSelector } from '@/hooks';
 import { useActiveLocale } from '@/hooks/useActivateLocale';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
 
 import classes from './Winner.module.css';
@@ -24,7 +25,7 @@ const Winner: React.FC<WinnerProps> = props => {
   const { winner, isNounders } = props;
   const { address: activeAccount } = useAccount();
 
-  const isCool = useAppSelector(state => state.application.isCoolBackground);
+  const isCool = useAtomValue(isCoolBackgroundAtom);
 
   const isWinnerYou =
     activeAccount !== undefined && activeAccount.toLocaleLowerCase() === winner.toLocaleLowerCase();

@@ -5,9 +5,10 @@ import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import { useAtomValue } from 'jotai/react';
 import { Col, Row } from 'react-bootstrap';
 
-import { useAppSelector } from '@/hooks';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 import { Auction } from '@/wrappers/nijiAuction';
 
 import classes from './AuctionTimer.module.css';
@@ -61,7 +62,7 @@ const AuctionTimer: React.FC<AuctionTimerProps> = ({ auction, auctionEnded }) =>
 
   const flooredMinutes = Math.floor(timerDuration.minutes());
   const flooredSeconds = Math.floor(timerDuration.seconds());
-  const isCool = useAppSelector(state => state.application.isCoolBackground);
+  const isCool = useAtomValue(isCoolBackgroundAtom);
 
   if (!auction) return null;
 

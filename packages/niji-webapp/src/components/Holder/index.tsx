@@ -2,12 +2,13 @@ import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
+import { useAtomValue } from 'jotai/react';
 import { Col, Row } from 'react-bootstrap';
 
 import ShortAddress from '@/components/ShortAddress';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useAppSelector } from '@/hooks';
 import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
 import { nounDocument } from '@/wrappers/subgraph';
 
@@ -21,7 +22,7 @@ interface HolderProps {
 const Holder: React.FC<HolderProps> = props => {
   const { nounId, isNounders } = props;
 
-  const isCool = useAppSelector(state => state.application.isCoolBackground);
+  const isCool = useAtomValue(isCoolBackgroundAtom);
 
   const id = nounId.toString();
   const { loading, error, data } = useSubgraphQuery({

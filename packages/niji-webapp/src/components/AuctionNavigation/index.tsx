@@ -3,7 +3,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useAtomValue } from 'jotai/react';
 import { useNavigate } from 'react-router';
 
-import { useAppSelector } from '@/hooks';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 import { lastAuctionNounIdAtom } from '@/state/atoms/onDisplayAuctionAtom';
 import useOnDisplayAuction from '@/wrappers/onDisplayAuction';
 
@@ -18,7 +18,7 @@ interface AuctionNavigationProps {
 
 const AuctionNavigation: React.FC<AuctionNavigationProps> = props => {
   const { isFirstAuction, isLastAuction, onPrevAuctionClick, onNextAuctionClick } = props;
-  const isCool = useAppSelector(state => state.application.stateBackgroundColor) === '#d5d7e1';
+  const isCool = useAtomValue(isCoolBackgroundAtom);
   const navigate = useNavigate();
   const onDisplayAuction = useOnDisplayAuction();
   const lastAuctionNounId = useAtomValue(lastAuctionNounIdAtom);

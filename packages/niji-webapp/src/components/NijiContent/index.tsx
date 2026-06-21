@@ -4,6 +4,7 @@ import React, { useCallback, useEffect } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction } from '@niji/sdk/react';
+import { useAtomValue } from 'jotai/react';
 import { Col, Row } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
@@ -17,7 +18,7 @@ import AuctionTitleAndNavWrapper from '@/components/AuctionTitleAndNavWrapper';
 import CurrentBid, { BID_N_A } from '@/components/CurrentBid';
 import SettleManuallyBtn from '@/components/SettleManuallyBtn';
 import Winner from '@/components/Winner';
-import { useAppSelector } from '@/hooks';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 
 import nounContentClasses from './NijiContent.module.css';
 
@@ -46,7 +47,7 @@ const NijiContent: React.FC<NijiContentProps> = props => {
     auction,
   } = props;
 
-  const isCool = useAppSelector(state => state.application.isCoolBackground);
+  const isCool = useAtomValue(isCoolBackgroundAtom);
   const { address: activeAccount } = useAccount();
   const { t } = useLingui();
 
