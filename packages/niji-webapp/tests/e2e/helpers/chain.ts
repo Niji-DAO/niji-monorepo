@@ -1,3 +1,7 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import {
   createPublicClient,
   createWalletClient,
@@ -7,6 +11,8 @@ import {
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export const anvil = defineChain({
   id: 31337,
   name: 'Anvil',
@@ -14,19 +20,54 @@ export const anvil = defineChain({
   rpcUrls: { default: { http: ['http://127.0.0.1:8547'] } },
 });
 
+type DeployedAddresses = {
+  AuctionHouseProxy: `0x${string}`;
+  NijiToken: `0x${string}`;
+  NijiArt: `0x${string}`;
+  NijiDescriptor: `0x${string}`;
+  NijiSeeder: `0x${string}`;
+  WETH: `0x${string}`;
+};
+
 /**
- * deploy-niji-full --network localhost は anvil の deterministic deploy で常に
- * 同じ address を返す (deployer = account #0、 nonce 起点 0)。 この前提を test に
- * ハードコードする。
+ * 最新の deploy-niji-full ログ (packages/niji-contracts/deploy/localhost-*-full.json) を
+ * 読んで address を返す。 SDK の address gen は別 PR で再生成される設計のため、 test 側は
+ * 実 deploy 出力を真実の source として扱う。
  */
-export const ADDRESSES = {
-  AuctionHouseProxy: '0x1Dbbf529D78d6507B0dd71F6c02f41138d828990',
-  NijiToken: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
-  NijiArt: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-  NijiDescriptor: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
-  NijiSeeder: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
-  WETH: '0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE',
-} as const;
+function loadLatestDeployAddresses(): DeployedAddresses {
+  const repoRoot = path.resolve(__dirname, '../../../../..');
+  const deployDir = path.join(repoRoot, 'packages/niji-contracts/deploy');
+  const files = readdirSync(deployDir)
+    .filter(f => /^localhost-.*-full\.json$/.test(f))
+    .sort()
+    .reverse();
+  if (files.length === 0) {
+    throw new Error(
+      `No deploy log found at ${deployDir}. Run \`pnpm exec hardhat deploy-niji-full --network localhost\` first.`,
+    );
+  }
+  const latest = path.join(deployDir, files[0]);
+  const json = JSON.parse(readFileSync(latest, 'utf-8')) as {
+    contracts: {
+      NijiArt: string;
+      NijiDescriptor: string;
+      NijiSeeder: string;
+      NijiToken: string;
+      NijiAuctionHouseProxy: string;
+      WETH: string;
+    };
+  };
+  return {
+    AuctionHouseProxy: json.contracts.NijiAuctionHouseProxy as `0x${string}`,
+    NijiToken: json.contracts.NijiToken as `0x${string}`,
+    NijiArt: json.contracts.NijiArt as `0x${string}`,
+    NijiDescriptor: json.contracts.NijiDescriptor as `0x${string}`,
+    NijiSeeder: json.contracts.NijiSeeder as `0x${string}`,
+    WETH: json.contracts.WETH as `0x${string}`,
+  };
+}
+
+export const ADDRESSES: DeployedAddresses = loadLatestDeployAddresses();
 
 // anvil default accounts (HD path m/44'/60'/0'/0/N)
 export const ANVIL_KEYS = {
