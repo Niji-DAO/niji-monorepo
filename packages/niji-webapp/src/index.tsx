@@ -14,7 +14,6 @@ import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-quer
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai/react';
 import { createRoot } from 'react-dom/client';
-import { Provider as ReduxProvider } from 'react-redux';
 import { parseAbiItem } from 'viem';
 import { hardhat } from 'viem/chains';
 import { usePublicClient, WagmiProvider } from 'wagmi';
@@ -22,7 +21,6 @@ import { usePublicClient, WagmiProvider } from 'wagmi';
 import { CustomConnectkitProvider } from '@/components/CustomConnectkitProvider';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { store } from '@/store';
 import { execute } from '@/subgraphs/execute';
 
 import App from './App';
@@ -267,24 +265,22 @@ const PastAuctions: React.FC = () => {
 createRoot(document.getElementById('root')!).render(
   <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light">
     <TooltipProvider delayDuration={0}>
-      <ReduxProvider store={store}>
-        <React.StrictMode>
-          <WagmiProvider config={wagmiConfig}>
-            <QueryClientProvider client={queryClient}>
-              {import.meta.env.VITE_ENABLE_TANSTACK_QUERY_DEVTOOLS === 'true' && (
-                <ReactQueryDevtools initialIsOpen={false} />
-              )}
-              <ChainSubscriber />
-              <PastAuctions />
-              <LanguageProvider>
-                <CustomConnectkitProvider>
-                  <App />
-                </CustomConnectkitProvider>
-              </LanguageProvider>
-            </QueryClientProvider>
-          </WagmiProvider>
-        </React.StrictMode>
-      </ReduxProvider>
+      <React.StrictMode>
+        <WagmiProvider config={wagmiConfig}>
+          <QueryClientProvider client={queryClient}>
+            {import.meta.env.VITE_ENABLE_TANSTACK_QUERY_DEVTOOLS === 'true' && (
+              <ReactQueryDevtools initialIsOpen={false} />
+            )}
+            <ChainSubscriber />
+            <PastAuctions />
+            <LanguageProvider>
+              <CustomConnectkitProvider>
+                <App />
+              </CustomConnectkitProvider>
+            </LanguageProvider>
+          </QueryClientProvider>
+        </WagmiProvider>
+      </React.StrictMode>
     </TooltipProvider>
   </ThemeProvider>,
 );

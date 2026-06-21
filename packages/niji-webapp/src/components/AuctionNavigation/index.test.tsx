@@ -4,9 +4,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 import AuctionNavigation from './index';
 
-// Mock the hooks used in the component
-vi.mock('@/hooks', () => ({
-  useAppSelector: () => '#d5d7e1', // Mock isCool to be true
+// Mock the hooks used in the component (isCoolBackgroundAtom 経由の Jotai)
+vi.mock('jotai/react', () => ({
+  useAtomValue: () => true, // Mock isCool to be true
 }));
 
 vi.mock('react-router', () => ({
