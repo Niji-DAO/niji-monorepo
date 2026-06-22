@@ -1,13 +1,11 @@
 import { NijiImage } from '@/components/Niji';
 
-import classes from './CandidateSponsors.module.css';
-
 type CandidateSponsorImageProps = {
   nounId: bigint;
 };
 
 const CandidateSponsorImage = ({ nounId }: CandidateSponsorImageProps) => (
-  <div className={classes.sponsorAvatar}>
+  <div className="h-8 w-8 [&_img]:block [&_img]:w-full [&_img]:rounded-full">
     <NijiImage nounId={nounId} />
   </div>
 );
