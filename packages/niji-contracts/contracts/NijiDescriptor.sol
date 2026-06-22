@@ -33,8 +33,14 @@ contract NijiDescriptor is Ownable2Step {
     /// @notice Thrown when trait indices array is empty
     error EmptyTraitIndices();
 
+    /// @notice Thrown when freezeMetadata is called before the descriptor is configured (art / resolution / compositeOrder)
+    error NotConfigured();
+
     /// @notice Thrown when renounceOwnership is called (disabled to prevent contract becoming unowned)
     error RenounceOwnershipDisabled();
+
+    /// @notice Thrown when a metadata setter is called after the metadata has been frozen
+    error MetadataIsFrozen();
 
     // =============================================================
     //                           EVENTS
@@ -54,6 +60,9 @@ contract NijiDescriptor is Ownable2Step {
     /// @param newCompositeOrder The new composite order array
     event CompositeOrderUpdated(uint256[] newCompositeOrder);
 
+    /// @notice Emitted when the metadata configuration is frozen permanently
+    event MetadataFrozen();
+
     // =============================================================
     //                           STORAGE
     // =============================================================
@@ -67,6 +76,10 @@ contract NijiDescriptor is Ownable2Step {
     /// @notice Trait composition order (bottom to top layer stacking)
     /// @dev Index i contains traitId to render at layer i
     uint256[] public compositeOrder;
+
+    /// @notice Whether the metadata configuration is frozen permanently (no further admin setter calls allowed)
+    /// @dev Once true, setArt / setResolution / setCompositeOrder revert with MetadataIsFrozen.
+    bool public isMetadataFrozen;
 
     // =============================================================
     //                           CONSTANTS
@@ -295,7 +308,9 @@ contract NijiDescriptor is Ownable2Step {
 
     /// @notice Set the art storage contract address
     /// @param _art New art contract address
+    /// @dev Reverts if the metadata has been frozen via freezeMetadata().
     function setArt(address _art) external onlyOwner {
+        if (isMetadataFrozen) revert MetadataIsFrozen();
         if (_art == address(0)) revert EmptyArtAddress();
 
         address oldArt = address(art);
@@ -306,7 +321,9 @@ contract NijiDescriptor is Ownable2Step {
 
     /// @notice Set the image resolution
     /// @param _resolution New resolution in pixels
+    /// @dev Reverts if the metadata has been frozen via freezeMetadata().
     function setResolution(uint256 _resolution) external onlyOwner {
+        if (isMetadataFrozen) revert MetadataIsFrozen();
         if (_resolution == 0) revert InvalidResolution();
 
         uint256 oldResolution = resolution;
@@ -317,9 +334,28 @@ contract NijiDescriptor is Ownable2Step {
 
     /// @notice Set the layer composition order
     /// @param _compositeOrder New composite order array
+    /// @dev Reverts if the metadata has been frozen via freezeMetadata().
     function setCompositeOrder(uint256[] memory _compositeOrder) external onlyOwner {
+        if (isMetadataFrozen) revert MetadataIsFrozen();
         compositeOrder = _compositeOrder;
         emit CompositeOrderUpdated(_compositeOrder);
+    }
+
+    /// @notice Freeze the metadata configuration permanently.
+    /// @dev Owner-only one-way switch. Requires the descriptor to be fully configured (`isConfigured() == true`)
+    ///      so the freeze cannot permanently lock an unrepairable state.
+    ///      After this call, setArt / setResolution / setCompositeOrder always revert with MetadataIsFrozen.
+    ///      View functions (`tokenURI` / `generateSVG` / `getCompositeOrder` / `isConfigured`) are not affected.
+    /// @dev Note: this freezes the descriptor's internal config only. The NijiToken `setDescriptor` setter is
+    ///      a separate surface and must be locked at the token side (out of scope for this PR) to make collection
+    ///      metadata fully immutable end-to-end.
+    function freezeMetadata() external onlyOwner {
+        if (isMetadataFrozen) revert MetadataIsFrozen();
+        if (address(art) == address(0) || resolution == 0 || compositeOrder.length == 0) {
+            revert NotConfigured();
+        }
+        isMetadataFrozen = true;
+        emit MetadataFrozen();
     }
 
     // =============================================================

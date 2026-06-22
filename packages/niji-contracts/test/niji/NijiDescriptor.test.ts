@@ -254,6 +254,92 @@ describe('NijiDescriptor', () => {
     });
   });
 
+  describe('freezeMetadata', () => {
+    it('should not be frozen by default', async () => {
+      expect(await descriptor.isMetadataFrozen()).to.be.false;
+    });
+
+    it('should allow owner to freeze metadata', async () => {
+      await expect(descriptor.freezeMetadata()).to.emit(descriptor, 'MetadataFrozen');
+      expect(await descriptor.isMetadataFrozen()).to.be.true;
+    });
+
+    it('should revert freezeMetadata when called twice', async () => {
+      await descriptor.freezeMetadata();
+      await expect(descriptor.freezeMetadata()).to.be.revertedWithCustomError(
+        descriptor,
+        'MetadataIsFrozen',
+      );
+    });
+
+    it('should revert freezeMetadata when non-owner', async () => {
+      await expect(descriptor.connect(other).freezeMetadata()).to.be.revertedWithCustomError(
+        descriptor,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should revert setArt after freezeMetadata', async () => {
+      await descriptor.freezeMetadata();
+      const newArt = await deployNijiArt(owner.address);
+      await expect(descriptor.setArt(await newArt.getAddress())).to.be.revertedWithCustomError(
+        descriptor,
+        'MetadataIsFrozen',
+      );
+    });
+
+    it('should revert setResolution after freezeMetadata', async () => {
+      await descriptor.freezeMetadata();
+      await expect(descriptor.setResolution(640)).to.be.revertedWithCustomError(
+        descriptor,
+        'MetadataIsFrozen',
+      );
+    });
+
+    it('should revert setCompositeOrder after freezeMetadata', async () => {
+      await descriptor.freezeMetadata();
+      await expect(descriptor.setCompositeOrder([0, 1, 2])).to.be.revertedWithCustomError(
+        descriptor,
+        'MetadataIsFrozen',
+      );
+    });
+
+    it('should still allow view reads after freezeMetadata', async () => {
+      await descriptor.freezeMetadata();
+      expect(await descriptor.isConfigured()).to.be.true;
+      const order = await descriptor.getCompositeOrder();
+      expect(order.length).to.equal(COMPOSITE_ORDER.length);
+    });
+
+    it('should still produce valid tokenURI / generateSVG after freezeMetadata', async () => {
+      // Add a sample image so the descriptor can render at least one layer.
+      await art.transferDescriptor(owner.address);
+      await art.addTraitImage(10, SAMPLE_PNG); // solidBackground
+
+      await descriptor.freezeMetadata();
+
+      const traitIndices = Array(12).fill(ethers.MaxUint256);
+      traitIndices[10] = 0;
+
+      const svg = await descriptor.generateSVG(traitIndices);
+      expect(svg).to.include('<svg xmlns="http://www.w3.org/2000/svg"');
+      expect(svg).to.include('</svg>');
+
+      const uri = await descriptor.tokenURI(0, traitIndices);
+      expect(uri).to.include('data:application/json;base64,');
+    });
+
+    it('should revert freezeMetadata when descriptor is unconfigured (empty compositeOrder)', async () => {
+      // Deploy a fresh descriptor with empty composite order and try to freeze without configuring.
+      const NijiDescriptorFactory = await ethers.getContractFactory('NijiDescriptor');
+      const emptyDescriptor = await NijiDescriptorFactory.deploy(await art.getAddress(), RESOLUTION, []);
+      await expect(emptyDescriptor.freezeMetadata()).to.be.revertedWithCustomError(
+        emptyDescriptor,
+        'NotConfigured',
+      );
+    });
+  });
+
   describe('isConfigured', () => {
     it('should return true when properly configured', async () => {
       expect(await descriptor.isConfigured()).to.be.true;
