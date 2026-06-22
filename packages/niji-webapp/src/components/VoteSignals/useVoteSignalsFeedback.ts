@@ -51,10 +51,18 @@ export function useVoteSignalsFeedback({
     setAbstainFeedback(abstainIt);
 
     if (account) {
-      const userFeedback = filtered.find(f => f.voter.id.toUpperCase() === account.toUpperCase());
-      if (userFeedback) {
+      // Match the original behavior: when a voter has submitted multiple feedback events,
+      // keep walking the filtered list so the **last** matching entry wins (most recent feedback).
+      // `Array.find` would return the first match instead, which is a behavior change.
+      let latestUserFeedback: VoteSignalDetail | undefined;
+      filtered.forEach(feedback => {
+        if (feedback.voter.id.toUpperCase() === account.toUpperCase()) {
+          latestUserFeedback = feedback;
+        }
+      });
+      if (latestUserFeedback) {
         setHasUserVoted(true);
-        setUserVoteSupport(userFeedback);
+        setUserVoteSupport(latestUserFeedback);
       }
     }
   }, [feedbackList, versionTimestamp, account]);

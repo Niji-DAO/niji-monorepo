@@ -176,7 +176,7 @@ function VoteSignals({
                     />
                   )
                 ) : (
-                  userVoteSupport && <VoteSignalsUserFeedback userVoteSupport={userVoteSupport} />
+                  <VoteSignalsUserFeedback userVoteSupport={userVoteSupport} />
                 )}
               </div>
             )}
