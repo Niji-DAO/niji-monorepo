@@ -496,9 +496,6 @@ importers:
       '@graphql-typed-document-node/core':
         specifier: ^3.2.0
         version: 3.2.0(graphql@16.11.0)
-      '@heroicons/react':
-        specifier: ^1.0.6
-        version: 1.0.6(react@19.1.0)
       '@lingui/core':
         specifier: ^5.9.0
         version: 5.9.2(@lingui/babel-plugin-lingui-macro@5.9.2(babel-plugin-macros@3.1.0)(typescript@5.9.2))(babel-plugin-macros@3.1.0)
@@ -2409,11 +2406,6 @@ packages:
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
       react-dom: ^18 || ^19 || ^19.0.0-rc
-
-  '@heroicons/react@1.0.6':
-    resolution: {integrity: sha512-JJCXydOFWMDpCP4q13iEplA503MQO3xLoZiKum+955ZCtHINWnx26CUxVxxFQu/uLb4LW3ge15ZpzIkXKkJ8oQ==}
-    peerDependencies:
-      react: '>= 16'
 
   '@hono/node-server@1.13.3':
     resolution: {integrity: sha512-tEo3hcyQ6chvSnJ3tKzfX4z2sd7Q+ZkBwwBdW1Ya8Mz29dukxC2xcWiB/lAMwGJrYMW8QTgknIsLu1AsnMBe7A==}
@@ -17938,10 +17930,6 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
       use-sync-external-store: 1.5.0(react@19.1.0)
-
-  '@heroicons/react@1.0.6(react@19.1.0)':
-    dependencies:
-      react: 19.1.0
 
   '@hono/node-server@1.13.3(hono@4.7.9)':
     dependencies:

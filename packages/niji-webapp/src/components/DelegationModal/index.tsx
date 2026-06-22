@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { XIcon } from '@heroicons/react/solid';
+import { X as XIcon } from 'lucide-react';
 import ReactDOM from 'react-dom';
 
 import { cn } from '@/lib/utils';

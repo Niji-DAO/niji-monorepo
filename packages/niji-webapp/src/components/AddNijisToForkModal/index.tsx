@@ -1,9 +1,8 @@
 import React, { ReactNode, useCallback, useEffect, useState, useMemo } from 'react';
 
-import { MinusCircleIcon } from '@heroicons/react/solid';
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
-import { CheckCircle2, X } from 'lucide-react';
+import { MinusCircle as MinusCircleIcon, CheckCircle2, X } from 'lucide-react';
 import { FormControl, FormSelect, FormText, InputGroup, Spinner } from 'react-bootstrap';
 import { map } from 'remeda';
 

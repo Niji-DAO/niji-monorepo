@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { ExternalLinkIcon } from '@heroicons/react/solid';
 import { i18n } from '@lingui/core';
 import { blo } from 'blo';
 import clsx from 'clsx';
+import { ExternalLink as ExternalLinkIcon } from 'lucide-react';
 
 import _trophy from '@/assets/icons/trophy.svg';
 import TruncatedAmount from '@/components/TruncatedAmount';
