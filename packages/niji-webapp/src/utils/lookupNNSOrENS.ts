@@ -3,15 +3,29 @@ import { parseAbiItem } from 'viem';
 import { Address } from '@/utils/types';
 
 /**
+ * Minimum surface we need from viem's PublicClient. Avoids `any` while staying compatible
+ * with both wagmi v2 client types and stock viem clients (chain narrowing differences make
+ * the full PublicClient generic awkward to import here).
+ */
+type ReadContractClient = {
+  readContract: (args: {
+    address: Address;
+    abi: ReadonlyArray<ReturnType<typeof parseAbiItem>>;
+    functionName: 'resolve';
+    args: readonly [Address];
+  }) => Promise<unknown>;
+};
+
+/**
  * look up NNS or ENS (NNS first, ENS fallback).
- * viem の PublicClient 型は chains narrow で wagmi 戻り値型と衝突しがちなので
- * client は any 受けし readContract 経由で抽象化する。
- * @param client viem PublicClient (any 受け)
+ * @param client viem PublicClient compatible client (must expose `readContract`)
  * @param target wallet address
  * @returns name or null
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function lookupNNSOrENS(client: any, target: Address): Promise<string | null> {
+export async function lookupNNSOrENS(
+  client: ReadContractClient,
+  target: Address,
+): Promise<string | null> {
   // try NNS
   try {
     const name = await client.readContract({
@@ -20,7 +34,7 @@ export async function lookupNNSOrENS(client: any, target: Address): Promise<stri
       functionName: 'resolve',
       args: [target],
     });
-    if (name) return name;
+    if (typeof name === 'string' && name) return name;
   } catch {
     // no biggie, NNS miss
   }
@@ -33,7 +47,7 @@ export async function lookupNNSOrENS(client: any, target: Address): Promise<stri
       functionName: 'resolve',
       args: [target],
     });
-    return name || null;
+    return typeof name === 'string' && name ? name : null;
   } catch {
     return null;
   }

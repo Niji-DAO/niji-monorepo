@@ -47,7 +47,7 @@ export const useReverseENSLookUp = (address: Address) => {
             }
           })
           .catch(error => {
-            console.log(`error resolving reverse ens lookup: `, error);
+            console.warn(`error resolving reverse ens lookup: `, error);
           });
       }
     }

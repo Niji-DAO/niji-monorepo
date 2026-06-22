@@ -5,8 +5,8 @@ import NavBarButton, { NavBarButtonStyle } from '../NavBarButton';
 import classes from './ModalBottomButtonRow.module.css';
 
 export interface ModalBottomButtonRowProps {
-  onPrevBtnClick: (e?: any) => void;
-  onNextBtnClick: (e?: any) => void;
+  onPrevBtnClick: React.MouseEventHandler<HTMLDivElement>;
+  onNextBtnClick: React.MouseEventHandler<HTMLDivElement>;
   prevBtnText: React.ReactNode;
   nextBtnText: React.ReactNode;
   isNextBtnDisabled?: boolean;

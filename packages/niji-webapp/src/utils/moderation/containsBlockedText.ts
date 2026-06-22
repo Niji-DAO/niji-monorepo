@@ -14,7 +14,7 @@ export const containsBlockedText = (text: string, language: string) => {
   const regexesForLanguage = new Map(Object.entries(moderationRegexes)).get(language);
   // Default to letting the string through if the language is unsupported
   if (regexesForLanguage === undefined) {
-    console.log(`Unsupported language ${language} requested`);
+    console.warn(`Unsupported language ${language} requested`);
     return false;
   }
 
