@@ -7,6 +7,7 @@ import { isAddress } from 'viem';
 import { useAccount, useEnsAddress } from 'wagmi';
 
 import BrandSpinner from '@/components/BrandSpinner';
+import { COPY_CLASS, TITLE_CLASS } from '@/components/CurrentDelegatePannel';
 import DelegationCandidateInfo from '@/components/DelegationCandidateInfo';
 import NavBarButton, { NavBarButtonStyle } from '@/components/NavBarButton';
 import { useActiveLocale } from '@/hooks/useActivateLocale';
@@ -22,8 +23,6 @@ import {
 } from '@/wrappers/nijiToken';
 
 import classes from './ChangeDelegatePanel.module.css';
-
-import currentDelegatePannelClasses from '@/components/CurrentDelegatePannel/CurrentDelegatePannel.module.css';
 
 interface ChangeDelegatePanelProps {
   onDismiss: () => void;
@@ -213,15 +212,10 @@ const ChangeDelegatePanel: React.FC<ChangeDelegatePanelProps> = props => {
   return (
     <>
       <div className={'flex h-fit flex-col gap-3'}>
-        <h1
-          className={clsx(
-            currentDelegatePannelClasses.title,
-            locale !== 'en-US' ? classes.nonEnBottomMargin : '',
-          )}
-        >
+        <h1 className={clsx(TITLE_CLASS, locale !== 'en-US' ? classes.nonEnBottomMargin : '')}>
           {getTitleFromState(changeDelegateState)}
         </h1>
-        <p className={currentDelegatePannelClasses.copy}>{primaryCopy}</p>
+        <p className={COPY_CLASS}>{primaryCopy}</p>
         {availableVotes > 0 && accountVotes - availableVotes < (proposalThreshold ?? 0) + 1 && (
           <div className={classes.changeDelegateWarning}>
             <Trans>

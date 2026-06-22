@@ -8,7 +8,12 @@ import duration from 'dayjs/plugin/duration';
 
 import { useAppSelector } from '@/hooks';
 
-import classes from './AuctionTimer.module.css';
+const TIMER_WRAPPER_CLASS = 'flex items-center justify-center';
+const TIMER_SECTION_CLASS =
+  "mr-2 text-center leading-[0.7] [&_span]:font-['PT_Root_UI'] [&_span]:!text-[32px] [&_span]:font-bold max-[992px]:[&_span]:!text-[18px]";
+const TIMER_SECTION_FINAL_CLASS =
+  "mr-0 text-center leading-[0.7] [&_span]:font-['PT_Root_UI'] [&_span]:!text-[32px] [&_span]:font-bold max-[992px]:[&_span]:!text-[18px]";
+const TIME_LEFT_CLASS = 'max-[992px]:pr-2';
 
 dayjs.extend(duration);
 
@@ -57,45 +62,45 @@ const ForkingPeriodTimer: React.FC<ForkingPeriodTimerProps> = props => {
       {timerToggle ? (
         <>
           <h2
-            className={clsx(classes.timerWrapper, classes.timeLeft)}
+            className={clsx(TIMER_WRAPPER_CLASS, TIME_LEFT_CLASS)}
             style={{
               color: isCool ? 'var(--brand-cool-dark-text)' : 'var(--brand-warm-dark-text)',
             }}
           >
-            <div className={classes.timerSection}>
+            <div className={TIMER_SECTION_CLASS}>
               {flooredDays > 0 && (
                 <span>
                   {`${Math.floor(timerDuration.days())}`}
-                  <span className={classes.small}>
+                  <span className={'text-sm'}>
                     {' '}
                     <Trans>days</Trans>
                   </span>
                 </span>
               )}
             </div>
-            <div className={classes.timerSection}>
+            <div className={TIMER_SECTION_CLASS}>
               <span>
                 {`${Math.floor(timerDuration.hours())}`}
-                <span className={classes.small}>
+                <span className={'text-sm'}>
                   {' '}
                   <Trans>hours</Trans>
                 </span>
               </span>
             </div>
-            <div className={classes.timerSection}>
+            <div className={TIMER_SECTION_CLASS}>
               <span>
                 {`${flooredMinutes}`}
-                <span className={classes.small}>
+                <span className={'text-sm'}>
                   {' '}
                   <Trans>minutes</Trans>
                 </span>
               </span>
             </div>
             {flooredDays === 0 && flooredHours < 1 && (
-              <div className={classes.timerSectionFinal}>
+              <div className={TIMER_SECTION_FINAL_CLASS}>
                 <span>
                   {`${flooredSeconds}`}
-                  <span className={classes.small}>
+                  <span className={'text-sm'}>
                     {' '}
                     <Trans>seconds</Trans>
                   </span>
@@ -108,12 +113,12 @@ const ForkingPeriodTimer: React.FC<ForkingPeriodTimerProps> = props => {
       ) : (
         <>
           <h2
-            className={classes.timerWrapper}
+            className={TIMER_WRAPPER_CLASS}
             style={{
               color: isCool ? 'var(--brand-cool-dark-text)' : 'var(--brand-warm-dark-text)',
             }}
           >
-            <div className={clsx(classes.timerSection, classes.clockSection)}>
+            <div className={clsx(TIMER_SECTION_CLASS, '')}>
               <span>{i18n.date(new Date(endTimeUnix * 1000))}</span>{' '}
               <span>{i18n.date(new Date(endTimeUnix * 1000), { timeStyle: 'medium' })}</span>
             </div>

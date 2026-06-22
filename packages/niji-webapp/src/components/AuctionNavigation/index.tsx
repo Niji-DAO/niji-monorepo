@@ -5,7 +5,13 @@ import { useNavigate } from 'react-router';
 import { useAppSelector } from '@/hooks';
 import useOnDisplayAuction from '@/wrappers/onDisplayAuction';
 
-import classes from './AuctionNavigation.module.css';
+const ARROW_BASE_CLASS =
+  'inline-block h-8 w-8 appearance-none rounded-full border-none bg-contain bg-no-repeat p-0 text-lg font-bold disabled:cursor-not-allowed disabled:opacity-50 min-[992px]:hover:bg-[color:var(--brand-gray-hover)] min-[992px]:hover:opacity-90';
+const ARROW_COOL_CLASS =
+  'bg-[color:var(--brand-cool-accent)] text-[color:var(--brand-cool-dark-text)]';
+const ARROW_WARM_CLASS =
+  'bg-[color:var(--brand-warm-accent)] text-[color:var(--brand-warm-dark-text)]';
+const RIGHT_MARGIN_CLASS = 'ml-[0.3rem]';
 
 interface AuctionNavigationProps {
   isFirstAuction: boolean;
@@ -67,17 +73,19 @@ const AuctionNavigation: React.FC<AuctionNavigationProps> = props => {
   }, [handleKeyPress]);
 
   return (
-    <div className={classes.navArrowsContainer}>
+    <div className="absolute">
       <button
         onClick={() => onPrevAuctionClick()}
-        className={isCool ? classes.leftArrowCool : classes.leftArrowWarm}
+        className={`${ARROW_BASE_CLASS} ${isCool ? ARROW_COOL_CLASS : ARROW_WARM_CLASS}`}
         disabled={isFirstAuction}
       >
         ←
       </button>
       <button
         onClick={() => onNextAuctionClick()}
-        className={isCool ? classes.rightArrowCool : classes.rightArrowWarm}
+        className={`${ARROW_BASE_CLASS} ${RIGHT_MARGIN_CLASS} ${
+          isCool ? ARROW_COOL_CLASS : ARROW_WARM_CLASS
+        }`}
         disabled={isLastAuction}
       >
         →
