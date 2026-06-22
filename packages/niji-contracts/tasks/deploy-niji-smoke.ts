@@ -281,5 +281,20 @@ task('deploy-niji-smoke', 'Deploy Niji stack + 36 sample PNGs + mint 1 token (P6
     fs.writeFileSync(logPath, JSON.stringify(deployLog, null, 2));
     console.log(`\n[11] deploy log: ${logPath}`);
 
+    // Persist the latest contract addresses under deployments/<network>.json so downstream tools
+    // (SDK / webapp / scripts) can read a stable path without scanning timestamped log files.
+    const deploymentsDir = path.join(__dirname, '../deployments');
+    if (!fs.existsSync(deploymentsDir)) fs.mkdirSync(deploymentsDir, { recursive: true });
+    const latestPath = path.join(deploymentsDir, `${network.name}.json`);
+    const latestPayload = {
+      network: deployLog.network,
+      chainId: Number((await ethers.provider.getNetwork()).chainId),
+      timestamp: deployLog.timestamp,
+      deployer: deployLog.deployer,
+      contracts: deployLog.contracts,
+    };
+    fs.writeFileSync(latestPath, JSON.stringify(latestPayload, null, 2) + '\n');
+    console.log(`[11] deployments snapshot: ${latestPath}`);
+
     console.log('\n=== SMOKE DEPLOY OK ===');
   });

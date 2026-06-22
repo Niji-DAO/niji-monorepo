@@ -24,6 +24,10 @@ i18n.cache
 # niji deploy artifacts (deploy log JSON kept selectively, but render PNG / SVG / metadata are large)
 packages/niji-contracts/deploy/
 
+# deployments snapshots: keep mainnet / sepolia / base-sepolia tracked, ignore local dev snapshots
+packages/niji-contracts/deployments/localhost.json
+packages/niji-contracts/deployments/hardhat.json
+
 # generated test outputs / playwright traces / forge artifacts
 packages/niji-assets/test_output/
 packages/niji-webapp/test-results/
