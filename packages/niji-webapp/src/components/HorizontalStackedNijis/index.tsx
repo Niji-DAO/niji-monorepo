@@ -2,15 +2,13 @@ import React from 'react';
 
 import { NijiCircular } from '@/components/Niji';
 
-import classes from './HorizontalStackedNijis.module.css';
-
 interface HorizontalStackedNounsProps {
   nounIds: string[];
 }
 
 const HorizontalStackedNijis: React.FC<HorizontalStackedNounsProps> = ({ nounIds }) => {
   return (
-    <div className={classes.wrapper}>
+    <div className="!relative mx-auto mb-[50px] mt-[10px] w-full">
       {nounIds
         .slice(0, 6)
         .map((nounId: string, i: number) => {
@@ -21,7 +19,7 @@ const HorizontalStackedNijis: React.FC<HorizontalStackedNounsProps> = ({ nounIds
                 top: '0px',
                 left: `${25 * i}px`,
               }}
-              className={classes.nounWrapper}
+              className="absolute"
             >
               <NijiCircular nounId={BigInt(nounId)} border={true} />
             </div>
