@@ -27,7 +27,6 @@ import App from './App';
 import config, { CHAIN_ID } from './config';
 import { useChainPastAuctions } from './hooks/useChainPastAuctions';
 import { LanguageProvider } from './i18n/LanguageProvider';
-import reportWebVitals from './reportWebVitals';
 import {
   auctionAtom,
   applyActiveAuction,
@@ -284,8 +283,3 @@ createRoot(document.getElementById('root')!).render(
     </TooltipProvider>
   </ThemeProvider>,
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example, reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
