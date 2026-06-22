@@ -7,8 +7,6 @@ import { Trans } from '@lingui/react/macro';
 import { Col, FormControl, FormGroup, InputGroup, Row } from 'react-bootstrap';
 import { encodeFunctionData, getAbiItem } from 'viem';
 
-import 'bs-custom-file-input';
-
 import ModalBottomButtonRow from '@/components/ModalBottomButtonRow';
 import ModalTitle from '@/components/ModalTitle';
 
