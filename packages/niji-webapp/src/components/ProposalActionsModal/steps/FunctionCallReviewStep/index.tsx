@@ -14,8 +14,6 @@ import { buildEtherscanAddressLink } from '@/utils/etherscan';
 
 import { FinalProposalActionStepProps, ProposalActionModalState } from '../..';
 
-import classes from './FunctionCallReviewStep.module.css';
-
 /**
  * @internal
  */
@@ -74,12 +72,12 @@ const FunctionCallReviewStep: React.FC<FinalProposalActionStepProps> = props => 
         <Trans>Review Function Call Action</Trans>
       </ModalTitle>
 
-      <div className={classes.row}>
+      <div className="flex">
         <div>
-          <span className={classes.label}>
+          <span className="opacity-50">
             <Trans>Address</Trans>
           </span>
-          <div className={classes.value}>
+          <div className="mb-2 break-all text-[22px] font-bold text-[color:var(--brand-cool-dark-text)]">
             <a href={buildEtherscanAddressLink(address)} target="_blank" rel="noreferrer">
               <ShortAddress address={address} />
             </a>
@@ -88,12 +86,14 @@ const FunctionCallReviewStep: React.FC<FinalProposalActionStepProps> = props => 
       </div>
 
       {value ? (
-        <div className={classes.row}>
+        <div className="flex">
           <div>
-            <span className={classes.label}>
+            <span className="opacity-50">
               <Trans>Value</Trans>
             </span>
-            <div className={classes.value}>{value ? `${value} ETH` : <Trans>None</Trans>}</div>
+            <div className="mb-2 break-all text-[22px] font-bold text-[color:var(--brand-cool-dark-text)]">
+              {value ? `${value} ETH` : <Trans>None</Trans>}
+            </div>
           </div>
         </div>
       ) : (
@@ -101,18 +101,20 @@ const FunctionCallReviewStep: React.FC<FinalProposalActionStepProps> = props => 
       )}
 
       {func && (
-        <div className={classes.row}>
+        <div className="flex">
           <div>
-            <span className={classes.label}>
+            <span className="opacity-50">
               <Trans>Function</Trans>
             </span>
-            <div className={classes.value}>{func || <Trans>None</Trans>}</div>
+            <div className="mb-2 break-all text-[22px] font-bold text-[color:var(--brand-cool-dark-text)]">
+              {func || <Trans>None</Trans>}
+            </div>
           </div>
         </div>
       )}
 
       <Row>
-        <Col sm="3" className={classes.label}>
+        <Col sm="3" className="opacity-50">
           <b>
             <Trans>Arguments</Trans>
           </b>
@@ -140,9 +142,9 @@ const FunctionCallReviewStep: React.FC<FinalProposalActionStepProps> = props => 
       </Row>
       {(functionAbiItem?.inputs ?? []).map((input, i) => (
         <Row key={i}>
-          <div className={classes.argument}>
-            <div className={classes.argValue}>{input.name}</div>
-            <div className={classes.argValue}>{args[i]}</div>
+          <div className="mb-1 flex justify-between">
+            <div className="max-w-[50%] break-all">{input.name}</div>
+            <div className="max-w-[50%] break-all">{args[i]}</div>
           </div>
         </Row>
       ))}
