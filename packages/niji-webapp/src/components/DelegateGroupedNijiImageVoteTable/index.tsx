@@ -7,8 +7,6 @@ import TightStackedCircleNijis from '@/components/TightStackedCircleNijis';
 import VoteCardPager from '@/components/VoteCardPager';
 import { pseudoRandomPredictableShuffle } from '@/utils/pseudoRandomPredictableShuffle';
 
-import classes from './DelegateGroupedNijiImageVoteTable.module.css';
-
 interface DelegateGruopedNounImageVoteTableProps {
   filteredDelegateGroupedVoteData:
     | { delegate: string; supportDetailed: 0 | 1 | 2; nijiRepresented: string[] }[]
@@ -61,7 +59,7 @@ const DelegateGruopedNounImageVoteTable: React.FC<
           {Array(rowLength)
             .fill(0)
             .map((_, j) => (
-              <td className={classes.nounCell} key={j}>
+              <td className="w-[55px] text-center" key={j}>
                 {paddedNounIds[i * rowLength + j]}
               </td>
             ))}
@@ -71,7 +69,7 @@ const DelegateGruopedNounImageVoteTable: React.FC<
 
   return (
     <>
-      <table className={classes.wrapper}>
+      <table className="mx-auto -mt-5">
         <tbody>{content(page)}</tbody>
       </table>
       <VoteCardPager
