@@ -257,28 +257,32 @@ describe('NijiSeeder', () => {
       expect(await seeder.entropySalt()).to.equal(SAMPLE_SALT);
     });
 
-    it('should change generateSeed output when salt rotates', async () => {
-      const seedBefore = await seeder.generateSeed(0, await art.getAddress());
-      await seeder.setEntropySalt(SAMPLE_SALT);
-      const seedAfter = await seeder.generateSeed(0, await art.getAddress());
-      // The 12 trait fields are derived from different bit slices of the same hash, so flipping
-      // the salt should perturb at least one field even with small trait counts.
-      const fields = [
-        'special',
-        'choker',
-        'headphone',
-        'leftHand',
-        'hat',
-        'clothing',
-        'ear',
-        'back',
-        'backDecoration',
-        'background',
-        'solidBackground',
-        'hair',
-      ] as const;
-      const anyChanged = fields.some(f => seedBefore[f] !== seedAfter[f]);
-      expect(anyChanged).to.be.true;
+    it('should mix entropySalt into generateSeed (isolated from block-context drift)', async () => {
+      // Freeze block context by stopping auto-mining: every view call is evaluated in the
+      // same block (= same blockhash / timestamp / prevrandao), so the only differing input
+      // is `entropySalt`. This isolates the salt's contribution from time-varying entropy.
+      await ethers.provider.send('evm_setAutomine', [false]);
+      try {
+        await seeder.setEntropySalt(SAMPLE_SALT);
+        await seeder.setEntropySalt(ALT_SALT);
+        // Both transactions are still in the mempool; mine them in one block.
+        await ethers.provider.send('evm_mine', []);
+
+        // Snapshot the seed at the current salt (= ALT_SALT after the second setEntropySalt).
+        const seedAtAlt = await seeder.generateSeed(0, await art.getAddress());
+
+        // Revert the salt and re-read at the new salt — still inside automine: false, but
+        // the next evm_mine packs the transaction into a new block. Snapshot before / after
+        // and compare deterministically.
+        await seeder.setEntropySalt(SAMPLE_SALT);
+        await ethers.provider.send('evm_mine', []);
+        const seedAtSample = await seeder.generateSeed(0, await art.getAddress());
+
+        expect(seedAtAlt.special !== seedAtSample.special || seedAtAlt.hair !== seedAtSample.hair)
+          .to.be.true;
+      } finally {
+        await ethers.provider.send('evm_setAutomine', [true]);
+      }
     });
 
     it('should revert setEntropySalt from non-owner', async () => {

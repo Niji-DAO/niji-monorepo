@@ -165,8 +165,9 @@ contract NijiSeeder is INijiSeeder, Ownable2Step {
 
     /// @notice Rotate the entropy salt (owner only, blocked once locked).
     /// @param newSalt The new salt value to mix into every subsequent generateSeed.
-    /// @dev Set to a VRF callback value to harden against block-builder MEV / front-run
-    ///      attacks that predict seeds when the next block is known.
+    /// @dev To consume a VRF-derived value, ownership must first be transferred to a wrapper
+    ///      contract that receives the VRF callback and then forwards the result here. Direct
+    ///      VRF coordinator → NijiSeeder calls are blocked by `onlyOwner`.
     function setEntropySalt(bytes32 newSalt) external onlyOwner {
         if (isEntropySaltLocked) revert EntropySaltLocked();
         entropySalt = newSalt;
