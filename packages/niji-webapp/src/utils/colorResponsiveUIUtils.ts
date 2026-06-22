@@ -19,7 +19,7 @@ export const shouldUseStateBg = (location: { pathname: string }) => {
  * @param coolState  cool 背景時に返す値
  * @param warmState  warm 背景時に返す値
  */
-export const usePickByStateColor = (whiteState: any, coolState: any, warmState: any) => {
+export const usePickByStateColor = <T>(whiteState: T, coolState: T, warmState: T): T => {
   const location = useLocation();
   const useStateBg = shouldUseStateBg(location);
   const isCoolState = useAtomValue(isCoolBackgroundAtom);

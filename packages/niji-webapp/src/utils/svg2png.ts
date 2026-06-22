@@ -38,7 +38,7 @@ export const svg2png = (
       try {
         resolve(png);
       } catch (e) {
-        console.log('Error converting SVG to PNG:', e);
+        console.error('Error converting SVG to PNG:', e);
         resolve(null);
       }
     };
