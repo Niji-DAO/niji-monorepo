@@ -147,6 +147,15 @@ describe('NijiArt', () => {
     () => descriptor,
   );
 
+  describe('renounceOwnership disabled (non-owner)', () => {
+    it('should revert with OwnableUnauthorizedAccount when called by non-owner', async () => {
+      await expect(art.connect(other).renounceOwnership()).to.be.revertedWithCustomError(
+        art,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+  });
+
   describe('getTraitNames', () => {
     it('should return all trait names', async () => {
       const names = await art.getTraitNames();

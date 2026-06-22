@@ -313,6 +313,15 @@ describe('NijiToken', () => {
     () => minter,
   );
 
+  describe('renounceOwnership disabled (non-owner)', () => {
+    it('should revert with OwnableUnauthorizedAccount when called by non-owner', async () => {
+      await expect(token.connect(other).renounceOwnership()).to.be.revertedWithCustomError(
+        token,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+  });
+
   describe('contractURI', () => {
     it('should return ipfs:// with empty hash by default', async () => {
       expect(await token.contractURI()).to.equal('ipfs://');

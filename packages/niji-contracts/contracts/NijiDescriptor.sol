@@ -33,6 +33,9 @@ contract NijiDescriptor is Ownable2Step {
     /// @notice Thrown when trait indices array is empty
     error EmptyTraitIndices();
 
+    /// @notice Thrown when renounceOwnership is called (disabled to prevent contract becoming unowned)
+    error RenounceOwnershipDisabled();
+
     // =============================================================
     //                           EVENTS
     // =============================================================
@@ -339,5 +342,11 @@ contract NijiDescriptor is Ownable2Step {
     /// @return True if art, resolution, and compositeOrder are set
     function isConfigured() external view returns (bool) {
         return address(art) != address(0) && resolution > 0 && compositeOrder.length > 0;
+    }
+
+    /// @notice Disabled to prevent the contract from becoming permanently unowned.
+    /// @dev Always reverts. Use `transferOwnership` (Ownable2Step two-step transfer) for ownership change instead.
+    function renounceOwnership() public view override onlyOwner {
+        revert RenounceOwnershipDisabled();
     }
 }

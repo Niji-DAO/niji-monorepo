@@ -54,6 +54,9 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @param reason The raw revert data returned by the owner-side call (helps diagnose smart-wallet rejections)
     error WithdrawFailed(bytes reason);
 
+    /// @notice Thrown when renounceOwnership is called (disabled to prevent contract becoming unowned)
+    error RenounceOwnershipDisabled();
+
     // =============================================================
     //                           EVENTS
     // =============================================================
@@ -471,6 +474,12 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
         override(ERC721Enumerable, ERC721Votes)
     {
         super._increaseBalance(account, amount);
+    }
+
+    /// @notice Disabled to prevent the contract from becoming permanently unowned.
+    /// @dev Always reverts. Use `transferOwnership` (Ownable2Step two-step transfer) for ownership change instead.
+    function renounceOwnership() public view override onlyOwner {
+        revert RenounceOwnershipDisabled();
     }
 
     /// @dev Multi-inheritance override for `supportsInterface` (ERC721Enumerable + ERC721).

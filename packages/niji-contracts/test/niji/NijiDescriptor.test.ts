@@ -245,6 +245,15 @@ describe('NijiDescriptor', () => {
     () => owner,
   );
 
+  describe('renounceOwnership disabled (non-owner)', () => {
+    it('should revert with OwnableUnauthorizedAccount when called by non-owner', async () => {
+      await expect(descriptor.connect(other).renounceOwnership()).to.be.revertedWithCustomError(
+        descriptor,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+  });
+
   describe('isConfigured', () => {
     it('should return true when properly configured', async () => {
       expect(await descriptor.isConfigured()).to.be.true;

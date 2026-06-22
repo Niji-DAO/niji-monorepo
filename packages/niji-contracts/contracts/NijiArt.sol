@@ -30,6 +30,9 @@ contract NijiArt is Ownable2Step {
     /// @notice Thrown when PNG data is empty
     error EmptyPngData();
 
+    /// @notice Thrown when renounceOwnership is called (disabled to prevent contract becoming unowned)
+    error RenounceOwnershipDisabled();
+
     // =============================================================
     //                           EVENTS
     // =============================================================
@@ -220,5 +223,11 @@ contract NijiArt is Ownable2Step {
     function getTraitPointers(uint256 traitId) external view returns (address[] memory) {
         if (traitId >= traitCount) revert InvalidTraitId(traitId, traitCount - 1);
         return traitPointers[traitId];
+    }
+
+    /// @notice Disabled to prevent the contract from becoming permanently unowned.
+    /// @dev Always reverts. Use `transferOwnership` (Ownable2Step two-step transfer) for ownership change instead.
+    function renounceOwnership() public view override onlyOwner {
+        revert RenounceOwnershipDisabled();
     }
 }

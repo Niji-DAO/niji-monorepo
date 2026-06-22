@@ -67,5 +67,14 @@ export function shouldBehaveLikeOwnable2Step(
         contract.connect(nonPendingOwner).acceptOwnership(),
       ).to.be.revertedWithCustomError(contract, 'OwnableUnauthorizedAccount');
     });
+
+    it('renounceOwnership should revert with RenounceOwnershipDisabled when called by owner', async () => {
+      const contract = getContract();
+
+      await expect(contract.renounceOwnership()).to.be.revertedWithCustomError(
+        contract,
+        'RenounceOwnershipDisabled',
+      );
+    });
   });
 }
