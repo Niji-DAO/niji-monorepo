@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { XIcon } from '@heroicons/react/solid';
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
+import { X as XIcon } from 'lucide-react';
 import ReactDOM from 'react-dom';
 
 import { Backdrop } from '@/components/Modal';

@@ -31,7 +31,6 @@
   ],
   "dependencies": {
     "@graphql-typed-document-node/core": "^3.2.0",
-    "@heroicons/react": "^1.0.6",
     "@lingui/core": "^5.9.0",
     "@lingui/detect-locale": "^5.9.0",
     "@lingui/loader": "^5.9.0",

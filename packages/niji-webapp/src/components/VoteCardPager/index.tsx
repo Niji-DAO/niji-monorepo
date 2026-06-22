@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid';
 import clsx from 'clsx';
+import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from 'lucide-react';
 
 import classes from './VoteCardPager.module.css';
 

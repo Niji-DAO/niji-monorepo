@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { ScaleIcon } from '@heroicons/react/solid';
 import { Trans } from '@lingui/react/macro';
+import { Scale as ScaleIcon } from 'lucide-react';
 import { Spinner } from 'react-bootstrap';
 import { map } from 'remeda';
 

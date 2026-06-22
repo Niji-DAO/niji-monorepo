@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import { ClockIcon } from '@heroicons/react/solid';
 import { i18n } from '@lingui/core';
 import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
@@ -8,6 +7,7 @@ import dayjs from 'dayjs';
 import en from 'dayjs/locale/en';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useAtom } from 'jotai/react';
+import { Clock as ClockIcon } from 'lucide-react';
 import { Alert, Button, Col, Container, Row, Spinner } from 'react-bootstrap';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { filter, find, last } from 'remeda';

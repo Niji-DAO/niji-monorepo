@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ChevronDownIcon } from '@heroicons/react/solid';
+import { ChevronDown as ChevronDownIcon } from 'lucide-react';
 
 import classes from './BrandDropdown.module.css';
 

@@ -2,7 +2,6 @@ import type { Address } from '@/utils/types';
 
 import { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { SearchIcon } from '@heroicons/react/solid';
 import { i18n } from '@lingui/core';
 import { t } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -14,6 +13,7 @@ import en from 'dayjs/locale/en';
 import advanced from 'dayjs/plugin/advancedFormat';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { Search as SearchIcon } from 'lucide-react';
 import { Button, Card, Col, Row, Spinner } from 'react-bootstrap';
 import { Link, useParams } from 'react-router';
 import { isNonNullish } from 'remeda';
