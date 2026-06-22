@@ -17,7 +17,7 @@ import {
 } from 'react-bootstrap';
 
 import InfoIcon from '@/assets/icons/Info.svg';
-import Noun from '@/components/LegacyNoun';
+import Niji from '@/components/LegacyNoun';
 import Link from '@/components/Link';
 import {
   getNijiData,
@@ -48,7 +48,7 @@ interface EncodedImage {
 
 const nounsProtocolLink = (
   <Link
-    text={<Trans>Nouns Protocol</Trans>}
+    text={<Trans>Niji Protocol</Trans>}
     url="https://www.notion.so/Noun-Protocol-32e4f0bf74fe433e927e2ea35e52a507"
     leavesPage={true}
   />
@@ -401,7 +401,7 @@ const Playground: FC = () => {
                           setDisplayNoun(true);
                         }}
                       >
-                        <Noun
+                        <Niji
                           imgPath={`data:image/svg+xml;base64,${btoa(svg)}`}
                           alt="niji"
                           className={classes.nounImg}

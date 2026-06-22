@@ -399,7 +399,7 @@ const Proposals = ({ proposals, nounsRequired }: ProposalsProps) => {
                 <p>
                   <Trans>
                     Proposal candidates can be created by anyone. If a candidate receives enough
-                    signatures by Nouns voters, it can be promoted to a proposal.
+                    signatures by Niji voters, it can be promoted to a proposal.
                   </Trans>
                 </p>
                 <Link to="/create-candidate" className={clsx(classes.button)}>

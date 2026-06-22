@@ -12,7 +12,7 @@ type Props = {
 const ForkCycleEvent = ({ forkDetails }: Props) => {
   const actionLabel = 'Fork deployed';
   const nounCount = forkDetails?.tokensInEscrowCount;
-  const nounLabel = nounCount > 1 ? 'Nouns' : 'Noun';
+  const nounLabel = nounCount > 1 ? 'Niji' : 'Niji';
   const timestamp = dayjs(
     forkDetails?.forkingPeriodEndTimestamp && +forkDetails?.forkingPeriodEndTimestamp * 1000,
   ).fromNow();

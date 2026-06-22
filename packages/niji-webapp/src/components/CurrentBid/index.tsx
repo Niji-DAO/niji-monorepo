@@ -14,12 +14,12 @@ const LEFT_COL_CLASS = 'max-[992px]:pl-2';
 
 /**
  * Passible to CurrentBid as `currentBid` prop to indicate that
- * the bid amount is not applicable to this auction. (Nounder Noun)
+ * the bid amount is not applicable to this auction. (Nounder Niji)
  */
 export const BID_N_A = 'n/a';
 
 /**
- * Special Bid type for not applicable auctions (Nounder Nouns)
+ * Special Bid type for not applicable auctions (Nounder Niji)
  */
 type BidNa = typeof BID_N_A;
 

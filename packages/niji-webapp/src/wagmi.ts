@@ -42,7 +42,7 @@ export const config = createConfig({
       showQrModal: false,
     }),
     coinbaseWallet({
-      appName: 'Nouns.WTF',
+      appName: 'Niji.WTF',
       appLogoUrl: 'https://nijis.wtf/static/media/logo.cdea1650.svg',
     }),
   ],
