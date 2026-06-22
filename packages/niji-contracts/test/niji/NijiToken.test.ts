@@ -910,4 +910,64 @@ describe('NijiToken', () => {
       await expect(token.tokenURI(999)).to.be.revertedWithCustomError(token, 'TokenDoesNotExist');
     });
   });
+
+  describe('lockContracts', () => {
+    it('should not be locked by default', async () => {
+      expect(await token.isContractsLocked()).to.be.false;
+    });
+
+    it('should allow owner to lock contracts', async () => {
+      await expect(token.lockContracts()).to.emit(token, 'ContractsLocked');
+      expect(await token.isContractsLocked()).to.be.true;
+    });
+
+    it('should revert lockContracts when called twice', async () => {
+      await token.lockContracts();
+      await expect(token.lockContracts()).to.be.revertedWithCustomError(
+        token,
+        'ContractsAreLocked',
+      );
+    });
+
+    it('should revert lockContracts when non-owner', async () => {
+      await expect(token.connect(other).lockContracts()).to.be.revertedWithCustomError(
+        token,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should revert setDescriptor after lockContracts', async () => {
+      const newDescriptor = await deployNijiDescriptor(await art.getAddress());
+      await token.lockContracts();
+      await expect(token.setDescriptor(await newDescriptor.getAddress())).to.be.revertedWithCustomError(
+        token,
+        'ContractsAreLocked',
+      );
+    });
+
+    it('should revert setSeeder after lockContracts', async () => {
+      const newSeeder = await deployNijiSeeder(await art.getAddress());
+      await token.lockContracts();
+      await expect(token.setSeeder(await newSeeder.getAddress())).to.be.revertedWithCustomError(
+        token,
+        'ContractsAreLocked',
+      );
+    });
+
+    it('should still allow tokenURI / mint / view functions after lockContracts', async () => {
+      await token.toggleMinting();
+      await token['mint(address)'](other.address);
+      await token.reveal();
+      await token.lockContracts();
+
+      const uri = await token.tokenURI(0);
+      expect(uri).to.include('data:application/json;base64,');
+      expect(await token.balanceOf(other.address)).to.equal(1);
+    });
+
+    it('should still allow setMinter after lockContracts (minter is not in lock scope)', async () => {
+      await token.lockContracts();
+      await expect(token.setMinter(other.address)).to.not.be.reverted;
+    });
+  });
 });
