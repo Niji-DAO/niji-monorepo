@@ -2,17 +2,18 @@ import React, { useEffect, useState } from 'react';
 
 import { t } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
 import clsx from 'clsx';
-import dayjs from 'dayjs';
-import { FormControl } from 'react-bootstrap';
 import { toast } from 'sonner';
 import { useAccount } from 'wagmi';
 
 import { Spinner } from '@/components/Spinner';
 import { useSendFeedback, VoteSignalDetail } from '@/wrappers/nijiData';
 
+import { useVoteSignalsFeedback } from './useVoteSignalsFeedback';
 import VoteSignalGroup from './VoteSignalGroup';
+import { VoteSignalsForm, VoteSignalsPending } from './VoteSignalsForm';
+import { VoteSignalsFootnote, VoteSignalsHeader } from './VoteSignalsHeader';
+import { VoteSignalsUserFeedback } from './VoteSignalsUserFeedback';
 
 type VoteSignalsProps = {
   proposalId?: string;
@@ -43,11 +44,6 @@ function VoteSignals({
   const [support, setSupport] = React.useState<number | undefined>();
   const [isTransactionWaiting, setIsTransactionWaiting] = useState(false);
   const [isTransactionPending, setIsTransactionPending] = useState(false);
-  const [forFeedback, setForFeedback] = useState<VoteSignalDetail[]>([]);
-  const [againstFeedback, setAgainstFeedback] = useState<VoteSignalDetail[]>([]);
-  const [abstainFeedback, setAbstainFeedback] = useState<VoteSignalDetail[]>([]);
-  const [hasUserVoted, setHasUserVoted] = useState(false);
-  const [userVoteSupport, setUserVoteSupport] = useState<VoteSignalDetail>();
   const [expandedGroup, setExpandedGroup] = useState<number | undefined>(undefined);
 
   const {
@@ -58,62 +54,25 @@ function VoteSignals({
   } = useSendFeedback();
 
   const { address: account } = useAccount();
-  const supportText = ['Against', 'For', 'Abstain'];
-
-  useEffect(() => {
-    const forIt: VoteSignalDetail[] = [];
-    const againstIt: VoteSignalDetail[] = [];
-    const abstainIt: VoteSignalDetail[] = [];
-
-    if (feedbackList) {
-      // filter feedback to this version
-      if (versionTimestamp) {
-        feedbackList = feedbackList.filter(
-          (feedback: VoteSignalDetail) => feedback.createdTimestamp >= versionTimestamp,
-        );
-      }
-      // sort feedback
-      feedbackList.forEach((feedback: VoteSignalDetail) => {
-        if (feedback.supportDetailed === 1) {
-          forIt.push(feedback);
-        }
-        if (feedback.supportDetailed === 0) {
-          againstIt.push(feedback);
-        }
-        if (feedback.supportDetailed === 2) {
-          abstainIt.push(feedback);
-        }
-      });
-      setForFeedback(forIt);
-      setAgainstFeedback(againstIt);
-      setAbstainFeedback(abstainIt);
-
-      // check if user has voted for this proposal or version
-      feedbackList.forEach((feedback: VoteSignalDetail) => {
-        if (account && account.toUpperCase() === feedback.voter.id.toUpperCase()) {
-          setHasUserVoted(true);
-          setUserVoteSupport(feedback);
-        }
-      });
-    }
-  }, [feedbackList, versionTimestamp, account]);
+  const { forFeedback, againstFeedback, abstainFeedback, hasUserVoted, userVoteSupport } =
+    useVoteSignalsFeedback({ feedbackList, versionTimestamp, account });
+  const [localHasUserVoted, setLocalHasUserVoted] = useState(false);
+  const userHasVoted = hasUserVoted || localHasUserVoted;
 
   async function handleFeedbackSubmit(
-    proposalId: number,
+    proposalIdNum: number,
     supportNum: number,
     reason: string | null,
-    candidateSlug?: string,
-    proposer?: string,
+    cSlug?: string,
+    cProposer?: string,
   ) {
-    if (supportNum > 2) {
-      return;
-    }
-    if (isCandidate === true && candidateSlug && proposer) {
+    if (supportNum > 2) return;
+    if (isCandidate === true && cSlug && cProposer) {
       await sendCandidateFeedback({
-        args: [proposer as `0x${string}`, candidateSlug, supportNum, reason || ''],
+        args: [cProposer as `0x${string}`, cSlug, supportNum, reason || ''],
       });
     } else {
-      await sendProposalFeedback({ args: [BigInt(proposalId), supportNum, reason || ''] });
+      await sendProposalFeedback({ args: [BigInt(proposalIdNum), supportNum, reason || ''] });
     }
   }
 
@@ -135,10 +94,9 @@ function VoteSignals({
       setIsTransactionPending(true);
       setDataFetchPollInterval(50);
     } else if (status === 'Success') {
-      // don't show modal. update feedback
       handleRefetch();
       setIsTransactionPending(false);
-      setHasUserVoted(true);
+      setLocalHasUserVoted(true);
       setExpandedGroup(support);
     } else if (status === 'Fail' || status === 'Exception') {
       toast.error(errorMessage || _(t`Please try again.`));
@@ -149,226 +107,84 @@ function VoteSignals({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sendCandidateFeedbackState, sendProposalFeedbackState, _]);
 
-  const userFeedbackAdded = (
-    <Trans>
-      You provided{' '}
-      <span
-        className={clsx(
-          userVoteSupport?.supportDetailed === 1 && 'text-[var(--brand-color-green)]',
-          userVoteSupport?.supportDetailed === 0 && 'text-[var(--brand-color-red)]',
-          userVoteSupport?.supportDetailed === 2 && 'text-[var(--brand-gray-light-text)]',
-        )}
-      >
-        {userVoteSupport && supportText[userVoteSupport.supportDetailed].toLowerCase()}
-      </span>{' '}
-      feedback{' '}
-      {userVoteSupport?.createdTimestamp &&
-        dayjs(userVoteSupport?.createdTimestamp * 1000).fromNow()}
-    </Trans>
-  );
-  const title = isCandidate ? (
-    <Trans>Pre-proposal feedback</Trans>
-  ) : (
-    <Trans>Pre-voting feedback</Trans>
-  );
+  const isBusy = isTransactionPending || isTransactionWaiting;
+  const showFeedbackPanel = !isFeedbackClosed && userVotes !== undefined && userVotes > 0;
+
+  if (!proposalId) return null;
 
   return (
-    <>
-      {proposalId && (
-        <div className={clsx(isCandidate && 'relative top-0')}>
-          <div className={clsx('my-4', isCandidate && 'mt-8')}>
-            <h2 className={clsx('m-0 mb-2 text-base font-bold', isCandidate && 'text-xl')}>
-              {title}
-            </h2>
-            {!isCandidate && (
-              <p className="m-0 p-0 text-base font-[PT_Root_UI] text-[var(--brand-gray-light-text)]">
-                <Trans>
-                  Nijis voters can cast voting signals to give proposers of pending proposals an
-                  idea of how they intend to vote and helpful guidance on proposal changes to change
-                  their vote.
-                </Trans>
-              </p>
-            )}
+    <div className={clsx(isCandidate && 'relative top-0')}>
+      <VoteSignalsHeader isCandidate={isCandidate} />
+      <div
+        className={clsx(
+          'flex flex-col items-center justify-between overflow-hidden rounded-xl border border-[#e6e6e6]',
+          !isCandidate && 'lg:sticky lg:top-5',
+        )}
+      >
+        {!feedbackList ? (
+          <div className="mx-auto flex h-full w-full items-center justify-center p-5 text-center">
+            <Spinner />
           </div>
-          <div
-            className={clsx(
-              'flex flex-col items-center justify-between overflow-hidden rounded-xl border border-[#e6e6e6]',
-              !isCandidate && 'lg:sticky lg:top-5',
-            )}
-          >
-            {!feedbackList ? (
-              <div className="mx-auto flex h-full w-full items-center justify-center p-5 text-center">
-                <Spinner />
-              </div>
-            ) : (
-              <>
-                <div className="w-full px-4 py-1.5">
-                  <VoteSignalGroup
-                    voteSignals={forFeedback}
-                    support={1}
-                    isExpanded={expandedGroup === 1}
-                  />
-                  <VoteSignalGroup
-                    voteSignals={againstFeedback}
-                    support={0}
-                    isExpanded={expandedGroup === 0}
-                  />
-                  <VoteSignalGroup
-                    voteSignals={abstainFeedback}
-                    support={2}
-                    isExpanded={expandedGroup === 2}
-                  />
-                </div>
-                {!isFeedbackClosed && userVotes !== undefined && userVotes > 0 && (
-                  <div
-                    className={clsx(
-                      'flex w-full flex-col items-center justify-center gap-2.5 border-t border-[#e6e6e6] bg-[#f4f4f8] p-5',
-                      userVoteSupport && 'block',
-                    )}
-                  >
-                    {!hasUserVoted ? (
-                      <>
-                        {isTransactionWaiting || isTransactionPending ? (
-                          <>
-                            <p className="m-0 p-0 text-base font-bold leading-tight">
-                              <Trans>Adding your feedback</Trans>
-                            </p>
-                            <img
-                              src="/loading-noggles.svg"
-                              alt="loading"
-                              className="mx-auto max-w-[60px] p-2.5"
-                            />
-                          </>
-                        ) : (
-                          <>
-                            <p className="m-0 p-0 text-base font-bold leading-tight">
-                              <Trans>Add your feedback</Trans>
-                            </p>
-                            <div className="flex flex-row gap-2.5 md:w-full md:flex-col">
-                              <button
-                                className={clsx(
-                                  'duration-125 cursor-pointer rounded-[10px] border-0 border-2 border-transparent bg-[var(--brand-color-green)] px-4 py-2.5 text-sm font-bold leading-none text-white outline-2 outline-transparent transition-all ease-in-out md:w-full',
-                                  support === undefined && 'opacity-100',
-                                  support && support === 1
-                                    ? 'border-2 border-white outline-2 outline-black'
-                                    : 'opacity-40',
-                                  support === undefined && 'opacity-100',
-                                  'hover:border-2 hover:border-white hover:opacity-80 hover:outline-2 hover:outline-[rgba(0,0,0,0.05)]',
-                                )}
-                                disabled={isTransactionPending || isTransactionWaiting}
-                                onClick={() =>
-                                  support === 1 ? setSupport(undefined) : setSupport(1)
-                                }
-                              >
-                                <Trans>For</Trans>
-                              </button>
-                              <button
-                                className={clsx(
-                                  'duration-125 cursor-pointer rounded-[10px] border-0 border-2 border-transparent bg-[var(--brand-color-red)] px-4 py-2.5 text-sm font-bold leading-none text-white outline-2 outline-transparent transition-all ease-in-out md:w-full',
-                                  support === undefined && 'opacity-100',
-                                  support !== undefined && support === 0
-                                    ? 'border-2 border-white outline-2 outline-black'
-                                    : 'opacity-40',
-                                  support === undefined && 'opacity-100',
-                                  'hover:border-2 hover:border-white hover:opacity-80 hover:outline-2 hover:outline-[rgba(0,0,0,0.05)]',
-                                )}
-                                disabled={isTransactionPending || isTransactionWaiting}
-                                onClick={() =>
-                                  support === 0 ? setSupport(undefined) : setSupport(0)
-                                }
-                              >
-                                <Trans>Against</Trans>
-                              </button>
-                              <button
-                                className={clsx(
-                                  'duration-125 cursor-pointer rounded-[10px] border-0 border-2 border-transparent bg-[var(--brand-gray-light-text)] px-4 py-2.5 text-sm font-bold leading-none text-white outline-2 outline-transparent transition-all ease-in-out md:w-full',
-                                  support === undefined && 'opacity-100',
-                                  support && support === 2
-                                    ? 'border-2 border-white outline-2 outline-black'
-                                    : 'opacity-40',
-                                  support === undefined && 'opacity-100',
-                                  'hover:border-2 hover:border-white hover:opacity-80 hover:outline-2 hover:outline-[rgba(0,0,0,0.05)]',
-                                )}
-                                disabled={isTransactionPending || isTransactionWaiting}
-                                onClick={() => {
-                                  if (support === 2) {
-                                    setSupport(undefined);
-                                  } else {
-                                    setSupport(2);
-                                  }
-                                }}
-                              >
-                                <Trans>Abstain</Trans>
-                              </button>
-                            </div>
-                            <>
-                              <FormControl
-                                className="mb-0 w-full rounded-lg border border-[#aaa] p-2.5 text-sm"
-                                placeholder="Optional reason"
-                                value={reasonText}
-                                disabled={isTransactionPending || isTransactionWaiting}
-                                onChange={event => setReasonText(event.target.value)}
-                                as="textarea"
-                              />
-                              <button
-                                className={clsx(
-                                  'duration-125 cursor-pointer rounded-[10px] border-0 border-2 border-transparent bg-black px-4 py-2.5 text-sm font-bold leading-none text-white outline-2 outline-transparent transition-all ease-in-out md:w-full',
-                                  'disabled:cursor-not-allowed disabled:opacity-20',
-                                  'disabled:hover:border-2 disabled:hover:border-transparent disabled:hover:opacity-20 disabled:hover:outline-2 disabled:hover:outline-transparent',
-                                )}
-                                disabled={
-                                  support === undefined ||
-                                  isTransactionPending ||
-                                  isTransactionWaiting
-                                }
-                                onClick={() => {
-                                  setIsTransactionWaiting(true);
-                                  if (proposalId && support !== undefined) {
-                                    handleFeedbackSubmit(
-                                      +proposalId,
-                                      support,
-                                      reasonText,
-                                      candidateSlug,
-                                      proposer,
-                                    );
-                                  }
-                                }}
-                              >
-                                <Trans>Submit</Trans>
-                              </button>
-                            </>
-                          </>
-                        )}
-                      </>
-                    ) : (
-                      <div className="text-left">
-                        <p>{userFeedbackAdded}</p>
-                        {userVoteSupport?.reason && (
-                          <div className="">
-                            <p className="text-left text-sm font-normal italic text-[var(--brand-gray-light-text)]">
-                              &ldquo;{userVoteSupport.reason}&rdquo;
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+        ) : (
+          <>
+            <div className="w-full px-4 py-1.5">
+              <VoteSignalGroup
+                voteSignals={forFeedback}
+                support={1}
+                isExpanded={expandedGroup === 1}
+              />
+              <VoteSignalGroup
+                voteSignals={againstFeedback}
+                support={0}
+                isExpanded={expandedGroup === 0}
+              />
+              <VoteSignalGroup
+                voteSignals={abstainFeedback}
+                support={2}
+                isExpanded={expandedGroup === 2}
+              />
+            </div>
+            {showFeedbackPanel && (
+              <div
+                className={clsx(
+                  'flex w-full flex-col items-center justify-center gap-2.5 border-t border-[#e6e6e6] bg-[#f4f4f8] p-5',
+                  userVoteSupport && 'block',
                 )}
-              </>
+              >
+                {!userHasVoted ? (
+                  isBusy ? (
+                    <VoteSignalsPending />
+                  ) : (
+                    <VoteSignalsForm
+                      support={support}
+                      setSupport={setSupport}
+                      reasonText={reasonText}
+                      setReasonText={setReasonText}
+                      isBusy={isBusy}
+                      onSubmit={() => {
+                        setIsTransactionWaiting(true);
+                        if (proposalId && support !== undefined) {
+                          handleFeedbackSubmit(
+                            +proposalId,
+                            support,
+                            reasonText,
+                            candidateSlug,
+                            proposer,
+                          );
+                        }
+                      }}
+                    />
+                  )
+                ) : (
+                  <VoteSignalsUserFeedback userVoteSupport={userVoteSupport} />
+                )}
+              </div>
             )}
-          </div>
-          {isCandidate && (
-            <p className="m-0 mt-2 p-0 text-base text-sm font-[PT_Root_UI] leading-tight text-[var(--brand-gray-light-text)]">
-              <Trans>
-                Nijis voters can cast voting signals to give proposers of pending proposals an idea
-                of how they intend to vote and helpful guidance on proposal changes to change their
-                vote.
-              </Trans>
-            </p>
-          )}
-        </div>
-      )}
-    </>
+          </>
+        )}
+      </div>
+      {isCandidate && <VoteSignalsFootnote />}
+    </div>
   );
 }
 
