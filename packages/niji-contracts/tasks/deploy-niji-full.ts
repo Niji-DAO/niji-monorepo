@@ -377,6 +377,14 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
       await setMinterTx.wait();
       console.log(`│ NijiToken.setMinter → proxy`);
 
+      // NijiToken.setPlaceholderURI — PR #247 で _mintTo に追加された PlaceholderURINotSet guard 対応。
+      // auction の初回 _createAuction が NijiToken.mint() を呼ぶ前に必ず非空 placeholder を入れておく。
+      const setPlaceholderTx = await (token as any).setPlaceholderURI(
+        'ipfs://niji-placeholder/metadata.json',
+      );
+      await setPlaceholderTx.wait();
+      console.log(`│ NijiToken.setPlaceholderURI`);
+
       // NijiToken.setMintingActive(true) — auction の初回 _createAuction が mint() を
       // 呼ぶときに `MintingNotActive` で revert しないように先に有効化する。
       const setMintingTx = await (token as any).setMintingActive(true);
