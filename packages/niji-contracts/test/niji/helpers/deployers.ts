@@ -39,11 +39,15 @@ export async function deployNijiToken(
   maxSupply: number,
 ): Promise<NijiToken> {
   const factory = await ethers.getContractFactory('NijiToken');
-  return (await factory.deploy(
+  const token = (await factory.deploy(
     name,
     symbol,
     descriptorAddress,
     seederAddress,
     maxSupply,
   )) as unknown as NijiToken;
+  // Pre-reveal mint guard requires a placeholder URI. Tests that exercise mint paths
+  // without explicit placeholder setup get a deterministic default here.
+  await token.setPlaceholderURI('ipfs://test-placeholder/metadata.json');
+  return token;
 }

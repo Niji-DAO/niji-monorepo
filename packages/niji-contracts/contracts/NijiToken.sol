@@ -15,10 +15,12 @@ import { EIP712 } from '@openzeppelin/contracts-v5/utils/cryptography/EIP712.sol
 import { Ownable2Step, Ownable } from '@openzeppelin/contracts-v5/access/Ownable2Step.sol';
 import { ReentrancyGuard } from '@openzeppelin/contracts-v5/utils/ReentrancyGuard.sol';
 import { Pausable } from '@openzeppelin/contracts-v5/utils/Pausable.sol';
+import { IERC4906 } from '@openzeppelin/contracts-v5/interfaces/IERC4906.sol';
+import { IERC165 } from '@openzeppelin/contracts-v5/utils/introspection/IERC165.sol';
 import { NijiDescriptor } from './NijiDescriptor.sol';
 import { INijiSeeder } from './interfaces/INijiSeeder.sol';
 
-contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGuard, Pausable {
+contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGuard, Pausable, IERC4906 {
     // =============================================================
     //                           ERRORS
     // =============================================================
@@ -62,6 +64,9 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
 
     /// @notice Thrown when placeholder URI is set to an empty string
     error EmptyPlaceholderURI();
+
+    /// @notice Thrown when mint is attempted before the placeholder URI is set (pre-reveal mint safety)
+    error PlaceholderURINotSet();
 
     // =============================================================
     //                           EVENTS
@@ -245,9 +250,12 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
 
     /// @notice Internal mint function
     /// @dev Uses _mint (not _safeMint) to remain compatible with auction house contracts that do not implement IERC721Receiver — matching NounsToken behavior.
+    ///      Reverts if the collection is still unrevealed and the placeholder URI is unset (otherwise tokenURI would return an empty string and break marketplaces).
     /// @param to The recipient address
     /// @return tokenId The minted token ID
     function _mintTo(address to) internal returns (uint256) {
+        if (!isRevealed && bytes(_placeholderURI).length == 0) revert PlaceholderURINotSet();
+
         uint256 tokenId = _currentTokenId;
 
         // Generate seed for this token
@@ -408,19 +416,23 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
 
     /// @notice Set the placeholder URI used for unrevealed tokens (owner only, only allowed pre-reveal)
     /// @param newPlaceholderURI URI string returned for every tokenURI while not revealed
+    /// @dev Emits ERC-4906 BatchMetadataUpdate so marketplaces refresh stale placeholder metadata.
     function setPlaceholderURI(string calldata newPlaceholderURI) external onlyOwner {
         if (isRevealed) revert RevealAlreadyDone();
         if (bytes(newPlaceholderURI).length == 0) revert EmptyPlaceholderURI();
         _placeholderURI = newPlaceholderURI;
         emit PlaceholderURIUpdated(newPlaceholderURI);
+        emit BatchMetadataUpdate(0, type(uint256).max);
     }
 
     /// @notice Reveal the collection (owner only, one-way switch)
     /// @dev After this call, tokenURI delegates to the on-chain descriptor for every token. Cannot be undone.
+    ///      Emits ERC-4906 BatchMetadataUpdate so marketplaces refresh from placeholder to on-chain metadata.
     function reveal() external onlyOwner {
         if (isRevealed) revert RevealAlreadyDone();
         isRevealed = true;
         emit Revealed();
+        emit BatchMetadataUpdate(0, type(uint256).max);
     }
 
     /// @notice Returns the current placeholder URI (empty string if never set)
@@ -536,14 +548,17 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     }
 
     /// @dev Multi-inheritance override for `supportsInterface` (ERC721Enumerable + ERC721).
-    ///      Also advertises `IVotes` so on-chain ERC165 probes (Governor / aggregators) can detect Votes support.
+    ///      Also advertises `IVotes` (Governor / aggregators) and `IERC4906` (marketplace metadata refresh).
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, ERC721Enumerable)
+        override(ERC721, ERC721Enumerable, IERC165)
         returns (bool)
     {
-        return interfaceId == type(IVotes).interfaceId || super.supportsInterface(interfaceId);
+        return
+            interfaceId == type(IVotes).interfaceId ||
+            interfaceId == bytes4(0x49064906) || // ERC-4906 (MetadataUpdate / BatchMetadataUpdate)
+            super.supportsInterface(interfaceId);
     }
 
     // =============================================================

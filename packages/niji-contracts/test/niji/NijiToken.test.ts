@@ -671,15 +671,22 @@ describe('NijiToken', () => {
       expect(await token.isRevealed()).to.be.false;
     });
 
-    it('should return empty placeholder URI by default', async () => {
-      expect(await token.placeholderURI()).to.equal('');
+    it('should have a default placeholder URI from helper setup', async () => {
+      // Helper deployNijiToken sets a default placeholder so mint paths work in tests.
+      expect(await token.placeholderURI()).to.equal('ipfs://test-placeholder/metadata.json');
     });
 
-    it('should allow owner to set placeholder URI before reveal', async () => {
+    it('should allow owner to update placeholder URI before reveal', async () => {
       await expect(token.setPlaceholderURI(PLACEHOLDER))
         .to.emit(token, 'PlaceholderURIUpdated')
         .withArgs(PLACEHOLDER);
       expect(await token.placeholderURI()).to.equal(PLACEHOLDER);
+    });
+
+    it('should emit BatchMetadataUpdate on setPlaceholderURI (ERC-4906)', async () => {
+      await expect(token.setPlaceholderURI(PLACEHOLDER))
+        .to.emit(token, 'BatchMetadataUpdate')
+        .withArgs(0, ethers.MaxUint256);
     });
 
     it('should revert setPlaceholderURI with empty string', async () => {
@@ -713,9 +720,50 @@ describe('NijiToken', () => {
       );
     });
 
+    it('should revert mint when placeholder URI is unset and not revealed', async () => {
+      // Deploy a fresh contract without going through the helper (which sets a default placeholder)
+      const factory = await ethers.getContractFactory('NijiToken');
+      const freshToken = await factory.deploy(
+        'Fresh',
+        'FRESH',
+        await descriptor.getAddress(),
+        await seeder.getAddress(),
+        10,
+      );
+      await freshToken.toggleMinting();
+      await expect(freshToken['mint(address)'](other.address)).to.be.revertedWithCustomError(
+        freshToken,
+        'PlaceholderURINotSet',
+      );
+    });
+
+    it('should allow mint after placeholder URI is set', async () => {
+      const factory = await ethers.getContractFactory('NijiToken');
+      const freshToken = await factory.deploy(
+        'Fresh',
+        'FRESH',
+        await descriptor.getAddress(),
+        await seeder.getAddress(),
+        10,
+      );
+      await freshToken.toggleMinting();
+      await freshToken.setPlaceholderURI(PLACEHOLDER);
+      await expect(freshToken['mint(address)'](other.address)).to.not.be.reverted;
+    });
+
     it('should allow owner to reveal exactly once', async () => {
       await expect(token.reveal()).to.emit(token, 'Revealed');
       expect(await token.isRevealed()).to.be.true;
+    });
+
+    it('should emit BatchMetadataUpdate on reveal (ERC-4906)', async () => {
+      await expect(token.reveal())
+        .to.emit(token, 'BatchMetadataUpdate')
+        .withArgs(0, ethers.MaxUint256);
+    });
+
+    it('should advertise IERC4906 via supportsInterface', async () => {
+      expect(await token.supportsInterface('0x49064906')).to.be.true;
     });
 
     it('should revert reveal when called twice', async () => {
