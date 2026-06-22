@@ -57,6 +57,12 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Thrown when renounceOwnership is called (disabled to prevent contract becoming unowned)
     error RenounceOwnershipDisabled();
 
+    /// @notice Thrown when reveal is called after it was already executed
+    error RevealAlreadyDone();
+
+    /// @notice Thrown when placeholder URI is set to an empty string
+    error EmptyPlaceholderURI();
+
     // =============================================================
     //                           EVENTS
     // =============================================================
@@ -99,6 +105,13 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @param amount The amount of ETH withdrawn (wei)
     event Withdrawn(address indexed to, uint256 amount);
 
+    /// @notice Emitted when the placeholder URI is updated (only available pre-reveal)
+    /// @param newPlaceholderURI The new placeholder URI used while not revealed
+    event PlaceholderURIUpdated(string newPlaceholderURI);
+
+    /// @notice Emitted when the collection is revealed (state is permanent after this)
+    event Revealed();
+
     // =============================================================
     //                           STORAGE
     // =============================================================
@@ -132,6 +145,15 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
 
     /// @notice Whether the provenance hash is locked
     bool public isProvenanceHashLocked;
+
+    /// @notice Whether the collection has been revealed (one-way switch)
+    /// @dev Pre-reveal: tokenURI returns the placeholder URI for every token.
+    ///      Post-reveal: tokenURI delegates to the on-chain descriptor as usual.
+    bool public isRevealed;
+
+    /// @notice Placeholder URI returned for every tokenURI while not revealed
+    /// @dev Should point to a single metadata JSON (per ERC721 marketplaces convention).
+    string private _placeholderURI;
 
     // =============================================================
     //                           MODIFIERS
@@ -248,8 +270,13 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Returns the token URI for a given token ID
     /// @param tokenId The token ID
     /// @return The token URI
+    /// @dev Pre-reveal returns the placeholder URI (same value for every token). Post-reveal delegates to the on-chain descriptor.
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (_ownerOf(tokenId) == address(0)) revert TokenDoesNotExist();
+
+        if (!isRevealed) {
+            return _placeholderURI;
+        }
 
         INijiSeeder.Seed memory seed = seeds[tokenId];
         uint256[] memory traitIndices = _seedToTraitIndices(seed);
@@ -373,6 +400,32 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     function lockProvenanceHash() external onlyOwner {
         if (isProvenanceHashLocked) revert ProvenanceHashLocked();
         isProvenanceHashLocked = true;
+    }
+
+    // =============================================================
+    //                      REVEAL
+    // =============================================================
+
+    /// @notice Set the placeholder URI used for unrevealed tokens (owner only, only allowed pre-reveal)
+    /// @param newPlaceholderURI URI string returned for every tokenURI while not revealed
+    function setPlaceholderURI(string calldata newPlaceholderURI) external onlyOwner {
+        if (isRevealed) revert RevealAlreadyDone();
+        if (bytes(newPlaceholderURI).length == 0) revert EmptyPlaceholderURI();
+        _placeholderURI = newPlaceholderURI;
+        emit PlaceholderURIUpdated(newPlaceholderURI);
+    }
+
+    /// @notice Reveal the collection (owner only, one-way switch)
+    /// @dev After this call, tokenURI delegates to the on-chain descriptor for every token. Cannot be undone.
+    function reveal() external onlyOwner {
+        if (isRevealed) revert RevealAlreadyDone();
+        isRevealed = true;
+        emit Revealed();
+    }
+
+    /// @notice Returns the current placeholder URI (empty string if never set)
+    function placeholderURI() external view returns (string memory) {
+        return _placeholderURI;
     }
 
     // =============================================================
