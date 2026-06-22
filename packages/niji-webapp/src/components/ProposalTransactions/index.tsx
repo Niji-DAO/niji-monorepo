@@ -5,8 +5,6 @@ import xIcon from '@/assets/x-icon.png';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
 import { ProposalTransaction } from '@/wrappers/nijiDao';
 
-import classes from './ProposalTransactions.module.css';
-
 interface ProposalTransactionsProps {
   className?: string;
   proposalTransactions: ProposalTransaction[];
@@ -45,7 +43,7 @@ const ProposalTransactions = ({
     }
 
     return (
-      <Popover className={classes.popover} id="transaction-details-popover">
+      <Popover className="!max-w-[600px]" id="transaction-details-popover">
         <Popover.Header as="h3">Transaction Details</Popover.Header>
         <Popover.Body>
           <Row>
@@ -90,9 +88,7 @@ const ProposalTransactions = ({
           placement="top"
           overlay={getPopover(tx)}
         >
-          <div
-            className={`${classes.transactionDetails} d-flex justify-content-between align-items-center`}
-          >
+          <div className="d-flex justify-content-between align-items-center mt-4 !rounded-lg !border !border-[#aaa] px-4 py-2">
             <div>
               <span>Transaction #{i + 1} - </span>
               <span>
@@ -101,7 +97,7 @@ const ProposalTransactions = ({
             </div>
             <button
               type="button"
-              className={classes.removeTransactionButton}
+              className="border-none bg-none !shadow-none !outline-none [&>img]:w-4"
               onClick={() => onRemoveProposalTransaction(i)}
             >
               <img src={xIcon} alt="Remove Transaction" />

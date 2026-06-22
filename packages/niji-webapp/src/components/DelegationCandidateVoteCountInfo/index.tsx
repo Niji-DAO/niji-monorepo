@@ -2,8 +2,6 @@ import React from 'react';
 
 import BrandSpinner from '../BrandSpinner';
 
-import classes from './DelegationCandidateVoteCountInfo.module.css';
-
 interface DelegationCandidateVoteCountInfoProps {
   text: React.ReactNode;
   voteCount: number;
@@ -14,15 +12,15 @@ const DelegationCandidateVoteCountInfo: React.FC<DelegationCandidateVoteCountInf
   const { text, voteCount, isLoading } = props;
 
   return (
-    <div className={classes.wrapper}>
+    <div className="flex">
       {isLoading && (
-        <div className={classes.spinner}>
+        <div className="mr-2 mt-2">
           <BrandSpinner />
         </div>
       )}
-      <div className={classes.voteInfoWrapper}>
+      <div className="flex flex-col text-right font-normal text-[color:var(--brand-gray-light-text)]">
         <div>{text}</div>
-        <div className={classes.voteCount}>
+        <div className="font-bold text-black">
           {voteCount === 1 ? <>{voteCount} Vote</> : <>{voteCount} Votes</>}
         </div>
       </div>
