@@ -3,8 +3,6 @@ import React from 'react';
 import LegacyNoun from '@/components/LegacyNoun';
 import { getGrayBackgroundSVG } from '@/utils/grayBackgroundSVG';
 
-import classes from './GrayCircle.module.css';
-
 import nounClasses from '@/components/LegacyNoun/Noun.module.css';
 
 interface GrayCircleProps {
@@ -13,7 +11,7 @@ interface GrayCircleProps {
 
 export const GrayCircle: React.FC<GrayCircleProps> = ({ isDelegateView }) => {
   return (
-    <div className={isDelegateView ? classes.wrapper : ''}>
+    <div className={isDelegateView ? 'h-[55px] w-[55px]' : ''}>
       <LegacyNoun
         imgPath={getGrayBackgroundSVG()}
         alt={''}
