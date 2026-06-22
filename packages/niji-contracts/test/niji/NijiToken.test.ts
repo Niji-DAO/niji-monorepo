@@ -503,5 +503,31 @@ describe('NijiToken', () => {
       await token.unpause();
       await expect(token['mint(address)'](other.address)).to.not.be.reverted;
     });
+
+    it('should keep transferOwnership / acceptOwnership available while paused (owner rescue path)', async () => {
+      await token.pause();
+      await expect(token.transferOwnership(other.address)).to.not.be.reverted;
+      await expect(token.connect(other).acceptOwnership()).to.not.be.reverted;
+      expect(await token.owner()).to.equal(other.address);
+      expect(await token.paused()).to.be.true;
+    });
+
+    it('should keep owner admin setters callable while paused (setMintingActive)', async () => {
+      await token.pause();
+      await expect(token.setMintingActive(true)).to.not.be.reverted;
+      expect(await token.isMintingActive()).to.be.true;
+      expect(await token.paused()).to.be.true;
+    });
+
+    it('should keep view functions (tokenURI / getSeed) callable while paused', async () => {
+      await token.toggleMinting();
+      await token['mint(address)'](other.address);
+      await token.pause();
+
+      const uri = await token.tokenURI(0);
+      expect(uri).to.include('data:application/json;base64,');
+      const seed = await token.getSeed(0);
+      expect(seed.special).to.be.at.least(0);
+    });
   });
 });
