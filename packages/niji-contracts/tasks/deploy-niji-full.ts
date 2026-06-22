@@ -490,6 +490,31 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     fs.writeFileSync(logPath, JSON.stringify(deployLog, null, 2));
     console.log(`\n📝 Deploy log: ${logPath}`);
 
+    // Persist the latest addresses under deployments/<network>.json so downstream tools
+    // (SDK / webapp / scripts) can read a stable path without scanning timestamped log files.
+    // The timestamped log above is kept as the auditable history; this file is the latest snapshot.
+    //
+    // Skip snapshot emission for partial deploys (--skipToken etc.) — otherwise the stable
+    // path could be overwritten with null/incomplete addresses on tracked networks
+    // (sepolia / base-sepolia / mainnet).
+    if (args.skipToken) {
+      console.log('\n⚠️  Skipping deployments/<network>.json snapshot (--skipToken partial run)');
+    } else {
+      const deploymentsDir = path.join(__dirname, '../deployments');
+      fs.mkdirSync(deploymentsDir, { recursive: true });
+      const latestPath = path.join(deploymentsDir, `${network.name}.json`);
+      const latestPayload = {
+        profile: 'full' as const,
+        network: deployLog.network,
+        chainId: deployLog.chainId,
+        timestamp: deployLog.timestamp,
+        deployer: deployLog.deployer,
+        contracts: deployLog.contracts,
+      };
+      fs.writeFileSync(latestPath, JSON.stringify(latestPayload, null, 2) + '\n');
+      console.log(`📝 Deployments snapshot: ${latestPath}`);
+    }
+
     // chainId 31337 (anvil / hardhat) のときだけ SDK gen.ts の 31337 entry を実 deploy
     // address に書き換える。 wagmi.config.ts は mainnet/sepolia のみを宣言しており
     // 31337 は test 用 patch entry のため、 deploy 結果と drift しないよう毎回同期する。
