@@ -240,4 +240,84 @@ describe('NijiSeeder', () => {
       );
     });
   });
+
+  describe('entropy salt', () => {
+    const SAMPLE_SALT = '0x' + 'ab'.repeat(32);
+    const ALT_SALT = '0x' + 'cd'.repeat(32);
+
+    it('should default to zero salt and unlocked', async () => {
+      expect(await seeder.entropySalt()).to.equal('0x' + '00'.repeat(32));
+      expect(await seeder.isEntropySaltLocked()).to.be.false;
+    });
+
+    it('should allow owner to rotate entropy salt', async () => {
+      await expect(seeder.setEntropySalt(SAMPLE_SALT))
+        .to.emit(seeder, 'EntropySaltUpdated')
+        .withArgs(SAMPLE_SALT);
+      expect(await seeder.entropySalt()).to.equal(SAMPLE_SALT);
+    });
+
+    it('should mix entropySalt into generateSeed (isolated from block-context drift)', async () => {
+      // Freeze block context by stopping auto-mining: every view call is evaluated in the
+      // same block (= same blockhash / timestamp / prevrandao), so the only differing input
+      // is `entropySalt`. This isolates the salt's contribution from time-varying entropy.
+      await ethers.provider.send('evm_setAutomine', [false]);
+      try {
+        await seeder.setEntropySalt(SAMPLE_SALT);
+        await seeder.setEntropySalt(ALT_SALT);
+        // Both transactions are still in the mempool; mine them in one block.
+        await ethers.provider.send('evm_mine', []);
+
+        // Snapshot the seed at the current salt (= ALT_SALT after the second setEntropySalt).
+        const seedAtAlt = await seeder.generateSeed(0, await art.getAddress());
+
+        // Revert the salt and re-read at the new salt — still inside automine: false, but
+        // the next evm_mine packs the transaction into a new block. Snapshot before / after
+        // and compare deterministically.
+        await seeder.setEntropySalt(SAMPLE_SALT);
+        await ethers.provider.send('evm_mine', []);
+        const seedAtSample = await seeder.generateSeed(0, await art.getAddress());
+
+        expect(seedAtAlt.special !== seedAtSample.special || seedAtAlt.hair !== seedAtSample.hair)
+          .to.be.true;
+      } finally {
+        await ethers.provider.send('evm_setAutomine', [true]);
+      }
+    });
+
+    it('should revert setEntropySalt from non-owner', async () => {
+      await expect(seeder.connect(other).setEntropySalt(SAMPLE_SALT)).to.be.revertedWithCustomError(
+        seeder,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should allow owner to lock entropy salt', async () => {
+      await expect(seeder.lockEntropySalt()).to.emit(seeder, 'EntropySaltLockedEvent');
+      expect(await seeder.isEntropySaltLocked()).to.be.true;
+    });
+
+    it('should revert setEntropySalt after lock', async () => {
+      await seeder.lockEntropySalt();
+      await expect(seeder.setEntropySalt(ALT_SALT)).to.be.revertedWithCustomError(
+        seeder,
+        'EntropySaltLocked',
+      );
+    });
+
+    it('should revert lockEntropySalt when called twice', async () => {
+      await seeder.lockEntropySalt();
+      await expect(seeder.lockEntropySalt()).to.be.revertedWithCustomError(
+        seeder,
+        'EntropySaltLocked',
+      );
+    });
+
+    it('should revert lockEntropySalt when non-owner', async () => {
+      await expect(seeder.connect(other).lockEntropySalt()).to.be.revertedWithCustomError(
+        seeder,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+  });
 });
