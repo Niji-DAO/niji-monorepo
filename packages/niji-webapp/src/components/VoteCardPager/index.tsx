@@ -3,8 +3,6 @@ import React from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid';
 import clsx from 'clsx';
 
-import classes from './VoteCardPager.module.css';
-
 interface VoteCardPagerProps {
   onRightArrowClick: () => void;
   onLeftArrowClick: () => void;
@@ -25,35 +23,39 @@ const VoteCardPager: React.FC<VoteCardPagerProps> = props => {
   } = props;
 
   const isOnePage = numPages === 1;
+  const PAGE_DOTS_CLASS =
+    'text-center text-2xl font-bold text-[color:var(--brand-gray-light-text)]';
+  const PAGINATION_ARROW_BTN_CLASS = 'border-none bg-transparent disabled:opacity-50';
+  const PAGINATION_ARROW_CLASS = 'h-7 w-7 text-[color:var(--brand-gray-light-text)]';
 
   return (
     <>
       {/* Dots */}
-      <div className={clsx(classes.pageDots, isOnePage ? classes.disabled : '')}>
+      <div className={clsx(PAGE_DOTS_CLASS, isOnePage ? 'opacity-25' : '')}>
         {Array.from(Array(numPages).keys()).map((n: number) => {
           return (
-            <span className={n === currentPage ? '' : classes.disabledPageDot} key={n}>
+            <span className={n === currentPage ? '' : 'opacity-50'} key={n}>
               •
             </span>
           );
         })}
       </div>
       {/* Arrows */}
-      <div className={clsx(classes.paginationArrowsWrapper, isOnePage ? classes.disabled : '')}>
+      <div className={clsx('flex justify-center', isOnePage ? 'opacity-25' : '')}>
         <button
-          className={classes.paginationArrowBtnWrapper}
+          className={PAGINATION_ARROW_BTN_CLASS}
           disabled={isLeftArrowDisabled || isOnePage}
           onClick={onLeftArrowClick}
         >
-          <ChevronLeftIcon className={classes.paginationArrow} />
+          <ChevronLeftIcon className={PAGINATION_ARROW_CLASS} />
         </button>
 
         <button
           disabled={isRightArrowDisabled || isOnePage}
           onClick={onRightArrowClick}
-          className={classes.paginationArrowBtnWrapper}
+          className={PAGINATION_ARROW_BTN_CLASS}
         >
-          <ChevronRightIcon className={classes.paginationArrow} />
+          <ChevronRightIcon className={PAGINATION_ARROW_CLASS} />
         </button>
       </div>
     </>

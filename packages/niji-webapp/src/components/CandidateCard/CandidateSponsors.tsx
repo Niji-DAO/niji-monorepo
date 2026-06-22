@@ -6,7 +6,6 @@ import { CandidateSignature } from '@/wrappers/nijiData';
 import { useDelegateNounsAtBlockQuery } from '@/wrappers/nijiToken';
 
 import CandidateSponsorImage from './CandidateSponsorImage';
-import classes from './CandidateSponsors.module.css';
 
 type CandidateSponsorsProps = {
   signers: CandidateSignature[];
@@ -42,12 +41,12 @@ const CandidateSponsors = ({
   return (
     <div
       className={clsx(
-        classes.sponsorsWrap,
-        signerCountOverflow > 0 && classes.sponsorsWrapOverflow,
+        'flex flex-row gap-2',
+        signerCountOverflow > 0 && 'min-[992px]:max-w-[200px] min-[992px]:overflow-visible',
       )}
     >
       {nounIds.length > 0 && (
-        <div className={classes.sponsors}>
+        <div className="flex flex-row flex-wrap content-center items-center justify-center gap-[5px] min-[992px]:justify-start">
           {nounIds.map((nounId, i) => {
             if (i >= maxVisibleSpots) return null;
             return <CandidateSponsorImage nounId={BigInt(+nounId)} key={i * +nounId} />;
@@ -55,7 +54,10 @@ const CandidateSponsors = ({
         </div>
       )}
       {placeholderArray.map((_, i) => (
-        <div className={classes.emptySponsorSpot} key={i} />
+        <div
+          className="h-8 w-8 rounded-full border border-dashed border-[#a7a7aa] bg-[#e8e8ec]"
+          key={i}
+        />
       ))}
     </div>
   );

@@ -5,18 +5,19 @@ import clsx from 'clsx';
 
 import { ForkState } from '@/wrappers/nijiDao';
 
-import classes from './ForkStatus.module.css';
+const PROPOSAL_STATUS_CLASS =
+  "rounded-lg border-2 border-transparent px-[0.65rem] py-[0.36rem] font-['PT_Root_UI'] text-sm font-bold text-white";
 
 const statusVariant = (status: ForkState | undefined) => {
   switch (status) {
     case ForkState.ESCROW:
-      return classes.escrow;
+      return '!border-2 !border-[#f0ad4e] !bg-white !text-[#dc9e46]';
     case ForkState.ACTIVE:
-      return classes.primary;
+      return 'bg-[color:var(--brand-color-green)]';
     case ForkState.EXECUTED:
-      return classes.success;
+      return 'bg-[color:var(--brand-color-blue)]';
     default:
-      return classes.secondary;
+      return 'bg-[color:var(--brand-gray-light-text)]';
   }
 };
 
@@ -41,7 +42,7 @@ interface ForkStateProps {
 const ForkStatus: React.FC<ForkStateProps> = props => {
   const { status, className } = props;
   return (
-    <div className={clsx(statusVariant(status), classes.proposalStatus, className)}>
+    <div className={clsx(statusVariant(status), PROPOSAL_STATUS_CLASS, className)}>
       {statusText(status)}
     </div>
   );
