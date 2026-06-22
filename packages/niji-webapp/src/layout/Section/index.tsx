@@ -2,8 +2,6 @@ import { CSSProperties } from 'react';
 
 import { Container, Row } from 'react-bootstrap';
 
-import classes from './Section.module.css';
-
 const Section: React.FC<{
   fullWidth: boolean;
   className?: string;
@@ -12,7 +10,7 @@ const Section: React.FC<{
 }> = props => {
   const { fullWidth, className, children, style } = props;
   return (
-    <div className={`${classes.container} ${className}`} style={style}>
+    <div className={`pt-8 ${className ?? ''}`} style={style}>
       <Container fluid={fullWidth ? true : 'lg'}>
         <Row className="align-items-center">{children}</Row>
       </Container>

@@ -2,8 +2,6 @@ import React from 'react';
 
 import NavBarButton, { NavBarButtonStyle } from '../NavBarButton';
 
-import classes from './ModalBottomButtonRow.module.css';
-
 export interface ModalBottomButtonRowProps {
   onPrevBtnClick: (e?: any) => void;
   onNextBtnClick: (e?: any) => void;
@@ -22,7 +20,7 @@ const ModalBottomButtonRow: React.FC<ModalBottomButtonRowProps> = props => {
   } = props;
 
   return (
-    <div className={classes.buttonWrapper}>
+    <div className="mt-8 flex justify-between">
       <NavBarButton
         buttonText={prevBtnText}
         buttonStyle={NavBarButtonStyle.DELEGATE_BACK}
