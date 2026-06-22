@@ -18,8 +18,6 @@ import DelegateGroupedNijiImageVoteTable from '../DelegateGroupedNijiImageVoteTa
 
 import classes from './VoteCard.module.css';
 
-import responsiveUiUtilsClasses from '@/utils/ResponsiveUIUtils.module.css';
-
 export enum VoteCardVariant {
   FOR,
   AGAINST,
@@ -117,7 +115,7 @@ const VoteCard: React.FC<VoteCardProps> = props => {
             <span
               className={clsx(
                 classes.voteCardVoteCount,
-                responsiveUiUtilsClasses.desktopOnly,
+                'max-[1200px]:hidden',
                 !isEnUS ? classes.smallerVoteCountText : '',
                 'relative',
               )}

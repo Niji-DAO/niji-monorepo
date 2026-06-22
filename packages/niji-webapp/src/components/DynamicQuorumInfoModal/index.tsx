@@ -12,8 +12,6 @@ import { adjustedNounSupplyAtPropSnapshotDocument } from '@/wrappers/subgraph';
 
 import classes from './DynamicQuorumInfoModal.module.css';
 
-import responsiveUiUtilsClasses from '@/utils/ResponsiveUIUtils.module.css';
-
 const PLOTTING_CONSTANTS = {
   width: 950,
   dqFunctionMaxQXCrossoverPlotSpace: 470,
@@ -105,7 +103,9 @@ const DynamicQuorumInfoModalOverlay: React.FC<DynamicQuorumInfoModalOverlayProps
           </p>
 
           {/* Mobile - no graph content */}
-          <div className={clsx(responsiveUiUtilsClasses.mobileOnly, classes.mobileQuorumWrapper)}>
+          <div
+            className={clsx('!hidden max-[1200px]:![display:inherit]', classes.mobileQuorumWrapper)}
+          >
             <div className={classes.mobileQuorumInfo}>
               <span>Min Threshold:</span> {Math.floor((minQuorumBps * totalNounSupply) / 10_000)}{' '}
               Nouns

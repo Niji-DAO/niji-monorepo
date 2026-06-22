@@ -7,7 +7,6 @@ import NavBarButton, { NavBarButtonStyle } from '@/components/NavBarButton';
 import { usePickByState } from '@/utils/colorResponsiveUIUtils';
 
 import navDropdownClasses from '@/components/NavBar/NavBarDropdown.module.css';
-import responsiveUiUtilsClasses from '@/utils/ResponsiveUIUtils.module.css';
 
 const NAV_DROPDOWN_WRAPPER_CLASS =
   "h-10 rounded-[10px] p-0 font-['PT_Root_UI'] text-[16px] font-bold leading-[16px] shadow-none transition-all duration-[125ms] ease-in-out";
@@ -67,7 +66,7 @@ const NavDropDown: React.FC<NavDropDownProps> = props => {
   return (
     <>
       <Dropdown
-        className={clsx(navDropdownClasses.nounsNavLink, responsiveUiUtilsClasses.desktopOnly)}
+        className={clsx(navDropdownClasses.nounsNavLink, 'max-[1200px]:hidden')}
         onToggle={() => setButtonUp(!buttonUp)}
         autoClose={true}
       >
