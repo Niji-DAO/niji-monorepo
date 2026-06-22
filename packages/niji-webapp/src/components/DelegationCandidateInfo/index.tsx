@@ -13,8 +13,6 @@ import { useAccountVotes } from '@/wrappers/nijiToken';
 
 import { ChangeDelegateState } from '../ChangeDelegatePanel';
 
-import classes from './DelegationCandidateInfo.module.css';
-
 interface DelegationCandidateInfoProps {
   address: Address;
   changeModalState: ChangeDelegateState;
@@ -85,16 +83,16 @@ const DelegationCandidateInfo: React.FC<DelegationCandidateInfoProps> = props =>
 
   if (votes == null) {
     return (
-      <div className={classes.spinner}>
+      <div className="flex justify-center">
         <BrandSpinner />
       </div>
     );
   }
 
   return (
-    <div className={classes.wrapper}>
-      <div className={classes.delegateCandidateInfoWrapper}>
-        <div className={classes.avatarWrapper}>
+    <div className="mt-3 flex flex-row justify-between px-2">
+      <div className="flex">
+        <div className="mr-4">
           <img
             alt={address}
             src={blo(address as Address)}
@@ -104,10 +102,12 @@ const DelegationCandidateInfo: React.FC<DelegationCandidateInfoProps> = props =>
           />
         </div>
         <div>
-          <div className={classes.ensText}>
+          <div className="text-[22px] font-bold text-[color:var(--brand-cool-dark-text)]">
             <ShortAddress address={address} />
           </div>
-          <div className={classes.shortAddress}>{shortAddress}</div>
+          <div className="text-[13px] font-medium text-[color:var(--brand-cool-light-text)]">
+            {shortAddress}
+          </div>
         </div>
       </div>
 
