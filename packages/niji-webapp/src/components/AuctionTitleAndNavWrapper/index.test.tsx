@@ -2,8 +2,6 @@ import { screen } from '@testing-library/dom';
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import classes from './AuctionTitleAndNavWrapper.module.css';
-
 import AuctionTitleAndNavWrapper from './index';
 
 describe('AuctionTitleAndNavWrapper Component', () => {
@@ -20,7 +18,7 @@ describe('AuctionTitleAndNavWrapper Component', () => {
     expect(childElement).toHaveTextContent(testText);
   });
 
-  it('should apply the correct CSS class', () => {
+  it('should apply flex layout via Tailwind class', () => {
     render(
       <AuctionTitleAndNavWrapper>
         <div>Test Content</div>
@@ -28,7 +26,7 @@ describe('AuctionTitleAndNavWrapper Component', () => {
     );
 
     const container = screen.getByText('Test Content').parentElement;
-    expect(container).toHaveClass(classes.auctionTitleAndNavContainer);
+    expect(container).toHaveClass('flex');
   });
 
   it('should use Bootstrap Col with lg={12} prop', () => {

@@ -12,7 +12,14 @@ import { useAppSelector } from '@/hooks';
 import { useActiveLocale } from '@/hooks/useActivateLocale';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
 
-import classes from './Winner.module.css';
+const WRAPPER_CLASS =
+  'ml-2 mt-[2px] pl-6 max-[992px]:mt-0 max-[992px]:mx-0 max-[992px]:w-full max-[992px]:p-0';
+const SECTION_CLASS =
+  "[&_h4]:font-['PT_Root_UI'] [&_h4]:text-lg [&_h4]:leading-[27px] [&_h2]:font-['PT_Root_UI'] [&_h2]:text-[32px] [&_h2]:font-bold max-[992px]:justify-between max-[992px]:[&_h2]:text-[23px]";
+const LEFT_COL_CLASS = "font-['PT_Root_UI'] [&_h4]:font-bold max-[992px]:pl-2";
+const LINK_CLASS =
+  'flex cursor-pointer text-black no-underline hover:text-black hover:no-underline active:text-black';
+const YOU_COPY_CLASS = 'mt-1 max-[992px]:pr-1';
 
 interface WinnerProps {
   winner: Address;
@@ -31,10 +38,10 @@ const Winner: React.FC<WinnerProps> = props => {
   const activeLocale = useActiveLocale();
 
   const nonNounderNounContent = isWinnerYou ? (
-    <Row className={classes.youSection}>
-      <Col lg={activeLocale === 'ja-JP' ? 8 : 4} className={classes.youCopy}>
+    <Row>
+      <Col lg={activeLocale === 'ja-JP' ? 8 : 4} className={YOU_COPY_CLASS}>
         <h2
-          className={classes.winnerContent}
+          className="max-[992px]:mr-2"
           style={{
             color: isCool ? 'var(--brand-cool-dark-text)' : 'var(--brand-warm-dark-text)',
           }}
@@ -52,7 +59,7 @@ const Winner: React.FC<WinnerProps> = props => {
       href={buildEtherscanAddressLink('nounders.eth')}
       target={'_blank'}
       rel="noreferrer"
-      className={classes.link}
+      className={LINK_CLASS}
     >
       <Tooltip>
         <TooltipContent id="holder-etherscan-tooltip">
@@ -65,20 +72,20 @@ const Winner: React.FC<WinnerProps> = props => {
 
   return (
     <>
-      <Row className={clsx(classes.wrapper, classes.section)}>
-        <Col xs={1} lg={12} className={classes.leftCol}>
+      <Row className={clsx(WRAPPER_CLASS, SECTION_CLASS)}>
+        <Col xs={1} lg={12} className={LEFT_COL_CLASS}>
           <h4
             style={{
               color: isCool ? 'var(--brand-cool-light-text)' : 'var(--brand-warm-light-text)',
             }}
-            className={classes.winnerCopy}
+            className="min-w-[250px]"
           >
             <Trans>Winner</Trans>
           </h4>
         </Col>
         <Col xs="auto" lg={12}>
           <h2
-            className={classes.winnerContent}
+            className="max-[992px]:mr-2"
             style={{
               color: isCool ? 'var(--brand-cool-dark-text)' : 'var(--brand-warm-dark-text)',
             }}

@@ -15,7 +15,17 @@ import { useAppSelector } from '@/hooks';
 
 import auctionActivityClasses from '@/components/AuctionActivity/AuctionActivity.module.css';
 import auctionBidClasses from '@/components/AuctionActivity/BidHistory.module.css';
-import bidBtnClasses from '@/components/BidHistoryBtn/BidHistoryBtn.module.css';
+
+const WRAPPER_BASE_CLASS =
+  'flex cursor-pointer justify-center !rounded-[10px] transition-all duration-200 ease-in-out';
+const WRAPPER_COOL_CLASS =
+  'text-[color:var(--brand-cool-light-text)] hover:text-[color:var(--brand-color-blue)]';
+const WRAPPER_WARM_CLASS =
+  'text-[color:var(--brand-warm-light-text)] hover:text-[color:var(--brand-color-warm)]';
+const LINK_COOL_CLASS =
+  "ml-2 font-['PT_Root_UI'] text-[16px] font-bold text-[color:var(--brand-color-blue)] no-underline transition-all duration-200 ease-in-out hover:text-[color:var(--brand-color-blue)] hover:brightness-110";
+const LINK_WARM_CLASS =
+  "ml-2 font-['PT_Root_UI'] text-[16px] font-bold text-[color:var(--brand-color-red)] no-underline transition-all duration-200 ease-in-out hover:text-[color:var(--brand-color-red)] hover:brightness-110";
 
 interface NijiContentProps {
   mintTimestamp: bigint;
@@ -119,14 +129,9 @@ const NijiContent: React.FC<NijiContentProps> = props => {
             </li>
           </ul>
           <div
-            className={
-              isCool ? bidBtnClasses.bidHistoryWrapperCool : bidBtnClasses.bidHistoryWrapperWarm
-            }
+            className={`${WRAPPER_BASE_CLASS} ${isCool ? WRAPPER_COOL_CLASS : WRAPPER_WARM_CLASS}`}
           >
-            <Link
-              to="/nounders"
-              className={isCool ? bidBtnClasses.bidHistoryCool : bidBtnClasses.bidHistoryWarm}
-            >
+            <Link to="/nounders" className={isCool ? LINK_COOL_CLASS : LINK_WARM_CLASS}>
               <Trans>Learn more</Trans> →
             </Link>
           </div>
