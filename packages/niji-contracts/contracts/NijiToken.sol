@@ -72,6 +72,9 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Thrown when mint is attempted before the placeholder URI is set (pre-reveal mint safety)
     error PlaceholderURINotSet();
 
+    /// @notice Thrown when mintBatch quantity exceeds the per-call upper bound (gas safety)
+    error MintBatchQuantityExceedsLimit(uint256 requested, uint256 limit);
+
     /// @notice Thrown when baseURI is modified after being locked
     error BaseURIIsLocked();
 
@@ -137,6 +140,11 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     // =============================================================
     //                           STORAGE
     // =============================================================
+
+    /// @notice Maximum number of tokens allowed in a single mintBatch call (gas-safety cap)
+    /// @dev Hard-coded constant since per-batch gas usage scales roughly linearly with the count;
+    ///      50 keeps the call well below typical block gas limits even with on-chain seed generation.
+    uint256 public constant MAX_MINT_BATCH_SIZE = 50;
 
     /// @notice The Niji descriptor contract for generating tokenURI
     NijiDescriptor public descriptor;
@@ -266,6 +274,9 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @return tokenIds Array of minted token IDs
     function mintBatch(address to, uint256 quantity) external onlyMinter nonReentrant returns (uint256[] memory) {
         if (!isMintingActive) revert MintingNotActive();
+        if (quantity > MAX_MINT_BATCH_SIZE) {
+            revert MintBatchQuantityExceedsLimit(quantity, MAX_MINT_BATCH_SIZE);
+        }
         if (maxSupply > 0 && _currentTokenId + quantity > maxSupply) revert MaxSupplyReached();
 
         uint256[] memory tokenIds = new uint256[](quantity);
