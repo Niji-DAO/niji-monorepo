@@ -12,7 +12,7 @@ Niji DAO は generative on-chain avatar art collective です。 本リポジト
 | `packages/niji-api` | [ponder.sh](https://ponder.sh) ベースの historical data API |
 | `packages/niji-subgraph` | (**deprecated**) The Graph subgraph manifest、 `niji-api` に置き換え予定 |
 | `packages/niji-webapp` | React + Vite frontend (wagmi + TanStack Query + Tailwind + shadcn/ui) |
-| `packages/niji-docs` | Next.js 15 + Nextra 4 の公開 docs サイト |
+| `packages/niji-docs` | Next.js 16 + Nextra 4 の公開 docs サイト |
 
 package 間の build 依存は webapp → assets / contracts / sdk の順で turbo が解決します。
 
@@ -82,11 +82,11 @@ contract だけテストしたい場合は `cd packages/niji-contracts && pnpm h
 
 ### Webapp (`niji-webapp`)
 
-React 18 + Vite + wagmi + TanStack Query で構築。 Redux Toolkit から TanStack Query への移行中、 CSS Modules + react-bootstrap から Tailwind + shadcn/ui への移行中。 Apollo Client は完全撤去済で全 subgraph query は TanStack Query + GraphQL Codegen 経由になっています。 詳細は [packages/niji-webapp/README.md](packages/niji-webapp/README.md) を参照。
+React 18 + Vite + wagmi + TanStack Query + Jotai で構築。 state は Jotai atom (UI / 永続化) と TanStack Query (server state) の組み合わせ、 styling は CSS Modules + react-bootstrap から Tailwind + shadcn/ui への移行中。 Apollo Client と Redux Toolkit は完全撤去済で、 全 subgraph query は TanStack Query + GraphQL Codegen 経由になっています。 詳細は [packages/niji-webapp/README.md](packages/niji-webapp/README.md) を参照。
 
 ### Docs (`niji-docs`)
 
-Next.js 15 + Nextra 4 + Pagefind の公開 docs サイト。 `pnpm build` で `.next` build + Pagefind 検索 index を同時生成。
+Next.js 16 + Nextra 4 + Pagefind の公開 docs サイト。 `pnpm build` で `.next` build + Pagefind 検索 index を同時生成。
 
 ## アクティブな移行
 
@@ -94,7 +94,7 @@ webapp 内で進行中の刷新は以下の通り。 新規実装ではモダン
 
 | 旧 | 新 | 状態 |
 |---|---|---|
-| Redux Toolkit (server state) | TanStack Query | 進行中 (UI state のみ Redux 残し) |
+| Redux Toolkit (server state) | TanStack Query + Jotai | 完了 (package.json から削除済) |
 | CSS Modules + react-bootstrap | Tailwind CSS + shadcn/ui | 進行中 |
 | Apollo Client | TanStack Query + GraphQL Codegen | 完了 |
 

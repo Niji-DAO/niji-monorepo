@@ -6,46 +6,46 @@ webapp から contract を直接触りたい場合の最短セットアップ。
 
 ```mermaid
 graph LR
-    A[anvil 起動 chainId 31337] --> B[deploy-niji-smoke で contract 群 deploy]
-    B --> C[deploy log を sdk address mapping に反映]
+    A[anvil --port 8547 起動 chainId 31337] --> B[deploy-niji-full で contract + auction を deploy]
+    B --> C[deploy log を sdk の .gen.ts address に反映]
     C --> D[webapp dev サーバ起動 port 2424]
-    D --> E[MetaMask で hardhat 31337 ネットワーク追加]
+    D --> E[MetaMask で 8547 ネットワーク追加]
     E --> F[mint や auction を手元で操作]
 ```
+
+トークンの mint と tokenURI 表示だけ確認したいなら `deploy-niji-smoke`、 webapp で auction まで触りたいなら `deploy-niji-full` (または `pnpm task:run-local`) を使います。 smoke は auction house を deploy しないため、 webapp の boot path で auction address を読みに行く処理が失敗します。
 
 ## 1. anvil を立ち上げる
 
 ```sh
-anvil
+anvil --port 8547
 ```
 
-default 設定で OK。 RPC は `http://127.0.0.1:8545`、 chainId は 31337。 deterministic accounts (anvil 標準の 10 個) が用意されます。 deployer は account[0]、 private key は anvil の起動 log に出る最初のキー (`0xac0974be...`) を使うのが基本です。
-
-webapp の env では `VITE_HARDHAT_JSONRPC=http://127.0.0.1:8547` のようにポート番号を変えている例もあるので、 自分の `.env` に合わせて anvil の `--port` を上げ下げしてください。
+本 repo は `packages/niji-contracts/hardhat.config.ts` の `localhost.url` と `packages/niji-webapp/src/constants/anvil.ts` の `ANVIL_PORT` が共に **8547** に固定されています。 anvil を default の 8545 で立ち上げると `pnpm hardhat deploy-niji-smoke --network localhost` も webapp 側も RPC に届かないので、 必ず `--port 8547` を指定してください。 chainId は 31337。 deterministic accounts (anvil 標準の 10 個) が用意され、 deployer は account[0]、 private key は anvil の起動 log に出る最初のキー (`0xac0974be...`) を使います。
 
 ## 2. contract をデプロイ
 
+webapp との繋ぎ込みまで含めて触るなら `deploy-niji-full` を使ってください。 `deploy-niji-smoke` は auction house を deploy しないため webapp の boot path で auction address read が失敗します。
+
 ```sh
 cd packages/niji-contracts
+# token + descriptor + auction まで full deploy (webapp 連携用)
+pnpm hardhat deploy-niji-full --network localhost
+# あるいは contract task の wrapper
+pnpm task:run-local
+```
+
+token / descriptor だけ動作確認したい (auction なしで OK) 場合は smoke で十分です。
+
+```sh
 pnpm hardhat deploy-niji-smoke --network localhost
 ```
 
 `deploy-niji-smoke` は最低限 (NijiArt → NijiDescriptor → NijiSeeder → NijiToken) を入れて mint 1 体 + tokenURI 検証まで通します。 完走すると `packages/niji-contracts/deploy/localhost-{timestamp}-smoke.json` に contract address と gas 情報が書き出されます。
 
-auction や governance まで含めて立ち上げたい場合は `deploy-niji-full` を使ってください。
-
 ## 3. SDK に address を反映
 
-deploy log を見ながら `packages/niji-sdk` の address mapping を更新します。 多くの場合は chainId 31337 の entry を以下の 4 つに差し替える形になります。
-
-```ts
-{
-  NijiArt:        '0x...',
-  NijiDescriptor: '0x...',
-  NijiSeeder:     '0x...',
-  NijiToken:      '0x...',
-}
-```
+deploy log を見ながら `packages/niji-sdk` 配下の生成 file (`src/react/*.gen.ts` と `src/actions/*.gen.ts`) を更新します。 主要 contract ごとに 1 ファイル単位で chainId 31337 の address 定数が定義されているので、 `auction-house.gen.ts` / `descriptor.gen.ts` / `seeder.gen.ts` / `token.gen.ts` 等を deploy 出力に合わせて書き換えます (この 4 file は wagmi cli の生成物なので、 wagmi cli を回せば自動更新も可能)。
 
 webapp は sdk 経由で contract address を参照するため、 ここを更新しない限り画面は古い address を見続けます。
 
@@ -57,7 +57,7 @@ cp .env.example.local .env
 pnpm dev
 ```
 
-webapp は `http://localhost:2424` で立ち上がります (strictPort: true で 3000 へのフォールバックはありません)。 MetaMask に「Hardhat」 ネットワーク (RPC `http://127.0.0.1:8545` / chainId 31337) を追加し、 anvil deployer の private key (`0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`) を import すれば最初の mint まで触れます。
+webapp は `http://localhost:2424` で立ち上がります (strictPort: true で 3000 へのフォールバックはありません)。 MetaMask に「Hardhat」 ネットワーク (RPC `http://127.0.0.1:8547` / chainId 31337) を追加し、 anvil deployer の private key (`0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`) を import すれば最初の mint まで触れます。
 
 ## 5. 開発中によくやる操作
 

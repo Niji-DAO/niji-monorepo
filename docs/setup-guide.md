@@ -48,7 +48,7 @@ cd packages/niji-webapp
 pnpm dev
 ```
 
-`pnpm -w dev` で root から呼ぶこともできますが、 contract と webapp を別 process で動かしたい場合は対象 dir で個別に `pnpm dev` を呼ぶ方が安全です。
+root の `pnpm -w dev` は `turbo run dev` で全 package の dev script を持続実行するため、 webapp / contracts / api / docs を同時に立ち上げます。 個別 package だけ動かしたい時は対象 dir で `pnpm dev` を直接呼ぶ方が確実です。
 
 ## 5. テスト実行で動作確認
 
@@ -81,7 +81,7 @@ PR #249 以降は `setPlaceholderURI` + `reveal` + view call の gasLimit overri
 
 ### `Token does not exist` が webapp で連発する
 
-contract address が古いままの可能性があります。 `packages/niji-sdk/src/contract/addresses.json` (または相当の address mapping) の chainId 31337 のエントリを deploy log (`packages/niji-contracts/deploy/localhost-*-smoke.json`) と照らし合わせて更新してください。
+contract address が古いままの可能性があります。 `packages/niji-sdk/src/react/{auction-house,descriptor,seeder,token}.gen.ts` (および `src/actions/*.gen.ts`) の chainId 31337 のエントリを deploy log (`packages/niji-contracts/deploy/localhost-*-{smoke,full}.json`) と照らし合わせて更新してください。 wagmi cli を回せば自動再生成も可能です。
 
 ### Foundry 系コマンドが PATH に通っていない
 
