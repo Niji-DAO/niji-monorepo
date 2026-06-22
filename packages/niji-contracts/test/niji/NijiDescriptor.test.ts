@@ -254,6 +254,64 @@ describe('NijiDescriptor', () => {
     });
   });
 
+  describe('freezeMetadata', () => {
+    it('should not be frozen by default', async () => {
+      expect(await descriptor.isMetadataFrozen()).to.be.false;
+    });
+
+    it('should allow owner to freeze metadata', async () => {
+      await expect(descriptor.freezeMetadata()).to.emit(descriptor, 'MetadataFrozen');
+      expect(await descriptor.isMetadataFrozen()).to.be.true;
+    });
+
+    it('should revert freezeMetadata when called twice', async () => {
+      await descriptor.freezeMetadata();
+      await expect(descriptor.freezeMetadata()).to.be.revertedWithCustomError(
+        descriptor,
+        'MetadataIsFrozen',
+      );
+    });
+
+    it('should revert freezeMetadata when non-owner', async () => {
+      await expect(descriptor.connect(other).freezeMetadata()).to.be.revertedWithCustomError(
+        descriptor,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should revert setArt after freezeMetadata', async () => {
+      await descriptor.freezeMetadata();
+      const newArt = await deployNijiArt(owner.address);
+      await expect(descriptor.setArt(await newArt.getAddress())).to.be.revertedWithCustomError(
+        descriptor,
+        'MetadataIsFrozen',
+      );
+    });
+
+    it('should revert setResolution after freezeMetadata', async () => {
+      await descriptor.freezeMetadata();
+      await expect(descriptor.setResolution(640)).to.be.revertedWithCustomError(
+        descriptor,
+        'MetadataIsFrozen',
+      );
+    });
+
+    it('should revert setCompositeOrder after freezeMetadata', async () => {
+      await descriptor.freezeMetadata();
+      await expect(descriptor.setCompositeOrder([0, 1, 2])).to.be.revertedWithCustomError(
+        descriptor,
+        'MetadataIsFrozen',
+      );
+    });
+
+    it('should still allow view reads after freezeMetadata', async () => {
+      await descriptor.freezeMetadata();
+      expect(await descriptor.isConfigured()).to.be.true;
+      const order = await descriptor.getCompositeOrder();
+      expect(order.length).to.equal(COMPOSITE_ORDER.length);
+    });
+  });
+
   describe('isConfigured', () => {
     it('should return true when properly configured', async () => {
       expect(await descriptor.isConfigured()).to.be.true;
