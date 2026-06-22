@@ -14,10 +14,11 @@ import { IVotes } from '@openzeppelin/contracts-v5/governance/utils/IVotes.sol';
 import { EIP712 } from '@openzeppelin/contracts-v5/utils/cryptography/EIP712.sol';
 import { Ownable2Step, Ownable } from '@openzeppelin/contracts-v5/access/Ownable2Step.sol';
 import { ReentrancyGuard } from '@openzeppelin/contracts-v5/utils/ReentrancyGuard.sol';
+import { Pausable } from '@openzeppelin/contracts-v5/utils/Pausable.sol';
 import { NijiDescriptor } from './NijiDescriptor.sol';
 import { INijiSeeder } from './interfaces/INijiSeeder.sol';
 
-contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGuard {
+contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGuard, Pausable {
     // =============================================================
     //                           ERRORS
     // =============================================================
@@ -360,6 +361,21 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     }
 
     // =============================================================
+    //                      PAUSABLE
+    // =============================================================
+
+    /// @notice Pause mint / transfer / burn (owner only)
+    /// @dev Inherits Pausable.paused() / Paused / Unpaused events. Emergency switch for security incidents.
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /// @notice Unpause mint / transfer / burn (owner only)
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
+    // =============================================================
     //                      VIEW FUNCTIONS
     // =============================================================
 
@@ -396,11 +412,12 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
 
     /// @dev Multi-inheritance override: ERC721Enumerable + ERC721Votes both override `_update`.
     /// Calling super.* chains both extensions: enumeration bookkeeping + voting unit transfer.
+    ///      `whenNotPaused` blocks mint / transfer / burn when paused (Pausable extension).
     function _update(
         address to,
         uint256 tokenId,
         address auth
-    ) internal override(ERC721Enumerable, ERC721Votes) returns (address) {
+    ) internal override(ERC721Enumerable, ERC721Votes) whenNotPaused returns (address) {
         return super._update(to, tokenId, auth);
     }
 
