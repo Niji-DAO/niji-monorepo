@@ -181,7 +181,7 @@ function NijiDUNABody() {
         </Trans>
       </p>
       <Link
-        text="Learn more about the DUNA"
+        text={<Trans>Learn more about the DUNA</Trans>}
         url="https://a16zcrypto.com/posts/article/duna-for-daos/"
         leavesPage={true}
       />
