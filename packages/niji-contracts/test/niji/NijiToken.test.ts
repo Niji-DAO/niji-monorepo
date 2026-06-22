@@ -429,7 +429,6 @@ describe('NijiToken', () => {
       expect(await unlimitedToken.remainingSupply()).to.equal(ethers.MaxUint256);
     });
   });
-<<<<<<< HEAD
 
   describe('pausable', () => {
     it('should not be paused by default', async () => {
@@ -531,8 +530,6 @@ describe('NijiToken', () => {
       expect(seed.special).to.be.at.least(0);
     });
   });
-||||||| parent of c93e2ec2d (💰 feat(niji-contracts): NijiToken に Withdraw 関数を追加 (Issue #28))
-=======
 
   describe('withdraw', () => {
     it('should accept ETH via receive()', async () => {
@@ -619,6 +616,40 @@ describe('NijiToken', () => {
         token.connect(other).withdrawAmount(ethers.parseEther('1')),
       ).to.be.revertedWithCustomError(token, 'OwnableUnauthorizedAccount');
     });
+
+    it('should revert with WithdrawFailed when owner-side ETH transfer rejects (withdraw)', async () => {
+      // Transfer ownership to a contract that always reverts on receive
+      const Rejecting = await ethers.getContractFactory('RejectingReceiver');
+      const rejecting = await Rejecting.deploy();
+      const rejectingAddr = await rejecting.getAddress();
+
+      await token.transferOwnership(rejectingAddr);
+      await rejecting.acceptOwnershipOn(await token.getAddress());
+
+      // Fund the token contract
+      const tokenAddr = await token.getAddress();
+      await owner.sendTransaction({ to: tokenAddr, value: ethers.parseEther('1') });
+
+      // Call withdraw from rejecting (now owner) and expect WithdrawFailed
+      const tokenIface = token.interface;
+      const callData = tokenIface.encodeFunctionData('withdraw');
+      await expect(rejecting.callOn(tokenAddr, callData)).to.be.reverted;
+    });
+
+    it('should revert with WithdrawFailed when owner-side ETH transfer rejects (withdrawAmount)', async () => {
+      const Rejecting = await ethers.getContractFactory('RejectingReceiver');
+      const rejecting = await Rejecting.deploy();
+      const rejectingAddr = await rejecting.getAddress();
+
+      await token.transferOwnership(rejectingAddr);
+      await rejecting.acceptOwnershipOn(await token.getAddress());
+
+      const tokenAddr = await token.getAddress();
+      await owner.sendTransaction({ to: tokenAddr, value: ethers.parseEther('1') });
+
+      const tokenIface = token.interface;
+      const callData = tokenIface.encodeFunctionData('withdrawAmount', [ethers.parseEther('1')]);
+      await expect(rejecting.callOn(tokenAddr, callData)).to.be.reverted;
+    });
   });
->>>>>>> c93e2ec2d (💰 feat(niji-contracts): NijiToken に Withdraw 関数を追加 (Issue #28))
 });

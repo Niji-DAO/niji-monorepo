@@ -51,7 +51,8 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     error WithdrawAmountExceedsBalance();
 
     /// @notice Thrown when ETH transfer fails during withdraw
-    error WithdrawFailed();
+    /// @param reason The raw revert data returned by the owner-side call (helps diagnose smart-wallet rejections)
+    error WithdrawFailed(bytes reason);
 
     // =============================================================
     //                           EVENTS
@@ -391,14 +392,14 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     // =============================================================
 
     /// @notice Withdraw all ETH held by the contract to the owner
-    /// @dev Drains the full contract balance. Reverts if the contract holds zero ETH or the transfer fails.
+    /// @dev Drains the full contract balance. Reverts if the contract holds zero ETH or the transfer fails (revert data preserved for smart-wallet diagnostics).
     function withdraw() external onlyOwner nonReentrant {
         uint256 balance = address(this).balance;
         if (balance == 0) revert WithdrawAmountExceedsBalance();
 
         address ownerAddr = owner();
-        (bool success, ) = payable(ownerAddr).call{ value: balance }('');
-        if (!success) revert WithdrawFailed();
+        (bool success, bytes memory data) = payable(ownerAddr).call{ value: balance }('');
+        if (!success) revert WithdrawFailed(data);
 
         emit Withdrawn(ownerAddr, balance);
     }
@@ -409,8 +410,8 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
         if (amount == 0 || amount > address(this).balance) revert WithdrawAmountExceedsBalance();
 
         address ownerAddr = owner();
-        (bool success, ) = payable(ownerAddr).call{ value: amount }('');
-        if (!success) revert WithdrawFailed();
+        (bool success, bytes memory data) = payable(ownerAddr).call{ value: amount }('');
+        if (!success) revert WithdrawFailed(data);
 
         emit Withdrawn(ownerAddr, amount);
     }
