@@ -429,6 +429,7 @@ describe('NijiToken', () => {
       expect(await unlimitedToken.remainingSupply()).to.equal(ethers.MaxUint256);
     });
   });
+<<<<<<< HEAD
 
   describe('pausable', () => {
     it('should not be paused by default', async () => {
@@ -530,4 +531,94 @@ describe('NijiToken', () => {
       expect(seed.special).to.be.at.least(0);
     });
   });
+||||||| parent of c93e2ec2d (💰 feat(niji-contracts): NijiToken に Withdraw 関数を追加 (Issue #28))
+=======
+
+  describe('withdraw', () => {
+    it('should accept ETH via receive()', async () => {
+      const tokenAddr = await token.getAddress();
+      await owner.sendTransaction({ to: tokenAddr, value: ethers.parseEther('1') });
+      expect(await ethers.provider.getBalance(tokenAddr)).to.equal(ethers.parseEther('1'));
+    });
+
+    it('should allow owner to withdraw full balance', async () => {
+      const tokenAddr = await token.getAddress();
+      await owner.sendTransaction({ to: tokenAddr, value: ethers.parseEther('2') });
+
+      const ownerBalanceBefore = await ethers.provider.getBalance(owner.address);
+      const tx = await token.withdraw();
+      const receipt = await tx.wait();
+      const gasCost = receipt!.gasUsed * receipt!.gasPrice;
+      const ownerBalanceAfter = await ethers.provider.getBalance(owner.address);
+
+      expect(await ethers.provider.getBalance(tokenAddr)).to.equal(0);
+      expect(ownerBalanceAfter - ownerBalanceBefore + gasCost).to.equal(ethers.parseEther('2'));
+    });
+
+    it('should emit Withdrawn event on withdraw', async () => {
+      const tokenAddr = await token.getAddress();
+      await owner.sendTransaction({ to: tokenAddr, value: ethers.parseEther('1') });
+
+      await expect(token.withdraw())
+        .to.emit(token, 'Withdrawn')
+        .withArgs(owner.address, ethers.parseEther('1'));
+    });
+
+    it('should revert withdraw when contract balance is zero', async () => {
+      await expect(token.withdraw()).to.be.revertedWithCustomError(
+        token,
+        'WithdrawAmountExceedsBalance',
+      );
+    });
+
+    it('should revert when non-owner calls withdraw', async () => {
+      const tokenAddr = await token.getAddress();
+      await owner.sendTransaction({ to: tokenAddr, value: ethers.parseEther('1') });
+
+      await expect(token.connect(other).withdraw()).to.be.revertedWithCustomError(
+        token,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should allow owner to withdraw a partial amount', async () => {
+      const tokenAddr = await token.getAddress();
+      await owner.sendTransaction({ to: tokenAddr, value: ethers.parseEther('3') });
+
+      await expect(token.withdrawAmount(ethers.parseEther('1')))
+        .to.emit(token, 'Withdrawn')
+        .withArgs(owner.address, ethers.parseEther('1'));
+
+      expect(await ethers.provider.getBalance(tokenAddr)).to.equal(ethers.parseEther('2'));
+    });
+
+    it('should revert withdrawAmount when amount is zero', async () => {
+      const tokenAddr = await token.getAddress();
+      await owner.sendTransaction({ to: tokenAddr, value: ethers.parseEther('1') });
+
+      await expect(token.withdrawAmount(0)).to.be.revertedWithCustomError(
+        token,
+        'WithdrawAmountExceedsBalance',
+      );
+    });
+
+    it('should revert withdrawAmount when amount exceeds balance', async () => {
+      const tokenAddr = await token.getAddress();
+      await owner.sendTransaction({ to: tokenAddr, value: ethers.parseEther('1') });
+
+      await expect(
+        token.withdrawAmount(ethers.parseEther('2')),
+      ).to.be.revertedWithCustomError(token, 'WithdrawAmountExceedsBalance');
+    });
+
+    it('should revert when non-owner calls withdrawAmount', async () => {
+      const tokenAddr = await token.getAddress();
+      await owner.sendTransaction({ to: tokenAddr, value: ethers.parseEther('1') });
+
+      await expect(
+        token.connect(other).withdrawAmount(ethers.parseEther('1')),
+      ).to.be.revertedWithCustomError(token, 'OwnableUnauthorizedAccount');
+    });
+  });
+>>>>>>> c93e2ec2d (💰 feat(niji-contracts): NijiToken に Withdraw 関数を追加 (Issue #28))
 });
