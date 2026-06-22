@@ -36,8 +36,6 @@ import TraitsPage from '@/pages/TraitsPage';
 import VotePage from '@/pages/Vote';
 import { setActiveAccount } from '@/state/slices/account';
 
-import classes from './App.module.css';
-
 function App() {
   const { address: account, chainId } = useAccount();
 
@@ -50,7 +48,7 @@ function App() {
   }, [account, dispatch]);
 
   return (
-    <div className={`${classes.wrapper}`}>
+    <div className="flex min-h-screen max-w-[100vw] flex-col max-[992px]:overflow-x-hidden">
       {chainId !== undefined && Number(CHAIN_ID) !== chainId && <NetworkAlert />}
       <BrowserRouter>
         <NavBar />
