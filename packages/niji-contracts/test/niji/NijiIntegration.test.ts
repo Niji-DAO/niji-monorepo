@@ -88,6 +88,7 @@ describe('NijiIntegration', () => {
   describe('full flow: mint → tokenURI → attributes', () => {
     it('should produce valid tokenURI with attributes after mint', async () => {
       await token['mint(address)'](minter.address);
+      await token.reveal();
 
       const uri = await token.tokenURI(0);
       const json = decodeTokenURI(uri);
@@ -112,6 +113,7 @@ describe('NijiIntegration', () => {
   describe('descriptor swap after mint', () => {
     it('should use new descriptor for tokenURI', async () => {
       await token['mint(address)'](minter.address);
+      await token.reveal();
 
       // Deploy new descriptor with different resolution
       const newArt = await deployNijiArt(owner.address);

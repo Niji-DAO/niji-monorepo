@@ -163,6 +163,7 @@ describe('NijiToken', () => {
     beforeEach(async () => {
       await token.toggleMinting();
       await token['mint(address)'](other.address);
+      await token.reveal(); // Reveal so tokenURI returns on-chain metadata, not the placeholder
     });
 
     it('should return valid tokenURI', async () => {
@@ -531,6 +532,7 @@ describe('NijiToken', () => {
     it('should keep view functions (tokenURI / getSeed) callable while paused', async () => {
       await token.toggleMinting();
       await token['mint(address)'](other.address);
+      await token.reveal(); // ensure tokenURI returns on-chain metadata, not the empty placeholder
       await token.pause();
 
       const uri = await token.tokenURI(0);
@@ -659,6 +661,143 @@ describe('NijiToken', () => {
       const tokenIface = token.interface;
       const callData = tokenIface.encodeFunctionData('withdrawAmount', [ethers.parseEther('1')]);
       await expect(rejecting.callOn(tokenAddr, callData)).to.be.reverted;
+    });
+  });
+
+  describe('reveal', () => {
+    const PLACEHOLDER = 'ipfs://QmPlaceholderHash/metadata.json';
+
+    it('should not be revealed by default', async () => {
+      expect(await token.isRevealed()).to.be.false;
+    });
+
+    it('should have a default placeholder URI from helper setup', async () => {
+      // Helper deployNijiToken sets a default placeholder so mint paths work in tests.
+      expect(await token.placeholderURI()).to.equal('ipfs://test-placeholder/metadata.json');
+    });
+
+    it('should allow owner to update placeholder URI before reveal', async () => {
+      await expect(token.setPlaceholderURI(PLACEHOLDER))
+        .to.emit(token, 'PlaceholderURIUpdated')
+        .withArgs(PLACEHOLDER);
+      expect(await token.placeholderURI()).to.equal(PLACEHOLDER);
+    });
+
+    it('should emit BatchMetadataUpdate on setPlaceholderURI (ERC-4906)', async () => {
+      await expect(token.setPlaceholderURI(PLACEHOLDER))
+        .to.emit(token, 'BatchMetadataUpdate')
+        .withArgs(0, ethers.MaxUint256);
+    });
+
+    it('should revert setPlaceholderURI with empty string', async () => {
+      await expect(token.setPlaceholderURI('')).to.be.revertedWithCustomError(
+        token,
+        'EmptyPlaceholderURI',
+      );
+    });
+
+    it('should revert setPlaceholderURI when non-owner', async () => {
+      await expect(
+        token.connect(other).setPlaceholderURI(PLACEHOLDER),
+      ).to.be.revertedWithCustomError(token, 'OwnableUnauthorizedAccount');
+    });
+
+    it('should return placeholder URI for every token pre-reveal', async () => {
+      await token.setPlaceholderURI(PLACEHOLDER);
+      await token.toggleMinting();
+      await token['mint(address)'](other.address);
+      await token['mint(address)'](other.address);
+
+      expect(await token.tokenURI(0)).to.equal(PLACEHOLDER);
+      expect(await token.tokenURI(1)).to.equal(PLACEHOLDER);
+    });
+
+    it('should still revert tokenURI for non-existent token pre-reveal', async () => {
+      await token.setPlaceholderURI(PLACEHOLDER);
+      await expect(token.tokenURI(999)).to.be.revertedWithCustomError(
+        token,
+        'TokenDoesNotExist',
+      );
+    });
+
+    it('should revert mint when placeholder URI is unset and not revealed', async () => {
+      // Deploy a fresh contract without going through the helper (which sets a default placeholder)
+      const factory = await ethers.getContractFactory('NijiToken');
+      const freshToken = await factory.deploy(
+        'Fresh',
+        'FRESH',
+        await descriptor.getAddress(),
+        await seeder.getAddress(),
+        10,
+      );
+      await freshToken.toggleMinting();
+      await expect(freshToken['mint(address)'](other.address)).to.be.revertedWithCustomError(
+        freshToken,
+        'PlaceholderURINotSet',
+      );
+    });
+
+    it('should allow mint after placeholder URI is set', async () => {
+      const factory = await ethers.getContractFactory('NijiToken');
+      const freshToken = await factory.deploy(
+        'Fresh',
+        'FRESH',
+        await descriptor.getAddress(),
+        await seeder.getAddress(),
+        10,
+      );
+      await freshToken.toggleMinting();
+      await freshToken.setPlaceholderURI(PLACEHOLDER);
+      await expect(freshToken['mint(address)'](other.address)).to.not.be.reverted;
+    });
+
+    it('should allow owner to reveal exactly once', async () => {
+      await expect(token.reveal()).to.emit(token, 'Revealed');
+      expect(await token.isRevealed()).to.be.true;
+    });
+
+    it('should emit BatchMetadataUpdate on reveal (ERC-4906)', async () => {
+      await expect(token.reveal())
+        .to.emit(token, 'BatchMetadataUpdate')
+        .withArgs(0, ethers.MaxUint256);
+    });
+
+    it('should advertise IERC4906 via supportsInterface', async () => {
+      expect(await token.supportsInterface('0x49064906')).to.be.true;
+    });
+
+    it('should revert reveal when called twice', async () => {
+      await token.reveal();
+      await expect(token.reveal()).to.be.revertedWithCustomError(token, 'RevealAlreadyDone');
+    });
+
+    it('should revert reveal when non-owner', async () => {
+      await expect(token.connect(other).reveal()).to.be.revertedWithCustomError(
+        token,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should revert setPlaceholderURI after reveal', async () => {
+      await token.reveal();
+      await expect(token.setPlaceholderURI(PLACEHOLDER)).to.be.revertedWithCustomError(
+        token,
+        'RevealAlreadyDone',
+      );
+    });
+
+    it('should switch tokenURI from placeholder to on-chain after reveal', async () => {
+      await token.setPlaceholderURI(PLACEHOLDER);
+      await token.toggleMinting();
+      await token['mint(address)'](other.address);
+
+      expect(await token.tokenURI(0)).to.equal(PLACEHOLDER);
+
+      await token.reveal();
+
+      const uri = await token.tokenURI(0);
+      expect(uri).to.include('data:application/json;base64,');
+      expect(uri).to.not.equal(PLACEHOLDER);
     });
   });
 });
