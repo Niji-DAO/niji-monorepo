@@ -185,8 +185,10 @@ describe('AuctionNavigation Component', () => {
     const prevButton = screen.getByText('←');
     const nextButton = screen.getByText('→');
 
-    // Since we mocked isCool to be true
-    expect(prevButton.className).toContain('leftArrowCool');
-    expect(nextButton.className).toContain('rightArrowCool');
+    // Since we mocked isCool to be true, both buttons share the cool Tailwind variant
+    expect(prevButton.className).toContain('bg-[color:var(--brand-cool-accent)]');
+    expect(nextButton.className).toContain('bg-[color:var(--brand-cool-accent)]');
+    // Right arrow keeps the ml-[0.3rem] margin variant
+    expect(nextButton.className).toContain('ml-[0.3rem]');
   });
 });
