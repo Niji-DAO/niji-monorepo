@@ -211,6 +211,15 @@ describe('NijiArt', () => {
       await art.lockArt();
       await expect(art.transferDescriptor(other.address)).to.not.be.reverted;
     });
+
+    it('should revert addTraitImage with SenderIsNotDescriptor for non-descriptor callers even when locked', async () => {
+      // Modifier order: onlyDescriptor runs before the lock check, so non-descriptor callers
+      // always see SenderIsNotDescriptor regardless of lock state.
+      await art.lockArt();
+      await expect(
+        art.connect(owner).addTraitImage(0, SAMPLE_PNG),
+      ).to.be.revertedWithCustomError(art, 'SenderIsNotDescriptor');
+    });
   });
 
   describe('getTraitName', () => {

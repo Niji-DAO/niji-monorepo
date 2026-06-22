@@ -115,7 +115,9 @@ contract NijiArt is Ownable2Step {
     /// @notice Store a batch of PNG images for a trait category
     /// @param traitId The trait category index
     /// @param pngDataArray Array of raw PNG bytes
-    /// @dev Each PNG is stored via SSTORE2 as contract bytecode. Reverts if the art has been locked via lockArt().
+    /// @dev Each PNG is stored via SSTORE2 as contract bytecode. `onlyDescriptor` guards the caller first
+    ///      (non-descriptor → `SenderIsNotDescriptor`); after the descriptor passes that gate, the lock check
+    ///      reverts with `ArtIsLocked` if `lockArt()` has been called.
     function addTraitImages(uint256 traitId, bytes[] calldata pngDataArray) external onlyDescriptor {
         if (isArtLocked) revert ArtIsLocked();
         if (traitId >= traitCount) revert InvalidTraitId(traitId, traitCount - 1);
@@ -137,7 +139,9 @@ contract NijiArt is Ownable2Step {
     /// @notice Store a single PNG image for a trait category
     /// @param traitId The trait category index
     /// @param pngData Raw PNG bytes
-    /// @dev PNG is stored via SSTORE2 as contract bytecode. Reverts if the art has been locked via lockArt().
+    /// @dev PNG is stored via SSTORE2 as contract bytecode. `onlyDescriptor` guards the caller first
+    ///      (non-descriptor → `SenderIsNotDescriptor`); after the descriptor passes that gate, the lock check
+    ///      reverts with `ArtIsLocked` if `lockArt()` has been called.
     function addTraitImage(uint256 traitId, bytes calldata pngData) external onlyDescriptor {
         if (isArtLocked) revert ArtIsLocked();
         if (traitId >= traitCount) revert InvalidTraitId(traitId, traitCount - 1);
