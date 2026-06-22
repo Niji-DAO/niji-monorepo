@@ -8,8 +8,6 @@ import { Backdrop } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
 import { svg2png } from '@/utils/svg2png';
 
-import classes from './NijiModal.module.css';
-
 const downloadNounPNG = (png: string) => {
   const downloadEl = document.createElement('a');
   downloadEl.href = png;
@@ -63,16 +61,11 @@ const NijiModal: React.FC<{ onDismiss: () => void; svg: string }> = props => {
         document.getElementById('backdrop-root')!,
       )}
       {ReactDOM.createPortal(
-        <div className={classes.modal}>
+        <div className="fixed left-[calc(50%-12.5rem)] top-[15vh] z-[100] w-[25rem] rounded-[15px] p-8 text-center max-[992px]:!left-[10%] max-[992px]:!w-4/5">
           {png && (
-            <LegacyNoun
-              imgPath={png}
-              alt="noun"
-              className={classes.nounImg}
-              wrapperClassName={classes.nounWrapper}
-            />
+            <LegacyNoun imgPath={png} alt="noun" className="rounded-2xl" wrapperClassName="mb-4" />
           )}
-          <div className={classes.displayNounFooter}>
+          <div className="flex flex-col items-center [&_button]:w-1/2 [&_button]:border-none [&_button]:bg-white/30 hover:[&_button]:!bg-white/40 hover:[&_button]:!shadow-none focus:[&_button]:!bg-white/40 focus:[&_button]:!shadow-none active:[&_button]:!bg-white/40 active:[&_button]:!shadow-none [&_span]:mb-4 [&_span]:font-bold [&_span]:text-white">
             {!isMobile && png && (
               <div className="flex gap-3">
                 <Button
