@@ -1,14 +1,12 @@
 import React from 'react';
 
-import classes from './ModalTitle.module.css';
-
 interface ModalTitleProps {
   children: React.ReactNode;
 }
 
 const ModalTitle = (props: ModalTitleProps) => {
   return (
-    <div className={classes.title}>
+    <div className="font-londrina">
       <h1>{props.children}</h1>
     </div>
   );
