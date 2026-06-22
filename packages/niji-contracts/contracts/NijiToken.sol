@@ -17,6 +17,7 @@ import { ReentrancyGuard } from '@openzeppelin/contracts-v5/utils/ReentrancyGuar
 import { Pausable } from '@openzeppelin/contracts-v5/utils/Pausable.sol';
 import { IERC4906 } from '@openzeppelin/contracts-v5/interfaces/IERC4906.sol';
 import { IERC165 } from '@openzeppelin/contracts-v5/utils/introspection/IERC165.sol';
+import { Strings } from '@openzeppelin/contracts-v5/utils/Strings.sol';
 import { NijiDescriptor } from './NijiDescriptor.sol';
 import { INijiSeeder } from './interfaces/INijiSeeder.sol';
 
@@ -68,6 +69,9 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Thrown when mint is attempted before the placeholder URI is set (pre-reveal mint safety)
     error PlaceholderURINotSet();
 
+    /// @notice Thrown when baseURI is modified after being locked
+    error BaseURIIsLocked();
+
     // =============================================================
     //                           EVENTS
     // =============================================================
@@ -117,6 +121,13 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Emitted when the collection is revealed (state is permanent after this)
     event Revealed();
 
+    /// @notice Emitted when the external baseURI fallback is updated
+    /// @param newBaseURI The new baseURI string. Empty string disables the fallback (on-chain descriptor is used instead).
+    event BaseURIUpdated(string newBaseURI);
+
+    /// @notice Emitted when the baseURI is locked permanently
+    event BaseURILocked();
+
     // =============================================================
     //                           STORAGE
     // =============================================================
@@ -159,6 +170,14 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Placeholder URI returned for every tokenURI while not revealed
     /// @dev Should point to a single metadata JSON (per ERC721 marketplaces convention).
     string private _placeholderURI;
+
+    /// @notice External baseURI fallback for token metadata
+    /// @dev Empty string disables the fallback (on-chain descriptor is used). Non-empty value takes precedence over the descriptor post-reveal.
+    ///      Concatenation rule: `{baseURI}{tokenId}.json` (no extra slash inserted — include the trailing slash in baseURI if needed).
+    string private _baseTokenURI;
+
+    /// @notice Whether the baseURI is locked permanently (no further updates allowed)
+    bool public isBaseURILocked;
 
     // =============================================================
     //                           MODIFIERS
@@ -278,12 +297,17 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Returns the token URI for a given token ID
     /// @param tokenId The token ID
     /// @return The token URI
-    /// @dev Pre-reveal returns the placeholder URI (same value for every token). Post-reveal delegates to the on-chain descriptor.
+    /// @dev Resolution order: (1) pre-reveal → placeholder URI. (2) post-reveal + baseURI set → `{baseURI}{tokenId}.json`. (3) post-reveal + no baseURI → on-chain descriptor.
+    ///      baseURI is intended as an emergency fallback if on-chain rendering is unavailable; flip back to on-chain by setting baseURI to empty.
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (_ownerOf(tokenId) == address(0)) revert TokenDoesNotExist();
 
         if (!isRevealed) {
             return _placeholderURI;
+        }
+
+        if (bytes(_baseTokenURI).length > 0) {
+            return string(abi.encodePacked(_baseTokenURI, Strings.toString(tokenId), '.json'));
         }
 
         INijiSeeder.Seed memory seed = seeds[tokenId];
@@ -438,6 +462,33 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Returns the current placeholder URI (empty string if never set)
     function placeholderURI() external view returns (string memory) {
         return _placeholderURI;
+    }
+
+    // =============================================================
+    //                      BASE URI FALLBACK
+    // =============================================================
+
+    /// @notice Set the external baseURI fallback (owner only)
+    /// @param newBaseURI The new baseURI. Pass empty string to disable the fallback and return to the on-chain descriptor.
+    /// @dev Emits ERC-4906 BatchMetadataUpdate so marketplaces refresh stale metadata.
+    function setBaseURI(string calldata newBaseURI) external onlyOwner {
+        if (isBaseURILocked) revert BaseURIIsLocked();
+        _baseTokenURI = newBaseURI;
+        emit BaseURIUpdated(newBaseURI);
+        emit BatchMetadataUpdate(0, type(uint256).max);
+    }
+
+    /// @notice Lock the baseURI permanently (no further updates allowed)
+    /// @dev Used to commit to a specific fallback (or to lock the on-chain descriptor in place by locking with empty baseURI).
+    function lockBaseURI() external onlyOwner {
+        if (isBaseURILocked) revert BaseURIIsLocked();
+        isBaseURILocked = true;
+        emit BaseURILocked();
+    }
+
+    /// @notice Returns the current baseURI (empty string when fallback is disabled)
+    function baseURI() external view returns (string memory) {
+        return _baseTokenURI;
     }
 
     // =============================================================

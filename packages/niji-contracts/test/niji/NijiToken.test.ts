@@ -800,4 +800,114 @@ describe('NijiToken', () => {
       expect(uri).to.not.equal(PLACEHOLDER);
     });
   });
+
+  describe('baseURI fallback', () => {
+    const BASE_URI = 'ipfs://QmBaseURIHash/';
+
+    it('should have empty baseURI by default', async () => {
+      expect(await token.baseURI()).to.equal('');
+    });
+
+    it('should not be locked by default', async () => {
+      expect(await token.isBaseURILocked()).to.be.false;
+    });
+
+    it('should allow owner to set baseURI', async () => {
+      await expect(token.setBaseURI(BASE_URI))
+        .to.emit(token, 'BaseURIUpdated')
+        .withArgs(BASE_URI);
+      expect(await token.baseURI()).to.equal(BASE_URI);
+    });
+
+    it('should emit BatchMetadataUpdate on setBaseURI (ERC-4906)', async () => {
+      await expect(token.setBaseURI(BASE_URI))
+        .to.emit(token, 'BatchMetadataUpdate')
+        .withArgs(0, ethers.MaxUint256);
+    });
+
+    it('should allow setting empty baseURI to disable fallback', async () => {
+      await token.setBaseURI(BASE_URI);
+      await expect(token.setBaseURI('')).to.emit(token, 'BaseURIUpdated').withArgs('');
+      expect(await token.baseURI()).to.equal('');
+    });
+
+    it('should revert setBaseURI when non-owner', async () => {
+      await expect(token.connect(other).setBaseURI(BASE_URI)).to.be.revertedWithCustomError(
+        token,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should return on-chain descriptor URI when baseURI is empty and revealed', async () => {
+      await token.toggleMinting();
+      await token['mint(address)'](other.address);
+      await token.reveal();
+
+      const uri = await token.tokenURI(0);
+      expect(uri).to.include('data:application/json;base64,');
+    });
+
+    it('should return baseURI + tokenId + .json when baseURI is set and revealed', async () => {
+      await token.toggleMinting();
+      await token['mint(address)'](other.address);
+      await token['mint(address)'](other.address);
+      await token.reveal();
+      await token.setBaseURI(BASE_URI);
+
+      expect(await token.tokenURI(0)).to.equal(`${BASE_URI}0.json`);
+      expect(await token.tokenURI(1)).to.equal(`${BASE_URI}1.json`);
+    });
+
+    it('should still return placeholder URI pre-reveal even when baseURI is set', async () => {
+      await token.setBaseURI(BASE_URI);
+      await token.toggleMinting();
+      await token['mint(address)'](other.address);
+
+      expect(await token.tokenURI(0)).to.equal('ipfs://test-placeholder/metadata.json');
+    });
+
+    it('should switch back to on-chain descriptor when baseURI is cleared', async () => {
+      await token.toggleMinting();
+      await token['mint(address)'](other.address);
+      await token.reveal();
+      await token.setBaseURI(BASE_URI);
+      expect(await token.tokenURI(0)).to.equal(`${BASE_URI}0.json`);
+
+      await token.setBaseURI('');
+      const uri = await token.tokenURI(0);
+      expect(uri).to.include('data:application/json;base64,');
+    });
+
+    it('should allow owner to lock baseURI', async () => {
+      await token.setBaseURI(BASE_URI);
+      await expect(token.lockBaseURI()).to.emit(token, 'BaseURILocked');
+      expect(await token.isBaseURILocked()).to.be.true;
+    });
+
+    it('should revert setBaseURI after lockBaseURI', async () => {
+      await token.lockBaseURI();
+      await expect(token.setBaseURI(BASE_URI)).to.be.revertedWithCustomError(
+        token,
+        'BaseURIIsLocked',
+      );
+    });
+
+    it('should revert lockBaseURI when called twice', async () => {
+      await token.lockBaseURI();
+      await expect(token.lockBaseURI()).to.be.revertedWithCustomError(token, 'BaseURIIsLocked');
+    });
+
+    it('should revert lockBaseURI when non-owner', async () => {
+      await expect(token.connect(other).lockBaseURI()).to.be.revertedWithCustomError(
+        token,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should still revert tokenURI for non-existent token when baseURI is set', async () => {
+      await token.reveal();
+      await token.setBaseURI(BASE_URI);
+      await expect(token.tokenURI(999)).to.be.revertedWithCustomError(token, 'TokenDoesNotExist');
+    });
+  });
 });
