@@ -170,10 +170,13 @@ task('deploy-niji-smoke', 'Deploy Niji stack + 36 sample PNGs + mint 1 token (P6
     const tokenAddr = await token.getAddress();
     console.log(`    NijiToken:      ${tokenAddr}`);
 
-    // ---------------- Step 9: enable minting + mint 1 ----------------
+    // ---------------- Step 9: placeholder + minting enable + mint 1 ----------------
+    // Niji's `_mintTo` requires a non-empty placeholder URI while not revealed
+    // (PR #247), so set one before flipping minting on.
     // Explicit gasLimit avoids Base public RPC race on estimateGas when
     // the previous tx state hasn't yet propagated.
-    console.log('\n[9] minting enable + mint 1');
+    console.log('\n[9] placeholder + minting enable + mint 1');
+    await (await token.setPlaceholderURI('ipfs://niji-placeholder/metadata.json')).wait();
     await (await token.setMintingActive(true)).wait();
     const mintTx = await token.mint(deployer.address, { gasLimit: 500_000n });
     const mintReceipt = await mintTx.wait();
@@ -187,9 +190,27 @@ task('deploy-niji-smoke', 'Deploy Niji stack + 36 sample PNGs + mint 1 token (P6
       console.log(`      ${NIJI_TRAITS[i].name.padEnd(16)}: index=${idx}`);
     }
 
+    // Sanity check: verify art contract actually has trait images loaded.
+    // If getTraitImageCount returns 0, the on-chain seed picker collapses to SKIP_LAYER
+    // (type(uint256).max), which then truncates to uint48 max in the Seed struct.
+    console.log(`    art trait image counts:`);
+    for (let i = 0; i < NIJI_TRAITS.length; i++) {
+      const cnt = await art.getTraitImageCount(i);
+      console.log(`      ${NIJI_TRAITS[i].name.padEnd(16)}: ${cnt}`);
+    }
+
+    // Reveal so tokenURI returns the on-chain SVG metadata (instead of the placeholder).
+    console.log('    → reveal()');
+    await (await token.reveal()).wait();
+
     // ---------------- Step 10: tokenURI verification ----------------
     console.log('\n[10] tokenURI 検証');
-    const uri = await token.tokenURI(tokenId);
+    const expandedIndices = await token.getTraitIndices(tokenId);
+    console.log(`    expanded indices: [${expandedIndices.map((x: bigint) => x.toString()).join(', ')}]`);
+    // tokenURI builds a full on-chain SVG by concatenating every trait layer (≈150-200 KB total).
+    // Anvil's eth_call gas limit defaults to 30M, which can revert the call for layer-heavy mints.
+    // Bump the call-time gas allowance so localhost smoke matches the contract's static-call needs.
+    const uri = await token.tokenURI(tokenId, { gasLimit: 300_000_000n } as any);
     console.log(`    tokenURI length: ${uri.length} chars`);
     if (!uri.startsWith('data:application/json;base64,')) {
       throw new Error('tokenURI does not start with expected data URI prefix');
