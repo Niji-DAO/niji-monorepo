@@ -59,58 +59,113 @@ task(
         `   profile=${data.profile} network=${data.network} chainId=${data.chainId} → newOwner=${to}`,
       );
 
+      // Hard-fail when the snapshot's network/chainId does not match the connected network.
+      // For an ownership-rotation task, mismatched inputs are dangerous: we could otherwise
+      // hit unrelated contracts at the same addresses on a different chain.
+      const provider = hre.ethers.provider;
+      const liveChainId = Number((await provider.getNetwork()).chainId);
+      if (liveChainId !== data.chainId) {
+        throw new Error(
+          `Network mismatch: snapshot.chainId=${data.chainId} but connected chainId=${liveChainId}. ` +
+            `Re-run with --network matching the snapshot, or pass the correct --snapshot path.`,
+        );
+      }
+      if (data.network !== hre.network.name) {
+        // network.name is a hardhat config label (not on-chain identity), so this is a softer
+        // sanity check than the chainId one above. Still bail out to avoid silent confusion.
+        throw new Error(
+          `Network name mismatch: snapshot.network=${data.network} but hre.network.name=${hre.network.name}.`,
+        );
+      }
+
       const [signer] = await hre.ethers.getSigners();
       console.log(`   signer (current owner expected): ${signer.address}`);
 
-      type Target = { name: string; address: string };
+      type Target = {
+        name: string;
+        address: string;
+        contract: Awaited<ReturnType<typeof hre.ethers.getContractAt>>;
+        currentOwner: string;
+        pendingOwner: string;
+        decision: 'skip-already-owned' | 'skip-pending' | 'will-transfer';
+      };
+
+      const ZERO = '0x' + '00'.repeat(20);
+
+      // -------- Pass 1: preflight (read-only) --------
+      // Walk every target, attach the contract handle, and read owner/pendingOwner once.
+      // This catches snapshot-vs-chain mismatches (ABI misdetection, wrong addresses, signer
+      // is not current owner) before sending any transactions, so the batch can stay atomic
+      // from the operator's point of view (either every transfer is queued or none are).
       const targets: Target[] = [];
-      for (const { name } of OWNED_CONTRACTS) {
+      const preflightProblems: string[] = [];
+
+      for (const { name, factory } of OWNED_CONTRACTS) {
         const addr = data.contracts[name];
         if (!addr) {
           console.log(`⚠️  Skip ${name} (not in snapshot)`);
           continue;
         }
-        targets.push({ name, address: addr });
+        const contract = await hre.ethers.getContractAt(factory, addr, signer);
+        const currentOwner: string = await contract.owner();
+        const pendingOwner: string = await contract.pendingOwner();
+
+        let decision: Target['decision'];
+        if (currentOwner.toLowerCase() === to.toLowerCase()) {
+          decision = 'skip-already-owned';
+        } else if (pendingOwner.toLowerCase() === to.toLowerCase()) {
+          decision = 'skip-pending';
+        } else if (currentOwner.toLowerCase() !== signer.address.toLowerCase()) {
+          preflightProblems.push(
+            `${name} (${addr}): currentOwner=${currentOwner} ≠ signer=${signer.address}; ` +
+              `transferOwnership would revert. Connect as the current owner first.`,
+          );
+          continue;
+        } else {
+          decision = 'will-transfer';
+        }
+
+        targets.push({ name, address: addr, contract, currentOwner, pendingOwner, decision });
       }
 
-      if (targets.length === 0) {
+      if (targets.length === 0 && preflightProblems.length === 0) {
         console.log('No matching contracts to transfer. Exiting.');
         return;
       }
 
-      console.log(`\n🔄 Transferring ${targets.length} ownership(s)...\n`);
+      console.log(`\n🔍 Preflight (${targets.length} target${targets.length === 1 ? '' : 's'}):\n`);
+      for (const t of targets) {
+        console.log(`→ ${t.name.padEnd(16)} ${t.address}`);
+        console.log(`  current owner : ${t.currentOwner}`);
+        console.log(`  pending owner : ${t.pendingOwner === ZERO ? '(none)' : t.pendingOwner}`);
+        console.log(`  decision      : ${t.decision}`);
+      }
+      if (preflightProblems.length > 0) {
+        console.error(`\n❌ Preflight failures (${preflightProblems.length}):`);
+        for (const msg of preflightProblems) console.error(`   - ${msg}`);
+        throw new Error(
+          `Preflight failed. Refusing to send any transferOwnership tx. ` +
+            `Fix the issues above (or pass --snapshot pointing at the correct chain) and retry.`,
+        );
+      }
 
-      const ZERO = '0x' + '00'.repeat(20);
+      const toTransfer = targets.filter(t => t.decision === 'will-transfer');
+      if (toTransfer.length === 0) {
+        console.log(`\n✓ All targets already owned by or pending --to; nothing to do.`);
+        return;
+      }
 
-      for (const { name, address } of targets) {
-        const factory = OWNED_CONTRACTS.find(c => c.name === name)!.factory;
-        const contract = await hre.ethers.getContractAt(factory, address, signer);
+      console.log(`\n🔄 Pass 2: transferOwnership for ${toTransfer.length} contract(s)\n`);
 
-        const currentOwner: string = await contract.owner();
-        const pendingOwner: string = await contract.pendingOwner();
-        console.log(`→ ${name.padEnd(16)} ${address}`);
-        console.log(`  current owner : ${currentOwner}`);
-        console.log(`  pending owner : ${pendingOwner === ZERO ? '(none)' : pendingOwner}`);
-
-        if (currentOwner.toLowerCase() === to.toLowerCase()) {
-          console.log(`  ↷ already owned by --to, skip`);
-          continue;
-        }
-        if (pendingOwner.toLowerCase() === to.toLowerCase()) {
-          console.log(
-            `  ↷ pending owner already set to --to, awaiting acceptOwnership by multisig`,
-          );
-          continue;
-        }
-
+      // -------- Pass 2: mutation --------
+      for (const t of toTransfer) {
         if (dryRun) {
-          console.log(`  [dry-run] would call transferOwnership(${to})`);
+          console.log(`→ ${t.name.padEnd(16)} [dry-run] would call transferOwnership(${to})`);
           continue;
         }
-
-        const tx = await contract.transferOwnership(to);
+        const tx = await t.contract.transferOwnership(to);
         const receipt = await tx.wait();
-        console.log(`  ✓ transferOwnership tx=${receipt!.hash} gas=${receipt!.gasUsed}`);
+        console.log(`→ ${t.name.padEnd(16)} ✓ tx=${receipt!.hash} gas=${receipt!.gasUsed}`);
       }
 
       console.log(
