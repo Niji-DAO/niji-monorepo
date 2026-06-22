@@ -33,6 +33,9 @@ contract NijiDescriptor is Ownable2Step {
     /// @notice Thrown when trait indices array is empty
     error EmptyTraitIndices();
 
+    /// @notice Thrown when freezeMetadata is called before the descriptor is configured (art / resolution / compositeOrder)
+    error NotConfigured();
+
     /// @notice Thrown when renounceOwnership is called (disabled to prevent contract becoming unowned)
     error RenounceOwnershipDisabled();
 
@@ -339,10 +342,18 @@ contract NijiDescriptor is Ownable2Step {
     }
 
     /// @notice Freeze the metadata configuration permanently.
-    /// @dev Owner-only one-way switch. After this call, setArt / setResolution / setCompositeOrder always revert with MetadataIsFrozen.
+    /// @dev Owner-only one-way switch. Requires the descriptor to be fully configured (`isConfigured() == true`)
+    ///      so the freeze cannot permanently lock an unrepairable state.
+    ///      After this call, setArt / setResolution / setCompositeOrder always revert with MetadataIsFrozen.
     ///      View functions (`tokenURI` / `generateSVG` / `getCompositeOrder` / `isConfigured`) are not affected.
+    /// @dev Note: this freezes the descriptor's internal config only. The NijiToken `setDescriptor` setter is
+    ///      a separate surface and must be locked at the token side (out of scope for this PR) to make collection
+    ///      metadata fully immutable end-to-end.
     function freezeMetadata() external onlyOwner {
         if (isMetadataFrozen) revert MetadataIsFrozen();
+        if (address(art) == address(0) || resolution == 0 || compositeOrder.length == 0) {
+            revert NotConfigured();
+        }
         isMetadataFrozen = true;
         emit MetadataFrozen();
     }
