@@ -7,7 +7,14 @@ import Section from '@/layout/Section';
 import { humanizeTraitKey, NijiImageData, nijiTraitKeys } from '@/lib/nijiAssets';
 import { cn } from '@/lib/utils';
 
-import classes from './Documentation.module.css';
+const DOCUMENTATION_SECTION_CLASS = '!py-16 max-[992px]:!py-8';
+const HEADER_WRAPPER_CLASS =
+  "[&_h1]:font-londrina [&_h1]:text-[4rem] [&_p]:font-['PT_Root_UI'] [&_p]:font-medium [&_p]:tracking-[-0.25px] [&_p]:leading-[28px] [&_p]:my-12 text-[1.3rem] max-[992px]:p-4";
+const ABOUT_TEXT_CLASS = '!m-0';
+const ACCORDION_ITEM_CLASS =
+  "mb-10 border-none bg-transparent font-['PT_Root_UI'] !text-[1.2rem] font-medium tracking-[-0.25px] leading-[28px]";
+const ACCORDION_HEADER_CLASS =
+  '[&_button]:border-none [&_button]:bg-transparent [&_button]:font-londrina [&_button]:!text-[2.5rem] [&_button]:cursor-pointer [&_button]:leading-normal [&_button]:py-0 hover:[&_button]:!text-[color:var(--brand-dark-red)] focus:[&_button]:!text-[color:var(--brand-dark-red)] focus:[&_button]:!shadow-none [&_button:not(.collapsed)]:!text-[#212529] [&_button:not(.collapsed)]:!bg-transparent [&_button:not(.collapsed)]:!shadow-none max-[992px]:[&_button]:pl-5';
 
 interface DocumentationProps {
   backgroundColor?: string;
@@ -52,15 +59,15 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
   return (
     <Section
       fullWidth={false}
-      className={cn(classes.documentationSection, '-mb-10 sm:-mb-20')}
+      className={cn(DOCUMENTATION_SECTION_CLASS, '-mb-10 sm:-mb-20')}
       style={{ background: props.backgroundColor }}
     >
       <Col lg={{ span: 10, offset: 1 }}>
-        <div className={classes.headerWrapper}>
+        <div className={HEADER_WRAPPER_CLASS}>
           <h1>
             <Trans>WTF?</Trans>
           </h1>
-          <p className={classes.aboutText}>
+          <p className={ABOUT_TEXT_CLASS}>
             <Trans>
               Nijis are an experimental attempt to improve the formation of on-chain avatar
               communities. While projects such as {cryptopunksLink} have attempted to bootstrap
@@ -68,15 +75,15 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
               governance, and a treasury that can be used by the community.
             </Trans>
           </p>
-          <p className={classes.aboutText} style={{ paddingBottom: '4rem' }}>
+          <p className={ABOUT_TEXT_CLASS} style={{ paddingBottom: '4rem' }}>
             <Trans>
               Learn more below, or start creating Nijis off-chain using the {playgroundLink}.
             </Trans>
           </p>
         </div>
         <Accordion flush>
-          <Accordion.Item eventKey="0" className={classes.accordionItem}>
-            <Accordion.Header className={classes.accordionHeader}>
+          <Accordion.Item eventKey="0" className={ACCORDION_ITEM_CLASS}>
+            <Accordion.Header className={ACCORDION_HEADER_CLASS}>
               <Trans>Summary</Trans>
             </Accordion.Header>
             <Accordion.Body>
@@ -122,12 +129,12 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
             </Accordion.Body>
           </Accordion.Item>
 
-          <Accordion.Item eventKey="1" className={classes.accordionItem}>
-            <Accordion.Header className={classes.accordionHeader}>
+          <Accordion.Item eventKey="1" className={ACCORDION_ITEM_CLASS}>
+            <Accordion.Header className={ACCORDION_HEADER_CLASS}>
               <Trans>Daily Auctions</Trans>
             </Accordion.Header>
             <Accordion.Body>
-              <p className={classes.aboutText}>
+              <p className={ABOUT_TEXT_CLASS}>
                 <Trans>
                   The Niji Auction Contract will act as a self-sufficient Niji generation and
                   distribution mechanism, auctioning one Niji every 24 hours, forever. 100% of
@@ -136,7 +143,7 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
                 </Trans>
               </p>
 
-              <p className={classes.aboutText}>
+              <p className={ABOUT_TEXT_CLASS}>
                 <Trans>
                   Each time an auction is settled, the settlement transaction will also cause a new
                   Niji to be minted and a new 24 hour auction to begin.{' '}
@@ -151,8 +158,8 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
               </p>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="2" className={classes.accordionItem}>
-            <Accordion.Header className={classes.accordionHeader}>
+          <Accordion.Item eventKey="2" className={ACCORDION_ITEM_CLASS}>
+            <Accordion.Header className={ACCORDION_HEADER_CLASS}>
               <Trans>Niji DAO</Trans>
             </Accordion.Header>
             <Accordion.Body>
@@ -166,8 +173,8 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
               </Trans>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="3" className={classes.accordionItem}>
-            <Accordion.Header className={classes.accordionHeader}>
+          <Accordion.Item eventKey="3" className={ACCORDION_ITEM_CLASS}>
+            <Accordion.Header className={ACCORDION_HEADER_CLASS}>
               <Trans>Niji DUNA</Trans>
             </Accordion.Header>
             <Accordion.Body>
@@ -205,8 +212,8 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
               />
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="4" className={classes.accordionItem}>
-            <Accordion.Header className={classes.accordionHeader}>
+          <Accordion.Item eventKey="4" className={ACCORDION_ITEM_CLASS}>
+            <Accordion.Header className={ACCORDION_HEADER_CLASS}>
               <Trans>Governance ‘Slow Start’</Trans>
             </Accordion.Header>
             <Accordion.Body>
@@ -274,8 +281,8 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
               </p>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="5" className={classes.accordionItem}>
-            <Accordion.Header className={classes.accordionHeader}>
+          <Accordion.Item eventKey="5" className={ACCORDION_ITEM_CLASS}>
+            <Accordion.Header className={ACCORDION_HEADER_CLASS}>
               <Trans>Niji Traits</Trans>
             </Accordion.Header>
             <Accordion.Body>
@@ -292,8 +299,8 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
               </Trans>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="6" className={classes.accordionItem}>
-            <Accordion.Header className={classes.accordionHeader}>
+          <Accordion.Item eventKey="6" className={ACCORDION_ITEM_CLASS}>
+            <Accordion.Header className={ACCORDION_HEADER_CLASS}>
               <Trans>On-Chain Artwork</Trans>
             </Accordion.Header>
             <Accordion.Body>
@@ -317,8 +324,8 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
               </p>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="7" className={classes.accordionItem}>
-            <Accordion.Header className={classes.accordionHeader}>
+          <Accordion.Item eventKey="7" className={ACCORDION_ITEM_CLASS}>
+            <Accordion.Header className={ACCORDION_HEADER_CLASS}>
               <Trans>Niji Seeder Contract</Trans>
             </Accordion.Header>
             <Accordion.Body>
@@ -342,8 +349,8 @@ const Documentation = (props: DocumentationProps = { backgroundColor: '#FFF' }) 
               </p>
             </Accordion.Body>
           </Accordion.Item>
-          <Accordion.Item eventKey="8" className={classes.accordionItem}>
-            <Accordion.Header className={classes.accordionHeader}>
+          <Accordion.Item eventKey="8" className={ACCORDION_ITEM_CLASS}>
+            <Accordion.Header className={ACCORDION_HEADER_CLASS}>
               <Trans>Nounder&apos;s Reward</Trans>
             </Accordion.Header>
             <Accordion.Body>
