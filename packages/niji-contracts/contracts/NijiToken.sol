@@ -47,6 +47,13 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Thrown when provenance hash is already locked
     error ProvenanceHashLocked();
 
+    /// @notice Thrown when withdraw amount exceeds contract balance
+    error WithdrawAmountExceedsBalance();
+
+    /// @notice Thrown when ETH transfer fails during withdraw
+    /// @param reason The raw revert data returned by the owner-side call (helps diagnose smart-wallet rejections)
+    error WithdrawFailed(bytes reason);
+
     // =============================================================
     //                           EVENTS
     // =============================================================
@@ -83,6 +90,11 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Emitted when the provenance hash is set
     /// @param provenanceHash The provenance hash value
     event ProvenanceHashSet(string provenanceHash);
+
+    /// @notice Emitted when the owner withdraws ETH from the contract
+    /// @param to The recipient of the withdrawn ETH
+    /// @param amount The amount of ETH withdrawn (wei)
+    event Withdrawn(address indexed to, uint256 amount);
 
     // =============================================================
     //                           STORAGE
@@ -374,6 +386,38 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     function unpause() external onlyOwner {
         _unpause();
     }
+
+    // =============================================================
+    //                      WITHDRAW
+    // =============================================================
+
+    /// @notice Withdraw all ETH held by the contract to the owner
+    /// @dev Drains the full contract balance. Reverts if the contract holds zero ETH or the transfer fails (revert data preserved for smart-wallet diagnostics).
+    function withdraw() external onlyOwner nonReentrant {
+        uint256 balance = address(this).balance;
+        if (balance == 0) revert WithdrawAmountExceedsBalance();
+
+        address ownerAddr = owner();
+        (bool success, bytes memory data) = payable(ownerAddr).call{ value: balance }('');
+        if (!success) revert WithdrawFailed(data);
+
+        emit Withdrawn(ownerAddr, balance);
+    }
+
+    /// @notice Withdraw a specific amount of ETH to the owner
+    /// @param amount Amount of wei to withdraw (must be <= contract balance)
+    function withdrawAmount(uint256 amount) external onlyOwner nonReentrant {
+        if (amount == 0 || amount > address(this).balance) revert WithdrawAmountExceedsBalance();
+
+        address ownerAddr = owner();
+        (bool success, bytes memory data) = payable(ownerAddr).call{ value: amount }('');
+        if (!success) revert WithdrawFailed(data);
+
+        emit Withdrawn(ownerAddr, amount);
+    }
+
+    /// @notice Accept ETH so auction proceeds / royalties / direct sends can accumulate for later withdraw
+    receive() external payable {}
 
     // =============================================================
     //                      VIEW FUNCTIONS
