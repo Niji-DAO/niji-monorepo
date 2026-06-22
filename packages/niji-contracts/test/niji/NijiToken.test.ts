@@ -162,7 +162,7 @@ describe('NijiToken', () => {
       expect(await token.MAX_MINT_BATCH_SIZE()).to.equal(50);
     });
 
-    it('should allow mintBatch at the upper bound (quantity = 50)', async () => {
+    it('should allow mintBatch at the upper bound (quantity = 50) within mainnet block gas limit (≤30M)', async () => {
       // Use an unlimited-supply token so the 50-mint batch can run without hitting maxSupply.
       const unlimited = await deployNijiToken(
         'Niji',
@@ -172,7 +172,14 @@ describe('NijiToken', () => {
         0,
       );
       await unlimited.toggleMinting();
-      await unlimited.mintBatch(other.address, 50);
+
+      const tx = await unlimited.mintBatch(other.address, 50);
+      const receipt = await tx.wait();
+      expect(receipt).to.not.be.null;
+      // Mainnet's block gas limit is ~30M. Assert the 50-mint batch fits well under that bound
+      // (test net Hardhat's 300M block limit hides regression by default; this guard surfaces it).
+      const MAINNET_BLOCK_GAS_LIMIT = 30_000_000n;
+      expect(receipt!.gasUsed).to.be.lessThan(MAINNET_BLOCK_GAS_LIMIT);
       expect(await unlimited.balanceOf(other.address)).to.equal(50);
     });
 
