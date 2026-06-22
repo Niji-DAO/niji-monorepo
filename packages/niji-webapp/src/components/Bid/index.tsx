@@ -17,8 +17,6 @@ import { Auction } from '@/wrappers/nijiAuction';
 
 import classes from './Bid.module.css';
 
-import responsiveUiUtilsClasses from '@/utils/ResponsiveUIUtils.module.css';
-
 const computeMinimumNextBid = (
   currentBid: bigint,
   minBidIncPercentage: bigint | undefined,
@@ -188,11 +186,7 @@ const Bid: React.FC<BidProps> = props => {
               {!auctionEnded && !bidInput ? (
                 <>
                   Ξ {minBidEth(minBid)}{' '}
-                  <span
-                    className={
-                      activeLocale === 'ja-JP' ? responsiveUiUtilsClasses.disableSmallScreens : ''
-                    }
-                  >
+                  <span className={activeLocale === 'ja-JP' ? 'max-[414px]:hidden' : ''}>
                     <Trans>or more</Trans>
                   </span>
                 </>

@@ -16,7 +16,6 @@ import { usePickByState } from '@/utils/colorResponsiveUIUtils';
 import classes from './NavLocalSwitcher.module.css';
 
 import navDropdownClasses from '@/components/NavBar/NavBarDropdown.module.css';
-import responsiveUiUtilsClasses from '@/utils/ResponsiveUIUtils.module.css';
 
 interface NavLocalSwitcherProps {
   buttonStyle?: NavBarButtonStyle;
@@ -113,7 +112,7 @@ const NavLocaleSwitcher: React.FC<NavLocalSwitcherProps> = props => {
       )}
 
       <div
-        className={clsx(navDropdownClasses.nounsNavLink, responsiveUiUtilsClasses.mobileOnly)}
+        className={clsx(navDropdownClasses.nounsNavLink, '!hidden max-[1200px]:![display:inherit]')}
         onClick={() => setShowLanguagePickerModal(true)}
       >
         <NavBarButton
@@ -124,7 +123,7 @@ const NavLocaleSwitcher: React.FC<NavLocalSwitcherProps> = props => {
       </div>
 
       <Dropdown
-        className={clsx(navDropdownClasses.nounsNavLink, responsiveUiUtilsClasses.desktopOnly)}
+        className={clsx(navDropdownClasses.nounsNavLink, 'max-[1200px]:hidden')}
         onToggle={() => setButtonUp(!buttonUp)}
         autoClose={true}
       >

@@ -28,8 +28,6 @@ import { useIsDaoGteV3 } from '@/wrappers/nijiDao';
 import classes from './NavBar.module.css';
 import navDropdownClasses from './NavBarDropdown.module.css';
 
-import responsiveUiUtilsClasses from '@/utils/ResponsiveUIUtils.module.css';
-
 const NavBar = () => {
   const chainId = defaultChain.id;
   const isDaoGteV3 = useIsDaoGteV3();
@@ -131,7 +129,7 @@ const NavBar = () => {
             onClick={() => setIsNavExpanded(!isNavExpanded)}
           />
           <Navbar.Collapse className="justify-content-end z-10">
-            <div className={clsx(responsiveUiUtilsClasses.mobileOnly)}>
+            <div className={clsx('!hidden max-[1200px]:![display:inherit]')}>
               <Nav.Link as={Link} to="/vote" className={classes.nounsNavLink} onClick={closeNav}>
                 <NavBarButton
                   buttonText={isDaoGteV3 ? <Trans>Proposals</Trans> : <Trans>DAO</Trans>}
@@ -158,7 +156,7 @@ const NavBar = () => {
                 </>
               )}
             </div>
-            <div className={clsx(responsiveUiUtilsClasses.desktopOnly)}>
+            <div className={clsx('max-[1200px]:hidden')}>
               {isDaoGteV3 ? (
                 v3DaoNavItem
               ) : (
@@ -171,7 +169,7 @@ const NavBar = () => {
                 </Nav.Link>
               )}
             </div>
-            <div className={clsx(responsiveUiUtilsClasses.mobileOnly)}>
+            <div className={clsx('!hidden max-[1200px]:![display:inherit]')}>
               <Nav.Link
                 as={Link}
                 to="/playground"
@@ -209,7 +207,7 @@ const NavBar = () => {
                 />
               </Nav.Link>
             </div>
-            <div className={clsx(responsiveUiUtilsClasses.desktopOnly)}>
+            <div className={clsx('max-[1200px]:hidden')}>
               <NavDropdown
                 buttonText="Explore"
                 buttonIcon={<NogglesIcon />}
