@@ -22,6 +22,9 @@ contract NijiSeeder is INijiSeeder, Ownable2Step {
     /// @notice Thrown when renounceOwnership is called (disabled to prevent contract becoming unowned)
     error RenounceOwnershipDisabled();
 
+    /// @notice Thrown when entropy salt update is attempted after it has been locked
+    error EntropySaltLocked();
+
     // =============================================================
     //                           EVENTS
     // =============================================================
@@ -31,12 +34,28 @@ contract NijiSeeder is INijiSeeder, Ownable2Step {
     /// @param newArt The new art contract address
     event ArtUpdated(address indexed oldArt, address indexed newArt);
 
+    /// @notice Emitted when the entropy salt is rotated
+    /// @param newSalt The new salt value mixed into every generateSeed
+    event EntropySaltUpdated(bytes32 newSalt);
+
+    /// @notice Emitted when the entropy salt is locked permanently
+    event EntropySaltLockedEvent();
+
     // =============================================================
     //                           STORAGE
     // =============================================================
 
     /// @notice The art contract for reading trait counts
     NijiArt public art;
+
+    /// @notice Owner-controlled entropy salt mixed into every generateSeed.
+    /// @dev Allows the DAO to rotate the seed source (e.g. switch to a VRF-derived value)
+    ///      without redeploying the contract. Pairs with chainid to defend against cross-chain
+    ///      replay where a precomputed seed from a fork chain would map to the same traits.
+    bytes32 public entropySalt;
+
+    /// @notice Whether the entropy salt is locked (no further rotations allowed).
+    bool public isEntropySaltLocked;
 
     // =============================================================
     //                         CONSTRUCTOR
@@ -61,13 +80,19 @@ contract NijiSeeder is INijiSeeder, Ownable2Step {
         // Use descriptor parameter to avoid unused variable warning
         descriptor;
 
+        // Mix in chainid (cross-chain replay defense) and an owner-rotatable entropy salt
+        // alongside the existing block / timestamp / prevrandao inputs. The salt lets the DAO
+        // rotate the entropy source post-deploy (e.g. switch to a VRF-derived value) without
+        // requiring a contract redeploy.
         uint256 pseudorandom = uint256(
             keccak256(
                 abi.encodePacked(
                     blockhash(block.number - 1),
                     tokenId,
                     block.timestamp,
-                    block.prevrandao
+                    block.prevrandao,
+                    block.chainid,
+                    entropySalt
                 )
             )
         );
@@ -136,6 +161,25 @@ contract NijiSeeder is INijiSeeder, Ownable2Step {
         art = NijiArt(_art);
 
         emit ArtUpdated(oldArt, _art);
+    }
+
+    /// @notice Rotate the entropy salt (owner only, blocked once locked).
+    /// @param newSalt The new salt value to mix into every subsequent generateSeed.
+    /// @dev Set to a VRF callback value to harden against block-builder MEV / front-run
+    ///      attacks that predict seeds when the next block is known.
+    function setEntropySalt(bytes32 newSalt) external onlyOwner {
+        if (isEntropySaltLocked) revert EntropySaltLocked();
+        entropySalt = newSalt;
+        emit EntropySaltUpdated(newSalt);
+    }
+
+    /// @notice Lock the entropy salt permanently (owner only, one-way switch).
+    /// @dev After this call, setEntropySalt reverts. Use when the final entropy source
+    ///      (e.g. committed VRF result) is in place.
+    function lockEntropySalt() external onlyOwner {
+        if (isEntropySaltLocked) revert EntropySaltLocked();
+        isEntropySaltLocked = true;
+        emit EntropySaltLockedEvent();
     }
 
     // =============================================================

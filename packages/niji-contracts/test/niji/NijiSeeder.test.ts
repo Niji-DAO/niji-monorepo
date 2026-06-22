@@ -240,4 +240,80 @@ describe('NijiSeeder', () => {
       );
     });
   });
+
+  describe('entropy salt', () => {
+    const SAMPLE_SALT = '0x' + 'ab'.repeat(32);
+    const ALT_SALT = '0x' + 'cd'.repeat(32);
+
+    it('should default to zero salt and unlocked', async () => {
+      expect(await seeder.entropySalt()).to.equal('0x' + '00'.repeat(32));
+      expect(await seeder.isEntropySaltLocked()).to.be.false;
+    });
+
+    it('should allow owner to rotate entropy salt', async () => {
+      await expect(seeder.setEntropySalt(SAMPLE_SALT))
+        .to.emit(seeder, 'EntropySaltUpdated')
+        .withArgs(SAMPLE_SALT);
+      expect(await seeder.entropySalt()).to.equal(SAMPLE_SALT);
+    });
+
+    it('should change generateSeed output when salt rotates', async () => {
+      const seedBefore = await seeder.generateSeed(0, await art.getAddress());
+      await seeder.setEntropySalt(SAMPLE_SALT);
+      const seedAfter = await seeder.generateSeed(0, await art.getAddress());
+      // The 12 trait fields are derived from different bit slices of the same hash, so flipping
+      // the salt should perturb at least one field even with small trait counts.
+      const fields = [
+        'special',
+        'choker',
+        'headphone',
+        'leftHand',
+        'hat',
+        'clothing',
+        'ear',
+        'back',
+        'backDecoration',
+        'background',
+        'solidBackground',
+        'hair',
+      ] as const;
+      const anyChanged = fields.some(f => seedBefore[f] !== seedAfter[f]);
+      expect(anyChanged).to.be.true;
+    });
+
+    it('should revert setEntropySalt from non-owner', async () => {
+      await expect(seeder.connect(other).setEntropySalt(SAMPLE_SALT)).to.be.revertedWithCustomError(
+        seeder,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should allow owner to lock entropy salt', async () => {
+      await expect(seeder.lockEntropySalt()).to.emit(seeder, 'EntropySaltLockedEvent');
+      expect(await seeder.isEntropySaltLocked()).to.be.true;
+    });
+
+    it('should revert setEntropySalt after lock', async () => {
+      await seeder.lockEntropySalt();
+      await expect(seeder.setEntropySalt(ALT_SALT)).to.be.revertedWithCustomError(
+        seeder,
+        'EntropySaltLocked',
+      );
+    });
+
+    it('should revert lockEntropySalt when called twice', async () => {
+      await seeder.lockEntropySalt();
+      await expect(seeder.lockEntropySalt()).to.be.revertedWithCustomError(
+        seeder,
+        'EntropySaltLocked',
+      );
+    });
+
+    it('should revert lockEntropySalt when non-owner', async () => {
+      await expect(seeder.connect(other).lockEntropySalt()).to.be.revertedWithCustomError(
+        seeder,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+  });
 });
