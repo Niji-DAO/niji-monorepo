@@ -35,7 +35,8 @@ import { useNounTokenBalance, useUserVotes } from '@/wrappers/nijiToken';
 
 import classes from './Proposals.module.css';
 
-import proposalStatusClasses from '@/components/ProposalStatus/ProposalStatus.module.css';
+const PROPOSAL_STATUS_CLASS =
+  "rounded-lg border-2 border-transparent px-[0.65rem] py-[0.36rem] font-['PT_Root_UI'] text-sm font-bold text-white";
 
 dayjs.extend(relativeTime);
 
@@ -283,12 +284,7 @@ const Proposals = ({ proposals, nounsRequired }: ProposalsProps) => {
 
                   const countdownPill = (
                     <div className={classes.proposalStatusWrapper}>
-                      <div
-                        className={clsx(
-                          proposalStatusClasses.proposalStatus,
-                          classes.countdownPill,
-                        )}
-                      >
+                      <div className={clsx(PROPOSAL_STATUS_CLASS, classes.countdownPill)}>
                         <div className={classes.countdownPillContentWrapper}>
                           <span className={classes.countdownPillClock}>
                             <ClockIcon height={16} width={16} />
