@@ -10,7 +10,17 @@ import { Col, Row } from 'react-bootstrap';
 import { useAppSelector } from '@/hooks';
 import { Auction } from '@/wrappers/nijiAuction';
 
-import classes from './AuctionTimer.module.css';
+const SECTION_CLASS =
+  "[&_span]:font-londrina [&_span]:text-5xl [&_span]:font-bold [&_h4]:font-['PT_Root_UI'] [&_h4]:text-lg [&_h4]:font-bold [&_h2]:font-['PT_Root_UI'] [&_h2]:text-[32px] [&_h2]:font-bold [&_h2]:!mb-0 [&_h2]:mt-[3px] max-[992px]:justify-between max-[992px]:[&_h4]:mt-1.5 max-[992px]:[&_h4]:mb-0 max-[992px]:[&_h2]:text-[23px]";
+const WRAPPER_CLASS =
+  'pl-10 pr-0 mt-[0.3rem] w-max-content cursor-pointer max-[992px]:w-auto max-[992px]:mx-0 max-[992px]:pl-0';
+const TIMER_WRAPPER_CLASS = 'mt-[1px] flex';
+const TIMER_SECTION_CLASS =
+  "mr-2 [&_span]:font-['PT_Root_UI'] [&_span]:!text-[32px] [&_span]:font-bold max-[992px]:[&_span]:!text-[23px]";
+const TIMER_SECTION_FINAL_CLASS =
+  "mr-0 [&_span]:font-['PT_Root_UI'] [&_span]:!text-[32px] [&_span]:font-bold max-[992px]:[&_span]:!text-[23px]";
+const LEFT_COL_CLASS = 'mt-[1px] max-[992px]:mt-0 max-[992px]:pl-2';
+const TIME_LEFT_CLASS = 'max-[992px]:pr-2';
 
 dayjs.extend(duration);
 
@@ -67,10 +77,10 @@ const AuctionTimer: React.FC<AuctionTimerProps> = ({ auction, auctionEnded }) =>
 
   return (
     <Row
-      className={clsx(classes.wrapper, classes.section)}
+      className={clsx(WRAPPER_CLASS, SECTION_CLASS)}
       onClick={() => setTimerToggle(!timerToggle)}
     >
-      <Col xs={timerToggle ? 4 : 6} lg={12} className={classes.leftCol}>
+      <Col xs={timerToggle ? 4 : 6} lg={12} className={LEFT_COL_CLASS}>
         <h4
           style={{
             color: isCool ? 'var(--brand-cool-light-text)' : 'var(--brand-warm-light-text)',
@@ -93,31 +103,31 @@ const AuctionTimer: React.FC<AuctionTimerProps> = ({ auction, auctionEnded }) =>
       <Col xs="auto" lg={12}>
         {timerToggle ? (
           <h2
-            className={clsx(classes.timerWrapper, classes.timeLeft)}
+            className={clsx(TIMER_WRAPPER_CLASS, TIME_LEFT_CLASS)}
             style={{
               color: isCool ? 'var(--brand-cool-dark-text)' : 'var(--brand-warm-dark-text)',
             }}
           >
-            <div className={classes.timerSection}>
+            <div className={TIMER_SECTION_CLASS}>
               <span>
                 {`${Math.floor(timerDuration.hours())}`}
-                <span className={classes.small}>
+                <span>
                   <Trans>h</Trans>
                 </span>
               </span>
             </div>
-            <div className={classes.timerSection}>
+            <div className={TIMER_SECTION_CLASS}>
               <span>
                 {`${flooredMinutes}`}
-                <span className={classes.small}>
+                <span>
                   <Trans>m</Trans>
                 </span>
               </span>
             </div>
-            <div className={classes.timerSectionFinal}>
+            <div className={TIMER_SECTION_FINAL_CLASS}>
               <span>
                 {`${flooredSeconds}`}
-                <span className={classes.small}>
+                <span>
                   <Trans>s</Trans>
                 </span>
               </span>
@@ -125,12 +135,12 @@ const AuctionTimer: React.FC<AuctionTimerProps> = ({ auction, auctionEnded }) =>
           </h2>
         ) : (
           <h2
-            className={classes.timerWrapper}
+            className={TIMER_WRAPPER_CLASS}
             style={{
               color: isCool ? 'var(--brand-cool-dark-text)' : 'var(--brand-warm-dark-text)',
             }}
           >
-            <div className={clsx(classes.timerSection, classes.clockSection)}>
+            <div className={TIMER_SECTION_CLASS}>
               <span>{i18n.date(new Date(endTimeUnix * 1000), { timeStyle: 'medium' })}</span>
             </div>
           </h2>
