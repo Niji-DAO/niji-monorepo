@@ -79,10 +79,6 @@ msgstr ""
 msgid "Proposal functions"
 msgstr ""
 
-#: src/components/CandidateSponsors/index.tsx
-msgid "Proposal candidates must meet the required Nouns vote threshold."
-msgstr ""
-
 #: src/components/Documentation/index.tsx
 #: src/components/Footer.tsx
 #: src/components/NavBar/index.tsx
@@ -121,11 +117,6 @@ msgstr ""
 msgid "Treasury"
 msgstr ""
 
-#. placeholder {0}: i18n.number(availableVotes)
-#: src/components/VoteModal/index.tsx
-msgid "Voting with <0>{0}</0> Nouns"
-msgstr ""
-
 #: src/pages/Vote/index.tsx
 msgid "Ended"
 msgstr ""
@@ -137,10 +128,6 @@ msgstr ""
 #: src/components/NavBar/index.tsx
 #: src/components/NavBar/index.tsx
 msgid "Candidates"
-msgstr ""
-
-#: src/components/CurrentDelegatePannel/index.tsx
-msgid "Noun votes are not transferable, but are <0>delegatable</0>, which means you can assign your vote to someone else as long as you own your Noun."
 msgstr ""
 
 #: src/components/ProposalActionsModal/steps/FunctionCallEnterArgsStep/index.tsx
@@ -170,6 +157,11 @@ msgstr ""
 
 #: src/components/ForkStatus/index.tsx
 msgid "In Escrow"
+msgstr ""
+
+#: src/components/VoteSignals/VoteSignals.tsx
+#: src/components/VoteSignals/VoteSignals.tsx
+msgid "Niji voters can cast voting signals to give proposers of pending proposals an idea of how they intend to vote and helpful guidance on proposal changes to change their vote."
 msgstr ""
 
 #: src/pages/EditProposal/index.tsx
@@ -280,24 +272,12 @@ msgstr ""
 msgid "Bids for"
 msgstr ""
 
-#: src/pages/CreateCandidate/index.tsx
-msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nouns voters, it can be promoted to a proposal. "
-msgstr ""
-
-#: src/components/DynamicQuorumInfoModal/index.tsx
-msgid "The Threshold (minimum number of For votes required to pass a proposal) is set as a function of the number of Against votes a proposal has received. It increases linearly as a function of the % of Nouns voting against a prop, varying between Min Threshold and Max Threshold."
-msgstr ""
-
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Go to playground"
 msgstr ""
 
 #: src/components/Bid/index.tsx
 msgid "or more"
-msgstr ""
-
-#: src/pages/Playground/index.tsx
-msgid "Nouns Protocol"
 msgstr ""
 
 #: src/components/Documentation/index.tsx
@@ -325,10 +305,6 @@ msgstr ""
 #: src/components/ProposalHeader/CandidateHeader.tsx
 #: src/components/ProposalHeader/index.tsx
 msgid "You have no votes."
-msgstr ""
-
-#: src/components/CandidateSponsors/index.tsx
-msgid "Sponsoring a proposal requires at least one Noun vote"
 msgstr ""
 
 #: src/components/StreamWithdrawModal/index.tsx
@@ -399,6 +375,10 @@ msgstr ""
 msgid "Queue"
 msgstr ""
 
+#: src/components/CurrentDelegatePannel/index.tsx
+msgid "Niji votes are not transferable, but are <0>delegatable</0>, which means you can assign your vote to someone else as long as you own your Niji."
+msgstr ""
+
 #: src/components/Documentation/index.tsx
 msgid "CryptoPunks"
 msgstr ""
@@ -416,9 +396,9 @@ msgstr ""
 msgid "You've successfully voted on on prop {0}"
 msgstr ""
 
-#: src/components/VoteSignals/VoteSignals.tsx
-#: src/components/VoteSignals/VoteSignals.tsx
-msgid "Nouns voters can cast voting signals to give proposers of pending proposals an idea of how they intend to vote and helpful guidance on proposal changes to change their vote."
+#. placeholder {0}: i18n.date(new Date(proposalCreationTimestamp * 1000), { dateStyle: 'long', timeStyle: 'long', })
+#: src/components/ProposalHeader/index.tsx
+msgid "Only Niji you owned or were delegated to you before {0} are eligible to vote."
 msgstr ""
 
 #: src/components/VoteModal/index.tsx
@@ -461,13 +441,15 @@ msgstr ""
 msgid "Ends {0}"
 msgstr ""
 
+#. placeholder {0}: forkThreshold == null ? '...' : forkThreshold
+#. placeholder {1}: forkThresholdBPS != null ? forkThresholdBPS / 100 : '...'
+#: src/pages/Fork/index.tsx
+msgid "More than {0} Niji ({1}% of the DAO) are required to pass the threshold"
+msgstr ""
+
 #: src/components/CreateProposalButton/index.tsx
 #: src/pages/CreateProposal/index.tsx
 msgid "Create Proposal"
-msgstr ""
-
-#: src/components/ByLineHoverCard/index.tsx
-msgid "<0>Delegated Noun: </0>"
 msgstr ""
 
 #: src/components/ProposalHeader/index.tsx
@@ -500,12 +482,12 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: src/components/CandidateSponsors/SignatureForm.tsx
-msgid "Signature request"
+#: src/components/CandidateSponsors/index.tsx
+msgid "Sponsoring a proposal requires at least one Niji vote"
 msgstr ""
 
-#: src/components/Proposals/index.tsx
-msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nouns voters, it can be promoted to a proposal."
+#: src/components/CandidateSponsors/SignatureForm.tsx
+msgid "Signature request"
 msgstr ""
 
 #: src/components/Documentation/index.tsx
@@ -730,12 +712,6 @@ msgstr ""
 msgid "Filename"
 msgstr ""
 
-#. placeholder {0}: forkThreshold == null ? '...' : forkThreshold
-#. placeholder {1}: forkThresholdBPS != null ? forkThresholdBPS / 100 : '...'
-#: src/pages/Fork/index.tsx
-msgid "More than {0} Nouns ({1}% of the DAO) are required to pass the threshold"
-msgstr ""
-
 #: src/components/Proposals/index.tsx
 msgid "About Proposal Candidates"
 msgstr ""
@@ -763,6 +739,10 @@ msgstr ""
 
 #: src/components/ForkingPeriodTimer/index.tsx
 msgid "minutes"
+msgstr ""
+
+#: src/components/CandidateSponsors/index.tsx
+msgid "This candidate has met the required threshold, but Niji voters can still add support until it’s put onchain."
 msgstr ""
 
 #: src/components/Proposals/index.tsx
@@ -837,10 +817,6 @@ msgstr ""
 msgid "Nijis govern <0>Niji DAO</0>. Nijis can vote on proposals or delegate their vote to a third party. A minimum of <1>{0}</1> is required to submit proposals."
 msgstr ""
 
-#: src/components/ByLineHoverCard/index.tsx
-msgid "<0>Delegated Nouns: </0>"
-msgstr ""
-
 #: src/components/EditProposalButton/index.tsx
 msgid "Update Proposal Candidate"
 msgstr ""
@@ -852,6 +828,10 @@ msgstr ""
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 #: src/pages/TraitsPage.tsx
 msgid "License"
+msgstr ""
+
+#: src/pages/TraitsPage.tsx
+msgid "Browse and download all available Niji traits."
 msgstr ""
 
 #: src/components/Proposals/index.tsx
@@ -948,6 +928,11 @@ msgstr ""
 #: src/pages/EditProposal/index.tsx
 #: src/pages/EditProposal/index.tsx
 msgid "Note"
+msgstr ""
+
+#: src/components/ByLineHoverCard/index.tsx
+#: src/components/ByLineHoverCard/index.tsx
+msgid "<0>Delegated Niji: </0>"
 msgstr ""
 
 #: src/components/Documentation/index.tsx
@@ -1094,11 +1079,6 @@ msgstr ""
 msgid "The Niji Seeder contract is used to determine Niji traits during the minting process. The seeder contract can be replaced to allow for future trait generation algorithm upgrades. Additionally, it can be locked by the Niji DAO to prevent any future updates. Currently, Niji traits are determined using pseudo-random number generation:"
 msgstr ""
 
-#. placeholder {0}: i18n.date(new Date(proposalCreationTimestamp * 1000), { dateStyle: 'long', timeStyle: 'long', })
-#: src/components/ProposalHeader/index.tsx
-msgid "Only Nouns you owned or were delegated to you before {0} are eligible to vote."
-msgstr ""
-
 #: src/components/Bid/index.tsx
 msgid "Settled auction successfully!"
 msgstr ""
@@ -1196,6 +1176,10 @@ msgstr ""
 msgid "Current Threshold"
 msgstr ""
 
+#: src/pages/Playground/index.tsx
+msgid "The playground was built using the {nounsProtocolLink}. Niji's traits are determined by the Niji Seed. The seed was generated using {nijiAssetsLink} and rendered using the {nounsSDKLink}."
+msgstr ""
+
 #: src/pages/TraitsPage.tsx
 msgid "All traits are <0>CC0</0> (Creative Commons Zero), meaning they are in the public domain and free to use for any purpose without restriction."
 msgstr ""
@@ -1214,10 +1198,6 @@ msgstr ""
 msgid "Add Streaming Payment Action"
 msgstr ""
 
-#: src/components/CandidateSponsors/index.tsx
-msgid "This candidate has met the required threshold, but Nouns voters can still add support until it’s put onchain."
-msgstr ""
-
 #. placeholder {0}: isForked ? ` #${id}` : ''
 #: src/pages/Fork/index.tsx
 msgid "Niji DAO Fork{0}"
@@ -1226,6 +1206,10 @@ msgstr ""
 #. placeholder {0}: isV2Prop ? i18n.number(Number(currentQuorum ?? 0)) : proposal.quorumVotes
 #: src/pages/Vote/index.tsx
 msgid "{0} votes"
+msgstr ""
+
+#: src/components/Proposals/index.tsx
+msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Niji voters, it can be promoted to a proposal."
 msgstr ""
 
 #: src/pages/Vote/index.tsx
@@ -1281,6 +1265,7 @@ msgid "Will have"
 msgstr ""
 
 #: src/components/DelegateHoverCard/index.tsx
+#: src/components/DelegateHoverCard/index.tsx
 msgid "Voted with<0>{numVotesForProp}</0>Niji"
 msgstr ""
 
@@ -1300,6 +1285,11 @@ msgstr ""
 #: src/pages/Vote/index.tsx
 #: src/pages/Vote/index.tsx
 msgid "Threshold"
+msgstr ""
+
+#. placeholder {0}: createCandidateCost ? formatEther(createCandidateCost) : '0'
+#: src/pages/CreateCandidate/index.tsx
+msgid "Submissions are free for Niji voters. Non-voters can submit for a {0} ETH fee."
 msgstr ""
 
 #: src/components/ChangeDelegatePanel/index.tsx
@@ -1343,10 +1333,6 @@ msgstr ""
 msgid "Vetoed"
 msgstr ""
 
-#: src/components/AddNijisToForkModal/index.tsx
-msgid "Add as many or as few of your Nouns as you’d like. Additional Nouns can be added during the escrow and forking periods."
-msgstr ""
-
 #: src/components/ProposalEditor/index.tsx
 msgid "Preview"
 msgstr ""
@@ -1356,8 +1342,8 @@ msgid "Your <0>{availableVotes}</0> votes have been delegated to a new account."
 msgstr ""
 
 #: src/pages/Playground/index.tsx
-msgid "The playground was built using the {nounsProtocolLink}. Niji's traits are determined by the Niji Seed. The seed was generated using {nounsAssetsLink} and rendered using the {nounsSDKLink}."
-msgstr ""
+#~ msgid "The playground was built using the {nounsProtocolLink}. Niji's traits are determined by the Niji Seed. The seed was generated using {nounsAssetsLink} and rendered using the {nounsSDKLink}."
+#~ msgstr ""
 
 #: src/components/DynamicQuorumInfoModal/index.tsx
 msgid "% of Nijis Currently Against"
@@ -1392,10 +1378,6 @@ msgstr ""
 msgid "Starting on"
 msgstr ""
 
-#: src/pages/TraitsPage.tsx
-msgid "Browse and download all available Noun traits."
-msgstr ""
-
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Colored Noggles"
 msgstr ""
@@ -1408,6 +1390,10 @@ msgstr ""
 
 #: src/components/Documentation/index.tsx
 msgid "On-Chain Artwork"
+msgstr ""
+
+#: src/components/AddNijisToForkModal/index.tsx
+msgid "Add as many or as few of your Niji as you’d like. Additional Niji can be added during the escrow and forking periods."
 msgstr ""
 
 #: src/components/Footer.tsx
@@ -1434,11 +1420,8 @@ msgstr ""
 msgid "Because this proposal contains a USDC fund transfer action we've added an additional additional ETH transaction to refill the TokenBuyer contract. This action allows to continue to trustlessly acquire USDC to fund proposals like this."
 msgstr ""
 
-#: src/components/DelegateHoverCard/index.tsx
-msgid "Voted with<0>{numVotesForProp}</0>Nouns"
-msgstr ""
-
 #. placeholder {0}: i18n.number(availableVotes)
+#: src/components/VoteModal/index.tsx
 #: src/components/VoteModal/index.tsx
 msgid "Voting with <0>{0}</0> Niji"
 msgstr ""
@@ -1463,13 +1446,12 @@ msgstr ""
 msgid "Forks"
 msgstr ""
 
-#. placeholder {0}: createCandidateCost ? formatEther(createCandidateCost) : '0'
-#: src/pages/CreateCandidate/index.tsx
-msgid "Submissions are free for Nouns voters. Non-voters can submit for a {0} ETH fee."
-msgstr ""
-
 #: src/pages/BrandAssets/BrandAssetsPage.tsx
 msgid "Explore traits"
+msgstr ""
+
+#: src/components/DynamicQuorumInfoModal/index.tsx
+msgid "The Threshold (minimum number of For votes required to pass a proposal) is set as a function of the number of Against votes a proposal has received. It increases linearly as a function of the % of Niji voting against a prop, varying between Min Threshold and Max Threshold."
 msgstr ""
 
 #: src/pages/Vote/index.tsx
@@ -1561,6 +1543,10 @@ msgstr ""
 msgid "at"
 msgstr ""
 
+#: src/pages/CreateCandidate/index.tsx
+msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Niji voters, it can be promoted to a proposal. "
+msgstr ""
+
 #: src/components/ProposalActionsModal/steps/TransferFundsReviewStep/index.tsx
 msgid "Review Transfer Funds Action"
 msgstr ""
@@ -1621,6 +1607,10 @@ msgstr ""
 
 #: src/components/Documentation/index.tsx
 msgid "The proposal veto right was initially envisioned as a temporary solution to the problem of ‘51% attacks’ on the Niji DAO treasury. While Nounders initially believed that a healthy distribution of Nijis would be sufficient protection for the DAO, a more complete understanding of the incentives and risks has led to general consensus within the Nounders, the Niji Foundation, and the wider community that a more robust game-theoretic solution should be implemented before the right is removed."
+msgstr ""
+
+#: src/components/CandidateSponsors/index.tsx
+msgid "Proposal candidates must meet the required Niji vote threshold."
 msgstr ""
 
 #: src/components/CandidateSponsors/SelectSponsorsToPropose.tsx
@@ -1777,4 +1767,8 @@ msgstr ""
 
 #: src/components/NijiContent/index.tsx
 msgid "Learn more"
+msgstr ""
+
+#: src/pages/Playground/index.tsx
+msgid "Niji Protocol"
 msgstr ""
