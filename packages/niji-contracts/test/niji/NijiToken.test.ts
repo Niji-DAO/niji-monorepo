@@ -157,6 +157,30 @@ describe('NijiToken', () => {
       await token.mintBatch(other.address, 3);
       expect(await token.balanceOf(other.address)).to.equal(3);
     });
+
+    it('should expose MAX_MINT_BATCH_SIZE = 50', async () => {
+      expect(await token.MAX_MINT_BATCH_SIZE()).to.equal(50);
+    });
+
+    it('should allow mintBatch at the upper bound (quantity = 50)', async () => {
+      // Use an unlimited-supply token so the 50-mint batch can run without hitting maxSupply.
+      const unlimited = await deployNijiToken(
+        'Niji',
+        'NIJI',
+        await descriptor.getAddress(),
+        await seeder.getAddress(),
+        0,
+      );
+      await unlimited.toggleMinting();
+      await unlimited.mintBatch(other.address, 50);
+      expect(await unlimited.balanceOf(other.address)).to.equal(50);
+    });
+
+    it('should revert mintBatch when quantity exceeds MAX_MINT_BATCH_SIZE', async () => {
+      await expect(token.mintBatch(other.address, 51))
+        .to.be.revertedWithCustomError(token, 'MintBatchQuantityExceedsLimit')
+        .withArgs(51, 50);
+    });
   });
 
   describe('tokenURI', () => {
