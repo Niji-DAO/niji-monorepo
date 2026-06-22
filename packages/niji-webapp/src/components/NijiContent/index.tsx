@@ -13,8 +13,6 @@ import CurrentBid, { BID_N_A } from '@/components/CurrentBid';
 import Winner from '@/components/Winner';
 import { useAppSelector } from '@/hooks';
 
-import nounContentClasses from './NijiContent.module.css';
-
 import auctionActivityClasses from '@/components/AuctionActivity/AuctionActivity.module.css';
 import auctionBidClasses from '@/components/AuctionActivity/BidHistory.module.css';
 import bidBtnClasses from '@/components/BidHistoryBtn/BidHistoryBtn.module.css';
@@ -87,7 +85,7 @@ const NijiContent: React.FC<NijiContentProps> = props => {
           </Col>
           <Col
             lg={5}
-            className={`${auctionActivityClasses.currentBidCol} ${nounContentClasses.currentBidCol} ${auctionActivityClasses.auctionTimerCol}`}
+            className={`${auctionActivityClasses.currentBidCol} !border-r-0 ${auctionActivityClasses.auctionTimerCol}`}
           >
             <div className={auctionActivityClasses.section}>
               <Winner winner={'0x'} isNounders={true} />
@@ -101,11 +99,14 @@ const NijiContent: React.FC<NijiContentProps> = props => {
             <li
               className={
                 (isCool ? `${auctionBidClasses.bidRowCool}` : `${auctionBidClasses.bidRowWarm}`) +
-                ` ${nounContentClasses.bidRow}`
+                ' text-[15.5px] font-medium leading-[21px]'
               }
             >
               <Trans>All Niji auction proceeds are sent to the</Trans>{' '}
-              <Link to="/vote" className={nounContentClasses.link}>
+              <Link
+                to="/vote"
+                className="text-[color:var(--brand-dark-green)] underline visited:text-[color:var(--brand-dark-green)] hover:text-[color:var(--brand-dark-red)] active:text-[color:var(--brand-dark-green)]"
+              >
                 <Trans>Niji DAO</Trans>
               </Link>
               .{' '}

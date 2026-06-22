@@ -3,8 +3,6 @@ import React from 'react';
 import nounPointerImg from '@/assets/noun-pointer.png';
 import TruncatedAmount from '@/components/TruncatedAmount';
 
-import classes from './MinBid.module.css';
-
 interface MinBidProps {
   minBid: bigint;
   onClick: () => void;
@@ -12,9 +10,9 @@ interface MinBidProps {
 
 const MinBid: React.FC<MinBidProps> = ({ minBid, onClick }) => {
   return (
-    <div className={classes.minBidWrapper} onClick={onClick}>
+    <div className="mt-4 flex" onClick={onClick}>
       <img src={nounPointerImg} alt="Pointer noun" />
-      <h3 className={classes.minBid}>
+      <h3 className="font-londrina ml-4 cursor-pointer text-xl font-normal text-[color:var(--brand-black)]">
         You must bid at least {!!minBid && <TruncatedAmount amount={minBid} />}
       </h3>
     </div>

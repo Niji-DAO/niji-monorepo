@@ -2,8 +2,6 @@ import React from 'react';
 
 import { Form } from 'react-bootstrap';
 
-import classes from './ABIUpload.module.css';
-
 interface ABIUploadProps {
   abiFileName?: string;
   isValid: boolean | undefined;
@@ -15,12 +13,12 @@ const ABIUpload: React.FC<ABIUploadProps> = ({ abiFileName, isValid, isInvalid, 
   const displayLabel = abiFileName === 'etherscan-abi-download.json' ? abiFileName : 'ABI';
 
   return (
-    <div className={classes.wrapper}>
-      <label htmlFor="import-abi" className={classes.label}>
+    <div className="mt-4">
+      <label htmlFor="import-abi" className="opacity-50">
         {displayLabel}
       </label>
       <Form.Control
-        className={classes.form}
+        className="h-12 w-full rounded-[15px] border border-black/10 px-4 py-2 text-[22px] font-bold text-[color:var(--brand-cool-dark-text)]"
         type="file"
         id="import-abi"
         size="lg"
