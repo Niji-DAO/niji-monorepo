@@ -231,4 +231,13 @@ describe('NijiSeeder', () => {
     () => other,
     () => owner,
   );
+
+  describe('renounceOwnership disabled (non-owner)', () => {
+    it('should revert with OwnableUnauthorizedAccount when called by non-owner', async () => {
+      await expect(seeder.connect(other).renounceOwnership()).to.be.revertedWithCustomError(
+        seeder,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+  });
 });

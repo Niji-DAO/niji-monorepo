@@ -19,6 +19,9 @@ contract NijiSeeder is INijiSeeder, Ownable2Step {
     /// @notice Thrown when art address is invalid
     error InvalidArtAddress();
 
+    /// @notice Thrown when renounceOwnership is called (disabled to prevent contract becoming unowned)
+    error RenounceOwnershipDisabled();
+
     // =============================================================
     //                           EVENTS
     // =============================================================
@@ -158,5 +161,11 @@ contract NijiSeeder is INijiSeeder, Ownable2Step {
         }
 
         return counts;
+    }
+
+    /// @notice Disabled to prevent the contract from becoming permanently unowned.
+    /// @dev Always reverts. Use `transferOwnership` (Ownable2Step two-step transfer) for ownership change instead.
+    function renounceOwnership() public view override onlyOwner {
+        revert RenounceOwnershipDisabled();
     }
 }
