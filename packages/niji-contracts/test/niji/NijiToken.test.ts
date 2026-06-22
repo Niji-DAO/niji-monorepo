@@ -910,4 +910,105 @@ describe('NijiToken', () => {
       await expect(token.tokenURI(999)).to.be.revertedWithCustomError(token, 'TokenDoesNotExist');
     });
   });
+
+  describe('lockContracts', () => {
+    it('should not be locked by default', async () => {
+      expect(await token.isContractsLocked()).to.be.false;
+    });
+
+    it('should allow owner to lock contracts', async () => {
+      await expect(token.lockContracts()).to.emit(token, 'ContractsLocked');
+      expect(await token.isContractsLocked()).to.be.true;
+    });
+
+    it('should revert lockContracts when called twice', async () => {
+      await token.lockContracts();
+      await expect(token.lockContracts()).to.be.revertedWithCustomError(
+        token,
+        'ContractsAreLocked',
+      );
+    });
+
+    it('should revert lockContracts when non-owner', async () => {
+      await expect(token.connect(other).lockContracts()).to.be.revertedWithCustomError(
+        token,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should revert setDescriptor after lockContracts', async () => {
+      const newDescriptor = await deployNijiDescriptor(await art.getAddress());
+      await token.lockContracts();
+      await expect(token.setDescriptor(await newDescriptor.getAddress())).to.be.revertedWithCustomError(
+        token,
+        'ContractsAreLocked',
+      );
+    });
+
+    it('should revert setSeeder after lockContracts', async () => {
+      const newSeeder = await deployNijiSeeder(await art.getAddress());
+      await token.lockContracts();
+      await expect(token.setSeeder(await newSeeder.getAddress())).to.be.revertedWithCustomError(
+        token,
+        'ContractsAreLocked',
+      );
+    });
+
+    it('should still allow tokenURI / mint / view functions after lockContracts', async () => {
+      await token.toggleMinting();
+      await token['mint(address)'](other.address);
+      await token.reveal();
+      await token.lockContracts();
+
+      const uri = await token.tokenURI(0);
+      expect(uri).to.include('data:application/json;base64,');
+      expect(await token.balanceOf(other.address)).to.equal(1);
+    });
+
+    it('should still allow setMinter after lockContracts (minter is not in lock scope)', async () => {
+      await token.lockContracts();
+      await expect(token.setMinter(other.address)).to.not.be.reverted;
+    });
+
+    it('should make tokenURI fully immutable when combined with art lock + metadata freeze + baseURI lock + reveal', async () => {
+      // 1. Mint and reveal first (mint needs placeholder, reveal switches tokenURI to on-chain descriptor)
+      await token.toggleMinting();
+      await token['mint(address)'](other.address);
+      await token.reveal();
+
+      // 2. Apply all four locks in one order (order is independent per docstring)
+      await art.lockArt();
+      await descriptor.freezeMetadata();
+      await token.lockBaseURI(); // baseURI is already '' so on-chain descriptor stays the resolution target
+      await token.lockContracts();
+
+      const uriBefore = await token.tokenURI(0);
+
+      // 3. Verify every mutation path is blocked
+      const newDescriptor = await deployNijiDescriptor(await art.getAddress());
+      await expect(token.setDescriptor(await newDescriptor.getAddress())).to.be.revertedWithCustomError(
+        token,
+        'ContractsAreLocked',
+      );
+      const newSeeder = await deployNijiSeeder(await art.getAddress());
+      await expect(token.setSeeder(await newSeeder.getAddress())).to.be.revertedWithCustomError(
+        token,
+        'ContractsAreLocked',
+      );
+      await expect(token.setBaseURI('https://attacker.example/')).to.be.revertedWithCustomError(
+        token,
+        'BaseURIIsLocked',
+      );
+      await expect(descriptor.setResolution(640)).to.be.revertedWithCustomError(
+        descriptor,
+        'MetadataIsFrozen',
+      );
+      await expect(
+        art.connect(owner).transferDescriptor(owner.address),
+      ).to.not.be.reverted; // transferDescriptor is intentionally not locked
+      // tokenURI should be identical to the pre-lock snapshot
+      const uriAfter = await token.tokenURI(0);
+      expect(uriAfter).to.equal(uriBefore);
+    });
+  });
 });

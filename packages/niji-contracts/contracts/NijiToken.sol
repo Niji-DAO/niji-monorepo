@@ -60,6 +60,9 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Thrown when renounceOwnership is called (disabled to prevent contract becoming unowned)
     error RenounceOwnershipDisabled();
 
+    /// @notice Thrown when setDescriptor / setSeeder is called after the contract pointers have been locked
+    error ContractsAreLocked();
+
     /// @notice Thrown when reveal is called after it was already executed
     error RevealAlreadyDone();
 
@@ -128,6 +131,9 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Emitted when the baseURI is locked permanently
     event BaseURILocked();
 
+    /// @notice Emitted when the contract pointers (descriptor + seeder) are locked permanently
+    event ContractsLocked();
+
     // =============================================================
     //                           STORAGE
     // =============================================================
@@ -178,6 +184,11 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
 
     /// @notice Whether the baseURI is locked permanently (no further updates allowed)
     bool public isBaseURILocked;
+
+    /// @notice Whether the contract pointers (descriptor + seeder) are locked permanently
+    /// @dev Once true, setDescriptor / setSeeder revert with ContractsAreLocked. Used together with
+    ///      NijiDescriptor.freezeMetadata / NijiArt.lockArt to make collection metadata fully immutable.
+    bool public isContractsLocked;
 
     // =============================================================
     //                           MODIFIERS
@@ -369,7 +380,9 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
 
     /// @notice Set the descriptor contract
     /// @param _descriptor New descriptor address
+    /// @dev Reverts if the contract pointers have been locked via lockContracts().
     function setDescriptor(address _descriptor) external onlyOwner {
+        if (isContractsLocked) revert ContractsAreLocked();
         if (_descriptor == address(0)) revert EmptyAddress();
 
         address oldDescriptor = address(descriptor);
@@ -380,13 +393,29 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
 
     /// @notice Set the seeder contract
     /// @param _seeder New seeder address
+    /// @dev Reverts if the contract pointers have been locked via lockContracts().
     function setSeeder(address _seeder) external onlyOwner {
+        if (isContractsLocked) revert ContractsAreLocked();
         if (_seeder == address(0)) revert EmptyAddress();
 
         address oldSeeder = address(seeder);
         seeder = INijiSeeder(_seeder);
 
         emit SeederUpdated(oldSeeder, _seeder);
+    }
+
+    /// @notice Lock the descriptor + seeder pointers permanently (owner only, one-way switch).
+    /// @dev Freezes only the contract pointers `descriptor` and `seeder`; after this call, `setDescriptor` /
+    ///      `setSeeder` always revert with `ContractsAreLocked`. Other mutable surfaces on this token
+    ///      (`setPlaceholderURI` pre-reveal, `reveal`, `setBaseURI` until `lockBaseURI` is called) remain in
+    ///      effect. To make collection metadata fully immutable end-to-end, owner must combine:
+    ///      (a) `NijiArt.lockArt` (PR #251), (b) `NijiDescriptor.freezeMetadata` (PR #252),
+    ///      (c) `reveal` + (`lockBaseURI` after `setBaseURI('')` to keep on-chain rendering), and (d) this
+    ///      function. The ordering of (a)-(d) is independent.
+    function lockContracts() external onlyOwner {
+        if (isContractsLocked) revert ContractsAreLocked();
+        isContractsLocked = true;
+        emit ContractsLocked();
     }
 
     /// @notice Set the minter address
