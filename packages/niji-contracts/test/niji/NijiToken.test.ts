@@ -429,4 +429,105 @@ describe('NijiToken', () => {
       expect(await unlimitedToken.remainingSupply()).to.equal(ethers.MaxUint256);
     });
   });
+
+  describe('pausable', () => {
+    it('should not be paused by default', async () => {
+      expect(await token.paused()).to.be.false;
+    });
+
+    it('should allow owner to pause', async () => {
+      await expect(token.pause()).to.emit(token, 'Paused').withArgs(owner.address);
+      expect(await token.paused()).to.be.true;
+    });
+
+    it('should allow owner to unpause', async () => {
+      await token.pause();
+      await expect(token.unpause()).to.emit(token, 'Unpaused').withArgs(owner.address);
+      expect(await token.paused()).to.be.false;
+    });
+
+    it('should revert when non-owner tries to pause', async () => {
+      await expect(token.connect(other).pause()).to.be.revertedWithCustomError(
+        token,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should revert when non-owner tries to unpause', async () => {
+      await token.pause();
+      await expect(token.connect(other).unpause()).to.be.revertedWithCustomError(
+        token,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should block mint when paused', async () => {
+      await token.toggleMinting();
+      await token.pause();
+      await expect(token['mint(address)'](other.address)).to.be.revertedWithCustomError(
+        token,
+        'EnforcedPause',
+      );
+    });
+
+    it('should block mintBatch when paused', async () => {
+      await token.toggleMinting();
+      await token.pause();
+      await expect(token.mintBatch(other.address, 2)).to.be.revertedWithCustomError(
+        token,
+        'EnforcedPause',
+      );
+    });
+
+    it('should block transfer when paused', async () => {
+      await token.toggleMinting();
+      const tokenId = await token['mint(address)'].staticCall(other.address);
+      await token['mint(address)'](other.address);
+      await token.pause();
+      await expect(
+        token.connect(other).transferFrom(other.address, owner.address, tokenId),
+      ).to.be.revertedWithCustomError(token, 'EnforcedPause');
+    });
+
+    it('should block burn when paused', async () => {
+      await token.toggleMinting();
+      const tokenId = await token['mint()'].staticCall();
+      await token['mint()']();
+      await token.pause();
+      await expect(token.burn(tokenId)).to.be.revertedWithCustomError(token, 'EnforcedPause');
+    });
+
+    it('should resume operations when unpaused', async () => {
+      await token.toggleMinting();
+      await token.pause();
+      await token.unpause();
+      await expect(token['mint(address)'](other.address)).to.not.be.reverted;
+    });
+
+    it('should keep transferOwnership / acceptOwnership available while paused (owner rescue path)', async () => {
+      await token.pause();
+      await expect(token.transferOwnership(other.address)).to.not.be.reverted;
+      await expect(token.connect(other).acceptOwnership()).to.not.be.reverted;
+      expect(await token.owner()).to.equal(other.address);
+      expect(await token.paused()).to.be.true;
+    });
+
+    it('should keep owner admin setters callable while paused (setMintingActive)', async () => {
+      await token.pause();
+      await expect(token.setMintingActive(true)).to.not.be.reverted;
+      expect(await token.isMintingActive()).to.be.true;
+      expect(await token.paused()).to.be.true;
+    });
+
+    it('should keep view functions (tokenURI / getSeed) callable while paused', async () => {
+      await token.toggleMinting();
+      await token['mint(address)'](other.address);
+      await token.pause();
+
+      const uri = await token.tokenURI(0);
+      expect(uri).to.include('data:application/json;base64,');
+      const seed = await token.getSeed(0);
+      expect(seed.special).to.be.at.least(0);
+    });
+  });
 });
