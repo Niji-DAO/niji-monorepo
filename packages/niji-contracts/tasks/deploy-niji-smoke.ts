@@ -297,6 +297,13 @@ task('deploy-niji-smoke', 'Deploy Niji stack + 36 sample PNGs + mint 1 token (P6
       timestamp: new Date().toISOString(),
       deployer: deployLog.deployer,
       contracts: deployLog.contracts,
+      // Constructor args captured per contract so verify-niji can reconstruct them.
+      constructorArgs: {
+        NijiArt: [deployer.address, NIJI_TRAITS.map(t => t.name)],
+        NijiDescriptor: [artAddr, NIJI_RESOLUTION, NIJI_COMPOSITE_ORDER],
+        NijiSeeder: [artAddr],
+        NijiToken: ['Niji', 'NIJI', descriptorAddr, seederAddr, 0],
+      } as Record<string, unknown[]>,
     };
     fs.writeFileSync(latestPath, JSON.stringify(latestPayload, null, 2) + '\n');
     console.log(`[11] deployments snapshot: ${latestPath}`);

@@ -468,6 +468,20 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     console.log(`║ ETH Spent:      ${ethers.formatEther(balance - balanceAfter)} ETH`);
     console.log('╚═══════════════════════════════════════════════════════════════╝');
 
+    // Constructor args captured per contract so the verify-niji task can reconstruct the
+    // arguments needed by hardhat-verify / Etherscan API. Includes only contracts whose
+    // verification we automate (NijiArt / Descriptor / Seeder / Token + AuctionHouse pair).
+    // null for contracts that were not deployed in this run (e.g. token skipped via --skipToken,
+    // auction skipped for non-localhost networks).
+    const constructorArgs: Record<string, unknown[] | null> = {
+      NijiArt: [deployer.address, TRAIT_DIRS.map(t => t.name)],
+      NijiDescriptor: [artAddr, RESOLUTION, COMPOSITE_ORDER],
+      NijiSeeder: [artAddr],
+      NijiToken: tokenAddrFinal ? ['Niji', 'NIJI', descAddrFinal, seederAddr, MAX_SUPPLY] : null,
+      NijiAuctionHouseProxy: null, // proxy uses initialize data, not constructor; verify separately
+      WETH: wethAddr ? [] : null,
+    };
+
     // Persist deploy log JSON for downstream sdk address sync
     const deployLog = {
       timestamp: new Date().toISOString(),
@@ -482,6 +496,7 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
         NijiAuctionHouseProxy: auctionProxyAddr,
         WETH: wethAddr,
       },
+      constructorArgs,
     };
     const deployLogDir = path.join(__dirname, '../deploy');
     fs.mkdirSync(deployLogDir, { recursive: true });
@@ -510,6 +525,7 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
         timestamp: deployLog.timestamp,
         deployer: deployLog.deployer,
         contracts: deployLog.contracts,
+        constructorArgs: deployLog.constructorArgs,
       };
       fs.writeFileSync(latestPath, JSON.stringify(latestPayload, null, 2) + '\n');
       console.log(`📝 Deployments snapshot: ${latestPath}`);
