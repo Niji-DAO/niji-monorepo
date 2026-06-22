@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
 import dayjs from 'dayjs';
 
@@ -19,6 +19,15 @@ export function useSignatureFlow(args: {
 }) {
   const { setDataFetchPollInterval, handleRefetchCandidateData, signatureData, isSignPending } =
     args;
+  // Keep refs to the parent-supplied callbacks so the addSignatureState effect's identity stays
+  // stable across parent rerenders. Without this, callers that pass inline lambdas would trigger
+  // duplicate `Success` refetch / poll-interval resets on every parent rerender.
+  const setDataFetchPollIntervalRef = useRef(setDataFetchPollInterval);
+  const handleRefetchCandidateDataRef = useRef(handleRefetchCandidateData);
+  useEffect(() => {
+    setDataFetchPollIntervalRef.current = setDataFetchPollInterval;
+    handleRefetchCandidateDataRef.current = handleRefetchCandidateData;
+  }, [setDataFetchPollInterval, handleRefetchCandidateData]);
   const { addSignature, addSignatureState } = useAddSignature();
 
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
@@ -40,44 +49,38 @@ export function useSignatureFlow(args: {
     setGetSignatureErrorMessage('');
     setIsGetSignatureTxSuccessful(false);
     setIsOverlayVisible(false);
-    setDataFetchPollInterval(0);
-  }, [setDataFetchPollInterval]);
-
-  const handleAddSignatureState = useCallback(
-    ({ errorMessage: errMsg, status }: { errorMessage?: string; status: string }) => {
-      switch (status) {
-        case 'None':
-          setIsLoading(false);
-          setIsWaiting(false);
-          break;
-        case 'PendingSignature':
-          setIsWaiting(true);
-          break;
-        case 'Mining':
-          setIsLoading(true);
-          setIsWaiting(false);
-          setDataFetchPollInterval(50);
-          break;
-        case 'Success':
-          handleRefetchCandidateData();
-          setIsTxSuccessful(true);
-          setIsLoading(false);
-          break;
-        case 'Fail':
-        case 'Exception':
-          setDataFetchPollInterval(0);
-          setErrorMessage(errMsg);
-          setIsLoading(false);
-          setIsWaiting(false);
-          break;
-      }
-    },
-    [setDataFetchPollInterval, handleRefetchCandidateData],
-  );
+    setDataFetchPollIntervalRef.current(0);
+  }, []);
 
   useEffect(() => {
-    handleAddSignatureState(addSignatureState);
-  }, [addSignatureState, handleAddSignatureState]);
+    const { errorMessage: errMsg, status } = addSignatureState;
+    switch (status) {
+      case 'None':
+        setIsLoading(false);
+        setIsWaiting(false);
+        break;
+      case 'PendingSignature':
+        setIsWaiting(true);
+        break;
+      case 'Mining':
+        setIsLoading(true);
+        setIsWaiting(false);
+        setDataFetchPollIntervalRef.current(50);
+        break;
+      case 'Success':
+        handleRefetchCandidateDataRef.current();
+        setIsTxSuccessful(true);
+        setIsLoading(false);
+        break;
+      case 'Fail':
+      case 'Exception':
+        setDataFetchPollIntervalRef.current(0);
+        setErrorMessage(errMsg);
+        setIsLoading(false);
+        setIsWaiting(false);
+        break;
+    }
+  }, [addSignatureState]);
 
   useEffect(() => {
     if (
