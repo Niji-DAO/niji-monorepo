@@ -1,8 +1,14 @@
-import { nounsAuctionHouseAbi } from '@niji/sdk/auction-house';
-import { nounsTokenAbi } from '@niji/sdk/token';
-import { nounsGovernorAbi } from '@niji/sdk/governor';
-import { nounsStreamFactoryAbi } from '@niji/sdk/stream-factory';
-import { nounsStreamAbi } from '@niji/sdk/stream';
+import {
+  nounsAuctionHouseAbi,
+  nounsAuctionHouseAddress,
+} from '@niji/sdk/auction-house';
+import { nijiTokenAbi, nijiTokenAddress } from '@niji/sdk/token';
+import { nounsGovernorAbi, nounsGovernorAddress } from '@niji/sdk/governor';
+import {
+  nijiStreamFactoryAbi,
+  nijiStreamFactoryAddress,
+} from '@niji/sdk/stream-factory';
+import { nijiStreamAbi } from '@niji/sdk/stream';
 import { createConfig, factory } from 'ponder';
 import { getAbiItem } from 'viem';
 import dotenv from 'dotenv';
@@ -16,37 +22,37 @@ const mainnetConfig = createConfig({
   contracts: {
     NounsAuctionHouseV2: {
       chain: 'mainnet',
-      address: '0x830BD73E4184ceF73443C15111a1DF14e495C706',
+      address: nounsAuctionHouseAddress[1],
       abi: nounsAuctionHouseAbi,
       startBlock: 12985451,
     },
     NounsToken: {
       chain: 'mainnet',
-      address: '0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03',
-      abi: nounsTokenAbi,
+      address: nijiTokenAddress[1],
+      abi: nijiTokenAbi,
       startBlock: 12985438,
     },
     NounsDAOV4: {
       chain: 'mainnet',
-      address: '0x6f3E6272A167e8AcCb32072d08E0957F9c79223d',
+      address: nounsGovernorAddress[1],
       abi: nounsGovernorAbi,
       startBlock: 12985453,
     },
     StreamFactory: {
       chain: 'mainnet',
-      address: '0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff',
-      abi: nounsStreamFactoryAbi,
+      address: nijiStreamFactoryAddress[1],
+      abi: nijiStreamFactoryAbi,
       startBlock: 16576500,
     },
 
     Stream: {
       chain: 'mainnet',
       address: factory({
-        address: '0x0fd206FC7A7dBcD5661157eDCb1FFDD0D02A61ff',
-        event: getAbiItem({ abi: nounsStreamFactoryAbi, name: 'StreamCreated' }),
-        parameter: getAbiItem({ abi: nounsStreamFactoryAbi, name: 'StreamCreated' }).inputs[7].name,
+        address: nijiStreamFactoryAddress[1],
+        event: getAbiItem({ abi: nijiStreamFactoryAbi, name: 'StreamCreated' }),
+        parameter: getAbiItem({ abi: nijiStreamFactoryAbi, name: 'StreamCreated' }).inputs[7].name,
       }),
-      abi: nounsStreamAbi,
+      abi: nijiStreamAbi,
       startBlock: 16576500,
     },
   },
@@ -63,37 +69,37 @@ const sepoliaConfig = createConfig({
   contracts: {
     NounsAuctionHouseV2: {
       chain: 'sepolia',
-      address: '0x488609b7113FCf3B761A05956300d605E8f6BcAf',
+      address: nounsAuctionHouseAddress[11155111],
       abi: nounsAuctionHouseAbi,
       startBlock: 3594847,
     },
     NounsToken: {
       chain: 'sepolia',
-      address: '0x4C4674bb72a096855496a7204962297bd7e12b85',
-      abi: nounsTokenAbi,
+      address: nijiTokenAddress[11155111],
+      abi: nijiTokenAbi,
       startBlock: 3594846,
     },
     NounsDAOV4: {
       chain: 'sepolia',
-      address: '0x35d2670d7C8931AACdd37C89Ddcb0638c3c44A57',
+      address: nounsGovernorAddress[11155111],
       abi: nounsGovernorAbi,
       startBlock: 3594849,
     },
     StreamFactory: {
       chain: 'sepolia',
-      address: '0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5',
-      abi: nounsStreamFactoryAbi,
+      address: nijiStreamFactoryAddress[11155111],
+      abi: nijiStreamFactoryAbi,
       startBlock: 2564095,
     },
 
     Stream: {
       chain: 'sepolia',
       address: factory({
-        address: '0xb78ccF3BD015f209fb9B2d3d132FD8784Df78DF5',
-        event: getAbiItem({ abi: nounsStreamFactoryAbi, name: 'StreamCreated' }),
-        parameter: getAbiItem({ abi: nounsStreamFactoryAbi, name: 'StreamCreated' }).inputs[7].name,
+        address: nijiStreamFactoryAddress[11155111],
+        event: getAbiItem({ abi: nijiStreamFactoryAbi, name: 'StreamCreated' }),
+        parameter: getAbiItem({ abi: nijiStreamFactoryAbi, name: 'StreamCreated' }).inputs[7].name,
       }),
-      abi: nounsStreamAbi,
+      abi: nijiStreamAbi,
       startBlock: 2564095,
     },
   },
