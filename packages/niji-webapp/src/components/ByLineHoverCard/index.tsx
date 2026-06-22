@@ -11,8 +11,6 @@ import { useSubgraphQuery } from '@/hooks/useSubgraphQuery';
 import { Address } from '@/utils/types';
 import { currentlyDelegatedNounsDocument } from '@/wrappers/subgraph';
 
-import classes from './ByLineHoverCard.module.css';
-
 interface ByLineHoverCardProps {
   proposerAddress: string;
 }
@@ -30,8 +28,8 @@ const ByLineHoverCard: React.FC<ByLineHoverCardProps> = props => {
 
   if (loading || (data && data?.delegates?.length === 0)) {
     return (
-      <div className={classes.spinnerWrapper}>
-        <div className={classes.spinner}>
+      <div className="flex h-[120px] w-full flex-col justify-center text-[color:var(--brand-gray-light-text)]">
+        <div className="flex w-full justify-center">
           <Spinner animation="border" />
         </div>
       </div>
@@ -50,8 +48,8 @@ const ByLineHoverCard: React.FC<ByLineHoverCardProps> = props => {
     });
 
   return (
-    <div className={classes.wrapper}>
-      <div className={classes.stackedNounWrapper}>
+    <div className="flex flex-col">
+      <div className="flex">
         <HorizontalStackedNijis
           nounIds={map(
             data?.delegates?.[0]?.nijiRepresented ?? [],
@@ -60,13 +58,13 @@ const ByLineHoverCard: React.FC<ByLineHoverCardProps> = props => {
         />
       </div>
 
-      <div className={classes.address}>
+      <div className="font-londrina w-full text-left text-2xl">
         <ShortAddress address={data?.delegates?.[0]?.id as Address} />
       </div>
 
-      <div className={classes.nijiRepresented}>
+      <div className="mt-1 flex max-w-[11rem] text-[15px] font-medium text-[color:var(--brand-gray-dark-text)]">
         <div>
-          <ScaleIcon height={15} width={15} className={classes.icon} />
+          <ScaleIcon height={15} width={15} className="mb-[5px] mr-[6px]" />
           {sortedNounIds?.length === 1 ? (
             <Trans>
               <span>Delegated Noun: </span>
@@ -79,7 +77,7 @@ const ByLineHoverCard: React.FC<ByLineHoverCardProps> = props => {
 
           {sortedNounIds?.slice(0, MAX_NOUN_IDS_SHOWN).map((nounId: number, i: number) => {
             return (
-              <span className={classes.bold} key={nounId.toString()}>
+              <span className="font-bold" key={nounId.toString()}>
                 {nounId}
                 {i !== Math.min(MAX_NOUN_IDS_SHOWN, sortedNounIds?.length) - 1 && ', '}{' '}
               </span>
