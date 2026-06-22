@@ -163,6 +163,56 @@ describe('NijiArt', () => {
     });
   });
 
+  describe('lockArt', () => {
+    it('should not be locked by default', async () => {
+      expect(await art.isArtLocked()).to.be.false;
+    });
+
+    it('should allow owner to lock art', async () => {
+      await expect(art.lockArt()).to.emit(art, 'ArtLocked');
+      expect(await art.isArtLocked()).to.be.true;
+    });
+
+    it('should revert lockArt when called twice', async () => {
+      await art.lockArt();
+      await expect(art.lockArt()).to.be.revertedWithCustomError(art, 'ArtIsLocked');
+    });
+
+    it('should revert lockArt when non-owner', async () => {
+      await expect(art.connect(other).lockArt()).to.be.revertedWithCustomError(
+        art,
+        'OwnableUnauthorizedAccount',
+      );
+    });
+
+    it('should revert addTraitImage after lockArt', async () => {
+      await art.lockArt();
+      await expect(
+        art.connect(descriptor).addTraitImage(0, SAMPLE_PNG),
+      ).to.be.revertedWithCustomError(art, 'ArtIsLocked');
+    });
+
+    it('should revert addTraitImages after lockArt', async () => {
+      await art.lockArt();
+      await expect(
+        art.connect(descriptor).addTraitImages(0, [SAMPLE_PNG, SAMPLE_PNG]),
+      ).to.be.revertedWithCustomError(art, 'ArtIsLocked');
+    });
+
+    it('should still allow getTraitImage reads after lockArt', async () => {
+      await art.connect(descriptor).addTraitImage(0, SAMPLE_PNG);
+      await art.lockArt();
+      const png = await art.getTraitImage(0, 0);
+      expect(png.length).to.be.greaterThan(0);
+      expect(png.toLowerCase()).to.equal('0x' + SAMPLE_PNG.toString('hex'));
+    });
+
+    it('should still allow transferDescriptor after lockArt', async () => {
+      await art.lockArt();
+      await expect(art.transferDescriptor(other.address)).to.not.be.reverted;
+    });
+  });
+
   describe('getTraitName', () => {
     it('should return specific trait name', async () => {
       expect(await art.getTraitName(0)).to.equal('special');
