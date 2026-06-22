@@ -47,8 +47,8 @@ const CurrentDelegatePannel: React.FC<CurrentDelegatePannelProps> = ({
 
           <p className={COPY_CLASS}>
             <Trans>
-              Noun votes are not transferable, but are <span className="emph">delegatable</span>,
-              which means you can assign your vote to someone else as long as you own your Noun.
+              Niji votes are not transferable, but are <span className="emph">delegatable</span>,
+              which means you can assign your vote to someone else as long as you own your Niji.
             </Trans>
           </p>
         </div>

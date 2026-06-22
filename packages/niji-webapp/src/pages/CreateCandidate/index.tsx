@@ -204,14 +204,14 @@ const CreateCandidatePage = () => {
         <Alert variant="secondary" className={classes.voterIneligibleAlert}>
           <Trans>
             Proposal candidates can be created by anyone. If a candidate receives enough signatures
-            by Nouns voters, it can be promoted to a proposal.{' '}
+            by Niji voters, it can be promoted to a proposal.{' '}
           </Trans>
           <br />
           <br />
 
           <strong>
             <Trans>
-              Submissions are free for Nouns voters. Non-voters can submit for a{' '}
+              Submissions are free for Niji voters. Non-voters can submit for a{' '}
               {createCandidateCost ? formatEther(createCandidateCost) : '0'} ETH fee.
             </Trans>
           </strong>

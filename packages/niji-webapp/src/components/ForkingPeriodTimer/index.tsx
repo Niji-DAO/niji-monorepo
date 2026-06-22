@@ -108,7 +108,7 @@ const ForkingPeriodTimer: React.FC<ForkingPeriodTimerProps> = props => {
               </div>
             )}
           </h2>
-          <p>time left to return Nouns and join this fork</p>
+          <p>time left to return Niji and join this fork</p>
         </>
       ) : (
         <>

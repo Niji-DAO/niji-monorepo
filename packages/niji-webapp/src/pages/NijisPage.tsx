@@ -209,7 +209,7 @@ const NijisPage: React.FC<NijisPageProps> = () => {
         </motion.div>
       </div>
 
-      {/* Selected Noun Details */}
+      {/* Selected Niji Details */}
       <motion.div layout className="border-border flex h-full flex-col border-l">
         <div className="bg-muted/40 flex h-full flex-col">
           {/* Niji Image */}

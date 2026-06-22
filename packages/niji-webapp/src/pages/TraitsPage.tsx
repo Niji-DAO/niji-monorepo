@@ -208,7 +208,7 @@ const TraitsPage: FC = () => {
             </Button>
           </div>
           <p className="mt-4 text-lg text-gray-600">
-            <Trans>Browse and download all available Noun traits.</Trans>
+            <Trans>Browse and download all available Niji traits.</Trans>
           </p>
         </div>
       </div>
