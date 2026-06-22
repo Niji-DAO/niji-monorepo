@@ -2,8 +2,6 @@ import clsx from 'clsx';
 
 import { VoteCardVariant } from '../VoteCard';
 
-import classes from './VoteProgressBar.module.css';
-
 const VoteProgressBar: React.FC<{
   variant: VoteCardVariant;
   percentage: number;
@@ -14,26 +12,26 @@ const VoteProgressBar: React.FC<{
   let wrapperClass;
   switch (variant) {
     case VoteCardVariant.FOR:
-      progressBarClass = classes.forProgressBar;
-      wrapperClass = classes.forWrapper;
+      progressBarClass = 'bg-[color:var(--brand-color-green)]';
+      wrapperClass = 'bg-[color:var(--brand-color-green-translucent)]';
       break;
     case VoteCardVariant.AGAINST:
-      progressBarClass = classes.againstProgressBar;
-      wrapperClass = classes.againstWrapper;
+      progressBarClass = 'bg-[color:var(--brand-color-red)]';
+      wrapperClass = 'bg-[color:var(--brand-color-red-translucent)]';
       break;
     default:
-      progressBarClass = classes.abstainProgressBar;
-      wrapperClass = classes.abstainWrapper;
+      progressBarClass = 'bg-[color:var(--brand-gray-light-text)]';
+      wrapperClass = 'bg-[color:var(--brand-gray-light-text-translucent)]';
       break;
   }
 
   return (
-    <div className={clsx(classes.wrapper, wrapperClass)}>
+    <div className={clsx('h-4 rounded-md', wrapperClass)}>
       <div
         style={{
           width: `${percentage}%`,
         }}
-        className={clsx(classes.progressBar, progressBarClass)}
+        className={clsx('h-full rounded-md', progressBarClass)}
       ></div>
     </div>
   );
