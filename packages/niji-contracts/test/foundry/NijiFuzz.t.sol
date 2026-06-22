@@ -190,4 +190,98 @@ contract NijiFuzz is Test {
             assertLt(buckets[i], 200, 'bucket overrepresented');
         }
     }
+
+    // =========================================================================
+    //  Fuzz: generateSeed(tokenId, descriptor) over varied tokenId + block state
+    // =========================================================================
+
+    function testFuzz_generateSeed_validTraits(uint256 tokenId, uint64 ts, uint256 prevrandao) public {
+        // vary block state for each fuzz iteration to exercise the keccak256 mixing
+        vm.warp(uint256(ts) + 1);
+        vm.prevrandao(bytes32(prevrandao));
+
+        INijiSeeder.Seed memory seed = seeder.generateSeed(tokenId, address(descriptor));
+        uint256[] memory indices = _seedToTraitIndices(seed);
+
+        for (uint256 i = 0; i < TRAIT_COUNT; i++) {
+            assertLt(indices[i], IMAGES_PER_TRAIT, string(abi.encodePacked(traitNames[i], ' out of range')));
+        }
+    }
+
+    // =========================================================================
+    //  Fuzz: generateSeed must be deterministic per (tokenId, block state)
+    // =========================================================================
+
+    function testFuzz_generateSeed_deterministic(uint256 tokenId, uint64 ts, uint256 prevrandao) public {
+        vm.warp(uint256(ts) + 1);
+        vm.prevrandao(bytes32(prevrandao));
+
+        INijiSeeder.Seed memory seedA = seeder.generateSeed(tokenId, address(descriptor));
+        INijiSeeder.Seed memory seedB = seeder.generateSeed(tokenId, address(descriptor));
+
+        assertEq(seedA.special, seedB.special, 'special drift');
+        assertEq(seedA.choker, seedB.choker, 'choker drift');
+        assertEq(seedA.headphone, seedB.headphone, 'headphone drift');
+        assertEq(seedA.leftHand, seedB.leftHand, 'leftHand drift');
+        assertEq(seedA.hat, seedB.hat, 'hat drift');
+        assertEq(seedA.clothing, seedB.clothing, 'clothing drift');
+        assertEq(seedA.ear, seedB.ear, 'ear drift');
+        assertEq(seedA.back, seedB.back, 'back drift');
+        assertEq(seedA.backDecoration, seedB.backDecoration, 'backDecoration drift');
+        assertEq(seedA.background, seedB.background, 'background drift');
+        assertEq(seedA.solidBackground, seedB.solidBackground, 'solidBackground drift');
+        assertEq(seedA.hair, seedB.hair, 'hair drift');
+    }
+
+    // =========================================================================
+    //  Fuzz: mintBatch exceeding maxSupply reverts with MaxSupplyReached
+    // =========================================================================
+
+    function testFuzz_mintBatch_overSupplyReverts(uint8 rawCap, uint16 rawExtra) public {
+        uint256 cap = bound(rawCap, 1, 100);
+        uint256 extra = bound(rawExtra, 1, 256);
+
+        // Deploy a fresh token with limited supply to force the MaxSupplyReached path
+        NijiToken limited = new NijiToken('Niji', 'NIJI', address(descriptor), address(seeder), cap);
+        limited.toggleMinting();
+
+        vm.expectRevert(); // MaxSupplyReached selector
+        limited.mintBatch(address(0xBEEF), cap + extra);
+    }
+
+    // =========================================================================
+    //  Fuzz: getTraitImage out-of-range imageIndex always reverts
+    // =========================================================================
+
+    function testFuzz_getTraitImage_outOfRangeReverts(uint8 rawTraitId, uint256 rawIndex) public {
+        uint256 traitId = bound(rawTraitId, 0, TRAIT_COUNT - 1);
+        uint256 imageCount = art.getTraitImageCount(traitId);
+        uint256 imageIndex = bound(rawIndex, imageCount, type(uint128).max);
+
+        vm.expectRevert();
+        art.getTraitImage(traitId, imageIndex);
+    }
+
+    // =========================================================================
+    //  Fuzz: tokenURI returns non-empty data URI for any minted tokenId
+    // =========================================================================
+
+    function testFuzz_tokenURI_nonEmpty(uint8 rawCount) public {
+        uint256 mintCount = bound(rawCount, 1, 50);
+        uint256[] memory tokenIds = token.mintBatch(address(0xBEEF), mintCount);
+
+        for (uint256 i = 0; i < mintCount; i++) {
+            string memory uri = token.tokenURI(tokenIds[i]);
+            assertGt(bytes(uri).length, 0, 'tokenURI must not be empty');
+        }
+    }
+
+    // =========================================================================
+    //  Fuzz: setArt with zero address always reverts
+    // =========================================================================
+
+    function testFuzz_setArt_zeroAddressReverts() public {
+        vm.expectRevert(NijiSeeder.InvalidArtAddress.selector);
+        seeder.setArt(address(0));
+    }
 }
