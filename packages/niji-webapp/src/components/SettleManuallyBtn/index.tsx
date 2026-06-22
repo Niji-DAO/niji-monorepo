@@ -8,8 +8,6 @@ import dayjs from 'dayjs';
 import { CHAIN_ID } from '@/config';
 import { Auction } from '@/wrappers/nijiAuction';
 
-import classes from './SettleManuallyBtn.module.css';
-
 const SettleManuallyBtn: React.FC<{
   settleAuctionHandler: () => void;
   auction: Auction;
@@ -56,10 +54,10 @@ const SettleManuallyBtn: React.FC<{
   const mins = timerDuration.minutes();
 
   return (
-    <p className={classes.emergencySettleWrapper}>
+    <p className="max-[992px]:ml-2 max-[992px]:text-center max-[660px]:ml-0">
       <button
         onClick={settleAuctionHandler}
-        className={classes.emergencySettleButton}
+        className="m-0 inline cursor-pointer border-none bg-transparent p-0 underline disabled:cursor-default disabled:text-[#8c8d92] disabled:no-underline"
         disabled={!settleEnabled}
       >
         {settleEnabled ? (
