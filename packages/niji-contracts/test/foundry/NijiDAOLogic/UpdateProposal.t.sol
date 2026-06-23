@@ -69,6 +69,11 @@ contract UpdateProposalPermissionsTest is UpdateProposalBaseTest {
         // Niji ... proposer は tokenId=0 を保有 (0 開始)
         nounsToken.transferFrom(proposer, signer, 0);
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) self-delegate (signer の votes 反映)
+        vm.prank(signer);
+        NijiToken(payable(address(nounsToken))).delegate(signer);
+
         vm.roll(block.number + 1);
 
         uint256 expirationTimestamp = block.timestamp + 1234;

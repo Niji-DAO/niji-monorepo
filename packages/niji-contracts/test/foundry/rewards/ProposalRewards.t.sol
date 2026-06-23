@@ -405,6 +405,7 @@ contract ProposalRewardsTest is BaseProposalRewardsTest {
         settleAuction();
         votingClientIds = [0];
 
+        // Niji ... rewardPerVote actual 3.75e15 (founder distribution 廃止反映)
         vm.expectEmit();
         emit Rewards.ProposalRewardsUpdated(
             1,
@@ -413,7 +414,7 @@ contract ProposalRewardsTest is BaseProposalRewardsTest {
             lastAuctionId,
             15 ether,
             0.075 ether,
-            4166666666666666
+            3750000000000000
         );
         rewards.updateRewardsForProposalWritingAndVoting({
             lastProposalId: proposalId,
@@ -439,6 +440,7 @@ contract ProposalRewardsTest is BaseProposalRewardsTest {
         settleAuction();
         votingClientIds = [0];
 
+        // Niji ... rewardPerVote actual 3.75e15
         vm.expectEmit();
         emit Rewards.ProposalRewardsUpdated(
             1,
@@ -447,7 +449,7 @@ contract ProposalRewardsTest is BaseProposalRewardsTest {
             lastAuctionId,
             15 ether,
             0.075 ether,
-            4166666666666666
+            3750000000000000
         );
         rewards.updateRewardsForProposalWritingAndVoting({
             lastProposalId: proposalId,
