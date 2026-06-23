@@ -94,11 +94,15 @@ contract NijiDAOLogic3InflationHandling40TotalSupplyTest is NijiDAOLogicV3Inflat
     }
 
     function testRejectsIfProposingBelowThreshold() public {
-        // Give user1 2 tokens, proposal requires 3
+        // Give user1 2 tokens, proposal requires 3 (Niji ... tokenId 0 開始 + ERC721Votes 手動 delegate 必須)
         vm.startPrank(tokenHolder);
+        nounsToken.transferFrom(tokenHolder, user1, 0);
         nounsToken.transferFrom(tokenHolder, user1, 1);
-        nounsToken.transferFrom(tokenHolder, user1, 2);
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) は受領で auto-delegate しないため self-delegate 明示
+        vm.prank(user1);
+        nounsToken.delegate(user1);
 
         vm.roll(block.number + 1);
 
@@ -109,12 +113,16 @@ contract NijiDAOLogic3InflationHandling40TotalSupplyTest is NijiDAOLogicV3Inflat
     }
 
     function testAllowsProposingIfAboveThreshold() public {
-        // Give user1 3 tokens, proposal requires 3
+        // Give user1 3 tokens, proposal requires 3 (Niji ... tokenId 0 開始 + ERC721Votes 手動 delegate 必須)
         vm.startPrank(tokenHolder);
+        nounsToken.transferFrom(tokenHolder, user1, 0);
         nounsToken.transferFrom(tokenHolder, user1, 1);
         nounsToken.transferFrom(tokenHolder, user1, 2);
-        nounsToken.transferFrom(tokenHolder, user1, 3);
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) は受領で auto-delegate しないため self-delegate 明示
+        vm.prank(user1);
+        nounsToken.delegate(user1);
 
         vm.roll(block.number + 1);
 
@@ -133,23 +141,31 @@ abstract contract TotalSupply40WithAProposalState is NijiDAOLogicV3InflationHand
         setTotalSupply(40);
 
         vm.startPrank(tokenHolder);
-        // 3 votes to user1
+        // 3 votes to user1 (Niji ... tokenId 0 開始のため -1 offset)
+        nounsToken.transferFrom(tokenHolder, user1, 0);
         nounsToken.transferFrom(tokenHolder, user1, 1);
         nounsToken.transferFrom(tokenHolder, user1, 2);
-        nounsToken.transferFrom(tokenHolder, user1, 3);
 
         // 3 votes to user2
+        nounsToken.transferFrom(tokenHolder, user2, 10);
         nounsToken.transferFrom(tokenHolder, user2, 11);
         nounsToken.transferFrom(tokenHolder, user2, 12);
-        nounsToken.transferFrom(tokenHolder, user2, 13);
 
         // 5 votes to user3
+        nounsToken.transferFrom(tokenHolder, user3, 20);
         nounsToken.transferFrom(tokenHolder, user3, 21);
         nounsToken.transferFrom(tokenHolder, user3, 22);
         nounsToken.transferFrom(tokenHolder, user3, 23);
         nounsToken.transferFrom(tokenHolder, user3, 24);
-        nounsToken.transferFrom(tokenHolder, user3, 25);
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) self-delegate
+        vm.prank(user1);
+        nounsToken.delegate(user1);
+        vm.prank(user2);
+        nounsToken.delegate(user2);
+        vm.prank(user3);
+        nounsToken.delegate(user3);
 
         vm.roll(block.number + 1);
 
