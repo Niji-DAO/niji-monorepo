@@ -48,10 +48,13 @@ abstract contract BaseProposalRewardsTest is NijiDAOLogicBaseTest {
         // Niji 仕様で founder distribution は廃止、 該当 transferFrom は不要 (削除)。
 
         // ERC721Votes (OZ v5) self-delegate (bidder1 / bidder2 が token 受領済)
+        // Niji ... ERC721Votes は token 受領時 delegatee=address(0) で受け取り、 後から delegate で votes 移動。
+        // propose 時の getPriorVotes(at block-1) で 0 になるのを防ぐため delegate 後 mineBlocks(1) 必須。
         vm.prank(bidder1);
         NijiToken(payable(address(nounsToken))).delegate(bidder1);
         vm.prank(bidder2);
         NijiToken(payable(address(nounsToken))).delegate(bidder2);
+        mineBlocks(1);
 
         rewards = RewardsDeployer.deployRewards(dao, admin, minter, address(erc20Mock), address(0));
 
@@ -526,16 +529,16 @@ contract ProposalRewardsEligibilityTest is BaseProposalRewardsTest {
 
         lastNounId = settleAuction();
 
-        // verify assumptions
-        assertEq(nounsToken.totalSupply(), 12);
-        assertEq(nounsToken.getCurrentVotes(bidder1), 8);
+        // Niji ... Nounders auto-distribution 廃止のため totalSupply 12 → 11、 bidder1 votes 8 → 9 (snapshot timing で settleAuction 前)。
+        assertEq(nounsToken.totalSupply(), 11);
+        assertEq(nounsToken.getCurrentVotes(bidder1), 9);
 
         votingClientIds = [0];
     }
 
     function test_ineligibleIfBelowQuorum() public {
-        // set quorum to >= 75% so that quorum requires 9 votes
-        proposalParams.proposalEligibilityQuorumBps = 7500;
+        // Niji ... quorum を totalSupply (11) のほぼ全数に設定して proposal を ineligible に。
+        proposalParams.proposalEligibilityQuorumBps = 10000;
         vm.prank(address(dao.timelock()));
         rewards.setProposalRewardParams(proposalParams);
 
@@ -547,7 +550,8 @@ contract ProposalRewardsEligibilityTest is BaseProposalRewardsTest {
     }
 
     function test_eligibleIfAboveQuorum() public {
-        proposalParams.proposalEligibilityQuorumBps = 7000; // (12 * 7000 / 10000) = 8
+        // Niji ... 7000 BPS で (11 * 7000 / 10000) = 7 quorum、 bidder1 vote=9 で eligible。
+        proposalParams.proposalEligibilityQuorumBps = 7000;
         vm.prank(address(dao.timelock()));
         rewards.setProposalRewardParams(proposalParams);
 
@@ -558,7 +562,8 @@ contract ProposalRewardsEligibilityTest is BaseProposalRewardsTest {
     }
 
     function test_canceledProposalsAreIneligible() public {
-        proposalParams.proposalEligibilityQuorumBps = 7000; // (12 * 7000 / 10000) = 8
+        // Niji ... 7000 BPS で eligible だが cancel で ineligible に降格する流れを確認。
+        proposalParams.proposalEligibilityQuorumBps = 7000;
         vm.prank(address(dao.timelock()));
         rewards.setProposalRewardParams(proposalParams);
 
@@ -783,14 +788,14 @@ contract VotesRewardsTest is BaseProposalRewardsTest {
     }
 
     function test_revertsIfNotAllVotesAreAccounted() public {
-        vote(bidder1, proposalId, 1, 'i support', clientId1);
+        // Niji ... noundersDAO 廃止のため、 旧 Nouns で noundersDAO が clientId=0 で vote していた経路を
+        // bidder1 が vote without clientId (clientId=0) で代替する。
+        vote(bidder1, proposalId, 1, 'i support'); // clientId=0
         vote(bidder2, proposalId, 1, 'i support', clientId2);
-        // vote with no clientId means clientId == 0
-        vote(makeAddr('noundersDAO'), proposalId, 0, 'against');
 
         mineBlocks(VOTING_PERIOD);
 
-        votingClientIds = [clientId1, clientId2];
+        votingClientIds = [clientId2];
         vm.expectRevert('not all votes accounted');
         rewards.updateRewardsForProposalWritingAndVoting({
             lastProposalId: proposalId,
@@ -798,13 +803,6 @@ contract VotesRewardsTest is BaseProposalRewardsTest {
         });
 
         votingClientIds = [0, clientId2];
-        vm.expectRevert('not all votes accounted');
-        rewards.updateRewardsForProposalWritingAndVoting({
-            lastProposalId: proposalId,
-            votingClientIds: votingClientIds
-        });
-
-        votingClientIds = [0, clientId1, clientId2];
         rewards.updateRewardsForProposalWritingAndVoting({
             lastProposalId: proposalId,
             votingClientIds: votingClientIds
@@ -827,11 +825,12 @@ contract VotesRewardsTest is BaseProposalRewardsTest {
     }
 
     function test_getVotingClientIds3() public {
+        // Niji ... noundersDAO 廃止のため、 旧 Nouns で noundersDAO が clientId=0 で vote していた経路を
+        // bidder2 vote without clientId (clientId=0) で代替し、 clientId 集合 [0, 1] を期待。
         vote(bidder1, proposalId, 1, 'i support', clientId1);
-        vote(bidder2, proposalId, 1, 'i support', clientId2);
-        vote(makeAddr('noundersDAO'), proposalId, 0, 'against');
+        vote(bidder2, proposalId, 1, 'i support'); // clientId=0
         mineBlocks(VOTING_PERIOD);
-        expectedClientIds = [0, 1, 2];
+        expectedClientIds = [0, 1];
         assertEq(rewards.getVotingClientIds(proposalId), expectedClientIds);
     }
 

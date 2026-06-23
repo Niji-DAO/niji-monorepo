@@ -888,9 +888,10 @@ contract NijiDAOData_CreateCandidateToUpdateProposalTest is NijiDAODataBaseTest 
         (signer, signerPK) = makeAddrAndKey('signerWithVote1');
         bidAndSettleAuction(auction, signer);
 
-        // ERC721Votes (OZ v5) self-delegate
+        // Niji ... ERC721Votes (OZ v5) self-delegate、 priorVotes snapshot のため delegate 後 +1 block。
         vm.prank(signer);
         NijiToken(payable(address(nounsDao.nouns()))).delegate(signer);
+        vm.roll(block.number + 1);
 
         proposalId = proposeBySigs(
             notNouner,
@@ -970,6 +971,12 @@ contract NijiDAOData_CreateCandidateToUpdateProposalTest is NijiDAODataBaseTest 
     function test_givenProposalNotBySigs_reverts() public {
         address nouner = makeAddr('nouner');
         bidAndSettleAuction(auction, nouner);
+
+        // Niji ... ERC721Votes (OZ v5) は token 受領後 self-delegate しないと votes が active にならない。
+        vm.prank(nouner);
+        NijiToken(payable(address(nounsDao.nouns()))).delegate(nouner);
+        vm.roll(block.number + 1);
+
         proposalId = propose(nouner, makeAddr('target'), 0.142 ether, '', '', 'description');
 
         vm.expectRevert(NijiDAOData.UpdateProposalCandidatesOnlyWorkWithProposalsBySigs.selector);
