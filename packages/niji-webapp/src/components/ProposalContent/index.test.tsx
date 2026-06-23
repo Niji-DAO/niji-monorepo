@@ -1,0 +1,117 @@
+import React from 'react';
+
+import { render } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@lingui/react/macro', () => ({
+  Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('react-markdown', () => ({
+  default: ({ children }: { children: string }) => <div data-testid="markdown">{children}</div>,
+}));
+
+vi.mock('remark-breaks', () => ({ default: () => null }));
+
+vi.mock('./ProposalTransactions', () => ({
+  default: ({ details }: { details: unknown[] }) => (
+    <ol data-testid="proposal-tx">tx-count-{details.length}</ol>
+  ),
+}));
+
+vi.mock('@/components/EnsOrLongAddress', () => ({
+  default: ({ address }: { address: string }) => <span>{address}</span>,
+}));
+
+vi.mock('@/utils/processProposalDescriptionText', () => ({
+  processProposalDescriptionText: (d: string, t: string) => `[${t}]${d}`,
+}));
+
+vi.mock('@/utils/etherscan', () => ({
+  buildEtherscanAddressLink: (a: string) => `https://etherscan.io/address/${a}`,
+  buildEtherscanHoldingsLink: (a: string) => `https://etherscan.io/tokenholdings?a=${a}`,
+  buildEtherscanTxLink: (h: string) => `https://etherscan.io/tx/${h}`,
+}));
+
+vi.mock('@niji/sdk/react', () => ({
+  nijiTokenAddress: { 1: '0xTOKEN' },
+}));
+
+vi.mock('@/wagmi', () => ({
+  defaultChain: { id: 1 },
+}));
+
+import ProposalContent, { linkIfAddress, transactionLink, transactionIconLink } from './index';
+
+const details = [{ target: '0xA' }, { target: '0xB' }] as never;
+
+describe('ProposalContent', () => {
+  it('renders Description heading + markdown when description provided', () => {
+    const { container } = render(
+      <ProposalContent description="# body" title="T1" details={details} />,
+    );
+    expect(container.textContent).toContain('Description');
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe('[T1]# body');
+  });
+
+  it('does NOT render markdown when description is empty', () => {
+    const { container } = render(<ProposalContent description="" title="T" details={details} />);
+    expect(container.querySelector('[data-testid="markdown"]')).toBeNull();
+  });
+
+  it('renders ProposalTransactions when details present', () => {
+    const { container } = render(<ProposalContent description="d" title="t" details={details} />);
+    expect(container.querySelector('[data-testid="proposal-tx"]')?.textContent).toBe('tx-count-2');
+  });
+
+  it('does NOT render Proposed Transactions when details is undefined', () => {
+    const { container } = render(
+      <ProposalContent description="d" title="t" details={undefined as never} />,
+    );
+    expect(container.textContent).not.toContain('Proposed Transactions');
+  });
+
+  it('shows original treasury banner when proposeOnV1=true', () => {
+    const { container } = render(
+      <ProposalContent description="d" title="t" details={details} proposeOnV1={true} />,
+    );
+    expect(container.textContent).toContain('original treasury');
+  });
+
+  it('does NOT show banner when proposeOnV1=false', () => {
+    const { container } = render(<ProposalContent description="d" title="t" details={details} />);
+    expect(container.textContent).not.toContain('original treasury');
+  });
+});
+
+describe('linkIfAddress helper', () => {
+  it('returns <a> when content is a valid address', () => {
+    const result = linkIfAddress('0x5FbDB2315678afecb367f032d93F642f64180aa3');
+    const { container } = render(<>{result}</>);
+    expect(container.querySelector('a')?.getAttribute('href')).toContain('etherscan.io/address');
+  });
+
+  it('returns <span> when content is not an address', () => {
+    const result = linkIfAddress('hello');
+    const { container } = render(<>{result}</>);
+    expect(container.querySelector('a')).toBeNull();
+    expect(container.querySelector('span')?.textContent).toBe('hello');
+  });
+});
+
+describe('transactionLink helper', () => {
+  it('returns <a> with 7-char prefix text', () => {
+    const result = transactionLink('0xdeadbeef1234');
+    const { container } = render(<>{result}</>);
+    expect(container.querySelector('a')?.textContent).toBe('0xdeadb');
+    expect(container.querySelector('a')?.getAttribute('href')).toContain('etherscan.io/tx');
+  });
+});
+
+describe('transactionIconLink helper', () => {
+  it('returns <a> with link img', () => {
+    const result = transactionIconLink('0xhash');
+    const { container } = render(<>{result}</>);
+    expect(container.querySelector('a img')).not.toBeNull();
+  });
+});
