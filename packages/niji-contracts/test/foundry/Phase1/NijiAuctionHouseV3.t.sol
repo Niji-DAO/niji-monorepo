@@ -106,9 +106,9 @@ contract NijiAuctionHouseV3Phase1Test is DeployUtils {
         assertEq(settlements.length, 0);
     }
 
-    /// TC-010: getPrices (history 空、 'Not enough history' revert)
+    /// TC-010: getPrices (history 空、 production code fix #322 で loop が id=0 含むため Missing data revert に変化)
     function test_TC010_getPrices_RevertsWhenHistoryEmpty() public {
-        vm.expectRevert(bytes('Not enough history'));
+        vm.expectRevert(bytes('Missing data'));
         auction.getPrices(10);
     }
 
