@@ -1,0 +1,92 @@
+import React from 'react';
+
+import { fireEvent, render } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@lingui/react/macro', () => ({
+  Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('react-markdown', () => ({
+  default: ({ children }: { children: string }) => <div data-testid="markdown">{children}</div>,
+}));
+
+vi.mock('remark-breaks', () => ({
+  default: () => null,
+}));
+
+import ProposalEditor from './index';
+
+const defaults = {
+  title: '',
+  body: '',
+  onTitleInput: () => {},
+  onBodyInput: () => {},
+};
+
+describe('ProposalEditor', () => {
+  it('renders "Proposal" header label by default', () => {
+    const { container } = render(<ProposalEditor {...defaults} />);
+    expect(container.textContent).toContain('Proposal');
+  });
+
+  it('renders "Candidate" label when isCandidate=true', () => {
+    const { container } = render(<ProposalEditor {...defaults} isCandidate={true} />);
+    expect(container.textContent).toContain('Candidate');
+  });
+
+  it('renders title input + body textarea', () => {
+    const { container } = render(<ProposalEditor {...defaults} />);
+    expect(container.querySelector('input')).not.toBeNull();
+    expect(container.querySelector('textarea')).not.toBeNull();
+  });
+
+  it('uses different placeholder when isCandidate=true', () => {
+    const { container } = render(<ProposalEditor {...defaults} isCandidate={true} />);
+    expect(container.querySelector('input')?.getAttribute('placeholder')).toBe(
+      'Proposal candidate title',
+    );
+  });
+
+  it('uses regular placeholder when isCandidate=false', () => {
+    const { container } = render(<ProposalEditor {...defaults} />);
+    expect(container.querySelector('input')?.getAttribute('placeholder')).toBe('Proposal title');
+  });
+
+  it('fires onTitleInput on title change', () => {
+    const onTitle = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onTitleInput={onTitle} />);
+    const input = container.querySelector('input');
+    if (input) fireEvent.change(input, { target: { value: 'New Title' } });
+    expect(onTitle).toHaveBeenCalledWith('New Title');
+  });
+
+  it('fires onBodyInput on body change', () => {
+    const onBody = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onBodyInput={onBody} />);
+    const ta = container.querySelector('textarea');
+    if (ta) fireEvent.change(ta, { target: { value: 'Body text' } });
+    expect(onBody).toHaveBeenCalledWith('Body text');
+  });
+
+  it('hides preview when body is empty', () => {
+    const { container } = render(<ProposalEditor {...defaults} />);
+    expect(container.querySelector('[data-testid="markdown"]')).toBeNull();
+  });
+
+  it('shows preview + markdown when body is non-empty', () => {
+    const { container } = render(<ProposalEditor {...defaults} body="# Hello" />);
+    expect(container.textContent).toContain('Preview');
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe('# Hello');
+  });
+
+  it('shows title preview h1 when both title + body present', () => {
+    const { container } = render(<ProposalEditor {...defaults} title="My Title" body="# Hello" />);
+    expect(container.querySelector('h1')?.textContent).toBe('My Title');
+  });
+
+  it('does NOT show title preview h1 when only body present', () => {
+    const { container } = render(<ProposalEditor {...defaults} title="" body="# Hello" />);
+    expect(container.querySelector('h1')).toBeNull();
+  });
+});
