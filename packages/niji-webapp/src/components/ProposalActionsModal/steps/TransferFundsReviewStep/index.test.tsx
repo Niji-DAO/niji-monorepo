@@ -114,9 +114,24 @@ describe('TransferFundsReviewStep', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
-  it.skip('Next button works for STETH currency (skip: BigInt JSON.stringify production bug)', () => {
-    // Niji ... handleActionAdd の STETH branch で `JSON.stringify(args)` が args 内 BigInt を直列化できず throw。
-    // production の既知 bug、 本 PR scope 外のため skip。 follow-up Issue で対応。
+  it('Next button works for STETH currency (BigInt JSON.stringify replacer 経路)', () => {
+    const onNext = vi.fn();
+    const onDismiss = vi.fn();
+    const state = { ...baseState, TransferFundsCurrency: SupportedCurrency.STETH };
+    const { container } = render(
+      <TransferFundsReviewStep
+        {...defaults}
+        state={state}
+        onNextBtnClick={onNext}
+        onDismiss={onDismiss}
+      />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onNext).toHaveBeenCalledTimes(1);
+    // BigInt が "2500000000000000000" 等の文字列として直列化されているか
+    const callArg = (onNext as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(callArg.decodedCalldata).toContain('2500000000000000000');
+    expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
   it('Next button works for USDC currency', () => {
