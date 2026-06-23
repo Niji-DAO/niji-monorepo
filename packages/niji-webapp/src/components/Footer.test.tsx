@@ -1,0 +1,90 @@
+import React from 'react';
+
+import { render } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@lingui/react/macro', () => ({
+  Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useLingui: () => ({ t: (s: TemplateStringsArray) => s[0] }),
+}));
+
+vi.mock('@niji/sdk/react', () => ({
+  nijiAuctionHouseAddress: { 1: '0xAH' },
+  nijiDescriptorAddress: { 1: '0xDESC' },
+  nijiGovernorAddress: { 1: '0xGOV' },
+  nijiTokenAddress: { 1: '0xTOKEN' },
+  nijiTreasuryAddress: { 1: '0xTREASURY' },
+}));
+
+vi.mock('@/wagmi', () => ({
+  defaultChain: { id: 1 },
+}));
+
+vi.mock('@/utils/etherscan', () => ({
+  buildEtherscanAddressLink: (addr: string) => `https://etherscan.io/address/${addr}`,
+}));
+
+vi.mock('@/assets/icons/socials/discord.svg?react', () => ({
+  default: () => <span data-testid="discord-icon" />,
+}));
+vi.mock('@/assets/icons/socials/farcaster.svg?react', () => ({
+  default: () => <span data-testid="farcaster-icon" />,
+}));
+vi.mock('@/assets/icons/socials/github.svg?react', () => ({
+  default: () => <span data-testid="github-icon" />,
+}));
+vi.mock('@/assets/icons/socials/x.svg?react', () => ({
+  default: () => <span data-testid="x-icon" />,
+}));
+vi.mock('@/assets/noggles.svg?react', () => ({
+  default: ({ className }: { className?: string }) => (
+    <span className={className} data-testid="noggles-icon" />
+  ),
+}));
+
+import { Footer } from './Footer';
+
+const wrap = (ui: React.ReactElement) => render(<MemoryRouter>{ui}</MemoryRouter>);
+
+describe('Footer', () => {
+  it('renders 3 main categories (Niji DAO / Contracts / 他)', () => {
+    const { container } = wrap(<Footer />);
+    expect(container.querySelectorAll('h3').length).toBeGreaterThanOrEqual(2);
+    expect(container.textContent).toContain('Niji DAO');
+    expect(container.textContent).toContain('Contracts');
+  });
+
+  it('renders 4 social icons', () => {
+    const { container } = wrap(<Footer />);
+    expect(container.querySelector('[data-testid="discord-icon"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="farcaster-icon"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="github-icon"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="x-icon"]')).not.toBeNull();
+  });
+
+  it('renders noggles icon in copyright', () => {
+    const { container } = wrap(<Footer />);
+    expect(container.querySelector('[data-testid="noggles-icon"]')).not.toBeNull();
+  });
+
+  it('shows current year + Niji DAO copyright', () => {
+    const { container } = wrap(<Footer />);
+    const year = new Date().getFullYear();
+    expect(container.textContent).toContain(`${year} Niji DAO`);
+  });
+
+  it('uses etherscan links for contract entries', () => {
+    const { container } = wrap(<Footer />);
+    const anchors = Array.from(container.querySelectorAll('a'));
+    const etherscanLinks = anchors.filter(a => a.getAttribute('href')?.includes('etherscan.io'));
+    expect(etherscanLinks.length).toBeGreaterThan(0);
+  });
+
+  it('internal route links use react-router Link (without target=_blank)', () => {
+    const { container } = wrap(<Footer />);
+    const anchors = Array.from(container.querySelectorAll('a'));
+    const internalLinks = anchors.filter(a => a.getAttribute('href')?.startsWith('/'));
+    expect(internalLinks.length).toBeGreaterThan(0);
+  });
+});
