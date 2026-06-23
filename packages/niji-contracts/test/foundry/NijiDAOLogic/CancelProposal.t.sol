@@ -44,10 +44,10 @@ abstract contract ProposalUpdatableState is ZeroState {
     function setUp() public virtual override {
         super.setUp();
 
-        // mint 1 noun to proposer
+        // mint 1 noun to proposer (Niji ... _currentTokenId 0 開始のため戻り値を受ける)
         vm.startPrank(minter);
-        nounsToken.mint();
-        nounsToken.transferFrom(minter, proposer, 1);
+        uint256 _tokenId = nounsToken.mint();
+        nounsToken.transferFrom(minter, proposer, _tokenId);
         vm.roll(block.number + 1);
         vm.stopPrank();
 
