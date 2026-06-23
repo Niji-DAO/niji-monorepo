@@ -131,6 +131,7 @@ abstract contract DeployUtils is Test {
         NijiSeeder seeder = new NijiSeeder(address(art));
         token = new NijiToken('Niji', 'NIJI', address(descriptor), address(seeder), 0);
         token.setMintingActive(true);
+        token.setPlaceholderURI('ipfs://placeholder');
         if (minter != address(0)) {
             token.setMinter(minter);
         }
