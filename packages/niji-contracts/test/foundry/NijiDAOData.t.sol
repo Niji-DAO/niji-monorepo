@@ -12,6 +12,7 @@ import { NijiDAODataEvents } from '../../contracts/governance/data/NijiDAODataEv
 import { NijiDAODataProxy } from '../../contracts/governance/data/NijiDAODataProxy.sol';
 import { NijiDAOProposals } from '../../contracts/governance/NijiDAOProposals.sol';
 import { SigUtils } from './helpers/SigUtils.sol';
+import { NijiToken } from '../../contracts/NijiToken.sol';
 
 abstract contract NijiDAODataBaseTest is DeployUtilsV3, SigUtils, NijiDAODataEvents, AuctionHelpers {
     NijiDAODataProxy proxy;
@@ -44,6 +45,13 @@ abstract contract NijiDAODataBaseTest is DeployUtilsV3, SigUtils, NijiDAODataEve
 
         bidAndSettleAuction(auction, address(this));
         bidAndSettleAuction(auction, otherProposer);
+
+        // ERC721Votes (OZ v5) は受領で auto-delegate しないため self-delegate 明示
+        // (Niji 仕様 ... candidate test の MustBeNounerOrPaySufficientFee 防御)
+        NijiToken nijiToken = NijiToken(payable(address(nounsDao.nouns())));
+        nijiToken.delegate(address(this));
+        vm.prank(otherProposer);
+        nijiToken.delegate(otherProposer);
 
         vm.roll(block.number + 1);
     }
