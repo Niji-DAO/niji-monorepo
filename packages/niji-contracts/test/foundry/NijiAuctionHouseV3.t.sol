@@ -421,23 +421,22 @@ contract NoracleTestManyAuctionsSettledStateTest is NoracleBaseTest {
     }
 
     function test_getSettlements_skipsNounderNiji() public {
+        // Niji ... NounderNiji 廃止 + nounId=0 開始のため、 20 回 settle で nounId=0〜19 が全て通常 auction。
+        // skipFalse でも全 20 件 reverse 順で返る (上は最新)。
         IAH.Settlement[] memory settlements = auction.getSettlements(20, true);
-        assertEq(settlements[0].nounId, 22);
-        assertEq(settlements[1].nounId, 21);
-        assertEq(settlements[2].nounId, 19);
-        assertEq(settlements[10].nounId, 11);
-        assertEq(settlements[11].nounId, 9);
-        assertEq(settlements[19].nounId, 1);
+        assertEq(settlements[0].nounId, 19);
+        assertEq(settlements[1].nounId, 18);
+        assertEq(settlements[10].nounId, 9);
+        assertEq(settlements[19].nounId, 0);
 
         assertEq(settlements[0].amount, 20 ether);
         assertEq(settlements[1].amount, 19 ether);
-        assertEq(settlements[2].amount, 18 ether);
         assertEq(settlements[10].amount, 10 ether);
-        assertEq(settlements[11].amount, 9 ether);
         assertEq(settlements[19].amount, 1 ether);
     }
 
     function test_getPrices_skipsNounderNiji() public {
+        // Niji ... NounderNiji 廃止のため 20 回 settle で 20 件全て価格取得。
         uint256[] memory prices = auction.getPrices(20);
         // prettier-ignore
         expectedPrices = [20e18, 19e18, 18e18, 17e18, 16e18, 15e18, 14e18, 13e18, 12e18, 11e18,
@@ -473,16 +472,18 @@ contract NoracleTest_GapInHistoricPricesTest is NoracleBaseTest {
     function setUp() public override {
         super.setUp();
 
-        bidAndWinCurrentAuction(bidder, 1 ether); // settle noun 1
+        // Niji ... auction は nounId=0 から開始 (旧 Nouns 1 開始から差替済)。
+        // settle nounId=0 → token mint で gap (2,3,4) 作成 → settle nounId=1 → settle nounId=5。
+        bidAndWinCurrentAuction(bidder, 1 ether); // settle nounId=0
 
         vm.startPrank(address(auction));
         for (uint256 i = 0; i < 3; ++i) {
-            auction.nouns().mint(); // mint nouns 3,4,5
+            auction.nouns().mint(); // mint nouns 2,3,4
         }
         vm.stopPrank();
 
-        bidAndWinCurrentAuction(bidder, 2 ether); // settle noun 2
-        bidAndWinCurrentAuction(bidder, 6 ether); // settle noun 6
+        bidAndWinCurrentAuction(bidder, 2 ether); // settle nounId=1
+        bidAndWinCurrentAuction(bidder, 6 ether); // settle nounId=5
     }
 
     function test_prices_revertsIfEmptyAuctionData() public {
@@ -499,14 +500,14 @@ contract NoracleTest_GapInHistoricPricesTest is NoracleBaseTest {
 
         uint256 ts = block.timestamp;
         expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: uint32(ts), amount: 6 ether, winner: bidder, nounId: 6, clientId: 0 })
+            IAH.Settlement({ blockTimestamp: uint32(ts), amount: 6 ether, winner: bidder, nounId: 5, clientId: 0 })
         );
         expectedSettlements.push(
             IAH.Settlement({
                 blockTimestamp: uint32(ts - 24 hours),
                 amount: 2 ether,
                 winner: bidder,
-                nounId: 2,
+                nounId: 1,
                 clientId: 0
             })
         );
@@ -515,7 +516,7 @@ contract NoracleTest_GapInHistoricPricesTest is NoracleBaseTest {
                 blockTimestamp: uint32(ts - 48 hours),
                 amount: 1 ether,
                 winner: bidder,
-                nounId: 1,
+                nounId: 0,
                 clientId: 0
             })
         );
@@ -533,10 +534,7 @@ contract NoracleTest_GapInHistoricPricesTest is NoracleBaseTest {
 
         uint256 ts = block.timestamp;
         expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: uint32(ts), amount: 6 ether, winner: bidder, nounId: 6, clientId: 0 })
-        );
-        expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 5, clientId: 0 })
+            IAH.Settlement({ blockTimestamp: uint32(ts), amount: 6 ether, winner: bidder, nounId: 5, clientId: 0 })
         );
         expectedSettlements.push(
             IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 4, clientId: 0 })
@@ -545,11 +543,14 @@ contract NoracleTest_GapInHistoricPricesTest is NoracleBaseTest {
             IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 3, clientId: 0 })
         );
         expectedSettlements.push(
+            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 2, clientId: 0 })
+        );
+        expectedSettlements.push(
             IAH.Settlement({
                 blockTimestamp: uint32(ts - 24 hours),
                 amount: 2 ether,
                 winner: bidder,
-                nounId: 2,
+                nounId: 1,
                 clientId: 0
             })
         );
@@ -558,16 +559,13 @@ contract NoracleTest_GapInHistoricPricesTest is NoracleBaseTest {
                 blockTimestamp: uint32(ts - 48 hours),
                 amount: 1 ether,
                 winner: bidder,
-                nounId: 1,
+                nounId: 0,
                 clientId: 0
             })
         );
-        expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 0, clientId: 0 })
-        );
         assertEq(settlements, expectedSettlements);
 
-        IAH.Settlement[] memory settlements2 = auction.getSettlements(0, 7, false);
+        IAH.Settlement[] memory settlements2 = auction.getSettlements(0, 6, false);
         assertEq(settlements2, reverse(expectedSettlements));
 
         IAH.Settlement[] memory settlements3 = auction.getSettlementsFromIdtoTimestamp(0, block.timestamp, false);
@@ -579,18 +577,19 @@ contract NoracleTest_GapInHistoricPrices_AfterWarmUp_Test is NoracleBaseTest {
     function setUp() public override {
         super.setUp();
 
-        auction.warmUpSettlementState(0, 7);
+        auction.warmUpSettlementState(0, 6);
 
-        bidAndWinCurrentAuction(bidder, 1 ether); // settle noun 1
+        // Niji ... auction は nounId=0 から開始 (旧 Nouns 1 開始から差替済)。
+        bidAndWinCurrentAuction(bidder, 1 ether); // settle nounId=0
 
         vm.startPrank(address(auction));
         for (uint256 i = 0; i < 3; ++i) {
-            auction.nouns().mint(); // mint nouns 3,4,5
+            auction.nouns().mint(); // mint nouns 2,3,4
         }
         vm.stopPrank();
 
-        bidAndWinCurrentAuction(bidder, 2 ether); // settle noun 2
-        bidAndWinCurrentAuction(bidder, 6 ether); // settle noun 6
+        bidAndWinCurrentAuction(bidder, 2 ether); // settle nounId=1
+        bidAndWinCurrentAuction(bidder, 6 ether); // settle nounId=5
     }
 
     function test_prices_revertsIfEmptyAuctionData() public {
@@ -607,14 +606,14 @@ contract NoracleTest_GapInHistoricPrices_AfterWarmUp_Test is NoracleBaseTest {
 
         uint256 ts = block.timestamp;
         expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: uint32(ts), amount: 6 ether, winner: bidder, nounId: 6, clientId: 0 })
+            IAH.Settlement({ blockTimestamp: uint32(ts), amount: 6 ether, winner: bidder, nounId: 5, clientId: 0 })
         );
         expectedSettlements.push(
             IAH.Settlement({
                 blockTimestamp: uint32(ts - 24 hours),
                 amount: 2 ether,
                 winner: bidder,
-                nounId: 2,
+                nounId: 1,
                 clientId: 0
             })
         );
@@ -623,7 +622,7 @@ contract NoracleTest_GapInHistoricPrices_AfterWarmUp_Test is NoracleBaseTest {
                 blockTimestamp: uint32(ts - 48 hours),
                 amount: 1 ether,
                 winner: bidder,
-                nounId: 1,
+                nounId: 0,
                 clientId: 0
             })
         );
@@ -641,10 +640,7 @@ contract NoracleTest_GapInHistoricPrices_AfterWarmUp_Test is NoracleBaseTest {
 
         uint256 ts = block.timestamp;
         expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: uint32(ts), amount: 6 ether, winner: bidder, nounId: 6, clientId: 0 })
-        );
-        expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: 1, amount: 0, winner: address(0), nounId: 5, clientId: 0 })
+            IAH.Settlement({ blockTimestamp: uint32(ts), amount: 6 ether, winner: bidder, nounId: 5, clientId: 0 })
         );
         expectedSettlements.push(
             IAH.Settlement({ blockTimestamp: 1, amount: 0, winner: address(0), nounId: 4, clientId: 0 })
@@ -653,11 +649,14 @@ contract NoracleTest_GapInHistoricPrices_AfterWarmUp_Test is NoracleBaseTest {
             IAH.Settlement({ blockTimestamp: 1, amount: 0, winner: address(0), nounId: 3, clientId: 0 })
         );
         expectedSettlements.push(
+            IAH.Settlement({ blockTimestamp: 1, amount: 0, winner: address(0), nounId: 2, clientId: 0 })
+        );
+        expectedSettlements.push(
             IAH.Settlement({
                 blockTimestamp: uint32(ts - 24 hours),
                 amount: 2 ether,
                 winner: bidder,
-                nounId: 2,
+                nounId: 1,
                 clientId: 0
             })
         );
@@ -666,18 +665,13 @@ contract NoracleTest_GapInHistoricPrices_AfterWarmUp_Test is NoracleBaseTest {
                 blockTimestamp: uint32(ts - 48 hours),
                 amount: 1 ether,
                 winner: bidder,
-                nounId: 1,
+                nounId: 0,
                 clientId: 0
             })
         );
-
-        // timestamp remains 0 here because it's a Nounder reward ID that does not get warmed up.
-        expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 0, clientId: 0 })
-        );
         assertEq(settlements, expectedSettlements);
 
-        IAH.Settlement[] memory settlements2 = auction.getSettlements(0, 7, false);
+        IAH.Settlement[] memory settlements2 = auction.getSettlements(0, 6, false);
         assertEq(settlements2, reverse(expectedSettlements));
 
         IAH.Settlement[] memory settlements3 = auction.getSettlementsFromIdtoTimestamp(0, block.timestamp, false);
@@ -689,9 +683,10 @@ contract NoracleTest_AuctionWithNoBids is NoracleBaseTest {
     function setUp() public override {
         super.setUp();
 
-        bidAndWinCurrentAuction(bidder, 1 ether); // settle noun 1
-        endAuctionAndSettle(); // no winner for noun 2
-        bidAndWinCurrentAuction(bidder, 3 ether); // settle noun 3
+        // Niji ... auction は nounId=0 から開始 (旧 Nouns 1 開始から差替済)。
+        bidAndWinCurrentAuction(bidder, 1 ether); // settle nounId=0
+        endAuctionAndSettle(); // no winner for nounId=1
+        bidAndWinCurrentAuction(bidder, 3 ether); // settle nounId=2
     }
 
     function test_getPrices_skipsAuctionsWithNotBids() public {
@@ -705,14 +700,14 @@ contract NoracleTest_AuctionWithNoBids is NoracleBaseTest {
 
         uint256 ts = block.timestamp;
         expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: uint32(ts), amount: 3 ether, winner: bidder, nounId: 3, clientId: 0 })
+            IAH.Settlement({ blockTimestamp: uint32(ts), amount: 3 ether, winner: bidder, nounId: 2, clientId: 0 })
         );
         expectedSettlements.push(
             IAH.Settlement({
                 blockTimestamp: uint32(ts - 24 hours),
                 amount: 0,
                 winner: address(0),
-                nounId: 2,
+                nounId: 1,
                 clientId: 0
             })
         );
@@ -721,16 +716,13 @@ contract NoracleTest_AuctionWithNoBids is NoracleBaseTest {
                 blockTimestamp: uint32(ts - 48 hours),
                 amount: 1 ether,
                 winner: bidder,
-                nounId: 1,
+                nounId: 0,
                 clientId: 0
             })
         );
-        expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 0, clientId: 0 })
-        );
         assertEq(settlements, expectedSettlements);
 
-        IAH.Settlement[] memory settlements2 = auction.getSettlements(0, 4, false);
+        IAH.Settlement[] memory settlements2 = auction.getSettlements(0, 3, false);
         assertEq(settlements2, reverse(expectedSettlements));
 
         IAH.Settlement[] memory settlements3 = auction.getSettlementsFromIdtoTimestamp(0, block.timestamp, false);
@@ -742,14 +734,14 @@ contract NoracleTest_AuctionWithNoBids is NoracleBaseTest {
 
         uint256 ts = block.timestamp;
         expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: uint32(ts), amount: 3 ether, winner: bidder, nounId: 3, clientId: 0 })
+            IAH.Settlement({ blockTimestamp: uint32(ts), amount: 3 ether, winner: bidder, nounId: 2, clientId: 0 })
         );
         expectedSettlements.push(
             IAH.Settlement({
                 blockTimestamp: uint32(ts - 24 hours),
                 amount: 0,
                 winner: address(0),
-                nounId: 2,
+                nounId: 1,
                 clientId: 0
             })
         );
@@ -758,7 +750,7 @@ contract NoracleTest_AuctionWithNoBids is NoracleBaseTest {
                 blockTimestamp: uint32(ts - 48 hours),
                 amount: 1 ether,
                 winner: bidder,
-                nounId: 1,
+                nounId: 0,
                 clientId: 0
             })
         );
@@ -793,13 +785,15 @@ contract NoracleTest_NoActiveAuction is NoracleBaseTest {
     function test_getSettlements_includesLastNoun() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(20, true);
 
+        // Niji ... auction は nounId=0 から開始 (旧 Nouns 1 開始から差替済)。
+        // setUp で 2 回 settle: bidder=1 ether@nounId=0 → bidder 2=2 ether@nounId=1。
         uint256 ts = block.timestamp;
         expectedSettlements.push(
             IAH.Settlement({
                 blockTimestamp: uint32(ts),
                 amount: 2 ether,
                 winner: makeAddr('bidder 2'),
-                nounId: 2,
+                nounId: 1,
                 clientId: 0
             })
         );
@@ -808,7 +802,7 @@ contract NoracleTest_NoActiveAuction is NoracleBaseTest {
                 blockTimestamp: uint32(ts - 24 hours),
                 amount: 1 ether,
                 winner: makeAddr('bidder'),
-                nounId: 1,
+                nounId: 0,
                 clientId: 0
             })
         );
