@@ -456,15 +456,25 @@ contract NijiAuctionHouseV3 is
         uint256 actualCount = 0;
 
         SettlementState memory settlementState;
-        for (uint256 id = latestNounId; id > 0 && actualCount < auctionCount; --id) {
-            if (id <= 1820 && id % 10 == 0) continue; // Skip Nounder reward nouns
+        // Niji ... nounId=0 開始のため id=0 を loop に含める (旧 Nouns nounId=1 開始想定の `id > 0` を修正)
+        // Nounder skip 条件は Niji で founder distribution 廃止のため id != 0 ガードを追加 (id=0 は通常 auction)
+        for (uint256 id = latestNounId; actualCount < auctionCount; --id) {
+            if (id != 0 && id <= 1820 && id % 10 == 0) {
+                if (id == 0) break;
+                continue; // Skip Nounder reward nouns (Niji ... id=0 は対象外)
+            }
 
             settlementState = settlementHistory[id];
             require(settlementState.blockTimestamp > 1, 'Missing data');
-            if (settlementState.winner == address(0)) continue; // Skip auctions with no bids
+            if (settlementState.winner == address(0)) {
+                if (id == 0) break;
+                continue; // Skip auctions with no bids
+            }
 
             prices[actualCount] = uint64PriceToUint256(settlementState.amount);
             ++actualCount;
+
+            if (id == 0) break;
         }
 
         require(auctionCount == actualCount, 'Not enough history');
