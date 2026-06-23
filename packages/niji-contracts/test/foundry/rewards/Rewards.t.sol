@@ -177,8 +177,9 @@ contract AuctionRewards is RewardsBaseTest {
     }
 
     function test_emitsAuctionRewardsUpdatedEvent() public {
+        // Niji ... mint 連番 0 開始のため最初の auction reward 更新 firstNounId は 0
         vm.expectEmit();
-        emit Rewards.AuctionRewardsUpdated(1, nounId);
+        emit Rewards.AuctionRewardsUpdated(0, nounId);
         rewards.updateRewardsForAuctions(nounId);
     }
 
