@@ -1,0 +1,212 @@
+import React from 'react';
+
+import { fireEvent, render } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@lingui/react/macro', () => ({
+  Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('./Signature', () => ({
+  default: ({ signer }: { signer: string }) => <li data-testid="signature">{signer}</li>,
+}));
+
+vi.mock('./OriginalSignature', () => ({
+  default: ({ signer }: { signer: string }) => <li data-testid="original-signature">{signer}</li>,
+}));
+
+import { SponsorsList } from './SponsorsList';
+
+const makeSignature = (
+  overrides: Partial<{
+    signerId: string;
+    voteCount: number;
+    canceled: boolean;
+  }> = {},
+) => ({
+  signer: {
+    id: overrides.signerId ?? '0xSIGNER1',
+    voteCount: overrides.voteCount ?? 5,
+    activeOrPendingProposal: false,
+  },
+  reason: '',
+  expirationTimestamp: '1700000000',
+  sig: '0xSIG',
+  canceled: overrides.canceled ?? false,
+});
+
+const makeCandidate = (
+  overrides: Partial<{
+    contentSignatures: ReturnType<typeof makeSignature>[];
+    requiredVotes: number;
+    voteCount: number;
+    isProposal: boolean;
+  }> = {},
+) =>
+  ({
+    version: {
+      content: {
+        contentSignatures: overrides.contentSignatures ?? [makeSignature()],
+      },
+    },
+    requiredVotes: overrides.requiredVotes ?? 3,
+    voteCount: overrides.voteCount ?? 1,
+    isProposal: overrides.isProposal ?? false,
+  }) as never;
+
+const baseProps = {
+  candidate: makeCandidate(),
+  isParentProposalUpdatable: true,
+  isProposer: false,
+  isAccountSigner: false,
+  isOriginalSigner: false,
+  isThresholdMet: false,
+  account: '0xACCT',
+  activePendingProposers: {} as unknown,
+  connectedAccountNounVotes: 5,
+  setIsAccountSigner: vi.fn(),
+  setDataFetchPollInterval: vi.fn(),
+  handleRefetchCandidateData: vi.fn(),
+  onOpenSubmitModal: vi.fn(),
+  onOpenUpdateModal: vi.fn(),
+  onOpenForm: vi.fn(),
+};
+
+const wrap = (ui: React.ReactElement) => render(<MemoryRouter>{ui}</MemoryRouter>);
+
+beforeEach(() => {
+  Object.assign(baseProps, {
+    setIsAccountSigner: vi.fn(),
+    setDataFetchPollInterval: vi.fn(),
+    handleRefetchCandidateData: vi.fn(),
+    onOpenSubmitModal: vi.fn(),
+    onOpenUpdateModal: vi.fn(),
+    onOpenForm: vi.fn(),
+  });
+});
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+describe('SponsorsList', () => {
+  it('renders Signature for each valid contentSignature', () => {
+    const candidate = makeCandidate({
+      contentSignatures: [makeSignature({ signerId: '0xS1' }), makeSignature({ signerId: '0xS2' })],
+    });
+    const { container } = wrap(<SponsorsList {...baseProps} candidate={candidate} />);
+    expect(container.querySelectorAll('[data-testid="signature"]')).toHaveLength(2);
+  });
+
+  it('skips canceled signatures', () => {
+    const candidate = makeCandidate({
+      contentSignatures: [
+        makeSignature({ signerId: '0xS1' }),
+        makeSignature({ signerId: '0xS2', canceled: true }),
+      ],
+    });
+    const { container } = wrap(<SponsorsList {...baseProps} candidate={candidate} />);
+    expect(container.querySelectorAll('[data-testid="signature"]')).toHaveLength(1);
+  });
+
+  it('skips signatures with voteCount=0', () => {
+    const candidate = makeCandidate({
+      contentSignatures: [
+        makeSignature({ signerId: '0xS1', voteCount: 0 }),
+        makeSignature({ signerId: '0xS2' }),
+      ],
+    });
+    const { container } = wrap(<SponsorsList {...baseProps} candidate={candidate} />);
+    expect(container.querySelectorAll('[data-testid="signature"]')).toHaveLength(1);
+  });
+
+  it('skips all signatures when activePendingProposers is null', () => {
+    const { container } = wrap(
+      <SponsorsList {...baseProps} activePendingProposers={null as unknown} />,
+    );
+    expect(container.querySelectorAll('[data-testid="signature"]')).toHaveLength(0);
+  });
+
+  it('renders placeholder li for required - voteCount slots', () => {
+    const candidate = makeCandidate({
+      contentSignatures: [],
+      requiredVotes: 3,
+      voteCount: 0,
+    });
+    const { container } = wrap(<SponsorsList {...baseProps} candidate={candidate} />);
+    const placeholders = Array.from(container.querySelectorAll('li')).filter(li =>
+      li.className.includes('placeholder'),
+    );
+    expect(placeholders).toHaveLength(3);
+  });
+
+  it('renders Submit onchain button when isProposer + isThresholdMet', () => {
+    const { container } = wrap(
+      <SponsorsList {...baseProps} isProposer={true} isThresholdMet={true} />,
+    );
+    expect(container.textContent).toContain('Submit onchain');
+  });
+
+  it('Submit onchain click invokes onOpenSubmitModal when non-update', () => {
+    const { container } = wrap(
+      <SponsorsList {...baseProps} isProposer={true} isThresholdMet={true} />,
+    );
+    const submitBtn = Array.from(container.querySelectorAll('button')).find(
+      b => b.textContent === 'Submit onchain',
+    );
+    fireEvent.click(submitBtn!);
+    expect(baseProps.onOpenSubmitModal).toHaveBeenCalled();
+  });
+
+  it('renders Sponsor button when canSignNewCandidate + votes > 0', () => {
+    const { container } = wrap(<SponsorsList {...baseProps} />);
+    expect(container.textContent).toContain('Sponsor');
+  });
+
+  it('Sponsor click invokes onOpenForm', () => {
+    const { container } = wrap(<SponsorsList {...baseProps} />);
+    const sponsorBtn = Array.from(container.querySelectorAll('button')).find(
+      b => b.textContent === 'Sponsor',
+    );
+    fireEvent.click(sponsorBtn!);
+    expect(baseProps.onOpenForm).toHaveBeenCalled();
+  });
+
+  it('renders "Sponsoring requires at least one Niji vote" when connectedAccountNounVotes=0', () => {
+    const { container } = wrap(<SponsorsList {...baseProps} connectedAccountNounVotes={0} />);
+    expect(container.textContent).toContain(
+      'Sponsoring a proposal requires at least one Niji vote',
+    );
+  });
+
+  it('renders "is no longer updatable" when isUpdateToProposal + !isParentProposalUpdatable', () => {
+    const { container } = wrap(
+      <SponsorsList
+        {...baseProps}
+        isUpdateToProposal={true}
+        isParentProposalUpdatable={false}
+        originalProposal={{ id: '42', signers: [] } as never}
+      />,
+    );
+    expect(container.textContent).toContain('is no longer updatable');
+  });
+
+  it('renders OriginalSignature for original proposal signers in update mode', () => {
+    const candidate = makeCandidate({
+      contentSignatures: [],
+      requiredVotes: 0,
+      voteCount: 0,
+    });
+    const { container } = wrap(
+      <SponsorsList
+        {...baseProps}
+        candidate={candidate}
+        isUpdateToProposal={true}
+        originalProposal={{ id: '42', signers: [{ id: '0xOG' }] } as never}
+        originalSignersDelegates={[{ id: '0xOG', nijiRepresented: [{}, {}] }]}
+      />,
+    );
+    expect(container.querySelectorAll('[data-testid="original-signature"]')).toHaveLength(1);
+  });
+});
