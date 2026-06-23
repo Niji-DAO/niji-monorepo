@@ -11,6 +11,7 @@ import { NijiDAOProxyV3 } from '../../../contracts/governance/NijiDAOProxyV3.sol
 import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
 import { NijiDAOExecutor } from '../../../contracts/governance/NijiDAOExecutor.sol';
+import { NijiToken } from '../../../contracts/NijiToken.sol';
 
 contract UpdateProposalBySigsTest is NijiDAOLogicBaseTest {
     address proposer = makeAddr('proposerWithVote');
@@ -30,12 +31,19 @@ contract UpdateProposalBySigsTest is NijiDAOLogicBaseTest {
             _signers.push(signer);
             _signerPKs.push(signerPK);
 
-            nounsToken.mint();
-            nounsToken.transferFrom(minter, signer, i + 1);
+            // Niji ... mint 戻り値経由 (旧 hard-code i+1 は 1 開始想定、 Niji は 0 開始)
+            uint256 _tokenId = nounsToken.mint();
+            nounsToken.transferFrom(minter, signer, _tokenId);
+        }
+        vm.stopPrank();
+
+        // ERC721Votes (OZ v5) self-delegate (8 signer)
+        for (uint256 i = 0; i < 8; ++i) {
+            vm.prank(_signers[i]);
+            NijiToken(payable(address(nounsToken))).delegate(_signers[i]);
         }
 
         vm.roll(block.number + 1);
-        vm.stopPrank();
 
         (
             address[] memory signers,
