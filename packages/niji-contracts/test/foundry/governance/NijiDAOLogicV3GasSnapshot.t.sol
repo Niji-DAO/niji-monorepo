@@ -18,8 +18,13 @@ abstract contract NijiDAOLogic_GasSnapshot_propose is NijiDAOLogicSharedBaseTest
         vm.startPrank(minter);
         uint256 _tokenId = nounsToken.mint();
         nounsToken.transferFrom(minter, proposer, _tokenId);
-        vm.roll(block.number + 1);
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) self-delegate
+        vm.prank(proposer);
+        nounsToken.delegate(proposer);
+
+        vm.roll(block.number + 1);
     }
 
     function test_propose_shortDescription() public {
@@ -65,8 +70,15 @@ abstract contract NijiDAOLogic_GasSnapshot_castVote is NijiDAOLogicSharedBaseTes
         nounsToken.transferFrom(minter, proposer, _tid1);
         uint256 _tid2 = nounsToken.mint();
         nounsToken.transferFrom(minter, nouner, _tid2);
-        vm.roll(block.number + 1);
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) self-delegate
+        vm.prank(proposer);
+        nounsToken.delegate(proposer);
+        vm.prank(nouner);
+        nounsToken.delegate(nouner);
+
+        vm.roll(block.number + 1);
 
         givenProposal();
         vm.roll(block.number + daoProxy.votingDelay() + 1);
@@ -114,8 +126,15 @@ abstract contract NijiDAOLogic_GasSnapshot_castVoteDuringObjectionPeriod is Niji
         nounsToken.transferFrom(minter, proposer, _tid1);
         uint256 _tid2 = nounsToken.mint();
         nounsToken.transferFrom(minter, nouner, _tid2);
-        vm.roll(block.number + 1);
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) self-delegate
+        vm.prank(proposer);
+        nounsToken.delegate(proposer);
+        vm.prank(nouner);
+        nounsToken.delegate(nouner);
+
+        vm.roll(block.number + 1);
 
         givenProposal();
         vm.roll(block.number + daoProxy.votingDelay() + 1);
