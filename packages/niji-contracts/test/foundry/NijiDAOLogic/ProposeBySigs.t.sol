@@ -34,12 +34,12 @@ contract ProposeBySigsTest is NijiDAOLogicBaseTest {
         dao._setProposalThresholdBPS(1_000);
 
         vm.startPrank(minter);
-        nounsToken.mint();
-        nounsToken.transferFrom(minter, proposerWithVote, 1);
-        nounsToken.mint();
-        nounsToken.transferFrom(minter, signerWithVote1, 2);
-        nounsToken.mint();
-        nounsToken.transferFrom(minter, signerWithVote2, 3);
+        uint256 _tid1 = nounsToken.mint();
+        nounsToken.transferFrom(minter, proposerWithVote, _tid1);
+        uint256 _tid2 = nounsToken.mint();
+        nounsToken.transferFrom(minter, signerWithVote1, _tid2);
+        uint256 _tid3 = nounsToken.mint();
+        nounsToken.transferFrom(minter, signerWithVote2, _tid3);
         vm.roll(block.number + 1);
         vm.stopPrank();
     }

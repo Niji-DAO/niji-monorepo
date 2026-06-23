@@ -25,8 +25,8 @@ abstract contract ProposalUpdatableState is ZeroState {
         (signerWithVote, signerWithVotePK) = makeAddrAndKey('signerWithVote');
 
         vm.startPrank(minter);
-        nounsToken.mint();
-        nounsToken.transferFrom(minter, signerWithVote, 1);
+        uint256 _tokenId = nounsToken.mint();
+        nounsToken.transferFrom(minter, signerWithVote, _tokenId);
         vm.roll(block.number + 1);
         vm.stopPrank();
 

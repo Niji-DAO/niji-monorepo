@@ -18,10 +18,10 @@ abstract contract UpdateProposalBaseTest is NijiDAOLogicBaseTest {
     function setUp() public override {
         super.setUp();
 
-        // mint 1 noun to proposer
+        // mint 1 noun to proposer (Niji ... tokenId は mint 戻り値経由、 0 開始)
         vm.startPrank(minter);
-        nounsToken.mint();
-        nounsToken.transferFrom(minter, proposer, 1);
+        uint256 _tokenId = nounsToken.mint();
+        nounsToken.transferFrom(minter, proposer, _tokenId);
         vm.roll(block.number + 1);
         vm.stopPrank();
 

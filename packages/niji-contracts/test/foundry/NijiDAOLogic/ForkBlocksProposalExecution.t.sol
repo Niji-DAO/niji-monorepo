@@ -13,8 +13,8 @@ abstract contract ExecutableProposalState is NijiDAOLogicBaseTest {
         super.setUp();
 
         vm.startPrank(minter);
-        nounsToken.mint();
-        nounsToken.transferFrom(minter, user, 1);
+        uint256 _tokenId = nounsToken.mint();
+        nounsToken.transferFrom(minter, user, _tokenId);
         vm.stopPrank();
         vm.roll(block.number + 1);
 

@@ -16,8 +16,8 @@ abstract contract NijiDAOLogic_GasSnapshot_propose is NijiDAOLogicSharedBaseTest
         super.setUp();
 
         vm.startPrank(minter);
-        nounsToken.mint();
-        nounsToken.transferFrom(minter, proposer, 1);
+        uint256 _tokenId = nounsToken.mint();
+        nounsToken.transferFrom(minter, proposer, _tokenId);
         vm.roll(block.number + 1);
         vm.stopPrank();
     }
@@ -61,10 +61,10 @@ abstract contract NijiDAOLogic_GasSnapshot_castVote is NijiDAOLogicSharedBaseTes
         super.setUp();
 
         vm.startPrank(minter);
-        nounsToken.mint();
-        nounsToken.transferFrom(minter, proposer, 1);
-        nounsToken.mint();
-        nounsToken.transferFrom(minter, nouner, 2);
+        uint256 _tid1 = nounsToken.mint();
+        nounsToken.transferFrom(minter, proposer, _tid1);
+        uint256 _tid2 = nounsToken.mint();
+        nounsToken.transferFrom(minter, nouner, _tid2);
         vm.roll(block.number + 1);
         vm.stopPrank();
 
@@ -110,10 +110,10 @@ abstract contract NijiDAOLogic_GasSnapshot_castVoteDuringObjectionPeriod is Niji
         super.setUp();
 
         vm.startPrank(minter);
-        nounsToken.mint();
-        nounsToken.transferFrom(minter, proposer, 1);
-        nounsToken.mint();
-        nounsToken.transferFrom(minter, nouner, 2);
+        uint256 _tid1 = nounsToken.mint();
+        nounsToken.transferFrom(minter, proposer, _tid1);
+        uint256 _tid2 = nounsToken.mint();
+        nounsToken.transferFrom(minter, nouner, _tid2);
         vm.roll(block.number + 1);
         vm.stopPrank();
 
