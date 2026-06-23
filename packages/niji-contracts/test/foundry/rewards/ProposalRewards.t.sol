@@ -7,6 +7,7 @@ import { Rewards } from '../../../contracts/client-incentives/Rewards.sol';
 import { INijiAuctionHouseV2 } from '../../../contracts/interfaces/INijiAuctionHouseV2.sol';
 import { NijiAuctionHouseProxy } from '../../../contracts/proxies/NijiAuctionHouseProxy.sol';
 import { RewardsDeployer } from '../../../script/Rewards/RewardsDeployer.sol';
+import { NijiToken } from '../../../contracts/NijiToken.sol';
 import 'forge-std/Test.sol';
 
 abstract contract BaseProposalRewardsTest is NijiDAOLogicBaseTest {
@@ -42,8 +43,15 @@ abstract contract BaseProposalRewardsTest is NijiDAOLogicBaseTest {
             bidAndSettleAuction({ bidAmount: 1 ether });
         }
 
-        vm.prank(makeAddr('noundersDAO'));
-        nounsToken.transferFrom(makeAddr('noundersDAO'), bidder2, 0);
+        // Niji ... 旧 Nouns で noundersDAO に 10 件毎 (tokenId 0/10/20...) 自動 distribute されていた
+        // 想定で noundersDAO → bidder2 への transferFrom が必要だったが、
+        // Niji 仕様で founder distribution は廃止、 該当 transferFrom は不要 (削除)。
+
+        // ERC721Votes (OZ v5) self-delegate (bidder1 / bidder2 が token 受領済)
+        vm.prank(bidder1);
+        NijiToken(payable(address(nounsToken))).delegate(bidder1);
+        vm.prank(bidder2);
+        NijiToken(payable(address(nounsToken))).delegate(bidder2);
 
         rewards = RewardsDeployer.deployRewards(dao, admin, minter, address(erc20Mock), address(0));
 
