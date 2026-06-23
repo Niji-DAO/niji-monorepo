@@ -323,9 +323,10 @@ contract ProposeBySigsTest is NijiDAOLogicBaseTest {
     }
 
     function test_givenProposerAndSignerWithVotesButBelowThreshold_reverts() public {
-        // Minting to push proposer and signer below threshold
+        // Niji ... Nounders auto-distribution 廃止のため、 旧 Nouns で 16 件 mint で nounders 自動 +2 = 21 件想定だったが
+        // Niji では明示的に 17 件 mint して totalSupply=20 へ到達 (3 setUp + 17 = 20、 threshold 1000bps で 2 票、 proposer+signer 2 <= 2 で revert)。
         vm.startPrank(minter);
-        for (uint256 i = 0; i < 16; ++i) {
+        for (uint256 i = 0; i < 17; ++i) {
             nounsToken.mint();
         }
         vm.roll(block.number + 1);
@@ -361,9 +362,9 @@ contract ProposeBySigsTest is NijiDAOLogicBaseTest {
     }
 
     function test_givenProposerAndSignerWithEnoughVotesCombined_worksAndEmitsEvents() public {
-        // Minting to push proposer below threshold, while combined with signer they have enough
+        // Niji ... Nounders 廃止のため 6 件 mint → 7 件 mint で totalSupply=10、 threshold 1 (proposer 1 + signer 1 = 2 > 1)。
         vm.startPrank(minter);
-        for (uint256 i = 0; i < 6; ++i) {
+        for (uint256 i = 0; i < 7; ++i) {
             nounsToken.mint();
         }
         vm.roll(block.number + 1);
@@ -387,9 +388,10 @@ contract ProposeBySigsTest is NijiDAOLogicBaseTest {
     }
 
     function test_givenProposerIsAlsoSigner_reverts() public {
-        // Minting to push proposer below threshold, while if counted twice will have enough
+        // Niji ... Nounders auto-distribution 廃止のため、 旧 Nouns で 6 件 mint で nounders 自動 +1 = 10 件想定だったが
+        // Niji では明示的に 7 件 mint して totalSupply=10 へ到達 (3 setUp + 7 = 10、 threshold 1000bps で 1 票)。
         vm.startPrank(minter);
-        for (uint256 i = 0; i < 6; ++i) {
+        for (uint256 i = 0; i < 7; ++i) {
             nounsToken.mint();
         }
         vm.roll(block.number + 1);
@@ -469,9 +471,9 @@ contract ProposeBySigsTest is NijiDAOLogicBaseTest {
     }
 
     function test_givenProposerWithNoVotesAndTwoSignersWithEnoughVotes_worksAndEmitsEvents() public {
-        // Minting to push a single signer below threshold
+        // Niji ... Nounders 廃止のため 6 件 mint → 7 件 mint で totalSupply=10、 threshold 1。
         vm.startPrank(minter);
-        for (uint256 i = 0; i < 6; ++i) {
+        for (uint256 i = 0; i < 7; ++i) {
             nounsToken.mint();
         }
         vm.roll(block.number + 1);
