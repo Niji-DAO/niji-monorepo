@@ -683,7 +683,8 @@ contract VotesRewardsTest is BaseProposalRewardsTest {
             votingClientIds: votingClientIds
         });
 
-        assertEq(rewards.clientBalance(clientId1), 0.075 ether); // 15 eth * 0.5%
+        // Niji ... 9 votes / round-off で 3 wei 不足
+        assertEq(rewards.clientBalance(clientId1), 74999999999999997); // 15 eth * 0.5% (round-off)
     }
 
     function test_rewardSplitBetweenTwoClients() public {
@@ -716,12 +717,12 @@ contract VotesRewardsTest is BaseProposalRewardsTest {
     function test_givenAnInvalidClientId_skipsIt() public {
         uint32 badClientId = rewards.nextTokenId();
 
-        // cast 8 votes
-        assertEq(nounsToken.getCurrentVotes(bidder1), 8);
+        // cast 9 votes (Niji ... founder distribution 廃止)
+        assertEq(nounsToken.getCurrentVotes(bidder1), 9);
         vote(bidder1, proposalId, 1, 'i support', clientId1);
 
-        // cast 1 votes
-        assertEq(nounsToken.getCurrentVotes(bidder2), 2);
+        // cast 1 vote
+        assertEq(nounsToken.getCurrentVotes(bidder2), 1);
         vote(bidder2, proposalId, 1, 'i support', clientId2);
 
         uint32 proposalId2 = uint32(propose(bidder2, address(1), 1 ether, '', '', 'my proposal', 0));
@@ -733,26 +734,27 @@ contract VotesRewardsTest is BaseProposalRewardsTest {
 
         settleAuction();
         votingClientIds = [clientId1, clientId2, badClientId];
+        // 9:1 比率 (10 votes total / 20 votes (2 proposal) = 比率 9/20:1/20)
         vm.expectEmit();
-        emit Rewards.ClientRewarded(clientId1, 0.03 ether);
+        emit Rewards.ClientRewarded(clientId1, 0.03375 ether);
         vm.expectEmit();
-        emit Rewards.ClientRewarded(clientId2, 0.0075 ether);
+        emit Rewards.ClientRewarded(clientId2, 0.00375 ether);
         rewards.updateRewardsForProposalWritingAndVoting({
             lastProposalId: proposalId2,
             votingClientIds: votingClientIds
         });
 
-        assertEq(rewards.clientBalance(clientId1), 0.03 ether); // 15 eth * 0.5% * (8/20)
-        assertEq(rewards.clientBalance(clientId2), 0.0075 ether); // 15 eth * 0.5% * (2/20)
+        assertEq(rewards.clientBalance(clientId1), 0.03375 ether); // 15 eth * 0.5% * (9/20)
+        assertEq(rewards.clientBalance(clientId2), 0.00375 ether); // 15 eth * 0.5% * (1/20)
     }
 
     function test_givenAProposalWhereNotAllClientContributed_updateRewardsWorks() public {
-        // cast 8 votes
-        assertEq(nounsToken.getCurrentVotes(bidder1), 8);
+        // cast 9 votes (Niji ... founder distribution 廃止)
+        assertEq(nounsToken.getCurrentVotes(bidder1), 9);
         vote(bidder1, proposalId, 1, 'i support', clientId1);
 
-        // cast 1 votes
-        assertEq(nounsToken.getCurrentVotes(bidder2), 2);
+        // cast 1 vote
+        assertEq(nounsToken.getCurrentVotes(bidder2), 1);
         vote(bidder2, proposalId, 1, 'i support', clientId2);
 
         uint32 proposalId2 = uint32(propose(bidder2, address(1), 1 ether, '', '', 'my proposal', 0));
@@ -764,17 +766,18 @@ contract VotesRewardsTest is BaseProposalRewardsTest {
 
         settleAuction();
         votingClientIds = [clientId1, clientId2];
+        // 9 + 10 = 19 votes for clientId1, 1 vote for clientId2, total 20 votes 2 proposals
         vm.expectEmit();
-        emit Rewards.ClientRewarded(clientId1, 0.0675 ether);
+        emit Rewards.ClientRewarded(clientId1, 0.07125 ether);
         vm.expectEmit();
-        emit Rewards.ClientRewarded(clientId2, 0.0075 ether);
+        emit Rewards.ClientRewarded(clientId2, 0.00375 ether);
         rewards.updateRewardsForProposalWritingAndVoting({
             lastProposalId: proposalId2,
             votingClientIds: votingClientIds
         });
 
-        assertEq(rewards.clientBalance(clientId1), 0.0675 ether); // 15 eth * 0.5% * (18/20)
-        assertEq(rewards.clientBalance(clientId2), 0.0075 ether); // 15 eth * 0.5% * (2/20)
+        assertEq(rewards.clientBalance(clientId1), 0.07125 ether); // 15 eth * 0.5% * (19/20)
+        assertEq(rewards.clientBalance(clientId2), 0.00375 ether); // 15 eth * 0.5% * (1/20)
     }
 
     function test_revertsIfNotAllVotesAreAccounted() public {
