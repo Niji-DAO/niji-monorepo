@@ -9,6 +9,7 @@ import { NijiDAOFork } from '../../../contracts/governance/fork/NijiDAOFork.sol'
 import { NijiDAOForkEscrow } from '../../../contracts/governance/fork/NijiDAOForkEscrow.sol';
 import { IERC721 } from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import { INijiDAOForkEscrow } from '../../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiToken } from '../../../contracts/NijiToken.sol';
 
 abstract contract DAOForkZeroState is NijiDAOLogicBaseTest {
     address tokenHolder = makeAddr('tokenHolder');
@@ -33,14 +34,19 @@ abstract contract DAOForkZeroState is NijiDAOLogicBaseTest {
         deal(address(timelock), 1000 ether);
         erc20Mock.mint(address(timelock), 300e18);
 
-        // Mint total of 20 tokens. 18 to token holder, 2 to nounders
+        // Mint total of 20 tokens, 全て tokenHolder へ (Niji ... founder distribution 廃止のため旧 2 件 nounders 経路なし)
         vm.startPrank(minter);
         while (nounsToken.totalSupply() < 20) {
             nounsToken.mint();
             nounsToken.transferFrom(minter, tokenHolder, nounsToken.totalSupply() - 1);
         }
         vm.stopPrank();
-        assertEq(dao.nouns().balanceOf(tokenHolder), 18);
+
+        // ERC721Votes (OZ v5) self-delegate
+        vm.prank(tokenHolder);
+        NijiToken(payable(address(nounsToken))).delegate(tokenHolder);
+
+        assertEq(dao.nouns().balanceOf(tokenHolder), 20);
 
         escrow = dao.forkEscrow();
     }
@@ -61,7 +67,8 @@ contract DAOForkZeroStateTest is DAOForkZeroState {
         dao.escrowToFork(tokenIds, new uint256[](0), '');
         vm.stopPrank();
 
-        assertEq(dao.nouns().balanceOf(tokenHolder), 15);
+        // 20 - 3 = 17
+        assertEq(dao.nouns().balanceOf(tokenHolder), 17);
     }
 
     function test_escrowToForkEmitsEvent() public {
@@ -142,7 +149,8 @@ contract DAOForkSignaledUnderThresholdStateTest is DAOForkSignaledUnderThreshold
     }
 
     function test_unsignalFork_returnsTokens() public {
-        assertEq(dao.nouns().balanceOf(tokenHolder), 15);
+        // 20 - 3 = 17 (escrow 中)
+        assertEq(dao.nouns().balanceOf(tokenHolder), 17);
 
         tokenIds = [1, 2, 3];
 
@@ -151,7 +159,8 @@ contract DAOForkSignaledUnderThresholdStateTest is DAOForkSignaledUnderThreshold
         vm.prank(tokenHolder);
         dao.withdrawFromForkEscrow(tokenIds);
 
-        assertEq(dao.nouns().balanceOf(tokenHolder), 18);
+        // withdraw 後 20 件全戻し
+        assertEq(dao.nouns().balanceOf(tokenHolder), 20);
     }
 
     function test_unsignalForkWithDifferentTokens_reverts() public {
