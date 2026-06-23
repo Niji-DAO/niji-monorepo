@@ -687,29 +687,30 @@ contract VotesRewardsTest is BaseProposalRewardsTest {
     }
 
     function test_rewardSplitBetweenTwoClients() public {
-        // cast 8 votes
-        assertEq(nounsToken.getCurrentVotes(bidder1), 8);
+        // cast 9 votes (Niji ... founder distribution 廃止で bidder1 が 9 件保有)
+        assertEq(nounsToken.getCurrentVotes(bidder1), 9);
         vote(bidder1, proposalId, 1, 'i support', clientId1);
 
-        // cast 1 votes
-        assertEq(nounsToken.getCurrentVotes(bidder2), 2);
+        // cast 1 vote
+        assertEq(nounsToken.getCurrentVotes(bidder2), 1);
         vote(bidder2, proposalId, 1, 'i support', clientId2);
 
         mineBlocks(VOTING_PERIOD);
 
         settleAuction();
         votingClientIds = [clientId1, clientId2];
+        // 9:1 比率 = 67.5e15 / 7.5e15
         vm.expectEmit();
-        emit Rewards.ClientRewarded(clientId1, 0.06 ether);
+        emit Rewards.ClientRewarded(clientId1, 0.0675 ether);
         vm.expectEmit();
-        emit Rewards.ClientRewarded(clientId2, 0.015 ether);
+        emit Rewards.ClientRewarded(clientId2, 0.0075 ether);
         rewards.updateRewardsForProposalWritingAndVoting({
             lastProposalId: proposalId,
             votingClientIds: votingClientIds
         });
 
-        assertEq(rewards.clientBalance(clientId1), 0.06 ether); // 15 eth * 0.5% * (8/10)
-        assertEq(rewards.clientBalance(clientId2), 0.015 ether); // 15 eth * 0.5% * (2/10)
+        assertEq(rewards.clientBalance(clientId1), 0.0675 ether); // 15 eth * 0.5% * (9/10)
+        assertEq(rewards.clientBalance(clientId2), 0.0075 ether); // 15 eth * 0.5% * (1/10)
     }
 
     function test_givenAnInvalidClientId_skipsIt() public {
