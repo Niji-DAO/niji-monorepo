@@ -8,6 +8,7 @@ import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
 import { DeployUtilsV3 } from '../helpers/DeployUtilsV3.sol';
 import { NijiDAOProxyV3 } from '../../../contracts/governance/NijiDAOProxyV3.sol';
 import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiToken } from '../../../contracts/NijiToken.sol';
 
 abstract contract NijiDAOLogic_GasSnapshot_propose is NijiDAOLogicSharedBaseTest {
     address immutable target = makeAddr('target');
@@ -22,7 +23,7 @@ abstract contract NijiDAOLogic_GasSnapshot_propose is NijiDAOLogicSharedBaseTest
 
         // ERC721Votes (OZ v5) self-delegate
         vm.prank(proposer);
-        nounsToken.delegate(proposer);
+        NijiToken(payable(address(nounsToken))).delegate(proposer);
 
         vm.roll(block.number + 1);
     }

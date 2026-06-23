@@ -118,7 +118,10 @@ abstract contract DeployUtilsV3 is DeployUtils {
             FORK_DAO_QUORUM_VOTES_BPS
         );
 
-        address predictedForkEscrowAddress = computeCreateAddress(address(this), vm.getNonce(address(this)) + 2);
+        // forkEscrow は NijiDAOProxyV3 deploy 直後 (nonce+1) に deploy される
+        // 旧 +2 は daoLogicImplementation を引数評価で deploy する想定だったが、
+        // line 107 で先に deploy 済のため実 deploy 順序は ProxyV3 (N) → ForkEscrow (N+1)
+        address predictedForkEscrowAddress = computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);
 
         INijiDAOLogic dao = INijiDAOLogic(
             payable(

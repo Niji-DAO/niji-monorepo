@@ -10,6 +10,7 @@ import { NijiDAOProxyV3 } from '../../../contracts/governance/NijiDAOProxyV3.sol
 import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
 import { NijiDAOExecutor } from '../../../contracts/governance/NijiDAOExecutor.sol';
+import { NijiToken } from '../../../contracts/NijiToken.sol';
 
 contract ProposeBySigsTest is NijiDAOLogicBaseTest {
     address proposerWithVote;
@@ -40,8 +41,17 @@ contract ProposeBySigsTest is NijiDAOLogicBaseTest {
         nounsToken.transferFrom(minter, signerWithVote1, _tid2);
         uint256 _tid3 = nounsToken.mint();
         nounsToken.transferFrom(minter, signerWithVote2, _tid3);
-        vm.roll(block.number + 1);
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) self-delegate
+        vm.prank(proposerWithVote);
+        NijiToken(payable(address(nounsToken))).delegate(proposerWithVote);
+        vm.prank(signerWithVote1);
+        NijiToken(payable(address(nounsToken))).delegate(signerWithVote1);
+        vm.prank(signerWithVote2);
+        NijiToken(payable(address(nounsToken))).delegate(signerWithVote2);
+
+        vm.roll(block.number + 1);
     }
 
     function test_givenNoSigs_reverts() public {
