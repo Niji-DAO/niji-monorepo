@@ -11,6 +11,7 @@ import { NijiDAOTypes, NijiTokenLike } from '../../../contracts/governance/NijiD
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
 import { NijiDAOExecutorV2 } from '../../../contracts/governance/NijiDAOExecutorV2.sol';
 import { NijiDAOForkEscrow } from '../../../contracts/governance/fork/NijiDAOForkEscrow.sol';
+import { NijiToken } from '../../../contracts/NijiToken.sol';
 import { INijiDAOLogic } from '../../../contracts/interfaces/INijiDAOLogic.sol';
 
 abstract contract NijiDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
@@ -88,6 +89,11 @@ abstract contract NijiDAOLogicBaseTest is Test, DeployUtilsV3, SigUtils {
         tokenID = nounsToken.mint();
         nounsToken.transferFrom(minter, to, tokenID);
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) self-delegate
+        vm.prank(to);
+        NijiToken(payable(address(nounsToken))).delegate(to);
+
         vm.roll(block.number + 1);
     }
 
