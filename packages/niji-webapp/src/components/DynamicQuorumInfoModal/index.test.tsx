@@ -1,0 +1,251 @@
+import React from 'react';
+
+import { render } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@lingui/react/macro', () => ({
+  Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('react-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-dom')>('react-dom');
+  const passthroughPortal = (node: React.ReactNode) => node as unknown as React.ReactPortal;
+  return {
+    ...actual,
+    createPortal: passthroughPortal,
+    default: {
+      ...actual,
+      createPortal: passthroughPortal,
+    },
+  };
+});
+
+vi.mock('@/components/Modal', () => ({
+  Backdrop: ({ onDismiss }: { onDismiss: () => void }) => (
+    <div data-testid="backdrop" onClick={onDismiss} />
+  ),
+}));
+
+const subgraphState: { data: unknown; loading: boolean; error: unknown } = {
+  data: { proposals: [{ adjustedTotalSupply: 100 }] },
+  loading: false,
+  error: null,
+};
+vi.mock('@/hooks/useSubgraphQuery', () => ({
+  useSubgraphQuery: () => subgraphState,
+}));
+
+const quorumState: {
+  current:
+    | { minQuorumVotesBPS: number; maxQuorumVotesBPS: number; quorumCoefficient: number }
+    | undefined;
+} = {
+  current: {
+    minQuorumVotesBPS: 1000,
+    maxQuorumVotesBPS: 4000,
+    quorumCoefficient: 1_000_000,
+  },
+};
+vi.mock('@/wrappers/nijiDao', () => ({
+  useDynamicQuorumProps: () => quorumState.current,
+}));
+
+vi.mock('@/wrappers/subgraph', () => ({
+  adjustedNounSupplyAtPropSnapshotDocument: 'doc',
+}));
+
+import DynamicQuorumInfoModal from './index';
+
+const makeProposal = (overrides: Partial<{ id: string; startBlock: string }> = {}) =>
+  ({
+    id: overrides.id ?? '42',
+    startBlock: overrides.startBlock ?? '100',
+  }) as never;
+
+const resetState = () => {
+  subgraphState.data = { proposals: [{ adjustedTotalSupply: 100 }] };
+  subgraphState.loading = false;
+  subgraphState.error = null;
+  quorumState.current = {
+    minQuorumVotesBPS: 1000,
+    maxQuorumVotesBPS: 4000,
+    quorumCoefficient: 1_000_000,
+  };
+};
+
+beforeEach(() => {
+  resetState();
+  const backdropRoot = document.createElement('div');
+  backdropRoot.id = 'backdrop-root';
+  const overlayRoot = document.createElement('div');
+  overlayRoot.id = 'overlay-root';
+  document.body.appendChild(backdropRoot);
+  document.body.appendChild(overlayRoot);
+});
+
+afterEach(() => {
+  document.getElementById('backdrop-root')?.remove();
+  document.getElementById('overlay-root')?.remove();
+});
+
+const setWindowWidth = (w: number) => {
+  Object.defineProperty(window, 'innerWidth', {
+    writable: true,
+    configurable: true,
+    value: w,
+  });
+};
+
+describe('DynamicQuorumInfoModal', () => {
+  it('renders empty fragment while loading', () => {
+    subgraphState.loading = true;
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={1}
+      />,
+    );
+    expect(container.textContent).toBe('');
+  });
+
+  it('renders error message when subgraph fails', () => {
+    subgraphState.error = new Error('boom');
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+      />,
+    );
+    expect(container.textContent).toContain('Failed to fetch dynamic threshold info');
+  });
+
+  it('renders Backdrop via portal', () => {
+    setWindowWidth(1400);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.querySelector('[data-testid="backdrop"]')).not.toBeNull();
+  });
+
+  it('renders Dynamic Threshold title', () => {
+    setWindowWidth(1400);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.textContent).toContain('Dynamic Threshold');
+  });
+
+  it('shows mobile copy when window width < 1200', () => {
+    setWindowWidth(800);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.textContent).toContain('Min Threshold');
+    expect(container.textContent).toContain('Max Threshold');
+  });
+
+  it('shows proposal id in desktop copy when width >= 1200', () => {
+    setWindowWidth(1400);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal({ id: '99' })}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.textContent).toContain('99');
+  });
+
+  it('handles quorumCoefficient=0 fallback (no NaN crash)', () => {
+    setWindowWidth(1400);
+    quorumState.current = {
+      minQuorumVotesBPS: 1000,
+      maxQuorumVotesBPS: 4000,
+      quorumCoefficient: 0,
+    };
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.textContent).toContain('Dynamic Threshold');
+  });
+
+  it('renders X close button that triggers onDismiss', () => {
+    setWindowWidth(1400);
+    const dismiss = vi.fn();
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={dismiss}
+        currentQuorum={5}
+      />,
+    );
+    const button = container.querySelector('button');
+    expect(button).not.toBeNull();
+    if (button) button.click();
+    expect(dismiss).toHaveBeenCalled();
+  });
+
+  it('renders SVG graph for desktop view', () => {
+    setWindowWidth(1400);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.querySelector('svg')).not.toBeNull();
+  });
+
+  it('handles undefined dynamicQuorumProps via 0 fallback', () => {
+    setWindowWidth(1400);
+    quorumState.current = undefined;
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={5}
+        onDismiss={() => {}}
+        currentQuorum={1}
+      />,
+    );
+    expect(container.querySelector('svg')).not.toBeNull();
+  });
+
+  it('handles missing proposal.id with default 0', () => {
+    setWindowWidth(800);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={{ startBlock: '100' } as never}
+        againstVotesAbsolute={0}
+        onDismiss={() => {}}
+      />,
+    );
+    expect(container.textContent).toContain('Threshold');
+  });
+});
