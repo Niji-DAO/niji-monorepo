@@ -313,6 +313,11 @@ contract DAOForkSignaledOverThresholdStateTest is DAOForkSignaledOverThresholdSt
         nounsToken.transferFrom(tokenHolder, someone, 13);
         vm.prank(tokenHolder);
         nounsToken.transferFrom(tokenHolder, someone, 14);
+
+        // ERC721Votes (OZ v5) self-delegate
+        vm.prank(someone);
+        NijiToken(payable(address(nounsToken))).delegate(someone);
+
         vm.roll(block.number + 1);
         propose(someone, address(0), 0, '', '', '');
     }
