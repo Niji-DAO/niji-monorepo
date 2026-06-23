@@ -888,6 +888,10 @@ contract NijiDAOData_CreateCandidateToUpdateProposalTest is NijiDAODataBaseTest 
         (signer, signerPK) = makeAddrAndKey('signerWithVote1');
         bidAndSettleAuction(auction, signer);
 
+        // ERC721Votes (OZ v5) self-delegate
+        vm.prank(signer);
+        NijiToken(payable(address(nounsDao.nouns()))).delegate(signer);
+
         proposalId = proposeBySigs(
             notNouner,
             signer,
