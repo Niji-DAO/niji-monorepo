@@ -65,6 +65,10 @@ contract NijiTokenKiwaTest is Test {
         // mintingActive を true に
         vm.prank(owner);
         token.setMintingActive(true);
+
+        // placeholder URI 設定 (Niji 仕様 ... mint 前に必須)
+        vm.prank(owner);
+        token.setPlaceholderURI('ipfs://placeholder');
     }
 
     // ====================================================
@@ -104,6 +108,8 @@ contract NijiTokenKiwaTest is Test {
         capped.setMinter(minter);
         vm.prank(owner);
         capped.setMintingActive(true);
+        vm.prank(owner);
+        capped.setPlaceholderURI('ipfs://placeholder');
 
         vm.prank(minter);
         capped.mint(recipient); // 0
