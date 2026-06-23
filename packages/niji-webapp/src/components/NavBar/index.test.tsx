@@ -1,0 +1,223 @@
+import React from 'react';
+
+import { fireEvent, render } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@lingui/react/macro', () => ({
+  Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('@niji/sdk/react', () => ({
+  nijiTreasuryAddress: { 1: '0xTREASURY' },
+  useReadNijiTreasuryBalancesInEth: () => ({ data: 1_000_000_000_000_000_000n * 5n }),
+}));
+
+vi.mock('connectkit', () => ({
+  ConnectKitButton: {
+    Custom: ({
+      children,
+    }: {
+      children: (args: {
+        isConnected: boolean;
+        show?: () => void;
+        address?: string;
+      }) => React.ReactNode;
+    }) => <>{children(connectKitState)}</>,
+  },
+}));
+
+const connectKitState: { isConnected: boolean; show?: () => void; address?: string } = {
+  isConnected: false,
+  show: () => {},
+  address: undefined,
+};
+
+const useAtomValueMock = vi.fn();
+vi.mock('jotai/react', () => ({
+  useAtomValue: () => useAtomValueMock(),
+}));
+
+vi.mock('@/assets/icons/Noggles.svg?react', () => ({
+  default: () => <span data-testid="noggles" />,
+}));
+
+vi.mock('@/assets/niji-lp/fav_180.png', () => ({
+  default: 'logo.png',
+}));
+
+vi.mock('@/components/NavBarButton', () => ({
+  default: ({ buttonText, onClick }: { buttonText: React.ReactNode; onClick?: () => void }) => (
+    <button data-testid="nav-btn" onClick={onClick}>
+      {buttonText}
+    </button>
+  ),
+  NavBarButtonStyle: {
+    COOL_INFO: 'cool',
+    WARM_INFO: 'warm',
+    WHITE_INFO: 'white',
+  },
+}));
+
+vi.mock('@/components/NavBarTreasury', () => ({
+  default: ({ treasuryBalance }: { treasuryBalance: string }) => (
+    <span data-testid="treasury">{treasuryBalance}</span>
+  ),
+}));
+
+vi.mock('@/components/NavDropdown', () => ({
+  default: ({ buttonText, children }: { buttonText: string; children: React.ReactNode }) => (
+    <div data-testid={`nav-dropdown-${buttonText}`}>{children}</div>
+  ),
+}));
+
+vi.mock('@/components/NavLocaleSwitcher', () => ({
+  default: () => <span data-testid="locale-switcher" />,
+}));
+
+vi.mock('@/components/ShortAddress', () => ({
+  default: ({ address }: { address: string }) => <span data-testid="short">{address}</span>,
+}));
+
+const configState: { CHAIN_ID: number; featureToggles: { candidates: boolean } } = {
+  CHAIN_ID: 1,
+  featureToggles: { candidates: true },
+};
+vi.mock('@/config', () => ({
+  CHAIN_ID: { valueOf: () => configState.CHAIN_ID, toString: () => String(configState.CHAIN_ID) },
+  default: {
+    get featureToggles() {
+      return configState.featureToggles;
+    },
+  },
+}));
+
+vi.mock('@/utils/colorResponsiveUIUtils', () => ({
+  usePickByStateColor: () => 'state-color',
+}));
+
+vi.mock('@/utils/etherscan', () => ({
+  buildEtherscanAddressLink: (a: string) => `https://etherscan.io/address/${a}`,
+}));
+
+vi.mock('@/wagmi', () => ({
+  defaultChain: { id: 1 },
+}));
+
+const useIsDaoGteV3Mock = vi.fn();
+vi.mock('@/wrappers/nijiDao', () => ({
+  useIsDaoGteV3: () => useIsDaoGteV3Mock(),
+}));
+
+import NavBar from './index';
+
+const wrap = (ui: React.ReactElement) => render(<MemoryRouter>{ui}</MemoryRouter>);
+
+const setup = (overrides: Partial<typeof configState> = {}) => {
+  configState.CHAIN_ID = overrides.CHAIN_ID ?? 1;
+  configState.featureToggles = overrides.featureToggles ?? { candidates: true };
+};
+
+describe('NavBar', () => {
+  it('renders logo image', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('img[alt="Niji DAO"]')).not.toBeNull();
+  });
+
+  it('renders treasury balance', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('[data-testid="treasury"]')?.textContent).toBe('5');
+  });
+
+  it('renders locale switcher', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('[data-testid="locale-switcher"]')).not.toBeNull();
+  });
+
+  it('hides testnet badge when CHAIN_ID is 1', () => {
+    setup({ CHAIN_ID: 1 });
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('[aria-label="testnet"]')).toBeNull();
+  });
+
+  it('shows testnet badge when CHAIN_ID is not 1', () => {
+    setup({ CHAIN_ID: 11155111 });
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('[aria-label="testnet"]')).not.toBeNull();
+  });
+
+  it('shows Faucet link only when CHAIN_ID is 31337', () => {
+    setup({ CHAIN_ID: 31337 });
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('a[href="/faucet"]')).not.toBeNull();
+  });
+
+  it('hides Faucet link by default (CHAIN_ID=1)', () => {
+    setup({ CHAIN_ID: 1 });
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('a[href="/faucet"]')).toBeNull();
+  });
+
+  it('renders DAO dropdown when isDaoGteV3=true', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('[data-testid="nav-dropdown-DAO"]')).not.toBeNull();
+  });
+
+  it('renders Connect button when wallet disconnected', () => {
+    setup();
+    connectKitState.isConnected = false;
+    connectKitState.address = undefined;
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.textContent).toContain('Connect');
+  });
+
+  it('renders ShortAddress when wallet connected', () => {
+    setup();
+    connectKitState.isConnected = true;
+    connectKitState.address = '0xUSER123';
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xUSER123');
+  });
+
+  it('renders Explore NavDropdown on desktop', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('[data-testid="nav-dropdown-Explore"]')).not.toBeNull();
+  });
+
+  it('Toggle button is rendered', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    const toggle = container.querySelector('.navbar-toggler');
+    expect(toggle).not.toBeNull();
+    if (toggle) fireEvent.click(toggle);
+  });
+});
