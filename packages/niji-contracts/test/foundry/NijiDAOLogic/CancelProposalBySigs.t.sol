@@ -5,6 +5,7 @@ import 'forge-std/Test.sol';
 import { NijiDAOLogicBaseTest } from './NijiDAOLogicBaseTest.sol';
 import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
 import { NijiDAOProposals } from '../../../contracts/governance/NijiDAOProposals.sol';
+import { NijiToken } from '../../../contracts/NijiToken.sol';
 
 abstract contract ZeroState is NijiDAOLogicBaseTest {
     address proposer = makeAddr('proposer');
@@ -27,8 +28,13 @@ abstract contract ProposalUpdatableState is ZeroState {
         vm.startPrank(minter);
         uint256 _tokenId = nounsToken.mint();
         nounsToken.transferFrom(minter, signerWithVote, _tokenId);
-        vm.roll(block.number + 1);
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) self-delegate
+        vm.prank(signerWithVote);
+        NijiToken(payable(address(nounsToken))).delegate(signerWithVote);
+
+        vm.roll(block.number + 1);
 
         NijiDAOProposals.ProposalTxs memory txs = makeTxs(makeAddr('target'), 0, '', '');
         uint256 expirationTimestamp = block.timestamp + 1234;

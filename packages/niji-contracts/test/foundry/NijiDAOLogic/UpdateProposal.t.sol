@@ -8,6 +8,7 @@ import { SigUtils, ERC1271Stub } from '../helpers/SigUtils.sol';
 import { NijiDAOProposals } from '../../../contracts/governance/NijiDAOProposals.sol';
 import { NijiDAOProxyV3 } from '../../../contracts/governance/NijiDAOProxyV3.sol';
 import { NijiDAOTypes } from '../../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiToken } from '../../../contracts/NijiToken.sol';
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
 import { NijiDAOExecutor } from '../../../contracts/governance/NijiDAOExecutor.sol';
 
@@ -22,8 +23,13 @@ abstract contract UpdateProposalBaseTest is NijiDAOLogicBaseTest {
         vm.startPrank(minter);
         uint256 _tokenId = nounsToken.mint();
         nounsToken.transferFrom(minter, proposer, _tokenId);
-        vm.roll(block.number + 1);
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) self-delegate
+        vm.prank(proposer);
+        NijiToken(payable(address(nounsToken))).delegate(proposer);
+
+        vm.roll(block.number + 1);
 
         proposalId = propose(proposer, makeAddr('target'), 0, '', '', '');
         vm.roll(block.number + 1);

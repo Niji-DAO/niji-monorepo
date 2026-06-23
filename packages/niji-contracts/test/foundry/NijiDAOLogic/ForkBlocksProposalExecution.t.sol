@@ -4,6 +4,7 @@ pragma solidity ^0.8.15;
 import 'forge-std/Test.sol';
 import { NijiDAOLogicBaseTest } from './NijiDAOLogicBaseTest.sol';
 import { NijiDAOProposals } from '../../../contracts/governance/NijiDAOProposals.sol';
+import { NijiToken } from '../../../contracts/NijiToken.sol';
 
 abstract contract ExecutableProposalState is NijiDAOLogicBaseTest {
     address user = makeAddr('user');
@@ -16,6 +17,11 @@ abstract contract ExecutableProposalState is NijiDAOLogicBaseTest {
         uint256 _tokenId = nounsToken.mint();
         nounsToken.transferFrom(minter, user, _tokenId);
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) self-delegate
+        vm.prank(user);
+        NijiToken(payable(address(nounsToken))).delegate(user);
+
         vm.roll(block.number + 1);
 
         // prep an executable proposal
