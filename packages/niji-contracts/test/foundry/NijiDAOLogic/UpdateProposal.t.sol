@@ -66,7 +66,8 @@ contract UpdateProposalPermissionsTest is UpdateProposalBaseTest {
         dao.cancel(proposalId);
 
         (address signer, uint256 signerPK) = makeAddrAndKey('signer');
-        nounsToken.transferFrom(proposer, signer, 1);
+        // Niji ... proposer は tokenId=0 を保有 (0 開始)
+        nounsToken.transferFrom(proposer, signer, 0);
         vm.stopPrank();
         vm.roll(block.number + 1);
 

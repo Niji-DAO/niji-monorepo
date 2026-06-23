@@ -61,8 +61,11 @@ contract NijiAuctionHouseV3Test is NijiAuctionHouseV3TestBase {
     function test_createBid_revertsGivenWrongNounId() public {
         uint128 nounId = auction.auction().nounId;
 
-        vm.expectRevert('Noun not up for auction');
-        auction.createBid(nounId - 1);
+        // Niji ... nounId=0 開始のため nounId-1 は uint underflow、 nounId>0 の場合のみ前 nounId 試行
+        if (nounId > 0) {
+            vm.expectRevert('Noun not up for auction');
+            auction.createBid(nounId - 1);
+        }
 
         vm.expectRevert('Noun not up for auction');
         auction.createBid(nounId + 1);

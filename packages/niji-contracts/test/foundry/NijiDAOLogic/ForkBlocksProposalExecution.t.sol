@@ -52,8 +52,9 @@ abstract contract ExecutableProposalWithActiveForkState is ExecutableProposalSta
         super.setUp();
 
         vm.startPrank(user);
-        tokenIds = [1];
-        nounsToken.approve(address(dao), 1);
+        // Niji ... mintTo(user) は tokenId=0 を受領するため 0-based
+        tokenIds = [0];
+        nounsToken.approve(address(dao), 0);
         dao.escrowToFork(tokenIds, new uint256[](0), '');
         vm.stopPrank();
 
