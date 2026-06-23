@@ -7,6 +7,7 @@ import { DeployUtilsFork } from './DeployUtilsFork.sol';
 import { NijiDAOExecutor } from '../../../contracts/governance/NijiDAOExecutor.sol';
 import { INijiTokenForkLike } from '../../../contracts/governance/fork/newdao/governance/INijiTokenForkLike.sol';
 import { NijiTokenLike } from '../../../contracts/governance/NijiDAOInterfaces.sol';
+import { NijiToken } from '../../../contracts/NijiToken.sol';
 import { Utils } from './Utils.sol';
 
 interface DAOLogicFork {
@@ -85,6 +86,13 @@ abstract contract NijiDAOLogicSharedBaseTest is Test, DeployUtilsFork {
             nounsToken.transferFrom(minter, to, tokenId);
         }
         vm.stopPrank();
+
+        // ERC721Votes (OZ v5) は受領で auto-delegate しないため self-delegate 明示
+        // (Niji 仕様 ... governance test の VotesBelowProposalThreshold 防御)
+        // NijiTokenLike に delegate 未公開のため NijiToken 直接 cast
+        vm.prank(to);
+        NijiToken(payable(address(nounsToken))).delegate(to);
+
         vm.roll(block.number + 1);
     }
 
