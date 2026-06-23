@@ -75,6 +75,9 @@ contract NijiFuzz is Test {
 
         // Activate minting
         token.toggleMinting();
+
+        // placeholder URI 設定 (Niji 仕様 ... mint 前に必須)
+        token.setPlaceholderURI('ipfs://placeholder');
     }
 
     // =========================================================================
