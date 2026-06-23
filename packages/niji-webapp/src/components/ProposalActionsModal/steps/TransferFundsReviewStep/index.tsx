@@ -49,11 +49,13 @@ const handleActionAdd = (
       args,
     });
 
+    // Niji ... args は readonly [Address, BigInt] tuple、 JSON.stringify は BigInt 直列化不能で throw。
+    // BigInt を string に変換する replacer を渡して STETH transfer の決定値を安全に直列化する。
     onActionAdd({
       address: stEthAddress[chainId],
       value: 0n,
       signature: 'transfer(address,uint256)',
-      decodedCalldata: JSON.stringify(args),
+      decodedCalldata: JSON.stringify(args, (_, v) => (typeof v === 'bigint' ? v.toString() : v)),
       calldata,
     });
   } else if (state.TransferFundsCurrency === SupportedCurrency.USDC) {
