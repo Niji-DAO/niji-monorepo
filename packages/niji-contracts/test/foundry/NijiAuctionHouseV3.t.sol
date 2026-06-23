@@ -247,17 +247,18 @@ abstract contract NoracleBaseTest is NijiAuctionHouseV3TestBase {
 }
 
 contract NoracleTestOneAuctionSettledStateTest is NoracleBaseTest {
-    IAH.Settlement nounId1Settlement;
+    IAH.Settlement nounId0Settlement;
 
     function setUp() public override {
         super.setUp();
         bidAndWinCurrentAuction(bidder, 1 ether);
 
-        nounId1Settlement = IAH.Settlement({
+        // Niji ... auction は nounId=0 から開始 (Nouns の 1 開始から差し替え済)。
+        nounId0Settlement = IAH.Settlement({
             blockTimestamp: uint32(block.timestamp),
             amount: 1 ether,
             winner: bidder,
-            nounId: 1,
+            nounId: 0,
             clientId: 0
         });
     }
@@ -276,69 +277,69 @@ contract NoracleTestOneAuctionSettledStateTest is NoracleBaseTest {
     function test_getSettlements_skipFalse_1() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(1, false);
 
-        expectedSettlements.push(nounId1Settlement);
+        expectedSettlements.push(nounId0Settlement);
         assertEq(settlements, expectedSettlements);
     }
 
     function test_getSettlementsRange_skipFalse_1() public {
+        // Niji ... range(1, 2) は id=1 (現在 auction、 settlementHistory に未書き込みなので 0 entry)。
         IAH.Settlement[] memory settlements = auction.getSettlements(1, 2, false);
-        expectedSettlements.push(nounId1Settlement);
+        expectedSettlements.push(
+            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 1, clientId: 0 })
+        );
         assertEq(settlements, expectedSettlements);
     }
 
     function test_getSettlementsFromIdtoTimestamp_skipFalse_1() public {
+        // Niji ... fromId=1 + endTimestamp=now、 nounId=1 は現在 auction (unsettled)、 maxId と一致 + blockTimestamp<=1 で continue → 空配列。
         IAH.Settlement[] memory settlements = auction.getSettlementsFromIdtoTimestamp(1, block.timestamp, false);
-        expectedSettlements.push(nounId1Settlement);
-        assertEq(settlements, expectedSettlements);
+        assertEq(settlements.length, 0);
     }
 
+    // Niji ... NounderNiji 廃止により nounId=0 は raw NounderNiji ではなく通常 auction の latest。
+    // setUp で nounId=0 が 1 件 settle → getSettlements(N, false) は max 1 件のみ返す。
     function test_getSettlements_skipFalse_returnsRawNounderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(2, false);
 
-        expectedSettlements.push(nounId1Settlement);
-        expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 0, clientId: 0 })
-        );
+        expectedSettlements.push(nounId0Settlement);
         assertEq(settlements, expectedSettlements);
     }
 
     function test_getSettlementsRange_skipFalse_returnsRawNounderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(0, 2, false);
+        expectedSettlements.push(nounId0Settlement);
         expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 0, clientId: 0 })
+            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 1, clientId: 0 })
         );
-        expectedSettlements.push(nounId1Settlement);
         assertEq(settlements, expectedSettlements);
     }
 
     function test_getSettlementsFromIdtoTimestamp_skipFalse_returnsRawNounderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlementsFromIdtoTimestamp(0, block.timestamp, false);
-        expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 0, clientId: 0 })
-        );
-        expectedSettlements.push(nounId1Settlement);
+        expectedSettlements.push(nounId0Settlement);
         assertEq(settlements, expectedSettlements);
     }
 
     function test_getSettlementsFormIdToTimestamp_skipFalse_stopsAtEndTimestamp() public {
         IAH.Settlement[] memory settlements = auction.getSettlementsFromIdtoTimestamp(0, block.timestamp - 1, false);
-        expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 0, clientId: 0 })
-        );
-        assertEq(settlements, expectedSettlements);
+        // Niji ... nounId=0 settle 完了済 + 現在 auction は nounId=1 (unsettled、 blockTimestamp=1 sentinel)。
+        // endTimestamp=block.timestamp-1 → settle (id=0) は break 条件 settlementState.blockTimestamp(=now) > endTimestamp(=now-1) で break。
+        // 結果空配列。
+        assertEq(settlements.length, 0);
     }
 
     function test_getSettlementsFormIdToTimestamp_skipFalse_startIdInTheFuture_reverts() public {
+        // Niji ... setUp 後の現在 auction nounId は 1。 startId=2 は startId>maxId で revert。
         vm.expectRevert('startId too large');
-        auction.getSettlementsFromIdtoTimestamp(3, block.timestamp, false);
+        auction.getSettlementsFromIdtoTimestamp(2, block.timestamp, false);
     }
 
     function test_getSettlementsRange_skipFalse_returnsEmptyData() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(0, 3, false);
+        expectedSettlements.push(nounId0Settlement);
         expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 0, clientId: 0 })
+            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 1, clientId: 0 })
         );
-        expectedSettlements.push(nounId1Settlement);
         expectedSettlements.push(
             IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 2, clientId: 0 })
         );
@@ -348,35 +349,32 @@ contract NoracleTestOneAuctionSettledStateTest is NoracleBaseTest {
     function test_getSettlements_skipFalse_returnsLessResultsIfReachedNounZero() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(3, false);
 
-        expectedSettlements.push(nounId1Settlement);
-        expectedSettlements.push(
-            IAH.Settlement({ blockTimestamp: 0, amount: 0, winner: address(0), nounId: 0, clientId: 0 })
-        );
+        expectedSettlements.push(nounId0Settlement);
         assertEq(settlements, expectedSettlements);
     }
 
     function test_getSettlements_skipTrue_skipsNounderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(2, true);
 
-        expectedSettlements.push(nounId1Settlement);
+        expectedSettlements.push(nounId0Settlement);
         assertEq(settlements, expectedSettlements);
     }
 
     function test_getSettlementsRange_skipTrue_skipsNounderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(0, 2, true);
-        expectedSettlements.push(nounId1Settlement);
+        expectedSettlements.push(nounId0Settlement);
         assertEq(settlements, expectedSettlements);
     }
 
     function test_getSettlementsFromIdToTimestamp_skipTrue_skipsNonderNiji() public {
         IAH.Settlement[] memory settlements = auction.getSettlementsFromIdtoTimestamp(0, block.timestamp, true);
-        expectedSettlements.push(nounId1Settlement);
+        expectedSettlements.push(nounId0Settlement);
         assertEq(settlements, expectedSettlements);
     }
 
     function test_getSettlementsRange_skipTrue_skipsEmptyData() public {
         IAH.Settlement[] memory settlements = auction.getSettlements(0, 4, true);
-        expectedSettlements.push(nounId1Settlement);
+        expectedSettlements.push(nounId0Settlement);
         assertEq(settlements, expectedSettlements);
     }
 
@@ -388,7 +386,8 @@ contract NoracleTestOneAuctionSettledStateTest is NoracleBaseTest {
         IAH.Settlement[] memory settlements = auction.getSettlements(1, true);
 
         assertEq(settlements.length, 1);
-        assertEq(settlements[0].nounId, 2);
+        // Niji ... 2 回 settle 後の latest nounId は 1 (0 開始)。
+        assertEq(settlements[0].nounId, 1);
         assertEq(settlements[0].amount, 1844674407.3709551615 ether);
         assertEq(settlements[0].winner, makeAddr('bidder'));
 
@@ -402,7 +401,8 @@ contract NoracleTestOneAuctionSettledStateTest is NoracleBaseTest {
         IAH.Settlement[] memory settlements = auction.getSettlements(1, false);
 
         assertEq(settlements.length, 1);
-        assertEq(settlements[0].nounId, 2);
+        // Niji ... 2 回 settle 後の latest nounId は 1 (0 開始)。
+        assertEq(settlements[0].nounId, 1);
         assertEq(settlements[0].amount, 1 * 1e8);
         assertEq(settlements[0].winner, makeAddr('bidder'));
 
