@@ -736,4 +736,91 @@ describe('CreateProposalButton', () => {
     );
     expect(container.querySelector('.spinner-border')).not.toBeNull();
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <CreateProposalButton
+              key={i}
+              isLoading={false}
+              hasActiveOrPendingProposal={false}
+              hasEnoughVote={true}
+              isFormInvalid={false}
+              handleCreateProposal={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times with prop changes', () => {
+    const { rerender } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <CreateProposalButton
+            isLoading={i % 2 === 0}
+            hasActiveOrPendingProposal={false}
+            hasEnoughVote={true}
+            isFormInvalid={false}
+            handleCreateProposal={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('rapid 100 button click events fire handler', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 100; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles very large proposalThreshold (1e6)', () => {
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={false}
+        isFormInvalid={false}
+        proposalThreshold={1000000}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.textContent).toContain('1000001');
+  });
+
+  it('isFormInvalid=true keeps button rendered', () => {
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={true}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('button')).not.toBeNull();
+  });
 });

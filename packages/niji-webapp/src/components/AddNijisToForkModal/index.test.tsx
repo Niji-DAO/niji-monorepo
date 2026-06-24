@@ -474,4 +474,52 @@ describe('AddNijisToForkModal', () => {
       { id: '2', title: 'Proposal Two' },
     ];
   });
+
+  it('renders 30 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AddNijisToForkModal key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves modal', () => {
+    const { container, rerender } = render(<AddNijisToForkModal {...baseProps} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<AddNijisToForkModal {...baseProps} isForkingPeriod={i % 2 === 0} />);
+    }
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+  });
+
+  it('handles 1000 owned nouns large array', () => {
+    const nouns = Array.from({ length: 1000 }, (_, i) => i);
+    expect(() => render(<AddNijisToForkModal {...baseProps} ownedNouns={nouns} />)).not.toThrow();
+  });
+
+  it('handles 500 proposals', () => {
+    hookState.proposals = Array.from({ length: 500 }, (_, i) => ({
+      id: String(i),
+      title: `Proposal ${i}`,
+    }));
+    expect(() => render(<AddNijisToForkModal {...baseProps} />)).not.toThrow();
+    hookState.proposals = [
+      { id: '1', title: 'Proposal One' },
+      { id: '2', title: 'Proposal Two' },
+    ];
+  });
+
+  it('handles all joinForkState statuses', () => {
+    const statuses: ApprovalStatus[] = ['None', 'PendingSignature', 'Mining', 'Success', 'Fail'];
+    statuses.forEach(s => {
+      hookState.joinForkState = { status: s };
+      expect(() =>
+        render(<AddNijisToForkModal {...baseProps} isForkingPeriod={true} />),
+      ).not.toThrow();
+    });
+    hookState.joinForkState = { status: 'None' };
+  });
 });
