@@ -179,4 +179,41 @@ describe('EditProposalButton', () => {
     );
     expect(container.textContent).toContain('active or pending');
   });
+
+  it('threshold = 100 with no enough votes shows 101 votes warning', () => {
+    const { container } = render(
+      <EditProposalButton {...defaults} hasEnoughVote={false} proposalThreshold={100} />,
+    );
+    expect(container.textContent).toContain('101 votes to submit a proposal');
+  });
+
+  it('all good state has no warning text', () => {
+    const { container } = render(<EditProposalButton {...defaults} />);
+    expect(container.textContent).not.toContain('don');
+    expect(container.textContent).not.toContain('active or pending');
+  });
+
+  it('repeat 5 clicks invoke handler 5 times', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <EditProposalButton {...defaults} handleCreateProposal={handle} />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 5; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(5);
+  });
+
+  it('hasActive + isFormInvalid both disabled', () => {
+    const { container } = render(
+      <EditProposalButton {...defaults} hasActiveOrPendingProposal={true} isFormInvalid={true} />,
+    );
+    expect(container.querySelector('button')?.disabled).toBe(true);
+  });
+
+  it('isCandidate=true + isLoading=true shows spinner only', () => {
+    const { container } = render(
+      <EditProposalButton {...defaults} isCandidate={true} isLoading={true} />,
+    );
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+  });
 });

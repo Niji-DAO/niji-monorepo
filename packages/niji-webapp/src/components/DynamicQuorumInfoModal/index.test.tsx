@@ -420,4 +420,78 @@ describe('DynamicQuorumInfoModal', () => {
     );
     expect(container.textContent).toContain('Dynamic Threshold');
   });
+
+  it('mobile width 500 + currentQuorum=0 renders without crash', () => {
+    setWindowWidth(500);
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={10}
+          onDismiss={() => {}}
+          currentQuorum={0}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('desktop width 1500 renders SVG graph', () => {
+    setWindowWidth(1500);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.querySelector('svg')).not.toBeNull();
+  });
+
+  it('boundary width 1200 (edge case) renders correctly', () => {
+    setWindowWidth(1200);
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={10}
+          onDismiss={() => {}}
+          currentQuorum={5}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('extra small width 320 (mobile small) renders correctly', () => {
+    setWindowWidth(320);
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={10}
+          onDismiss={() => {}}
+          currentQuorum={5}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('extremely high quorumCoefficient (1e15) renders without crash', () => {
+    setWindowWidth(1400);
+    quorumState.current = {
+      minQuorumVotesBPS: 1000,
+      maxQuorumVotesBPS: 4000,
+      quorumCoefficient: 1e15,
+    };
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={50}
+          onDismiss={() => {}}
+          currentQuorum={5}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });

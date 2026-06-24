@@ -272,4 +272,59 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
     fireEvent.click(container.querySelector('[data-testid="right"]')!);
     expect(container.querySelector('[data-testid="current-page"]')?.textContent).toBe('2');
   });
+
+  it('200 delegates render 17 pages (floor(200/12)+1)', () => {
+    const data = Array.from({ length: 200 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    expect(container.querySelector('[data-testid="num-pages"]')?.textContent).toBe('17');
+  });
+
+  it('rerender from 0 to 5 delegates updates hover count', () => {
+    const { container, rerender } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+    );
+    expect(container.querySelectorAll('[data-testid="hover"]').length).toBe(0);
+    rerender(
+      <DelegateGroupedNijiImageVoteTable
+        {...baseProps}
+        filteredDelegateGroupedVoteData={Array.from({ length: 5 }, (_, i) =>
+          makeVote(`0x${i}`, ['1']),
+        )}
+      />,
+    );
+    expect(container.querySelectorAll('[data-testid="hover"]').length).toBe(5);
+  });
+
+  it('left click followed by right click cycles pages', () => {
+    const data = Array.from({ length: 50 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="right"]')!);
+    fireEvent.click(container.querySelector('[data-testid="right"]')!);
+    fireEvent.click(container.querySelector('[data-testid="left"]')!);
+    expect(container.querySelector('[data-testid="current-page"]')?.textContent).toBe('1');
+  });
+
+  it('different propId+blockNumber renders without crash', () => {
+    expect(() =>
+      render(
+        <DelegateGroupedNijiImageVoteTable
+          propId={9999}
+          proposalCreationBlock={500n}
+          filteredDelegateGroupedVoteData={[]}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('30 delegates renders 12 buttons on first page', () => {
+    const data = Array.from({ length: 30 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    expect(container.querySelectorAll('td').length).toBe(12);
+  });
 });
