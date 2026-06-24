@@ -348,4 +348,51 @@ describe('EditProposalButton', () => {
     for (let i = 0; i < 100; i++) fireEvent.click(btn);
     expect(handle).toHaveBeenCalledTimes(100);
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <EditProposalButton key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves button', () => {
+    const { container, rerender } = render(<EditProposalButton {...defaults} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<EditProposalButton {...defaults} isCandidate={i % 2 === 0} />);
+    }
+    expect(container.querySelector('button')).not.toBeNull();
+  });
+
+  it('handles very large proposalThreshold (1e6)', () => {
+    const { container } = render(
+      <EditProposalButton {...defaults} hasEnoughVote={false} proposalThreshold={1000000} />,
+    );
+    expect(container.textContent).toContain('1000001');
+  });
+
+  it('rapid props switching 50 times', () => {
+    const { rerender } = render(<EditProposalButton {...defaults} />);
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        rerender(
+          <EditProposalButton
+            {...defaults}
+            isLoading={i % 2 === 0}
+            hasActiveOrPendingProposal={i % 3 === 0}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('isFormInvalid=true keeps button rendered', () => {
+    const { container } = render(<EditProposalButton {...defaults} isFormInvalid={true} />);
+    expect(container.querySelector('button')).not.toBeNull();
+  });
 });

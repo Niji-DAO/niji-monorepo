@@ -325,4 +325,47 @@ describe('ModalSubtitle', () => {
     // Symbol は React で render 対象外、 crash しないことだけ確認
     expect(() => render(<ModalSubtitle>{Symbol('x') as never}</ModalSubtitle>)).not.toThrow();
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ModalSubtitle key={i}>sub-{i}</ModalSubtitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves div', () => {
+    const { container, rerender } = render(<ModalSubtitle>x</ModalSubtitle>);
+    for (let i = 0; i < 30; i++) {
+      rerender(<ModalSubtitle>val-{i}</ModalSubtitle>);
+    }
+    expect(container.querySelector('div')?.textContent).toContain('29');
+  });
+
+  it('handles array children', () => {
+    const items = [1, 2, 3];
+    const { container } = render(
+      <ModalSubtitle>
+        {items.map(n => (
+          <span key={n}>{n}</span>
+        ))}
+      </ModalSubtitle>,
+    );
+    expect(container.querySelectorAll('span').length).toBe(3);
+  });
+
+  it('handles unicode children', () => {
+    const { container } = render(<ModalSubtitle>🚀 日本語</ModalSubtitle>);
+    expect(container.querySelector('div')?.textContent).toBe('🚀 日本語');
+  });
+
+  it('handles 5000 char children (very long)', () => {
+    const long = 'b'.repeat(5000);
+    const { container } = render(<ModalSubtitle>{long}</ModalSubtitle>);
+    expect(container.querySelector('div')?.textContent?.length).toBe(5000);
+  });
 });
