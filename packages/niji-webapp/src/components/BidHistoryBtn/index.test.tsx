@@ -255,4 +255,46 @@ describe('BidHistoryBtn Component (isCool=true)', () => {
     const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
     expect(container.children.length).toBe(1);
   });
+
+  it('renders 30 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 30 }, (_, i) => (
+          <BidHistoryBtn key={i} onClick={vi.fn()} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(30);
+  });
+
+  it('click event provides MouseEvent with target', () => {
+    let receivedTarget: EventTarget | null = null;
+    const onClick = (e: { target: EventTarget }) => {
+      receivedTarget = e.target;
+    };
+    const { container } = render(<BidHistoryBtn onClick={onClick} />);
+    fireEvent.click(container.firstElementChild as HTMLElement);
+    expect(receivedTarget).not.toBeNull();
+  });
+
+  it('repeated 50 clicks invoke onClick 50 times', () => {
+    const onClick = vi.fn();
+    const { container } = render(<BidHistoryBtn onClick={onClick} />);
+    const outer = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 50; i++) fireEvent.click(outer);
+    expect(onClick).toHaveBeenCalledTimes(50);
+  });
+
+  it('text wrapper inner div has className', () => {
+    const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    const inner = container.firstElementChild?.firstElementChild as HTMLDivElement;
+    expect(inner.className).toBeTruthy();
+  });
+
+  it('renders consistent text across rerenders', () => {
+    const { container, rerender } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    expect(container.textContent).toBe('View all bids');
+    rerender(<BidHistoryBtn onClick={vi.fn()} />);
+    expect(container.textContent).toBe('View all bids');
+  });
 });

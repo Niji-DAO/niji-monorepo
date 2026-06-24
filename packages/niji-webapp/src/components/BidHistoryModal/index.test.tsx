@@ -307,4 +307,47 @@ describe('BidHistoryModal', () => {
     render(<BidHistoryModal auction={auction} onDismiss={onDismiss} />);
     expect(onDismiss).not.toHaveBeenCalled();
   });
+
+  it('renders 10 bids list', () => {
+    useAuctionBidsMock.mockReturnValue(
+      Array.from({ length: 10 }, (_, i) => ({ transactionHash: `0x${i}` })),
+    );
+    render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelectorAll('[data-testid="row"]').length,
+    ).toBe(10);
+  });
+
+  it('renders for very large nounId auction', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const huge = { ...auction, nounId: 9007199254740991n };
+    expect(() => render(<BidHistoryModal auction={huge} onDismiss={() => {}} />)).not.toThrow();
+  });
+
+  it('rerender with new auction does not crash', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const { rerender } = render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    const newAuction = { ...auction, nounId: 99n };
+    expect(() =>
+      rerender(<BidHistoryModal auction={newAuction} onDismiss={() => {}} />),
+    ).not.toThrow();
+  });
+
+  it('Backdrop fires onDismiss on multiple clicks', () => {
+    const onDismiss = vi.fn();
+    const { container } = render(<Backdrop onDismiss={onDismiss} />);
+    const div = container.querySelector('div');
+    if (div) {
+      fireEvent.click(div);
+      fireEvent.click(div);
+      fireEvent.click(div);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders for 0n nounId auction', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const zero = { ...auction, nounId: 0n };
+    expect(() => render(<BidHistoryModal auction={zero} onDismiss={() => {}} />)).not.toThrow();
+  });
 });
