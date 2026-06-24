@@ -340,4 +340,74 @@ describe('ModalBottomButtonRow', () => {
     const next = container.querySelectorAll('button')[1];
     expect(next?.getAttribute('data-style')).toBe('disabled');
   });
+
+  it('isNextBtnDisabled=undefined defaults to enabled secondary', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="x"
+        nextBtnText="y"
+      />,
+    );
+    const next = container.querySelectorAll('button')[1];
+    expect(next?.disabled).toBe(false);
+    expect(next?.getAttribute('data-style')).toBe('secondary');
+  });
+
+  it('prev button data-style is back regardless of isNextBtnDisabled', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="x"
+        nextBtnText="y"
+        isNextBtnDisabled={true}
+      />,
+    );
+    expect(container.querySelectorAll('button')[0]?.getAttribute('data-style')).toBe('back');
+  });
+
+  it('Fragment children in prevBtnText render correctly', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText={
+          <>
+            <span data-testid="frag-a">A</span>
+            <span data-testid="frag-b">B</span>
+          </>
+        }
+        nextBtnText="y"
+      />,
+    );
+    expect(container.querySelector('[data-testid="frag-a"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="frag-b"]')).not.toBeNull();
+  });
+
+  it('null prevBtnText renders empty button', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText={null as never}
+        nextBtnText="y"
+      />,
+    );
+    expect(container.querySelectorAll('button')[0]?.textContent).toBe('');
+  });
+
+  it('long nextBtnText (200 chars) renders verbatim', () => {
+    const long = 'b'.repeat(200);
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="x"
+        nextBtnText={long}
+      />,
+    );
+    expect(container.querySelectorAll('button')[1]?.textContent?.length).toBe(200);
+  });
 });
