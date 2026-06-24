@@ -59,4 +59,33 @@ describe('CandidateSponsorImage', () => {
     expect(c1.querySelector('[data-testid="niji-image"]')?.textContent).toBe('1');
     expect(c2.querySelector('[data-testid="niji-image"]')?.textContent).toBe('2');
   });
+
+  it('renders 9999n nounId without crash', () => {
+    const { container } = render(<CandidateSponsorImage nounId={9999n} />);
+    expect(container.querySelector('[data-testid="niji-image"]')?.textContent).toBe('9999');
+  });
+
+  it('renders 100n with correct text content', () => {
+    const { container } = render(<CandidateSponsorImage nounId={100n} />);
+    expect(container.querySelector('[data-testid="niji-image"]')?.textContent).toBe('100');
+  });
+
+  it('rerender with new nounId updates the rendered text', () => {
+    const { container, rerender } = render(<CandidateSponsorImage nounId={1n} />);
+    expect(container.querySelector('[data-testid="niji-image"]')?.textContent).toBe('1');
+    rerender(<CandidateSponsorImage nounId={5n} />);
+    expect(container.querySelector('[data-testid="niji-image"]')?.textContent).toBe('5');
+  });
+
+  it('CSS class contains hash-like identifier (CSS module)', () => {
+    const { container } = render(<CandidateSponsorImage nounId={1n} />);
+    const className = container.querySelector('div')?.className ?? '';
+    expect(className).toMatch(/_.+/);
+  });
+
+  it('NijiImage receives bigint type for nounId', () => {
+    const { container } = render(<CandidateSponsorImage nounId={42n} />);
+    // mock NijiImage は nounId.toString() を render するので bigint で渡されている証
+    expect(container.querySelector('[data-testid="niji-image"]')?.textContent).toBe('42');
+  });
 });

@@ -52,4 +52,36 @@ describe('ModalTitle', () => {
     const { container } = render(<ModalTitle>{['Hello', ' ', 'World']}</ModalTitle>);
     expect(container.querySelector('h1')?.textContent).toBe('Hello World');
   });
+
+  it('renders null children gracefully (empty h1)', () => {
+    const { container } = render(<ModalTitle>{null}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('');
+  });
+
+  it('renders boolean false as empty (React behavior)', () => {
+    const { container } = render(<ModalTitle>{false}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('');
+  });
+
+  it('renders multiple nested elements', () => {
+    const { container } = render(
+      <ModalTitle>
+        <span>a</span>
+        <strong>b</strong>
+      </ModalTitle>,
+    );
+    expect(container.querySelector('h1')?.textContent).toBe('ab');
+  });
+
+  it('renders long string children', () => {
+    const long = 'a'.repeat(200);
+    const { container } = render(<ModalTitle>{long}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent?.length).toBe(200);
+  });
+
+  it('CSS module className has hash format', () => {
+    const { container } = render(<ModalTitle>x</ModalTitle>);
+    const className = container.querySelector('div')?.className ?? '';
+    expect(className).toMatch(/_.+/);
+  });
 });

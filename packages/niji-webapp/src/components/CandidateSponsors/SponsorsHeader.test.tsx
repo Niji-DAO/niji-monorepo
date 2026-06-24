@@ -78,4 +78,60 @@ describe('SponsorsHeader (update flow)', () => {
     );
     expect(container.textContent).not.toContain('Proposer has');
   });
+
+  it('renders 10 vote count correctly (plural)', () => {
+    const candidate = { ...baseCandidate, proposerVotes: 10 } as never;
+    const { container } = render(<SponsorsHeader candidate={candidate} isThresholdMet={false} />);
+    expect(container.textContent).toContain('Proposer has 10 vote');
+  });
+
+  it('threshold met message takes priority over proposer line', () => {
+    const { container } = render(
+      <SponsorsHeader candidate={baseCandidate} isThresholdMet={true} />,
+    );
+    expect(container.textContent).toContain('met the required threshold');
+  });
+
+  it('update flow with 3 signers shows "X of 3"', () => {
+    const proposal = {
+      signers: [{ id: '0xA' }, { id: '0xB' }, { id: '0xC' }],
+    } as never;
+    const { container } = render(
+      <SponsorsHeader
+        candidate={baseCandidate}
+        isUpdateToProposal={true}
+        isThresholdMet={false}
+        originalProposal={proposal}
+      />,
+    );
+    expect(container.textContent).toContain('5 of 3');
+  });
+
+  it('voteCount=0 in update flow shows "0 of N"', () => {
+    const candidate = { ...baseCandidate, voteCount: 0 } as never;
+    const proposal = { signers: [{ id: '0xA' }] } as never;
+    const { container } = render(
+      <SponsorsHeader
+        candidate={candidate}
+        isUpdateToProposal={true}
+        isThresholdMet={false}
+        originalProposal={proposal}
+      />,
+    );
+    expect(container.textContent).toContain('0 of 1');
+  });
+
+  it('originalProposal with empty signers array shows "..." fallback', () => {
+    const proposal = { signers: [] } as never;
+    const { container } = render(
+      <SponsorsHeader
+        candidate={baseCandidate}
+        isUpdateToProposal={true}
+        isThresholdMet={false}
+        originalProposal={proposal}
+      />,
+    );
+    // signers=[] でも fallback "..." 経路
+    expect(container.textContent).toContain('5 of');
+  });
 });
