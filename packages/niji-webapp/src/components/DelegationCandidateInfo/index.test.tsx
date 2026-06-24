@@ -543,4 +543,78 @@ describe('DelegationCandidateInfo', () => {
       ).not.toThrow();
     }
   });
+
+  it('renders 30 instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DelegationCandidateInfo
+              key={i}
+              address={`0xADDR${i}`}
+              changeModalState={(i % 4) as never}
+              votesToAdd={i}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles all 4 state values without crash', () => {
+    [0, 1, 2, 3].forEach(state => {
+      expect(() =>
+        render(
+          <DelegationCandidateInfo
+            address="0xA"
+            changeModalState={state as never}
+            votesToAdd={1}
+          />,
+        ),
+      ).not.toThrow();
+    });
+  });
+
+  it('handles 0 + Number.MAX_SAFE_INTEGER edge for votesToAdd', () => {
+    expect(() =>
+      render(
+        <DelegationCandidateInfo
+          address="0xA"
+          changeModalState={0 as never}
+          votesToAdd={Number.MAX_SAFE_INTEGER}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 10 times preserves component', () => {
+    const { rerender } = render(
+      <DelegationCandidateInfo address="0xA" changeModalState={0 as never} votesToAdd={0} />,
+    );
+    for (let i = 0; i < 10; i++) {
+      expect(() =>
+        rerender(
+          <DelegationCandidateInfo
+            address={`0xA${i}`}
+            changeModalState={(i % 4) as never}
+            votesToAdd={i}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 100 different addresses sequentially', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        render(
+          <DelegationCandidateInfo
+            address={`0xADDR${i}`}
+            changeModalState={0 as never}
+            votesToAdd={i}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });

@@ -347,4 +347,54 @@ describe('DelegationModal', () => {
       initial,
     );
   });
+
+  it('renders 20 DelegationModal instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <DelegationModal key={i} onDismiss={() => {}} delegateTo={`0x${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('Backdrop renders 20 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <Backdrop key={i} onDismiss={vi.fn()} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(20);
+  });
+
+  it('rapid 30 close button clicks fire 30 times', () => {
+    const onDismiss = vi.fn();
+    render(<DelegationModal onDismiss={onDismiss} />);
+    const closeBtn = document.getElementById('overlay-root')?.querySelector('button:first-of-type');
+    if (closeBtn) {
+      for (let i = 0; i < 30; i++) fireEvent.click(closeBtn);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(30);
+  });
+
+  it('rerender preserves portal structure 5 times', () => {
+    const { rerender } = render(<DelegationModal onDismiss={() => {}} delegateTo="0x0" />);
+    for (let i = 0; i < 5; i++) {
+      rerender(<DelegationModal onDismiss={() => {}} delegateTo={`0x${i}`} />);
+      expect(
+        document.getElementById('overlay-root')?.querySelector('[data-testid="change-panel"]'),
+      ).not.toBeNull();
+    }
+  });
+
+  it('Backdrop rerender preserves single div', () => {
+    const { container, rerender } = render(<Backdrop onDismiss={vi.fn()} />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+    rerender(<Backdrop onDismiss={vi.fn()} />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+  });
 });
