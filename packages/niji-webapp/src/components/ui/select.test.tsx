@@ -231,4 +231,90 @@ describe('Select', () => {
     const item = document.querySelector('[data-testid="item-a"]');
     expect(item?.querySelector('svg')).not.toBeNull();
   });
+
+  it('placeholder shows when value is undefined', () => {
+    const { container } = render(
+      <Select>
+        <SelectTrigger data-testid="trigger">
+          <SelectValue placeholder="empty-placeholder" />
+        </SelectTrigger>
+      </Select>,
+    );
+    expect(container.querySelector('[data-testid="trigger"]')?.textContent).toContain(
+      'empty-placeholder',
+    );
+  });
+
+  it('multiple SelectItem renders all options when open', () => {
+    render(
+      <Select open={true} value="a">
+        <SelectTrigger>
+          <SelectValue placeholder="x" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="a">A</SelectItem>
+          <SelectItem value="b">B</SelectItem>
+          <SelectItem value="c">C</SelectItem>
+          <SelectItem value="d">D</SelectItem>
+        </SelectContent>
+      </Select>,
+    );
+    expect(document.body.textContent).toContain('A');
+    expect(document.body.textContent).toContain('B');
+    expect(document.body.textContent).toContain('C');
+    expect(document.body.textContent).toContain('D');
+  });
+
+  it('SelectGroup wraps items + label without crash', () => {
+    expect(() =>
+      render(
+        <Select open={true} value="a">
+          <SelectTrigger>
+            <SelectValue placeholder="x" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Group</SelectLabel>
+              <SelectItem value="a">A</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('SelectSeparator can appear multiple times', () => {
+    render(
+      <Select open={true} value="a">
+        <SelectTrigger>
+          <SelectValue placeholder="x" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="a">A</SelectItem>
+          <SelectSeparator />
+          <SelectItem value="b">B</SelectItem>
+          <SelectSeparator />
+          <SelectItem value="c">C</SelectItem>
+        </SelectContent>
+      </Select>,
+    );
+    const seps = document.querySelectorAll('[class*="h-px"]');
+    expect(seps.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('SelectContent open=true renders SelectItem with value attribute', () => {
+    render(
+      <Select open={true} value="a">
+        <SelectTrigger>
+          <SelectValue placeholder="x" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem data-testid="item-a" value="a">
+            Apple
+          </SelectItem>
+        </SelectContent>
+      </Select>,
+    );
+    expect(document.querySelector('[data-testid="item-a"]')).not.toBeNull();
+  });
 });

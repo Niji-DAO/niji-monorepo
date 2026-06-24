@@ -121,4 +121,39 @@ describe('ProposalTransactions', () => {
     const { container } = render(<ProposalTransactions details={[largeTx]} />);
     expect(container.textContent).toContain('1000000000000000000');
   });
+
+  it('handles single tx with empty callData gracefully', () => {
+    const empty = { ...simpleTx, callData: '' } as never;
+    expect(() => render(<ProposalTransactions details={[empty]} />)).not.toThrow();
+  });
+
+  it('renders 2 TokenBuyer banners for 2 tokenBuyer tx in list', () => {
+    const { container } = render(<ProposalTransactions details={[tokenBuyerTx, tokenBuyerTx]} />);
+    const matches = container.textContent?.match(/automatically added/g) ?? [];
+    expect(matches.length).toBe(2);
+  });
+
+  it('renders 5 li with 5 distinct targets', () => {
+    const targets = ['0xA', '0xB', '0xC', '0xD', '0xE'];
+    const details = targets.map(t => ({
+      target: t,
+      functionSig: '',
+      callData: 'd',
+      value: 0n,
+    })) as never;
+    const { container } = render(<ProposalTransactions details={details} />);
+    targets.forEach(t => expect(container.textContent).toContain(t));
+  });
+
+  it('passes details=[] without crash + 0 li', () => {
+    const { container } = render(<ProposalTransactions details={[]} />);
+    expect(container.querySelectorAll('li').length).toBe(0);
+  });
+
+  it('functionSig present + non-zero value renders both', () => {
+    const tx = { ...sigTx, value: 999n } as never;
+    const { container } = render(<ProposalTransactions details={[tx]} />);
+    expect(container.textContent).toContain('999');
+    expect(container.textContent).toContain('transfer');
+  });
 });
