@@ -102,4 +102,47 @@ describe('AuctionActivityNijiTitle', () => {
     expect(container.querySelector('h1')?.textContent).toContain('Niji');
     expect(container.querySelector('h1')?.textContent).toContain('42');
   });
+
+  it('rerender from isCool=true to false switches color', () => {
+    const { container, rerender } = render(<AuctionActivityNijiTitle nounId={1n} isCool={true} />);
+    expect(container.querySelector('h1')?.getAttribute('style')).toContain('cool');
+    rerender(<AuctionActivityNijiTitle nounId={1n} isCool={false} />);
+    expect(container.querySelector('h1')?.getAttribute('style')).toContain('warm');
+  });
+
+  it('5 instances render 5 h1 elements', () => {
+    const { container } = render(
+      <>
+        <AuctionActivityNijiTitle nounId={1n} />
+        <AuctionActivityNijiTitle nounId={2n} />
+        <AuctionActivityNijiTitle nounId={3n} />
+        <AuctionActivityNijiTitle nounId={4n} />
+        <AuctionActivityNijiTitle nounId={5n} />
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(5);
+  });
+
+  it('div wrapper renders only 1 element', () => {
+    const { container } = render(<AuctionActivityNijiTitle nounId={1n} />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+  });
+
+  it('h1 className is non-empty', () => {
+    const { container } = render(<AuctionActivityNijiTitle nounId={1n} />);
+    expect(container.querySelector('h1')?.className).toBeTruthy();
+  });
+
+  it('rerender from large to small nounId reduces text', () => {
+    const { container, rerender } = render(<AuctionActivityNijiTitle nounId={9999n} />);
+    expect(container.querySelector('h1')?.textContent).toContain('9999');
+    rerender(<AuctionActivityNijiTitle nounId={1n} />);
+    expect(container.querySelector('h1')?.textContent).toContain('1');
+    expect(container.querySelector('h1')?.textContent).not.toContain('9999');
+  });
+
+  it('1000n nounId renders as "1000"', () => {
+    const { container } = render(<AuctionActivityNijiTitle nounId={1000n} />);
+    expect(container.querySelector('h1')?.textContent).toContain('1000');
+  });
 });

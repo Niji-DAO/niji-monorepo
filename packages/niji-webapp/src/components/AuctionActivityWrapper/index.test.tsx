@@ -104,4 +104,54 @@ describe('AuctionActivityWrapper', () => {
     );
     expect(container.querySelector('[data-testid="inner"]')?.textContent).toBe('deep');
   });
+
+  it('rerender updates children text', () => {
+    const { container, rerender } = render(<AuctionActivityWrapper>first</AuctionActivityWrapper>);
+    expect(container.textContent).toBe('first');
+    rerender(<AuctionActivityWrapper>second</AuctionActivityWrapper>);
+    expect(container.textContent).toBe('second');
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <AuctionActivityWrapper>a</AuctionActivityWrapper>
+        <AuctionActivityWrapper>b</AuctionActivityWrapper>
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(2);
+    expect(container.textContent).toContain('a');
+    expect(container.textContent).toContain('b');
+  });
+
+  it('unicode children render verbatim', () => {
+    const { container } = render(<AuctionActivityWrapper>こんにちは</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe('こんにちは');
+  });
+
+  it('0 children renders as "0"', () => {
+    const { container } = render(<AuctionActivityWrapper>{0}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe('0');
+  });
+
+  it('mixed text + element children render', () => {
+    const { container } = render(
+      <AuctionActivityWrapper>
+        text-<strong>strong</strong>
+      </AuctionActivityWrapper>,
+    );
+    expect(container.querySelector('strong')?.textContent).toBe('strong');
+    expect(container.textContent).toContain('text-');
+  });
+
+  it('all instances share same className', () => {
+    const { container } = render(
+      <>
+        <AuctionActivityWrapper>a</AuctionActivityWrapper>
+        <AuctionActivityWrapper>b</AuctionActivityWrapper>
+      </>,
+    );
+    const divs = container.querySelectorAll('div');
+    expect(divs[0].className).toBe(divs[1].className);
+  });
 });
