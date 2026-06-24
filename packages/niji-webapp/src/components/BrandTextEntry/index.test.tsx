@@ -159,4 +159,36 @@ describe('BrandTextEntry', () => {
     );
     expect(container.querySelectorAll('input').length).toBe(5);
   });
+
+  it('type="email" renders correctly', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} type="email" />);
+    expect(container.querySelector('input')?.getAttribute('type')).toBe('email');
+  });
+
+  it('rapid 10 changes invoke onChange 10 times', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandTextEntry onChange={onChange} />);
+    const input = container.querySelector('input');
+    if (input) {
+      for (let i = 0; i < 10; i++) {
+        fireEvent.change(input, { target: { value: `text${i}` } });
+      }
+    }
+    expect(onChange).toHaveBeenCalledTimes(10);
+  });
+
+  it('value with special chars renders verbatim', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} value={'<>&"'} />);
+    expect(container.querySelector('input')?.value).toBe('<>&"');
+  });
+
+  it('emoji value renders correctly', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} value="🎉🎊" />);
+    expect(container.querySelector('input')?.value).toBe('🎉🎊');
+  });
+
+  it('min attribute forwarded as is', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} min="10" />);
+    expect(container.querySelector('input')?.getAttribute('min')).toBe('10');
+  });
 });
