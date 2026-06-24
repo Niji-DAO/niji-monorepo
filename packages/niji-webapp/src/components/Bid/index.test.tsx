@@ -259,4 +259,40 @@ describe('Bid', () => {
     const spinner = container.querySelector('.spinner-border');
     expect(spinner).not.toBeNull();
   });
+
+  it('renders exactly 1 input when not auctionEnded', () => {
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    expect(container.querySelectorAll('input').length).toBe(1);
+  });
+
+  it('rerender from auctionEnded=false to true removes input', () => {
+    const { container, rerender } = render(
+      <Bid auction={makeAuction() as never} auctionEnded={false} />,
+    );
+    expect(container.querySelector('input')).not.toBeNull();
+    rerender(<Bid auction={makeAuction() as never} auctionEnded={true} />);
+    expect(container.querySelector('input')).toBeNull();
+  });
+
+  it('bid button is shown when not auctionEnded', () => {
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    const bidBtn = Array.from(container.querySelectorAll('button')).find(b =>
+      b.textContent?.includes('Bid'),
+    );
+    expect(bidBtn).not.toBeUndefined();
+  });
+
+  it('Pick button shown when auctionEnded=true', () => {
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={true} />);
+    const pickBtn = Array.from(container.querySelectorAll('button')).find(b =>
+      b.textContent?.includes('Pick'),
+    );
+    expect(pickBtn).not.toBeUndefined();
+  });
+
+  it('different nounId renders without crash', () => {
+    expect(() =>
+      render(<Bid auction={makeAuction({ nounId: 999n }) as never} auctionEnded={false} />),
+    ).not.toThrow();
+  });
 });

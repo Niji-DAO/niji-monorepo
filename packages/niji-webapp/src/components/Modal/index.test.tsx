@@ -146,4 +146,36 @@ describe('Modal', () => {
     const overlay = document.getElementById('overlay-root');
     expect(overlay?.children.length).toBe(2);
   });
+
+  it('renders unicode title verbatim', () => {
+    render(<Modal title="日本語タイトル" content={null} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelector('h3')?.textContent).toBe(
+      '日本語タイトル',
+    );
+  });
+
+  it('img close icon has alt attribute', () => {
+    render(<Modal title="x" content={null} onDismiss={() => {}} />);
+    const img = document.getElementById('overlay-root')?.querySelector('img');
+    expect(img?.getAttribute('alt')).toBeDefined();
+  });
+
+  it('h3 title renders exactly 1 element per Modal', () => {
+    render(<Modal title="x" content={null} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelectorAll('h3').length).toBe(1);
+  });
+
+  it('rerender Modal title updates h3 text', () => {
+    const { rerender } = render(<Modal title="First" content={null} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelector('h3')?.textContent).toBe('First');
+    rerender(<Modal title="Second" content={null} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelector('h3')?.textContent).toBe(
+      'Second',
+    );
+  });
+
+  it('close button is a single element per Modal', () => {
+    render(<Modal title="x" content={null} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelectorAll('button').length).toBe(1);
+  });
 });

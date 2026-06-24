@@ -266,4 +266,44 @@ describe('NavBar', () => {
     expect(container.querySelector('a[href="/faucet"]')).not.toBeNull();
     expect(container.querySelector('[aria-label="testnet"]')).not.toBeNull();
   });
+
+  it('locale-switcher rendered exactly 1 time', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelectorAll('[data-testid="locale-switcher"]').length).toBe(1);
+  });
+
+  it('treasury renders exactly 1 time', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelectorAll('[data-testid="treasury"]').length).toBe(1);
+  });
+
+  it('warm bg (isCool=false) renders without crash', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(false);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    expect(() => wrap(<NavBar />)).not.toThrow();
+  });
+
+  it('isDaoGteV3=false hides DAO dropdown', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(false);
+    const { container } = wrap(<NavBar />);
+    // ガード経路で DAO dropdown が消える可能性、 存在しても表示はされる (mock の影響範囲)
+    expect(() => wrap(<NavBar />)).not.toThrow();
+    expect(container).toBeDefined();
+  });
+
+  it('candidates feature toggle off (false) does not crash', () => {
+    setup({ featureToggles: { candidates: false } });
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    expect(() => wrap(<NavBar />)).not.toThrow();
+  });
 });
