@@ -57,4 +57,48 @@ describe('SettleManuallyBtn', () => {
     );
     expect(container.querySelector('p button')).not.toBeNull();
   });
+
+  it('fires settleAuctionHandler on multiple clicks', () => {
+    const handler = vi.fn();
+    const { container } = render(
+      <SettleManuallyBtn settleAuctionHandler={handler} auction={auction} />,
+    );
+    const btn = container.querySelector('button');
+    if (btn) {
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+    }
+    expect(handler).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders with huge bid amount', () => {
+    const huge = { ...auction, amount: 1_000_000_000_000_000_000_000_000n };
+    const { container } = render(
+      <SettleManuallyBtn settleAuctionHandler={() => {}} auction={huge} />,
+    );
+    expect(container.textContent).toContain('Settle');
+  });
+
+  it('renders exactly 1 button element', () => {
+    const { container } = render(
+      <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(1);
+  });
+
+  it('outermost wrapper is a single <p>', () => {
+    const { container } = render(
+      <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />,
+    );
+    expect(container.children.length).toBe(1);
+    expect(container.firstElementChild?.tagName).toBe('P');
+  });
+
+  it('handles nounId=0n auction', () => {
+    const zeroId = { ...auction, nounId: 0n };
+    expect(() =>
+      render(<SettleManuallyBtn settleAuctionHandler={() => {}} auction={zeroId} />),
+    ).not.toThrow();
+  });
 });

@@ -47,4 +47,40 @@ describe('NijidersRewardSection', () => {
     );
     expect(a?.getAttribute('href')).toBe('https://twitter.com/carrot_init');
   });
+
+  it('all 10 links point to twitter.com domain', () => {
+    const { container } = wrap(<NijidersRewardSection />);
+    const links = Array.from(container.querySelectorAll('a'));
+    expect(links.length).toBe(10);
+    links.forEach(a => {
+      expect(a.getAttribute('href')?.startsWith('https://twitter.com/')).toBe(true);
+    });
+  });
+
+  it('all 10 URLs are unique (no duplicates)', () => {
+    const { container } = wrap(<NijidersRewardSection />);
+    const urls = Array.from(container.querySelectorAll('a')).map(a => a.getAttribute('href'));
+    const unique = new Set(urls);
+    expect(unique.size).toBe(10);
+  });
+
+  it('all handles start with @', () => {
+    const { container } = wrap(<NijidersRewardSection />);
+    const links = Array.from(container.querySelectorAll('a'));
+    links.forEach(a => {
+      expect(a.textContent?.startsWith('@')).toBe(true);
+    });
+  });
+
+  it('mentions "Niji DAO" and "auction proceeds" context', () => {
+    const { container } = wrap(<NijidersRewardSection />);
+    expect(container.textContent).toContain('Niji DAO');
+    expect(container.textContent).toContain('auction proceeds');
+  });
+
+  it('mentions "Every 10th Niji" + 5 years vesting context', () => {
+    const { container } = wrap(<NijidersRewardSection />);
+    expect(container.textContent).toContain('Every 10th Niji');
+    expect(container.textContent).toContain('5 years');
+  });
 });
