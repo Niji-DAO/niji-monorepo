@@ -130,4 +130,38 @@ describe('ModalSubtitle', () => {
     expect(container.querySelector('strong')?.textContent).toBe('strong');
     expect(container.textContent).toContain('text-');
   });
+
+  it('div has non-empty className from CSS module', () => {
+    const { container } = render(<ModalSubtitle>x</ModalSubtitle>);
+    const cls = container.querySelector('div')?.className ?? '';
+    expect(cls.length).toBeGreaterThan(0);
+  });
+
+  it('renders text node + element node siblings correctly', () => {
+    const { container } = render(
+      <ModalSubtitle>
+        a<em>b</em>c
+      </ModalSubtitle>,
+    );
+    expect(container.querySelector('em')?.textContent).toBe('b');
+    expect(container.textContent).toBe('abc');
+  });
+
+  it('repeat re-render with different content preserves div tag', () => {
+    const { container, rerender } = render(<ModalSubtitle>1</ModalSubtitle>);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+    rerender(<ModalSubtitle>2</ModalSubtitle>);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
+
+  it('large array children renders correctly', () => {
+    const large = Array.from({ length: 50 }, (_, i) => String(i));
+    const { container } = render(<ModalSubtitle>{large}</ModalSubtitle>);
+    expect(container.textContent).toBe(large.join(''));
+  });
+
+  it('special chars in text render correctly', () => {
+    const { container } = render(<ModalSubtitle>{'<>&"\''}</ModalSubtitle>);
+    expect(container.textContent).toBe('<>&"\'');
+  });
 });
