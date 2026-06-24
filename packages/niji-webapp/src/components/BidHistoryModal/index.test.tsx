@@ -191,4 +191,46 @@ describe('BidHistoryModal', () => {
       document.getElementById('overlay-root')?.querySelectorAll('[data-testid="row"]').length,
     ).toBe(1);
   });
+
+  it('rerender from no bids to bids shows rows', () => {
+    useAuctionBidsMock.mockReturnValueOnce([]);
+    const { rerender } = render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelectorAll('[data-testid="row"]').length,
+    ).toBe(0);
+    useAuctionBidsMock.mockReturnValue([{ transactionHash: '0xnew' }]);
+    rerender(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelectorAll('[data-testid="row"]').length,
+    ).toBe(1);
+  });
+
+  it('Backdrop element is 1 div', () => {
+    const { container } = render(<Backdrop onDismiss={() => {}} />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+  });
+
+  it('Backdrop without onDismiss does not crash', () => {
+    expect(() => render(<Backdrop onDismiss={() => {}} />)).not.toThrow();
+  });
+
+  it('overlay contains 1 button (close)', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelectorAll('button').length).toBe(1);
+  });
+
+  it('rerender auction.nounId updates niji-rounded text', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const { rerender } = render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="niji-rounded"]')
+        ?.textContent,
+    ).toBe('42');
+    rerender(<BidHistoryModal auction={{ ...auction, nounId: 100n }} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="niji-rounded"]')
+        ?.textContent,
+    ).toBe('100');
+  });
 });

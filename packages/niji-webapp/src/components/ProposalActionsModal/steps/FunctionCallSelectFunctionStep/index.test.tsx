@@ -306,4 +306,63 @@ describe('FunctionCallSelectFunctionStep', () => {
     const abiUpload = container.querySelector('[data-testid="abi-upload"]');
     expect(abiUpload?.getAttribute('data-filename')).toBe('etherscan-abi-download.json');
   });
+
+  it('renders exactly 2 buttons (Prev + Next)', () => {
+    const { container } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('renders ABI upload component exactly 1 time', () => {
+    const { container } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+    expect(container.querySelectorAll('[data-testid="abi-upload"]').length).toBe(1);
+  });
+
+  it('multi-click on Prev fires onPrevBtnClick N times', () => {
+    const { container } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+    const prev = container.querySelector('[data-testid="prev-btn"]') as HTMLButtonElement;
+    fireEvent.click(prev);
+    fireEvent.click(prev);
+    fireEvent.click(prev);
+    expect(onPrevBtnClick).toHaveBeenCalledTimes(3);
+  });
+
+  it('Next button does not fire onPrev', () => {
+    const { container } = render(
+      <FunctionCallSelectFunctionStep
+        {...baseProps}
+        state={{ ...baseProps.state, address: validAddress, abi: sampleAbi } as never}
+      />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]') as HTMLButtonElement);
+    expect(onPrevBtnClick).not.toHaveBeenCalled();
+  });
+
+  it('modal-title renders inside container', () => {
+    const { container } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+    expect(container.querySelector('[data-testid="modal-title"]')).not.toBeNull();
+  });
+
+  it('initial state has empty address input', () => {
+    const { container } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+    const addressInput = container.querySelector(
+      '[data-testid="input-Contract Address"]',
+    ) as HTMLInputElement;
+    expect(addressInput.value).toBe('');
+  });
+
+  it('Contract Address input is empty when state.address is empty', () => {
+    const { container } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+    const addressInput = container.querySelector(
+      '[data-testid="input-Contract Address"]',
+    ) as HTMLInputElement;
+    expect(addressInput.value).toBe('');
+  });
+
+  it('dropdown initial value is empty string', () => {
+    const { container } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+    const dropdown = container.querySelector(
+      '[data-testid="dropdown-Select Contract Function"]',
+    ) as HTMLSelectElement;
+    expect(dropdown.value).toBe('');
+  });
 });
