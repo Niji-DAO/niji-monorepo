@@ -465,6 +465,36 @@ describe('ProposalActionModal', () => {
     );
     expect(container.querySelectorAll('[data-testid="solid-modal"]').length).toBe(2);
   });
+
+  it('renders 5 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <ProposalActionModal key={i} {...baseProps} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="solid-modal"]').length).toBe(5);
+  });
+
+  it('renders without crash with show=false', () => {
+    expect(() => render(<ProposalActionModal {...baseProps} show={false} />)).not.toThrow();
+  });
+
+  it('rerender from show=false to true does not crash', () => {
+    const { rerender } = render(<ProposalActionModal {...baseProps} show={false} />);
+    expect(() => rerender(<ProposalActionModal {...baseProps} show={true} />)).not.toThrow();
+  });
+
+  it('renders consecutive 10 times without crash', () => {
+    for (let i = 0; i < 10; i++) {
+      expect(() => render(<ProposalActionModal {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('renders without crash with default baseProps', () => {
+    expect(() => render(<ProposalActionModal {...baseProps} />)).not.toThrow();
+  });
 });
 
 // dummy reference to silence unused warning
