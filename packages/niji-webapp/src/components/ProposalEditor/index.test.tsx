@@ -171,4 +171,33 @@ describe('ProposalEditor', () => {
       'Proposal candidate title',
     );
   });
+
+  it('renders input + textarea exactly 1 each', () => {
+    const { container } = render(<ProposalEditor {...defaults} />);
+    expect(container.querySelectorAll('input').length).toBe(1);
+    expect(container.querySelectorAll('textarea').length).toBe(1);
+  });
+
+  it('renders title and body strings as values', () => {
+    const { container } = render(<ProposalEditor {...defaults} title="MyTitle" body="MyBody" />);
+    expect((container.querySelector('input') as HTMLInputElement)?.value).toBe('MyTitle');
+    expect((container.querySelector('textarea') as HTMLTextAreaElement)?.value).toBe('MyBody');
+  });
+
+  it('rapid 10 input event fires handler 10 times', () => {
+    const onInput = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onTitleInput={onInput} />);
+    const inp = container.querySelector('input')!;
+    for (let i = 0; i < 10; i++) fireEvent.input(inp, { target: { value: `x${i}` } });
+    expect(onInput).toHaveBeenCalledTimes(10);
+  });
+
+  it('renders empty body without crash', () => {
+    expect(() => render(<ProposalEditor {...defaults} body="" />)).not.toThrow();
+  });
+
+  it('renders body textarea even with markdown text', () => {
+    const { container } = render(<ProposalEditor {...defaults} body="# Header" />);
+    expect((container.querySelector('textarea') as HTMLTextAreaElement)?.value).toBe('# Header');
+  });
 });

@@ -275,4 +275,63 @@ describe('NavDropDown', () => {
     );
     expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('AAAAA');
   });
+
+  it('renders with React element buttonText', () => {
+    const { container } = render(
+      <NavDropDown buttonText={<span data-testid="inner-btn">elem</span>}>
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="inner-btn"]')?.textContent).toBe('elem');
+  });
+
+  it('handles empty string buttonText', () => {
+    const { container } = render(
+      <NavDropDown buttonText="">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('');
+  });
+
+  it('renders without buttonIcon prop', () => {
+    const { container } = render(
+      <NavDropDown buttonText="NoIcon">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('NoIcon');
+  });
+
+  it('rerender from "Menu" to "NewMenu" updates text', () => {
+    const { container, rerender } = render(
+      <NavDropDown buttonText="Menu">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('Menu');
+    rerender(
+      <NavDropDown buttonText="NewMenu">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('NewMenu');
+  });
+
+  it('multiple instances render each their own button', () => {
+    const { container } = render(
+      <>
+        <NavDropDown buttonText="One">
+          <span>a</span>
+        </NavDropDown>
+        <NavDropDown buttonText="Two">
+          <span>b</span>
+        </NavDropDown>
+      </>,
+    );
+    const btns = container.querySelectorAll('[data-testid="nav-button"]');
+    expect(btns.length).toBe(2);
+    expect(btns[0].textContent).toBe('One');
+    expect(btns[1].textContent).toBe('Two');
+  });
 });
