@@ -110,4 +110,58 @@ describe('LegacyNoun — additional edge cases', () => {
     const { container } = render(<LegacyNoun imgPath="/x.png" alt="x" />);
     expect(container.querySelector('img')).not.toBeNull();
   });
+
+  it('rerender imgPath updates src', () => {
+    const { container, rerender } = render(<LegacyNoun imgPath="/a.png" alt="x" />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('/a.png');
+    rerender(<LegacyNoun imgPath="/b.png" alt="x" />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('/b.png');
+  });
+
+  it('rerender alt updates alt attribute', () => {
+    const { container, rerender } = render(<LegacyNoun imgPath="/x.png" alt="alt1" />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('alt1');
+    rerender(<LegacyNoun imgPath="/x.png" alt="alt2" />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('alt2');
+  });
+
+  it('multiple LegacyNoun instances render 2 imgs', () => {
+    const { container } = render(
+      <>
+        <LegacyNoun imgPath="/a.png" alt="A" />
+        <LegacyNoun imgPath="/b.png" alt="B" />
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(2);
+  });
+
+  it('unicode alt renders verbatim', () => {
+    const { container } = render(<LegacyNoun imgPath="/x.png" alt="日本語" />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('日本語');
+  });
+
+  it('LoadingNoun has expected alt="loading noun"', () => {
+    const { container } = render(<LoadingNoun />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('loading noun');
+  });
+
+  it('rerender from empty imgPath to loaded shows real img', () => {
+    const { container, rerender } = render(<LegacyNoun imgPath="" alt="x" />);
+    expect(container.querySelector('img')?.getAttribute('src')).toMatch(/loading-skull/i);
+    rerender(<LegacyNoun imgPath="/real.png" alt="x" />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('/real.png');
+  });
+
+  it('5 LoadingNoun instances render 5 imgs', () => {
+    const { container } = render(
+      <>
+        <LoadingNoun />
+        <LoadingNoun />
+        <LoadingNoun />
+        <LoadingNoun />
+        <LoadingNoun />
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(5);
+  });
 });
