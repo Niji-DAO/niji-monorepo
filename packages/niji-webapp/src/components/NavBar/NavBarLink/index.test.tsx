@@ -44,4 +44,40 @@ describe('NavBarLink', () => {
     );
     expect(container.querySelector('a span')?.textContent).toBe('nested');
   });
+
+  it('renders numeric children as string', () => {
+    const { container } = wrap(<NavBarLink to="/x">{42}</NavBarLink>);
+    expect(container.querySelector('a')?.textContent).toBe('42');
+  });
+
+  it('renders Fragment children unwrapped', () => {
+    const { container } = wrap(
+      <NavBarLink to="/x">
+        <>
+          <span>a</span>
+          <span>b</span>
+        </>
+      </NavBarLink>,
+    );
+    expect(container.querySelectorAll('span').length).toBe(2);
+  });
+
+  it('handles empty className prop', () => {
+    const { container } = wrap(
+      <NavBarLink to="/x" className="">
+        x
+      </NavBarLink>,
+    );
+    expect(container.querySelector('a')).not.toBeNull();
+  });
+
+  it('external https link with path preserves href', () => {
+    const { container } = wrap(<NavBarLink to="https://example.com/foo/bar">ext</NavBarLink>);
+    expect(container.querySelector('a')?.getAttribute('href')).toBe('https://example.com/foo/bar');
+  });
+
+  it('renders exactly 1 <a> element (no extras)', () => {
+    const { container } = wrap(<NavBarLink to="/x">x</NavBarLink>);
+    expect(container.querySelectorAll('a').length).toBe(1);
+  });
 });

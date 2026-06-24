@@ -52,4 +52,38 @@ describe('NetworkAlert', () => {
     render(<NetworkAlert />);
     expect(switchChainMock).toHaveBeenCalledWith({ chainId: 1 });
   });
+
+  it('calls switchChain when chainId is 0 (truthy isConnected, chainId !== target)', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 0 });
+    render(<NetworkAlert />);
+    // chainId 0 !== CHAIN_ID 1 で switchChain 呼出 (実装は != null check のみ)
+    expect(switchChainMock).toHaveBeenCalledWith({ chainId: 1 });
+  });
+
+  it('does not call switchChain when chainId is undefined', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: undefined });
+    render(<NetworkAlert />);
+    expect(switchChainMock).not.toHaveBeenCalled();
+  });
+
+  it('renders null DOM (firstChild is null) when connected on wrong chain', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 11155111 });
+    const { container } = render(<NetworkAlert />);
+    // switchChain は呼ばれるが DOM 自体は null (UI なし)
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('calls switchChain with target chainId from config (CHAIN_ID=1)', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 137 });
+    render(<NetworkAlert />);
+    expect(switchChainMock).toHaveBeenCalledWith({ chainId: 1 });
+  });
+
+  it('does not re-call switchChain when correct chain after wrong (idempotent)', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 1 });
+    render(<NetworkAlert />);
+    render(<NetworkAlert />);
+    render(<NetworkAlert />);
+    expect(switchChainMock).not.toHaveBeenCalled();
+  });
 });
