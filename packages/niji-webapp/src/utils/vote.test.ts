@@ -39,4 +39,30 @@ describe('Vote enum', () => {
   it('typeof Vote.FOR is number', () => {
     expect(typeof Vote.FOR).toBe('number');
   });
+
+  it('Object.entries length is 6 (3 named + 3 reverse)', () => {
+    expect(Object.entries(Vote).length).toBe(6);
+  });
+
+  it('Object.values contains both numeric and string representations', () => {
+    const values = Object.values(Vote);
+    expect(values).toContain(0);
+    expect(values).toContain(1);
+    expect(values).toContain(2);
+    expect(values).toContain('SUPPORT');
+    expect(values).toContain('FOR');
+    expect(values).toContain('ABSTAIN');
+  });
+
+  it('each enum value is integer (Math.floor(v) === v)', () => {
+    expect(Math.floor(Vote.SUPPORT)).toBe(Vote.SUPPORT);
+    expect(Math.floor(Vote.FOR)).toBe(Vote.FOR);
+    expect(Math.floor(Vote.ABSTAIN)).toBe(Vote.ABSTAIN);
+  });
+
+  it('reverse lookup at index 0 returns SUPPORT (not undefined)', () => {
+    // 0 は falsy だが reverse lookup は存在 -> 'SUPPORT'
+    expect(Vote[0]).toBe('SUPPORT');
+    expect(Vote[0]).toBeTruthy();
+  });
 });
