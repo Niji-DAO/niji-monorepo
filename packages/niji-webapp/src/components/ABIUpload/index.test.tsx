@@ -506,4 +506,81 @@ describe('ABIUpload Component', () => {
     );
     expect(container.querySelector('label')?.className).toBe(labelCls);
   });
+
+  it('renders 50 ABIUpload instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <ABIUpload
+              key={i}
+              abiFileName={`file${i}.json`}
+              isValid={false}
+              isInvalid={false}
+              onChange={vi.fn()}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 100 change events fire 100 times', () => {
+    const handleChange = vi.fn();
+    render(
+      <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={handleChange} />,
+    );
+    const input = screen.getByLabelText(/abi/i) as HTMLInputElement;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(input, {
+        target: { files: [new File([`c${i}`], `f${i}.json`, { type: 'application/json' })] },
+      });
+    }
+    expect(handleChange).toHaveBeenCalledTimes(100);
+  });
+
+  it('rerender 30 times preserves input element', () => {
+    const { rerender } = render(
+      <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      rerender(
+        <ABIUpload
+          abiFileName={`file${i}.json`}
+          isValid={i % 2 === 0}
+          isInvalid={i % 3 === 0}
+          onChange={vi.fn()}
+        />,
+      );
+      expect(screen.getByLabelText(/abi/i)).not.toBeNull();
+    }
+  });
+
+  it('handles unicode filename across renders', () => {
+    expect(() =>
+      render(
+        <ABIUpload
+          abiFileName="日本語ファイル.json"
+          isValid={false}
+          isInvalid={false}
+          onChange={vi.fn()}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different filenames sequentially', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        render(
+          <ABIUpload
+            abiFileName={`file${i}.json`}
+            isValid={false}
+            isInvalid={false}
+            onChange={vi.fn()}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
