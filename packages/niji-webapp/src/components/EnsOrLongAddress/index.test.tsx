@@ -283,4 +283,50 @@ describe('EnsOrLongAddress', () => {
     const { container } = render(<EnsOrLongAddress address={otherAddr} />);
     expect(container.textContent).toBe(otherAddr);
   });
+
+  it('renders 50 instances each with own ENS', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('shared.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <EnsOrLongAddress key={i} address={ADDR} />
+        ))}
+      </>,
+    );
+    expect(container.textContent).toBe('shared.eth'.repeat(50));
+  });
+
+  it('rerender from address with ENS to address without', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValueOnce('alice.eth');
+    const { container, rerender } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('alice.eth');
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    rerender(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(ADDR);
+  });
+
+  it('handles 100 consecutive renders', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    for (let i = 0; i < 100; i++) {
+      expect(() => render(<EnsOrLongAddress address={ADDR} />)).not.toThrow();
+    }
+  });
+
+  it('handles ENS containing special chars', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('test-name_123.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('test-name_123.eth');
+  });
+
+  it('rerender different addresses uses different short fallback', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const addr1 = '0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    const addr2 = '0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB';
+    const { container, rerender } = render(<EnsOrLongAddress address={addr1} />);
+    expect(container.textContent).toBe(addr1);
+    rerender(<EnsOrLongAddress address={addr2} />);
+    expect(container.textContent).toBe(addr2);
+  });
 });

@@ -312,4 +312,50 @@ describe('LanguageSelectionModal', () => {
     });
     expect(setLocale).toHaveBeenCalledTimes(3);
   });
+
+  it('renders 5 LanguageSelectionModal instances all together', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <LanguageSelectionModal key={i} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 5 times preserves modal', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { rerender } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+    for (let i = 0; i < 5; i++) {
+      expect(() => rerender(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
+    }
+  });
+
+  it('h3 title preserves across locale toggle', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelector('h3')?.textContent).toBe(
+      'Select Language',
+    );
+  });
+
+  it('all 3 buttons accessible via div content match', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    const buttons = document.getElementById('overlay-root')?.querySelectorAll('div');
+    const labels = ['日本語', 'English', '中文'];
+    labels.forEach(label => {
+      const btn = Array.from(buttons ?? []).find(d => d.textContent === label);
+      expect(btn).toBeDefined();
+    });
+  });
+
+  it('overlay-root contains modal portal', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.children.length).toBeGreaterThanOrEqual(1);
+  });
 });

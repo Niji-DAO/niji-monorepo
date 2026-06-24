@@ -575,4 +575,80 @@ describe('DynamicQuorumInfoModal', () => {
       ).not.toThrow();
     }
   });
+
+  it('renders 5 instances each with different againstVotes', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <DynamicQuorumInfoModal
+              key={i}
+              proposal={makeProposal()}
+              againstVotesAbsolute={i * 5}
+              onDismiss={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles negative againstVotesAbsolute', () => {
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={-1}
+          onDismiss={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender does not crash 5 times', () => {
+    const { rerender } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+      />,
+    );
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        rerender(
+          <DynamicQuorumInfoModal
+            proposal={makeProposal()}
+            againstVotesAbsolute={i * 10}
+            onDismiss={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles currentQuorum=0', () => {
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={10}
+          onDismiss={() => {}}
+          currentQuorum={0}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles currentQuorum=1000', () => {
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={10}
+          onDismiss={() => {}}
+          currentQuorum={1000}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });
