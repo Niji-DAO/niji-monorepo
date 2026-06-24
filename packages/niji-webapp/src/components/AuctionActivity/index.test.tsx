@@ -551,4 +551,63 @@ describe('AuctionActivity', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 20 instances without crash', () => {
+    useAtomValueMock.mockReturnValue(false);
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <AuctionActivity key={i} {...defaults} auction={makeAuction() as never} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves wrapper', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const { container, rerender } = wrap(
+      <AuctionActivity {...defaults} auction={makeAuction() as never} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      rerender(
+        <MemoryRouter>
+          <AuctionActivity {...defaults} auction={makeAuction({ nounId: BigInt(i) }) as never} />
+        </MemoryRouter>,
+      );
+    }
+    expect(container.querySelector('[data-testid="wrapper"]')).not.toBeNull();
+  });
+
+  it('handles isFirstAuction=true variant', () => {
+    useAtomValueMock.mockReturnValue(false);
+    expect(() =>
+      wrap(
+        <AuctionActivity {...defaults} isFirstAuction={true} auction={makeAuction() as never} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles displayGraphDepComps=false variant', () => {
+    useAtomValueMock.mockReturnValue(false);
+    expect(() =>
+      wrap(
+        <AuctionActivity
+          {...defaults}
+          displayGraphDepComps={false}
+          auction={makeAuction() as never}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 1e9 nounId large bigint', () => {
+    useAtomValueMock.mockReturnValue(false);
+    expect(() =>
+      wrap(
+        <AuctionActivity {...defaults} auction={makeAuction({ nounId: 1000000000n }) as never} />,
+      ),
+    ).not.toThrow();
+  });
 });
