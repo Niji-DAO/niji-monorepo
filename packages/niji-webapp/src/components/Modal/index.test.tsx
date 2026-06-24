@@ -212,4 +212,30 @@ describe('Modal', () => {
     render(<Modal title="x" content={null} onDismiss={() => {}} />);
     expect(document.getElementById('overlay-root')?.querySelectorAll('img').length).toBe(1);
   });
+
+  it('renders without crash with minimal content', () => {
+    expect(() => render(<Modal title="X" content={<>x</>} onDismiss={() => {}} />)).not.toThrow();
+  });
+
+  it('renders unicode title', () => {
+    render(<Modal title="日本語" content={<>x</>} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.textContent).toContain('日本語');
+  });
+
+  it('renders 500 char long content', () => {
+    const longStr = 'x'.repeat(500);
+    render(<Modal title="T" content={<div>{longStr}</div>} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.textContent).toContain(longStr);
+  });
+
+  it('rerender title updates display', () => {
+    const { rerender } = render(<Modal title="first" content={<>x</>} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.textContent).toContain('first');
+    rerender(<Modal title="second" content={<>x</>} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.textContent).toContain('second');
+  });
+
+  it('renders for null content', () => {
+    expect(() => render(<Modal title="T" content={null} onDismiss={() => {}} />)).not.toThrow();
+  });
 });

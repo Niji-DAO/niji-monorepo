@@ -286,4 +286,51 @@ describe('ForkingPeriodTimer', () => {
     );
     expect(container.querySelector('h2')).toBeNull();
   });
+
+  it('renders without crash with endTime=0', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() => render(<ForkingPeriodTimer endTime={0} isPeriodEnded={false} />)).not.toThrow();
+  });
+
+  it('renders 5 instances independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const baseTime = Math.floor(Date.now() / 1000) + 1000;
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <ForkingPeriodTimer key={i} endTime={baseTime + i * 100} isPeriodEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender from active to ended', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { rerender } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 1000} isPeriodEnded={false} />,
+    );
+    expect(() =>
+      rerender(
+        <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 1000} isPeriodEnded={true} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash for very far future endTime', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(<ForkingPeriodTimer endTime={9999999999} isPeriodEnded={false} />),
+    ).not.toThrow();
+  });
+
+  it('useAtomValue=false renders without crash', () => {
+    useAtomValueMock.mockReturnValue(false);
+    expect(() =>
+      render(
+        <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 1000} isPeriodEnded={false} />,
+      ),
+    ).not.toThrow();
+  });
 });
