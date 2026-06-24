@@ -114,4 +114,40 @@ describe('transactionIconLink helper', () => {
     const { container } = render(<>{result}</>);
     expect(container.querySelector('a img')).not.toBeNull();
   });
+
+  it('transactionIconLink href uses transactionHash arg', () => {
+    const result = transactionIconLink('0xspecific123');
+    const { container } = render(<>{result}</>);
+    expect(container.querySelector('a')?.getAttribute('href')).toContain('0xspecific123');
+  });
+});
+
+describe('ProposalContent extra cases', () => {
+  it('renders Proposed Transactions section when details non-empty', () => {
+    const { container } = render(<ProposalContent description="" title="t" details={details} />);
+    expect(container.textContent).toContain('Proposed Transactions');
+  });
+
+  it('renders empty details array (0 transactions) gracefully', () => {
+    const { container } = render(
+      <ProposalContent description="d" title="t" details={[] as never} />,
+    );
+    expect(container.querySelector('[data-testid="proposal-tx"]')?.textContent).toBe('tx-count-0');
+  });
+
+  it('renders 10 details (large details array)', () => {
+    const tenDetails = Array.from({ length: 10 }, (_, i) => ({ target: `0x${i}` })) as never;
+    const { container } = render(
+      <ProposalContent description="d" title="t" details={tenDetails} />,
+    );
+    expect(container.querySelector('[data-testid="proposal-tx"]')?.textContent).toBe('tx-count-10');
+  });
+
+  it('Description heading appears before Proposed Transactions heading', () => {
+    const { container } = render(<ProposalContent description="d" title="t" details={details} />);
+    const html = container.innerHTML;
+    const descIdx = html.indexOf('Description');
+    const txIdx = html.indexOf('Proposed Transactions');
+    expect(descIdx).toBeLessThan(txIdx);
+  });
 });

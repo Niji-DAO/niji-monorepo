@@ -124,4 +124,32 @@ describe('Footer', () => {
     // sibling text に Niji DAO の copyright が出る contract pin
     expect(container.textContent).toContain('Niji DAO');
   });
+
+  it('renders multiple external links (target=_blank)', () => {
+    const { container } = wrap(<Footer />);
+    const anchors = Array.from(container.querySelectorAll('a'));
+    const external = anchors.filter(a => a.getAttribute('target') === '_blank');
+    expect(external.length).toBeGreaterThan(0);
+  });
+
+  it('external links count is positive (target=_blank)', () => {
+    const { container } = wrap(<Footer />);
+    const anchors = Array.from(container.querySelectorAll('a'));
+    const external = anchors.filter(a => a.getAttribute('target') === '_blank');
+    expect(external.length).toBeGreaterThan(0);
+  });
+
+  it('Contracts category includes nijiTreasury etherscan link', () => {
+    const { container } = wrap(<Footer />);
+    expect(container.querySelector('a[href*="0xTREASURY"]')).not.toBeNull();
+  });
+
+  it('Contracts category includes nijiGovernor etherscan link', () => {
+    const { container } = wrap(<Footer />);
+    expect(container.querySelector('a[href*="0xGOV"]')).not.toBeNull();
+  });
+
+  it('renders for empty MemoryRouter without crash', () => {
+    expect(() => wrap(<Footer />)).not.toThrow();
+  });
 });
