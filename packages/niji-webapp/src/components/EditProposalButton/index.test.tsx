@@ -216,4 +216,49 @@ describe('EditProposalButton', () => {
     );
     expect(container.querySelector('.spinner-border')).not.toBeNull();
   });
+
+  it('renders 5 instances each independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <EditProposalButton key={i} {...defaults} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(5);
+  });
+
+  it('threshold=1000 with no enough votes shows "1001 votes"', () => {
+    const { container } = render(
+      <EditProposalButton {...defaults} hasEnoughVote={false} proposalThreshold={1000} />,
+    );
+    expect(container.textContent).toContain('1001 votes to submit a proposal');
+  });
+
+  it('isFormInvalid disables button', () => {
+    const { container } = render(<EditProposalButton {...defaults} isFormInvalid={true} />);
+    expect(container.querySelector('button')?.disabled).toBe(true);
+  });
+
+  it('multiple consecutive clicks fire handler N times', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <EditProposalButton {...defaults} handleCreateProposal={handle} />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 20; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(20);
+  });
+
+  it('isCandidate + hasEnoughVote=false + threshold=2 shows "3 votes"', () => {
+    const { container } = render(
+      <EditProposalButton
+        {...defaults}
+        isCandidate={true}
+        hasEnoughVote={false}
+        proposalThreshold={2}
+      />,
+    );
+    expect(container.textContent).toContain('3 votes to submit a proposal');
+  });
 });
