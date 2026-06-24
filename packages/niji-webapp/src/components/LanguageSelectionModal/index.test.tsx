@@ -184,4 +184,44 @@ describe('LanguageSelectionModal', () => {
     const h3 = document.getElementById('overlay-root')?.querySelector('h3');
     expect(h3?.textContent).toBe('Select Language');
   });
+
+  it('backdrop-root has 1 portal child', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('backdrop-root')?.children.length).toBe(1);
+  });
+
+  it('overlay-root has 1 portal child', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.children.length).toBe(1);
+  });
+
+  it('SVG check icon for ja-JP active', () => {
+    useAtomMock.mockReturnValue(['ja-JP', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelector('svg')).not.toBeNull();
+  });
+
+  it('different language click sequence: 日本語 → 中文 → English', () => {
+    const setLocale = vi.fn();
+    const onDismiss = vi.fn();
+    useAtomMock.mockReturnValue(['en-US', setLocale]);
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    const overlay = document.getElementById('overlay-root');
+    const buttons = overlay?.querySelectorAll('div');
+    const ja = Array.from(buttons ?? []).find(d => d.textContent === '日本語');
+    const zh = Array.from(buttons ?? []).find(d => d.textContent === '中文');
+    const en = Array.from(buttons ?? []).find(d => d.textContent === 'English');
+    if (ja) fireEvent.click(ja);
+    if (zh) fireEvent.click(zh);
+    if (en) fireEvent.click(en);
+    expect(setLocale).toHaveBeenCalledTimes(3);
+  });
+
+  it('zh-CN active locale renders only 1 SVG icon', () => {
+    useAtomMock.mockReturnValue(['zh-CN', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelectorAll('svg').length).toBe(1);
+  });
 });
