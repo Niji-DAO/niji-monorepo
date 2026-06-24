@@ -208,4 +208,37 @@ describe('StreamPaymentDateDetailsStep', () => {
     const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
     expect((container.querySelector('p')?.textContent ?? '').length).toBeGreaterThan(0);
   });
+
+  it('renders 2 date input elements (start + end)', () => {
+    const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('input[type="date"]').length).toBe(2);
+  });
+
+  it('renders 2 buttons (Back + Next)', () => {
+    const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('h1 title renders exactly 1 time', () => {
+    const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('back button repeated clicks invoke onPrev N times', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <StreamPaymentDateDetailsStep {...defaults} onPrevBtnClick={onPrev} />,
+    );
+    const back = container.querySelectorAll('button')[0];
+    fireEvent.click(back);
+    fireEvent.click(back);
+    fireEvent.click(back);
+    expect(onPrev).toHaveBeenCalledTimes(3);
+  });
+
+  it('Next button initial state can be queried (button exists)', () => {
+    const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+    const nextBtn = container.querySelector('[data-testid="next-btn"]');
+    expect(nextBtn).not.toBeNull();
+  });
 });

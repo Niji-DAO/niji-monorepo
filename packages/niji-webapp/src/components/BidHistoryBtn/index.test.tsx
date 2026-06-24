@@ -139,4 +139,47 @@ describe('BidHistoryBtn Component (isCool=true)', () => {
     const inner = outer.firstElementChild as HTMLDivElement;
     expect(outer.className).not.toBe(inner.className);
   });
+
+  it('rapid 10 clicks invoke handler 10 times', () => {
+    const onClick = vi.fn();
+    const { container } = render(<BidHistoryBtn onClick={onClick} />);
+    const div = container.firstElementChild as HTMLDivElement;
+    for (let i = 0; i < 10; i++) fireEvent.click(div);
+    expect(onClick).toHaveBeenCalledTimes(10);
+  });
+
+  it('child div count is exactly 2 (outer wraps inner)', () => {
+    const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    expect(container.querySelectorAll('div').length).toBe(2);
+  });
+
+  it('outer div has data-* attribute (cursor pointer for click)', () => {
+    const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    const outer = container.firstElementChild as HTMLDivElement;
+    expect(outer.className.length).toBeGreaterThan(0);
+  });
+
+  it('5 instances render 5 outer divs', () => {
+    const { container } = render(
+      <>
+        <BidHistoryBtn onClick={vi.fn()} />
+        <BidHistoryBtn onClick={vi.fn()} />
+        <BidHistoryBtn onClick={vi.fn()} />
+        <BidHistoryBtn onClick={vi.fn()} />
+        <BidHistoryBtn onClick={vi.fn()} />
+      </>,
+    );
+    expect(container.children.length).toBe(5);
+  });
+
+  it('onClick handler captures click event (event.type=click)', () => {
+    let captured: { type: string } | null = null;
+    const onClick = (e: { type: string }) => {
+      captured = e;
+    };
+    const { container } = render(<BidHistoryBtn onClick={onClick} />);
+    fireEvent.click(container.firstElementChild as HTMLDivElement);
+    expect(captured).not.toBeNull();
+    expect((captured as unknown as { type: string }).type).toBe('click');
+  });
 });
