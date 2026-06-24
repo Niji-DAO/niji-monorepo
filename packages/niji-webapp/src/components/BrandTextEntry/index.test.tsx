@@ -48,4 +48,37 @@ describe('BrandTextEntry', () => {
     if (input) fireEvent.change(input, { target: { value: 'hi' } });
     expect(onChange).toHaveBeenCalledTimes(1);
   });
+
+  it('fires onChange repeatedly across multiple changes', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandTextEntry onChange={onChange} />);
+    const input = container.querySelector('input');
+    if (input) {
+      fireEvent.change(input, { target: { value: 'a' } });
+      fireEvent.change(input, { target: { value: 'ab' } });
+      fireEvent.change(input, { target: { value: 'abc' } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(3);
+  });
+
+  it('handles large value string (1000 chars)', () => {
+    const long = 'a'.repeat(1000);
+    const { container } = render(<BrandTextEntry onChange={() => {}} value={long} />);
+    expect(container.querySelector('input')?.value.length).toBe(1000);
+  });
+
+  it('forwards type="email"', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} type="email" />);
+    expect(container.querySelector('input')?.getAttribute('type')).toBe('email');
+  });
+
+  it('renders exactly 1 input element', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} />);
+    expect(container.querySelectorAll('input').length).toBe(1);
+  });
+
+  it('does NOT apply invalid class when isInvalid=false (default)', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} isInvalid={false} />);
+    expect(container.querySelector('input')?.className).not.toMatch(/invalid/i);
+  });
 });
