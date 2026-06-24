@@ -270,4 +270,87 @@ describe('AuctionNavigation Component', () => {
     fireEvent.click(nextBtn);
     expect(onNext).not.toHaveBeenCalled();
   });
+
+  it('multiple keydown events invoke handlers N times', () => {
+    const onPrev = vi.fn();
+    const onNext = vi.fn();
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={onPrev}
+        onNextAuctionClick={onNext}
+      />,
+    );
+    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    fireEvent.keyDown(document, { key: 'ArrowRight' });
+    expect(onPrev).toHaveBeenCalledTimes(2);
+    expect(onNext).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders exactly 2 buttons', () => {
+    const { container } = render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={vi.fn()}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('isFirstAuction=true + isLastAuction=true both buttons disabled', () => {
+    render(
+      <AuctionNavigation
+        isFirstAuction={true}
+        isLastAuction={true}
+        onPrevAuctionClick={vi.fn()}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    expect(screen.getByText('←')).toBeDisabled();
+    expect(screen.getByText('→')).toBeDisabled();
+  });
+
+  it('keyDown ArrowLeft does not fire onNext', () => {
+    const onNext = vi.fn();
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={vi.fn()}
+        onNextAuctionClick={onNext}
+      />,
+    );
+    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
+  it('keyDown ArrowRight does not fire onPrev', () => {
+    const onPrev = vi.fn();
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={onPrev}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    fireEvent.keyDown(document, { key: 'ArrowRight' });
+    expect(onPrev).not.toHaveBeenCalled();
+  });
+
+  it('disabled prev button maintains correct className', () => {
+    render(
+      <AuctionNavigation
+        isFirstAuction={true}
+        isLastAuction={false}
+        onPrevAuctionClick={vi.fn()}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    expect(screen.getByText('←').className).toContain('leftArrowCool');
+  });
 });
