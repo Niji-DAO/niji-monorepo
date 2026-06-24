@@ -90,4 +90,48 @@ describe('ModalLabel', () => {
     const { container } = render(<ModalLabel>x</ModalLabel>);
     expect(container.querySelector('div')?.className).toMatch(/_.+/);
   });
+
+  it('rerender updates text', () => {
+    const { container, rerender } = render(<ModalLabel>first</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('first');
+    rerender(<ModalLabel>second</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('second');
+  });
+
+  it('multiple instances share same className', () => {
+    const { container } = render(
+      <>
+        <ModalLabel>a</ModalLabel>
+        <ModalLabel>b</ModalLabel>
+      </>,
+    );
+    const divs = container.querySelectorAll('div');
+    expect(divs[0].className).toBe(divs[1].className);
+  });
+
+  it('unicode children render verbatim', () => {
+    const { container } = render(<ModalLabel>テスト</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('テスト');
+  });
+
+  it('mixed text + element children', () => {
+    const { container } = render(
+      <ModalLabel>
+        prefix-<em>em</em>
+      </ModalLabel>,
+    );
+    expect(container.querySelector('em')?.textContent).toBe('em');
+    expect(container.textContent).toContain('prefix-');
+  });
+
+  it('exact div tag name (DIV)', () => {
+    const { container } = render(<ModalLabel>x</ModalLabel>);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
+
+  it('large 1000-char string renders without crash', () => {
+    const huge = 'b'.repeat(1000);
+    const { container } = render(<ModalLabel>{huge}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent?.length).toBe(1000);
+  });
 });

@@ -97,4 +97,51 @@ describe('MinBid', () => {
     rerender(<MinBid minBid={parseEther('2')} onClick={() => {}} />);
     expect(container.textContent).toContain('Ξ 2.00');
   });
+
+  it('rerender from minBid > 0 to 0n hides amount', () => {
+    const { container, rerender } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    expect(container.textContent).toContain('Ξ');
+    rerender(<MinBid minBid={0n} onClick={() => {}} />);
+    expect(container.textContent).not.toContain('Ξ');
+  });
+
+  it('img tag count remains 1 across rerenders', () => {
+    const { container, rerender } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    rerender(<MinBid minBid={parseEther('5')} onClick={() => {}} />);
+    rerender(<MinBid minBid={parseEther('10')} onClick={() => {}} />);
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <MinBid minBid={parseEther('1')} onClick={() => {}} />
+        <MinBid minBid={parseEther('5')} onClick={() => {}} />
+      </>,
+    );
+    expect(container.textContent).toContain('1.00');
+    expect(container.textContent).toContain('5.00');
+  });
+
+  it('onClick handler captures click event', () => {
+    let receivedEvent: { type?: string } | null = null;
+    const onClick = vi.fn((e: { type: string }) => {
+      receivedEvent = e;
+    });
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={onClick} />);
+    const wrapper = container.querySelector('div');
+    if (wrapper) fireEvent.click(wrapper);
+    expect(receivedEvent).not.toBeNull();
+    expect((receivedEvent as unknown as { type: string }).type).toBe('click');
+  });
+
+  it('1 wei minBid is treated as truthy and renders amount', () => {
+    const { container } = render(<MinBid minBid={1n} onClick={() => {}} />);
+    expect(container.textContent).toContain('Ξ');
+  });
+
+  it('h3 element contains the message text', () => {
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    expect(container.querySelector('h3')?.textContent).toContain('You must bid at least');
+  });
 });
