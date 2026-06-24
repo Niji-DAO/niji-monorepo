@@ -400,4 +400,48 @@ describe('CandidateCard', () => {
     const candidate = { ...baseCandidate, id: 'cand-日本語-絵文字' } as never;
     expect(() => wrap(<CandidateCard candidate={candidate} nounsRequired={3} />)).not.toThrow();
   });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <CandidateCard key={i} candidate={baseCandidate} nounsRequired={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves component', () => {
+    const { rerender } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <CandidateCard candidate={baseCandidate} nounsRequired={i} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles very large nounsRequired (1000)', () => {
+    expect(() =>
+      wrap(<CandidateCard candidate={baseCandidate} nounsRequired={1000} />),
+    ).not.toThrow();
+  });
+
+  it('handles 0 nounsRequired', () => {
+    expect(() => wrap(<CandidateCard candidate={baseCandidate} nounsRequired={0} />)).not.toThrow();
+  });
+
+  it('handles long candidate title (1000 char)', () => {
+    const longTitle = 'a'.repeat(1000);
+    const candidate = {
+      ...baseCandidate,
+      version: { content: { title: longTitle, contentSignatures: [] } },
+    } as never;
+    expect(() => wrap(<CandidateCard candidate={candidate} nounsRequired={3} />)).not.toThrow();
+  });
 });

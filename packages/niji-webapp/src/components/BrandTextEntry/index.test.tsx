@@ -355,4 +355,45 @@ describe('BrandTextEntry', () => {
     );
     expect(container.querySelectorAll('input').length).toBe(5);
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <BrandTextEntry key={i} onChange={() => {}} label={`L-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves input', () => {
+    const { container, rerender } = render(<BrandTextEntry onChange={() => {}} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<BrandTextEntry onChange={() => {}} value={`v-${i}`} />);
+    }
+    expect(container.querySelector('input')).not.toBeNull();
+  });
+
+  it('rapid 100 onChange events fire handler', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandTextEntry onChange={onChange} />);
+    const input = container.querySelector('input')!;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(input, { target: { value: `v-${i}` } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles unicode label', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} label="🚀 タイトル" />);
+    expect(container.querySelector('span')?.textContent).toBe('🚀 タイトル');
+  });
+
+  it('handles very long value (5000 char)', () => {
+    const long = 'a'.repeat(5000);
+    const { container } = render(<BrandTextEntry onChange={() => {}} value={long} />);
+    expect(container.querySelector('input')?.value.length).toBe(5000);
+  });
 });
