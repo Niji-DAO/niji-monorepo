@@ -486,4 +486,69 @@ describe('AuctionActivity', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 30 AuctionActivity instances consecutively', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        wrap(
+          <AuctionActivity {...defaults} auction={makeAuction({ nounId: BigInt(i) }) as never} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('rerender 30 times preserves wrapper', () => {
+    const { container, rerender } = wrap(
+      <AuctionActivity {...defaults} auction={makeAuction() as never} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      rerender(
+        <MemoryRouter>
+          <AuctionActivity {...defaults} auction={makeAuction({ nounId: BigInt(i) }) as never} />
+        </MemoryRouter>,
+      );
+      expect(container.querySelector('[data-testid="wrapper"]')).not.toBeNull();
+    }
+  });
+
+  it('handles isLastAuction=false in non-graph mode', () => {
+    expect(() =>
+      wrap(
+        <AuctionActivity
+          {...defaults}
+          isLastAuction={false}
+          displayGraphDepComps={false}
+          auction={makeAuction() as never}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders for ended + isLastAuction + 1 wei amount', () => {
+    expect(() =>
+      wrap(
+        <AuctionActivity
+          {...defaults}
+          isLastAuction={true}
+          auction={makeAuction({ endTime: 1n, amount: 1n }) as never}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders for 50 different auction nounIds', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <AuctionActivity
+              key={i}
+              {...defaults}
+              auction={makeAuction({ nounId: BigInt(i) }) as never}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });

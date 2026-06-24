@@ -438,4 +438,60 @@ describe('ProposalHeader', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 100 ProposalHeader instances consecutively', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => wrap(<ProposalHeader {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('renders 30 ProposalHeader instances in single wrap', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalHeader key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders ProposalHeader within 5-level nested fragment', () => {
+    expect(() =>
+      wrap(
+        <>
+          <>
+            <>
+              <>
+                <ProposalHeader {...baseProps} />
+              </>
+            </>
+          </>
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders 50 ProposalHeaders consecutively without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => wrap(<ProposalHeader {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('renders ProposalHeader within complex DOM tree', () => {
+    expect(() =>
+      wrap(
+        <div data-testid="root">
+          <div>
+            <section>
+              <article>
+                <ProposalHeader {...baseProps} />
+              </article>
+            </section>
+          </div>
+        </div>,
+      ),
+    ).not.toThrow();
+  });
 });
