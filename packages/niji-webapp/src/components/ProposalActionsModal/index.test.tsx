@@ -402,6 +402,35 @@ describe('ProposalActionModal', () => {
     expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="select-action"]')).not.toBeNull();
   });
+
+  it('initial state shows select-action step', () => {
+    const { container } = render(<ProposalActionModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="select-action"]')).not.toBeNull();
+  });
+
+  it('show=false hides modal', () => {
+    const { container } = render(<ProposalActionModal {...baseProps} show={false} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
+  });
+
+  it('show=true displays solid-modal wrapper', () => {
+    const { container } = render(<ProposalActionModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+  });
+
+  it('rerender from show=true to show=false hides modal', () => {
+    const { container, rerender } = render(<ProposalActionModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+    rerender(<ProposalActionModal {...baseProps} show={false} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
+  });
+
+  it('initial step shows only select-action (not other steps)', () => {
+    const { container } = render(<ProposalActionModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="transfer-details"]')).toBeNull();
+    expect(container.querySelector('[data-testid="function-select"]')).toBeNull();
+    expect(container.querySelector('[data-testid="stream-payment"]')).toBeNull();
+  });
 });
 
 // dummy reference to silence unused warning
