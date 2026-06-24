@@ -346,4 +346,52 @@ describe('ByLineHoverCard', () => {
       render(<ByLineHoverCard proposerAddress={'0x' + 'a'.repeat(100)} />),
     ).not.toThrow();
   });
+
+  it('renders 5 instances each independently', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <ByLineHoverCard key={i} proposerAddress={`0xA${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders spinner consistently across rerenders', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    const { container, rerender } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+    rerender(<ByLineHoverCard proposerAddress="0xB" />);
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+  });
+
+  it('renders for empty proposer string', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    expect(() => render(<ByLineHoverCard proposerAddress="" />)).not.toThrow();
+  });
+
+  it('renders for very long proposer address (200 char)', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    expect(() =>
+      render(<ByLineHoverCard proposerAddress={'0x' + 'a'.repeat(200)} />),
+    ).not.toThrow();
+  });
+
+  it('rerender from loading to error state', () => {
+    useSubgraphQueryMock.mockReturnValueOnce({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    const { rerender } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: new Error('boom'),
+    });
+    expect(() => rerender(<ByLineHoverCard proposerAddress="0xA" />)).not.toThrow();
+  });
 });

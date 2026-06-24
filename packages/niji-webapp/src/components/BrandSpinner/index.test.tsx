@@ -206,4 +206,50 @@ describe('BrandSpinner', () => {
       c2.querySelector('svg')?.getAttribute('fill'),
     );
   });
+
+  it('renders 20 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(20);
+  });
+
+  it('all rendered svgs have same viewBox', () => {
+    const { container: c1 } = render(<BrandSpinner />);
+    const { container: c2 } = render(<BrandSpinner />);
+    expect(c1.querySelector('svg')?.getAttribute('viewBox')).toBe(
+      c2.querySelector('svg')?.getAttribute('viewBox'),
+    );
+  });
+
+  it('svg width attribute is consistent', () => {
+    const { container: c1 } = render(<BrandSpinner />);
+    const { container: c2 } = render(<BrandSpinner />);
+    expect(c1.querySelector('svg')?.getAttribute('width')).toBe(
+      c2.querySelector('svg')?.getAttribute('width'),
+    );
+  });
+
+  it('renders 5 times consecutively without crash', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() => render(<BrandSpinner />)).not.toThrow();
+    }
+  });
+
+  it('renders within Fragment with sibling', () => {
+    const { container } = render(
+      <>
+        <span>before</span>
+        <BrandSpinner />
+        <span>after</span>
+      </>,
+    );
+    expect(container.textContent).toContain('before');
+    expect(container.textContent).toContain('after');
+    expect(container.querySelector('svg')).not.toBeNull();
+  });
 });
