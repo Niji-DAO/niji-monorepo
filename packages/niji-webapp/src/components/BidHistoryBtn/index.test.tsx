@@ -224,4 +224,35 @@ describe('BidHistoryBtn Component (isCool=true)', () => {
     const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
     expect(container.textContent?.trim()).toBe('View all bids');
   });
+
+  it('renders 10 instances each with own onClick', () => {
+    const handlers = Array.from({ length: 10 }, () => vi.fn());
+    const { container } = render(
+      <>
+        {handlers.map((h, i) => (
+          <BidHistoryBtn key={i} onClick={h} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(10);
+  });
+
+  it('rerender onClick handler updates handler', () => {
+    const h1 = vi.fn();
+    const h2 = vi.fn();
+    const { container, rerender } = render(<BidHistoryBtn onClick={h1} />);
+    rerender(<BidHistoryBtn onClick={h2} />);
+    fireEvent.click(container.firstElementChild as HTMLElement);
+    expect(h2).toHaveBeenCalledTimes(1);
+    expect(h1).not.toHaveBeenCalled();
+  });
+
+  it('renders without crash with noop handler', () => {
+    expect(() => render(<BidHistoryBtn onClick={() => {}} />)).not.toThrow();
+  });
+
+  it('container has exactly 1 wrapper div', () => {
+    const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    expect(container.children.length).toBe(1);
+  });
 });

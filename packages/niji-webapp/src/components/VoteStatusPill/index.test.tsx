@@ -187,4 +187,41 @@ describe('VoteStatusPill', () => {
     const { container } = render(<VoteStatusPill status="success" text="x" />);
     expect(container.firstElementChild?.tagName).toBe('DIV');
   });
+
+  it('renders 5 instances each with own status', () => {
+    const { container } = render(
+      <>
+        <VoteStatusPill status="success" text="A" />
+        <VoteStatusPill status="failure" text="B" />
+        <VoteStatusPill status="pending" text="C" />
+        <VoteStatusPill status="success" text="D" />
+        <VoteStatusPill status="failure" text="E" />
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(5);
+  });
+
+  it('rerender text updates display', () => {
+    const { container, rerender } = render(<VoteStatusPill status="success" text="first" />);
+    expect(container.querySelector('div')?.textContent).toBe('first');
+    rerender(<VoteStatusPill status="success" text="second" />);
+    expect(container.querySelector('div')?.textContent).toBe('second');
+  });
+
+  it('rerender status changes className', () => {
+    const { container, rerender } = render(<VoteStatusPill status="success" text="x" />);
+    const initial = container.querySelector('div')?.className;
+    rerender(<VoteStatusPill status="failure" text="x" />);
+    expect(container.querySelector('div')?.className).not.toBe(initial);
+  });
+
+  it('renders empty string text', () => {
+    const { container } = render(<VoteStatusPill status="success" text="" />);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('renders unicode text', () => {
+    const { container } = render(<VoteStatusPill status="success" text="日本語ステータス" />);
+    expect(container.querySelector('div')?.textContent).toBe('日本語ステータス');
+  });
 });

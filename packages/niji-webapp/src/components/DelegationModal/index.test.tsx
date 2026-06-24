@@ -262,4 +262,42 @@ describe('DelegationModal', () => {
   it('delegateTo with empty string renders without crash', () => {
     expect(() => render(<DelegationModal onDismiss={() => {}} delegateTo="" />)).not.toThrow();
   });
+
+  it('renders without crash for 500 char long delegateTo', () => {
+    const longAddr = '0x' + 'a'.repeat(500);
+    expect(() =>
+      render(<DelegationModal onDismiss={() => {}} delegateTo={longAddr} />),
+    ).not.toThrow();
+  });
+
+  it('renders 3 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          <DelegationModal onDismiss={() => {}} delegateTo="0xA" />
+          <DelegationModal onDismiss={() => {}} delegateTo="0xB" />
+          <DelegationModal onDismiss={() => {}} delegateTo="0xC" />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender with new delegateTo does not crash', () => {
+    const { rerender } = render(<DelegationModal onDismiss={() => {}} delegateTo="0xA" />);
+    expect(() => rerender(<DelegationModal onDismiss={() => {}} delegateTo="0xB" />)).not.toThrow();
+  });
+
+  it('renders without crash for unicode delegateTo', () => {
+    expect(() =>
+      render(<DelegationModal onDismiss={() => {}} delegateTo="0xXXXあいう" />),
+    ).not.toThrow();
+  });
+
+  it('renders consecutive 5 times without crash', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        render(<DelegationModal onDismiss={() => {}} delegateTo={`0x${i}`} />),
+      ).not.toThrow();
+    }
+  });
 });
