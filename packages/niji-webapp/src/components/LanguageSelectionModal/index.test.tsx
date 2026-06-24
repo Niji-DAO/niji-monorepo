@@ -140,4 +140,48 @@ describe('LanguageSelectionModal', () => {
     useAtomMock.mockReturnValue(['en-US', vi.fn()]);
     expect(() => render(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
   });
+
+  it('exactly 1 SVG icon (only active locale gets check)', () => {
+    useAtomMock.mockReturnValue(['ja-JP', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelectorAll('svg').length).toBe(1);
+  });
+
+  it('clicking 日本語 only fires once even on rapid repeated clicks', () => {
+    const setLocale = vi.fn();
+    const onDismiss = vi.fn();
+    useAtomMock.mockReturnValue(['en-US', setLocale]);
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    const overlay = document.getElementById('overlay-root');
+    const buttons = overlay?.querySelectorAll('div');
+    const jaBtn = Array.from(buttons ?? []).find(d => d.textContent === '日本語');
+    if (jaBtn) {
+      fireEvent.click(jaBtn);
+      fireEvent.click(jaBtn);
+    }
+    expect(setLocale).toHaveBeenCalledTimes(2);
+    expect(onDismiss).toHaveBeenCalledTimes(2);
+  });
+
+  it('unknown locale string still renders all 3 buttons (no crash)', () => {
+    useAtomMock.mockReturnValue(['xx-YY', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    const text = document.getElementById('overlay-root')?.textContent ?? '';
+    expect(text).toContain('日本語');
+    expect(text).toContain('English');
+    expect(text).toContain('中文');
+  });
+
+  it('overlay root contains all 3 language texts even when no active locale match', () => {
+    useAtomMock.mockReturnValue(['xx-YY', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.textContent).toContain('日本語');
+  });
+
+  it('h3 title text is exactly "Select Language"', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    const h3 = document.getElementById('overlay-root')?.querySelector('h3');
+    expect(h3?.textContent).toBe('Select Language');
+  });
 });

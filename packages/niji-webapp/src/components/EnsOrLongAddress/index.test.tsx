@@ -112,4 +112,48 @@ describe('EnsOrLongAddress', () => {
     render(<EnsOrLongAddress address={ADDR} />);
     expect(useReverseENSLookUp).toHaveBeenCalledTimes(1);
   });
+
+  it('ENS lookup result with unicode chars renders verbatim', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('日本.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('日本.eth');
+  });
+
+  it('multiple component instances render independently', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('alice.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(
+      <>
+        <EnsOrLongAddress address={ADDR} />
+        <EnsOrLongAddress address={ADDR} />
+      </>,
+    );
+    expect(container.textContent).toBe('alice.ethalice.eth');
+  });
+
+  it('lowercase only address forwarded to ENS lookup as-is', () => {
+    const lower = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' as `0x${string}`;
+    vi.mocked(useReverseENSLookUp).mockClear();
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    render(<EnsOrLongAddress address={lower} />);
+    expect(useReverseENSLookUp).toHaveBeenCalledWith(lower);
+  });
+
+  it('blocklist enabled but blank string still falls back to address', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('  ');
+    vi.mocked(containsBlockedText).mockReturnValue(true);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(ADDR);
+  });
+
+  it('rerender from ENS name to undefined falls back to address', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('alice.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container, rerender } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('alice.eth');
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    rerender(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(ADDR);
+  });
 });
