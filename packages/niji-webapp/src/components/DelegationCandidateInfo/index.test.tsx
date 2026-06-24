@@ -366,4 +366,69 @@ describe('DelegationCandidateInfo', () => {
     );
     expect(container.querySelector('[data-testid="vote-info"]')?.textContent).toContain('8');
   });
+
+  it('addr prop forwarded to short-address verbatim', () => {
+    useAccountVotesMock.mockReturnValue(3);
+    const longAddr = '0x1234567890abcdef1234567890abcdef12345678' as const;
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={longAddr}
+        changeModalState={ChangeDelegateState.ENTER_DELEGATE_ADDRESS}
+        votesToAdd={0}
+      />,
+    );
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(longAddr);
+  });
+
+  it('CHANGE_SUCCESS state shows short-address (not spinner)', () => {
+    useAccountVotesMock.mockReturnValue(3);
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.CHANGE_SUCCESS}
+        votesToAdd={2}
+      />,
+    );
+    expect(container.querySelector('[data-testid="spinner"]')).toBeNull();
+    expect(container.querySelector('[data-testid="short"]')).not.toBeNull();
+  });
+
+  it('avatar img renders for any state with votes', () => {
+    useAccountVotesMock.mockReturnValue(3);
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.CHANGING}
+        votesToAdd={1}
+      />,
+    );
+    expect(container.querySelector('img')).not.toBeNull();
+  });
+
+  it('addresses with 0x prefix format render correctly', () => {
+    useAccountVotesMock.mockReturnValue(3);
+    const newAddr = '0xabcdef0000000000000000000000000000000123' as const;
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={newAddr}
+        changeModalState={ChangeDelegateState.ENTER_DELEGATE_ADDRESS}
+        votesToAdd={0}
+      />,
+    );
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(newAddr);
+  });
+
+  it('renders ShortAddress + img + vote-info in same render', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.ENTER_DELEGATE_ADDRESS}
+        votesToAdd={0}
+      />,
+    );
+    expect(container.querySelector('[data-testid="short"]')).not.toBeNull();
+    expect(container.querySelector('img')).not.toBeNull();
+    expect(container.querySelector('[data-testid="vote-info"]')).not.toBeNull();
+  });
 });
