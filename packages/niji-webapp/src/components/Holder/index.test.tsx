@@ -314,4 +314,41 @@ describe('Holder', () => {
     const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
     expect(container.textContent).toContain('Failed to fetch Niji info');
   });
+
+  it('loading state has empty textContent', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    const { container } = render(<Holder nounId={5n} />, { wrapper: WithProviders });
+    expect(container.textContent).toBe('');
+  });
+
+  it('different nounId still renders without crash on loading', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() => render(<Holder nounId={999n} />, { wrapper: WithProviders })).not.toThrow();
+  });
+
+  it('error state contains error message text', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: new Error('network'),
+      data: undefined,
+    });
+    const { container } = render(<Holder nounId={2n} />, { wrapper: WithProviders });
+    expect(container.textContent).toContain('Failed');
+  });
+
+  it('useAtomValueMock false (not cool) still renders loading empty', () => {
+    useAtomValueMock.mockReturnValue(false);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    expect(container.textContent).toBe('');
+  });
+
+  it('renders without crash for nounId=0n', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() => render(<Holder nounId={0n} />, { wrapper: WithProviders })).not.toThrow();
+  });
 });

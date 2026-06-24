@@ -327,4 +327,32 @@ describe('AddNijisToForkModal', () => {
   it('default props renders without crash', () => {
     expect(() => render(<AddNijisToForkModal {...baseProps} />)).not.toThrow();
   });
+
+  it('renders with isModalOpen=false (closed state)', () => {
+    const { container } = render(<AddNijisToForkModal {...baseProps} isModalOpen={false} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
+  });
+
+  it('renders with isModalOpen=true (open state)', () => {
+    const { container } = render(<AddNijisToForkModal {...baseProps} isModalOpen={true} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+  });
+
+  it('renders without crash with empty ownedNouns', () => {
+    expect(() =>
+      render(<AddNijisToForkModal {...baseProps} ownedNouns={[] as number[]} />),
+    ).not.toThrow();
+  });
+
+  it('renders with large ownedNouns list (50 items)', () => {
+    const nouns = Array.from({ length: 50 }, (_, i) => i);
+    expect(() => render(<AddNijisToForkModal {...baseProps} ownedNouns={nouns} />)).not.toThrow();
+  });
+
+  it('confirmModal show only renders modal content (no main modal)', () => {
+    const { container } = render(
+      <AddNijisToForkModal {...baseProps} isModalOpen={false} isConfirmModalOpen={true} />,
+    );
+    expect(container.textContent).toContain('Confirm');
+  });
 });
