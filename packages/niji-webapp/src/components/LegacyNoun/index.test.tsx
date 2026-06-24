@@ -164,4 +164,40 @@ describe('LegacyNoun — additional edge cases', () => {
     );
     expect(container.querySelectorAll('img').length).toBe(5);
   });
+
+  it('LegacyNoun renders without crash for empty alt', () => {
+    expect(() => render(<LegacyNoun imgPath="/x.png" alt="" />)).not.toThrow();
+  });
+
+  it('LegacyNoun rerender from empty imgPath to valid path', () => {
+    const { container, rerender } = render(<LegacyNoun imgPath="" alt="x" />);
+    expect(container.querySelector('img')?.getAttribute('src')).toMatch(/loading-skull-noun/i);
+    rerender(<LegacyNoun imgPath="/new.png" alt="x" />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('/new.png');
+  });
+
+  it('LegacyNoun renders 3 instances each with own src', () => {
+    const { container } = render(
+      <>
+        <LegacyNoun imgPath="/a.png" alt="a" />
+        <LegacyNoun imgPath="/b.png" alt="b" />
+        <LegacyNoun imgPath="/c.png" alt="c" />
+      </>,
+    );
+    const imgs = container.querySelectorAll('img');
+    expect(imgs[0]?.getAttribute('src')).toBe('/a.png');
+    expect(imgs[1]?.getAttribute('src')).toBe('/b.png');
+    expect(imgs[2]?.getAttribute('src')).toBe('/c.png');
+  });
+
+  it('LegacyNoun handles unicode alt text', () => {
+    const { container } = render(<LegacyNoun imgPath="/x.png" alt="日本語ALT" />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('日本語ALT');
+  });
+
+  it('LegacyNoun handles 500 char long imgPath', () => {
+    const longPath = '/' + 'x'.repeat(500) + '.png';
+    const { container } = render(<LegacyNoun imgPath={longPath} alt="x" />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe(longPath);
+  });
 });

@@ -448,4 +448,42 @@ describe('VoteCard', () => {
       ),
     ).not.toThrow();
   });
+
+  it('VoteCardVariant.FOR exported as 0', () => {
+    expect(typeof VoteCardVariant.FOR).toBe('number');
+  });
+
+  it('VoteCardVariant.AGAINST exported', () => {
+    expect(VoteCardVariant.AGAINST).toBeDefined();
+  });
+
+  it('VoteCardVariant.ABSTAIN exported', () => {
+    expect(VoteCardVariant.ABSTAIN).toBeDefined();
+  });
+
+  it('all 3 variants are distinct values', () => {
+    expect(VoteCardVariant.FOR).not.toBe(VoteCardVariant.AGAINST);
+    expect(VoteCardVariant.AGAINST).not.toBe(VoteCardVariant.ABSTAIN);
+    expect(VoteCardVariant.FOR).not.toBe(VoteCardVariant.ABSTAIN);
+  });
+
+  it('renders without crash for empty delegateGroupedVoteData', () => {
+    usePublicClientMock.mockReturnValue({});
+    useActiveLocaleMock.mockReturnValue('en-US');
+    lookupNNSOrENSMock.mockResolvedValue('alice.eth');
+    expect(() =>
+      render(
+        <VoteCard
+          proposal={
+            { forCount: 0, againstCount: 0, abstainCount: 0, status: 1, quorumVotes: 0 } as never
+          }
+          percentage={0}
+          nounIds={[]}
+          variant={VoteCardVariant.FOR}
+          delegateGroupedVoteData={[]}
+          isNounsDAOProp={true}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });

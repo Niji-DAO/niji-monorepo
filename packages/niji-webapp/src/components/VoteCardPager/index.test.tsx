@@ -178,4 +178,42 @@ describe('VoteCardPager', () => {
     expect(container.querySelectorAll('span')[0]?.className).toMatch(/disabledPageDot/);
     expect(container.querySelectorAll('span')[4]?.className).toMatch(/disabledPageDot/);
   });
+
+  it('renders 10 dots for numPages=10', () => {
+    const { container } = render(<VoteCardPager {...defaults} numPages={10} currentPage={0} />);
+    expect(container.querySelectorAll('span').length).toBe(10);
+  });
+
+  it('rapid 5 left clicks invoke handler 5 times', () => {
+    const onLeft = vi.fn();
+    const { container } = render(
+      <VoteCardPager {...defaults} onLeftArrowClick={onLeft} isLeftArrowDisabled={false} />,
+    );
+    const leftBtn = container.querySelectorAll('button')[0];
+    for (let i = 0; i < 5; i++) fireEvent.click(leftBtn);
+    expect(onLeft).toHaveBeenCalledTimes(5);
+  });
+
+  it('rapid 5 right clicks invoke handler 5 times', () => {
+    const onRight = vi.fn();
+    const { container } = render(
+      <VoteCardPager {...defaults} onRightArrowClick={onRight} isRightArrowDisabled={false} />,
+    );
+    const rightBtn = container.querySelectorAll('button')[1];
+    for (let i = 0; i < 5; i++) fireEvent.click(rightBtn);
+    expect(onRight).toHaveBeenCalledTimes(5);
+  });
+
+  it('rerender numPages updates dot count', () => {
+    const { container, rerender } = render(
+      <VoteCardPager {...defaults} numPages={3} currentPage={0} />,
+    );
+    expect(container.querySelectorAll('span').length).toBe(3);
+    rerender(<VoteCardPager {...defaults} numPages={7} currentPage={0} />);
+    expect(container.querySelectorAll('span').length).toBe(7);
+  });
+
+  it('renders without crash for numPages=0', () => {
+    expect(() => render(<VoteCardPager {...defaults} numPages={0} />)).not.toThrow();
+  });
 });

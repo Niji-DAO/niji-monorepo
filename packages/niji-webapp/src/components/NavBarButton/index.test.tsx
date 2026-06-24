@@ -160,4 +160,42 @@ describe('NavBarButton', () => {
     expect(container.textContent).toContain('text');
     expect(container.querySelector('[data-testid="icon"]')).not.toBeNull();
   });
+
+  it('repeated 5 clicks invoke handler 5 times', () => {
+    const onClick = vi.fn();
+    const { container } = render(<NavBarButton buttonText="X" onClick={onClick} />);
+    const div = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 5; i++) fireEvent.click(div);
+    expect(onClick).toHaveBeenCalledTimes(5);
+  });
+
+  it('renders empty buttonText without crash', () => {
+    expect(() => render(<NavBarButton buttonText="" />)).not.toThrow();
+  });
+
+  it('rerender buttonText updates display', () => {
+    const { container, rerender } = render(<NavBarButton buttonText="first" />);
+    expect(container.textContent).toContain('first');
+    rerender(<NavBarButton buttonText="second" />);
+    expect(container.textContent).toContain('second');
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <NavBarButton buttonText="A" />
+        <NavBarButton buttonText="B" />
+        <NavBarButton buttonText="C" />
+      </>,
+    );
+    expect(container.textContent).toContain('A');
+    expect(container.textContent).toContain('B');
+    expect(container.textContent).toContain('C');
+  });
+
+  it('onClick prop not provided does not crash on click', () => {
+    const { container } = render(<NavBarButton buttonText="X" />);
+    const div = container.firstElementChild as HTMLElement;
+    expect(() => fireEvent.click(div)).not.toThrow();
+  });
 });
