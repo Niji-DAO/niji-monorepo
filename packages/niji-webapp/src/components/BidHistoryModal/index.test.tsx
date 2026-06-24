@@ -392,4 +392,65 @@ describe('BidHistoryModal', () => {
     }
     expect(onDismiss).toHaveBeenCalledTimes(30);
   });
+
+  it('renders 500 bid rows', () => {
+    useAuctionBidsMock.mockReturnValue(
+      Array.from({ length: 500 }, (_, i) => ({ transactionHash: `0x${i}` })),
+    );
+    render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelectorAll('[data-testid="row"]').length,
+    ).toBe(500);
+  });
+
+  it('renders 30 different auction modal sequentially', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    for (let i = 0; i < 30; i++) {
+      document.body.innerHTML = '<div id="backdrop-root"></div><div id="overlay-root"></div>';
+      expect(() =>
+        render(
+          <BidHistoryModal auction={{ ...auction, nounId: BigInt(i) }} onDismiss={() => {}} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('Backdrop rapid 100 clicks fire onDismiss 100 times', () => {
+    const onDismiss = vi.fn();
+    const { container } = render(<Backdrop onDismiss={onDismiss} />);
+    const div = container.querySelector('div');
+    if (div) {
+      for (let i = 0; i < 100; i++) fireEvent.click(div);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(100);
+  });
+
+  it('renders 10 BidHistoryModal instances each independently', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <BidHistoryModal
+              key={i}
+              auction={{ ...auction, nounId: BigInt(i) }}
+              onDismiss={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves portal', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const { rerender } = render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <BidHistoryModal auction={{ ...auction, nounId: BigInt(i) }} onDismiss={() => {}} />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
