@@ -306,4 +306,44 @@ describe('ByLineHoverCard', () => {
     const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
     expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-3');
   });
+
+  it('renders without crash for undefined data + loading=false', () => {
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [] },
+      loading: false,
+      error: undefined,
+    });
+    expect(() => render(<ByLineHoverCard proposerAddress="0xA" />)).not.toThrow();
+  });
+
+  it('renders without crash with empty proposer string', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    expect(() => render(<ByLineHoverCard proposerAddress="" />)).not.toThrow();
+  });
+
+  it('renders spinner consistently across rerenders', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    const { container, rerender } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+    rerender(<ByLineHoverCard proposerAddress="0xB" />);
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+  });
+
+  it('renders multiple instances independently', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    const { container } = render(
+      <>
+        <ByLineHoverCard proposerAddress="0xA" />
+        <ByLineHoverCard proposerAddress="0xB" />
+      </>,
+    );
+    expect(container.querySelectorAll('.spinner-border').length).toBe(2);
+  });
+
+  it('renders without crash for very long proposer address', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    expect(() =>
+      render(<ByLineHoverCard proposerAddress={'0x' + 'a'.repeat(100)} />),
+    ).not.toThrow();
+  });
 });

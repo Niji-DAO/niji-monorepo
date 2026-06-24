@@ -193,4 +193,50 @@ describe('AuctionActivityWrapper', () => {
     );
     expect(container.querySelector('span')?.textContent).toBe('solo');
   });
+
+  it('renders empty string children', () => {
+    const { container } = render(<AuctionActivityWrapper>{''}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('renders nested deeply (3 levels)', () => {
+    const { container } = render(
+      <AuctionActivityWrapper>
+        <span>
+          <span>
+            <span data-testid="deep">deep</span>
+          </span>
+        </span>
+      </AuctionActivityWrapper>,
+    );
+    expect(container.querySelector('[data-testid="deep"]')?.textContent).toBe('deep');
+  });
+
+  it('rerender from text to nested children', () => {
+    const { container, rerender } = render(<AuctionActivityWrapper>simple</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe('simple');
+    rerender(
+      <AuctionActivityWrapper>
+        <span>nested</span>
+      </AuctionActivityWrapper>,
+    );
+    expect(container.querySelector('span')?.textContent).toBe('nested');
+  });
+
+  it('renders multiple sibling children', () => {
+    const { container } = render(
+      <AuctionActivityWrapper>
+        <span>A</span>
+        <span>B</span>
+        <span>C</span>
+      </AuctionActivityWrapper>,
+    );
+    expect(container.querySelectorAll('span').length).toBe(3);
+  });
+
+  it('renders 200 char long text content', () => {
+    const longStr = 'x'.repeat(200);
+    const { container } = render(<AuctionActivityWrapper>{longStr}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe(longStr);
+  });
 });

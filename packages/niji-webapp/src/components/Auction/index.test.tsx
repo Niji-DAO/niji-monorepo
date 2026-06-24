@@ -278,4 +278,27 @@ describe('Auction', () => {
     isNounderMock.mockReturnValue(true);
     expect(() => wrap(<Auction auction={makeAuction(0n)} />)).not.toThrow();
   });
+
+  it('renders without crash for auction id=999999n', () => {
+    expect(() => wrap(<Auction auction={makeAuction(999999n)} />)).not.toThrow();
+  });
+
+  it('renders without crash for auction id=2n', () => {
+    expect(() => wrap(<Auction auction={makeAuction(2n)} />)).not.toThrow();
+  });
+
+  it('renders for non-Nounders id', () => {
+    expect(() => wrap(<Auction auction={makeAuction(11n)} />)).not.toThrow();
+  });
+
+  it('navigates without crash on rerender with different id', () => {
+    expect(() => {
+      const { rerender } = wrap(<Auction auction={makeAuction(1n)} />);
+      rerender(<Auction auction={makeAuction(2n)} />);
+    }).not.toThrow();
+  });
+
+  it('renders for MAX_SAFE bigint id', () => {
+    expect(() => wrap(<Auction auction={makeAuction(9007199254740991n)} />)).not.toThrow();
+  });
 });
