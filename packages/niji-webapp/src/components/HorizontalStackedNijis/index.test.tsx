@@ -71,4 +71,33 @@ describe('HorizontalStackedNijis', () => {
     expect(lefts.some(s => s.includes('left: 0px'))).toBe(true);
     expect(lefts.some(s => s.includes('left: 25px'))).toBe(true);
   });
+
+  it('renders 4 nijis with left: 0/25/50/75', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={['1', '2', '3', '4']} />);
+    const innerDivs = container.querySelectorAll('div div');
+    const styles = Array.from(innerDivs).map(d => d.getAttribute('style') ?? '');
+    expect(styles.some(s => s.includes('left: 75px'))).toBe(true);
+    expect(styles.some(s => s.includes('left: 50px'))).toBe(true);
+  });
+
+  it('exceeds 6 nounIds — slice(0,6) caps DOM count', () => {
+    const ids = Array.from({ length: 20 }, (_, i) => String(i + 1));
+    const { container } = render(<HorizontalStackedNijis nounIds={ids} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(6);
+  });
+
+  it('large numeric nounId (10000) renders correctly', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={['10000']} />);
+    expect(container.querySelector('[data-testid="niji-circular"]')?.textContent).toBe('10000');
+  });
+
+  it('"0" nounId renders as "0"', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={['0']} />);
+    expect(container.querySelector('[data-testid="niji-circular"]')?.textContent).toBe('0');
+  });
+
+  it('wrapper is single div regardless of nounIds count', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={['1', '2', '3', '4', '5']} />);
+    expect(container.children.length).toBe(1);
+  });
 });
