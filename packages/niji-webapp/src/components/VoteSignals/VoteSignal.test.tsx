@@ -67,4 +67,40 @@ describe('VoteSignal', () => {
     );
     expect(container.textContent).toContain('My reason here');
   });
+
+  it('uses plural "votes" for voteCount=0', () => {
+    useEnsNameMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <VoteSignal support={1} voteCount={0} reason="ok" address={ADDR} />,
+    );
+    expect(container.textContent).toContain('0 votes');
+  });
+
+  it('renders empty reason without crash', () => {
+    useEnsNameMock.mockReturnValue({ data: undefined });
+    const { container } = render(<VoteSignal support={1} voteCount={1} reason="" address={ADDR} />);
+    expect(container.querySelector('[data-testid="short"]')).not.toBeNull();
+  });
+
+  it('renders for support=0 (AGAINST variant)', () => {
+    useEnsNameMock.mockReturnValue({ data: undefined });
+    expect(() =>
+      render(<VoteSignal support={0} voteCount={1} reason="x" address={ADDR} />),
+    ).not.toThrow();
+  });
+
+  it('renders for support=2 (ABSTAIN variant)', () => {
+    useEnsNameMock.mockReturnValue({ data: undefined });
+    expect(() =>
+      render(<VoteSignal support={2} voteCount={1} reason="x" address={ADDR} />),
+    ).not.toThrow();
+  });
+
+  it('handles large voteCount (1000) with plural', () => {
+    useEnsNameMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <VoteSignal support={1} voteCount={1000} reason="ok" address={ADDR} />,
+    );
+    expect(container.textContent).toContain('1000 votes');
+  });
 });

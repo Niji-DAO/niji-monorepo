@@ -82,4 +82,64 @@ describe('SolidColorBackgroundModal', () => {
     if (btn) fireEvent.click(btn);
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
+
+  it('fires onDismiss on repeated close clicks', () => {
+    const onDismiss = vi.fn();
+    render(<SolidColorBackgroundModal show={true} onDismiss={onDismiss} content={null} />);
+    const btn = document.getElementById('overlay-root')?.querySelector('button');
+    if (btn) {
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders multiple children content within overlay-root', () => {
+    render(
+      <SolidColorBackgroundModal
+        show={true}
+        onDismiss={() => {}}
+        content={
+          <>
+            <p>line1</p>
+            <p>line2</p>
+          </>
+        }
+      />,
+    );
+    expect(document.getElementById('overlay-root')?.querySelectorAll('p').length).toBe(2);
+  });
+
+  it('renders numeric content node', () => {
+    render(<SolidColorBackgroundModal show={true} onDismiss={() => {}} content={42 as never} />);
+    expect(document.getElementById('overlay-root')?.textContent).toContain('42');
+  });
+
+  it('renders exactly 1 close button (single dismiss handler)', () => {
+    render(<SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>x</p>} />);
+    const buttons = document.getElementById('overlay-root')?.querySelectorAll('button');
+    expect(buttons?.length).toBe(1);
+  });
+
+  it('show toggle false → true rerender re-mounts content', () => {
+    const { rerender } = render(
+      <SolidColorBackgroundModal
+        show={false}
+        onDismiss={() => {}}
+        content={<p data-testid="x">a</p>}
+      />,
+    );
+    expect(document.getElementById('overlay-root')?.querySelector('[data-testid="x"]')).toBeNull();
+    rerender(
+      <SolidColorBackgroundModal
+        show={true}
+        onDismiss={() => {}}
+        content={<p data-testid="x">a</p>}
+      />,
+    );
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="x"]'),
+    ).not.toBeNull();
+  });
 });
