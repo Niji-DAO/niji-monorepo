@@ -223,4 +223,46 @@ describe('CurrentBid', () => {
     expect(BID_N_A).toBeDefined();
     expect(BID_N_A).not.toBeNull();
   });
+
+  it('renders for 0n bid amount', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<CurrentBid currentBid={0n} auctionEnded={false} />);
+    expect(container.textContent).toContain('Current bid');
+  });
+
+  it('renders 5 instances independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <CurrentBid key={i} currentBid={parseEther(`${i + 1}`)} auctionEnded={false} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(5);
+  });
+
+  it('rerender from running to ended updates label', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <CurrentBid currentBid={parseEther('1')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('Current bid');
+    rerender(<CurrentBid currentBid={parseEther('1')} auctionEnded={true} />);
+    expect(container.textContent).toContain('Winning bid');
+  });
+
+  it('renders for huge bid (1M ETH)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(<CurrentBid currentBid={parseEther('1000000')} auctionEnded={false} />),
+    ).not.toThrow();
+  });
+
+  it('useAtomValueMock=false branch renders without crash', () => {
+    useAtomValueMock.mockReturnValue(false);
+    expect(() =>
+      render(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />),
+    ).not.toThrow();
+  });
 });

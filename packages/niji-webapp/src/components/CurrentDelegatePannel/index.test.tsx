@@ -324,4 +324,60 @@ describe('CurrentDelegatePannel', () => {
     );
     expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xVERBATIM');
   });
+
+  it('renders 3 instances each independently', () => {
+    useAccountMock.mockReturnValue({ address: '0xUSER' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xDELEG' });
+    const { container } = render(
+      <>
+        <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />
+        <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />
+        <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="short"]').length).toBe(3);
+  });
+
+  it('rerender with new account does not crash', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xDELEG' });
+    const { rerender } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    useAccountMock.mockReturnValue({ address: '0xB' });
+    expect(() =>
+      rerender(
+        <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash when delegate data is undefined', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    expect(() =>
+      render(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />),
+    ).not.toThrow();
+  });
+
+  it('multiple instances render without crash', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xDELEG' });
+    expect(() =>
+      render(
+        <>
+          <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />
+          <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash with account undefined', () => {
+    useAccountMock.mockReturnValue({ address: undefined });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xDELEG' });
+    expect(() =>
+      render(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />),
+    ).not.toThrow();
+  });
 });
