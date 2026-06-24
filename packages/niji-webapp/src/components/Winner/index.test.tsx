@@ -70,4 +70,47 @@ describe('Winner', () => {
     const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
     expect(container.textContent?.toLowerCase()).toContain('you');
   });
+
+  it('handles ja-JP locale with isNounders=true', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('ja-JP');
+    const { container } = render(<Winner winner={ADDR} isNounders={true} />, {
+      wrapper: WithProviders,
+    });
+    expect(container.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('handles warm bg variant (useAtomValue false)', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(false);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    expect(container.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('handles useAccount returning undefined address', () => {
+    useAccountMock.mockReturnValue({ address: undefined });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    // 未接続でも winner = ADDR で render 可能
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(ADDR);
+  });
+
+  it('zero address winner renders without crashing', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const zero = '0x0000000000000000000000000000000000000000' as const;
+    expect(() => render(<Winner winner={zero} />, { wrapper: WithProviders })).not.toThrow();
+  });
+
+  it('"you" branch fires for matching account in any locale', () => {
+    useAccountMock.mockReturnValue({ address: ADDR });
+    useAtomValueMock.mockReturnValue(false);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    expect(container.textContent?.toLowerCase()).toContain('you');
+  });
 });

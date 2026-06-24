@@ -85,4 +85,76 @@ describe('ProposalTransactionsDiffs', () => {
         container.querySelectorAll('[data-testid="tx"]').length,
     ).toBeGreaterThanOrEqual(1);
   });
+
+  it('accepts activeVersionNumber 0 without crashing', () => {
+    expect(() =>
+      render(
+        <ProposalTransactionsDiffs
+          oldTransactions={[]}
+          newTransactions={[]}
+          activeVersionNumber={0}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders many transactions in array (10 entries)', () => {
+    const old = Array.from({ length: 10 }, (_, i) => makeTx(`0x${i}`) as never);
+    const ne = Array.from({ length: 10 }, (_, i) => makeTx(`0x${i}`) as never);
+    const { container } = render(
+      <ProposalTransactionsDiffs
+        oldTransactions={old}
+        newTransactions={ne}
+        activeVersionNumber={3}
+      />,
+    );
+    expect(
+      container.querySelectorAll('[data-testid="diff"]').length +
+        container.querySelectorAll('[data-testid="tx"]').length,
+    ).toBeGreaterThanOrEqual(10);
+  });
+
+  it('handles empty old + non-empty new (creation scenario)', () => {
+    const ne = [makeTx('0xA') as never, makeTx('0xB') as never, makeTx('0xC') as never];
+    const { container } = render(
+      <ProposalTransactionsDiffs
+        oldTransactions={[]}
+        newTransactions={ne}
+        activeVersionNumber={1}
+      />,
+    );
+    expect(
+      container.querySelectorAll('[data-testid="diff"]').length +
+        container.querySelectorAll('[data-testid="tx"]').length,
+    ).toBeGreaterThanOrEqual(3);
+  });
+
+  it('handles non-empty old + empty new (deletion scenario)', () => {
+    const old = [makeTx('0xA') as never, makeTx('0xB') as never];
+    const { container } = render(
+      <ProposalTransactionsDiffs
+        oldTransactions={old}
+        newTransactions={[]}
+        activeVersionNumber={1}
+      />,
+    );
+    expect(
+      container.querySelectorAll('[data-testid="diff"]').length +
+        container.querySelectorAll('[data-testid="tx"]').length,
+    ).toBeGreaterThanOrEqual(2);
+  });
+
+  it('renders different funcSig transactions without crashing', () => {
+    const old = [makeTx('0xA', 'transfer') as never];
+    const ne = [makeTx('0xA', 'approve(address,uint256)') as never];
+    expect(() =>
+      render(
+        <ProposalTransactionsDiffs
+          oldTransactions={old}
+          newTransactions={ne}
+          activeVersionNumber={1}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });
