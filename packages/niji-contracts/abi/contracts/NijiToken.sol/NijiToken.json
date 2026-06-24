@@ -2,33 +2,336 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_noundersDAO",
-        "type": "address"
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_symbol",
+        "type": "string"
       },
       {
         "internalType": "address",
-        "name": "_minter",
-        "type": "address"
-      },
-      {
-        "internalType": "contract INounsDescriptor",
         "name": "_descriptor",
         "type": "address"
       },
       {
-        "internalType": "contract INounsSeeder",
+        "internalType": "address",
         "name": "_seeder",
         "type": "address"
       },
       {
-        "internalType": "contract IProxyRegistry",
-        "name": "_proxyRegistry",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "_maxSupply",
+        "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "CheckpointUnorderedInsertion",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "DescriptorNotSet",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ECDSAInvalidSignature",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "length",
+        "type": "uint256"
+      }
+    ],
+    "name": "ECDSAInvalidSignatureLength",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
+      }
+    ],
+    "name": "ECDSAInvalidSignatureS",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "timepoint",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint48",
+        "name": "clock",
+        "type": "uint48"
+      }
+    ],
+    "name": "ERC5805FutureLookup",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ERC6372InconsistentClock",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ERC721EnumerableForbiddenBatchMint",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "ERC721IncorrectOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ERC721InsufficientApproval",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "approver",
+        "type": "address"
+      }
+    ],
+    "name": "ERC721InvalidApprover",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      }
+    ],
+    "name": "ERC721InvalidOperator",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "ERC721InvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      }
+    ],
+    "name": "ERC721InvalidReceiver",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "ERC721InvalidSender",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ERC721NonexistentToken",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "ERC721OutOfBoundsIndex",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "EmptyAddress",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "currentNonce",
+        "type": "uint256"
+      }
+    ],
+    "name": "InvalidAccountNonce",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidShortString",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "MaxSupplyReached",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "MintingNotActive",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "OnlyMinter",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ProvenanceHashLocked",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReentrancyGuardReentrantCall",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "bits",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "SafeCastOverflowedUintDowncast",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SeederNotSet",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "str",
+        "type": "string"
+      }
+    ],
+    "name": "StringTooLong",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TokenDoesNotExist",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "expiry",
+        "type": "uint256"
+      }
+    ],
+    "name": "VotesExpiredSignature",
+    "type": "error"
   },
   {
     "anonymous": false,
@@ -84,6 +387,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "string",
+        "name": "newContractURIHash",
+        "type": "string"
+      }
+    ],
+    "name": "ContractURIHashUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "delegator",
@@ -117,13 +433,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "previousBalance",
+        "name": "previousVotes",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "newBalance",
+        "name": "newVotes",
         "type": "uint256"
       }
     ],
@@ -132,17 +448,17 @@
   },
   {
     "anonymous": false,
-    "inputs": [],
-    "name": "DescriptorLocked",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "contract INounsDescriptor",
-        "name": "descriptor",
+        "indexed": true,
+        "internalType": "address",
+        "name": "oldDescriptor",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newDescriptor",
         "type": "address"
       }
     ],
@@ -152,16 +468,22 @@
   {
     "anonymous": false,
     "inputs": [],
-    "name": "MinterLocked",
+    "name": "EIP712DomainChanged",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
-        "name": "minter",
+        "name": "oldMinter",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newMinter",
         "type": "address"
       }
     ],
@@ -172,13 +494,13 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isActive",
+        "type": "bool"
       }
     ],
-    "name": "NounBurned",
+    "name": "MintingToggled",
     "type": "event"
   },
   {
@@ -191,7 +513,58 @@
         "type": "uint256"
       },
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
         "components": [
+          {
+            "internalType": "uint48",
+            "name": "special",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "choker",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "headphone",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "leftHand",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "hat",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "clothing",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "ear",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "back",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "backDecoration",
+            "type": "uint48"
+          },
           {
             "internalType": "uint48",
             "name": "background",
@@ -199,45 +572,41 @@
           },
           {
             "internalType": "uint48",
-            "name": "body",
+            "name": "solidBackground",
             "type": "uint48"
           },
           {
             "internalType": "uint48",
-            "name": "accessory",
-            "type": "uint48"
-          },
-          {
-            "internalType": "uint48",
-            "name": "head",
-            "type": "uint48"
-          },
-          {
-            "internalType": "uint48",
-            "name": "glasses",
+            "name": "hair",
             "type": "uint48"
           }
         ],
         "indexed": false,
-        "internalType": "struct INounsSeeder.Seed",
+        "internalType": "struct INijiSeeder.Seed",
         "name": "seed",
         "type": "tuple"
       }
     ],
-    "name": "NounCreated",
+    "name": "NijiMinted",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
-        "name": "noundersDAO",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
         "type": "address"
       }
     ],
-    "name": "NoundersDAOUpdated",
+    "name": "OwnershipTransferStarted",
     "type": "event"
   },
   {
@@ -261,17 +630,30 @@
   },
   {
     "anonymous": false,
-    "inputs": [],
-    "name": "SeederLocked",
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "provenanceHash",
+        "type": "string"
+      }
+    ],
+    "name": "ProvenanceHashSet",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "contract INounsSeeder",
-        "name": "seeder",
+        "indexed": true,
+        "internalType": "address",
+        "name": "oldSeeder",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newSeeder",
         "type": "address"
       }
     ],
@@ -305,12 +687,12 @@
   },
   {
     "inputs": [],
-    "name": "DELEGATION_TYPEHASH",
+    "name": "CLOCK_MODE",
     "outputs": [
       {
-        "internalType": "bytes32",
+        "internalType": "string",
         "name": "",
-        "type": "bytes32"
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -318,15 +700,9 @@
   },
   {
     "inputs": [],
-    "name": "DOMAIN_TYPEHASH",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "acceptOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -370,7 +746,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "nounId",
+        "name": "tokenId",
         "type": "uint256"
       }
     ],
@@ -380,29 +756,13 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "checkpoints",
+    "inputs": [],
+    "name": "clock",
     "outputs": [
       {
-        "internalType": "uint32",
-        "name": "fromBlock",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint96",
-        "name": "votes",
-        "type": "uint96"
+        "internalType": "uint48",
+        "name": "",
+        "type": "uint48"
       }
     ],
     "stateMutability": "view",
@@ -422,32 +782,13 @@
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "currentTokenId",
+    "outputs": [
       {
         "internalType": "uint256",
-        "name": "tokenId",
+        "name": "",
         "type": "uint256"
-      }
-    ],
-    "name": "dataURI",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "decimals",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
       }
     ],
     "stateMutability": "view",
@@ -508,7 +849,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "delegator",
+        "name": "account",
         "type": "address"
       }
     ],
@@ -528,9 +869,71 @@
     "name": "descriptor",
     "outputs": [
       {
-        "internalType": "contract INounsDescriptor",
+        "internalType": "contract NijiDescriptor",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "eip712Domain",
+    "outputs": [
+      {
+        "internalType": "bytes1",
+        "name": "fields",
+        "type": "bytes1"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "version",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "chainId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "verifyingContract",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "salt",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "extensions",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "exists",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -577,6 +980,49 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "timepoint",
+        "type": "uint256"
+      }
+    ],
+    "name": "getPastTotalSupply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timepoint",
+        "type": "uint256"
+      }
+    ],
+    "name": "getPastVotes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "account",
         "type": "address"
@@ -593,6 +1039,125 @@
         "internalType": "uint96",
         "name": "",
         "type": "uint96"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getSeed",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint48",
+            "name": "special",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "choker",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "headphone",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "leftHand",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "hat",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "clothing",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "ear",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "back",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "backDecoration",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "background",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "solidBackground",
+            "type": "uint48"
+          },
+          {
+            "internalType": "uint48",
+            "name": "hair",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct INijiSeeder.Seed",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getTraitIndices",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "getVotes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -624,7 +1189,7 @@
   },
   {
     "inputs": [],
-    "name": "isDescriptorLocked",
+    "name": "isMintingActive",
     "outputs": [
       {
         "internalType": "bool",
@@ -637,7 +1202,7 @@
   },
   {
     "inputs": [],
-    "name": "isMinterLocked",
+    "name": "isProvenanceHashLocked",
     "outputs": [
       {
         "internalType": "bool",
@@ -650,36 +1215,22 @@
   },
   {
     "inputs": [],
-    "name": "isSeederLocked",
+    "name": "lockProvenanceHash",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxSupply",
     "outputs": [
       {
-        "internalType": "bool",
+        "internalType": "uint256",
         "name": "",
-        "type": "bool"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lockDescriptor",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lockMinter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lockSeeder",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -690,6 +1241,49 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      }
+    ],
+    "name": "mint",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "quantity",
+        "type": "uint256"
+      }
+    ],
+    "name": "mintBatch",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "nonpayable",
@@ -725,7 +1319,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "",
+        "name": "owner",
         "type": "address"
       }
     ],
@@ -735,38 +1329,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "noundersDAO",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "numCheckpoints",
-    "outputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
       }
     ],
     "stateMutability": "view",
@@ -806,12 +1368,38 @@
   },
   {
     "inputs": [],
-    "name": "proxyRegistry",
+    "name": "pendingOwner",
     "outputs": [
       {
-        "internalType": "contract IProxyRegistry",
+        "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "provenanceHash",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "remainingSupply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -866,7 +1454,7 @@
       },
       {
         "internalType": "bytes",
-        "name": "_data",
+        "name": "data",
         "type": "bytes"
       }
     ],
@@ -880,7 +1468,7 @@
     "name": "seeder",
     "outputs": [
       {
-        "internalType": "contract INounsSeeder",
+        "internalType": "contract INijiSeeder",
         "name": "",
         "type": "address"
       }
@@ -900,27 +1488,62 @@
     "outputs": [
       {
         "internalType": "uint48",
+        "name": "special",
+        "type": "uint48"
+      },
+      {
+        "internalType": "uint48",
+        "name": "choker",
+        "type": "uint48"
+      },
+      {
+        "internalType": "uint48",
+        "name": "headphone",
+        "type": "uint48"
+      },
+      {
+        "internalType": "uint48",
+        "name": "leftHand",
+        "type": "uint48"
+      },
+      {
+        "internalType": "uint48",
+        "name": "hat",
+        "type": "uint48"
+      },
+      {
+        "internalType": "uint48",
+        "name": "clothing",
+        "type": "uint48"
+      },
+      {
+        "internalType": "uint48",
+        "name": "ear",
+        "type": "uint48"
+      },
+      {
+        "internalType": "uint48",
+        "name": "back",
+        "type": "uint48"
+      },
+      {
+        "internalType": "uint48",
+        "name": "backDecoration",
+        "type": "uint48"
+      },
+      {
+        "internalType": "uint48",
         "name": "background",
         "type": "uint48"
       },
       {
         "internalType": "uint48",
-        "name": "body",
+        "name": "solidBackground",
         "type": "uint48"
       },
       {
         "internalType": "uint48",
-        "name": "accessory",
-        "type": "uint48"
-      },
-      {
-        "internalType": "uint48",
-        "name": "head",
-        "type": "uint48"
-      },
-      {
-        "internalType": "uint48",
-        "name": "glasses",
+        "name": "hair",
         "type": "uint48"
       }
     ],
@@ -961,7 +1584,7 @@
   {
     "inputs": [
       {
-        "internalType": "contract INounsDescriptor",
+        "internalType": "address",
         "name": "_descriptor",
         "type": "address"
       }
@@ -987,12 +1610,12 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_noundersDAO",
-        "type": "address"
+        "internalType": "bool",
+        "name": "_isActive",
+        "type": "bool"
       }
     ],
-    "name": "setNoundersDAO",
+    "name": "setMintingActive",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1000,7 +1623,20 @@
   {
     "inputs": [
       {
-        "internalType": "contract INounsSeeder",
+        "internalType": "string",
+        "name": "_provenanceHash",
+        "type": "string"
+      }
+    ],
+    "name": "setProvenanceHash",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_seeder",
         "type": "address"
       }
@@ -1040,6 +1676,13 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "toggleMinting",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1151,25 +1794,6 @@
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "delegator",
-        "type": "address"
-      }
-    ],
-    "name": "votesToDelegate",
-    "outputs": [
-      {
-        "internalType": "uint96",
-        "name": "",
-        "type": "uint96"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   }
 ]
