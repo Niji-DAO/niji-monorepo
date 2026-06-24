@@ -97,4 +97,36 @@ describe('CandidateCard', () => {
     const { container } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />);
     expect(container.textContent).toContain('1 day ago');
   });
+
+  it('renders empty contentSignatures array gracefully', () => {
+    const candidate = {
+      ...baseCandidate,
+      version: { content: { title: 'T', contentSignatures: [] } },
+    } as never;
+    const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
+    expect(container.textContent).toContain('T');
+  });
+
+  it('renders different requiredVotes (5) to sponsors', () => {
+    const candidate = { ...baseCandidate, requiredVotes: 5 } as never;
+    const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
+    expect(container.querySelector('[data-testid="sponsors"]')?.textContent).toBe('req-5');
+  });
+
+  it('renders link href without query string (clean)', () => {
+    const { container } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />);
+    const href = container.querySelector('a')?.getAttribute('href') ?? '';
+    expect(href).not.toContain('?');
+  });
+
+  it('proposer address renders within ShortAddress', () => {
+    const candidate = { ...baseCandidate, proposer: '0xBOB' } as never;
+    const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xBOB');
+  });
+
+  it('renders 1 sponsors element exactly', () => {
+    const { container } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />);
+    expect(container.querySelectorAll('[data-testid="sponsors"]').length).toBe(1);
+  });
 });

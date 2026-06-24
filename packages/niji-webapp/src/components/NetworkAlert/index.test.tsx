@@ -86,4 +86,34 @@ describe('NetworkAlert', () => {
     render(<NetworkAlert />);
     expect(switchChainMock).not.toHaveBeenCalled();
   });
+
+  it('does not call switchChain when isConnected=false even with chainId=1', () => {
+    useAccountMock.mockReturnValue({ isConnected: false, chainId: 1 });
+    render(<NetworkAlert />);
+    expect(switchChainMock).not.toHaveBeenCalled();
+  });
+
+  it('calls switchChain when on layer-2 wrong chain (Polygon=137)', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 137 });
+    render(<NetworkAlert />);
+    expect(switchChainMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders null when disconnected (no error display)', () => {
+    useAccountMock.mockReturnValue({ isConnected: false, chainId: 11155111 });
+    const { container } = render(<NetworkAlert />);
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('switch invoked with correct config chainId (1)', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 31337 });
+    render(<NetworkAlert />);
+    expect(switchChainMock.mock.calls[0][0].chainId).toBe(1);
+  });
+
+  it('renders no DOM elements (always returns null UI)', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 11155111 });
+    const { container } = render(<NetworkAlert />);
+    expect(container.children.length).toBe(0);
+  });
 });

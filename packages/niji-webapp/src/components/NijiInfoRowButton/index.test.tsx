@@ -103,4 +103,54 @@ describe('NijiInfoRowButton', () => {
     expect(container.children.length).toBe(1);
     expect(container.firstElementChild?.tagName).toBe('DIV');
   });
+
+  it('renders empty btnText', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="" onClickHandler={() => {}} />,
+    );
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('JSX btnText (ReactNode) renders as JSX child', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <NijiInfoRowButton
+        iconImgSource="/x.png"
+        btnText={<strong data-testid="jsx-text">Bold</strong>}
+        onClickHandler={() => {}}
+      />,
+    );
+    expect(container.querySelector('[data-testid="jsx-text"]')?.textContent).toBe('Bold');
+  });
+
+  it('multiple clicks call handler N times', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const onClick = vi.fn();
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="x" onClickHandler={onClick} />,
+    );
+    const div = container.querySelector('div');
+    if (div) {
+      for (let i = 0; i < 5; i++) fireEvent.click(div);
+    }
+    expect(onClick).toHaveBeenCalledTimes(5);
+  });
+
+  it('isCool toggle does not affect button text', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="My text" onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe('My text');
+  });
+
+  it('large size icon URL still renders correctly', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const long = 'https://example.com/' + 'a'.repeat(500) + '.png';
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource={long} btnText="x" onClickHandler={() => {}} />,
+    );
+    expect(container.querySelector('img')?.getAttribute('src')).toBe(long);
+  });
 });
