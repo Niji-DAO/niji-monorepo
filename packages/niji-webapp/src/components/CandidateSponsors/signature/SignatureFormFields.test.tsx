@@ -92,4 +92,39 @@ describe('SignatureFormFields', () => {
     if (btn) fireEvent.click(btn);
     expect(onSign).toHaveBeenCalledTimes(1);
   });
+
+  it('renders reason text in textarea (pre-set)', () => {
+    const { container } = render(<SignatureFormFields {...defaults} reasonText="pre-existing" />);
+    expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('pre-existing');
+  });
+
+  it('disables button when dateErrorMessage is non-empty + transactionState=None', () => {
+    const { container } = render(<SignatureFormFields {...defaults} dateErrorMessage="boom" />);
+    expect(container.querySelector('button')?.disabled).toBe(true);
+  });
+
+  it('renders fewer textarea changes (1 trigger)', () => {
+    const setReason = vi.fn();
+    const { container } = render(<SignatureFormFields {...defaults} setReasonText={setReason} />);
+    const ta = container.querySelector('textarea');
+    if (ta) fireEvent.change(ta, { target: { value: 'a' } });
+    expect(setReason).toHaveBeenCalledTimes(1);
+  });
+
+  it('multi click on sign button fires onSign N times', () => {
+    const onSign = vi.fn();
+    const { container } = render(<SignatureFormFields {...defaults} onSign={onSign} />);
+    const btn = container.querySelector('button');
+    if (btn) {
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+    }
+    expect(onSign).toHaveBeenCalledTimes(2);
+  });
+
+  it('isLoading=true disables textarea and input', () => {
+    const { container } = render(<SignatureFormFields {...defaults} isLoading={true} />);
+    expect(container.querySelector('textarea')?.disabled).toBe(true);
+    expect(container.querySelector('input[type="date"]')?.disabled).toBe(true);
+  });
 });

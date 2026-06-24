@@ -89,4 +89,37 @@ describe('ProposalEditor', () => {
     const { container } = render(<ProposalEditor {...defaults} title="" body="# Hello" />);
     expect(container.querySelector('h1')).toBeNull();
   });
+
+  it('preserves multi-line body in textarea + markdown preview', () => {
+    const body = 'line1\nline2\nline3';
+    const { container } = render(<ProposalEditor {...defaults} body={body} />);
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe(body);
+  });
+
+  it('renders title verbatim in input value', () => {
+    const { container } = render(<ProposalEditor {...defaults} title="My Proposal Title" />);
+    expect((container.querySelector('input') as HTMLInputElement).value).toBe('My Proposal Title');
+  });
+
+  it('renders body verbatim in textarea value', () => {
+    const { container } = render(<ProposalEditor {...defaults} body="body content" />);
+    expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('body content');
+  });
+
+  it('renders unicode body content', () => {
+    const { container } = render(<ProposalEditor {...defaults} body="日本語本文" />);
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe('日本語本文');
+  });
+
+  it('repeated title change fires onTitleInput multiple times', () => {
+    const onTitle = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onTitleInput={onTitle} />);
+    const input = container.querySelector('input');
+    if (input) {
+      fireEvent.change(input, { target: { value: 'a' } });
+      fireEvent.change(input, { target: { value: 'ab' } });
+      fireEvent.change(input, { target: { value: 'abc' } });
+    }
+    expect(onTitle).toHaveBeenCalledTimes(3);
+  });
 });
