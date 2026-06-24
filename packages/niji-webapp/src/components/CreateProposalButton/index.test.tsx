@@ -552,4 +552,107 @@ describe('CreateProposalButton', () => {
     );
     expect(container.textContent).toContain('Create Proposal');
   });
+
+  it('renders 20 instances each independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <CreateProposalButton
+            key={i}
+            isLoading={false}
+            hasActiveOrPendingProposal={false}
+            hasEnoughVote={true}
+            isFormInvalid={false}
+            handleCreateProposal={() => {}}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(20);
+  });
+
+  it('rapid 50 clicks invoke handler 50 times', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 50; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(50);
+  });
+
+  it('handles all 4 flag combinations', () => {
+    const flags = [true, false];
+    flags.forEach(isLoading => {
+      flags.forEach(hasActive => {
+        flags.forEach(hasEnough => {
+          flags.forEach(isFormInvalid => {
+            expect(() =>
+              render(
+                <CreateProposalButton
+                  isLoading={isLoading}
+                  hasActiveOrPendingProposal={hasActive}
+                  hasEnoughVote={hasEnough}
+                  isFormInvalid={isFormInvalid}
+                  handleCreateProposal={() => {}}
+                />,
+              ),
+            ).not.toThrow();
+          });
+        });
+      });
+    });
+  });
+
+  it('rerender all flags toggles', () => {
+    const { rerender } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(() =>
+      rerender(
+        <CreateProposalButton
+          isLoading={true}
+          hasActiveOrPendingProposal={true}
+          hasEnoughVote={false}
+          isFormInvalid={true}
+          handleCreateProposal={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('consistent button count across rerenders', () => {
+    const { container, rerender } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(1);
+    rerender(
+      <CreateProposalButton
+        isLoading={true}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(1);
+  });
 });
