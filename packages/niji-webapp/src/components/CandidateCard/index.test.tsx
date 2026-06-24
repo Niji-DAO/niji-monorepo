@@ -298,4 +298,54 @@ describe('CandidateCard', () => {
       ).not.toThrow();
     }
   });
+
+  it('renders 30 instances each independently', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CandidateCard
+              key={i}
+              candidate={{ ...baseCandidate, id: `c-${i}` } as never}
+              nounsRequired={i}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles candidate with proposerVotes=999999', () => {
+    const c = { ...baseCandidate, proposerVotes: 999999 } as never;
+    expect(() => wrap(<CandidateCard candidate={c} nounsRequired={3} />)).not.toThrow();
+  });
+
+  it('handles candidate without title', () => {
+    const c = {
+      ...baseCandidate,
+      version: { content: { title: '', contentSignatures: [] } },
+    } as never;
+    expect(() => wrap(<CandidateCard candidate={c} nounsRequired={3} />)).not.toThrow();
+  });
+
+  it('multiple instances in single wrap renders distinct links', () => {
+    const c1 = { ...baseCandidate, id: 'unique-1' } as never;
+    const c2 = { ...baseCandidate, id: 'unique-2' } as never;
+    const { container } = wrap(
+      <>
+        <CandidateCard candidate={c1} nounsRequired={2} />
+        <CandidateCard candidate={c2} nounsRequired={2} />
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(2);
+  });
+
+  it('renders 1 anchor per instance consistently', () => {
+    for (let i = 0; i < 5; i++) {
+      const { container } = wrap(
+        <CandidateCard candidate={{ ...baseCandidate, id: `c-${i}` } as never} nounsRequired={i} />,
+      );
+      expect(container.querySelectorAll('a').length).toBe(1);
+    }
+  });
 });

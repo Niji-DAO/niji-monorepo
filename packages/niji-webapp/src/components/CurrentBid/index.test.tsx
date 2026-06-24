@@ -313,4 +313,52 @@ describe('CurrentBid', () => {
     rerender(<CurrentBid currentBid={parseEther('5')} auctionEnded={false} />);
     expect(container.textContent).toContain('Current bid');
   });
+
+  it('renders 30 instances each independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        {Array.from({ length: 30 }, (_, i) => (
+          <CurrentBid key={i} currentBid={parseEther(`${i + 1}`)} auctionEnded={false} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(30);
+  });
+
+  it('rerender all states preserves text class', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <CurrentBid currentBid={parseEther('1')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('Current bid');
+    rerender(<CurrentBid currentBid={parseEther('1')} auctionEnded={true} />);
+    expect(container.textContent).toContain('Winning bid');
+    rerender(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />);
+    expect(container.textContent).toContain('Current bid');
+  });
+
+  it('renders huge bid (1M ETH) preserves "bid" text', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <CurrentBid currentBid={parseEther('1000000')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('Current bid');
+  });
+
+  it('renders for very small fractional 0.00001 ETH', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(<CurrentBid currentBid={parseEther('0.00001')} auctionEnded={false} />),
+    ).not.toThrow();
+  });
+
+  it('cool variant + warm variant rerender does not crash', () => {
+    useAtomValueMock.mockReturnValueOnce(true);
+    const { rerender } = render(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />);
+    useAtomValueMock.mockReturnValue(false);
+    expect(() =>
+      rerender(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />),
+    ).not.toThrow();
+  });
 });

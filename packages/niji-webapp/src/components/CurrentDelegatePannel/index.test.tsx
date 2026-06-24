@@ -444,4 +444,80 @@ describe('CurrentDelegatePannel', () => {
     );
     expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0x');
   });
+
+  it('renders 30 instances each independently', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xDELEG' });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CurrentDelegatePannel
+              key={i}
+              onPrimaryBtnClick={() => {}}
+              onSecondaryBtnClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender all combinations of account/delegate', () => {
+    const cases = [
+      { addr: '0xA', delegate: '0xDELEG' },
+      { addr: '0xA', delegate: undefined },
+      { addr: undefined, delegate: undefined },
+      { addr: '0xB', delegate: '0xDELEG2' },
+    ];
+    useAccountMock.mockReturnValue({ address: cases[0].addr });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: cases[0].delegate });
+    const { rerender } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    cases.slice(1).forEach(c => {
+      useAccountMock.mockReturnValue({ address: c.addr });
+      useReadNijiTokenDelegatesMock.mockReturnValue({ data: c.delegate });
+      expect(() =>
+        rerender(
+          <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+        ),
+      ).not.toThrow();
+    });
+  });
+
+  it('rapid 30 close button clicks invoke handler 30 times', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const onSec = vi.fn();
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={onSec} />,
+    );
+    const buttons = container.querySelectorAll('button');
+    for (let i = 0; i < 30; i++) fireEvent.click(buttons[0]);
+    expect(onSec).toHaveBeenCalledTimes(30);
+  });
+
+  it('rapid 30 primary clicks invoke handler 30 times', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const onPri = vi.fn();
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={onPri} onSecondaryBtnClick={() => {}} />,
+    );
+    const buttons = container.querySelectorAll('button');
+    for (let i = 0; i < 30; i++) fireEvent.click(buttons[1]);
+    expect(onPri).toHaveBeenCalledTimes(30);
+  });
+
+  it('h1 title element preserved across rerenders', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xDELEG' });
+    const { container, rerender } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    expect(container.querySelector('h1')).not.toBeNull();
+    rerender(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />);
+    expect(container.querySelector('h1')).not.toBeNull();
+  });
 });
