@@ -38,4 +38,34 @@ describe('Input', () => {
     const { container } = render(<Input disabled />);
     expect(container.querySelector('input')?.disabled).toBe(true);
   });
+
+  it('forwards numeric value prop', () => {
+    const { container } = render(<Input type="number" defaultValue={42} />);
+    expect(container.querySelector('input')?.value).toBe('42');
+  });
+
+  it('renders with undefined className (defaults preserved)', () => {
+    const { container } = render(<Input className={undefined} />);
+    expect(container.querySelector('input')?.getAttribute('class')).toContain('h-9');
+  });
+
+  it('forwards required attribute', () => {
+    const { container } = render(<Input required />);
+    expect(container.querySelector('input')?.required).toBe(true);
+  });
+
+  it('forwards readOnly attribute', () => {
+    const { container } = render(<Input readOnly />);
+    expect(container.querySelector('input')?.readOnly).toBe(true);
+  });
+
+  it('renders type=email correctly', () => {
+    const { container } = render(<Input type="email" />);
+    expect(container.querySelector('input')?.type).toBe('email');
+  });
+
+  it('renders exactly 1 input element', () => {
+    const { container } = render(<Input />);
+    expect(container.querySelectorAll('input').length).toBe(1);
+  });
 });

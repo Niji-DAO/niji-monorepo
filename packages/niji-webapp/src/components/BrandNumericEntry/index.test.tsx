@@ -43,4 +43,29 @@ describe('BrandNumericEntry', () => {
     // react-number-format で - は除去されるはず
     expect(input?.value).not.toContain('-');
   });
+
+  it('forwards large value (1_000_000_000_000)', () => {
+    const { container } = render(<BrandNumericEntry value={1_000_000_000_000} />);
+    expect(container.querySelector('input')?.value).toContain('1,000,000,000,000');
+  });
+
+  it('forwards 0 value', () => {
+    const { container } = render(<BrandNumericEntry value={0} />);
+    expect(container.querySelector('input')?.value).toBe('0');
+  });
+
+  it('renders exactly 1 input element', () => {
+    const { container } = render(<BrandNumericEntry />);
+    expect(container.querySelectorAll('input').length).toBe(1);
+  });
+
+  it('renders label span exactly 1 element when label provided', () => {
+    const { container } = render(<BrandNumericEntry label="Amount" />);
+    expect(container.querySelectorAll('span').length).toBe(1);
+  });
+
+  it('does NOT apply invalid class when isInvalid=false (default)', () => {
+    const { container } = render(<BrandNumericEntry isInvalid={false} />);
+    expect(container.querySelector('input')?.className).not.toMatch(/invalid/i);
+  });
 });
