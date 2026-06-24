@@ -63,4 +63,45 @@ describe('LanguageSelectionModal', () => {
     expect(setLocale).toHaveBeenCalledWith('ja-JP');
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
+
+  it('clicking English button calls setLocale("en-US")', () => {
+    const setLocale = vi.fn();
+    const onDismiss = vi.fn();
+    useAtomMock.mockReturnValue(['ja-JP', setLocale]);
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    const overlay = document.getElementById('overlay-root');
+    const buttons = overlay?.querySelectorAll('div');
+    const enBtn = Array.from(buttons ?? []).find(d => d.textContent === 'English');
+    if (enBtn) fireEvent.click(enBtn);
+    expect(setLocale).toHaveBeenCalledWith('en-US');
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('clicking 中文 button calls setLocale("zh-CN")', () => {
+    const setLocale = vi.fn();
+    const onDismiss = vi.fn();
+    useAtomMock.mockReturnValue(['en-US', setLocale]);
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    const overlay = document.getElementById('overlay-root');
+    const buttons = overlay?.querySelectorAll('div');
+    const zhBtn = Array.from(buttons ?? []).find(d => d.textContent === '中文');
+    if (zhBtn) fireEvent.click(zhBtn);
+    expect(setLocale).toHaveBeenCalledWith('zh-CN');
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders 3 languages regardless of active locale', () => {
+    useAtomMock.mockReturnValue(['zh-CN', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    const text = document.getElementById('overlay-root')?.textContent ?? '';
+    expect(text).toContain('日本語');
+    expect(text).toContain('English');
+    expect(text).toContain('中文');
+  });
+
+  it('exactly 1 modal h3 title rendered', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelectorAll('h3').length).toBe(1);
+  });
 });

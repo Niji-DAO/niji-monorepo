@@ -55,4 +55,52 @@ describe('TightStackedCircleNiji', () => {
     expect(circle?.getAttribute('cx')).toBe('34'); // 28 + 2*3
     expect(circle?.getAttribute('cy')).toBe('28'); // 55 - 21 - 2*3
   });
+
+  it('index 0 produces cx=28, cy=34 (square 55 - 21)', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const { container } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
+    const circle = container.querySelector('circle');
+    expect(circle?.getAttribute('cx')).toBe('28'); // 28 + 0*3
+    expect(circle?.getAttribute('cy')).toBe('34'); // 55 - 21 - 0*3
+  });
+
+  it('square 100 + shift 5 produces shifted positions', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const { container } = renderSvg({ nounId: 1, index: 1, square: 100, shift: 5 });
+    const circle = container.querySelector('circle');
+    expect(circle?.getAttribute('cx')).toBe('33'); // 28 + 1*5
+    expect(circle?.getAttribute('cy')).toBe('74'); // 100 - 21 - 1*5
+  });
+
+  it('image href passes through getNiji image verbatim', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'data:custom-svg' });
+    const { container } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
+    expect(container.querySelector('image')?.getAttribute('href')).toBe('data:custom-svg');
+  });
+
+  it('exactly 1 LoadingNoun when seed undefined (no extra circles/images)', () => {
+    useNounSeedMock.mockReturnValue(undefined);
+    const { container } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
+    expect(container.querySelectorAll('[data-testid="loading-noun"]').length).toBe(1);
+    expect(container.querySelector('image')).toBeNull();
+  });
+
+  it('renders circle + image when seed present (no LoadingNoun)', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const { container } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
+    expect(container.querySelector('[data-testid="loading-noun"]')).toBeNull();
+    expect(container.querySelector('circle')).not.toBeNull();
+    expect(container.querySelector('image')).not.toBeNull();
+  });
+
+  it('circle id reflects different nounIds (numeric stringification)', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const { container } = renderSvg({ nounId: 9999, index: 0, square: 55, shift: 3 });
+    expect(container.querySelector('circle')?.getAttribute('id')).toBe('9999');
+  });
 });
