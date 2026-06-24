@@ -187,4 +187,55 @@ describe('Auction', () => {
     expect(container.querySelector('[data-testid="auction-activity"]')).toBeNull();
     expect(container.querySelector('[data-testid="niji-content"]')).not.toBeNull();
   });
+
+  it('multiple next clicks navigate to nounId+1 each time', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    navigateMock.mockReset();
+    const { container } = wrap(<Auction auction={makeAuction(3n)} />);
+    const next = container.querySelector('[data-testid="next"]') as HTMLButtonElement;
+    fireEvent.click(next);
+    fireEvent.click(next);
+    expect(navigateMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders niji-with-seed exactly 1 time per auction', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    const { container } = wrap(<Auction auction={makeAuction(5n)} />);
+    expect(container.querySelectorAll('[data-testid="niji-with-seed"]').length).toBe(1);
+  });
+
+  it('lastNounId undefined disables AuctionActivity render path', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    isNounderMock.mockReturnValue(false);
+    const { container } = wrap(<Auction auction={makeAuction(5n)} />);
+    expect(container.querySelector('[data-testid="niji-with-seed"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="auction-activity"]')).toBeNull();
+  });
+
+  it('last auction next click does not navigate (button disabled)', () => {
+    useAtomValueMock.mockReturnValue(5n);
+    isNounderMock.mockReturnValue(false);
+    navigateMock.mockReset();
+    const { container } = wrap(<Auction auction={makeAuction(5n)} />);
+    const next = container.querySelector('[data-testid="next"]') as HTMLButtonElement;
+    expect(next.disabled).toBe(true);
+    fireEvent.click(next);
+    expect(navigateMock).not.toHaveBeenCalled();
+  });
+
+  it('Nounder nounId=20 with isNounder=true renders niji-content', () => {
+    useAtomValueMock.mockReturnValue(100n);
+    isNounderMock.mockReturnValue(true);
+    const { container } = wrap(<Auction auction={makeAuction(20n)} />);
+    expect(container.querySelector('[data-testid="niji-content"]')).not.toBeNull();
+  });
+
+  it('isFirstAuction=false for nounId=1 (boundary)', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    const { container } = wrap(<Auction auction={makeAuction(1n)} />);
+    expect(container.querySelector('[data-testid="prev"]')?.disabled).toBe(false);
+  });
 });

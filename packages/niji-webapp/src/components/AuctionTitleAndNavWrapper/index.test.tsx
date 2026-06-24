@@ -133,4 +133,49 @@ describe('AuctionTitleAndNavWrapper Component', () => {
     );
     expect(container.querySelectorAll('span').length).toBe(10);
   });
+
+  it('rerender updates children content', () => {
+    const { container, rerender } = render(
+      <AuctionTitleAndNavWrapper>first</AuctionTitleAndNavWrapper>,
+    );
+    expect(container.textContent).toBe('first');
+    rerender(<AuctionTitleAndNavWrapper>second</AuctionTitleAndNavWrapper>);
+    expect(container.textContent).toBe('second');
+  });
+
+  it('0 children renders as "0"', () => {
+    const { container } = render(<AuctionTitleAndNavWrapper>{0}</AuctionTitleAndNavWrapper>);
+    expect(container.textContent).toBe('0');
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <AuctionTitleAndNavWrapper>a</AuctionTitleAndNavWrapper>
+        <AuctionTitleAndNavWrapper>b</AuctionTitleAndNavWrapper>
+      </>,
+    );
+    expect(container.children.length).toBe(2);
+  });
+
+  it('long children string (500 chars) renders fully', () => {
+    const long = 'x'.repeat(500);
+    const { container } = render(<AuctionTitleAndNavWrapper>{long}</AuctionTitleAndNavWrapper>);
+    expect(container.textContent?.length).toBe(500);
+  });
+
+  it('unicode children render verbatim', () => {
+    const { container } = render(<AuctionTitleAndNavWrapper>こんにちは</AuctionTitleAndNavWrapper>);
+    expect(container.textContent).toBe('こんにちは');
+  });
+
+  it('mixed text + element children render', () => {
+    const { container } = render(
+      <AuctionTitleAndNavWrapper>
+        text-<strong>strong</strong>
+      </AuctionTitleAndNavWrapper>,
+    );
+    expect(container.querySelector('strong')?.textContent).toBe('strong');
+    expect(container.textContent).toContain('text-');
+  });
 });
