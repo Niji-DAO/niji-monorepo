@@ -297,4 +297,58 @@ describe('NavBarTreasury', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 15 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 15 }, (_, i) => (
+          <NavBarTreasury
+            key={i}
+            treasuryBalance={`${i * 100}`}
+            treasuryStyle={NavBarButtonStyle.WHITE_INFO}
+          />
+        ))}
+      </>,
+    );
+    expect(container.textContent?.match(/Treasury/g)?.length).toBe(15);
+  });
+
+  it('renders decimal balance "100.50"', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="100.5" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    expect(container.textContent).toContain('Treasury');
+  });
+
+  it('rerender from "100" to "200" updates balance', () => {
+    const { container, rerender } = render(
+      <NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    expect(container.textContent).toContain('100');
+    rerender(<NavBarTreasury treasuryBalance="200" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />);
+    expect(container.textContent).toContain('200');
+  });
+
+  it('handles extremely large balance (1 trillion)', () => {
+    const { container } = render(
+      <NavBarTreasury
+        treasuryBalance="1000000000000"
+        treasuryStyle={NavBarButtonStyle.WHITE_INFO}
+      />,
+    );
+    expect(container.textContent).toContain('Treasury');
+  });
+
+  it('renders 5 consecutive instances without crash', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        render(
+          <NavBarTreasury
+            treasuryBalance={`${i * 1000}`}
+            treasuryStyle={NavBarButtonStyle.WHITE_INFO}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });

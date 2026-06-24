@@ -497,5 +497,49 @@ describe('ProposalActionModal', () => {
   });
 });
 
+describe('ProposalActionModal extra', () => {
+  it('renders 10 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <ProposalActionModal key={i} {...baseProps} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="solid-modal"]').length).toBe(10);
+  });
+
+  it('renders without crash for show=true repeatedly', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() => render(<ProposalActionModal {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('show toggle false→true rerenders modal', () => {
+    const { container, rerender } = render(<ProposalActionModal {...baseProps} show={false} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
+    rerender(<ProposalActionModal {...baseProps} show={true} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+  });
+
+  it('renders with show=false 5 times consecutively', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() => render(<ProposalActionModal {...baseProps} show={false} />)).not.toThrow();
+    }
+  });
+
+  it('renders Modal in deeply nested context', () => {
+    expect(() =>
+      render(
+        <div>
+          <div>
+            <ProposalActionModal {...baseProps} />
+          </div>
+        </div>,
+      ),
+    ).not.toThrow();
+  });
+});
+
 // dummy reference to silence unused warning
 void advanceTo;
