@@ -378,4 +378,52 @@ describe('EnsOrLongAddress', () => {
       expect(() => render(<EnsOrLongAddress address={ADDR} />)).not.toThrow();
     }
   });
+
+  it('renders 100 instances independently', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('alice.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <EnsOrLongAddress key={i} address={ADDR} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves ENS text', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('bob.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container, rerender } = render(<EnsOrLongAddress address={ADDR} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<EnsOrLongAddress address={ADDR} />);
+    }
+    expect(container.textContent).toBe('bob.eth');
+  });
+
+  it('handles uppercase address verbatim', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const UPPER = '0xABCDEF1234567890ABCDEF1234567890ABCDEF12' as const;
+    const { container } = render(<EnsOrLongAddress address={UPPER} />);
+    expect(container.textContent).toBe(UPPER);
+  });
+
+  it('rerender between ENS and blocked fallback 50 times', () => {
+    const { rerender } = render(<EnsOrLongAddress address={ADDR} />);
+    for (let i = 0; i < 50; i++) {
+      vi.mocked(useReverseENSLookUp).mockReturnValue(i % 2 === 0 ? 'x.eth' : undefined);
+      vi.mocked(containsBlockedText).mockReturnValue(i % 3 === 0);
+      expect(() => rerender(<EnsOrLongAddress address={ADDR} />)).not.toThrow();
+    }
+  });
+
+  it('handles unicode ENS name', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('日本.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('日本.eth');
+  });
 });

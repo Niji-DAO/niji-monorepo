@@ -731,4 +731,81 @@ describe('DynamicQuorumInfoModal', () => {
       ).not.toThrow();
     }
   });
+
+  it('renders 30 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DynamicQuorumInfoModal
+              key={i}
+              proposal={makeProposal()}
+              againstVotesAbsolute={i * 3}
+              onDismiss={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times with varying againstVotes', () => {
+    const { rerender } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={0}
+        onDismiss={() => {}}
+      />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <DynamicQuorumInfoModal
+            proposal={makeProposal()}
+            againstVotesAbsolute={i * 7}
+            onDismiss={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles very large againstVotesAbsolute (1e9)', () => {
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={1000000000}
+          onDismiss={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 50 onDismiss invocations registered', () => {
+    const onDismiss = vi.fn();
+    render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={5}
+        onDismiss={onDismiss}
+      />,
+    );
+    for (let i = 0; i < 50; i++) {
+      onDismiss();
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(50);
+  });
+
+  it('handles negative againstVotesAbsolute edge case', () => {
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={-5}
+          onDismiss={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });

@@ -384,4 +384,58 @@ describe('DelegationCandidateVoteCountInfo', () => {
       ).not.toThrow();
     }
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <DelegationCandidateVoteCountInfo
+              key={i}
+              text={`t-${i}`}
+              voteCount={i}
+              isLoading={false}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves count display', () => {
+    const { container, rerender } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={1} isLoading={false} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      rerender(<DelegationCandidateVoteCountInfo text="x" voteCount={i + 1} isLoading={false} />);
+    }
+    expect(container.textContent).toContain('30');
+  });
+
+  it('rapid loading toggle 50 times without crash', () => {
+    const { rerender } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={5} isLoading={false} />,
+    );
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        rerender(
+          <DelegationCandidateVoteCountInfo text="x" voteCount={5} isLoading={i % 2 === 0} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles negative voteCount edge case', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={-5} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('-5');
+  });
+
+  it('unicode text renders correctly', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="🚀日本語" voteCount={1} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('🚀日本語');
+  });
 });
