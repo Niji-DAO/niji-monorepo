@@ -33,4 +33,39 @@ describe('MinBid', () => {
     if (wrapper) fireEvent.click(wrapper);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
+
+  it('handles very large minBid (1M ETH = 1e24 wei)', () => {
+    const { container } = render(<MinBid minBid={parseEther('1000000')} onClick={() => {}} />);
+    expect(container.textContent).toContain('You must bid at least');
+    expect(container.textContent).toContain('Ξ');
+  });
+
+  it('fires onClick multiple times for repeated clicks', () => {
+    const onClick = vi.fn();
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={onClick} />);
+    const wrapper = container.querySelector('div');
+    if (wrapper) {
+      fireEvent.click(wrapper);
+      fireEvent.click(wrapper);
+      fireEvent.click(wrapper);
+    }
+    expect(onClick).toHaveBeenCalledTimes(3);
+  });
+
+  it('img alt is "Pointer noun"', () => {
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('Pointer noun');
+  });
+
+  it('renders exactly 1 h3 element', () => {
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    expect(container.querySelectorAll('h3').length).toBe(1);
+  });
+
+  it('outermost wrapper is single <div> with onClick handler', () => {
+    const onClick = vi.fn();
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={onClick} />);
+    expect(container.children.length).toBe(1);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
 });
