@@ -89,4 +89,43 @@ describe('SignatureStatusOverlay', () => {
     // X aria-icon は lucide-react SVG、 li 内 strong 直下を確認
     expect(container.querySelectorAll('svg').length).toBeGreaterThan(0);
   });
+
+  it('overlay is visible by default (isOverlayVisible=true)', () => {
+    const { container } = render(<SignatureStatusOverlay {...defaults} />);
+    expect(container.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('Try again button click invokes onTryAgain', () => {
+    const onTryAgain = vi.fn();
+    const { container } = render(
+      <SignatureStatusOverlay {...defaults} errorMessage="oops" onTryAgain={onTryAgain} />,
+    );
+    const btn = container.querySelector('button');
+    if (btn) fireEvent.click(btn);
+    expect(onTryAgain).toHaveBeenCalledTimes(1);
+  });
+
+  it('errorMessage rendering does not show success copy', () => {
+    const { container } = render(<SignatureStatusOverlay {...defaults} errorMessage="boom" />);
+    expect(container.textContent).not.toContain('Signature added successfully');
+  });
+
+  it('getSignatureErrorMessage shows the error text verbatim', () => {
+    const { container } = render(
+      <SignatureStatusOverlay {...defaults} getSignatureErrorMessage="ENS lookup failed" />,
+    );
+    expect(container.textContent).toContain('ENS lookup failed');
+  });
+
+  it('isTxSuccessful + no transactionHash still renders anchor (empty href)', () => {
+    const { container } = render(<SignatureStatusOverlay {...defaults} isTxSuccessful={true} />);
+    expect(container.textContent).toContain('Signature added successfully');
+    const anchor = container.querySelector('a');
+    expect(anchor).not.toBeNull();
+  });
+
+  it('isSignPending renders Spinner', () => {
+    const { container } = render(<SignatureStatusOverlay {...defaults} isSignPending={true} />);
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+  });
 });

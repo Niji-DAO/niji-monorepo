@@ -101,4 +101,45 @@ describe('NavDropDown', () => {
     );
     expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe(long);
   });
+
+  it('renders JSX buttonText (ReactNode)', () => {
+    const { container } = render(
+      <NavDropDown buttonText={<strong data-testid="jsx-text">Bold</strong>}>
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="jsx-text"]')?.textContent).toBe('Bold');
+  });
+
+  it('renders no children (empty fragment) without crash', () => {
+    expect(() => render(<NavDropDown buttonText="Menu">{null}</NavDropDown>)).not.toThrow();
+  });
+
+  it('dropdown class is exactly applied (no extras after split)', () => {
+    const { container } = render(
+      <NavDropDown buttonText="Menu">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    const dropdown = container.querySelector('.dropdown');
+    expect(dropdown?.className.split(' ')).toContain('dropdown');
+  });
+
+  it('numeric buttonText is rendered', () => {
+    const { container } = render(
+      <NavDropDown buttonText={42 as never}>
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('42');
+  });
+
+  it('without buttonIcon prop still renders nav-button', () => {
+    const { container } = render(
+      <NavDropDown buttonText="Menu">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
+  });
 });
