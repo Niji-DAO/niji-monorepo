@@ -335,4 +335,36 @@ describe('ABIUpload Component', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 5 instances each with own fileName', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <ABIUpload
+            key={i}
+            abiFileName={`file${i}.json`}
+            isValid={false}
+            isInvalid={false}
+            onChange={vi.fn()}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(5);
+  });
+
+  it('isValid=true + isInvalid=true (both flags) does not crash', () => {
+    expect(() =>
+      render(<ABIUpload abiFileName="x" isValid={true} isInvalid={true} onChange={vi.fn()} />),
+    ).not.toThrow();
+  });
+
+  it('rerender from isValid=false to true', () => {
+    const { rerender } = render(
+      <ABIUpload abiFileName="x" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    expect(() =>
+      rerender(<ABIUpload abiFileName="x" isValid={true} isInvalid={false} onChange={vi.fn()} />),
+    ).not.toThrow();
+  });
 });

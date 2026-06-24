@@ -215,4 +215,51 @@ describe('VoteProgressBar', () => {
     );
     expect(container.children.length).toBe(3);
   });
+
+  it('renders 10 instances all variants mixed', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <VoteProgressBar
+            key={i}
+            variant={[VoteCardVariant.FOR, VoteCardVariant.AGAINST, VoteCardVariant.ABSTAIN][i % 3]}
+            percentage={(i + 1) * 10}
+          />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(10);
+  });
+
+  it('rerender percentage from 0 to 50 updates style', () => {
+    const { container, rerender } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={0} />,
+    );
+    expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 0%');
+    rerender(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+    expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 50%');
+  });
+
+  it('renders 1% (boundary just above 0)', () => {
+    const { container } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={1} />);
+    expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 1%');
+  });
+
+  it('renders 99% (boundary just below 100)', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.AGAINST} percentage={99} />,
+    );
+    expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 99%');
+  });
+
+  it('all 3 variants rerender between each other', () => {
+    const { container, rerender } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />,
+    );
+    expect(container.querySelectorAll('div')[1]?.className).toMatch(/for/i);
+    rerender(<VoteProgressBar variant={VoteCardVariant.AGAINST} percentage={50} />);
+    expect(container.querySelectorAll('div')[1]?.className).toMatch(/against/i);
+    rerender(<VoteProgressBar variant={VoteCardVariant.ABSTAIN} percentage={50} />);
+    expect(container.querySelectorAll('div')[1]?.className).toMatch(/abstain/i);
+  });
 });
