@@ -332,4 +332,42 @@ describe('BidHistoryItem Component', () => {
       expect(() => render(<BidHistoryItem bid={mockBid} classes={mockClasses} />)).not.toThrow();
     }
   });
+
+  it('renders 20 BidHistoryItem instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <BidHistoryItem
+            key={i}
+            bid={{ ...mockBid, value: BigInt(i + 1) * 1_000_000_000_000_000_000n }}
+            classes={mockClasses}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="truncated-amount"]').length).toBe(20);
+  });
+
+  it('different sender address renders correctly', () => {
+    const otherBid = { ...mockBid, sender: '0xDEADBEEF' as Address };
+    render(<BidHistoryItem bid={otherBid} classes={mockClasses} />);
+    expect(screen.getByTestId('short-address')).toHaveTextContent('0xDEADBEEF');
+  });
+
+  it('rerender consistent link element preserved', () => {
+    const { container, rerender } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    expect(container.querySelector('a')).not.toBeNull();
+    rerender(<BidHistoryItem bid={{ ...mockBid, value: 5n }} classes={mockClasses} />);
+    expect(container.querySelector('a')).not.toBeNull();
+  });
+
+  it('renders for transactionIndex=0', () => {
+    const zeroIdx = { ...mockBid, transactionIndex: 0 };
+    expect(() => render(<BidHistoryItem bid={zeroIdx} classes={mockClasses} />)).not.toThrow();
+  });
+
+  it('renders for very recent timestamp', () => {
+    const recent = { ...mockBid, timestamp: BigInt(Math.floor(Date.now() / 1000)) };
+    expect(() => render(<BidHistoryItem bid={recent} classes={mockClasses} />)).not.toThrow();
+  });
 });
