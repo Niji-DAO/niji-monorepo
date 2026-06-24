@@ -284,4 +284,49 @@ describe('MinBid', () => {
     rerender(<MinBid minBid={parseEther('100')} onClick={() => {}} />);
     expect(container.querySelector('h3')).not.toBeNull();
   });
+
+  it('renders 50 MinBid instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <MinBid key={i} minBid={parseEther(`${i + 1}`)} onClick={vi.fn()} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(50);
+  });
+
+  it('rapid 100 clicks invoke onClick 100 times', () => {
+    const onClick = vi.fn();
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={onClick} />);
+    const wrapper = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 100; i++) fireEvent.click(wrapper);
+    expect(onClick).toHaveBeenCalledTimes(100);
+  });
+
+  it('rerender 20 times preserves img + h3', () => {
+    const { container, rerender } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    for (let i = 1; i <= 20; i++) {
+      rerender(<MinBid minBid={parseEther(`${i}`)} onClick={() => {}} />);
+      expect(container.querySelector('img')).not.toBeNull();
+      expect(container.querySelector('h3')).not.toBeNull();
+    }
+  });
+
+  it('handles boundary 1 wei + huge bid', () => {
+    expect(() => render(<MinBid minBid={1n} onClick={() => {}} />)).not.toThrow();
+    expect(() =>
+      render(
+        <MinBid minBid={BigInt('1000000000000000000000000') /* 1M ETH */} onClick={() => {}} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('img element preserved across 30 rerenders', () => {
+    const { container, rerender } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<MinBid minBid={parseEther(`${i + 1}`)} onClick={() => {}} />);
+      expect(container.querySelectorAll('img').length).toBe(1);
+    }
+  });
 });

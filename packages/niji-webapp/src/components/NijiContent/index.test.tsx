@@ -563,4 +563,77 @@ describe('NijiContent', () => {
     );
     expect(container.querySelector('[data-testid="niji-title"]')).not.toBeNull();
   });
+
+  it('renders 30 NijiContent instances each in single wrap', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiContent key={i} nounId={BigInt(i)} auctionId={BigInt(i)} isCool={false} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 20 times with different nounIds', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { rerender } = render(
+      <MemoryRouter>
+        <NijiContent nounId={1n} auctionId={1n} isCool={false} />
+      </MemoryRouter>,
+    );
+    for (let i = 0; i < 20; i++) {
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <NijiContent nounId={BigInt(i)} auctionId={BigInt(i)} isCool={i % 2 === 0} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles isCool true/false rerender preserves component', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <MemoryRouter>
+        <NijiContent nounId={1n} auctionId={1n} isCool={true} />
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('[data-testid="niji-title"]')).not.toBeNull();
+    rerender(
+      <MemoryRouter>
+        <NijiContent nounId={1n} auctionId={1n} isCool={false} />
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('[data-testid="niji-title"]')).not.toBeNull();
+  });
+
+  it('handles 100 consecutive renders without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        render(
+          <MemoryRouter>
+            <NijiContent nounId={BigInt(i)} auctionId={1n} isCool={false} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('useAtomValue various return values', () => {
+    [true, false, undefined, null, 0, 1].forEach(v => {
+      useAtomValueMock.mockReturnValue(v);
+      expect(() =>
+        render(
+          <MemoryRouter>
+            <NijiContent nounId={1n} auctionId={1n} isCool={false} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    });
+  });
 });
