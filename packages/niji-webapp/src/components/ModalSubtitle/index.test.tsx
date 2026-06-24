@@ -59,4 +59,37 @@ describe('ModalSubtitle', () => {
     );
     expect(container.querySelectorAll('span').length).toBe(2);
   });
+
+  it('renders empty string children gracefully', () => {
+    const { container } = render(<ModalSubtitle>{''}</ModalSubtitle>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('renders array children concatenated', () => {
+    const { container } = render(<ModalSubtitle>{['a', 'b', 'c']}</ModalSubtitle>);
+    expect(container.querySelector('div')?.textContent).toBe('abc');
+  });
+
+  it('div tagName is DIV (semantic)', () => {
+    const { container } = render(<ModalSubtitle>x</ModalSubtitle>);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
+
+  it('CSS module class has hash format', () => {
+    const { container } = render(<ModalSubtitle>x</ModalSubtitle>);
+    expect(container.querySelector('div')?.className).toMatch(/_.+/);
+  });
+
+  it('renders deeply nested content', () => {
+    const { container } = render(
+      <ModalSubtitle>
+        <div>
+          <span>
+            <em data-testid="deep">deep</em>
+          </span>
+        </div>
+      </ModalSubtitle>,
+    );
+    expect(container.querySelector('[data-testid="deep"]')?.textContent).toBe('deep');
+  });
 });
