@@ -265,4 +265,52 @@ describe('CurrentBid', () => {
       render(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />),
     ).not.toThrow();
   });
+
+  it('renders 20 instances independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <CurrentBid key={i} currentBid={parseEther(`${i + 1}`)} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender auctionEnded toggle preserves component', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <CurrentBid currentBid={parseEther('1')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('bid');
+    rerender(<CurrentBid currentBid={parseEther('1')} auctionEnded={true} />);
+    expect(container.textContent).toContain('bid');
+  });
+
+  it('renders 0.0001 ETH fractional', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <CurrentBid currentBid={parseEther('0.0001')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('bid');
+  });
+
+  it('renders 0n currentBid 5 times without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 5; i++) {
+      expect(() => render(<CurrentBid currentBid={0n} auctionEnded={false} />)).not.toThrow();
+    }
+  });
+
+  it('rerender currentBid changes from 1 to 5 ETH', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <CurrentBid currentBid={parseEther('1')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('Current bid');
+    rerender(<CurrentBid currentBid={parseEther('5')} auctionEnded={false} />);
+    expect(container.textContent).toContain('Current bid');
+  });
 });

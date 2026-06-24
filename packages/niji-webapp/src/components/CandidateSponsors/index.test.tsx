@@ -402,4 +402,34 @@ describe('CandidateSponsors', () => {
     expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
     hookState.isThresholdMet = false;
   });
+
+  it('renders without crash with userVotes=0', () => {
+    hookState.userVotes = 0;
+    expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+    hookState.userVotes = 5;
+  });
+
+  it('renders without crash with userVotes=10000', () => {
+    hookState.userVotes = 10000;
+    expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+    hookState.userVotes = 5;
+  });
+
+  it('renders without crash with isOriginalSigner=true', () => {
+    hookState.isOriginalSigner = true;
+    expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+    hookState.isOriginalSigner = false;
+  });
+
+  it('renders without crash with delegatesData=undefined', () => {
+    hookState.delegatesData = undefined;
+    expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+    hookState.delegatesData = { delegates: [] };
+  });
+
+  it('renders consecutive 5 times without crash', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+    }
+  });
 });
