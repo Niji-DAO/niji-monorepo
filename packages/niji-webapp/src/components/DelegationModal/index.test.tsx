@@ -95,4 +95,49 @@ describe('DelegationModal', () => {
     if (backdrop) fireEvent.click(backdrop);
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
+
+  it('secondary button click fires onDismiss', () => {
+    const onDismiss = vi.fn();
+    render(<DelegationModal onDismiss={onDismiss} />);
+    const buttons = document.getElementById('overlay-root')?.querySelectorAll('button');
+    const secondary = Array.from(buttons ?? []).find(b => b.textContent === 'secondary');
+    if (secondary) fireEvent.click(secondary);
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('delegateTo verbatim passed to ChangeDelegatePanel', () => {
+    render(<DelegationModal onDismiss={() => {}} delegateTo="0xDEAD" />);
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="change-panel"]')
+        ?.textContent,
+    ).toBe('change-0xDEAD');
+  });
+
+  it('backdrop multi-click invokes onDismiss multiple times', () => {
+    const onDismiss = vi.fn();
+    render(<DelegationModal onDismiss={onDismiss} />);
+    const backdrop = document.getElementById('backdrop-root')?.querySelector('div');
+    if (backdrop) {
+      fireEvent.click(backdrop);
+      fireEvent.click(backdrop);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(2);
+  });
+
+  it('primary click switches to change-none (no delegateTo)', () => {
+    render(<DelegationModal onDismiss={() => {}} />);
+    const primary = Array.from(
+      document.getElementById('overlay-root')?.querySelectorAll('button') ?? [],
+    ).find(b => b.textContent === 'primary');
+    if (primary) fireEvent.click(primary);
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="change-panel"]')
+        ?.textContent,
+    ).toBe('change-none');
+  });
+
+  it('Backdrop renders single div element', () => {
+    const { container } = render(<Backdrop onDismiss={() => {}} />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+  });
 });

@@ -97,4 +97,59 @@ describe('ThemeProvider', () => {
         ?.getAttribute('data-attribute'),
     ).toBe('');
   });
+
+  it('renders empty children gracefully', () => {
+    const { container } = render(<ThemeProvider>{[]}</ThemeProvider>);
+    expect(container.querySelector('[data-testid="next-themes-provider"]')).not.toBeNull();
+  });
+
+  it('renders nested ThemeProvider without crash', () => {
+    const { container } = render(
+      <ThemeProvider>
+        <ThemeProvider>
+          <span>nested</span>
+        </ThemeProvider>
+      </ThemeProvider>,
+    );
+    expect(container.querySelectorAll('[data-testid="next-themes-provider"]').length).toBe(2);
+  });
+
+  it('forwards complex props to provider verbatim', () => {
+    const { container } = render(
+      <ThemeProvider attribute="data-mode">
+        <span>x</span>
+      </ThemeProvider>,
+    );
+    expect(
+      container
+        .querySelector('[data-testid="next-themes-provider"]')
+        ?.getAttribute('data-attribute'),
+    ).toBe('data-mode');
+  });
+
+  it('renders deeply nested children', () => {
+    const { container } = render(
+      <ThemeProvider>
+        <div>
+          <span>
+            <em data-testid="deep">deep</em>
+          </span>
+        </div>
+      </ThemeProvider>,
+    );
+    expect(container.querySelector('[data-testid="deep"]')?.textContent).toBe('deep');
+  });
+
+  it('renders fragment children directly', () => {
+    const { container } = render(
+      <ThemeProvider>
+        <>
+          <span data-testid="a">a</span>
+          <span data-testid="b">b</span>
+        </>
+      </ThemeProvider>,
+    );
+    expect(container.querySelector('[data-testid="a"]')?.textContent).toBe('a');
+    expect(container.querySelector('[data-testid="b"]')?.textContent).toBe('b');
+  });
 });
