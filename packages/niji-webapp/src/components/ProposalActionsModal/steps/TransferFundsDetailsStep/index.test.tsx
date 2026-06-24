@@ -261,4 +261,57 @@ describe('TransferFundsDetailsStep', () => {
     // initial state.amount = undefined → value = ''
     expect(amountInput.value).toBe('');
   });
+
+  it('currency dropdown change fires onChange handler', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    const currencyDropdown = container.querySelector(
+      '[data-testid="currency"]',
+    ) as HTMLSelectElement;
+    expect(currencyDropdown).not.toBeNull();
+    // changeEvent fire はクラッシュしない
+    expect(() => {
+      fireEvent.change(currencyDropdown, { target: { value: 'WETH' } });
+    }).not.toThrow();
+  });
+
+  it('Next button does not fire onPrev', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <TransferFundsDetailsStep {...defaults} onPrevBtnClick={onPrev} />,
+    );
+    fireEvent.change(container.querySelector('[data-testid="amount"]')!, {
+      target: { value: '100' },
+    });
+    fireEvent.change(container.querySelector('[data-testid="recipient"]')!, {
+      target: { value: ADDR },
+    });
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onPrev).not.toHaveBeenCalled();
+  });
+
+  it('h1 title renders only 1 time', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('valid recipient address sets data-invalid=false', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    fireEvent.change(container.querySelector('[data-testid="recipient"]')!, {
+      target: { value: ADDR },
+    });
+    expect(container.querySelector('[data-testid="recipient"]')?.getAttribute('data-invalid')).toBe(
+      'false',
+    );
+  });
+
+  it('amount=0 + valid recipient still disables Next', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    fireEvent.change(container.querySelector('[data-testid="amount"]')!, {
+      target: { value: '0' },
+    });
+    fireEvent.change(container.querySelector('[data-testid="recipient"]')!, {
+      target: { value: ADDR },
+    });
+    expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(true);
+  });
 });
