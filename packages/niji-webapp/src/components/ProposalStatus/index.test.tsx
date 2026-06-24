@@ -59,4 +59,29 @@ describe('ProposalStatus', () => {
     expect(d.querySelector('div')?.className).toMatch(/danger/i);
     expect(v.querySelector('div')?.className).toMatch(/danger/i);
   });
+
+  it('renders without className when not provided', () => {
+    const { container } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
+    expect(container.querySelector('div')).not.toBeNull();
+  });
+
+  it('UPDATABLE state renders updatable class', () => {
+    const { container } = render(<ProposalStatus status={ProposalState.UPDATABLE} />);
+    expect(container.querySelector('div')?.className).toMatch(/updatable/i);
+  });
+
+  it('OBJECTION_PERIOD state renders objection class', () => {
+    const { container } = render(<ProposalStatus status={ProposalState.OBJECTION_PERIOD} />);
+    expect(container.querySelector('div')?.className).toMatch(/objection/i);
+  });
+
+  it('QUEUED state renders secondary class', () => {
+    const { container } = render(<ProposalStatus status={ProposalState.QUEUED} />);
+    expect(container.querySelector('div')?.className).toMatch(/secondary/i);
+  });
+
+  it('renders exactly 1 div element', () => {
+    const { container } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+  });
 });

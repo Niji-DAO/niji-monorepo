@@ -78,4 +78,47 @@ describe('ProposalTransactions', () => {
     );
     expect(container.firstChild?.className).toContain('my-tx-list');
   });
+
+  it('Transaction # uses 1-based index (Transaction #1, #2)', () => {
+    const txs = [makeTx('a()', '0x'), makeTx('b()', '0x')];
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.textContent).toContain('Transaction #1');
+    expect(container.textContent).toContain('Transaction #2');
+  });
+
+  it('renders 5 transactions correctly', () => {
+    const txs = Array.from({ length: 5 }, (_, i) => makeTx(`fn${i}()`, '0x'));
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(5);
+  });
+
+  it('removes first tx with index 0', () => {
+    const onRemove = vi.fn();
+    const txs = [makeTx('a()', '0x'), makeTx('b()', '0x')];
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={onRemove} />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onRemove).toHaveBeenCalledWith(0);
+  });
+
+  it('renders x-icon img count matches tx count', () => {
+    const txs = [makeTx('a()', '0x'), makeTx('b()', '0x'), makeTx('c()', '0x')];
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.querySelectorAll('img[alt="Remove Transaction"]').length).toBe(3);
+  });
+
+  it('no className renders without crash', () => {
+    expect(() =>
+      render(
+        <ProposalTransactions proposalTransactions={[]} onRemoveProposalTransaction={() => {}} />,
+      ),
+    ).not.toThrow();
+  });
 });

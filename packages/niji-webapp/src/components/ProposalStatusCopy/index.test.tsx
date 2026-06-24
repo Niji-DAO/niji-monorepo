@@ -54,4 +54,35 @@ describe('ProposalStatusCopy', () => {
     );
     expect(container.textContent).toBe('Undetermined');
   });
+
+  it('renders empty when proposal is undefined-like (no crash)', () => {
+    const { container } = render(<ProposalStatusCopy proposal={{ status: undefined } as never} />);
+    expect(container.textContent).toBe('Undetermined');
+  });
+
+  it('renders for arbitrary numeric status (99) — Undetermined fallback', () => {
+    const { container } = render(<ProposalStatusCopy proposal={{ status: 99 } as never} />);
+    expect(container.textContent).toBe('Undetermined');
+  });
+
+  it('PENDING is rendered as "Pending" verbatim', () => {
+    const { container } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.PENDING)} />,
+    );
+    expect(container.textContent).toBe('Pending');
+  });
+
+  it('renders different content (Defeated) for DEFEATED state', () => {
+    const { container } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.DEFEATED)} />,
+    );
+    expect(container.textContent).toBe('Defeated');
+  });
+
+  it('renders Queued for QUEUED state (alphabetical sorting check)', () => {
+    const { container } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.QUEUED)} />,
+    );
+    expect(container.textContent).toBe('Queued');
+  });
 });
