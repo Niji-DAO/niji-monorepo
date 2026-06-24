@@ -268,4 +268,50 @@ describe('ModalTitle', () => {
     );
     expect(container.querySelector('h1')).not.toBeNull();
   });
+
+  it('renders 100 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <ModalTitle key={i}>{`title-${i}`}</ModalTitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(100);
+  });
+
+  it('handles deeply nested children (5 levels)', () => {
+    const { container } = render(
+      <ModalTitle>
+        <span>
+          <strong>
+            <em>
+              <small>
+                <i data-testid="deep">5</i>
+              </small>
+            </em>
+          </strong>
+        </span>
+      </ModalTitle>,
+    );
+    expect(container.querySelector('h1 [data-testid="deep"]')?.textContent).toBe('5');
+  });
+
+  it('renders 5000 char long title', () => {
+    const longStr = 'x'.repeat(5000);
+    const { container } = render(<ModalTitle>{longStr}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe(longStr);
+  });
+
+  it('rerender preserves h1 element type 10 times', () => {
+    const { container, rerender } = render(<ModalTitle>a</ModalTitle>);
+    for (let i = 0; i < 10; i++) {
+      rerender(<ModalTitle>{`item-${i}`}</ModalTitle>);
+      expect(container.querySelector('h1')).not.toBeNull();
+    }
+  });
+
+  it('renders without crash with Symbol children', () => {
+    expect(() => render(<ModalTitle>{Symbol('x') as never}</ModalTitle>)).not.toThrow();
+  });
 });

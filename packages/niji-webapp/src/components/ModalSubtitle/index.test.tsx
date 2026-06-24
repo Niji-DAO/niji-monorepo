@@ -277,4 +277,52 @@ describe('ModalSubtitle', () => {
     );
     expect(container.children.length).toBe(1);
   });
+
+  it('renders 100 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <ModalSubtitle key={i}>{`sub-${i}`}</ModalSubtitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(100);
+  });
+
+  it('handles deeply nested children (5 levels)', () => {
+    const { container } = render(
+      <ModalSubtitle>
+        <span>
+          <strong>
+            <em>
+              <small>
+                <i data-testid="deep">5</i>
+              </small>
+            </em>
+          </strong>
+        </span>
+      </ModalSubtitle>,
+    );
+    expect(container.querySelector('[data-testid="deep"]')?.textContent).toBe('5');
+  });
+
+  it('renders 5000 char long text', () => {
+    const longStr = 'x'.repeat(5000);
+    const { container } = render(<ModalSubtitle>{longStr}</ModalSubtitle>);
+    expect(container.querySelector('div')?.textContent).toBe(longStr);
+  });
+
+  it('rerender preserves single div wrapper count', () => {
+    const { container, rerender } = render(<ModalSubtitle>a</ModalSubtitle>);
+    expect(container.children.length).toBe(1);
+    for (let i = 0; i < 10; i++) {
+      rerender(<ModalSubtitle>{`item-${i}`}</ModalSubtitle>);
+      expect(container.children.length).toBe(1);
+    }
+  });
+
+  it('handles Symbol value as React children (renders empty)', () => {
+    // Symbol は React で render 対象外、 crash しないことだけ確認
+    expect(() => render(<ModalSubtitle>{Symbol('x') as never}</ModalSubtitle>)).not.toThrow();
+  });
 });

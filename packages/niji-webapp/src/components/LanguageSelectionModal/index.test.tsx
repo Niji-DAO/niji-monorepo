@@ -358,4 +358,64 @@ describe('LanguageSelectionModal', () => {
     render(<LanguageSelectionModal onDismiss={() => {}} />);
     expect(document.getElementById('overlay-root')?.children.length).toBeGreaterThanOrEqual(1);
   });
+
+  it('renders 20 instances each independently', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <LanguageSelectionModal key={i} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 50 onDismiss clicks via Japanese button', () => {
+    const setLocale = vi.fn();
+    const onDismiss = vi.fn();
+    useAtomMock.mockReturnValue(['en-US', setLocale]);
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    const buttons = document.getElementById('overlay-root')?.querySelectorAll('div');
+    const jaBtn = Array.from(buttons ?? []).find(d => d.textContent === '日本語');
+    if (jaBtn) {
+      for (let i = 0; i < 50; i++) fireEvent.click(jaBtn);
+    }
+    expect(setLocale).toHaveBeenCalledTimes(50);
+    expect(onDismiss).toHaveBeenCalledTimes(50);
+  });
+
+  it('handles all 3 locales each fires setLocale 1 time', () => {
+    const setLocale = vi.fn();
+    useAtomMock.mockReturnValue(['en-US', setLocale]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    const buttons = document.getElementById('overlay-root')?.querySelectorAll('div');
+    ['日本語', 'English', '中文'].forEach(label => {
+      const btn = Array.from(buttons ?? []).find(d => d.textContent === label);
+      if (btn) fireEvent.click(btn);
+    });
+    expect(setLocale).toHaveBeenCalledTimes(3);
+  });
+
+  it('rerender 10 times preserves modal portal', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { rerender } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+    for (let i = 0; i < 10; i++) {
+      expect(() => rerender(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
+    }
+  });
+
+  it('renders consistent h3 title across locale changes', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { rerender } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelector('h3')?.textContent).toBe(
+      'Select Language',
+    );
+    useAtomMock.mockReturnValue(['ja-JP', vi.fn()]);
+    rerender(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelector('h3')?.textContent).toBe(
+      'Select Language',
+    );
+  });
 });
