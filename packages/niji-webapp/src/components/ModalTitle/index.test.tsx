@@ -156,4 +156,36 @@ describe('ModalTitle', () => {
     const { container } = render(<ModalTitle>x</ModalTitle>);
     expect(container.querySelectorAll('div').length).toBe(1);
   });
+
+  it('renders empty string children', () => {
+    const { container } = render(<ModalTitle>{''}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('');
+  });
+
+  it('renders 200 char long title verbatim', () => {
+    const longStr = 'x'.repeat(200);
+    const { container } = render(<ModalTitle>{longStr}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe(longStr);
+  });
+
+  it('renders nested span as h1 children', () => {
+    const { container } = render(
+      <ModalTitle>
+        <span data-testid="inner">inner-text</span>
+      </ModalTitle>,
+    );
+    expect(container.querySelector('h1 [data-testid="inner"]')?.textContent).toBe('inner-text');
+  });
+
+  it('rerender from "first" to "second" updates h1', () => {
+    const { container, rerender } = render(<ModalTitle>first</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('first');
+    rerender(<ModalTitle>second</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('second');
+  });
+
+  it('renders unicode title verbatim', () => {
+    const { container } = render(<ModalTitle>日本語タイトル</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('日本語タイトル');
+  });
 });

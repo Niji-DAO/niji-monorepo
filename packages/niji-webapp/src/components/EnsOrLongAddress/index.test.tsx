@@ -199,4 +199,47 @@ describe('EnsOrLongAddress', () => {
     );
     expect(container.textContent).toBe('shared.ethshared.eth');
   });
+
+  it('renders empty wrapper when address only without ENS (still renders ADDR)', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('renders address even when containsBlockedText is true with ENS undefined', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    vi.mocked(containsBlockedText).mockReturnValue(true);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(ADDR);
+  });
+
+  it('renders 10 instances each with ENS name', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('bulk.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <EnsOrLongAddress key={i} address={ADDR} />
+        ))}
+      </>,
+    );
+    expect(container.textContent).toBe('bulk.eth'.repeat(10));
+  });
+
+  it('different address triggers re-lookup (rerender path)', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('first.eth');
+    const { container, rerender } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('first.eth');
+    vi.mocked(useReverseENSLookUp).mockReturnValue('second.eth');
+    rerender(<EnsOrLongAddress address={'0x1234567890123456789012345678901234567890'} />);
+    expect(container.textContent).toBe('second.eth');
+  });
+
+  it('extremely long ENS string renders verbatim', () => {
+    const longName = 'a'.repeat(200) + '.eth';
+    vi.mocked(useReverseENSLookUp).mockReturnValue(longName);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(longName);
+  });
 });

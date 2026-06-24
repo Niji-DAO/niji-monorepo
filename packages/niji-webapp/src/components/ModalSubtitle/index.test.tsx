@@ -164,4 +164,36 @@ describe('ModalSubtitle', () => {
     const { container } = render(<ModalSubtitle>{'<>&"\''}</ModalSubtitle>);
     expect(container.textContent).toBe('<>&"\'');
   });
+
+  it('renders empty string children', () => {
+    const { container } = render(<ModalSubtitle>{''}</ModalSubtitle>);
+    expect(container.textContent).toBe('');
+  });
+
+  it('renders 100 char long string verbatim', () => {
+    const longStr = 'x'.repeat(100);
+    const { container } = render(<ModalSubtitle>{longStr}</ModalSubtitle>);
+    expect(container.textContent).toBe(longStr);
+  });
+
+  it('renders nested span children', () => {
+    const { container } = render(
+      <ModalSubtitle>
+        <span data-testid="inner">inner-text</span>
+      </ModalSubtitle>,
+    );
+    expect(container.querySelector('[data-testid="inner"]')?.textContent).toBe('inner-text');
+  });
+
+  it('rerender from text to different text', () => {
+    const { container, rerender } = render(<ModalSubtitle>first</ModalSubtitle>);
+    expect(container.textContent).toBe('first');
+    rerender(<ModalSubtitle>second</ModalSubtitle>);
+    expect(container.textContent).toBe('second');
+  });
+
+  it('renders unicode characters verbatim', () => {
+    const { container } = render(<ModalSubtitle>日本語テスト</ModalSubtitle>);
+    expect(container.textContent).toBe('日本語テスト');
+  });
 });
