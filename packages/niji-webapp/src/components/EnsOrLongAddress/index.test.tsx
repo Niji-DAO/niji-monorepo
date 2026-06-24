@@ -74,4 +74,42 @@ describe('EnsOrLongAddress', () => {
     expect(c1.textContent).toBe(ADDR);
     expect(c2.textContent).toBe(ADDR_B);
   });
+
+  it('renders short ENS name (3 chars) verbatim', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('ab.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('ab.eth');
+  });
+
+  it('renders very long ENS name (100 chars) verbatim', () => {
+    const longEns = 'verylongdomain'.repeat(8) + '.eth';
+    vi.mocked(useReverseENSLookUp).mockReturnValue(longEns);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(longEns);
+  });
+
+  it('handles ENS=null (cast as undefined-like, falls back)', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(null as never);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(ADDR);
+  });
+
+  it('rerender preserves new prop addresss', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container, rerender } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(ADDR);
+    const NEW_ADDR = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' as const;
+    rerender(<EnsOrLongAddress address={NEW_ADDR} />);
+    expect(container.textContent).toBe(NEW_ADDR);
+  });
+
+  it('useReverseENSLookUp called once per render', () => {
+    vi.mocked(useReverseENSLookUp).mockClear();
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    render(<EnsOrLongAddress address={ADDR} />);
+    expect(useReverseENSLookUp).toHaveBeenCalledTimes(1);
+  });
 });

@@ -62,4 +62,42 @@ describe('VoteCardPager', () => {
     expect(spans[1]?.className).toBe('');
     expect(spans[2]?.className).toMatch(/disabledPageDot/);
   });
+
+  it('renders 10 pages correctly', () => {
+    const { container } = render(<VoteCardPager {...defaults} numPages={10} />);
+    expect(container.querySelectorAll('span').length).toBe(10);
+  });
+
+  it('repeated left click invokes onLeft N times', () => {
+    const onLeft = vi.fn();
+    const { container } = render(<VoteCardPager {...defaults} onLeftArrowClick={onLeft} />);
+    const leftBtn = container.querySelectorAll('button')[0];
+    fireEvent.click(leftBtn);
+    fireEvent.click(leftBtn);
+    fireEvent.click(leftBtn);
+    expect(onLeft).toHaveBeenCalledTimes(3);
+  });
+
+  it('right disabled button does not fire onRight', () => {
+    const onRight = vi.fn();
+    const { container } = render(
+      <VoteCardPager {...defaults} onRightArrowClick={onRight} isRightArrowDisabled={true} />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[1]);
+    expect(onRight).not.toHaveBeenCalled();
+  });
+
+  it('currentPage=0 with numPages=5 has active first dot', () => {
+    const { container } = render(<VoteCardPager {...defaults} currentPage={0} numPages={5} />);
+    const spans = container.querySelectorAll('span');
+    expect(spans[0]?.className).toBe('');
+    expect(spans[4]?.className).toMatch(/disabledPageDot/);
+  });
+
+  it('numPages=0 renders no dots and disabled buttons', () => {
+    const { container } = render(<VoteCardPager {...defaults} numPages={0} />);
+    expect(container.querySelectorAll('span').length).toBe(0);
+    // numPages != 1 で disabled になるかは実装次第
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
 });

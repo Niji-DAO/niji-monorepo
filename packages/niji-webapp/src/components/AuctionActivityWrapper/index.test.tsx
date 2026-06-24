@@ -64,4 +64,44 @@ describe('AuctionActivityWrapper', () => {
     const { container } = render(<AuctionActivityWrapper>{null}</AuctionActivityWrapper>);
     expect(container.querySelector('div')?.textContent).toBe('');
   });
+
+  it('renders empty string children gracefully', () => {
+    const { container } = render(<AuctionActivityWrapper>{''}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('renders boolean false as empty (React behavior)', () => {
+    const { container } = render(<AuctionActivityWrapper>{false}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('renders large 1000-char string content', () => {
+    const long = 'a'.repeat(1000);
+    const { container } = render(<AuctionActivityWrapper>{long}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent?.length).toBe(1000);
+  });
+
+  it('renders multiple sibling children correctly', () => {
+    const { container } = render(
+      <AuctionActivityWrapper>
+        <p>a</p>
+        <p>b</p>
+        <p>c</p>
+      </AuctionActivityWrapper>,
+    );
+    expect(container.querySelectorAll('p').length).toBe(3);
+  });
+
+  it('renders deeply nested element tree', () => {
+    const { container } = render(
+      <AuctionActivityWrapper>
+        <div data-testid="outer">
+          <div>
+            <span data-testid="inner">deep</span>
+          </div>
+        </div>
+      </AuctionActivityWrapper>,
+    );
+    expect(container.querySelector('[data-testid="inner"]')?.textContent).toBe('deep');
+  });
 });
