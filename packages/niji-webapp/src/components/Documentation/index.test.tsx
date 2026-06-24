@@ -382,4 +382,53 @@ describe('Documentation', () => {
     expect(container.querySelector('[data-testid="art-section"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="gov-section"]')).not.toBeNull();
   });
+
+  it('renders 30 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Documentation key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves structure', () => {
+    const { container, rerender } = render(<Documentation />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<Documentation />);
+    }
+    expect(container.querySelector('[data-testid="about-section"]')).not.toBeNull();
+  });
+
+  it('all 50 instances contain art-section', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <Documentation key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="art-section"]').length).toBe(50);
+  });
+
+  it('rapid consecutive 100 renders without crash', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => render(<Documentation />)).not.toThrow();
+    }
+  });
+
+  it('all sections present in 10 instance render', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <Documentation key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="gov-section"]').length).toBe(10);
+    expect(container.querySelectorAll('[data-testid="nijiders-section"]').length).toBe(10);
+  });
 });

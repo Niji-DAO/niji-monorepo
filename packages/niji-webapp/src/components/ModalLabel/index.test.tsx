@@ -331,4 +331,47 @@ describe('ModalLabel', () => {
     );
     expect(container.querySelector('[data-testid="deep"]')?.textContent).toBe('5');
   });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <ModalLabel key={i}>label-{i}</ModalLabel>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 50 times preserves div', () => {
+    const { container, rerender } = render(<ModalLabel>x</ModalLabel>);
+    for (let i = 0; i < 50; i++) {
+      rerender(<ModalLabel>val-{i}</ModalLabel>);
+    }
+    expect(container.querySelector('div')?.textContent).toContain('49');
+  });
+
+  it('handles 10000 char children', () => {
+    const long = 'a'.repeat(10000);
+    const { container } = render(<ModalLabel>{long}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent?.length).toBe(10000);
+  });
+
+  it('handles array of 100 spans children', () => {
+    const items = Array.from({ length: 100 }, (_, i) => i);
+    const { container } = render(
+      <ModalLabel>
+        {items.map(n => (
+          <span key={n}>{n}</span>
+        ))}
+      </ModalLabel>,
+    );
+    expect(container.querySelectorAll('span').length).toBe(100);
+  });
+
+  it('handles unicode children', () => {
+    const { container } = render(<ModalLabel>🎉 ラベル</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('🎉 ラベル');
+  });
 });
