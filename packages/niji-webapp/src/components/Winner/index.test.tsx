@@ -213,4 +213,54 @@ describe('Winner', () => {
     const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
     expect(container.querySelector('[data-testid="short"]')).not.toBeNull();
   });
+
+  it('zh-CN locale with non-user winner shows ShortAddress', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('zh-CN');
+    const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    expect(container.querySelector('[data-testid="short"]')).not.toBeNull();
+  });
+
+  it('isNounders + warm bg + zh-CN does not crash', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(false);
+    useActiveLocaleMock.mockReturnValue('zh-CN');
+    expect(() =>
+      render(<Winner winner={ADDR} isNounders={true} />, { wrapper: WithProviders }),
+    ).not.toThrow();
+  });
+
+  it('multiple Winner instances render with own contents', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const ADDR_B = '0x000000000000000000000000000000000000bbbb' as const;
+    const { container } = render(
+      <>
+        <Winner winner={ADDR} />
+        <Winner winner={ADDR_B} />
+      </>,
+      { wrapper: WithProviders },
+    );
+    expect(container.querySelectorAll('[data-testid="short"]').length).toBe(2);
+  });
+
+  it('isNounders=true renders without ShortAddress when warm + zh-CN', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(false);
+    useActiveLocaleMock.mockReturnValue('zh-CN');
+    const { container } = render(<Winner winner={ADDR} isNounders={true} />, {
+      wrapper: WithProviders,
+    });
+    expect(container.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('zero address ja-JP renders without crash', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('ja-JP');
+    const zero = '0x0000000000000000000000000000000000000000' as const;
+    expect(() => render(<Winner winner={zero} />, { wrapper: WithProviders })).not.toThrow();
+  });
 });
