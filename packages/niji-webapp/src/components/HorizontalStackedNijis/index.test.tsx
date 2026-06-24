@@ -282,4 +282,42 @@ describe('HorizontalStackedNijis', () => {
     const { container } = render(<HorizontalStackedNijis nounIds={ids} />);
     expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(6);
   });
+
+  it('renders 100 instances each independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <HorizontalStackedNijis key={i} nounIds={[`${i}`]} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(100);
+  });
+
+  it('handles 0 IDs renders empty wrapper', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={[]} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(0);
+  });
+
+  it('handles 5 IDs renders 5 circles (under cap)', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={['1', '2', '3', '4', '5']} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(5);
+  });
+
+  it('rerender 20 times preserves DOM count', () => {
+    const { container, rerender } = render(<HorizontalStackedNijis nounIds={['1']} />);
+    for (let i = 0; i < 20; i++) {
+      rerender(
+        <HorizontalStackedNijis nounIds={Array.from({ length: i + 1 }, (_, j) => `${j}`)} />,
+      );
+      const expected = Math.min(i + 1, 6);
+      expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(expected);
+    }
+  });
+
+  it('handles 10000 IDs caps at 6 circles', () => {
+    const ids = Array.from({ length: 10000 }, (_, i) => `${i}`);
+    const { container } = render(<HorizontalStackedNijis nounIds={ids} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(6);
+  });
 });

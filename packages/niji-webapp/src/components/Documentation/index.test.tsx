@@ -332,4 +332,54 @@ describe('Documentation', () => {
     const { container } = render(<Documentation />);
     expect(container.querySelectorAll('[data-testid="gov-section"]').length).toBe(1);
   });
+
+  it('renders 100 Documentation instances consecutively', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => render(<Documentation />)).not.toThrow();
+    }
+  });
+
+  it('renders 50 Documentation instances together', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <Documentation key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders within nested fragment 5 levels deep', () => {
+    expect(() =>
+      render(
+        <>
+          <>
+            <>
+              <>
+                <>
+                  <Documentation />
+                </>
+              </>
+            </>
+          </>
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 50 times same Documentation', () => {
+    const { rerender } = render(<Documentation />);
+    for (let i = 0; i < 50; i++) {
+      expect(() => rerender(<Documentation />)).not.toThrow();
+    }
+  });
+
+  it('Documentation contains both about + art + gov sections', () => {
+    const { container } = render(<Documentation />);
+    expect(container.querySelector('[data-testid="about-section"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="art-section"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="gov-section"]')).not.toBeNull();
+  });
 });
