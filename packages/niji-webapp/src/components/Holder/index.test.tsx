@@ -184,4 +184,69 @@ describe('Holder', () => {
     const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
     expect(container.textContent).toContain('Failed to fetch');
   });
+
+  it('rerender from loading to data shows ShortAddress', async () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValueOnce({
+      loading: true,
+      error: undefined,
+      data: undefined,
+    });
+    const { container, rerender } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    expect(container.querySelector('[data-testid="short"]')).toBeNull();
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER2' } } },
+    });
+    rerender(<Holder nounId={1n} />);
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xOWNER2');
+    });
+  });
+
+  it('rerender from data to loading hides ShortAddress', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    const { container, rerender } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    rerender(<Holder nounId={1n} />);
+    expect(container.querySelector('[data-testid="short"]')).toBeNull();
+  });
+
+  it('renders error msg even for loading=true + error truthy (error takes precedence on render)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: new Error('rpc'),
+      data: undefined,
+    });
+    const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    expect(container.textContent).toContain('Failed');
+  });
+
+  it('big nounId (Number.MAX_SAFE_INTEGER * 2) still renders without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() =>
+      render(<Holder nounId={18014398509481982n} />, { wrapper: WithProviders }),
+    ).not.toThrow();
+  });
+
+  it('ShortAddress rendered for owner.id with mixed case', async () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xAbCdEfAbCdEf' } } },
+    });
+    const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xAbCdEfAbCdEf');
+    });
+  });
 });
