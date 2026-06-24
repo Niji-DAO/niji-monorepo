@@ -334,4 +334,54 @@ describe('DelegationCandidateVoteCountInfo', () => {
     expect(container.textContent).toContain('a');
     expect(container.textContent).toContain('5 Votes');
   });
+
+  it('renders 30 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 30 }, (_, i) => (
+          <DelegationCandidateVoteCountInfo
+            key={i}
+            text={`name-${i}`}
+            voteCount={i + 1}
+            isLoading={false}
+          />
+        ))}
+      </>,
+    );
+    expect(container.textContent).toContain('name-0');
+    expect(container.textContent).toContain('30 Votes');
+  });
+
+  it('renders empty string text', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="" voteCount={1} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('1 Vote');
+  });
+
+  it('rerender from 0 to 100 votes', () => {
+    const { container, rerender } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={0} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('0 Votes');
+    rerender(<DelegationCandidateVoteCountInfo text="x" voteCount={100} isLoading={false} />);
+    expect(container.textContent).toContain('100 Votes');
+  });
+
+  it('handles 1000000 votes (large)', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={1000000} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('1000000');
+  });
+
+  it('renders consecutive 10 times without crash', () => {
+    for (let i = 0; i < 10; i++) {
+      expect(() =>
+        render(
+          <DelegationCandidateVoteCountInfo text={`t${i}`} voteCount={i} isLoading={i % 2 === 0} />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });

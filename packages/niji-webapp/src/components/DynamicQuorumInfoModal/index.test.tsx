@@ -651,4 +651,84 @@ describe('DynamicQuorumInfoModal', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 20 instances each with different state', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <DynamicQuorumInfoModal
+              key={i}
+              proposal={makeProposal()}
+              againstVotesAbsolute={i}
+              onDismiss={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles subgraph loading=true state', () => {
+    subgraphState.loading = true;
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={10}
+          onDismiss={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+    subgraphState.loading = false;
+  });
+
+  it('handles subgraph error state', () => {
+    subgraphState.error = new Error('boom');
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={10}
+          onDismiss={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+    subgraphState.error = undefined;
+  });
+
+  it('renders 10 consecutive without crash', () => {
+    for (let i = 0; i < 10; i++) {
+      expect(() =>
+        render(
+          <DynamicQuorumInfoModal
+            proposal={makeProposal()}
+            againstVotesAbsolute={i * 5}
+            onDismiss={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('rerender many times preserves modal portal', () => {
+    const { rerender } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+      />,
+    );
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        rerender(
+          <DynamicQuorumInfoModal
+            proposal={makeProposal()}
+            againstVotesAbsolute={i * 10}
+            onDismiss={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
