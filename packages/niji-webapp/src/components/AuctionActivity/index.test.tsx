@@ -336,4 +336,52 @@ describe('AuctionActivity', () => {
     const huge = makeAuction({ nounId: 999999n });
     expect(() => wrap(<AuctionActivity {...defaults} auction={huge as never} />)).not.toThrow();
   });
+
+  it('renders 5 instances each independently', () => {
+    expect(() => {
+      wrap(
+        <>
+          <AuctionActivity {...defaults} auction={makeAuction() as never} />
+          <AuctionActivity {...defaults} auction={makeAuction() as never} />
+          <AuctionActivity {...defaults} auction={makeAuction() as never} />
+          <AuctionActivity {...defaults} auction={makeAuction() as never} />
+          <AuctionActivity {...defaults} auction={makeAuction() as never} />
+        </>,
+      );
+    }).not.toThrow();
+  });
+
+  it('renders without crash with isLastAuction=true', () => {
+    expect(() =>
+      wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} isLastAuction={true} />),
+    ).not.toThrow();
+  });
+
+  it('renders without crash with isFirstAuction=true', () => {
+    expect(() =>
+      wrap(
+        <AuctionActivity {...defaults} auction={makeAuction() as never} isFirstAuction={true} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender does not crash (re-wrap MemoryRouter)', () => {
+    expect(() => {
+      wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+      wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+    }).not.toThrow();
+  });
+
+  it('renders both first and last simultaneously without crash', () => {
+    expect(() =>
+      wrap(
+        <AuctionActivity
+          {...defaults}
+          auction={makeAuction() as never}
+          isFirstAuction={true}
+          isLastAuction={true}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });

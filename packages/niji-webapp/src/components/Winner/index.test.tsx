@@ -263,4 +263,47 @@ describe('Winner', () => {
     const zero = '0x0000000000000000000000000000000000000000' as const;
     expect(() => render(<Winner winner={zero} />, { wrapper: WithProviders })).not.toThrow();
   });
+
+  it('renders ShortAddress with different address', () => {
+    useAccountMock.mockReturnValue({ address: ADDR });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(<Winner winner={'0xDIFFERENT_ADDRESS'} />, {
+      wrapper: WithProviders,
+    });
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(
+      '0xDIFFERENT_ADDRESS',
+    );
+  });
+
+  it('renders without crash 5 times consecutively', () => {
+    useAccountMock.mockReturnValue({ address: ADDR });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    for (let i = 0; i < 5; i++) {
+      expect(() => render(<Winner winner={ADDR} />, { wrapper: WithProviders })).not.toThrow();
+    }
+  });
+
+  it('useAccount returns null address (no wallet) handled', () => {
+    useAccountMock.mockReturnValue({ address: undefined });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    expect(() => render(<Winner winner={ADDR} />, { wrapper: WithProviders })).not.toThrow();
+  });
+
+  it('rerender with different winner does not crash', () => {
+    useAccountMock.mockReturnValue({ address: ADDR });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { rerender } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    expect(() => rerender(<Winner winner={'0xNEW_WINNER'} />)).not.toThrow();
+  });
+
+  it('ja-JP locale renders without crash', () => {
+    useAccountMock.mockReturnValue({ address: ADDR });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('ja-JP');
+    expect(() => render(<Winner winner={ADDR} />, { wrapper: WithProviders })).not.toThrow();
+  });
 });
