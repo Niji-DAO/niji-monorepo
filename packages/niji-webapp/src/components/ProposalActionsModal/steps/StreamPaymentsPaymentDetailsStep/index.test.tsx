@@ -307,4 +307,40 @@ describe('StreamPaymentsPaymentDetailsStep', () => {
     const amountInput = container.querySelector('[data-testid="amount"]') as HTMLInputElement;
     expect(amountInput.value).toBe('');
   });
+
+  it('recipient input exists initially', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    expect(container.querySelector('[data-testid="recipient"]')).not.toBeNull();
+  });
+
+  it('exact 1 input each for amount + recipient', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('[data-testid="amount"]').length).toBe(1);
+    expect(container.querySelectorAll('[data-testid="recipient"]').length).toBe(1);
+  });
+
+  it('rapid 5 Back clicks invoke onPrev 5 times', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <StreamPaymentsPaymentDetailsStep {...defaults} onPrevBtnClick={onPrev} />,
+    );
+    const back = container.querySelectorAll('button')[0];
+    for (let i = 0; i < 5; i++) fireEvent.click(back);
+    expect(onPrev).toHaveBeenCalledTimes(5);
+  });
+
+  it('rerender from invalid to valid recipient still requires both fields', () => {
+    const { container, rerender } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    fireEvent.change(container.querySelector('[data-testid="recipient"]')!, {
+      target: { value: '0xBAD' },
+    });
+    expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(true);
+    rerender(<StreamPaymentsPaymentDetailsStep {...defaults} state={{ address: ADDR } as never} />);
+    expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(true);
+  });
+
+  it('h1 title contains "Add Streaming Payment Action"', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    expect(container.querySelector('h1')?.textContent).toContain('Add Streaming Payment Action');
+  });
 });

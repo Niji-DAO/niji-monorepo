@@ -314,4 +314,46 @@ describe('TransferFundsDetailsStep', () => {
     });
     expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(true);
   });
+
+  it('rapid 5 Back clicks invoke onPrev 5 times', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <TransferFundsDetailsStep {...defaults} onPrevBtnClick={onPrev} />,
+    );
+    const back = container.querySelectorAll('button')[0];
+    for (let i = 0; i < 5; i++) fireEvent.click(back);
+    expect(onPrev).toHaveBeenCalledTimes(5);
+  });
+
+  it('amount + recipient valid then Next enabled', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    fireEvent.change(container.querySelector('[data-testid="amount"]')!, {
+      target: { value: '5' },
+    });
+    fireEvent.change(container.querySelector('[data-testid="recipient"]')!, {
+      target: { value: ADDR },
+    });
+    expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(false);
+  });
+
+  it('clearing recipient to empty still allows component to render', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    fireEvent.change(container.querySelector('[data-testid="recipient"]')!, {
+      target: { value: '' },
+    });
+    expect(container.querySelector('[data-testid="recipient"]')).not.toBeNull();
+  });
+
+  it('large amount (10000) renders without crash', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    fireEvent.change(container.querySelector('[data-testid="amount"]')!, {
+      target: { value: '10000' },
+    });
+    expect(container.querySelector('[data-testid="amount"]')).not.toBeNull();
+  });
+
+  it('h1 title text contains "Add Transfer Funds Action"', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    expect(container.querySelector('h1')?.textContent).toContain('Add Transfer Funds Action');
+  });
 });
