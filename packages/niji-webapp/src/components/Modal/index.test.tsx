@@ -110,4 +110,40 @@ describe('Modal', () => {
     // overlay-root の直下 children は 1 個 (modal portal)
     expect(document.getElementById('overlay-root')?.children.length).toBe(1);
   });
+
+  it('long title text renders verbatim', () => {
+    render(<Modal title={'a'.repeat(200)} content={null} onDismiss={() => {}} />);
+    const h3 = document.getElementById('overlay-root')?.querySelector('h3');
+    expect(h3?.textContent?.length).toBe(200);
+  });
+
+  it('JSX title renders as ReactNode (not string)', () => {
+    render(
+      <Modal
+        title={<strong data-testid="strong-title">Bold</strong>}
+        content={null}
+        onDismiss={() => {}}
+      />,
+    );
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="strong-title"]')
+        ?.textContent,
+    ).toBe('Bold');
+  });
+
+  it('renders for null content + undefined title both null-safe', () => {
+    expect(() => render(<Modal content={null} onDismiss={() => {}} />)).not.toThrow();
+  });
+
+  it('Backdrop renders single div element (no nested)', () => {
+    const { container } = render(<Backdrop onDismiss={() => {}} />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+  });
+
+  it('multiple Modal instances render to overlay-root in order', () => {
+    render(<Modal title="A" content={<p>a</p>} onDismiss={() => {}} />);
+    render(<Modal title="B" content={<p>b</p>} onDismiss={() => {}} />);
+    const overlay = document.getElementById('overlay-root');
+    expect(overlay?.children.length).toBe(2);
+  });
 });

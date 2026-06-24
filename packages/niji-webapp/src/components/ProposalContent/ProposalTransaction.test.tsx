@@ -112,4 +112,49 @@ describe('ProposalTransaction', () => {
     const links = container.querySelectorAll('[data-testid="link-if-addr"]');
     expect(links.length).toBe(1);
   });
+
+  it('handles 3-arg callData splits into 4 linkIfAddr entries (target + 3 args)', () => {
+    const tx3 = {
+      target: '0xT',
+      functionSig: 'fn(a,b,c)',
+      callData: 'a,b,c',
+      value: 0n,
+    } as never;
+    const { container } = render(<ProposalTransaction transaction={tx3} />);
+    expect(container.querySelectorAll('[data-testid="link-if-addr"]').length).toBe(4);
+  });
+
+  it('renders empty callData functionSig path', () => {
+    const empty = {
+      target: '0xT',
+      functionSig: 'fn()',
+      callData: '',
+      value: 0n,
+    } as never;
+    expect(() => render(<ProposalTransaction transaction={empty} />)).not.toThrow();
+  });
+
+  it('large bigint value (1e30) renders correctly', () => {
+    const huge = { ...sigTx, value: 1_000_000_000_000_000_000_000_000_000_000n } as never;
+    const { container } = render(<ProposalTransaction transaction={huge} />);
+    expect(container.textContent).toContain('1000000000000000000000000000000');
+  });
+
+  it('renders functionSig with single arg', () => {
+    const single = {
+      target: '0xT',
+      functionSig: 'mint(uint256)',
+      callData: '42',
+      value: 0n,
+    } as never;
+    const { container } = render(<ProposalTransaction transaction={single} />);
+    expect(container.textContent).toContain('mint(uint256)');
+    expect(container.textContent).toContain('42');
+  });
+
+  it('different target prefixes render as target text', () => {
+    const altTx = { ...simpleTx, target: '0xWEIRD' } as never;
+    const { container } = render(<ProposalTransaction transaction={altTx} />);
+    expect(container.textContent).toContain('0xWEIRD');
+  });
 });
