@@ -494,4 +494,85 @@ describe('DynamicQuorumInfoModal', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders without crash with 0 againstVotesAbsolute', () => {
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={0}
+          onDismiss={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash with very large againstVotesAbsolute', () => {
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={1000000}
+          onDismiss={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders 3 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          <DynamicQuorumInfoModal
+            proposal={makeProposal()}
+            againstVotesAbsolute={10}
+            onDismiss={() => {}}
+          />
+          <DynamicQuorumInfoModal
+            proposal={makeProposal()}
+            againstVotesAbsolute={20}
+            onDismiss={() => {}}
+          />
+          <DynamicQuorumInfoModal
+            proposal={makeProposal()}
+            againstVotesAbsolute={30}
+            onDismiss={() => {}}
+          />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender with new againstVotesAbsolute does not crash', () => {
+    const { rerender } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+      />,
+    );
+    expect(() =>
+      rerender(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={20}
+          onDismiss={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders consecutive 5 times without crash', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        render(
+          <DynamicQuorumInfoModal
+            proposal={makeProposal()}
+            againstVotesAbsolute={i * 10}
+            onDismiss={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
