@@ -150,4 +150,33 @@ describe('BidHistoryItem Component', () => {
     render(<BidHistoryItem bid={shortHash} classes={mockClasses} />);
     expect(screen.getByRole('link').getAttribute('href')).toBe('https://etherscan.io/tx/0xshort');
   });
+
+  it('desktop view (innerWidth=1200) keeps full ShortAddress', () => {
+    window.innerWidth = 1200;
+    render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    expect(screen.getByTestId('short-address')).toHaveTextContent(mockBid.sender);
+  });
+
+  it('renders 0n value via TruncatedAmount', () => {
+    const zeroBid = { ...mockBid, value: 0n };
+    render(<BidHistoryItem bid={zeroBid} classes={mockClasses} />);
+    expect(screen.getByTestId('truncated-amount')).toHaveTextContent('Amount: 0');
+  });
+
+  it('renders exactly 1 link element per bid item', () => {
+    const { container } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    expect(container.querySelectorAll('a').length).toBe(1);
+  });
+
+  it('renders link-icon inside link wrapper', () => {
+    const { container } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    const link = container.querySelector('a');
+    expect(link?.querySelector('[data-testid="link-icon"]')).not.toBeNull();
+  });
+
+  it('renders different sender address correctly', () => {
+    const diffSender = { ...mockBid, sender: '0xBBB' as Address };
+    render(<BidHistoryItem bid={diffSender} classes={mockClasses} />);
+    expect(screen.getByTestId('short-address')).toHaveTextContent('0xBBB');
+  });
 });

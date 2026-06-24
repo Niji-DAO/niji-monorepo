@@ -171,4 +171,69 @@ describe('ModalBottomButtonRow', () => {
     );
     expect(container.querySelectorAll('button')[0]?.textContent?.length).toBe(200);
   });
+
+  it('isNextBtnDisabled=false renders next as non-disabled', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="x"
+        nextBtnText="y"
+        isNextBtnDisabled={false}
+      />,
+    );
+    expect(container.querySelectorAll('button')[1]?.disabled).toBe(false);
+  });
+
+  it('disabled next button does not call onNextBtnClick on click', () => {
+    const onNext = vi.fn();
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={onNext}
+        prevBtnText="x"
+        nextBtnText="y"
+        isNextBtnDisabled
+      />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[1]);
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
+  it('prev button is never disabled (no disabled prop)', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="x"
+        nextBtnText="y"
+        isNextBtnDisabled
+      />,
+    );
+    expect(container.querySelectorAll('button')[0]?.disabled).toBe(false);
+  });
+
+  it('renders ReactNode (JSX) as prev button text', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText={<span data-testid="custom-prev">Custom Back</span>}
+        nextBtnText="y"
+      />,
+    );
+    expect(container.querySelector('[data-testid="custom-prev"]')?.textContent).toBe('Custom Back');
+  });
+
+  it('renders ReactNode (JSX) as next button text', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="x"
+        nextBtnText={<strong data-testid="custom-next">Go</strong>}
+      />,
+    );
+    expect(container.querySelector('[data-testid="custom-next"]')?.textContent).toBe('Go');
+  });
 });

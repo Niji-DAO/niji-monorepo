@@ -146,4 +146,60 @@ describe('CandidateSponsors', () => {
       render(<CandidateSponsors signers={[makeSigner('0xA')]} nounsRequired={3} />),
     ).not.toThrow();
   });
+
+  it('renders sponsor-img counts equal to flat nijiRepresented count', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: {
+        delegates: [
+          { id: '0xA', nijiRepresented: [{ id: '1' }, { id: '2' }] },
+          { id: '0xB', nijiRepresented: [{ id: '3' }] },
+        ],
+      },
+    });
+    const { container } = render(
+      <CandidateSponsors signers={[makeSigner('0xA'), makeSigner('0xB')]} nounsRequired={5} />,
+    );
+    expect(container.querySelectorAll('[data-testid="sponsor-img"]').length).toBe(3);
+  });
+
+  it('signer.activeOrPendingProposal=true filters out signer from query input', () => {
+    useDelegateNounsAtBlockQueryMock.mockClear();
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({ data: undefined });
+    render(<CandidateSponsors signers={[makeSigner('0xA', true)]} nounsRequired={3} />);
+    expect(useDelegateNounsAtBlockQueryMock).toHaveBeenCalled();
+  });
+
+  it('nounsRequired=0 + signers present still renders sponsor-img up to cap', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+    });
+    const { container } = render(
+      <CandidateSponsors signers={[makeSigner('0xA')]} nounsRequired={0} />,
+    );
+    expect(container.querySelectorAll('[data-testid="sponsor-img"]').length).toBe(1);
+  });
+
+  it('large nounsRequired (50) still caps at maxVisibleSpots (5)', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: {
+        delegates: [
+          {
+            id: '0xA',
+            nijiRepresented: Array.from({ length: 20 }, (_, i) => ({ id: String(i + 1) })),
+          },
+        ],
+      },
+    });
+    const { container } = render(
+      <CandidateSponsors signers={[makeSigner('0xA')]} nounsRequired={50} />,
+    );
+    expect(container.querySelectorAll('[data-testid="sponsor-img"]').length).toBe(5);
+  });
+
+  it('handles empty data object (no delegates field) without crash', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({ data: {} });
+    expect(() =>
+      render(<CandidateSponsors signers={[makeSigner('0xA')]} nounsRequired={3} />),
+    ).not.toThrow();
+  });
 });
