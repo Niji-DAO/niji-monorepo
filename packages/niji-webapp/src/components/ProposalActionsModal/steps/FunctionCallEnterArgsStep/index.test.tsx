@@ -282,4 +282,48 @@ describe('FunctionCallEnterArgsStep', () => {
     );
     expect(container.querySelectorAll('input').length).toBe(2);
   });
+
+  it('Next button repeated clicks invoke onNext N times', () => {
+    const onNext = vi.fn();
+    const setState = vi.fn();
+    const { container } = render(
+      <FunctionCallEnterArgsStep
+        {...defaults}
+        onNextBtnClick={onNext}
+        setState={setState}
+        state={{ abi, function: 'noArg' } as never}
+      />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onNext).toHaveBeenCalledTimes(2);
+  });
+
+  it('transfer function shows 2 inputs (address + uint256)', () => {
+    const { container } = render(
+      <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+    );
+    expect(container.querySelectorAll('input').length).toBe(2);
+  });
+
+  it('h1 title exactly 1 instance', () => {
+    const { container } = render(
+      <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'noArg' } as never} />,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('Back + Next buttons count exactly 2', () => {
+    const { container } = render(
+      <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'noArg' } as never} />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('h1 title contains "Add Function Call Arguments"', () => {
+    const { container } = render(
+      <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'noArg' } as never} />,
+    );
+    expect(container.querySelector('h1')?.textContent).toContain('Add Function Call Arguments');
+  });
 });

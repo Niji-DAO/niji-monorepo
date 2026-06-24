@@ -274,4 +274,35 @@ describe('ProposalHeader', () => {
     // 1 (proposer) + 3 (signers) = 4
     expect(addresses.length).toBeGreaterThanOrEqual(4);
   });
+
+  it('proposal status badge renders', () => {
+    const { container } = wrap(<ProposalHeader {...baseProps} />);
+    expect(container.querySelector('[data-testid="proposal-status"]')).not.toBeNull();
+  });
+
+  it('rerender without crash', () => {
+    const { rerender } = wrap(<ProposalHeader {...baseProps} />);
+    expect(() =>
+      rerender(
+        <MemoryRouter>
+          <ProposalHeader {...baseProps} />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('mobile (isMobile=true) renders without crash', () => {
+    isMobileMock.mockReturnValue(true);
+    expect(() => wrap(<ProposalHeader {...baseProps} />)).not.toThrow();
+  });
+
+  it('hasVoted=true renders without crash', () => {
+    hookState.hasVoted = true;
+    expect(() => wrap(<ProposalHeader {...baseProps} />)).not.toThrow();
+  });
+
+  it('availableVotes=0 renders without crash', () => {
+    hookState.availableVotes = 0;
+    expect(() => wrap(<ProposalHeader {...baseProps} />)).not.toThrow();
+  });
 });

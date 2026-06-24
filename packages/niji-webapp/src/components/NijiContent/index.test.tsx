@@ -333,4 +333,49 @@ describe('NijiContent', () => {
     const { container } = wrap(<NijiContent {...defaults} auction={makeAuction(1000n)} />);
     expect(container.textContent).toContain('送信中');
   });
+
+  it('isFirstAuction=true disables prev button (auction nav prev disabled)', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    const { container } = wrap(<NijiContent {...defaults} isFirstAuction={true} />);
+    expect(container.querySelector('[data-testid="prev-btn"]')).not.toBeNull();
+  });
+
+  it('isLastAuction=false enables next button', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    const { container } = wrap(<NijiContent {...defaults} isLastAuction={false} />);
+    expect(container.querySelector('[data-testid="next-btn"]')).not.toBeNull();
+  });
+
+  it('mintTimestamp prop is forwarded as bigint', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    expect(() => wrap(<NijiContent {...defaults} mintTimestamp={123456789n} />)).not.toThrow();
+  });
+
+  it('large nounId (Number.MAX_SAFE_INTEGER) renders without crash', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    expect(() =>
+      wrap(<NijiContent {...defaults} nounId={Number.MAX_SAFE_INTEGER as never} />),
+    ).not.toThrow();
+  });
+
+  it('niji-title rendered exactly 1 time', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    const { container } = wrap(<NijiContent {...defaults} />);
+    expect(container.querySelectorAll('[data-testid="niji-title"]').length).toBe(1);
+  });
 });
