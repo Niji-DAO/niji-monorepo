@@ -65,4 +65,44 @@ describe('GovernanceSection', () => {
     const { container } = wrap(<GovernanceSection />);
     expect((container.textContent ?? '').length).toBeGreaterThan(1000);
   });
+
+  it('renders without crash in closed accordion', () => {
+    expect(() =>
+      render(
+        <Accordion>
+          <GovernanceSection />
+        </Accordion>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('contains the word "governance" anywhere', () => {
+    const { container } = wrap(<GovernanceSection />);
+    expect(container.textContent?.toLowerCase()).toContain('governance');
+  });
+
+  it('renders single accordion-item element', () => {
+    const { container } = wrap(<GovernanceSection />);
+    expect(container.querySelectorAll('.accordion-item').length).toBe(1);
+  });
+
+  it('ul element exists (veto criteria parent)', () => {
+    const { container } = wrap(<GovernanceSection />);
+    expect(container.querySelector('ul')).not.toBeNull();
+  });
+
+  it('rerenders identically when accordion key same', () => {
+    const { container, rerender } = render(
+      <Accordion alwaysOpen defaultActiveKey="4">
+        <GovernanceSection />
+      </Accordion>,
+    );
+    const first = container.textContent;
+    rerender(
+      <Accordion alwaysOpen defaultActiveKey="4">
+        <GovernanceSection />
+      </Accordion>,
+    );
+    expect(container.textContent).toBe(first);
+  });
 });

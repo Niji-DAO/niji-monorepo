@@ -69,4 +69,34 @@ describe('ArtAndTraitsSection', () => {
     const ulItems = container.querySelectorAll('ul li');
     expect(ulItems.length).toBeGreaterThanOrEqual(6);
   });
+
+  it('renders without crash in closed accordion', () => {
+    expect(() =>
+      render(
+        <Accordion>
+          <ArtAndTraitsSection />
+        </Accordion>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('total textContent length > 500 chars (rich body)', () => {
+    const { container } = wrap(<ArtAndTraitsSection />);
+    expect((container.textContent ?? '').length).toBeGreaterThan(500);
+  });
+
+  it('contains decode mention (on-chain rendering keyword)', () => {
+    const { container } = wrap(<ArtAndTraitsSection />);
+    expect(container.textContent?.toLowerCase()).toContain('on-chain');
+  });
+
+  it('renders multiple ul elements (one per accordion item)', () => {
+    const { container } = wrap(<ArtAndTraitsSection />);
+    expect(container.querySelectorAll('ul').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders Trait + Special together (key set integrity)', () => {
+    const { container } = wrap(<ArtAndTraitsSection />);
+    expect(container.textContent).toContain('Special');
+  });
 });

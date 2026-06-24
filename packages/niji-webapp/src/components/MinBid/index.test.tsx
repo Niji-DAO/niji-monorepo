@@ -68,4 +68,33 @@ describe('MinBid', () => {
     expect(container.children.length).toBe(1);
     expect(container.firstElementChild?.tagName).toBe('DIV');
   });
+
+  it('img src is the noun-pointer.png asset', () => {
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('noun-pointer.png');
+  });
+
+  it('renders fractional minBid (0.5 ETH)', () => {
+    const { container } = render(<MinBid minBid={parseEther('0.5')} onClick={() => {}} />);
+    expect(container.textContent).toContain('Ξ 0.50');
+  });
+
+  it('renders 1 img element exactly', () => {
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('You must bid text exists for both minBid=0 and minBid>0', () => {
+    const { container: c1 } = render(<MinBid minBid={0n} onClick={() => {}} />);
+    const { container: c2 } = render(<MinBid minBid={parseEther('5')} onClick={() => {}} />);
+    expect(c1.textContent).toContain('You must bid at least');
+    expect(c2.textContent).toContain('You must bid at least');
+  });
+
+  it('rerender updates displayed minBid', () => {
+    const { container, rerender } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    expect(container.textContent).toContain('Ξ 1.00');
+    rerender(<MinBid minBid={parseEther('2')} onClick={() => {}} />);
+    expect(container.textContent).toContain('Ξ 2.00');
+  });
 });

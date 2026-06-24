@@ -53,4 +53,41 @@ describe('ModalLabel', () => {
     expect(className).toBeTruthy();
     expect(className?.length).toBeGreaterThan(0);
   });
+
+  it('renders empty string children', () => {
+    const { container } = render(<ModalLabel>{''}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('renders nested elements correctly', () => {
+    const { container } = render(
+      <ModalLabel>
+        <span data-testid="nested">deep</span>
+      </ModalLabel>,
+    );
+    expect(container.querySelector('[data-testid="nested"]')?.textContent).toBe('deep');
+  });
+
+  it('renders Fragment children unwrapped', () => {
+    const { container } = render(
+      <ModalLabel>
+        <>
+          <span>a</span>
+          <span>b</span>
+        </>
+      </ModalLabel>,
+    );
+    expect(container.querySelectorAll('span').length).toBe(2);
+  });
+
+  it('renders 200-char long string', () => {
+    const long = 'a'.repeat(200);
+    const { container } = render(<ModalLabel>{long}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent?.length).toBe(200);
+  });
+
+  it('CSS module class has hash format', () => {
+    const { container } = render(<ModalLabel>x</ModalLabel>);
+    expect(container.querySelector('div')?.className).toMatch(/_.+/);
+  });
 });
