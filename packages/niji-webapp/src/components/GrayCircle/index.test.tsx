@@ -294,4 +294,47 @@ describe('GrayCircle', () => {
       expect(() => render(<GrayCircle />)).not.toThrow();
     }
   });
+
+  it('renders 200 GrayCircle instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <GrayCircle key={i} isDelegateView={i % 2 === 0} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(200);
+  });
+
+  it('rerender 30 times preserves img across isDelegateView toggle', () => {
+    const { container, rerender } = render(<GrayCircle />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<GrayCircle isDelegateView={i % 2 === 0} />);
+      expect(container.querySelector('img')).not.toBeNull();
+    }
+  });
+
+  it('handles 50 consecutive renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => render(<GrayCircle isDelegateView={i % 2 === 0} />)).not.toThrow();
+    }
+  });
+
+  it('img src always matches mocked SVG data URL', () => {
+    const { container } = render(<GrayCircle />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe(
+      'data:image/svg+xml;base64,FAKE',
+    );
+  });
+
+  it('multiple GrayCircles in nested div renders independently', () => {
+    const { container } = render(
+      <div data-testid="parent">
+        <GrayCircle isDelegateView={true} />
+        <GrayCircle isDelegateView={false} />
+        <GrayCircle isDelegateView={undefined} />
+      </div>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(3);
+  });
 });
