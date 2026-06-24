@@ -77,4 +77,36 @@ describe('Toaster (sonner wrapper)', () => {
     const t = container.querySelector('[data-testid="sonner-toaster"]');
     expect(t?.getAttribute('data-extra-prop')).toBe('top-right');
   });
+
+  it('forwards theme=light from useTheme', () => {
+    useThemeMock.mockReturnValue({ theme: 'light' });
+    const { container } = render(<Toaster />);
+    const t = container.querySelector('[data-testid="sonner-toaster"]');
+    expect(t?.getAttribute('data-theme')).toBe('light');
+  });
+
+  it('handles undefined theme', () => {
+    useThemeMock.mockReturnValue({ theme: undefined });
+    expect(() => render(<Toaster />)).not.toThrow();
+  });
+
+  it('toastOptions includes toast class with bg-background', () => {
+    const { container } = render(<Toaster />);
+    const t = container.querySelector('[data-testid="sonner-toaster"]');
+    const opts = JSON.parse(t?.getAttribute('data-toast-options') ?? '{}');
+    expect(opts.classNames.toast).toContain('bg-background');
+  });
+
+  it('toastOptions actionButton contains text-primary-foreground', () => {
+    const { container } = render(<Toaster />);
+    const t = container.querySelector('[data-testid="sonner-toaster"]');
+    const opts = JSON.parse(t?.getAttribute('data-toast-options') ?? '{}');
+    expect(opts.classNames.actionButton).toContain('text-primary-foreground');
+  });
+
+  it('className is "toaster group" verbatim (no extra)', () => {
+    const { container } = render(<Toaster />);
+    const t = container.querySelector('[data-testid="sonner-toaster"]');
+    expect(t?.getAttribute('data-class')).toBe('toaster group');
+  });
 });
