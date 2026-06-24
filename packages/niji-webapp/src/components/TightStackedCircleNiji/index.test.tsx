@@ -103,4 +103,43 @@ describe('TightStackedCircleNiji', () => {
     const { container } = renderSvg({ nounId: 9999, index: 0, square: 55, shift: 3 });
     expect(container.querySelector('circle')?.getAttribute('id')).toBe('9999');
   });
+
+  it('large index value (5) shifts position correctly', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const { container } = renderSvg({ nounId: 1, index: 5, square: 100, shift: 4 });
+    const circle = container.querySelector('circle');
+    expect(circle?.getAttribute('cx')).toBe('48'); // 28 + 5*4
+    expect(circle?.getAttribute('cy')).toBe('59'); // 100 - 21 - 5*4
+  });
+
+  it('nounId=0 still renders id="0"', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const { container } = renderSvg({ nounId: 0, index: 0, square: 55, shift: 3 });
+    expect(container.querySelector('circle')?.getAttribute('id')).toBe('0');
+  });
+
+  it('different image strings produce different href values', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'data:custom-x' });
+    const { container } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
+    expect(container.querySelector('image')?.getAttribute('href')).toBe('data:custom-x');
+  });
+
+  it('shift=0 keeps cx/cy constant regardless of index', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const { container: c1 } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 0 });
+    const { container: c2 } = renderSvg({ nounId: 1, index: 9, square: 55, shift: 0 });
+    expect(c1.querySelector('circle')?.getAttribute('cx')).toBe(
+      c2.querySelector('circle')?.getAttribute('cx'),
+    );
+  });
+
+  it('renders LoadingNoun + no circle when seed undefined', () => {
+    useNounSeedMock.mockReturnValue(undefined);
+    const { container } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
+    expect(container.querySelector('circle')).toBeNull();
+  });
 });

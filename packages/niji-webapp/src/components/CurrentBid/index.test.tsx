@@ -92,4 +92,35 @@ describe('CurrentBid', () => {
     expect(container.textContent).toContain('-');
     expect(container.textContent).toContain('Winning bid');
   });
+
+  it('isCool=true + auctionEnded=true uses cool dark text', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<CurrentBid currentBid={parseEther('1')} auctionEnded={true} />);
+    expect(container.querySelector('h2')?.getAttribute('style')).toContain('brand-cool-dark-text');
+  });
+
+  it('renders smallest denomination (1 wei) without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<CurrentBid currentBid={1n} auctionEnded={false} />);
+    expect(container.textContent).toContain('Ξ');
+  });
+
+  it('renders 0.5 ETH decimal correctly', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <CurrentBid currentBid={parseEther('0.5')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('Ξ 0.50');
+  });
+
+  it('BID_N_A is exported (defined constant)', () => {
+    expect(BID_N_A).toBeDefined();
+  });
+
+  it('renders both h4 (label) and h2 (amount) regardless of state', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const { container } = render(<CurrentBid currentBid={BID_N_A} auctionEnded={true} />);
+    expect(container.querySelector('h4')).not.toBeNull();
+    expect(container.querySelector('h2')).not.toBeNull();
+  });
 });

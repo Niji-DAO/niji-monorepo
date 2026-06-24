@@ -82,4 +82,44 @@ describe('VoteProgressBar', () => {
     expect(inner?.getAttribute('style')).toContain('width: 25%');
     expect(inner?.className).toMatch(/abstain/i);
   });
+
+  it('handles fractional percentage (33.33)', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={33.33} />,
+    );
+    const inner = container.querySelectorAll('div')[1];
+    expect(inner?.getAttribute('style')).toContain('width: 33.33%');
+  });
+
+  it('outer div renders 1 element regardless of variant', () => {
+    const { container } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+    expect(container.querySelectorAll('div').length).toBe(2);
+  });
+
+  it('FOR + 100% renders full-width "for" bar', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={100} />,
+    );
+    const inner = container.querySelectorAll('div')[1];
+    expect(inner?.className).toMatch(/for/i);
+    expect(inner?.getAttribute('style')).toContain('width: 100%');
+  });
+
+  it('AGAINST + 0% renders empty against bar', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.AGAINST} percentage={0} />,
+    );
+    const inner = container.querySelectorAll('div')[1];
+    expect(inner?.className).toMatch(/against/i);
+    expect(inner?.getAttribute('style')).toContain('width: 0%');
+  });
+
+  it('ABSTAIN + 75% renders 75 width abstain bar', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.ABSTAIN} percentage={75} />,
+    );
+    const inner = container.querySelectorAll('div')[1];
+    expect(inner?.getAttribute('style')).toContain('width: 75%');
+    expect(inner?.className).toMatch(/abstain/i);
+  });
 });

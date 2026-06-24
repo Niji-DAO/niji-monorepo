@@ -83,4 +83,31 @@ describe('LegacyNoun — additional edge cases', () => {
     expect(container.children.length).toBe(1);
     expect(container.firstElementChild?.tagName).toBe('DIV');
   });
+
+  it('long alt text (200 chars) is set verbatim', () => {
+    const long = 'a'.repeat(200);
+    const { container } = render(<LegacyNoun imgPath="/x.png" alt={long} />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe(long);
+  });
+
+  it('data URI imgPath is preserved verbatim', () => {
+    const dataUri = 'data:image/svg+xml;base64,FAKE';
+    const { container } = render(<LegacyNoun imgPath={dataUri} alt="x" />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe(dataUri);
+  });
+
+  it('renders without crash for very long imgPath URL', () => {
+    const longUrl = 'https://example.com/' + 'a'.repeat(500) + '.png';
+    expect(() => render(<LegacyNoun imgPath={longUrl} alt="x" />)).not.toThrow();
+  });
+
+  it('LoadingNoun renders exactly 1 img', () => {
+    const { container } = render(<LoadingNoun />);
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('LegacyNoun without className still renders img', () => {
+    const { container } = render(<LegacyNoun imgPath="/x.png" alt="x" />);
+    expect(container.querySelector('img')).not.toBeNull();
+  });
 });
