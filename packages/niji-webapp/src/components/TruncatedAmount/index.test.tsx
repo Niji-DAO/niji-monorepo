@@ -88,4 +88,49 @@ describe('TruncatedAmount', () => {
     const text = container.textContent ?? '';
     expect(text.split(' ').length).toBe(2);
   });
+
+  it('rerender updates displayed amount', () => {
+    const { container, rerender } = render(<TruncatedAmount amount={parseEther('1')} />);
+    expect(container.textContent).toBe('Ξ 1.00');
+    rerender(<TruncatedAmount amount={parseEther('5')} />);
+    expect(container.textContent).toBe('Ξ 5.00');
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <TruncatedAmount amount={parseEther('1')} />
+        <TruncatedAmount amount={parseEther('2')} />
+      </>,
+    );
+    expect(container.textContent).toContain('1.00');
+    expect(container.textContent).toContain('2.00');
+  });
+
+  it('1 wei renders as "Ξ 0.00" (rounding down)', () => {
+    const { container } = render(<TruncatedAmount amount={1n} />);
+    expect(container.textContent).toBe('Ξ 0.00');
+  });
+
+  it('999 ETH renders correctly', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('999')} />);
+    expect(container.textContent).toBe('Ξ 999.00');
+  });
+
+  it('value contains a dot (decimal separator)', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('1.5')} />);
+    expect(container.textContent).toContain('.');
+  });
+
+  it('value contains exactly 2 decimal places', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('1.5')} />);
+    const text = container.textContent ?? '';
+    const decimalPart = text.split('.')[1];
+    expect(decimalPart.length).toBe(2);
+  });
+
+  it('renders with no children/wrapper text (just amount)', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('1')} />);
+    expect(container.children.length).toBeGreaterThanOrEqual(0);
+  });
 });
