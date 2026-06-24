@@ -125,4 +125,56 @@ describe('ByLineHoverCard', () => {
     const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
     expect(container.querySelector('.spinner-border')).toBeNull();
   });
+
+  it('does not render error message when error is undefined', () => {
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.textContent).not.toContain('Error');
+  });
+
+  it('renders stacked with 10 nijis', () => {
+    const nijiList = Array.from({ length: 10 }, (_, i) => ({ id: String(i + 1) }));
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: nijiList }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-10');
+  });
+
+  it('loading=true takes precedence over data (still spinner)', () => {
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: true,
+      error: undefined,
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+  });
+
+  it('loading=true takes precedence over error (spinner shown, error skipped)', () => {
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: true,
+      error: new Error('boom'),
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+    expect(container.textContent).not.toContain('Error');
+  });
+
+  it('different proposerAddress does not change rendering of stacked content', () => {
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xB', nijiRepresented: [{ id: '7' }, { id: '8' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xB" />);
+    expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-2');
+  });
 });
