@@ -207,4 +207,69 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
     );
     expect(container.querySelectorAll('[data-testid="hover"]').length).toBe(1);
   });
+
+  it('empty data renders 12 gray cells exactly', () => {
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+    );
+    expect(container.querySelectorAll('[data-testid="gray"]').length).toBe(12);
+  });
+
+  it('numPages = floor(N/12) + 1 for N=11 returns 1', () => {
+    const data = Array.from({ length: 11 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    expect(container.querySelector('[data-testid="num-pages"]')?.textContent).toBe('1');
+  });
+
+  it('numPages = floor(N/12) + 1 for N=12 returns 2', () => {
+    const data = Array.from({ length: 12 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    expect(container.querySelector('[data-testid="num-pages"]')?.textContent).toBe('2');
+  });
+
+  it('right arrow on multi-page advances and disables at last page', () => {
+    const data = Array.from({ length: 13 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="right"]')!);
+    expect(container.querySelector('[data-testid="right"]')?.disabled).toBe(true);
+  });
+
+  it('large dataset (100 delegates) renders 9 pages', () => {
+    const data = Array.from({ length: 100 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    // floor(100/12)+1 = 8+1 = 9
+    expect(container.querySelector('[data-testid="num-pages"]')?.textContent).toBe('9');
+  });
+
+  it('rerender data updates count of hover cards', () => {
+    const { container, rerender } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+    );
+    expect(container.querySelectorAll('[data-testid="hover"]').length).toBe(0);
+    rerender(
+      <DelegateGroupedNijiImageVoteTable
+        {...baseProps}
+        filteredDelegateGroupedVoteData={[makeVote('0xA', ['1']), makeVote('0xB', ['2'])]}
+      />,
+    );
+    expect(container.querySelectorAll('[data-testid="hover"]').length).toBe(2);
+  });
+
+  it('multiple right clicks advance through pages correctly', () => {
+    const data = Array.from({ length: 25 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="right"]')!);
+    fireEvent.click(container.querySelector('[data-testid="right"]')!);
+    expect(container.querySelector('[data-testid="current-page"]')?.textContent).toBe('2');
+  });
 });

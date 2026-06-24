@@ -130,4 +130,68 @@ describe('DelegationCandidateVoteCountInfo', () => {
       render(<DelegationCandidateVoteCountInfo text="x" voteCount={0} isLoading={true} />),
     ).not.toThrow();
   });
+
+  it('rerender from singular to plural', () => {
+    const { container, rerender } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={1} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('1 Vote');
+    rerender(<DelegationCandidateVoteCountInfo text="x" voteCount={5} isLoading={false} />);
+    expect(container.textContent).toContain('5 Votes');
+  });
+
+  it('rerender from isLoading=false to true shows svg', () => {
+    const { container, rerender } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={1} isLoading={false} />,
+    );
+    expect(container.querySelector('svg')).toBeNull();
+    rerender(<DelegationCandidateVoteCountInfo text="x" voteCount={1} isLoading={true} />);
+    expect(container.querySelector('svg')).not.toBeNull();
+  });
+
+  it('multiple instances render with own vote counts', () => {
+    const { container } = render(
+      <>
+        <DelegationCandidateVoteCountInfo text="A" voteCount={1} isLoading={false} />
+        <DelegationCandidateVoteCountInfo text="B" voteCount={2} isLoading={false} />
+      </>,
+    );
+    expect(container.textContent).toContain('1 Vote');
+    expect(container.textContent).toContain('2 Votes');
+  });
+
+  it('large voteCount (Number.MAX_SAFE_INTEGER) renders correctly', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo
+        text="x"
+        voteCount={Number.MAX_SAFE_INTEGER}
+        isLoading={false}
+      />,
+    );
+    expect(container.textContent).toContain('9007199254740991');
+  });
+
+  it('unicode text renders verbatim', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="日本語" voteCount={1} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('日本語');
+  });
+
+  it('rerender text updates content', () => {
+    const { container, rerender } = render(
+      <DelegationCandidateVoteCountInfo text="First" voteCount={1} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('First');
+    rerender(<DelegationCandidateVoteCountInfo text="Second" voteCount={1} isLoading={false} />);
+    expect(container.textContent).toContain('Second');
+    expect(container.textContent).not.toContain('First');
+  });
+
+  it('voteCount=-1 (negative) renders as "-1 Votes"', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={-1} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('-1 Votes');
+  });
 });

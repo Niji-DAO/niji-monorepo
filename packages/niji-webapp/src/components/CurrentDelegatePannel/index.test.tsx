@@ -204,4 +204,71 @@ describe('CurrentDelegatePannel', () => {
     );
     expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0x');
   });
+
+  it('rerender from delegate to no delegate falls to account', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValueOnce({ data: '0xDELEGATE' });
+    const { container, rerender } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xDELEGATE');
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    rerender(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />);
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xACCOUNT');
+  });
+
+  it('h1 title text is exact "Delegation"', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    expect(container.querySelector('h1')?.textContent).toBe('Delegation');
+  });
+
+  it('close button does not fire onPrimary', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const onPri = vi.fn();
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={onPri} onSecondaryBtnClick={() => {}} />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onPri).not.toHaveBeenCalled();
+  });
+
+  it('update button does not fire onSecondary', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const onSec = vi.fn();
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={onSec} />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[1]);
+    expect(onSec).not.toHaveBeenCalled();
+  });
+
+  it('multiple instances render with own h1', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <>
+        <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />
+        <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(2);
+  });
+
+  it('different account address renders independently', () => {
+    useAccountMock.mockReturnValueOnce({ address: '0xACCOUNT1' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container, rerender } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xACCOUNT1');
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT2' });
+    rerender(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />);
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xACCOUNT2');
+  });
 });
