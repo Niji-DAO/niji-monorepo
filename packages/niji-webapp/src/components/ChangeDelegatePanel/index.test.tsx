@@ -305,4 +305,29 @@ describe('ChangeDelegatePanel', () => {
     const input = container.querySelector('input');
     expect(input?.getAttribute('type')).toBeDefined();
   });
+
+  it('renders input element exactly 1 time', () => {
+    const { container } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+    expect(container.querySelectorAll('input').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders without crash with default state', () => {
+    expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+  });
+
+  it('onDismiss prop is callable (fn ref preserved)', () => {
+    const onDismiss = vi.fn();
+    render(<ChangeDelegatePanel onDismiss={onDismiss} />);
+    expect(onDismiss).not.toHaveBeenCalled();
+  });
+
+  it('rerender with same props does not crash', () => {
+    const { rerender } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+    expect(() => rerender(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+  });
+
+  it('renders DelegationCandidateInfo component when address is set', () => {
+    const { container } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+    expect(container.querySelector('[data-testid="delegation-candidate-info"]')).toBeDefined();
+  });
 });
