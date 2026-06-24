@@ -384,4 +384,50 @@ describe('AuctionActivity', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 10 instances consecutively without crash', () => {
+    for (let i = 0; i < 10; i++) {
+      expect(() =>
+        wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('renders 3 instances each with own auctions', () => {
+    expect(() =>
+      wrap(
+        <>
+          <AuctionActivity {...defaults} auction={makeAuction({ nounId: 1n }) as never} />
+          <AuctionActivity {...defaults} auction={makeAuction({ nounId: 2n }) as never} />
+          <AuctionActivity {...defaults} auction={makeAuction({ nounId: 3n }) as never} />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles displayGraphDepComps=false in last auction', () => {
+    expect(() =>
+      wrap(
+        <AuctionActivity
+          {...defaults}
+          displayGraphDepComps={false}
+          auction={makeAuction() as never}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles useAtomValueMock=false branch', () => {
+    useAtomValueMock.mockReturnValue(false);
+    expect(() =>
+      wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />),
+    ).not.toThrow();
+    useAtomValueMock.mockReturnValue(true);
+  });
+
+  it('renders large nounId auction (1M)', () => {
+    expect(() =>
+      wrap(<AuctionActivity {...defaults} auction={makeAuction({ nounId: 1000000n }) as never} />),
+    ).not.toThrow();
+  });
 });

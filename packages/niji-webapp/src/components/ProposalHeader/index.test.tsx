@@ -342,4 +342,48 @@ describe('ProposalHeader', () => {
       wrap(<ProposalHeader {...baseProps} />);
     }).not.toThrow();
   });
+
+  it('renders 20 times consecutively without crash', () => {
+    for (let i = 0; i < 20; i++) {
+      expect(() => wrap(<ProposalHeader {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('renders 10 instances each in single wrap', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <ProposalHeader key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders ProposalHeader within outer div parent', () => {
+    expect(() =>
+      wrap(
+        <div data-testid="parent">
+          <ProposalHeader {...baseProps} />
+        </div>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders ProposalHeader within Fragment', () => {
+    expect(() =>
+      wrap(
+        <>
+          <ProposalHeader {...baseProps} />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders ProposalHeader 5 times sequentially without crash', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() => wrap(<ProposalHeader {...baseProps} />)).not.toThrow();
+    }
+  });
 });
