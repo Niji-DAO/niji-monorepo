@@ -53,4 +53,54 @@ describe('NijiInfoRowButton', () => {
     if (div) fireEvent.click(div);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
+
+  it('fires onClickHandler on repeated clicks', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const onClick = vi.fn();
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="x" onClickHandler={onClick} />,
+    );
+    const div = container.querySelector('div');
+    if (div) {
+      fireEvent.click(div);
+      fireEvent.click(div);
+      fireEvent.click(div);
+    }
+    expect(onClick).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders long btnText (200 chars)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const long = 'a'.repeat(200);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText={long} onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe(long);
+  });
+
+  it('renders exactly 1 img element', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="x" onClickHandler={() => {}} />,
+    );
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('accepts data URI as iconImgSource', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const dataUri = 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=';
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource={dataUri} btnText="x" onClickHandler={() => {}} />,
+    );
+    expect(container.querySelector('img')?.getAttribute('src')).toBe(dataUri);
+  });
+
+  it('outermost wrapper is a single <div>', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="x" onClickHandler={() => {}} />,
+    );
+    expect(container.children.length).toBe(1);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
 });

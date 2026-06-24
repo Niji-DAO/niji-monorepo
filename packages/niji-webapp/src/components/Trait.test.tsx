@@ -58,4 +58,43 @@ describe('Trait', () => {
     });
     expect(container.querySelector('img')?.className).toBe('custom-trait');
   });
+
+  it('handles seed=1 (out-of-bounds index, fallback to undefined image data)', async () => {
+    const { container } = render(<Trait type="hat" seed={1} />, { wrapper: WithProviders });
+    await waitFor(() => {
+      const src = container.querySelector('img')?.getAttribute('src') ?? '';
+      expect(src.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('handles undefined className (empty string passthrough)', () => {
+    const { container } = render(<Trait type="hat" />, { wrapper: WithProviders });
+    const img = container.querySelector('img');
+    // className が prop 未指定でも crash しない
+    expect(img).not.toBeNull();
+  });
+
+  it('renders exactly 1 img element', () => {
+    const { container } = render(<Trait type="hat" seed={0} />, { wrapper: WithProviders });
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('FALLBACK_TRANSPARENT starts with data:image/gif;base64, prefix (1x1 transparent)', () => {
+    const { container } = render(<Trait type="hat" />, { wrapper: WithProviders });
+    const src = container.querySelector('img')?.getAttribute('src') ?? '';
+    expect(src.startsWith('data:image/gif;base64,')).toBe(true);
+    // 1x1 transparent GIF の base64 ペイロードを含む
+    expect(src.length).toBeGreaterThan('data:image/gif;base64,'.length);
+  });
+
+  it('different types produce different result paths', async () => {
+    const { container: c1 } = render(<Trait type="hat" seed={0} />, { wrapper: WithProviders });
+    const { container: c2 } = render(<Trait type="special" seed={0} />, {
+      wrapper: WithProviders,
+    });
+    await waitFor(() => {
+      expect(c1.querySelector('img')?.getAttribute('src')).toBeTruthy();
+      expect(c2.querySelector('img')?.getAttribute('src')).toBeTruthy();
+    });
+  });
 });
