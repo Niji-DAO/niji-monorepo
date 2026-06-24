@@ -100,4 +100,51 @@ describe('NavBarItem', () => {
     const { container } = render(<NavBarItem>{['a', 'b', 'c']}</NavBarItem>);
     expect(container.querySelector('div')?.textContent).toBe('abc');
   });
+
+  it('rerender updates children content', () => {
+    const { container, rerender } = render(<NavBarItem>first</NavBarItem>);
+    expect(container.textContent).toBe('first');
+    rerender(<NavBarItem>second</NavBarItem>);
+    expect(container.textContent).toBe('second');
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <NavBarItem>A</NavBarItem>
+        <NavBarItem>B</NavBarItem>
+      </>,
+    );
+    const divs = container.querySelectorAll('div');
+    expect(divs.length).toBeGreaterThanOrEqual(2);
+    expect(container.textContent).toContain('A');
+    expect(container.textContent).toContain('B');
+  });
+
+  it('unicode children render verbatim', () => {
+    const { container } = render(<NavBarItem>メニュー</NavBarItem>);
+    expect(container.querySelector('div')?.textContent).toBe('メニュー');
+  });
+
+  it('rerender with different className updates class', () => {
+    const { container, rerender } = render(<NavBarItem className="cls1">x</NavBarItem>);
+    expect(container.querySelector('div')?.className).toContain('cls1');
+    rerender(<NavBarItem className="cls2">x</NavBarItem>);
+    expect(container.querySelector('div')?.className).toContain('cls2');
+    expect(container.querySelector('div')?.className).not.toContain('cls1');
+  });
+
+  it('onClick fires regardless of children type', () => {
+    const onClick = vi.fn();
+    const { container } = render(<NavBarItem onClick={onClick}>{42}</NavBarItem>);
+    const div = container.querySelector('div');
+    if (div) fireEvent.click(div);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('long className (100+ chars) is accepted', () => {
+    const long = 'x'.repeat(120);
+    const { container } = render(<NavBarItem className={long}>y</NavBarItem>);
+    expect(container.querySelector('div')?.className).toContain(long);
+  });
 });

@@ -100,4 +100,49 @@ describe('ModalTextPrimary', () => {
     );
     expect(container.querySelectorAll('div').length).toBe(2);
   });
+
+  it('rerender updates text', () => {
+    const { container, rerender } = render(<ModalTextPrimary>first</ModalTextPrimary>);
+    expect(container.textContent).toBe('first');
+    rerender(<ModalTextPrimary>second</ModalTextPrimary>);
+    expect(container.textContent).toBe('second');
+  });
+
+  it('unicode children render verbatim', () => {
+    const { container } = render(<ModalTextPrimary>こんにちは</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('こんにちは');
+  });
+
+  it('boolean children render as empty string', () => {
+    const { container } = render(<ModalTextPrimary>{true}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('multiple instances share same className', () => {
+    const { container } = render(
+      <>
+        <ModalTextPrimary>a</ModalTextPrimary>
+        <ModalTextPrimary>b</ModalTextPrimary>
+      </>,
+    );
+    const divs = container.querySelectorAll('div');
+    expect(divs[0].className).toBe(divs[1].className);
+  });
+
+  it('rerender from text to numeric updates content', () => {
+    const { container, rerender } = render(<ModalTextPrimary>abc</ModalTextPrimary>);
+    expect(container.textContent).toBe('abc');
+    rerender(<ModalTextPrimary>{99}</ModalTextPrimary>);
+    expect(container.textContent).toBe('99');
+  });
+
+  it('mixed text + element renders', () => {
+    const { container } = render(
+      <ModalTextPrimary>
+        text-<strong>strong</strong>
+      </ModalTextPrimary>,
+    );
+    expect(container.querySelector('strong')?.textContent).toBe('strong');
+    expect(container.textContent).toContain('text-');
+  });
 });
