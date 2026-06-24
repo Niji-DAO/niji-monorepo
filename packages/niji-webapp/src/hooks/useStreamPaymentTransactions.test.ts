@@ -1,0 +1,181 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@niji/sdk/react', () => ({
+  nijiPayerAbi: [{ type: 'function', name: 'sendOrRegisterDebt', inputs: [] }],
+  nijiPayerAddress: { 1: '0xPAYER' as const },
+  nijiStreamFactoryAbi: [{ type: 'function', name: 'createStream', inputs: [] }],
+  nijiStreamFactoryAddress: { 1: '0xFACTORY' as const },
+  usdcAddress: { 1: '0xUSDC' as const },
+  wethAddress: { 1: '0xWETH' as const },
+}));
+
+vi.mock('@/wagmi', () => ({
+  defaultChain: { id: 1 },
+}));
+
+vi.mock('@/components/ProposalActionsModal/steps/TransferFundsDetailsStep', () => ({
+  SupportedCurrency: { USDC: 'USDC', WETH: 'WETH' },
+}));
+
+vi.mock('@/utils/streamingPaymentUtils/streamingPaymentUtils', () => ({
+  formatTokenAmount: (amount: number, currency: string) =>
+    currency === 'USDC' ? BigInt(amount * 1_000_000) : BigInt(amount),
+  getTokenAddressForCurrency: (currency: string) => (currency === 'USDC' ? '0xUSDC' : '0xWETH'),
+}));
+
+vi.mock('@/utils/usdcUtils', () => ({
+  human2ContractUSDCFormat: (a: string) => String(Number(a) * 1_000_000),
+}));
+
+vi.mock('viem', async () => {
+  const actual = await vi.importActual<typeof import('viem')>('viem');
+  return {
+    ...actual,
+    encodeFunctionData: ({ functionName, args }: { functionName: string; args: unknown[] }) => {
+      return `0xENCODED_${functionName}_${args.length}` as `0x${string}`;
+    },
+    parseEther: (s: string) => BigInt(Math.floor(Number(s) * 1e18)),
+    parseAbi: (signatures: string[]) => signatures.map(s => ({ type: 'function', signature: s })),
+  };
+});
+
+import useStreamPaymentTransactions from './useStreamPaymentTransactions';
+
+const makeState = (
+  overrides: Partial<{
+    TransferFundsCurrency: string;
+    amount: string;
+    address: string;
+    streamStartTimestamp: number;
+    streamEndTimestamp: number;
+  }> = {},
+) =>
+  ({
+    actionType: 'STREAM',
+    address: (overrides.address ?? '0xRECIPIENT') as `0x${string}`,
+    TransferFundsCurrency: overrides.TransferFundsCurrency ?? 'USDC',
+    amount: overrides.amount ?? '100',
+    streamStartTimestamp: overrides.streamStartTimestamp ?? 1700000000,
+    streamEndTimestamp: overrides.streamEndTimestamp ?? 1800000000,
+  }) as never;
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+describe('useStreamPaymentTransactions', () => {
+  it('returns empty array when predictedAddress is undefined', () => {
+    const actions = useStreamPaymentTransactions({ state: makeState() });
+    expect(actions).toEqual([]);
+  });
+
+  it('returns 2 actions for USDC currency (createStream + sendOrRegisterDebt)', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'USDC' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(actions).toHaveLength(2);
+    expect(actions[0].signature).toBe('createStream');
+    expect(actions[1].signature).toBe('sendOrRegisterDebt');
+  });
+
+  it('returns 3 actions for WETH currency (createStream + deposit + transfer)', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'WETH' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(actions).toHaveLength(3);
+    expect(actions[0].signature).toBe('createStream');
+    expect(actions[1].signature).toBe('deposit()');
+    expect(actions[2].signature).toBe('transfer');
+  });
+
+  it('createStream action address is nijiStreamFactoryAddress', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState(),
+      predictedAddress: '0xPRED',
+    });
+    expect(actions[0].address).toBe('0xFACTORY');
+  });
+
+  it('USDC sendOrRegisterDebt action address is nijiPayerAddress', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'USDC' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(actions[1].address).toBe('0xPAYER');
+  });
+
+  it('WETH deposit + transfer actions use wethAddress', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'WETH' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(actions[1].address).toBe('0xWETH');
+    expect(actions[2].address).toBe('0xWETH');
+  });
+
+  it('WETH deposit action value uses parseEther(amount)', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'WETH', amount: '1' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(actions[1].value).toBe(String(BigInt(1e18)));
+  });
+
+  it('USDC usdcValue is human2ContractUSDCFormat numeric value', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'USDC', amount: '50' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(actions[0].usdcValue).toBe(50_000_000);
+  });
+
+  it('WETH currency keeps usdcValue=0 on all actions', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'WETH', amount: '5' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(actions.every(a => a.usdcValue === 0)).toBe(true);
+  });
+
+  it('createStream decodedCalldata contains predictedAddress + streamStart/End timestamps', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ streamStartTimestamp: 1100, streamEndTimestamp: 2200 }),
+      predictedAddress: '0xPRED',
+    });
+    const parsed = JSON.parse(actions[0].decodedCalldata);
+    expect(parsed).toContain('0xPRED');
+    expect(parsed).toContain(1100);
+    expect(parsed).toContain(2200);
+  });
+
+  it('WETH transfer decodedCalldata contains predictedAddress + amount eth', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'WETH', amount: '2' }),
+      predictedAddress: '0xPRED',
+    });
+    const parsed = JSON.parse(actions[2].decodedCalldata);
+    expect(parsed).toContain('0xPRED');
+    expect(parsed).toContain(String(BigInt(2e18)));
+  });
+
+  it('amount default "0" used when state.amount is missing', () => {
+    const stateWithoutAmount = {
+      actionType: 'STREAM',
+      address: '0xRECIPIENT' as `0x${string}`,
+      TransferFundsCurrency: 'USDC',
+      streamStartTimestamp: 1700000000,
+      streamEndTimestamp: 1800000000,
+    } as never;
+    const actions = useStreamPaymentTransactions({
+      state: stateWithoutAmount,
+      predictedAddress: '0xPRED',
+    });
+    expect(actions[0].usdcValue).toBe(0);
+  });
+});
