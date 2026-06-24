@@ -292,4 +292,43 @@ describe('SelectProposalActionStep', () => {
     const { container } = render(<SelectProposalActionStep {...setupProps()} />);
     expect(container.querySelectorAll('[data-testid="title"]').length).toBe(1);
   });
+
+  it('dropdown options have exact 3 distinct values', () => {
+    const { container } = render(<SelectProposalActionStep {...setupProps()} />);
+    const options = container.querySelectorAll('option');
+    const values = Array.from(options).map(o => o.value);
+    expect(new Set(values).size).toBe(3);
+  });
+
+  it('back button does not fire onNext', () => {
+    const onNext = vi.fn();
+    const { container } = render(
+      <SelectProposalActionStep {...setupProps({ onNextBtnClick: onNext })} />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="prev-btn"]')!);
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
+  it('next button does not fire onPrev', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <SelectProposalActionStep {...setupProps({ onPrevBtnClick: onPrev })} />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onPrev).not.toHaveBeenCalled();
+  });
+
+  it('subtitle text is non-empty', () => {
+    render(<SelectProposalActionStep {...setupProps()} />);
+    expect(screen.getByTestId('subtitle').textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('dropdown change to Transfer Funds invokes setState', () => {
+    const setState = vi.fn();
+    render(<SelectProposalActionStep {...setupProps({ setState })} />);
+    fireEvent.change(screen.getByTestId('action-dropdown'), {
+      target: { value: 'Transfer Funds' },
+    });
+    expect(setState).toHaveBeenCalledTimes(1);
+  });
 });
