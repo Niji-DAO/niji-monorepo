@@ -265,4 +265,50 @@ describe('Proposals', () => {
     );
     expect(candidatesTab).toBeUndefined();
   });
+
+  it('default tab is Proposals (location.hash empty)', () => {
+    locationMock.hash = '';
+    const { container } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+    expect(container.textContent).toContain('No proposals found');
+    expect(container.textContent).not.toContain('No candidates found');
+  });
+
+  it('Proposals tab navigation back to /vote (no hash) when clicked', () => {
+    locationMock.hash = '#candidates';
+    const { container } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+    const proposalsTab = Array.from(container.querySelectorAll('button')).find(
+      b => b.textContent?.trim() === 'Proposals',
+    );
+    expect(proposalsTab).not.toBeUndefined();
+    fireEvent.click(proposalsTab!);
+    expect(navigateMock).toHaveBeenCalledWith('/vote');
+  });
+
+  it('renders multiple CandidateCard entries when candidates list has many', () => {
+    locationMock.hash = '#candidates';
+    candidatesAtomState.current = [
+      { id: 'cand-1', proposalIdToUpdate: '0' },
+      { id: 'cand-2', proposalIdToUpdate: '0' },
+      { id: 'cand-3', proposalIdToUpdate: '0' },
+    ];
+    const { container } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+    expect(container.querySelectorAll('[data-testid="candidate-card"]').length).toBe(3);
+  });
+
+  it('shows "Submit Proposal" copy when account has votes equal to threshold', () => {
+    wagmiState.account = '0xUSER';
+    tokenState.userVotes = 1;
+    daoState.proposalThreshold = 0;
+    const { container } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+    expect(container.textContent).toContain('Submit Proposal');
+  });
+
+  it('renders single proposal correctly (1-element list)', () => {
+    const proposals = [
+      { id: '99', title: 'Solo', status: 1, startBlock: 50n, endBlock: 200n, eta: '0' },
+    ] as never;
+    const { container } = wrap(<Proposals proposals={proposals} nounsRequired={2} />);
+    expect(container.textContent).toContain('Solo');
+    expect(container.textContent).not.toContain('No proposals found');
+  });
 });

@@ -234,4 +234,44 @@ describe('ProposalHeader', () => {
     const { container } = wrap(<ProposalHeader {...baseProps} />);
     expect(container.textContent).not.toContain('Version');
   });
+
+  it('hides Submit vote button when isActiveForVoting=false', () => {
+    const { container } = wrap(<ProposalHeader {...baseProps} isActiveForVoting={false} />);
+    expect(container.textContent).not.toContain('Submit vote');
+  });
+
+  it('shows "voted Against" alert when hasVoted + proposalVote=Against', () => {
+    hookState.hasVoted = true;
+    hookState.proposalVote = 'Against';
+    const { container } = wrap(<ProposalHeader {...baseProps} />);
+    expect(container.textContent).toContain('You voted');
+    expect(container.textContent).toContain('Against');
+  });
+
+  it('shows "Abstained" alert when hasVoted + proposalVote=Abstain', () => {
+    hookState.hasVoted = true;
+    hookState.proposalVote = 'Abstain';
+    const { container } = wrap(<ProposalHeader {...baseProps} />);
+    expect(container.textContent).toContain('Abstained');
+  });
+
+  it('submit button click triggers submitButtonClickHandler when enabled', () => {
+    submitMock.mockReset();
+    const { container } = wrap(<ProposalHeader {...baseProps} />);
+    const btn = Array.from(container.querySelectorAll('button')).find(b =>
+      b.textContent?.includes('Submit vote'),
+    );
+    if (btn) btn.click();
+    expect(submitMock).toHaveBeenCalled();
+  });
+
+  it('renders multi-signer "Sponsored by" with 3 ShortAddress entries', () => {
+    const proposal = makeProposal({
+      signers: [{ id: '0xS1' }, { id: '0xS2' }, { id: '0xS3' }],
+    });
+    const { container } = wrap(<ProposalHeader {...baseProps} proposal={proposal} />);
+    const addresses = container.querySelectorAll('[data-testid="short-address"]');
+    // 1 (proposer) + 3 (signers) = 4
+    expect(addresses.length).toBeGreaterThanOrEqual(4);
+  });
 });

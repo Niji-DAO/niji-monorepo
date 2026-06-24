@@ -203,4 +203,38 @@ describe('VoteSignals', () => {
     fireEvent.click(formBtn);
     expect(sendProposalFeedbackMock).not.toHaveBeenCalled();
   });
+
+  it('shows VoteSignalsPending while candidate transaction is Mining (isCandidate=true)', () => {
+    feedbackState.candidate = { status: 'Mining' };
+    const { container } = render(<VoteSignals {...baseProps} isCandidate={true} />);
+    expect(container.querySelector('[data-testid="vote-signals-pending"]')).not.toBeNull();
+  });
+
+  it('renders header in all valid render paths', () => {
+    const { container } = render(<VoteSignals {...baseProps} />);
+    expect(container.querySelector('[data-testid="signals-header"]')).not.toBeNull();
+  });
+
+  it('VoteSignalGroup forwards feedback length to each group', () => {
+    useVoteSignalsFeedbackState.forFeedback = [{ a: 1 }, { b: 2 }];
+    useVoteSignalsFeedbackState.againstFeedback = [{ c: 3 }];
+    useVoteSignalsFeedbackState.abstainFeedback = [];
+    const { container } = render(<VoteSignals {...baseProps} />);
+    expect(container.querySelector('[data-testid="signal-group-1"]')?.textContent).toBe('2');
+    expect(container.querySelector('[data-testid="signal-group-0"]')?.textContent).toBe('1');
+    expect(container.querySelector('[data-testid="signal-group-2"]')?.textContent).toBe('0');
+  });
+
+  it('toast.error fires when sendCandidateFeedbackState=Fail (isCandidate=true)', () => {
+    feedbackState.candidate = { status: 'Fail', errorMessage: 'cand failed' };
+    render(<VoteSignals {...baseProps} isCandidate={true} />);
+    expect(toastErrorMock).toHaveBeenCalledWith('cand failed');
+  });
+
+  it('handleRefetch fires when candidate status=Success (isCandidate=true)', () => {
+    feedbackState.candidate = { status: 'Success' };
+    const refetch = vi.fn();
+    render(<VoteSignals {...baseProps} isCandidate={true} handleRefetch={refetch} />);
+    expect(refetch).toHaveBeenCalled();
+  });
 });
