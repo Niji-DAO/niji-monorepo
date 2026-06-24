@@ -32,4 +32,28 @@ describe('countDecimals', () => {
     expect(countDecimals(-5.5)).toBe(1);
     expect(countDecimals(-3.14)).toBe(2);
   });
+
+  it('handles 3 decimals (1.001)', () => {
+    expect(countDecimals(1.001)).toBe(3);
+  });
+
+  it('handles 4 decimals (0.0001)', () => {
+    expect(countDecimals(0.0001)).toBe(4);
+  });
+
+  it('handles very small decimal value', () => {
+    expect(countDecimals(0.000001)).toBe(6);
+  });
+
+  it('treats 5.10 as 1 decimal (trailing 0 dropped by Number)', () => {
+    expect(countDecimals(5.1)).toBe(1);
+  });
+
+  it('handles scientific notation as integer when result is whole', () => {
+    expect(countDecimals(1e2)).toBe(0);
+  });
+
+  it('handles MAX_SAFE_INTEGER as 0 decimals', () => {
+    expect(countDecimals(Number.MAX_SAFE_INTEGER)).toBe(0);
+  });
 });
