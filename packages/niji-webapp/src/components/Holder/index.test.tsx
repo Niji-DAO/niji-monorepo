@@ -522,4 +522,66 @@ describe('Holder', () => {
     useAtomValueMock.mockReturnValue(false);
     expect(() => rerender(<Holder nounId={1n} />)).not.toThrow();
   });
+
+  it('renders 50 instances without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <Holder key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times with varying nounId', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    const { rerender } = render(<Holder nounId={0n} />, { wrapper: WithProviders });
+    for (let i = 0; i < 30; i++) {
+      expect(() => rerender(<Holder nounId={BigInt(i)} />)).not.toThrow();
+    }
+  });
+
+  it('handles very large nounId (1e9)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() => render(<Holder nounId={1000000000n} />, { wrapper: WithProviders })).not.toThrow();
+  });
+
+  it('handles data with empty owner id string', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '' } } },
+    });
+    const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('');
+  });
+
+  it('rapid loading transitions 50 times without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { rerender } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    for (let i = 0; i < 50; i++) {
+      useSubgraphQueryMock.mockReturnValue({
+        loading: i % 2 === 0,
+        error: undefined,
+        data: undefined,
+      });
+      expect(() => rerender(<Holder nounId={1n} />)).not.toThrow();
+    }
+  });
 });
