@@ -332,4 +332,39 @@ describe('StreamWithdrawModal', () => {
       render(<StreamWithdrawModal {...baseProps} tokenAddress={'0xABCDEF' as `0x${string}`} />),
     ).not.toThrow();
   });
+
+  it('renders without crash with 0 withdrawable balance', () => {
+    hookState.withdrawableBalance = 0n;
+    expect(() => render(<StreamWithdrawModal {...baseProps} />)).not.toThrow();
+    hookState.withdrawableBalance = 5_000_000n;
+  });
+
+  it('renders without crash for very large balance', () => {
+    hookState.withdrawableBalance = 1_000_000_000_000_000_000_000n;
+    expect(() => render(<StreamWithdrawModal {...baseProps} />)).not.toThrow();
+    hookState.withdrawableBalance = 5_000_000n;
+  });
+
+  it('renders without crash with elapsedTime=100', () => {
+    hookState.elapsedTime = 100;
+    expect(() => render(<StreamWithdrawModal {...baseProps} />)).not.toThrow();
+    hookState.elapsedTime = 50;
+  });
+
+  it('rerender does not crash', () => {
+    const { rerender } = render(<StreamWithdrawModal {...baseProps} />);
+    expect(() => rerender(<StreamWithdrawModal {...baseProps} />)).not.toThrow();
+  });
+
+  it('renders 3 instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          <StreamWithdrawModal {...baseProps} />
+          <StreamWithdrawModal {...baseProps} />
+          <StreamWithdrawModal {...baseProps} />
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });

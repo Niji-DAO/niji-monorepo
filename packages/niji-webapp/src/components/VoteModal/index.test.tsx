@@ -276,4 +276,35 @@ describe('VoteModal', () => {
   it('availableVotes=0 still renders modal', () => {
     expect(() => render(<VoteModal {...baseProps} availableVotes={0} />)).not.toThrow();
   });
+
+  it('renders without crash with very large availableVotes (1M)', () => {
+    expect(() => render(<VoteModal {...baseProps} availableVotes={1000000} />)).not.toThrow();
+  });
+
+  it('rerender does not crash', () => {
+    const { rerender } = render(<VoteModal {...baseProps} />);
+    expect(() => rerender(<VoteModal {...baseProps} availableVotes={5} />)).not.toThrow();
+  });
+
+  it('renders 3 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          <VoteModal {...baseProps} />
+          <VoteModal {...baseProps} />
+          <VoteModal {...baseProps} />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash with negative availableVotes', () => {
+    expect(() => render(<VoteModal {...baseProps} availableVotes={-1} />)).not.toThrow();
+  });
+
+  it('renders consecutive 5 times without crash', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() => render(<VoteModal {...baseProps} />)).not.toThrow();
+    }
+  });
 });
