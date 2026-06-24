@@ -294,4 +294,81 @@ describe('FunctionCallReviewStep', () => {
     expect(onNext).toHaveBeenCalledTimes(2);
     expect(onPrev).toHaveBeenCalledTimes(1);
   });
+
+  it('Back button repeated clicks invoke onPrev N times', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        onPrevBtnClick={onPrev}
+        state={{ abi, function: 'noArg', address: ADDR, amount: '0', args: [] } as never}
+      />,
+    );
+    const back = container.querySelectorAll('button')[0];
+    fireEvent.click(back);
+    fireEvent.click(back);
+    fireEvent.click(back);
+    expect(onPrev).toHaveBeenCalledTimes(3);
+  });
+
+  it('h1 (ModalTitle) is rendered exactly 1 time', () => {
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        state={{ abi, function: 'noArg', address: ADDR, amount: '0', args: [] } as never}
+      />,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('Next button does not fire onPrev', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        onPrevBtnClick={onPrev}
+        state={{ abi, function: 'noArg', address: ADDR, amount: '0', args: [] } as never}
+      />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onPrev).not.toHaveBeenCalled();
+  });
+
+  it('Back button does not fire onNext', () => {
+    const onNext = vi.fn();
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        onNextBtnClick={onNext}
+        state={{ abi, function: 'noArg', address: ADDR, amount: '0', args: [] } as never}
+      />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
+  it('rerender from noArg to transfer updates arguments text', () => {
+    const { container, rerender } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        state={{ abi, function: 'noArg', address: ADDR, amount: '0', args: [] } as never}
+      />,
+    );
+    expect(container.textContent).toContain('None');
+    rerender(
+      <FunctionCallReviewStep
+        {...defaults}
+        state={
+          {
+            abi,
+            function: 'transfer',
+            address: ADDR,
+            amount: '0',
+            args: [ADDR, '500'],
+          } as never
+        }
+      />,
+    );
+    expect(container.textContent).toContain('500');
+  });
 });
