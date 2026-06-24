@@ -228,4 +228,40 @@ describe('StreamPaymentsReviewStep', () => {
     expect(onNext).toHaveBeenCalledTimes(1);
     expect(onPrev).toHaveBeenCalledTimes(1);
   });
+
+  it('h1 title element renders exactly 1 time', () => {
+    const { container } = render(<StreamPaymentsReviewStep {...defaults} />);
+    expect(container.querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('renders 2 buttons exactly (Back + Next)', () => {
+    const { container } = render(<StreamPaymentsReviewStep {...defaults} />);
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('amount 0 renders correctly without crash', () => {
+    const state = { ...baseState, amount: '0' };
+    const { container } = render(<StreamPaymentsReviewStep {...defaults} state={state as never} />);
+    expect(container.textContent).toContain('0');
+  });
+
+  it('large amount (1000000) renders without crash', () => {
+    const state = { ...baseState, amount: '1000000' };
+    expect(() =>
+      render(<StreamPaymentsReviewStep {...defaults} state={state as never} />),
+    ).not.toThrow();
+  });
+
+  it('Multiple Next clicks invoke onNext + onDismiss N times', () => {
+    const onNext = vi.fn();
+    const onDismiss = vi.fn();
+    const { container } = render(
+      <StreamPaymentsReviewStep {...defaults} onNextBtnClick={onNext} onDismiss={onDismiss} />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onNext).toHaveBeenCalledTimes(3);
+    expect(onDismiss).toHaveBeenCalledTimes(3);
+  });
 });

@@ -384,4 +384,68 @@ describe('VoteCard', () => {
     const bar = container.querySelector('[data-testid="vote-progress"]');
     expect(bar?.getAttribute('data-percentage')).toBe('100');
   });
+
+  it('passes percentage=0 to VoteProgressBar', () => {
+    const { container } = render(
+      <VoteCard
+        proposal={makeProposal({ forCount: 0 })}
+        percentage={0}
+        variant={VoteCardVariant.FOR}
+        delegateGroupedVoteData={undefined}
+      />,
+    );
+    const bar = container.querySelector('[data-testid="vote-progress"]');
+    expect(bar?.getAttribute('data-percentage')).toBe('0');
+  });
+
+  it('VoteProgressBar renders exactly 1 time per VoteCard', () => {
+    const { container } = render(
+      <VoteCard
+        proposal={makeProposal({ forCount: 50 })}
+        percentage={50}
+        variant={VoteCardVariant.FOR}
+        delegateGroupedVoteData={undefined}
+      />,
+    );
+    expect(container.querySelectorAll('[data-testid="vote-progress"]').length).toBe(1);
+  });
+
+  it('passes variant=AGAINST (1) to VoteProgressBar', () => {
+    const { container } = render(
+      <VoteCard
+        proposal={makeProposal({ againstCount: 30 })}
+        percentage={30}
+        variant={VoteCardVariant.AGAINST}
+        delegateGroupedVoteData={undefined}
+      />,
+    );
+    const bar = container.querySelector('[data-testid="vote-progress"]');
+    expect(bar?.getAttribute('data-variant')).toBe(String(VoteCardVariant.AGAINST));
+  });
+
+  it('passes variant=ABSTAIN (2) to VoteProgressBar', () => {
+    const { container } = render(
+      <VoteCard
+        proposal={makeProposal({ abstainCount: 10 })}
+        percentage={10}
+        variant={VoteCardVariant.ABSTAIN}
+        delegateGroupedVoteData={undefined}
+      />,
+    );
+    const bar = container.querySelector('[data-testid="vote-progress"]');
+    expect(bar?.getAttribute('data-variant')).toBe(String(VoteCardVariant.ABSTAIN));
+  });
+
+  it('renders without crash for variant=FOR + 50% midpoint', () => {
+    expect(() =>
+      render(
+        <VoteCard
+          proposal={makeProposal({ forCount: 50 })}
+          percentage={50}
+          variant={VoteCardVariant.FOR}
+          delegateGroupedVoteData={undefined}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });
