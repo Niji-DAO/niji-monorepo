@@ -180,4 +180,35 @@ describe('TransferFundsReviewStep', () => {
     const { container } = render(<TransferFundsReviewStep {...defaults} />);
     expect(container.querySelector('h1')?.textContent).toBe('Review Transfer Funds Action');
   });
+
+  it('renders ETH currency body without crash', () => {
+    const { container } = render(<TransferFundsReviewStep {...defaults} />);
+    expect(container.textContent).toContain('ETH');
+  });
+
+  it('renders amount with decimal places (2.5)', () => {
+    const { container } = render(<TransferFundsReviewStep {...defaults} />);
+    expect(container.textContent).toContain('2.5');
+  });
+
+  it('renders for very large amount (1000000) with comma formatting (1,000,000)', () => {
+    const state = { ...baseState, amount: '1000000' };
+    const { container } = render(<TransferFundsReviewStep {...defaults} state={state} />);
+    expect(container.textContent).toContain('1,000,000');
+  });
+
+  it('handleActionAdd is called once per Next click', () => {
+    const onNext = vi.fn();
+    const { container } = render(<TransferFundsReviewStep {...defaults} onNextBtnClick={onNext} />);
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onNext).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders all 3 sections (title + Pay + To)', () => {
+    const { container } = render(<TransferFundsReviewStep {...defaults} />);
+    expect(container.querySelector('h1')).not.toBeNull();
+    expect(container.textContent).toContain('Pay');
+    expect(container.textContent).toContain('To');
+  });
 });

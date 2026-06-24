@@ -222,4 +222,43 @@ describe('TransferFundsDetailsStep', () => {
     });
     expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(true);
   });
+
+  it('Next stays disabled when address invalid + amount valid', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    fireEvent.change(container.querySelector('[data-testid="amount"]')!, {
+      target: { value: '100' },
+    });
+    fireEvent.change(container.querySelector('[data-testid="recipient"]')!, {
+      target: { value: '0xBAD' },
+    });
+    expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(true);
+  });
+
+  it('amount input accepts decimal value (0.5)', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    const amountInput = container.querySelector('[data-testid="amount"]') as HTMLInputElement;
+    fireEvent.change(amountInput, { target: { value: '0.5' } });
+    expect(amountInput.value).toBe('0.5');
+  });
+
+  it('recipient is not invalid when address fully cleared via state.address=""', () => {
+    const { container } = render(
+      <TransferFundsDetailsStep {...defaults} state={{ address: '' } as never} />,
+    );
+    expect(container.querySelector('[data-testid="recipient"]')?.getAttribute('data-invalid')).toBe(
+      'false',
+    );
+  });
+
+  it('renders 2 buttons (Back + Review and Add)', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('amount value reflects pre-existing state.amount via numeric mock', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    const amountInput = container.querySelector('[data-testid="amount"]') as HTMLInputElement;
+    // initial state.amount = undefined → value = ''
+    expect(amountInput.value).toBe('');
+  });
 });

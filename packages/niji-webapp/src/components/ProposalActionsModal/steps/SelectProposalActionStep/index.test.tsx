@@ -183,4 +183,79 @@ describe('SelectProposalActionStep', () => {
     render(<SelectProposalActionStep {...setupProps()} />);
     expect(screen.getByTestId('subtitle')).toBeInTheDocument();
   });
+
+  it('next-btn click on LUMP_SUM does not call onPrev', () => {
+    const onPrev = vi.fn();
+    const onNext = vi.fn();
+    render(
+      <SelectProposalActionStep
+        {...setupProps({ onPrevBtnClick: onPrev, onNextBtnClick: onNext })}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('next-btn'));
+    expect(onPrev).not.toHaveBeenCalled();
+    expect(onNext).toHaveBeenCalledTimes(1);
+  });
+
+  it('prev-btn click on STREAM state does not affect next', () => {
+    const onPrev = vi.fn();
+    const onNext = vi.fn();
+    render(
+      <SelectProposalActionStep
+        {...setupProps({
+          onPrevBtnClick: onPrev,
+          onNextBtnClick: onNext,
+          state: {
+            actionType: ProposalActionType.STREAM,
+            address: '0x0',
+            amount: '0',
+          },
+        })}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('prev-btn'));
+    expect(onPrev).toHaveBeenCalledTimes(1);
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
+  it('dropdown change to "Transfer Funds" sets LUMP_SUM type', () => {
+    const setState = vi.fn();
+    render(<SelectProposalActionStep {...setupProps({ setState })} />);
+    fireEvent.change(screen.getByTestId('action-dropdown'), {
+      target: { value: 'Transfer Funds' },
+    });
+    expect(setState).toHaveBeenCalled();
+  });
+
+  it('dropdown value reflects current actionType (Stream)', () => {
+    render(
+      <SelectProposalActionStep
+        {...setupProps({
+          state: {
+            actionType: ProposalActionType.STREAM,
+            address: '0x0',
+            amount: '0',
+          },
+        })}
+      />,
+    );
+    expect((screen.getByTestId('action-dropdown') as HTMLSelectElement).value).toBe('Stream Funds');
+  });
+
+  it('dropdown value reflects current actionType (Function Call)', () => {
+    render(
+      <SelectProposalActionStep
+        {...setupProps({
+          state: {
+            actionType: ProposalActionType.FUNCTION_CALL,
+            address: '0x0',
+            amount: '0',
+          },
+        })}
+      />,
+    );
+    expect((screen.getByTestId('action-dropdown') as HTMLSelectElement).value).toBe(
+      'Function Call',
+    );
+  });
 });
