@@ -13,4 +13,50 @@ describe('ModalTextPrimary', () => {
     const { container } = render(<ModalTextPrimary />);
     expect(container.querySelector('div')?.textContent).toBe('');
   });
+
+  it('renders numeric children as string', () => {
+    const { container } = render(<ModalTextPrimary>{7}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('7');
+  });
+
+  it('renders 0 as "0" (numeric falsy still renders)', () => {
+    const { container } = render(<ModalTextPrimary>{0}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('0');
+  });
+
+  it('renders array children concatenated', () => {
+    const { container } = render(<ModalTextPrimary>{['x', 'y', 'z']}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('xyz');
+  });
+
+  it('renders Fragment children', () => {
+    const { container } = render(
+      <ModalTextPrimary>
+        <>
+          <span>a</span>
+          <em>b</em>
+        </>
+      </ModalTextPrimary>,
+    );
+    expect(container.querySelector('span')?.textContent).toBe('a');
+    expect(container.querySelector('em')?.textContent).toBe('b');
+  });
+
+  it('outermost wrapper is a single <div>', () => {
+    const { container } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+    expect(container.children.length).toBe(1);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
+
+  it('applies CSS module className', () => {
+    const { container } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+    const className = container.querySelector('div')?.className;
+    expect(className).toBeTruthy();
+    expect(className?.length).toBeGreaterThan(0);
+  });
+
+  it('does NOT render undefined children', () => {
+    const { container } = render(<ModalTextPrimary>{undefined}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
 });
