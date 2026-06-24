@@ -175,4 +175,51 @@ describe('ProposalTransactions', () => {
     expect(onRemove).toHaveBeenCalledTimes(1);
     expect(onRemove).not.toHaveBeenCalledWith(1);
   });
+
+  it('20 transactions render 20 entries', () => {
+    const txs = Array.from({ length: 20 }, (_, i) => makeTx(`fn${i}()`, '0x'));
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(20);
+  });
+
+  it('signature with bytes32 arg renders verbatim', () => {
+    const txs = [makeTx('setProposalThreshold(bytes32)', '0x')];
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.textContent).toContain('setProposalThreshold(bytes32)');
+  });
+
+  it('unicode signature renders correctly', () => {
+    const txs = [makeTx('日本語()', '0x')];
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.textContent).toContain('日本語()');
+  });
+
+  it('rerender txs from 3 to 1 reduces button count', () => {
+    const txs3 = [makeTx('a()', '0x'), makeTx('b()', '0x'), makeTx('c()', '0x')];
+    const txs1 = [makeTx('a()', '0x')];
+    const { container, rerender } = render(
+      <ProposalTransactions proposalTransactions={txs3} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(3);
+    rerender(
+      <ProposalTransactions proposalTransactions={txs1} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(1);
+  });
+
+  it('Transaction #N labels match tx index 1-based', () => {
+    const txs = [makeTx('a()', '0x'), makeTx('b()', '0x'), makeTx('c()', '0x')];
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.textContent).toContain('Transaction #1');
+    expect(container.textContent).toContain('Transaction #2');
+    expect(container.textContent).toContain('Transaction #3');
+  });
 });

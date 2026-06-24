@@ -211,4 +211,38 @@ describe('TransferFundsReviewStep', () => {
     expect(container.textContent).toContain('Pay');
     expect(container.textContent).toContain('To');
   });
+
+  it('Next button does not fire onPrev', () => {
+    const onPrev = vi.fn();
+    const { container } = render(<TransferFundsReviewStep {...defaults} onPrevBtnClick={onPrev} />);
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onPrev).not.toHaveBeenCalled();
+  });
+
+  it('Back button does not fire onNext', () => {
+    const onNext = vi.fn();
+    const { container } = render(<TransferFundsReviewStep {...defaults} onNextBtnClick={onNext} />);
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
+  it('renders exactly 2 buttons (Back + Next)', () => {
+    const { container } = render(<TransferFundsReviewStep {...defaults} />);
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('h1 renders exactly 1 time', () => {
+    const { container } = render(<TransferFundsReviewStep {...defaults} />);
+    expect(container.querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('multi-click on Back fires onPrev N times', () => {
+    const onPrev = vi.fn();
+    const { container } = render(<TransferFundsReviewStep {...defaults} onPrevBtnClick={onPrev} />);
+    const back = container.querySelectorAll('button')[0];
+    fireEvent.click(back);
+    fireEvent.click(back);
+    fireEvent.click(back);
+    expect(onPrev).toHaveBeenCalledTimes(3);
+  });
 });

@@ -267,4 +267,44 @@ describe('StreamPaymentsPaymentDetailsStep', () => {
       'false',
     );
   });
+
+  it('Back button does not fire onNext', () => {
+    const onNext = vi.fn();
+    const { container } = render(
+      <StreamPaymentsPaymentDetailsStep {...defaults} onNextBtnClick={onNext} />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
+  it('Next button does not fire onPrev when valid', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <StreamPaymentsPaymentDetailsStep {...defaults} onPrevBtnClick={onPrev} />,
+    );
+    fireEvent.change(container.querySelector('[data-testid="amount"]')!, {
+      target: { value: '100' },
+    });
+    fireEvent.change(container.querySelector('[data-testid="recipient"]')!, {
+      target: { value: ADDR },
+    });
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onPrev).not.toHaveBeenCalled();
+  });
+
+  it('renders exactly 2 buttons (Back + Next)', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('h1 renders exactly 1 element', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('amount input has empty initial value', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    const amountInput = container.querySelector('[data-testid="amount"]') as HTMLInputElement;
+    expect(amountInput.value).toBe('');
+  });
 });
