@@ -104,4 +104,39 @@ describe('OriginalSignature', () => {
     // mock は signer.slice(0, 6)
     expect(container.textContent).toContain('0x5FbD');
   });
+
+  it('isParentProposalUpdatable=true does NOT show "Did not re-sign"', () => {
+    const { container } = render(
+      <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={true} />,
+    );
+    expect(container.textContent).not.toContain('Did not re-sign');
+  });
+
+  it('isParentProposalUpdatable=false does NOT show "Awaiting signature"', () => {
+    const { container } = render(
+      <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={false} />,
+    );
+    expect(container.textContent).not.toContain('Awaiting signature');
+  });
+
+  it('voteCount=5 (medium plural) shows "5 votes"', () => {
+    const { container } = render(
+      <OriginalSignature voteCount={5} signer={SIGNER} isParentProposalUpdatable={true} />,
+    );
+    expect(container.textContent).toContain('5 votes');
+  });
+
+  it('renders external link with target=_blank', () => {
+    const { container } = render(
+      <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={false} />,
+    );
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('_blank');
+  });
+
+  it('renders rel=noreferrer regardless of updatable state', () => {
+    const { container } = render(
+      <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={false} />,
+    );
+    expect(container.querySelector('a')?.getAttribute('rel')).toBe('noreferrer');
+  });
 });

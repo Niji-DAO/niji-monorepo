@@ -103,4 +103,46 @@ describe('VoteSignal', () => {
     );
     expect(container.textContent).toContain('1000 votes');
   });
+
+  it('ENS avatar src is data:image/png (blo() fallback path)', () => {
+    useEnsNameMock.mockReturnValue({ data: 'alice.eth' });
+    const { container } = render(
+      <VoteSignal support={1} voteCount={1} reason="ok" address={ADDR} />,
+    );
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('data:image/png;base64,FAKE');
+  });
+
+  it('multi-line reason renders all lines', () => {
+    useEnsNameMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <VoteSignal support={1} voteCount={1} reason="line1\nline2" address={ADDR} />,
+    );
+    expect(container.textContent).toContain('line1');
+    expect(container.textContent).toContain('line2');
+  });
+
+  it('different address renders ShortAddress with that address', () => {
+    useEnsNameMock.mockReturnValue({ data: undefined });
+    const OTHER = '0x0000000000000000000000000000000000000001' as const;
+    const { container } = render(
+      <VoteSignal support={1} voteCount={1} reason="x" address={OTHER} />,
+    );
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(OTHER);
+  });
+
+  it('renders 1 ShortAddress element exactly', () => {
+    useEnsNameMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <VoteSignal support={1} voteCount={1} reason="ok" address={ADDR} />,
+    );
+    expect(container.querySelectorAll('[data-testid="short"]').length).toBe(1);
+  });
+
+  it('ENS with empty string still treated as no avatar', () => {
+    useEnsNameMock.mockReturnValue({ data: '' });
+    const { container } = render(
+      <VoteSignal support={1} voteCount={1} reason="ok" address={ADDR} />,
+    );
+    expect(container.querySelector('img')).toBeNull();
+  });
 });

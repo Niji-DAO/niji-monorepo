@@ -116,4 +116,57 @@ describe('VoteSignalsPending', () => {
     expect(container.querySelector('img[alt="loading"]')).not.toBeNull();
     expect(container.textContent).toContain('Adding your feedback');
   });
+
+  it('renders exactly 1 img element', () => {
+    const { container } = render(<VoteSignalsPending />);
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+});
+
+describe('VoteSignalsForm extra cases', () => {
+  it('reason textarea reflects pre-set reasonText prop', () => {
+    const { container } = render(<VoteSignalsForm {...defaults} reasonText="pre-set" />);
+    expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('pre-set');
+  });
+
+  it('Submit disabled when isBusy=true even with support set', () => {
+    const { container } = render(<VoteSignalsForm {...defaults} isBusy={true} support={1} />);
+    const submit = Array.from(container.querySelectorAll('button')).find(b =>
+      b.textContent?.includes('Submit'),
+    );
+    expect(submit?.disabled).toBe(true);
+  });
+
+  it('clicking Against on support=0 toggles back to undefined', () => {
+    const setSupport = vi.fn();
+    const { container } = render(
+      <VoteSignalsForm {...defaults} setSupport={setSupport} support={0} />,
+    );
+    const againstBtn = Array.from(container.querySelectorAll('button')).find(b =>
+      b.textContent?.includes('Against'),
+    );
+    if (againstBtn) fireEvent.click(againstBtn);
+    expect(setSupport).toHaveBeenCalledWith(undefined);
+  });
+
+  it('clicking Abstain on support=2 toggles back to undefined', () => {
+    const setSupport = vi.fn();
+    const { container } = render(
+      <VoteSignalsForm {...defaults} setSupport={setSupport} support={2} />,
+    );
+    const abstainBtn = Array.from(container.querySelectorAll('button')).find(b =>
+      b.textContent?.includes('Abstain'),
+    );
+    if (abstainBtn) fireEvent.click(abstainBtn);
+    expect(setSupport).toHaveBeenCalledWith(undefined);
+  });
+
+  it('multi-line reason input fires setReasonText with newlines', () => {
+    const setReasonText = vi.fn();
+    const { container } = render(<VoteSignalsForm {...defaults} setReasonText={setReasonText} />);
+    fireEvent.change(container.querySelector('textarea')!, {
+      target: { value: 'a\nb\nc' },
+    });
+    expect(setReasonText).toHaveBeenCalledWith('a\nb\nc');
+  });
 });

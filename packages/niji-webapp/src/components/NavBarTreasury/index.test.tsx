@@ -108,4 +108,45 @@ describe('NavBarTreasury', () => {
     expect(container.children.length).toBe(1);
     expect(container.firstElementChild?.tagName).toBe('DIV');
   });
+
+  it('renders 3-digit balance (999) without comma', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="999" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    expect(container.textContent).toContain('999');
+    expect(container.textContent).not.toContain('9,99');
+  });
+
+  it('renders very large balance (10 billion) with separator', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="10000000000" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    expect(container.textContent).toContain('10,000,000,000');
+  });
+
+  it('Treasury label appears before the numeric amount in DOM order', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="500" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    const text = container.textContent ?? '';
+    const labelIdx = text.indexOf('Treasury');
+    const amountIdx = text.indexOf('500');
+    expect(labelIdx).toBeLessThan(amountIdx);
+  });
+
+  it('warm + huge balance both apply together', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="999999999" treasuryStyle={NavBarButtonStyle.WARM_INFO} />,
+    );
+    expect(container.querySelector('div')?.className).toMatch(/warm/i);
+    expect(container.textContent).toContain('999,999,999');
+  });
+
+  it('renders DELEGATE_BACK style without crash + falls back to whiteInfo', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="42" treasuryStyle={NavBarButtonStyle.DELEGATE_BACK} />,
+    );
+    expect(container.querySelector('div')?.className).toMatch(/white/i);
+    expect(container.textContent).toContain('42');
+  });
 });
