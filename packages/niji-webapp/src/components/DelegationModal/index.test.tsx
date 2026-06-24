@@ -221,4 +221,45 @@ describe('DelegationModal', () => {
       document.getElementById('overlay-root')?.querySelector('[data-testid="change-panel"]'),
     ).not.toBeNull();
   });
+
+  it('5 modals render concurrently with 5 backdrops', () => {
+    render(
+      <>
+        <DelegationModal onDismiss={() => {}} />
+        <DelegationModal onDismiss={() => {}} />
+        <DelegationModal onDismiss={() => {}} />
+        <DelegationModal onDismiss={() => {}} />
+        <DelegationModal onDismiss={() => {}} />
+      </>,
+    );
+    expect(document.getElementById('backdrop-root')?.children.length).toBe(5);
+  });
+
+  it('rerender preserves overlay-root child count', () => {
+    const { rerender } = render(<DelegationModal onDismiss={() => {}} />);
+    const initial = document.getElementById('overlay-root')?.children.length ?? 0;
+    rerender(<DelegationModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.children.length).toBeLessThanOrEqual(
+      initial + 1,
+    );
+  });
+
+  it('rapid 10 backdrop clicks invoke onDismiss 10 times', () => {
+    const onDismiss = vi.fn();
+    render(<DelegationModal onDismiss={onDismiss} />);
+    const backdrop = document.getElementById('backdrop-root')?.querySelector('div');
+    if (backdrop) {
+      for (let i = 0; i < 10; i++) fireEvent.click(backdrop);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(10);
+  });
+
+  it('Backdrop component is standalone div', () => {
+    const { container } = render(<Backdrop onDismiss={() => {}} />);
+    expect(container.firstChild?.nodeName).toBe('DIV');
+  });
+
+  it('delegateTo with empty string renders without crash', () => {
+    expect(() => render(<DelegationModal onDismiss={() => {}} delegateTo="" />)).not.toThrow();
+  });
 });

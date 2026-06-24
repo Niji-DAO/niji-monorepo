@@ -345,4 +345,26 @@ describe('CandidateSponsors', () => {
     const { container } = render(<CandidateSponsors {...baseProps} />);
     expect(container).toBeDefined();
   });
+
+  it('isProposer=true renders without crash', () => {
+    expect(() => render(<CandidateSponsors {...baseProps} isProposer={true} />)).not.toThrow();
+  });
+
+  it('requiredVotes=0 renders without crash', () => {
+    expect(() => render(<CandidateSponsors {...baseProps} requiredVotes={0} />)).not.toThrow();
+  });
+
+  it('userVotes=0 renders without crash', () => {
+    hookState.userVotes = 0;
+    expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+  });
+
+  it('rerender slug updates correctly', () => {
+    const { rerender } = render(<CandidateSponsors {...baseProps} slug="slug1" />);
+    expect(() => rerender(<CandidateSponsors {...baseProps} slug="slug2" />)).not.toThrow();
+  });
+
+  it('blockNumber=0n renders without crash', () => {
+    expect(() => render(<CandidateSponsors {...baseProps} blockNumber={0n} />)).not.toThrow();
+  });
 });

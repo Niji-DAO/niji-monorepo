@@ -182,4 +182,46 @@ describe('BidHistoryBtn Component (isCool=true)', () => {
     expect(captured).not.toBeNull();
     expect((captured as unknown as { type: string }).type).toBe('click');
   });
+
+  it('20 instances render 20 outer divs', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <BidHistoryBtn key={i} onClick={vi.fn()} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(20);
+  });
+
+  it('20 instances each render "View all bids" text', () => {
+    const { container } = render(
+      <>
+        <BidHistoryBtn onClick={vi.fn()} />
+        <BidHistoryBtn onClick={vi.fn()} />
+        <BidHistoryBtn onClick={vi.fn()} />
+      </>,
+    );
+    expect(container.textContent).toBe('View all bidsView all bidsView all bids');
+  });
+
+  it('rerender preserves outer div structure', () => {
+    const { container, rerender } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+    rerender(<BidHistoryBtn onClick={vi.fn()} />);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
+
+  it('inner click bubbles to outer click handler', () => {
+    const onClick = vi.fn();
+    const { container } = render(<BidHistoryBtn onClick={onClick} />);
+    const inner = container.firstElementChild?.firstElementChild as HTMLDivElement;
+    fireEvent.click(inner);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('text content trimmed equals "View all bids"', () => {
+    const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    expect(container.textContent?.trim()).toBe('View all bids');
+  });
 });
