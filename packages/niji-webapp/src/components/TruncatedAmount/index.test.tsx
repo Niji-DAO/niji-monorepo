@@ -236,4 +236,40 @@ describe('TruncatedAmount', () => {
       expect(container.textContent).toMatch(/^Ξ \d+\.\d{2}$/);
     }
   });
+
+  it('renders 50 instances each independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <TruncatedAmount key={i} amount={parseEther(`${i + 1}`)} />
+        ))}
+      </>,
+    );
+    expect((container.textContent?.match(/Ξ/g) ?? []).length).toBe(50);
+  });
+
+  it('handles wei (smallest unit) as Ξ 0.00', () => {
+    const { container } = render(<TruncatedAmount amount={1n} />);
+    expect(container.textContent).toBe('Ξ 0.00');
+  });
+
+  it('rerender from huge to small amount', () => {
+    const { container, rerender } = render(<TruncatedAmount amount={parseEther('1000000')} />);
+    expect(container.textContent).toBe('Ξ 1000000.00');
+    rerender(<TruncatedAmount amount={parseEther('0.5')} />);
+    expect(container.textContent).toBe('Ξ 0.50');
+  });
+
+  it('renders consistent format across 20 rerenders', () => {
+    const { container, rerender } = render(<TruncatedAmount amount={parseEther('1')} />);
+    for (let i = 1; i <= 20; i++) {
+      rerender(<TruncatedAmount amount={parseEther(`${i}`)} />);
+      expect(container.textContent).toMatch(/^Ξ \d+\.\d{2}$/);
+    }
+  });
+
+  it('renders for very precise small fractional (0.000001)', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('0.000001')} />);
+    expect(container.textContent).toMatch(/Ξ \d/);
+  });
 });
