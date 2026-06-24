@@ -121,4 +121,58 @@ describe('ProposalTransactions', () => {
       ),
     ).not.toThrow();
   });
+
+  it('removes last tx with correct index (n-1)', () => {
+    const onRemove = vi.fn();
+    const txs = [makeTx('a()', '0x'), makeTx('b()', '0x'), makeTx('c()', '0x')];
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={onRemove} />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[2]);
+    expect(onRemove).toHaveBeenCalledWith(2);
+  });
+
+  it('signature with arguments renders as-is', () => {
+    const txs = [makeTx('mint(address,uint256)', '0x')];
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.textContent).toContain('mint(address,uint256)');
+  });
+
+  it('10 txs renders 10 buttons (large list)', () => {
+    const txs = Array.from({ length: 10 }, (_, i) => makeTx(`fn${i}()`, '0x'));
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(10);
+  });
+
+  it('rerender with new tx list updates count', () => {
+    const { container, rerender } = render(
+      <ProposalTransactions
+        proposalTransactions={[makeTx('a()', '0x')]}
+        onRemoveProposalTransaction={() => {}}
+      />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(1);
+    rerender(
+      <ProposalTransactions
+        proposalTransactions={[makeTx('a()', '0x'), makeTx('b()', '0x'), makeTx('c()', '0x')]}
+        onRemoveProposalTransaction={() => {}}
+      />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(3);
+  });
+
+  it('click does not invoke onRemove for unrelated buttons', () => {
+    const onRemove = vi.fn();
+    const txs = [makeTx('a()', '0x'), makeTx('b()', '0x')];
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={onRemove} />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onRemove).toHaveBeenCalledTimes(1);
+    expect(onRemove).not.toHaveBeenCalledWith(1);
+  });
 });

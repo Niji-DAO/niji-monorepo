@@ -85,4 +85,45 @@ describe('ProposalStatusCopy', () => {
     );
     expect(container.textContent).toBe('Queued');
   });
+
+  it('renders only text (no html children)', () => {
+    const { container } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.PENDING)} />,
+    );
+    expect(container.children.length).toBe(0);
+  });
+
+  it('CANCELLED renders "Canceled" (US spelling)', () => {
+    const { container } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.CANCELLED)} />,
+    );
+    expect(container.textContent).toBe('Canceled');
+  });
+
+  it('VETOED renders "Vetoed" verbatim', () => {
+    const { container } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.VETOED)} />,
+    );
+    expect(container.textContent).toBe('Vetoed');
+  });
+
+  it('rerender with new state updates text', () => {
+    const { container, rerender } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.PENDING)} />,
+    );
+    expect(container.textContent).toBe('Pending');
+    rerender(<ProposalStatusCopy proposal={makeProposal(ProposalState.EXECUTED)} />);
+    expect(container.textContent).toBe('Executed');
+  });
+
+  it('multiple instances render distinct texts', () => {
+    const { container } = render(
+      <>
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.ACTIVE)} />
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.EXECUTED)} />
+      </>,
+    );
+    expect(container.textContent).toContain('Active');
+    expect(container.textContent).toContain('Executed');
+  });
 });
