@@ -47,4 +47,38 @@ describe('VoteSignalsFootnote', () => {
     const { container } = render(<VoteSignalsFootnote />);
     expect(container.querySelector('p')?.textContent).toContain('Nijis voters');
   });
+
+  it('renders exactly 1 p element', () => {
+    const { container } = render(<VoteSignalsFootnote />);
+    expect(container.querySelectorAll('p').length).toBe(1);
+  });
+});
+
+describe('VoteSignalsHeader — additional', () => {
+  it('renders exactly 1 h2 element', () => {
+    const { container } = render(<VoteSignalsHeader />);
+    expect(container.querySelectorAll('h2').length).toBe(1);
+  });
+
+  it('isCandidate=true text-xl is verbatim class match', () => {
+    const { container } = render(<VoteSignalsHeader isCandidate={true} />);
+    const cls = container.querySelector('h2')?.className ?? '';
+    expect(cls.split(/\s+/).includes('text-xl')).toBe(true);
+  });
+
+  it('isCandidate undefined defaults to non-candidate (Pre-voting feedback)', () => {
+    const { container } = render(<VoteSignalsHeader />);
+    expect(container.textContent).toContain('Pre-voting feedback');
+    expect(container.querySelector('p')).not.toBeNull();
+  });
+
+  it('isCandidate=true hides description paragraph entirely', () => {
+    const { container } = render(<VoteSignalsHeader isCandidate={true} />);
+    expect(container.querySelectorAll('p').length).toBe(0);
+  });
+
+  it('description paragraph contains "Nijis voters" when isCandidate=false', () => {
+    const { container } = render(<VoteSignalsHeader isCandidate={false} />);
+    expect(container.querySelector('p')?.textContent).toContain('Nijis voters');
+  });
 });

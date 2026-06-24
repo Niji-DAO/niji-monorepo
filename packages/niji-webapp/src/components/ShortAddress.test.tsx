@@ -96,4 +96,52 @@ describe('ShortAddress', () => {
       'https://example.com/alice.png',
     );
   });
+
+  it('renders no img when avatar=false (default)', () => {
+    vi.mocked(useEnsName).mockReturnValue(ensReturn('alice.eth'));
+    vi.mocked(useEnsAvatar).mockReturnValue(ensReturn(undefined));
+    vi.mocked(resolveNijiContractAddress).mockReturnValue(undefined);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<ShortAddress address={ADDR} />);
+    expect(container.querySelector('img')).toBeNull();
+  });
+
+  it('handles large size (64) for avatar', () => {
+    vi.mocked(useEnsName).mockReturnValue(ensReturn('alice.eth'));
+    vi.mocked(useEnsAvatar).mockReturnValue(ensReturn(undefined));
+    vi.mocked(resolveNijiContractAddress).mockReturnValue(undefined);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<ShortAddress address={ADDR} avatar={true} size={64} />);
+    expect(container.querySelector('img')?.style.width).toBe('64px');
+    expect(container.querySelector('img')?.style.height).toBe('64px');
+  });
+
+  it('handles different address (case insensitive comparison)', () => {
+    const ADDR2 = '0xABCDEF1234567890ABCDEF1234567890ABCDEF12' as const;
+    vi.mocked(useEnsName).mockReturnValue(ensReturn(null));
+    vi.mocked(useEnsAvatar).mockReturnValue(ensReturn(undefined));
+    vi.mocked(resolveNijiContractAddress).mockReturnValue(undefined);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<ShortAddress address={ADDR2} />);
+    expect(container.textContent).toMatch(/^0x[\dA-Fa-f]{2}\.{3}[\dA-Fa-f]{4}$/);
+  });
+
+  it('renders span when avatar=true (wrapper for ENS name)', () => {
+    vi.mocked(useEnsName).mockReturnValue(ensReturn('alice.eth'));
+    vi.mocked(useEnsAvatar).mockReturnValue(ensReturn(undefined));
+    vi.mocked(resolveNijiContractAddress).mockReturnValue(undefined);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<ShortAddress address={ADDR} avatar={true} />);
+    expect(container.querySelectorAll('span').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders only blo avatar when ENS avatar is null', () => {
+    vi.mocked(useEnsName).mockReturnValue(ensReturn('alice.eth'));
+    vi.mocked(useEnsAvatar).mockReturnValue(ensReturn(null));
+    vi.mocked(resolveNijiContractAddress).mockReturnValue(undefined);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<ShortAddress address={ADDR} avatar={true} />);
+    // ENS avatar undefined → blo() fallback
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('data:image/png;base64,FAKE');
+  });
 });
