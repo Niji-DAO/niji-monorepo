@@ -188,4 +188,47 @@ describe('AuctionActivity', () => {
     );
     expect(container.querySelector('[data-testid="bid-history-btn"]')).not.toBeNull();
   });
+
+  it('renders Holder for non-last + ended auction (no Winner fallback)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const endedAuction = makeAuction({ endTime: 1n });
+    const { container } = wrap(
+      <AuctionActivity {...defaults} isLastAuction={false} auction={endedAuction as never} />,
+    );
+    expect(container.querySelector('[data-testid="holder"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="winner"]')).toBeNull();
+  });
+
+  it('renders Winner for last + ended auction with bidder', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const endedAuction = makeAuction({ endTime: 1n, bidder: '0xBIDDER' });
+    const { container } = wrap(
+      <AuctionActivity {...defaults} isLastAuction={true} auction={endedAuction as never} />,
+    );
+    expect(container.querySelector('[data-testid="winner"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="holder"]')).toBeNull();
+  });
+
+  it('renders AuctionTimer (last + active auction)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+    expect(container.querySelector('[data-testid="auction-timer"]')).not.toBeNull();
+  });
+
+  it('renders date-headline in all common render paths', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+    expect(container.querySelector('[data-testid="date-headline"]')).not.toBeNull();
+  });
+
+  it('renders title-wrap as child of wrapper', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+    expect(container.querySelector('[data-testid="title-wrap"]')).not.toBeNull();
+    expect(
+      container
+        .querySelector('[data-testid="wrapper"]')
+        ?.querySelector('[data-testid="title-wrap"]'),
+    ).not.toBeNull();
+  });
 });

@@ -220,4 +220,58 @@ describe('NijiContent', () => {
     fireEvent.click(container.querySelector('[data-testid="settle-btn"]')!);
     expect(writeContractMock).toHaveBeenCalledWith({});
   });
+
+  it('renders AuctionNavigation prev/next buttons', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    const { container } = wrap(<NijiContent {...defaults} />);
+    expect(container.querySelector('[data-testid="auction-nav"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="prev-btn"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="next-btn"]')).not.toBeNull();
+  });
+
+  it('prev-btn click invokes onPrevAuctionClick', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    const { container } = wrap(<NijiContent {...defaults} />);
+    fireEvent.click(container.querySelector('[data-testid="prev-btn"]')!);
+    expect(prevClickMock).toHaveBeenCalled();
+  });
+
+  it('next-btn click invokes onNextAuctionClick', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    const { container } = wrap(<NijiContent {...defaults} />);
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(nextClickMock).toHaveBeenCalled();
+  });
+
+  it('ignores non-arrow key events (no prev/next invocation)', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    wrap(<NijiContent {...defaults} />);
+    fireEvent.keyDown(document, { key: 'Enter' });
+    fireEvent.keyDown(document, { key: 'ArrowUp' });
+    expect(prevClickMock).not.toHaveBeenCalled();
+    expect(nextClickMock).not.toHaveBeenCalled();
+  });
+
+  it('renders nounder title pieces (date-headline and niji-title) inside title wrap', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    const { container } = wrap(<NijiContent {...defaults} />);
+    expect(container.querySelector('[data-testid="title-wrap"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="date-headline"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="niji-title"]')).not.toBeNull();
+  });
 });

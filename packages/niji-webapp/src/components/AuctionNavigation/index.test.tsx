@@ -189,4 +189,85 @@ describe('AuctionNavigation Component', () => {
     expect(prevButton.className).toContain('leftArrowCool');
     expect(nextButton.className).toContain('rightArrowCool');
   });
+
+  it('ignores keys other than ArrowLeft/ArrowRight', () => {
+    const onPrev = vi.fn();
+    const onNext = vi.fn();
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={onPrev}
+        onNextAuctionClick={onNext}
+      />,
+    );
+    fireEvent.keyDown(document, { key: 'Enter' });
+    fireEvent.keyDown(document, { key: 'ArrowUp' });
+    fireEvent.keyDown(document, { key: 'a' });
+    expect(onPrev).not.toHaveBeenCalled();
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
+  it('rapid prev clicks invoke handler N times', () => {
+    const onPrev = vi.fn();
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={onPrev}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    const prevBtn = screen.getByText('←');
+    fireEvent.click(prevBtn);
+    fireEvent.click(prevBtn);
+    fireEvent.click(prevBtn);
+    expect(onPrev).toHaveBeenCalledTimes(3);
+  });
+
+  it('rapid next clicks invoke handler N times', () => {
+    const onNext = vi.fn();
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={vi.fn()}
+        onNextAuctionClick={onNext}
+      />,
+    );
+    const nextBtn = screen.getByText('→');
+    fireEvent.click(nextBtn);
+    fireEvent.click(nextBtn);
+    expect(onNext).toHaveBeenCalledTimes(2);
+  });
+
+  it('disabled prev click does not invoke handler', () => {
+    const onPrev = vi.fn();
+    render(
+      <AuctionNavigation
+        isFirstAuction={true}
+        isLastAuction={false}
+        onPrevAuctionClick={onPrev}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    const prevBtn = screen.getByText('←');
+    fireEvent.click(prevBtn);
+    expect(onPrev).not.toHaveBeenCalled();
+  });
+
+  it('disabled next click does not invoke handler', () => {
+    const onNext = vi.fn();
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={true}
+        onPrevAuctionClick={vi.fn()}
+        onNextAuctionClick={onNext}
+      />,
+    );
+    const nextBtn = screen.getByText('→');
+    fireEvent.click(nextBtn);
+    expect(onNext).not.toHaveBeenCalled();
+  });
 });

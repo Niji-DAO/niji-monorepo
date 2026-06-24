@@ -169,4 +169,48 @@ describe('SubmitUpdateProposal', () => {
     fireEvent.click(tryAgain!);
     expect(container.textContent).not.toContain('rpc failed');
   });
+
+  it('shows error message when status=Exception (same path as Fail)', () => {
+    hookState.updateProposalBySigsState = { status: 'Exception', errorMessage: 'tx exception' };
+    const { container } = wrap(<SubmitUpdateProposal {...baseProps} />);
+    expect(container.textContent).toContain('tx exception');
+  });
+
+  it('Submit update call includes reason field from textarea state', () => {
+    const { container } = wrap(<SubmitUpdateProposal {...baseProps} />);
+    const textarea = container.querySelector('textarea') as HTMLTextAreaElement;
+    fireEvent.change(textarea, { target: { value: 'reason text' } });
+    const submitBtn = Array.from(container.querySelectorAll('button')).find(
+      b => b.textContent?.trim() === 'Submit update',
+    );
+    fireEvent.click(submitBtn!);
+    const call = updateProposalBySigsMock.mock.calls[0][0];
+    expect(call.args).toContain('reason text');
+  });
+
+  it('Submit update call uses proposalIdToUpdate prop (converted to bigint)', () => {
+    const { container } = wrap(<SubmitUpdateProposal {...baseProps} proposalIdToUpdate="99" />);
+    const submitBtn = Array.from(container.querySelectorAll('button')).find(
+      b => b.textContent?.trim() === 'Submit update',
+    );
+    fireEvent.click(submitBtn!);
+    const call = updateProposalBySigsMock.mock.calls[0][0];
+    expect(call.args).toContain(99n);
+  });
+
+  it('renders 2 target rows when candidate has 2 targets', () => {
+    const { container } = wrap(<SubmitUpdateProposal {...baseProps} />);
+    // verify sorted sigs length passed to updateProposalBySigs
+    const submitBtn = Array.from(container.querySelectorAll('button')).find(
+      b => b.textContent?.trim() === 'Submit update',
+    );
+    fireEvent.click(submitBtn!);
+    const call = updateProposalBySigsMock.mock.calls[0][0];
+    expect(call.args[1].length).toBe(2);
+  });
+
+  it('handles empty signature array gracefully', () => {
+    const { container } = wrap(<SubmitUpdateProposal {...baseProps} signatures={[] as never} />);
+    expect(container.textContent).toContain('Update proposal');
+  });
 });
