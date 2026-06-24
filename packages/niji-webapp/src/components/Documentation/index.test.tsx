@@ -188,4 +188,36 @@ describe('Documentation', () => {
     expect(html.includes('art-section')).toBe(true);
     expect(html.includes('nijiders-section')).toBe(true);
   });
+
+  it('section has tailwind margin classes', () => {
+    const { container } = render(<Documentation />);
+    const cls = container.querySelector('section')?.className ?? '';
+    expect(cls).toContain('mb');
+  });
+
+  it('background color hex with shorthand (#fff) applies inline', () => {
+    const { container } = render(<Documentation backgroundColor="#fff" />);
+    expect(container.querySelector('section')?.getAttribute('style')).toContain(
+      'rgb(255, 255, 255)',
+    );
+  });
+
+  it('background color named color "red" applies inline', () => {
+    const { container } = render(<Documentation backgroundColor="red" />);
+    expect(container.querySelector('section')?.getAttribute('style')).toBeTruthy();
+  });
+
+  it('AboutHeader renders before AboutSection in DOM order', () => {
+    const { container } = render(<Documentation />);
+    const html = container.innerHTML;
+    expect(html.indexOf('about-header')).toBeLessThan(html.indexOf('about-section'));
+  });
+
+  it('multiple successive rerenders preserve structure', () => {
+    const { container, rerender } = render(<Documentation backgroundColor="#aaa" />);
+    rerender(<Documentation backgroundColor="#bbb" />);
+    rerender(<Documentation backgroundColor="#ccc" />);
+    expect(container.querySelectorAll('section').length).toBe(1);
+    expect(container.querySelectorAll('[data-testid="about-section"]').length).toBe(1);
+  });
 });

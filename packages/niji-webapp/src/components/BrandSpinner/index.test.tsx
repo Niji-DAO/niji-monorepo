@@ -138,4 +138,34 @@ describe('BrandSpinner', () => {
     const vb = container.querySelector('svg')?.getAttribute('viewBox') ?? '';
     expect(vb.startsWith('0 0')).toBe(true);
   });
+
+  it('circle cx=12.5 (center)', () => {
+    const { container } = render(<BrandSpinner />);
+    expect(container.querySelector('svg circle')?.getAttribute('cx')).toBe('12.5');
+  });
+
+  it('circle cy=12.5 (center)', () => {
+    const { container } = render(<BrandSpinner />);
+    expect(container.querySelector('svg circle')?.getAttribute('cy')).toBe('12.5');
+  });
+
+  it('path stroke-linecap is "round"', () => {
+    const { container } = render(<BrandSpinner />);
+    const path = container.querySelector('svg path');
+    expect(path?.getAttribute('stroke-linecap')).toBe('round');
+  });
+
+  it('circle radius is 10.5', () => {
+    const { container } = render(<BrandSpinner />);
+    expect(container.querySelector('svg circle')?.getAttribute('r')).toBe('10.5');
+  });
+
+  it('rerender always renders identical SVG (no state)', () => {
+    const { container, rerender } = render(<BrandSpinner />);
+    const firstHTML = container.innerHTML;
+    rerender(<BrandSpinner />);
+    rerender(<BrandSpinner />);
+    rerender(<BrandSpinner />);
+    expect(container.innerHTML).toBe(firstHTML);
+  });
 });
