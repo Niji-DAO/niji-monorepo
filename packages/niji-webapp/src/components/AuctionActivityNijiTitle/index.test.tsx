@@ -244,4 +244,40 @@ describe('AuctionActivityNijiTitle', () => {
       expect(container.querySelector('h1')?.textContent).toContain('Niji');
     }
   });
+
+  it('renders 50 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <AuctionActivityNijiTitle key={i} nounId={BigInt(i + 1)} isCool={i % 2 === 0} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(50);
+  });
+
+  it('renders for 0n + isCool=true', () => {
+    const { container } = render(<AuctionActivityNijiTitle nounId={0n} isCool={true} />);
+    expect(container.querySelector('h1')?.textContent).toContain('0');
+  });
+
+  it('renders for 0n + isCool=false', () => {
+    const { container } = render(<AuctionActivityNijiTitle nounId={0n} isCool={false} />);
+    expect(container.querySelector('h1')?.textContent).toContain('0');
+  });
+
+  it('renders consistent style across rerenders with same isCool', () => {
+    const { container, rerender } = render(<AuctionActivityNijiTitle nounId={1n} isCool={true} />);
+    const style1 = container.querySelector('h1')?.getAttribute('style');
+    rerender(<AuctionActivityNijiTitle nounId={2n} isCool={true} />);
+    expect(container.querySelector('h1')?.getAttribute('style')).toBe(style1);
+  });
+
+  it('renders 5 consecutive renders without crash', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        render(<AuctionActivityNijiTitle nounId={BigInt(i)} isCool={i % 2 === 0} />),
+      ).not.toThrow();
+    }
+  });
 });

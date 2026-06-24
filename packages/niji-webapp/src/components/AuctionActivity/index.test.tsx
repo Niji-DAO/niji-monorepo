@@ -430,4 +430,60 @@ describe('AuctionActivity', () => {
       wrap(<AuctionActivity {...defaults} auction={makeAuction({ nounId: 1000000n }) as never} />),
     ).not.toThrow();
   });
+
+  it('renders AuctionActivity 30 times consecutively', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('renders 10 AuctionActivity instances in single wrap', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <AuctionActivity
+              key={i}
+              {...defaults}
+              auction={makeAuction({ nounId: BigInt(i + 1) }) as never}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash with displayGraphDepComps=false + isLastAuction=false', () => {
+    expect(() =>
+      wrap(
+        <AuctionActivity
+          {...defaults}
+          displayGraphDepComps={false}
+          isLastAuction={false}
+          auction={makeAuction() as never}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders with 0n nounId auction', () => {
+    expect(() =>
+      wrap(<AuctionActivity {...defaults} auction={makeAuction({ nounId: 0n }) as never} />),
+    ).not.toThrow();
+  });
+
+  it('renders without crash for ended + first + last all true', () => {
+    expect(() =>
+      wrap(
+        <AuctionActivity
+          {...defaults}
+          isFirstAuction={true}
+          isLastAuction={true}
+          auction={makeAuction({ endTime: 1n }) as never}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });
