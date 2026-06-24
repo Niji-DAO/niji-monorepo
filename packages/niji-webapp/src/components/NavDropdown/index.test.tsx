@@ -392,4 +392,64 @@ describe('NavDropDown', () => {
     );
     expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe(initial);
   });
+
+  it('renders 50 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <NavDropDown key={i} buttonText={`btn-${i}`}>
+            <span>x</span>
+          </NavDropDown>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="nav-button"]').length).toBe(50);
+  });
+
+  it('renders nested NavDropDown without crash', () => {
+    expect(() =>
+      render(
+        <NavDropDown buttonText="outer">
+          <NavDropDown buttonText="inner">
+            <span>x</span>
+          </NavDropDown>
+        </NavDropDown>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender from no icon to icon', () => {
+    const { container, rerender } = render(
+      <NavDropDown buttonText="x">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
+    rerender(
+      <NavDropDown buttonText="x" buttonIcon={<span data-testid="ic" />}>
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
+  });
+
+  it('renders empty children', () => {
+    const { container } = render(<NavDropDown buttonText="x">{null}</NavDropDown>);
+    expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
+  });
+
+  it('renders consistent buttonText with rerenders', () => {
+    const { container, rerender } = render(
+      <NavDropDown buttonText="A">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('A');
+    rerender(
+      <NavDropDown buttonText="A">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('A');
+  });
 });
