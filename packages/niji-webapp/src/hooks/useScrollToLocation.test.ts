@@ -80,4 +80,50 @@ describe('useScrollToLocation', () => {
       behavior: 'smooth',
     });
   });
+
+  it('applies 30 offset to element top (top 50 → top: 20)', () => {
+    locationState.hash = '#x';
+    getElementByIdMock.mockReturnValue({
+      getBoundingClientRect: () => ({ top: 50 }),
+    });
+    renderHook(() => useScrollToLocation());
+    expect(scrollToMock).toHaveBeenCalledWith({ top: 20, behavior: 'smooth' });
+  });
+
+  it('handles element top 0 → top: -30 (offset applied unconditionally)', () => {
+    locationState.hash = '#top';
+    getElementByIdMock.mockReturnValue({
+      getBoundingClientRect: () => ({ top: 0 }),
+    });
+    renderHook(() => useScrollToLocation());
+    expect(scrollToMock).toHaveBeenCalledWith({ top: -30, behavior: 'smooth' });
+  });
+
+  it('handles negative element top (already scrolled past)', () => {
+    locationState.hash = '#above';
+    getElementByIdMock.mockReturnValue({
+      getBoundingClientRect: () => ({ top: -100 }),
+    });
+    renderHook(() => useScrollToLocation());
+    expect(scrollToMock).toHaveBeenCalledWith({ top: -130, behavior: 'smooth' });
+  });
+
+  it('strips leading "#" from hash before getElementById', () => {
+    locationState.hash = '#my-id';
+    getElementByIdMock.mockReturnValue({
+      getBoundingClientRect: () => ({ top: 10 }),
+    });
+    renderHook(() => useScrollToLocation());
+    // hash.slice(1) で `my-id` を渡す
+    expect(getElementByIdMock).toHaveBeenCalledWith('my-id');
+  });
+
+  it('always uses behavior: "smooth"', () => {
+    locationState.hash = '#smooth-test';
+    getElementByIdMock.mockReturnValue({
+      getBoundingClientRect: () => ({ top: 99 }),
+    });
+    renderHook(() => useScrollToLocation());
+    expect(scrollToMock).toHaveBeenCalledWith(expect.objectContaining({ behavior: 'smooth' }));
+  });
 });
