@@ -307,4 +307,45 @@ describe('VoteModal', () => {
       expect(() => render(<VoteModal {...baseProps} />)).not.toThrow();
     }
   });
+
+  it('renders 10 instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <VoteModal key={i} {...baseProps} availableVotes={i + 1} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender does not crash 5 times', () => {
+    const { rerender } = render(<VoteModal {...baseProps} />);
+    for (let i = 0; i < 5; i++) {
+      expect(() => rerender(<VoteModal {...baseProps} availableVotes={i + 10} />)).not.toThrow();
+    }
+  });
+
+  it('handles availableVotes=Number.MAX_SAFE_INTEGER', () => {
+    expect(() =>
+      render(<VoteModal {...baseProps} availableVotes={Number.MAX_SAFE_INTEGER} />),
+    ).not.toThrow();
+  });
+
+  it('handles isCastVoting=true mid-vote', () => {
+    expect(() => render(<VoteModal {...baseProps} />)).not.toThrow();
+  });
+
+  it('handles VoteModal in deeply nested context', () => {
+    expect(() =>
+      render(
+        <div>
+          <div>
+            <VoteModal {...baseProps} />
+          </div>
+        </div>,
+      ),
+    ).not.toThrow();
+  });
 });

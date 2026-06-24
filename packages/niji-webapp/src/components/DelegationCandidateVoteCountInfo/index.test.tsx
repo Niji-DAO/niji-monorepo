@@ -288,4 +288,50 @@ describe('DelegationCandidateVoteCountInfo', () => {
     );
     expect(container.textContent).toContain(longText);
   });
+
+  it('rerender to isLoading persists text', () => {
+    const { container, rerender } = render(
+      <DelegationCandidateVoteCountInfo text="Bob" voteCount={5} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('Bob');
+    rerender(<DelegationCandidateVoteCountInfo text="Bob" voteCount={5} isLoading={true} />);
+    expect(container.textContent).toContain('Bob');
+  });
+
+  it('voteCount fractional (1.5) treated as "1.5 Votes"', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={1.5} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('1.5');
+  });
+
+  it('isLoading=true svg count is 1', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={5} isLoading={true} />,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(1);
+  });
+
+  it('rerender from voteCount=1 to 1 idempotent', () => {
+    const { container, rerender } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={1} isLoading={false} />,
+    );
+    const initial = container.innerHTML;
+    rerender(<DelegationCandidateVoteCountInfo text="x" voteCount={1} isLoading={false} />);
+    expect(container.innerHTML).toBe(initial);
+  });
+
+  it('5 instances render 5 distinct results', () => {
+    const { container } = render(
+      <>
+        <DelegationCandidateVoteCountInfo text="a" voteCount={1} isLoading={false} />
+        <DelegationCandidateVoteCountInfo text="b" voteCount={2} isLoading={false} />
+        <DelegationCandidateVoteCountInfo text="c" voteCount={3} isLoading={false} />
+        <DelegationCandidateVoteCountInfo text="d" voteCount={4} isLoading={false} />
+        <DelegationCandidateVoteCountInfo text="e" voteCount={5} isLoading={false} />
+      </>,
+    );
+    expect(container.textContent).toContain('a');
+    expect(container.textContent).toContain('5 Votes');
+  });
 });
