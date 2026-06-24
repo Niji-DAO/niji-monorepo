@@ -238,4 +238,44 @@ describe('Auction', () => {
     const { container } = wrap(<Auction auction={makeAuction(1n)} />);
     expect(container.querySelector('[data-testid="prev"]')?.disabled).toBe(false);
   });
+
+  it('renders 1 NijiWithSeed per Auction', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    const { container } = wrap(<Auction auction={makeAuction(5n)} />);
+    expect(container.querySelectorAll('[data-testid="niji-with-seed"]').length).toBe(1);
+  });
+
+  it('multiple Auction instances render independently', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    const { container } = wrap(
+      <>
+        <Auction auction={makeAuction(1n)} />
+        <Auction auction={makeAuction(2n)} />
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="niji-with-seed"]').length).toBe(2);
+  });
+
+  it('no auction prop renders only LoadingNoun', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    const { container } = wrap(<Auction />);
+    expect(container.querySelector('[data-testid="loading"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="niji-with-seed"]')).toBeNull();
+  });
+
+  it('lastAuctionNounId 100n + nounId 5n renders both buttons enabled', () => {
+    useAtomValueMock.mockReturnValue(100n);
+    isNounderMock.mockReturnValue(false);
+    const { container } = wrap(<Auction auction={makeAuction(5n)} />);
+    expect(container.querySelector('[data-testid="prev"]')?.disabled).toBe(false);
+    expect(container.querySelector('[data-testid="next"]')?.disabled).toBe(false);
+  });
+
+  it('Nounder isFirstAuction logic still applies (NijiContent variant)', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(true);
+    expect(() => wrap(<Auction auction={makeAuction(0n)} />)).not.toThrow();
+  });
 });

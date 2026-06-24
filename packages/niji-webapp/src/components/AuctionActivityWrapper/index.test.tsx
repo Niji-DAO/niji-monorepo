@@ -154,4 +154,43 @@ describe('AuctionActivityWrapper', () => {
     const divs = container.querySelectorAll('div');
     expect(divs[0].className).toBe(divs[1].className);
   });
+
+  it('emoji children render verbatim', () => {
+    const { container } = render(<AuctionActivityWrapper>🎉</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe('🎉');
+  });
+
+  it('5 instances render 5 divs', () => {
+    const { container } = render(
+      <>
+        <AuctionActivityWrapper>1</AuctionActivityWrapper>
+        <AuctionActivityWrapper>2</AuctionActivityWrapper>
+        <AuctionActivityWrapper>3</AuctionActivityWrapper>
+        <AuctionActivityWrapper>4</AuctionActivityWrapper>
+        <AuctionActivityWrapper>5</AuctionActivityWrapper>
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(5);
+  });
+
+  it('rerender children type from string to number updates content', () => {
+    const { container, rerender } = render(<AuctionActivityWrapper>text</AuctionActivityWrapper>);
+    expect(container.textContent).toBe('text');
+    rerender(<AuctionActivityWrapper>{42}</AuctionActivityWrapper>);
+    expect(container.textContent).toBe('42');
+  });
+
+  it('children with special chars (HTML entities)', () => {
+    const { container } = render(<AuctionActivityWrapper>{'<>&'}</AuctionActivityWrapper>);
+    expect(container.textContent).toBe('<>&');
+  });
+
+  it('children renders without errors when only single ReactNode element', () => {
+    const { container } = render(
+      <AuctionActivityWrapper>
+        <span>solo</span>
+      </AuctionActivityWrapper>,
+    );
+    expect(container.querySelector('span')?.textContent).toBe('solo');
+  });
 });
