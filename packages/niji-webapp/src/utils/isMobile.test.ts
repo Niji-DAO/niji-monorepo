@@ -54,4 +54,29 @@ describe('isMobileScreen', () => {
     setWidth(3840);
     expect(isMobileScreen()).toBe(false);
   });
+
+  it('returns true for width 0 (edge: maximal mobile)', () => {
+    setWidth(0);
+    expect(isMobileScreen()).toBe(true);
+  });
+
+  it('returns true for negative width (defensive: still < 992)', () => {
+    setWidth(-100);
+    expect(isMobileScreen()).toBe(true);
+  });
+
+  it('returns true for fractional width 991.5 (< 992)', () => {
+    setWidth(991.5);
+    expect(isMobileScreen()).toBe(true);
+  });
+
+  it('returns false for fractional width 992.5 (>= 992)', () => {
+    setWidth(992.5);
+    expect(isMobileScreen()).toBe(false);
+  });
+
+  it('returns false when innerWidth is NaN (NaN < 992 is always false)', () => {
+    setWidth(NaN);
+    expect(isMobileScreen()).toBe(false);
+  });
 });
