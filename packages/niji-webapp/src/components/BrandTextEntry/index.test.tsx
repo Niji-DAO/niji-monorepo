@@ -267,4 +267,44 @@ describe('BrandTextEntry', () => {
   it('renders without crash for empty label', () => {
     expect(() => render(<BrandTextEntry onChange={() => {}} label="" />)).not.toThrow();
   });
+
+  it('renders 50 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <BrandTextEntry key={i} onChange={() => {}} label={`L${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(50);
+  });
+
+  it('handles long placeholder (300 char)', () => {
+    const long = 'p'.repeat(300);
+    const { container } = render(<BrandTextEntry onChange={() => {}} placeholder={long} />);
+    expect(container.querySelector('input')?.getAttribute('placeholder')).toBe(long);
+  });
+
+  it('rerender preserves input element', () => {
+    const { container, rerender } = render(<BrandTextEntry onChange={() => {}} value="v1" />);
+    expect(container.querySelector('input')?.value).toBe('v1');
+    rerender(<BrandTextEntry onChange={() => {}} value="v2" />);
+    expect(container.querySelector('input')?.value).toBe('v2');
+  });
+
+  it('renders without crash 10 consecutive times', () => {
+    for (let i = 0; i < 10; i++) {
+      expect(() => render(<BrandTextEntry onChange={() => {}} label={`L${i}`} />)).not.toThrow();
+    }
+  });
+
+  it('rapid 30 change events fire 30 times', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandTextEntry onChange={onChange} />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    for (let i = 0; i < 30; i++) {
+      fireEvent.change(input, { target: { value: `v${i}` } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(30);
+  });
 });

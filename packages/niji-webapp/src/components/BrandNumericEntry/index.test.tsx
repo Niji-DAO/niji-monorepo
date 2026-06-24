@@ -249,4 +249,42 @@ describe('BrandNumericEntry', () => {
     const { container } = render(<BrandNumericEntry />);
     expect(container.querySelector('input')?.getAttribute('type')).toBeTruthy();
   });
+
+  it('renders 50 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <BrandNumericEntry key={i} label={`L${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(50);
+  });
+
+  it('handles long placeholder (200 char)', () => {
+    const long = 'p'.repeat(200);
+    const { container } = render(<BrandNumericEntry placeholder={long} />);
+    expect(container.querySelector('input')?.getAttribute('placeholder')).toBe(long);
+  });
+
+  it('rerender preserves input + label structure', () => {
+    const { container, rerender } = render(<BrandNumericEntry label="A" placeholder="ph1" />);
+    expect(container.querySelector('input')).not.toBeNull();
+    expect(container.querySelector('span')).not.toBeNull();
+    rerender(<BrandNumericEntry label="B" placeholder="ph2" />);
+    expect(container.querySelector('input')).not.toBeNull();
+    expect(container.querySelector('span')).not.toBeNull();
+  });
+
+  it('renders consecutive 10 times', () => {
+    for (let i = 0; i < 10; i++) {
+      expect(() => render(<BrandNumericEntry label={`L${i}`} />)).not.toThrow();
+    }
+  });
+
+  it('renders input + label exactly 1 each per instance', () => {
+    const { container } = render(<BrandNumericEntry label="X" />);
+    expect(container.querySelectorAll('input').length).toBe(1);
+    expect(container.querySelectorAll('span').length).toBe(1);
+  });
 });
