@@ -191,4 +191,44 @@ describe('BrandTextEntry', () => {
     const { container } = render(<BrandTextEntry onChange={() => {}} min="10" />);
     expect(container.querySelector('input')?.getAttribute('min')).toBe('10');
   });
+
+  it('renders 5 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <BrandTextEntry key={i} onChange={() => {}} label={`L${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(5);
+  });
+
+  it('rerender label updates display', () => {
+    const { container, rerender } = render(<BrandTextEntry onChange={() => {}} label="first" />);
+    expect(container.querySelector('span')?.textContent).toBe('first');
+    rerender(<BrandTextEntry onChange={() => {}} label="second" />);
+    expect(container.querySelector('span')?.textContent).toBe('second');
+  });
+
+  it('rapid 10 change events invoke handler 10 times', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandTextEntry onChange={onChange} />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    for (let i = 0; i < 10; i++) {
+      fireEvent.change(input, { target: { value: `v${i}` } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(10);
+  });
+
+  it('renders unicode label', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} label="入力" />);
+    expect(container.querySelector('span')?.textContent).toBe('入力');
+  });
+
+  it('handles isInvalid rerender from true to false', () => {
+    const { container, rerender } = render(<BrandTextEntry onChange={() => {}} isInvalid />);
+    expect(container.querySelector('input')?.className).toMatch(/invalid/i);
+    rerender(<BrandTextEntry onChange={() => {}} isInvalid={false} />);
+    expect(container.querySelector('input')?.className).not.toMatch(/invalid/i);
+  });
 });

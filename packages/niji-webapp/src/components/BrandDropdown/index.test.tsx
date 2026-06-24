@@ -335,4 +335,64 @@ describe('BrandDropdown', () => {
     );
     expect(container.querySelector('div[style]')?.getAttribute('style')).toContain('right: 50px');
   });
+
+  it('renders 5 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <BrandDropdown key={i} onChange={() => {}} value="a" label={`L${i}`}>
+            {opts}
+          </BrandDropdown>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('select').length).toBe(5);
+  });
+
+  it('rerender from "a" to "b" updates value', () => {
+    const { container, rerender } = render(
+      <BrandDropdown onChange={() => {}} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect((container.querySelector('select') as HTMLSelectElement)?.value).toBe('a');
+    rerender(
+      <BrandDropdown onChange={() => {}} value="b">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect((container.querySelector('select') as HTMLSelectElement)?.value).toBe('b');
+  });
+
+  it('rapid 10 change events invoke handler 10 times', () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <BrandDropdown onChange={onChange} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    const select = container.querySelector('select') as HTMLSelectElement;
+    for (let i = 0; i < 10; i++) {
+      fireEvent.change(select, { target: { value: i % 2 === 0 ? 'a' : 'b' } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(10);
+  });
+
+  it('renders unicode label', () => {
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="a" label="選択">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('span')?.textContent).toBe('選択');
+  });
+
+  it('empty children renders select without options', () => {
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="">
+        {[]}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('select')).not.toBeNull();
+  });
 });
