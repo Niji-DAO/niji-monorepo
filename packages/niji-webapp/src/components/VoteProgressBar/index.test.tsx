@@ -47,4 +47,39 @@ describe('VoteProgressBar', () => {
     const inner = container.querySelectorAll('div')[1];
     expect(inner?.getAttribute('style')).toContain('width: 100%');
   });
+
+  it('handles 1% (small but non-zero)', () => {
+    const { container } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={1} />);
+    const inner = container.querySelectorAll('div')[1];
+    expect(inner?.getAttribute('style')).toContain('width: 1%');
+  });
+
+  it('handles 99% (boundary just below 100)', () => {
+    const { container } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={99} />);
+    const inner = container.querySelectorAll('div')[1];
+    expect(inner?.getAttribute('style')).toContain('width: 99%');
+  });
+
+  it('renders exactly 1 outer + 1 inner div', () => {
+    const { container } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+    expect(container.querySelectorAll('div').length).toBe(2);
+  });
+
+  it('handles 50% (midpoint)', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.AGAINST} percentage={50} />,
+    );
+    const inner = container.querySelectorAll('div')[1];
+    expect(inner?.getAttribute('style')).toContain('width: 50%');
+    expect(inner?.className).toMatch(/against/i);
+  });
+
+  it('handles 25% with ABSTAIN variant', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.ABSTAIN} percentage={25} />,
+    );
+    const inner = container.querySelectorAll('div')[1];
+    expect(inner?.getAttribute('style')).toContain('width: 25%');
+    expect(inner?.className).toMatch(/abstain/i);
+  });
 });

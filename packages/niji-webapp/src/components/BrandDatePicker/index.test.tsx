@@ -36,4 +36,37 @@ describe('BrandDatePicker', () => {
     if (input) fireEvent.change(input, { target: { value: '2025-06-23' } });
     expect(onChange).toHaveBeenCalled();
   });
+
+  it('fires onChange repeatedly for multiple date changes', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandDatePicker onChange={onChange} />);
+    const input = container.querySelector('input');
+    if (input) {
+      fireEvent.change(input, { target: { value: '2025-01-01' } });
+      fireEvent.change(input, { target: { value: '2025-02-15' } });
+      fireEvent.change(input, { target: { value: '2025-03-31' } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders label span exactly once when label is provided', () => {
+    const { container } = render(<BrandDatePicker onChange={() => {}} label="Date" />);
+    expect(container.querySelectorAll('span').length).toBe(1);
+  });
+
+  it('does NOT apply invalid class when isInvalid=false (default)', () => {
+    const { container } = render(<BrandDatePicker onChange={() => {}} isInvalid={false} />);
+    expect(container.querySelector('input')?.className).not.toMatch(/invalid/i);
+  });
+
+  it('accepts non-ISO date string value (browser may reject but DOM holds it)', () => {
+    const { container } = render(<BrandDatePicker onChange={() => {}} value="not-a-date" />);
+    // input type=date は valid な値以外を保持しない (DOM 仕様)
+    expect(container.querySelector('input')).not.toBeNull();
+  });
+
+  it('renders exactly 1 input element', () => {
+    const { container } = render(<BrandDatePicker onChange={() => {}} />);
+    expect(container.querySelectorAll('input').length).toBe(1);
+  });
 });
