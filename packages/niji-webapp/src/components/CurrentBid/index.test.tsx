@@ -361,4 +361,56 @@ describe('CurrentBid', () => {
       rerender(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />),
     ).not.toThrow();
   });
+
+  it('renders 100 CurrentBid instances independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <CurrentBid key={i} currentBid={parseEther(`${i + 1}`)} auctionEnded={false} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(100);
+  });
+
+  it('rerender 30 times preserves text content', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <CurrentBid currentBid={parseEther('1')} auctionEnded={false} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      rerender(<CurrentBid currentBid={parseEther(`${i + 1}`)} auctionEnded={false} />);
+      expect(container.textContent).toContain('Current bid');
+    }
+  });
+
+  it('renders all useAtomValue return values', () => {
+    [true, false, undefined, null, 0, 1].forEach(v => {
+      useAtomValueMock.mockReturnValue(v);
+      expect(() =>
+        render(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />),
+      ).not.toThrow();
+    });
+  });
+
+  it('rerender between cool/warm preserves bid text', () => {
+    useAtomValueMock.mockReturnValueOnce(true);
+    const { container, rerender } = render(
+      <CurrentBid currentBid={parseEther('1')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('Current bid');
+    useAtomValueMock.mockReturnValue(false);
+    rerender(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />);
+    expect(container.textContent).toContain('Current bid');
+  });
+
+  it('renders 30 different bid values consecutively', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 1; i <= 30; i++) {
+      expect(() =>
+        render(<CurrentBid currentBid={parseEther(`${i}`)} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
 });

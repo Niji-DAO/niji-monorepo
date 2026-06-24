@@ -523,4 +523,74 @@ describe('BrandDropdown', () => {
     );
     expect(container.querySelector('select')).not.toBeNull();
   });
+
+  it('renders 100 BrandDropdown instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <BrandDropdown key={i} onChange={() => {}} value="a">
+            {opts}
+          </BrandDropdown>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('select').length).toBe(100);
+  });
+
+  it('rerender 30 times preserves select element', () => {
+    const { container, rerender } = render(
+      <BrandDropdown onChange={() => {}} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    for (let i = 0; i < 30; i++) {
+      rerender(
+        <BrandDropdown onChange={() => {}} value={i % 2 === 0 ? 'a' : 'b'}>
+          {opts}
+        </BrandDropdown>,
+      );
+      expect(container.querySelector('select')).not.toBeNull();
+    }
+  });
+
+  it('handles all common dropdown sizes', () => {
+    [1, 5, 10, 50, 100].forEach(n => {
+      const dynOpts = Array.from({ length: n }, (_, i) => (
+        <option key={i} value={`v-${i}`}>
+          {`Option ${i}`}
+        </option>
+      ));
+      expect(() =>
+        render(
+          <BrandDropdown onChange={() => {}} value="v-0">
+            {dynOpts}
+          </BrandDropdown>,
+        ),
+      ).not.toThrow();
+    });
+  });
+
+  it('rapid 100 change events fire 100 times', () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <BrandDropdown onChange={onChange} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    const select = container.querySelector('select') as HTMLSelectElement;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(select, { target: { value: i % 2 === 0 ? 'a' : 'b' } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles unicode label across renders', () => {
+    expect(() =>
+      render(
+        <BrandDropdown onChange={() => {}} value="a" label="日本語ラベル絵文字🎉">
+          {opts}
+        </BrandDropdown>,
+      ),
+    ).not.toThrow();
+  });
 });

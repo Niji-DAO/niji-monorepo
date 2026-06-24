@@ -617,4 +617,72 @@ describe('DelegationCandidateInfo', () => {
       ).not.toThrow();
     }
   });
+
+  it('renders 50 DelegationCandidateInfo instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <DelegationCandidateInfo
+              key={i}
+              address={`0xADDR${i}`}
+              changeModalState={(i % 4) as never}
+              votesToAdd={i}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 consecutive renders without crash', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() =>
+        render(
+          <DelegationCandidateInfo
+            address={`0xADDR${i}`}
+            changeModalState={(i % 4) as never}
+            votesToAdd={i}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('rerender 30 times with state transitions', () => {
+    const { rerender } = render(
+      <DelegationCandidateInfo address="0xA" changeModalState={0 as never} votesToAdd={0} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <DelegationCandidateInfo
+            address={`0x${i}`}
+            changeModalState={(i % 4) as never}
+            votesToAdd={i * 10}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles negative votesToAdd values', () => {
+    [-1, -10, -1000].forEach(vt => {
+      expect(() =>
+        render(
+          <DelegationCandidateInfo address="0xA" changeModalState={0 as never} votesToAdd={vt} />,
+        ),
+      ).not.toThrow();
+    });
+  });
+
+  it('renders for empty + very long addresses', () => {
+    ['', '0x', '0x' + 'a'.repeat(1000)].forEach(addr => {
+      expect(() =>
+        render(
+          <DelegationCandidateInfo address={addr} changeModalState={0 as never} votesToAdd={1} />,
+        ),
+      ).not.toThrow();
+    });
+  });
 });
