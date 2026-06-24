@@ -204,4 +204,42 @@ describe('ProposalContent extra cases', () => {
     );
     expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe('[t]こんにちは');
   });
+
+  it('multi-line description renders verbatim', () => {
+    const multi = 'line1\nline2\nline3';
+    const { container } = render(
+      <ProposalContent description={multi} title="t" details={details} />,
+    );
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe(`[t]${multi}`);
+  });
+
+  it('proposeOnV1=false (default) does not show banner', () => {
+    const { container } = render(<ProposalContent description="d" title="t" details={details} />);
+    expect(container.textContent).not.toContain('original treasury');
+  });
+
+  it('renders proposal-tx exactly 1 time for non-empty details', () => {
+    const { container } = render(<ProposalContent description="d" title="t" details={details} />);
+    expect(container.querySelectorAll('[data-testid="proposal-tx"]').length).toBe(1);
+  });
+
+  it('Title prefix [t] verbatim with simple ASCII description', () => {
+    const { container } = render(
+      <ProposalContent description="hello" title="t" details={details} />,
+    );
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe('[t]hello');
+  });
+
+  it('5 instances render 5 markdown wrappers', () => {
+    const { container } = render(
+      <>
+        <ProposalContent description="d1" title="t1" details={details} />
+        <ProposalContent description="d2" title="t2" details={details} />
+        <ProposalContent description="d3" title="t3" details={details} />
+        <ProposalContent description="d4" title="t4" details={details} />
+        <ProposalContent description="d5" title="t5" details={details} />
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="markdown"]').length).toBe(5);
+  });
 });

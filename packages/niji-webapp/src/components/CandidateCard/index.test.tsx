@@ -186,4 +186,39 @@ describe('CandidateCard', () => {
     const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
     expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(longAddr);
   });
+
+  it('candidate.id with special chars renders in href', () => {
+    const candidate = { ...baseCandidate, id: 'special-id-xyz' } as never;
+    const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
+    expect(container.querySelector('a')?.getAttribute('href')).toBe('/candidates/special-id-xyz');
+  });
+
+  it('multiple CandidateCard render 5 anchor links', () => {
+    const { container } = wrap(
+      <>
+        <CandidateCard candidate={baseCandidate} nounsRequired={3} />
+        <CandidateCard candidate={baseCandidate} nounsRequired={3} />
+        <CandidateCard candidate={baseCandidate} nounsRequired={3} />
+        <CandidateCard candidate={baseCandidate} nounsRequired={3} />
+        <CandidateCard candidate={baseCandidate} nounsRequired={3} />
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(5);
+  });
+
+  it('candidate.voteCount=10 renders without crash', () => {
+    const candidate = { ...baseCandidate, voteCount: 10 } as never;
+    expect(() => wrap(<CandidateCard candidate={candidate} nounsRequired={3} />)).not.toThrow();
+  });
+
+  it('proposer with mixed case address preserved verbatim', () => {
+    const candidate = { ...baseCandidate, proposer: '0xMiXeDcAsE' } as never;
+    const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xMiXeDcAsE');
+  });
+
+  it('candidate.proposerVotes=0 renders without crash', () => {
+    const candidate = { ...baseCandidate, proposerVotes: 0 } as never;
+    expect(() => wrap(<CandidateCard candidate={candidate} nounsRequired={3} />)).not.toThrow();
+  });
 });
