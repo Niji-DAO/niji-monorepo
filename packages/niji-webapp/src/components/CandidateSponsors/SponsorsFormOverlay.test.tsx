@@ -70,4 +70,45 @@ describe('SponsorsFormOverlay', () => {
     expect(setIsForm).toHaveBeenCalledWith(false);
     expect(setPoll).toHaveBeenCalledWith(0);
   });
+
+  it('does NOT render Success banner for transactionState=Failed', () => {
+    const { container } = render(<SponsorsFormOverlay {...defaults} transactionState="Failed" />);
+    expect(container.textContent).not.toContain('Success!');
+  });
+
+  it('does NOT render Success banner for transactionState=Pending', () => {
+    const { container } = render(<SponsorsFormOverlay {...defaults} transactionState="Pending" />);
+    expect(container.textContent).not.toContain('Success!');
+  });
+
+  it('repeated close clicks call setIsFormDisplayed multiple times', () => {
+    const setIsForm = vi.fn();
+    const setPoll = vi.fn();
+    const { container } = render(
+      <SponsorsFormOverlay
+        {...defaults}
+        isFormDisplayed={true}
+        setIsFormDisplayed={setIsForm}
+        setDataFetchPollInterval={setPoll}
+      />,
+    );
+    const btn = container.querySelector('button');
+    if (btn) {
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+    }
+    expect(setIsForm).toHaveBeenCalledTimes(2);
+    expect(setPoll).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders exactly 1 signature-form when isFormDisplayed=true', () => {
+    const { container } = render(<SponsorsFormOverlay {...defaults} isFormDisplayed={true} />);
+    expect(container.querySelectorAll('[data-testid="signature-form"]').length).toBe(1);
+  });
+
+  it('accepts different proposalIdToUpdate value without crash', () => {
+    expect(() =>
+      render(<SponsorsFormOverlay {...defaults} proposalIdToUpdate={42} />),
+    ).not.toThrow();
+  });
 });
