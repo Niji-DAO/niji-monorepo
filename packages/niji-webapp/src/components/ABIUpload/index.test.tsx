@@ -367,4 +367,71 @@ describe('ABIUpload Component', () => {
       rerender(<ABIUpload abiFileName="x" isValid={true} isInvalid={false} onChange={vi.fn()} />),
     ).not.toThrow();
   });
+
+  it('renders 10 instances independently each with own state (no crash)', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <ABIUpload
+              key={i}
+              abiFileName={`file${i}.json`}
+              isValid={i % 2 === 0}
+              isInvalid={i % 3 === 0}
+              onChange={vi.fn()}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender from isInvalid=true to false', () => {
+    const { rerender } = render(
+      <ABIUpload abiFileName="x.json" isValid={false} isInvalid={true} onChange={vi.fn()} />,
+    );
+    let input = screen.getByLabelText(/abi/i) as HTMLInputElement;
+    expect(input.className).toContain('is-invalid');
+    rerender(
+      <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    input = screen.getByLabelText(/abi/i) as HTMLInputElement;
+    expect(input.className).not.toContain('is-invalid');
+  });
+
+  it('rapid 10 file change events fire 10 times', () => {
+    const handleChange = vi.fn();
+    render(
+      <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={handleChange} />,
+    );
+    const input = screen.getByLabelText(/abi/i) as HTMLInputElement;
+    for (let i = 0; i < 10; i++) {
+      fireEvent.change(input, {
+        target: { files: [new File([`c${i}`], `f${i}.json`, { type: 'application/json' })] },
+      });
+    }
+    expect(handleChange).toHaveBeenCalledTimes(10);
+  });
+
+  it('handles 500 char long fileName', () => {
+    const longName = 'a'.repeat(500) + '.json';
+    expect(() =>
+      render(
+        <ABIUpload abiFileName={longName} isValid={false} isInvalid={false} onChange={vi.fn()} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders unicode fileName', () => {
+    expect(() =>
+      render(
+        <ABIUpload
+          abiFileName="日本語.json"
+          isValid={false}
+          isInvalid={false}
+          onChange={vi.fn()}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });

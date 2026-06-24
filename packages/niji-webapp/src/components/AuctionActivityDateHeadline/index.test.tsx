@@ -240,4 +240,44 @@ describe('AuctionActivityDateHeadline', () => {
     useAtomValueMock.mockReturnValue(false);
     expect(() => render(<AuctionActivityDateHeadline startTime={1735689600n} />)).not.toThrow();
   });
+
+  it('renders 20 instances independently with same startTime', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <AuctionActivityDateHeadline key={i} startTime={1735689600n} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h4').length).toBe(20);
+  });
+
+  it('renders March startTime (2025-03-15)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const marchTime = 1742000000n;
+    const { container } = render(<AuctionActivityDateHeadline startTime={marchTime} />);
+    expect(container.querySelector('h4')?.textContent).toContain('2025');
+  });
+
+  it('renders June startTime (2025-06-15)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const juneTime = 1750000000n;
+    const { container } = render(<AuctionActivityDateHeadline startTime={juneTime} />);
+    expect(container.querySelector('h4')?.textContent).toContain('2025');
+  });
+
+  it('renders 10 consecutive different startTimes', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 10; i++) {
+      const time = 1735689600n + BigInt(i * 86400);
+      expect(() => render(<AuctionActivityDateHeadline startTime={time} />)).not.toThrow();
+    }
+  });
+
+  it('rerender to past startTime (1970)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { rerender } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect(() => rerender(<AuctionActivityDateHeadline startTime={0n} />)).not.toThrow();
+  });
 });
