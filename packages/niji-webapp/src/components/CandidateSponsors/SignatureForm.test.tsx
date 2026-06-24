@@ -283,4 +283,44 @@ describe('SignatureForm', () => {
     render(<SignatureForm {...baseProps} />);
     expect(validateExpirationDateMock).toHaveBeenCalled();
   });
+
+  it('passes isOverlayVisible=false when flow says hidden', () => {
+    flowState.isOverlayVisible = false;
+    const { container } = render(<SignatureForm {...baseProps} />);
+    const overlay = container.querySelector('[data-testid="signature-status-overlay"]');
+    expect(overlay?.getAttribute('data-overlay-visible')).toBe('false');
+  });
+
+  it('passes empty errorMessage when flow has none', () => {
+    flowState.errorMessage = '';
+    const { container } = render(<SignatureForm {...baseProps} />);
+    const overlay = container.querySelector('[data-testid="signature-status-overlay"]');
+    expect(overlay?.getAttribute('data-error-message')).toBe('');
+  });
+
+  it('default isWaiting/isLoading both false on initial state', () => {
+    const { container } = render(<SignatureForm {...baseProps} />);
+    const fields = container.querySelector('[data-testid="signature-form-fields"]');
+    expect(fields?.getAttribute('data-is-waiting')).toBe('false');
+    expect(fields?.getAttribute('data-is-loading')).toBe('false');
+  });
+
+  it('multiple sign clicks call signTypedData per click', async () => {
+    const { container } = render(<SignatureForm {...baseProps} proposalIdToUpdate={0} />);
+    const signBtn = container.querySelector('[data-testid="sign-btn"]') as HTMLButtonElement;
+    fireEvent.click(signBtn);
+    fireEvent.click(signBtn);
+    await new Promise(r => setTimeout(r, 0));
+    expect(signTypedDataMock.mock.calls.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('overlay close calls setIsFormDisplayed exactly once per click', () => {
+    const setFormDisplayed = vi.fn();
+    const { container } = render(
+      <SignatureForm {...baseProps} setIsFormDisplayed={setFormDisplayed} />,
+    );
+    const closeBtn = container.querySelector('[data-testid="overlay-close"]') as HTMLButtonElement;
+    fireEvent.click(closeBtn);
+    expect(setFormDisplayed).toHaveBeenCalledTimes(1);
+  });
 });

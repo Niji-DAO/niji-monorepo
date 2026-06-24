@@ -220,4 +220,50 @@ describe('NavBar', () => {
     expect(toggle).not.toBeNull();
     if (toggle) fireEvent.click(toggle);
   });
+
+  it('renders multiple nav buttons via NavBarButton mock', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelectorAll('[data-testid="nav-btn"]').length).toBeGreaterThan(0);
+  });
+
+  it('logo image points to "/" via parent link', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    const logoImg = container.querySelector('img[alt="Niji DAO"]');
+    expect(logoImg).not.toBeNull();
+    expect(logoImg?.closest('a')?.getAttribute('href')).toBe('/');
+  });
+
+  it('treasury balance reflects raw value formatted as eth (5n * 1e18 → "5")', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('[data-testid="treasury"]')?.textContent).toBe('5');
+  });
+
+  it('handles disconnected + non-mainnet chain combination without crash', () => {
+    setup({ CHAIN_ID: 11155111 });
+    connectKitState.isConnected = false;
+    connectKitState.address = undefined;
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.textContent).toContain('Connect');
+    expect(container.querySelector('[aria-label="testnet"]')).not.toBeNull();
+  });
+
+  it('local chain (31337) renders both Faucet link and testnet badge', () => {
+    setup({ CHAIN_ID: 31337 });
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('a[href="/faucet"]')).not.toBeNull();
+    expect(container.querySelector('[aria-label="testnet"]')).not.toBeNull();
+  });
 });
