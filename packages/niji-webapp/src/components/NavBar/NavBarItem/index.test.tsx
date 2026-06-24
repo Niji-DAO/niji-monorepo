@@ -67,4 +67,37 @@ describe('NavBarItem', () => {
     expect(container.children.length).toBe(1);
     expect(container.firstElementChild?.tagName).toBe('DIV');
   });
+
+  it('null children rendered as empty wrapper', () => {
+    const { container } = render(<NavBarItem>{null}</NavBarItem>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('boolean true children rendered as empty', () => {
+    const { container } = render(<NavBarItem>{true}</NavBarItem>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('renders deep nested children', () => {
+    const { container } = render(
+      <NavBarItem>
+        <div>
+          <span data-testid="deep">deep</span>
+        </div>
+      </NavBarItem>,
+    );
+    expect(container.querySelector('[data-testid="deep"]')?.textContent).toBe('deep');
+  });
+
+  it('custom className coexists with default classes', () => {
+    const { container } = render(<NavBarItem className="my-extra">x</NavBarItem>);
+    const cls = container.querySelector('div')?.className ?? '';
+    expect(cls).toContain('my-extra');
+    expect(cls.split(/\s+/).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders without crash for array children', () => {
+    const { container } = render(<NavBarItem>{['a', 'b', 'c']}</NavBarItem>);
+    expect(container.querySelector('div')?.textContent).toBe('abc');
+  });
 });

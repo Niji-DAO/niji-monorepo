@@ -64,4 +64,33 @@ describe('TightStackedCircleNijis', () => {
     expect(svg?.getAttribute('width')).toBe('55');
     expect(svg?.getAttribute('height')).toBe('55');
   });
+
+  it('handles 0 nounId without crash', () => {
+    const { container } = render(<TightStackedCircleNijis nounIds={[0]} />);
+    expect(container.querySelector('circle')?.getAttribute('data-niji')).toBe('0');
+  });
+
+  it('rerender from [1] to [1,2,3] increases circle count', () => {
+    const { container, rerender } = render(<TightStackedCircleNijis nounIds={[1]} />);
+    expect(container.querySelectorAll('circle').length).toBe(1);
+    rerender(<TightStackedCircleNijis nounIds={[1, 2, 3]} />);
+    expect(container.querySelectorAll('circle').length).toBe(3);
+  });
+
+  it('exactly 3 nounIds == 3 circles (boundary)', () => {
+    const { container } = render(<TightStackedCircleNijis nounIds={[1, 2, 3]} />);
+    expect(container.querySelectorAll('circle').length).toBe(3);
+  });
+
+  it('100 nounIds still caps at 3', () => {
+    const ids = Array.from({ length: 100 }, (_, i) => i + 1);
+    const { container } = render(<TightStackedCircleNijis nounIds={ids} />);
+    expect(container.querySelectorAll('circle').length).toBe(3);
+  });
+
+  it('outermost element is single svg', () => {
+    const { container } = render(<TightStackedCircleNijis nounIds={[1]} />);
+    expect(container.children.length).toBe(1);
+    expect(container.firstElementChild?.tagName.toLowerCase()).toBe('svg');
+  });
 });
