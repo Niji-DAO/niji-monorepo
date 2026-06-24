@@ -87,4 +87,71 @@ describe('CreateCandidateButton', () => {
     if (btn) fireEvent.click(btn);
     expect(handle).toHaveBeenCalledTimes(1);
   });
+
+  it('isLoading=true + isFormInvalid=true で spinner 表示 + disabled', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={true}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={true}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+    expect(container.querySelector('button')?.disabled).toBe(true);
+  });
+
+  it('renders exactly 1 button element', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(1);
+  });
+
+  it('renders exactly 1 spinner when isLoading=true', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={true}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelectorAll('.spinner-border').length).toBe(1);
+  });
+
+  it('does NOT fire handleCreateProposal on click when disabled', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={true}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button');
+    if (btn) fireEvent.click(btn);
+    // disabled button は click event を propagate しない
+    expect(handle).toHaveBeenCalledTimes(0);
+  });
+
+  it('hasActiveOrPendingProposal=true takes precedence over default text', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    // warning text のみが render される
+    expect(container.textContent).not.toContain('Create proposal candidate');
+    expect(container.textContent).toContain('active or pending proposal');
+  });
 });
