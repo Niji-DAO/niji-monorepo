@@ -68,4 +68,40 @@ describe('VoteStatusPill', () => {
     expect(container.children.length).toBe(1);
     expect(container.firstElementChild?.tagName).toBe('DIV');
   });
+
+  it('different statuses produce different class names', () => {
+    const { container: c1 } = render(<VoteStatusPill status="success" text="x" />);
+    const { container: c2 } = render(<VoteStatusPill status="failure" text="x" />);
+    expect(c1.querySelector('div')?.className).not.toBe(c2.querySelector('div')?.className);
+  });
+
+  it('long text (500 chars) renders verbatim', () => {
+    const long = 'a'.repeat(500);
+    const { container } = render(<VoteStatusPill status="success" text={long} />);
+    expect(container.querySelector('div')?.textContent?.length).toBe(500);
+  });
+
+  it('unicode text renders correctly', () => {
+    const { container } = render(<VoteStatusPill status="success" text="日本語テキスト" />);
+    expect(container.querySelector('div')?.textContent).toBe('日本語テキスト');
+  });
+
+  it('rerender with new status changes class', () => {
+    const { container, rerender } = render(<VoteStatusPill status="success" text="x" />);
+    const successCls = container.querySelector('div')?.className;
+    rerender(<VoteStatusPill status="failure" text="x" />);
+    expect(container.querySelector('div')?.className).not.toBe(successCls);
+  });
+
+  it('multiple instances render independently with different statuses', () => {
+    const { container } = render(
+      <>
+        <VoteStatusPill status="success" text="A" />
+        <VoteStatusPill status="failure" text="B" />
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(2);
+    expect(container.textContent).toContain('A');
+    expect(container.textContent).toContain('B');
+  });
 });

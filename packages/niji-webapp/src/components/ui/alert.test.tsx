@@ -70,3 +70,43 @@ describe('AlertDescription', () => {
     expect((container.firstChild as Element).getAttribute('class')).toContain('italic');
   });
 });
+
+describe('Alert extra cases', () => {
+  it('renders nested AlertTitle + AlertDescription correctly', () => {
+    const { container } = render(
+      <Alert>
+        <AlertTitle>title</AlertTitle>
+        <AlertDescription>desc</AlertDescription>
+      </Alert>,
+    );
+    expect(container.querySelector('h5')?.textContent).toBe('title');
+    expect(container.textContent).toContain('desc');
+  });
+
+  it('default Alert (no variant) does not have destructive class', () => {
+    const { container } = render(<Alert />);
+    expect(container.querySelector('div[role="alert"]')?.className).not.toContain(
+      'text-destructive',
+    );
+  });
+
+  it('Alert renders exactly 1 role=alert element', () => {
+    const { container } = render(<Alert>x</Alert>);
+    expect(container.querySelectorAll('div[role="alert"]').length).toBe(1);
+  });
+
+  it('AlertTitle renders nested JSX correctly', () => {
+    const { container } = render(
+      <AlertTitle>
+        <span data-testid="nested">nested</span>
+      </AlertTitle>,
+    );
+    expect(container.querySelector('[data-testid="nested"]')?.textContent).toBe('nested');
+  });
+
+  it('AlertDescription renders 200-char long string', () => {
+    const long = 'a'.repeat(200);
+    const { container } = render(<AlertDescription>{long}</AlertDescription>);
+    expect(container.firstChild?.textContent?.length).toBe(200);
+  });
+});

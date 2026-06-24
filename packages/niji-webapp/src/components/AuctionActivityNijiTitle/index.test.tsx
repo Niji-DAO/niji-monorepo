@@ -63,4 +63,43 @@ describe('AuctionActivityNijiTitle', () => {
     expect(cool.querySelector('h1')?.getAttribute('style')).toContain('color');
     expect(warm.querySelector('h1')?.getAttribute('style')).toContain('color');
   });
+
+  it('cool color differs from warm color', () => {
+    const { container: cool } = render(<AuctionActivityNijiTitle nounId={1n} isCool={true} />);
+    const { container: warm } = render(<AuctionActivityNijiTitle nounId={1n} isCool={false} />);
+    expect(cool.querySelector('h1')?.getAttribute('style')).not.toBe(
+      warm.querySelector('h1')?.getAttribute('style'),
+    );
+  });
+
+  it('rerender with new nounId updates h1 text', () => {
+    const { container, rerender } = render(<AuctionActivityNijiTitle nounId={1n} />);
+    expect(container.querySelector('h1')?.textContent).toContain('1');
+    rerender(<AuctionActivityNijiTitle nounId={999n} />);
+    expect(container.querySelector('h1')?.textContent).toContain('999');
+  });
+
+  it('multiple instances render independently with different nounIds', () => {
+    const { container } = render(
+      <>
+        <AuctionActivityNijiTitle nounId={1n} />
+        <AuctionActivityNijiTitle nounId={2n} />
+      </>,
+    );
+    const h1s = container.querySelectorAll('h1');
+    expect(h1s.length).toBe(2);
+    expect(h1s[0].textContent).toContain('1');
+    expect(h1s[1].textContent).toContain('2');
+  });
+
+  it('handles 100n nounId', () => {
+    const { container } = render(<AuctionActivityNijiTitle nounId={100n} />);
+    expect(container.querySelector('h1')?.textContent).toContain('100');
+  });
+
+  it('isCool=true keeps Niji prefix text visible', () => {
+    const { container } = render(<AuctionActivityNijiTitle nounId={42n} isCool={true} />);
+    expect(container.querySelector('h1')?.textContent).toContain('Niji');
+    expect(container.querySelector('h1')?.textContent).toContain('42');
+  });
 });
