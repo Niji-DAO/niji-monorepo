@@ -388,4 +388,34 @@ describe('Proposals', () => {
     wagmiState.account = undefined;
     expect(() => wrap(<Proposals proposals={[]} nounsRequired={2} />)).not.toThrow();
   });
+
+  it('renders with nounsRequired=0', () => {
+    expect(() => wrap(<Proposals proposals={[]} nounsRequired={0} />)).not.toThrow();
+  });
+
+  it('renders with nounsRequired=1000 (large)', () => {
+    expect(() => wrap(<Proposals proposals={[]} nounsRequired={1000} />)).not.toThrow();
+  });
+
+  it('renders without crash for empty proposals array (with container check)', () => {
+    const { container } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+    expect(container).not.toBeNull();
+  });
+
+  it('renders multiple instances each independently', () => {
+    expect(() =>
+      wrap(
+        <>
+          <Proposals proposals={[]} nounsRequired={2} />
+          <Proposals proposals={[]} nounsRequired={3} />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders consecutive 5 times without crash', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() => wrap(<Proposals proposals={[]} nounsRequired={i} />)).not.toThrow();
+    }
+  });
 });

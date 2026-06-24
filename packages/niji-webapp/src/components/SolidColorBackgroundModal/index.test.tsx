@@ -290,4 +290,42 @@ describe('SolidColorBackgroundModal', () => {
     );
     expect(document.getElementById('overlay-root')?.querySelectorAll('span').length).toBe(3);
   });
+
+  it('renders without crash with show=false', () => {
+    expect(() =>
+      render(<SolidColorBackgroundModal show={false} onDismiss={() => {}} content={<>x</>} />),
+    ).not.toThrow();
+  });
+
+  it('renders 500 char long content', () => {
+    const longStr = 'x'.repeat(500);
+    render(
+      <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<div>{longStr}</div>} />,
+    );
+    expect(document.getElementById('overlay-root')?.textContent).toContain(longStr);
+  });
+
+  it('rerender from show=false to true does not crash', () => {
+    const { rerender } = render(
+      <SolidColorBackgroundModal show={false} onDismiss={() => {}} content={<>x</>} />,
+    );
+    expect(() =>
+      rerender(<SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<>x</>} />),
+    ).not.toThrow();
+  });
+
+  it('renders without crash 5 times consecutively', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        render(<SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<>x</>} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('renders unicode content', () => {
+    render(
+      <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<>{'日本語'}</>} />,
+    );
+    expect(document.getElementById('overlay-root')?.textContent).toContain('日本語');
+  });
 });

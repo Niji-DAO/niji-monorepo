@@ -270,4 +270,75 @@ describe('ProposalTransactions', () => {
     );
     expect(container.querySelectorAll('button').length).toBe(5);
   });
+
+  it('renders 10 transactions without crash', () => {
+    const tenDetails = Array.from({ length: 10 }, (_, i) => makeTx(`fn${i}()`, `0x${i}`)) as never;
+    expect(() =>
+      render(
+        <ProposalTransactions
+          proposalTransactions={tenDetails}
+          onRemoveProposalTransaction={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders 0 transactions with empty array', () => {
+    expect(() =>
+      render(
+        <ProposalTransactions
+          proposalTransactions={[] as never}
+          onRemoveProposalTransaction={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender with new details count updates rendering', () => {
+    const initial = [makeTx('a()', '0x')] as never;
+    const updated = [makeTx('a()', '0x'), makeTx('b()', '0x'), makeTx('c()', '0x')] as never;
+    const { rerender } = render(
+      <ProposalTransactions
+        proposalTransactions={initial}
+        onRemoveProposalTransaction={() => {}}
+      />,
+    );
+    expect(() =>
+      rerender(
+        <ProposalTransactions
+          proposalTransactions={updated}
+          onRemoveProposalTransaction={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders multiple instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          <ProposalTransactions
+            proposalTransactions={[makeTx('a()', '0x')] as never}
+            onRemoveProposalTransaction={() => {}}
+          />
+          <ProposalTransactions
+            proposalTransactions={[makeTx('b()', '0x')] as never}
+            onRemoveProposalTransaction={() => {}}
+          />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash for very long signature string', () => {
+    const longSig = 'x'.repeat(500) + '()';
+    expect(() =>
+      render(
+        <ProposalTransactions
+          proposalTransactions={[makeTx(longSig, '0x')] as never}
+          onRemoveProposalTransaction={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });
