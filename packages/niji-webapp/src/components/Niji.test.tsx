@@ -172,4 +172,34 @@ describe('Niji', () => {
     wrap(<NijiWithSeed nounId={1n} onLoadSeed={onLoadSeedMock} />);
     expect(onLoadSeedMock).not.toHaveBeenCalled();
   });
+
+  it('default link uses /niji/{nounId} path (different ids)', () => {
+    const { container } = wrap(<DefaultLinkedNiji nounId={123n} />);
+    expect(container.querySelector('a[href="/niji/123"]')).not.toBeNull();
+  });
+
+  it('LinkedNiji default render does not require an alt prop (auto-alt)', () => {
+    const { container } = wrap(<DefaultLinkedNiji nounId={42n} />);
+    const img = container.querySelector('img') as HTMLImageElement;
+    expect(img.alt).toContain('Niji');
+  });
+
+  it('Niji renders empty alt string when alt prop is "" provided explicitly', () => {
+    const { container } = render(<Niji nounId={5n} alt="" />);
+    const img = container.querySelector('img') as HTMLImageElement;
+    expect(img.alt).toBe('');
+  });
+
+  it('NijiCircular default (no border prop) does not apply border class', () => {
+    const { container } = wrap(<NijiCircular nounId={1n} />);
+    const img = container.querySelector('img');
+    expect(img?.className).not.toContain('circle-border');
+  });
+
+  it('NijiWithSeed calls onLoadSeed when single nonzero seed field is set', () => {
+    hookState.fetchedSeed = { background: 0, body: 0, accessory: 0, head: 0, glasses: 1 };
+    const onLoadSeedMock = vi.fn();
+    wrap(<NijiWithSeed nounId={1n} onLoadSeed={onLoadSeedMock} />);
+    expect(onLoadSeedMock).toHaveBeenCalledWith(hookState.fetchedSeed);
+  });
 });

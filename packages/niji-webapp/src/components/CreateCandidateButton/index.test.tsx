@@ -154,4 +154,77 @@ describe('CreateCandidateButton', () => {
     expect(container.textContent).not.toContain('Create proposal candidate');
     expect(container.textContent).toContain('active or pending proposal');
   });
+
+  it('isLoading=true でも button タグ自体は 1 つだけ存在', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={true}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(1);
+  });
+
+  it('multi-click on enabled button fires handler N 回', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(3);
+  });
+
+  it('isFormInvalid=true で disable + click 時 handler 呼ばれない', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={true}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    fireEvent.click(btn);
+    expect(handle).not.toHaveBeenCalled();
+  });
+
+  it('isLoading=true 単独では disabled にならない (Spinner 表示のみ、 click 可能)', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={true}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    expect(btn.disabled).toBe(false);
+    fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(1);
+  });
+
+  it('hasActiveOrPendingProposal=true 時に warning text + button disabled の両立', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.textContent).toContain('active or pending proposal');
+    expect(container.querySelector('button')?.disabled).toBe(true);
+  });
 });

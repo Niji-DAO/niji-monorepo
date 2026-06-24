@@ -188,4 +188,40 @@ describe('VoteModal', () => {
     });
     expect(onHideMock).toHaveBeenCalled();
   });
+
+  it('does not render modal content when show=false', () => {
+    const { container } = render(<VoteModal {...baseProps} show={false} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
+  });
+
+  it('auto-closes after success of castRefundableVoteWithReason', () => {
+    hookState.castRefundableVoteWithReasonState = { status: 'Success' };
+    render(<VoteModal {...baseProps} />);
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(onHideMock).toHaveBeenCalled();
+  });
+
+  it('shows failure copy when castRefundableVoteWithReasonState=Fail', () => {
+    hookState.castRefundableVoteWithReasonState = {
+      status: 'Fail',
+      errorMessage: 'reason boom',
+    };
+    const { container } = render(<VoteModal {...baseProps} />);
+    expect(container.textContent).toContain('There was an error voting');
+    expect(container.textContent).toContain('reason boom');
+  });
+
+  it('renders for prop without crash for very large proposalId', () => {
+    const { container } = render(<VoteModal {...baseProps} proposalId="999999" />);
+    expect(container.textContent).toContain('Vote on Prop 999999');
+  });
+
+  it('handles Exception status same as Fail (error copy)', () => {
+    hookState.castRefundableVoteState = { status: 'Exception', errorMessage: 'rpc dead' };
+    const { container } = render(<VoteModal {...baseProps} />);
+    expect(container.textContent).toContain('There was an error voting');
+    expect(container.textContent).toContain('rpc dead');
+  });
 });
