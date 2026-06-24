@@ -355,4 +355,36 @@ describe('AddNijisToForkModal', () => {
     );
     expect(container.textContent).toContain('Confirm');
   });
+
+  it('isForkingPeriod=true title changes', () => {
+    const { container } = render(<AddNijisToForkModal {...baseProps} isForkingPeriod={true} />);
+    expect(container.textContent).toContain('Join fork');
+  });
+
+  it('renders without crash with isForkingPeriod=false', () => {
+    expect(() =>
+      render(<AddNijisToForkModal {...baseProps} isForkingPeriod={false} />),
+    ).not.toThrow();
+  });
+
+  it('renders without crash with all default props', () => {
+    expect(() => render(<AddNijisToForkModal {...baseProps} />)).not.toThrow();
+  });
+
+  it('rerender does not crash', () => {
+    const { rerender } = render(<AddNijisToForkModal {...baseProps} />);
+    expect(() => rerender(<AddNijisToForkModal {...baseProps} />)).not.toThrow();
+  });
+
+  it('renders 3 instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          <AddNijisToForkModal {...baseProps} />
+          <AddNijisToForkModal {...baseProps} />
+          <AddNijisToForkModal {...baseProps} />
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });

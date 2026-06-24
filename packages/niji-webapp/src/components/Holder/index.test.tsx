@@ -351,4 +351,65 @@ describe('Holder', () => {
     useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
     expect(() => render(<Holder nounId={0n} />, { wrapper: WithProviders })).not.toThrow();
   });
+
+  it('renders 3 instances each with own nounId', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() =>
+      render(
+        <>
+          <Holder nounId={1n} />
+          <Holder nounId={2n} />
+          <Holder nounId={3n} />
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash for negative-bigint analogue (-1n)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() => render(<Holder nounId={-1n} />, { wrapper: WithProviders })).not.toThrow();
+  });
+
+  it('isNounders=true branch renders without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    expect(() =>
+      render(<Holder nounId={1n} isNounders={true} />, { wrapper: WithProviders }),
+    ).not.toThrow();
+  });
+
+  it('isNounders=false default branch', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    expect(() =>
+      render(<Holder nounId={1n} isNounders={false} />, { wrapper: WithProviders }),
+    ).not.toThrow();
+  });
+
+  it('rerender from loading to error state', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValueOnce({
+      loading: true,
+      error: undefined,
+      data: undefined,
+    });
+    const { rerender } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: new Error('rpc'),
+      data: undefined,
+    });
+    expect(() => rerender(<Holder nounId={1n} />)).not.toThrow();
+  });
 });
