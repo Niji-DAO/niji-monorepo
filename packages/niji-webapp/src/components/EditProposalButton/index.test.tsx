@@ -261,4 +261,43 @@ describe('EditProposalButton', () => {
     );
     expect(container.textContent).toContain('3 votes to submit a proposal');
   });
+
+  it('renders 20 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <EditProposalButton key={i} {...defaults} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(20);
+  });
+
+  it('hasEnoughVote=false + threshold=undefined shows generic warning', () => {
+    const { container } = render(<EditProposalButton {...defaults} hasEnoughVote={false} />);
+    expect(container.textContent).toContain("don't have enough votes");
+  });
+
+  it('isLoading=true preserves button element type', () => {
+    const { container } = render(<EditProposalButton {...defaults} isLoading={true} />);
+    expect(container.querySelector('button')).not.toBeNull();
+  });
+
+  it('isCandidate rerender preserves Spinner during loading', () => {
+    const { container, rerender } = render(
+      <EditProposalButton {...defaults} isCandidate={false} isLoading={true} />,
+    );
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+    rerender(<EditProposalButton {...defaults} isCandidate={true} isLoading={true} />);
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+  });
+
+  it('rerender from isFormInvalid=true to false enables button', () => {
+    const { container, rerender } = render(
+      <EditProposalButton {...defaults} isFormInvalid={true} />,
+    );
+    expect(container.querySelector('button')?.disabled).toBe(true);
+    rerender(<EditProposalButton {...defaults} isFormInvalid={false} />);
+    expect(container.querySelector('button')?.disabled).toBe(false);
+  });
 });
