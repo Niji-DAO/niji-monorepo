@@ -100,4 +100,50 @@ describe('VoteCardPager', () => {
     // numPages != 1 で disabled になるかは実装次第
     expect(container.querySelectorAll('button').length).toBe(2);
   });
+
+  it('repeated right click invokes onRight N times', () => {
+    const onRight = vi.fn();
+    const { container } = render(<VoteCardPager {...defaults} onRightArrowClick={onRight} />);
+    const rightBtn = container.querySelectorAll('button')[1];
+    fireEvent.click(rightBtn);
+    fireEvent.click(rightBtn);
+    expect(onRight).toHaveBeenCalledTimes(2);
+  });
+
+  it('left disabled button does not fire onLeft', () => {
+    const onLeft = vi.fn();
+    const { container } = render(
+      <VoteCardPager {...defaults} onLeftArrowClick={onLeft} isLeftArrowDisabled={true} />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onLeft).not.toHaveBeenCalled();
+  });
+
+  it('last page (currentPage = numPages - 1) has active last dot', () => {
+    const { container } = render(<VoteCardPager {...defaults} currentPage={4} numPages={5} />);
+    const spans = container.querySelectorAll('span');
+    expect(spans[4]?.className).toBe('');
+    expect(spans[0]?.className).toMatch(/disabledPageDot/);
+  });
+
+  it('numPages=2 renders exactly 2 dots', () => {
+    const { container } = render(<VoteCardPager {...defaults} numPages={2} />);
+    expect(container.querySelectorAll('span').length).toBe(2);
+  });
+
+  it('rerender from numPages=3 to numPages=5 updates dot count', () => {
+    const { container, rerender } = render(<VoteCardPager {...defaults} numPages={3} />);
+    expect(container.querySelectorAll('span').length).toBe(3);
+    rerender(<VoteCardPager {...defaults} numPages={5} />);
+    expect(container.querySelectorAll('span').length).toBe(5);
+  });
+
+  it('rerender currentPage changes which dot is active', () => {
+    const { container, rerender } = render(
+      <VoteCardPager {...defaults} numPages={3} currentPage={0} />,
+    );
+    expect(container.querySelectorAll('span')[0]?.className).toBe('');
+    rerender(<VoteCardPager {...defaults} numPages={3} currentPage={2} />);
+    expect(container.querySelectorAll('span')[2]?.className).toBe('');
+  });
 });

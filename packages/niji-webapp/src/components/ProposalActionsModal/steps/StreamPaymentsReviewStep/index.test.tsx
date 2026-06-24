@@ -180,4 +180,52 @@ describe('StreamPaymentsReviewStep', () => {
     const { container } = render(<StreamPaymentsReviewStep {...defaults} />);
     expect(container.querySelector('h1')?.textContent).toBe('Review Streaming Payment Action');
   });
+
+  it('different endTimestamp passes through', () => {
+    const state = { ...baseState, streamEndTimestamp: 1950000000 };
+    const { container } = render(<StreamPaymentsReviewStep {...defaults} state={state as never} />);
+    expect(container.textContent).toContain('date-1950000000');
+  });
+
+  it('Next button does not fire onPrev', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <StreamPaymentsReviewStep {...defaults} onPrevBtnClick={onPrev} />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onPrev).not.toHaveBeenCalled();
+  });
+
+  it('Back button does not fire onNext', () => {
+    const onNext = vi.fn();
+    const { container } = render(
+      <StreamPaymentsReviewStep {...defaults} onNextBtnClick={onNext} />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
+  it('different currency string renders in stream text', () => {
+    const state = { ...baseState, TransferFundsCurrency: 'WETH' };
+    const { container } = render(<StreamPaymentsReviewStep {...defaults} state={state as never} />);
+    expect(container.textContent).toContain('WETH');
+  });
+
+  it('different amount value renders in stream text', () => {
+    const state = { ...baseState, amount: '99.5' };
+    const { container } = render(<StreamPaymentsReviewStep {...defaults} state={state as never} />);
+    expect(container.textContent).toContain('99.5');
+  });
+
+  it('Next then Back sequence preserves callback counts', () => {
+    const onPrev = vi.fn();
+    const onNext = vi.fn();
+    const { container } = render(
+      <StreamPaymentsReviewStep {...defaults} onPrevBtnClick={onPrev} onNextBtnClick={onNext} />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onNext).toHaveBeenCalledTimes(1);
+    expect(onPrev).toHaveBeenCalledTimes(1);
+  });
 });

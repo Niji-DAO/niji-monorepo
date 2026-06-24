@@ -186,4 +186,63 @@ describe('ABIUpload Component', () => {
     expect(container.querySelectorAll('input').length).toBe(1);
     expect(container.querySelectorAll('label').length).toBe(1);
   });
+
+  it('rerender from etherscan filename to other shows ABI default', () => {
+    const { rerender } = render(
+      <ABIUpload
+        abiFileName="etherscan-abi-download.json"
+        isValid={false}
+        isInvalid={false}
+        onChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByText('etherscan-abi-download.json')).toBeInTheDocument();
+    rerender(
+      <ABIUpload abiFileName="other.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    expect(screen.getByText('ABI')).toBeInTheDocument();
+  });
+
+  it('rerender from isValid=false to isValid=true updates class', () => {
+    const { rerender } = render(
+      <ABIUpload abiFileName="t.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    let input = screen.getByLabelText(/abi/i) as HTMLInputElement;
+    expect(input.className).not.toContain('is-valid');
+    rerender(
+      <ABIUpload abiFileName="t.json" isValid={true} isInvalid={false} onChange={vi.fn()} />,
+    );
+    input = screen.getByLabelText(/abi/i) as HTMLInputElement;
+    expect(input.className).toContain('is-valid');
+  });
+
+  it('input has type=file attribute', () => {
+    const { container } = render(
+      <ABIUpload abiFileName="t.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    expect(container.querySelector('input')?.getAttribute('type')).toBe('file');
+  });
+
+  it('label htmlFor / input id link is "import-abi"', () => {
+    const { container } = render(
+      <ABIUpload abiFileName="t.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    const labelFor = container.querySelector('label')?.getAttribute('for');
+    const inputId = container.querySelector('input')?.getAttribute('id');
+    expect(labelFor).toBe(inputId);
+    expect(labelFor).toBe('import-abi');
+  });
+
+  it('repeated re-render does not duplicate inputs', () => {
+    const { container, rerender } = render(
+      <ABIUpload abiFileName="t.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    rerender(
+      <ABIUpload abiFileName="u.json" isValid={true} isInvalid={false} onChange={vi.fn()} />,
+    );
+    rerender(
+      <ABIUpload abiFileName="v.json" isValid={false} isInvalid={true} onChange={vi.fn()} />,
+    );
+    expect(container.querySelectorAll('input').length).toBe(1);
+  });
 });
