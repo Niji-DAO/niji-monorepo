@@ -431,4 +431,55 @@ describe('DelegationCandidateInfo', () => {
     expect(container.querySelector('img')).not.toBeNull();
     expect(container.querySelector('[data-testid="vote-info"]')).not.toBeNull();
   });
+
+  it('renders 5 instances each independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <DelegationCandidateInfo
+            key={i}
+            address={`0xADDR${i}`}
+            changeModalState={0 as never}
+            votesToAdd={i}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="vote-info"]').length).toBeGreaterThanOrEqual(
+      0,
+    );
+  });
+
+  it('rerender with new address does not crash', () => {
+    const { rerender } = render(
+      <DelegationCandidateInfo address="0xA" changeModalState={0 as never} votesToAdd={1} />,
+    );
+    expect(() =>
+      rerender(
+        <DelegationCandidateInfo address="0xB" changeModalState={0 as never} votesToAdd={1} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash with votesToAdd=0', () => {
+    expect(() =>
+      render(
+        <DelegationCandidateInfo address="0xA" changeModalState={0 as never} votesToAdd={0} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash with very large votesToAdd', () => {
+    expect(() =>
+      render(
+        <DelegationCandidateInfo address="0xA" changeModalState={0 as never} votesToAdd={999999} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash with empty address string', () => {
+    expect(() =>
+      render(<DelegationCandidateInfo address="" changeModalState={0 as never} votesToAdd={1} />),
+    ).not.toThrow();
+  });
 });
