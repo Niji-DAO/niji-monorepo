@@ -354,4 +354,38 @@ describe('NavBar', () => {
     const { container } = wrap(<NavBar />);
     expect(container.querySelector('img[alt="Niji DAO"]')?.getAttribute('alt')).toBe('Niji DAO');
   });
+
+  it('renders 3 NavBar instances independently', () => {
+    expect(() =>
+      wrap(
+        <>
+          <NavBar />
+          <NavBar />
+          <NavBar />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender does not crash (re-wrap MemoryRouter)', () => {
+    expect(() => {
+      wrap(<NavBar />);
+      wrap(<NavBar />);
+    }).not.toThrow();
+  });
+
+  it('renders without crash with default props', () => {
+    expect(() => wrap(<NavBar />)).not.toThrow();
+  });
+
+  it('logo image alt text is "Niji DAO"', () => {
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('img[alt="Niji DAO"]')).not.toBeNull();
+  });
+
+  it('renders multiple buttons or links', () => {
+    const { container } = wrap(<NavBar />);
+    const interactiveElements = container.querySelectorAll('button, a');
+    expect(interactiveElements.length).toBeGreaterThanOrEqual(1);
+  });
 });
