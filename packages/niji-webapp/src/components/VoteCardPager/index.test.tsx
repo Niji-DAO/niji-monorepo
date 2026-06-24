@@ -216,4 +216,42 @@ describe('VoteCardPager', () => {
   it('renders without crash for numPages=0', () => {
     expect(() => render(<VoteCardPager {...defaults} numPages={0} />)).not.toThrow();
   });
+
+  it('renders 100 dots for numPages=100', () => {
+    const { container } = render(<VoteCardPager {...defaults} numPages={100} />);
+    expect(container.querySelectorAll('span').length).toBe(100);
+  });
+
+  it('currentPage=5 highlights 5th dot (visual indication)', () => {
+    const { container } = render(<VoteCardPager {...defaults} numPages={10} currentPage={5} />);
+    expect(container.querySelectorAll('span').length).toBe(10);
+  });
+
+  it('renders 5 instances each without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <VoteCardPager key={i} {...defaults} numPages={i + 1} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('disables both arrows simultaneously', () => {
+    const { container } = render(
+      <VoteCardPager {...defaults} isLeftArrowDisabled={true} isRightArrowDisabled={true} />,
+    );
+    const buttons = container.querySelectorAll('button');
+    expect(buttons[0]?.disabled).toBe(true);
+    expect(buttons[1]?.disabled).toBe(true);
+  });
+
+  it('rerender currentPage updates display', () => {
+    const { container, rerender } = render(<VoteCardPager {...defaults} currentPage={0} />);
+    expect(container.querySelectorAll('span').length).toBe(3);
+    rerender(<VoteCardPager {...defaults} currentPage={2} />);
+    expect(container.querySelectorAll('span').length).toBe(3);
+  });
 });
