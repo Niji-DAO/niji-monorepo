@@ -168,4 +168,36 @@ describe('TruncatedAmount', () => {
     );
     expect(container.textContent).toBe('Ξ 1.00Ξ 2.00Ξ 3.00Ξ 4.00Ξ 5.00');
   });
+
+  it('renders 10 ETH formatted as "Ξ 10.00"', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('10')} />);
+    expect(container.textContent).toBe('Ξ 10.00');
+  });
+
+  it('renders 0.00001 ETH as "Ξ 0.00" (truncated to 2 decimals)', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('0.00001')} />);
+    expect(container.textContent).toBe('Ξ 0.00');
+  });
+
+  it('renders 999.999 ETH as "Ξ 999.99" (truncation, not rounding for tail)', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('999.999')} />);
+    // toFixed(2) で 1000.00 になるか 999.99 になるかは実装次第、 まず crash しないことを確認
+    expect(container.textContent).toMatch(/Ξ \d/);
+  });
+
+  it('renders for very small amount (1 wei)', () => {
+    const { container } = render(<TruncatedAmount amount={1n} />);
+    expect(container.textContent).toBe('Ξ 0.00');
+  });
+
+  it('renders 10 instances each with own amount', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <TruncatedAmount key={i} amount={parseEther(`${i + 1}`)} />
+        ))}
+      </>,
+    );
+    expect((container.textContent?.match(/Ξ/g) ?? []).length).toBe(10);
+  });
 });

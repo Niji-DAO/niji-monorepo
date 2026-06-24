@@ -200,4 +200,46 @@ describe('ProposalEditor', () => {
     const { container } = render(<ProposalEditor {...defaults} body="# Header" />);
     expect((container.querySelector('textarea') as HTMLTextAreaElement)?.value).toBe('# Header');
   });
+
+  it('renders 3 instances independently', () => {
+    const { container } = render(
+      <>
+        <ProposalEditor {...defaults} title="A" />
+        <ProposalEditor {...defaults} title="B" />
+        <ProposalEditor {...defaults} title="C" />
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(3);
+  });
+
+  it('renders unicode title + body', () => {
+    const { container } = render(
+      <ProposalEditor {...defaults} title="日本語タイトル" body="日本語本文" />,
+    );
+    expect((container.querySelector('input') as HTMLInputElement)?.value).toBe('日本語タイトル');
+    expect((container.querySelector('textarea') as HTMLTextAreaElement)?.value).toBe('日本語本文');
+  });
+
+  it('renders very long title (500 char)', () => {
+    const longTitle = 'a'.repeat(500);
+    const { container } = render(<ProposalEditor {...defaults} title={longTitle} />);
+    expect((container.querySelector('input') as HTMLInputElement)?.value).toBe(longTitle);
+  });
+
+  it('body textarea + title input have distinct identities', () => {
+    const { container } = render(<ProposalEditor {...defaults} title="t" body="b" />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    const textarea = container.querySelector('textarea') as HTMLTextAreaElement;
+    expect(input.value).toBe('t');
+    expect(textarea.value).toBe('b');
+    expect(input).not.toBe(textarea);
+  });
+
+  it('rerender title only updates input value', () => {
+    const { container, rerender } = render(<ProposalEditor {...defaults} title="first" body="b" />);
+    expect((container.querySelector('input') as HTMLInputElement)?.value).toBe('first');
+    rerender(<ProposalEditor {...defaults} title="second" body="b" />);
+    expect((container.querySelector('input') as HTMLInputElement)?.value).toBe('second');
+    expect((container.querySelector('textarea') as HTMLTextAreaElement)?.value).toBe('b');
+  });
 });
