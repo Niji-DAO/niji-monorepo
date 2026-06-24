@@ -168,4 +168,44 @@ describe('StreamPaymentDateDetailsStep', () => {
     const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
     expect(container.querySelector('p')).not.toBeNull();
   });
+
+  it('next-btn click works after future start + future end', () => {
+    const onNext = vi.fn();
+    const { container } = render(
+      <StreamPaymentDateDetailsStep {...defaults} onNextBtnClick={onNext} />,
+    );
+    const inputs = container.querySelectorAll('input[type="date"]');
+    fireEvent.change(inputs[0], { target: { value: '2030-01-01' } });
+    fireEvent.change(inputs[1], { target: { value: '2030-12-31' } });
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onNext).toHaveBeenCalledTimes(1);
+  });
+
+  it('start date input has "Start" related label', () => {
+    const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+    const inputs = container.querySelectorAll('input[type="date"]');
+    expect(inputs[0].getAttribute('data-label')).toContain('Start');
+  });
+
+  it('end date input has "End" related label', () => {
+    const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+    const inputs = container.querySelectorAll('input[type="date"]');
+    expect(inputs[1].getAttribute('data-label')).toContain('End');
+  });
+
+  it('back button is independent of date validity', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <StreamPaymentDateDetailsStep {...defaults} onPrevBtnClick={onPrev} />,
+    );
+    const inputs = container.querySelectorAll('input[type="date"]');
+    fireEvent.change(inputs[0], { target: { value: '2020-01-01' } });
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onPrev).toHaveBeenCalledTimes(1);
+  });
+
+  it('subtitle paragraph text exists (non-empty)', () => {
+    const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+    expect((container.querySelector('p')?.textContent ?? '').length).toBeGreaterThan(0);
+  });
 });

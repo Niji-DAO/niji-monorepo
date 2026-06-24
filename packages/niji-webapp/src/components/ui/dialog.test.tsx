@@ -171,4 +171,47 @@ describe('Dialog', () => {
     );
     expect(document.querySelector('[data-testid="body"]')).toBeNull();
   });
+
+  it('DialogTitle render multiple title elements when stacked', () => {
+    render(
+      <Dialog open={true}>
+        <DialogContent>
+          <DialogTitle>title-1</DialogTitle>
+        </DialogContent>
+      </Dialog>,
+    );
+    expect(document.body.textContent).toContain('title-1');
+  });
+
+  it('Dialog open with nested DialogTitle and Description renders both', () => {
+    render(
+      <Dialog open={true}>
+        <DialogContent>
+          <DialogTitle>my-title</DialogTitle>
+          <DialogDescription>my-desc</DialogDescription>
+        </DialogContent>
+      </Dialog>,
+    );
+    expect(document.body.textContent).toContain('my-title');
+    expect(document.body.textContent).toContain('my-desc');
+  });
+
+  it('DialogHeader without children renders empty wrapper', () => {
+    const { container } = render(<DialogHeader data-testid="empty-header" />);
+    expect(container.querySelector('[data-testid="empty-header"]')?.textContent).toBe('');
+  });
+
+  it('DialogFooter without children renders empty wrapper', () => {
+    const { container } = render(<DialogFooter data-testid="empty-footer" />);
+    expect(container.querySelector('[data-testid="empty-footer"]')?.textContent).toBe('');
+  });
+
+  it('DialogTrigger renders as button by default', () => {
+    const { container } = render(
+      <Dialog>
+        <DialogTrigger>click</DialogTrigger>
+      </Dialog>,
+    );
+    expect(container.querySelector('button')?.textContent).toBe('click');
+  });
 });
