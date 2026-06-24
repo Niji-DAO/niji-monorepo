@@ -51,4 +51,31 @@ describe('processProposalDescriptionText', () => {
   it('handles title with special markdown chars', () => {
     expect(processProposalDescriptionText('# Hash Header body', '# Hash Header')).toBe(' body');
   });
+
+  it('handles description with consecutive newlines after title', () => {
+    expect(processProposalDescriptionText('Title\n\n\nbody', 'Title')).toBe('\n\n\nbody');
+  });
+
+  it('handles title at end of description', () => {
+    expect(processProposalDescriptionText('body Title', 'Title')).toBe('body ');
+  });
+
+  it('handles 1-char title at start (single character match)', () => {
+    expect(processProposalDescriptionText('Abody', 'A')).toBe('body');
+  });
+
+  it('handles title containing regex replacement sigil ($&, $1) as literal', () => {
+    // $& は String.replace の sigil だが、 search pattern 側は literal なので removal は素直
+    // result 側の treatment は source `''` 直接挿入で sigil は問題ない
+    expect(processProposalDescriptionText('Hello $& world', '$&')).toBe('Hello  world');
+  });
+
+  it('handles emoji-containing title', () => {
+    expect(processProposalDescriptionText('🎉 Proposal text', '🎉 Proposal')).toBe(' text');
+  });
+
+  it('replaces only first instance even with overlapping titles', () => {
+    // 重複 title 'aa' を 'a' で removal、 最初の 'a' のみ removal
+    expect(processProposalDescriptionText('aaaa', 'a')).toBe('aaa');
+  });
 });

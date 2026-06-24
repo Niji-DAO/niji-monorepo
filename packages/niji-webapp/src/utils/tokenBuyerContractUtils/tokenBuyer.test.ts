@@ -78,4 +78,35 @@ describe('useEthNeeded', () => {
     renderHook(() => useEthNeeded('0xADDR', 0));
     expect(lastCallOpts().args).toEqual([0n, 5000n]);
   });
+
+  it('returns toString() of very large ethNeeded (1e30 magnitude)', () => {
+    const huge = 1_000_000_000_000_000_000_000_000n;
+    useReadNijiTokenBuyerEthNeededMock.mockReturnValue({ data: huge });
+    const { result } = renderHook(() => useEthNeeded('0xADDR', 1));
+    expect(result.current).toBe(huge.toString());
+  });
+
+  it('BUFFER_BPS is always 5000n at args[1] regardless of additionalTokens', () => {
+    renderHook(() => useEthNeeded('0xADDR', 1));
+    expect(lastCallOpts().args[1]).toBe(5000n);
+    renderHook(() => useEthNeeded('0xADDR', 9999));
+    expect(lastCallOpts().args[1]).toBe(5000n);
+  });
+
+  it('skip=undefined behaves as false (enabled=true)', () => {
+    renderHook(() => useEthNeeded('0xADDR', 10, undefined));
+    expect(lastCallOpts().query.enabled).toBe(true);
+  });
+
+  it('returns undefined when hook returns null data (falsy)', () => {
+    useReadNijiTokenBuyerEthNeededMock.mockReturnValue({ data: null });
+    const { result } = renderHook(() => useEthNeeded('0xADDR', 10));
+    expect(result.current).toBeUndefined();
+  });
+
+  it('disabled hook returns undefined consistently (skip + valid address)', () => {
+    useReadNijiTokenBuyerEthNeededMock.mockReturnValue({ data: undefined });
+    const { result } = renderHook(() => useEthNeeded('0xADDR', 10, true));
+    expect(result.current).toBeUndefined();
+  });
 });
