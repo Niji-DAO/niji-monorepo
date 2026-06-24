@@ -844,4 +844,104 @@ describe('VoteCard', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 10 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <VoteCard
+              key={i}
+              proposal={{ id: '1', forCount: 5n, againstCount: 0n, abstainCount: 0n } as never}
+              percentage={50}
+              nounIds={[]}
+              variant={VoteCardVariant.FOR}
+              delegateGroupedVoteData={[]}
+              isNounsDAOProp={true}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves component', () => {
+    const { rerender } = render(
+      <VoteCard
+        proposal={{ id: '1', forCount: 5n, againstCount: 0n, abstainCount: 0n } as never}
+        percentage={50}
+        nounIds={[]}
+        variant={VoteCardVariant.FOR}
+        delegateGroupedVoteData={[]}
+        isNounsDAOProp={true}
+      />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <VoteCard
+            proposal={
+              {
+                id: String(i),
+                forCount: BigInt(i),
+                againstCount: 0n,
+                abstainCount: 0n,
+              } as never
+            }
+            percentage={i % 100}
+            nounIds={[]}
+            variant={VoteCardVariant.FOR}
+            delegateGroupedVoteData={[]}
+            isNounsDAOProp={true}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 500 nounIds', () => {
+    const ids = Array.from({ length: 500 }, (_, i) => i);
+    expect(() =>
+      render(
+        <VoteCard
+          proposal={{ id: '1', forCount: 500n, againstCount: 0n, abstainCount: 0n } as never}
+          percentage={100}
+          nounIds={ids}
+          variant={VoteCardVariant.FOR}
+          delegateGroupedVoteData={[]}
+          isNounsDAOProp={true}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles negative percentage edge case', () => {
+    expect(() =>
+      render(
+        <VoteCard
+          proposal={{ id: '1', forCount: 0n, againstCount: 0n, abstainCount: 0n } as never}
+          percentage={-10}
+          nounIds={[]}
+          variant={VoteCardVariant.ABSTAIN}
+          delegateGroupedVoteData={[]}
+          isNounsDAOProp={true}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles percentage > 100', () => {
+    expect(() =>
+      render(
+        <VoteCard
+          proposal={{ id: '1', forCount: 0n, againstCount: 0n, abstainCount: 0n } as never}
+          percentage={150}
+          nounIds={[]}
+          variant={VoteCardVariant.AGAINST}
+          delegateGroupedVoteData={[]}
+          isNounsDAOProp={true}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });

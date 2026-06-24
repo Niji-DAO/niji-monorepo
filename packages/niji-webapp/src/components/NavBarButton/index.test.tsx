@@ -315,4 +315,43 @@ describe('NavBarButton', () => {
       expect(() => render(<NavBarButton buttonText="X" buttonStyle={style} />)).not.toThrow();
     });
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <NavBarButton key={i} buttonText={`btn-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves button text', () => {
+    const { container, rerender } = render(<NavBarButton buttonText="x" />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<NavBarButton buttonText={`btn-${i}`} />);
+    }
+    expect(container.textContent).toContain('btn-29');
+  });
+
+  it('rapid 100 onClick events fire handler 100 times', () => {
+    const onClick = vi.fn();
+    const { container } = render(<NavBarButton buttonText="x" onClick={onClick} />);
+    const target = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 100; i++) fireEvent.click(target);
+    expect(onClick).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles unicode buttonText', () => {
+    const { container } = render(<NavBarButton buttonText="🎉 ボタン" />);
+    expect(container.textContent).toContain('🎉 ボタン');
+  });
+
+  it('handles very long buttonText (1000 char)', () => {
+    const long = 'a'.repeat(1000);
+    const { container } = render(<NavBarButton buttonText={long} />);
+    expect(container.textContent?.length).toBeGreaterThanOrEqual(1000);
+  });
 });
