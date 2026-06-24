@@ -252,4 +252,41 @@ describe('ModalTextPrimary', () => {
     expect(container.querySelector('div')?.textContent).toContain('middle');
     expect(container.querySelector('div')?.textContent).toContain('after');
   });
+
+  it('renders 50 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <ModalTextPrimary key={i}>{`primary-${i}`}</ModalTextPrimary>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(50);
+  });
+
+  it('renders array children', () => {
+    const { container } = render(<ModalTextPrimary>{['x', 'y', 'z']}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('xyz');
+  });
+
+  it('renders 1000 char long text', () => {
+    const longStr = 'x'.repeat(1000);
+    const { container } = render(<ModalTextPrimary>{longStr}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe(longStr);
+  });
+
+  it('rerender preserves wrapper element type', () => {
+    const { container, rerender } = render(<ModalTextPrimary>a</ModalTextPrimary>);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+    rerender(<ModalTextPrimary>b</ModalTextPrimary>);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
+
+  it('rerender 10 times preserves content', () => {
+    const { container, rerender } = render(<ModalTextPrimary>start</ModalTextPrimary>);
+    for (let i = 0; i < 10; i++) {
+      rerender(<ModalTextPrimary>{`item-${i}`}</ModalTextPrimary>);
+      expect(container.querySelector('div')?.textContent).toBe(`item-${i}`);
+    }
+  });
 });

@@ -499,4 +499,68 @@ describe('NijiContent', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 20 instances each in single MemoryRouter wrap', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 20 }, (_, i) => (
+            <NijiContent key={i} nounId={BigInt(i)} auctionId={BigInt(i)} isCool={false} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash with 0n nounId + 999n auctionId', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent nounId={0n} auctionId={999n} isCool={false} />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders consecutive 5 times without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        render(
+          <MemoryRouter>
+            <NijiContent nounId={BigInt(i)} auctionId={1n} isCool={i % 2 === 0} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('useAtomValue=undefined treated as falsy', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent nounId={1n} auctionId={1n} isCool={false} />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender preserves niji-title element', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <MemoryRouter>
+        <NijiContent nounId={1n} auctionId={1n} isCool={false} />
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('[data-testid="niji-title"]')).not.toBeNull();
+    rerender(
+      <MemoryRouter>
+        <NijiContent nounId={2n} auctionId={2n} isCool={false} />
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('[data-testid="niji-title"]')).not.toBeNull();
+  });
 });

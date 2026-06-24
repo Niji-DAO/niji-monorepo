@@ -343,4 +343,60 @@ describe('SettleManuallyBtn', () => {
       render(<SettleManuallyBtn auction={wei} settleAuctionHandler={() => {}} />),
     ).not.toThrow();
   });
+
+  it('renders 20 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <SettleManuallyBtn
+              key={i}
+              auction={{ ...auction, nounId: BigInt(i) }}
+              settleAuctionHandler={vi.fn()}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 50 clicks invoke handler 50 times', () => {
+    const handler = vi.fn();
+    const { container } = render(
+      <SettleManuallyBtn auction={auction} settleAuctionHandler={handler} />,
+    );
+    const btn = container.querySelector('button');
+    if (btn) {
+      for (let i = 0; i < 50; i++) fireEvent.click(btn);
+    }
+    expect(handler).toHaveBeenCalledTimes(50);
+  });
+
+  it('rerender same handler invokes handler N times', () => {
+    const handler = vi.fn();
+    const { container, rerender } = render(
+      <SettleManuallyBtn auction={auction} settleAuctionHandler={handler} />,
+    );
+    rerender(<SettleManuallyBtn auction={auction} settleAuctionHandler={handler} />);
+    const btn = container.querySelector('button');
+    if (btn) {
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+    }
+    expect(handler).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders for endTime 1 hour in future', () => {
+    const future = { ...auction, endTime: BigInt(Math.floor(Date.now() / 1000) + 3600) };
+    expect(() =>
+      render(<SettleManuallyBtn auction={future} settleAuctionHandler={() => {}} />),
+    ).not.toThrow();
+  });
+
+  it('renders for 0n bidder amount auction', () => {
+    const zero = { ...auction, amount: 0n, bidder: '0x0' };
+    expect(() =>
+      render(<SettleManuallyBtn auction={zero} settleAuctionHandler={() => {}} />),
+    ).not.toThrow();
+  });
 });
