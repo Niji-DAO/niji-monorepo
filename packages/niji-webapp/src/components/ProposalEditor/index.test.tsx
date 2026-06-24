@@ -280,4 +280,46 @@ describe('ProposalEditor', () => {
     expect(container.querySelectorAll('input').length).toBe(1);
     expect(container.querySelectorAll('textarea').length).toBe(1);
   });
+
+  it('renders 20 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <ProposalEditor key={i} {...defaults} title={`t${i}`} body={`b${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 50 title input events fire 50 times', () => {
+    const onTitle = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onTitleInput={onTitle} />);
+    const input = container.querySelector('input')!;
+    for (let i = 0; i < 50; i++) fireEvent.input(input, { target: { value: `t${i}` } });
+    expect(onTitle).toHaveBeenCalledTimes(50);
+  });
+
+  it('renders 1000 char long title in input', () => {
+    const longTitle = 'a'.repeat(1000);
+    const { container } = render(<ProposalEditor {...defaults} title={longTitle} />);
+    expect((container.querySelector('input') as HTMLInputElement)?.value).toBe(longTitle);
+  });
+
+  it('rerender from "Proposal" to "Candidate" mode', () => {
+    const { container, rerender } = render(<ProposalEditor {...defaults} />);
+    expect(container.textContent).toContain('Proposal');
+    rerender(<ProposalEditor {...defaults} isCandidate={true} />);
+    expect(container.textContent).toContain('Candidate');
+  });
+
+  it('renders consistent input + textarea across 10 rerenders', () => {
+    const { container, rerender } = render(<ProposalEditor {...defaults} />);
+    for (let i = 0; i < 10; i++) {
+      rerender(<ProposalEditor {...defaults} title={`t${i}`} />);
+      expect(container.querySelector('input')).not.toBeNull();
+      expect(container.querySelector('textarea')).not.toBeNull();
+    }
+  });
 });

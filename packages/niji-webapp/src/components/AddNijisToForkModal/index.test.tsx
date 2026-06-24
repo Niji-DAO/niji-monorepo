@@ -426,4 +426,52 @@ describe('AddNijisToForkModal', () => {
       rerender(<AddNijisToForkModal {...baseProps} isForkingPeriod={true} />),
     ).not.toThrow();
   });
+
+  it('renders 20 instances each in single mount', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <AddNijisToForkModal
+              key={i}
+              {...baseProps}
+              ownedNouns={Array.from({ length: i + 1 }, (_, j) => j)}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles all 4 setApprovalState statuses', () => {
+    const statuses: ApprovalStatus[] = ['None', 'PendingSignature', 'Mining', 'Success'];
+    statuses.forEach(status => {
+      hookState.setApprovalState = { status };
+      expect(() => render(<AddNijisToForkModal {...baseProps} />)).not.toThrow();
+      hookState.setApprovalState = { status: 'None' };
+    });
+  });
+
+  it('handles all escrowToForkState transition states', () => {
+    const statuses: ApprovalStatus[] = ['None', 'PendingSignature', 'Mining', 'Success', 'Fail'];
+    statuses.forEach(status => {
+      hookState.escrowToForkState = { status };
+      expect(() => render(<AddNijisToForkModal {...baseProps} />)).not.toThrow();
+      hookState.escrowToForkState = { status: 'None' };
+    });
+  });
+
+  it('renders for 100 owned nouns', () => {
+    const nouns = Array.from({ length: 100 }, (_, i) => i);
+    expect(() => render(<AddNijisToForkModal {...baseProps} ownedNouns={nouns} />)).not.toThrow();
+  });
+
+  it('renders with empty proposals list', () => {
+    hookState.proposals = [];
+    expect(() => render(<AddNijisToForkModal {...baseProps} />)).not.toThrow();
+    hookState.proposals = [
+      { id: '1', title: 'Proposal One' },
+      { id: '2', title: 'Proposal Two' },
+    ];
+  });
 });

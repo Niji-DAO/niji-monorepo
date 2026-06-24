@@ -305,4 +305,64 @@ describe('VoteProgressBar', () => {
     rerender(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={100} />);
     expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 100%');
   });
+
+  it('renders 50 instances each independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <VoteProgressBar
+            key={i}
+            variant={[VoteCardVariant.FOR, VoteCardVariant.AGAINST, VoteCardVariant.ABSTAIN][i % 3]}
+            percentage={i * 2}
+          />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(50);
+  });
+
+  it('handles boundary percentages (-100, 1000)', () => {
+    expect(() =>
+      render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={-100} />),
+    ).not.toThrow();
+    expect(() =>
+      render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={1000} />),
+    ).not.toThrow();
+  });
+
+  it('rerender 20 times preserves inner div', () => {
+    const { container, rerender } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />,
+    );
+    for (let i = 0; i < 20; i++) {
+      rerender(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={i * 5} />);
+      expect(container.querySelectorAll('div')[1]).not.toBeNull();
+    }
+  });
+
+  it('multiple variants 30 instances each independent', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 30 }, (_, i) => {
+          const v =
+            i % 3 === 0
+              ? VoteCardVariant.FOR
+              : i % 3 === 1
+                ? VoteCardVariant.AGAINST
+                : VoteCardVariant.ABSTAIN;
+          return <VoteProgressBar key={i} variant={v} percentage={i} />;
+        })}
+      </>,
+    );
+    expect(container.children.length).toBe(30);
+  });
+
+  it('renders consistent 2 divs per instance', () => {
+    for (let i = 0; i < 5; i++) {
+      const { container } = render(
+        <VoteProgressBar variant={VoteCardVariant.FOR} percentage={i * 10} />,
+      );
+      expect(container.querySelectorAll('div').length).toBe(2);
+    }
+  });
 });
