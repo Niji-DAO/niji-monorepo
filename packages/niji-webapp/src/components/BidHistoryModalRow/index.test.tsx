@@ -92,4 +92,36 @@ describe('BidHistoryModalRow', () => {
       'https://etherscan.io/tx/0xdeadbeef',
     );
   });
+
+  it('renders large amount (1000 ETH)', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const large = { ...bid, value: parseEther('1000') };
+    const { container } = render(<BidHistoryModalRow bid={large} index={1} />);
+    expect(container.textContent).toContain('Ξ 1000.00');
+  });
+
+  it('renders avatar img for different sender', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const diff = { ...bid, sender: '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' as `0x${string}` };
+    const { container } = render(<BidHistoryModalRow bid={diff} index={1} />);
+    expect(container.querySelector(`img[alt="${diff.sender}"]`)).not.toBeNull();
+  });
+
+  it('extended=true bid renders normally', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const ext = { ...bid, extended: true };
+    expect(() => render(<BidHistoryModalRow bid={ext} index={1} />)).not.toThrow();
+  });
+
+  it('handles large timestamp (year 2200+)', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const future = { ...bid, timestamp: 7_258_118_400n };
+    expect(() => render(<BidHistoryModalRow bid={future} index={1} />)).not.toThrow();
+  });
+
+  it('renders exactly 1 anchor element (etherscan link)', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    expect(container.querySelectorAll('a').length).toBe(1);
+  });
 });

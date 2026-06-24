@@ -101,4 +101,53 @@ describe('BidHistoryModal', () => {
     if (backdrop) fireEvent.click(backdrop);
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
+
+  it('close button fires onDismiss on repeated clicks', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const onDismiss = vi.fn();
+    render(<BidHistoryModal auction={auction} onDismiss={onDismiss} />);
+    const btn = document.getElementById('overlay-root')?.querySelector('button');
+    if (btn) {
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders 10 bid rows when 10 bids present', () => {
+    const bids = Array.from({ length: 10 }, (_, i) => ({ transactionHash: `0x${i}` }));
+    useAuctionBidsMock.mockReturnValue(bids);
+    render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelectorAll('[data-testid="row"]').length,
+    ).toBe(10);
+  });
+
+  it('renders exactly 1 NijiRoundedCorners (single instance contract)', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelectorAll('[data-testid="niji-rounded"]')
+        .length,
+    ).toBe(1);
+  });
+
+  it('null-state text omitted when bids exist', () => {
+    useAuctionBidsMock.mockReturnValue([{ transactionHash: '0x1' }]);
+    render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.textContent).not.toContain(
+      'Bids will appear here',
+    );
+  });
+
+  it('renders for large nounId auction', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const largeAuction = { ...auction, nounId: 999999n };
+    render(<BidHistoryModal auction={largeAuction} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="niji-rounded"]')
+        ?.textContent,
+    ).toBe('999999');
+  });
 });
