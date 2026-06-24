@@ -423,4 +423,58 @@ describe('Bid', () => {
     ).not.toThrow();
     hookState.placeBid.isPending = false;
   });
+
+  it('renders 20 Bid instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <Bid
+              key={i}
+              auction={makeAuction({ nounId: BigInt(i) }) as never}
+              auctionEnded={false}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders for settleAuction isError=true', () => {
+    hookState.settleAuction.isError = true;
+    expect(() =>
+      render(<Bid auction={makeAuction() as never} auctionEnded={true} />),
+    ).not.toThrow();
+    hookState.settleAuction.isError = false;
+  });
+
+  it('renders for placeBid isSuccess=true', () => {
+    hookState.placeBid.isSuccess = true;
+    expect(() =>
+      render(<Bid auction={makeAuction() as never} auctionEnded={false} />),
+    ).not.toThrow();
+    hookState.placeBid.isSuccess = false;
+  });
+
+  it('rapid 30 input change events update value', () => {
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    for (let i = 0; i < 30; i++) {
+      fireEvent.change(input, { target: { value: `${i}.5` } });
+    }
+    expect(input.value).toBe('29.5');
+  });
+
+  it('rerender from auctionEnded=true to false', () => {
+    const { rerender } = render(<Bid auction={makeAuction() as never} auctionEnded={true} />);
+    expect(() =>
+      rerender(<Bid auction={makeAuction() as never} auctionEnded={false} />),
+    ).not.toThrow();
+  });
+
+  it('renders for settled=true auction', () => {
+    expect(() =>
+      render(<Bid auction={makeAuction({ settled: true }) as never} auctionEnded={true} />),
+    ).not.toThrow();
+  });
 });

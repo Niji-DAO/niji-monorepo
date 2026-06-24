@@ -434,4 +434,76 @@ describe('ABIUpload Component', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 30 ABIUpload instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ABIUpload
+              key={i}
+              abiFileName={`file${i}.json`}
+              isValid={false}
+              isInvalid={false}
+              onChange={vi.fn()}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 50 file change events fire 50 times', () => {
+    const handleChange = vi.fn();
+    render(
+      <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={handleChange} />,
+    );
+    const input = screen.getByLabelText(/abi/i) as HTMLInputElement;
+    for (let i = 0; i < 50; i++) {
+      fireEvent.change(input, {
+        target: { files: [new File([`c${i}`], `f${i}.json`, { type: 'application/json' })] },
+      });
+    }
+    expect(handleChange).toHaveBeenCalledTimes(50);
+  });
+
+  it('rerender all flag combinations without crash', () => {
+    const flags = [
+      { isValid: true, isInvalid: false },
+      { isValid: false, isInvalid: true },
+      { isValid: true, isInvalid: true },
+      { isValid: false, isInvalid: false },
+    ];
+    const { rerender } = render(
+      <ABIUpload abiFileName="x.json" {...flags[0]} onChange={vi.fn()} />,
+    );
+    flags.slice(1).forEach(f => {
+      expect(() =>
+        rerender(<ABIUpload abiFileName="x.json" {...f} onChange={vi.fn()} />),
+      ).not.toThrow();
+    });
+  });
+
+  it('handles abiFileName boundary "etherscan-abi-download.json"', () => {
+    const { container } = render(
+      <ABIUpload
+        abiFileName="etherscan-abi-download.json"
+        isValid={false}
+        isInvalid={false}
+        onChange={vi.fn()}
+      />,
+    );
+    expect(container.textContent).toContain('etherscan-abi-download.json');
+  });
+
+  it('renders consistent label class across rerenders', () => {
+    const { container, rerender } = render(
+      <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    const labelCls = container.querySelector('label')?.className;
+    rerender(
+      <ABIUpload abiFileName="y.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    expect(container.querySelector('label')?.className).toBe(labelCls);
+  });
 });
