@@ -175,4 +175,41 @@ describe('BrandNumericEntry', () => {
     expect(container.querySelector('span')?.textContent).toBe('My Label');
     expect(container.querySelector('input')?.getAttribute('placeholder')).toBe('Type here');
   });
+
+  it('renders 5 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <BrandNumericEntry key={i} label={`L${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(5);
+  });
+
+  it('rerender from invalid=true to false removes invalid class', () => {
+    const { container, rerender } = render(<BrandNumericEntry isInvalid />);
+    expect(container.querySelector('input')?.className).toMatch(/invalid/i);
+    rerender(<BrandNumericEntry isInvalid={false} />);
+    expect(container.querySelector('input')?.className).not.toMatch(/invalid/i);
+  });
+
+  it('rapid 10 input change events do not crash', () => {
+    const { container } = render(<BrandNumericEntry />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    for (let i = 0; i < 10; i++) {
+      fireEvent.change(input, { target: { value: `${i}` } });
+    }
+    expect(input).not.toBeNull();
+  });
+
+  it('renders unicode label', () => {
+    const { container } = render(<BrandNumericEntry label="金額" />);
+    expect(container.querySelector('span')?.textContent).toBe('金額');
+  });
+
+  it('empty placeholder still preserves input element', () => {
+    const { container } = render(<BrandNumericEntry placeholder="" />);
+    expect(container.querySelector('input')).not.toBeNull();
+  });
 });
