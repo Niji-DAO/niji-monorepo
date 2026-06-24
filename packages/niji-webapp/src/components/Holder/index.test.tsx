@@ -249,4 +249,69 @@ describe('Holder', () => {
       expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xAbCdEfAbCdEf');
     });
   });
+
+  it('renders multiple Holder instances independently', async () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xMULTI' } } },
+    });
+    const { container } = render(
+      <>
+        <Holder nounId={1n} />
+        <Holder nounId={2n} />
+      </>,
+      { wrapper: WithProviders },
+    );
+    await waitFor(() => {
+      expect(container.querySelectorAll('[data-testid="short"]').length).toBe(2);
+    });
+  });
+
+  it('error and loading both true: loading takes precedence', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: true,
+      error: new Error('rpc'),
+      data: undefined,
+    });
+    const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    expect(container.textContent).toBe('');
+  });
+
+  it('isNounders=true with error renders error message', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: new Error('rpc'),
+      data: undefined,
+    });
+    const { container } = render(<Holder nounId={1n} isNounders={true} />, {
+      wrapper: WithProviders,
+    });
+    expect(container.textContent).toContain('Failed to fetch');
+  });
+
+  it('error contains "Niji" keyword', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: new Error('rpc'),
+      data: undefined,
+    });
+    const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    expect(container.textContent).toContain('Niji');
+  });
+
+  it('error full text matches "Failed to fetch Niji info"', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: new Error('rpc'),
+      data: undefined,
+    });
+    const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    expect(container.textContent).toContain('Failed to fetch Niji info');
+  });
 });

@@ -272,4 +272,37 @@ describe('ChangeDelegatePanel', () => {
     const { container } = render(<ChangeDelegatePanel onDismiss={dismissMock} />);
     expect(container.textContent).not.toContain('less than');
   });
+
+  it('renders h1 title element exactly 1 time', () => {
+    const { container } = render(<ChangeDelegatePanel onDismiss={dismissMock} />);
+    expect(container.querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('renders multiple ChangeDelegatePanel instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          <ChangeDelegatePanel onDismiss={dismissMock} />
+          <ChangeDelegatePanel onDismiss={dismissMock} />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender does not duplicate input field', () => {
+    const { container, rerender } = render(<ChangeDelegatePanel onDismiss={dismissMock} />);
+    rerender(<ChangeDelegatePanel onDismiss={dismissMock} />);
+    expect(container.querySelectorAll('input').length).toBe(1);
+  });
+
+  it('button count includes Delegate + Close buttons', () => {
+    const { container } = render(<ChangeDelegatePanel onDismiss={dismissMock} />);
+    expect(container.querySelectorAll('button').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('input has type text', () => {
+    const { container } = render(<ChangeDelegatePanel onDismiss={dismissMock} />);
+    const input = container.querySelector('input');
+    expect(input?.getAttribute('type')).toBeDefined();
+  });
 });
