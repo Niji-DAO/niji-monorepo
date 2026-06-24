@@ -42,4 +42,39 @@ describe('getProposalVoteIcon', () => {
     expect(yes).not.toBe(no);
     expect(abs).not.toBe(no);
   });
+
+  it('returns AbsentVote icon for undefined support + DEFEATED', () => {
+    expect(getProposalVoteIcon(makeProposal(ProposalState.DEFEATED), undefined)).toBeTruthy();
+  });
+
+  it('returns AbsentVote icon for undefined support + SUCCEEDED', () => {
+    expect(getProposalVoteIcon(makeProposal(ProposalState.SUCCEEDED), undefined)).toBeTruthy();
+  });
+
+  it('returns AbsentVote icon for undefined support + VETOED', () => {
+    expect(getProposalVoteIcon(makeProposal(ProposalState.VETOED), undefined)).toBeTruthy();
+  });
+
+  it('returns AbsentVote icon for undefined support + CANCELLED', () => {
+    expect(getProposalVoteIcon(makeProposal(ProposalState.CANCELLED), undefined)).toBeTruthy();
+  });
+
+  it('PendingVote icon for PENDING differs from AbsentVote for terminal state', () => {
+    const pending = getProposalVoteIcon(makeProposal(ProposalState.PENDING), undefined);
+    const terminal = getProposalVoteIcon(makeProposal(ProposalState.EXECUTED), undefined);
+    expect(pending).not.toBe(terminal);
+  });
+
+  it('PendingVote vs FOR vote on ACTIVE state are different icons', () => {
+    const pending = getProposalVoteIcon(makeProposal(ProposalState.ACTIVE), undefined);
+    const yes = getProposalVoteIcon(makeProposal(ProposalState.ACTIVE), Vote.FOR);
+    expect(pending).not.toBe(yes);
+  });
+
+  it('returns NoVote (switch default) for AGAINST regardless of proposal status', () => {
+    // status は switch 経路に到達しないので、 PENDING / EXECUTED どちらでも NoVote 同じ
+    const a = getProposalVoteIcon(makeProposal(ProposalState.PENDING), Vote.AGAINST);
+    const b = getProposalVoteIcon(makeProposal(ProposalState.EXECUTED), Vote.AGAINST);
+    expect(a).toBe(b);
+  });
 });

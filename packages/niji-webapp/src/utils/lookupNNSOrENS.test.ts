@@ -64,4 +64,48 @@ describe('lookupNNSOrENS', () => {
     await lookupNNSOrENS(client, TARGET);
     expect(readContract.mock.calls[0][0].args).toEqual([TARGET]);
   });
+
+  it('does NOT call ENS when NNS resolves to a non-empty string (1 call only)', async () => {
+    const readContract = vi.fn().mockResolvedValueOnce('alice.⌐◨-◨');
+    const client: Client = { readContract };
+    await lookupNNSOrENS(client, TARGET);
+    expect(readContract).toHaveBeenCalledTimes(1);
+  });
+
+  it('falls through to ENS when NNS returns undefined (typeof !== "string")', async () => {
+    const readContract = vi.fn().mockResolvedValueOnce(undefined).mockResolvedValueOnce('bob.eth');
+    const client: Client = { readContract };
+    await expect(lookupNNSOrENS(client, TARGET)).resolves.toBe('bob.eth');
+    expect(readContract).toHaveBeenCalledTimes(2);
+  });
+
+  it('falls through to ENS when NNS returns 0 (typeof !== "string")', async () => {
+    const readContract = vi.fn().mockResolvedValueOnce(0).mockResolvedValueOnce('zero.eth');
+    const client: Client = { readContract };
+    await expect(lookupNNSOrENS(client, TARGET)).resolves.toBe('zero.eth');
+    expect(readContract).toHaveBeenCalledTimes(2);
+  });
+
+  it('passes target as args also to ENS fallback call (preserves target)', async () => {
+    const readContract = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('NNS'))
+      .mockResolvedValueOnce('e.eth');
+    const client: Client = { readContract };
+    await lookupNNSOrENS(client, TARGET);
+    expect(readContract.mock.calls[1][0].args).toEqual([TARGET]);
+  });
+
+  it('NNS and ENS use the same functionName "resolve" with different addresses', async () => {
+    const readContract = vi
+      .fn()
+      .mockResolvedValueOnce('') // NNS empty -> ENS
+      .mockResolvedValueOnce('y.eth');
+    const client: Client = { readContract };
+    await lookupNNSOrENS(client, TARGET);
+    expect(readContract.mock.calls[0][0].functionName).toBe('resolve');
+    expect(readContract.mock.calls[1][0].functionName).toBe('resolve');
+    expect(readContract.mock.calls[0][0].address).toBe(NNS_ADDR);
+    expect(readContract.mock.calls[1][0].address).toBe(ENS_ADDR);
+  });
 });
