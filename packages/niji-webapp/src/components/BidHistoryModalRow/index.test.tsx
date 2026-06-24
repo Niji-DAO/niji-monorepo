@@ -359,4 +359,49 @@ describe('BidHistoryModalRow', () => {
     const { container: c1 } = render(<BidHistoryModalRow bid={bid} index={1} />);
     expect(c1.querySelectorAll('img').length).toBe(1);
   });
+
+  it('renders 30 BidHistoryModalRow instances independently', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(
+      <>
+        {Array.from({ length: 30 }, (_, i) => (
+          <BidHistoryModalRow key={i} bid={bid} index={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(30);
+  });
+
+  it('renders 100 different bid values consecutively', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    for (let i = 0; i < 100; i++) {
+      const newBid = { ...bid, value: BigInt(i + 1) * 1_000_000_000_000_000_000n };
+      expect(() => render(<BidHistoryModalRow bid={newBid} index={i} />)).not.toThrow();
+    }
+  });
+
+  it('rerender 30 times preserves anchor', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container, rerender } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<BidHistoryModalRow bid={bid} index={i} />);
+      expect(container.querySelector('a')).not.toBeNull();
+    }
+  });
+
+  it('handles 50 different ENS names', () => {
+    for (let i = 0; i < 50; i++) {
+      vi.mocked(useReverseENSLookUp).mockReturnValue(`name${i}.eth`);
+      vi.mocked(containsBlockedText).mockReturnValue(false);
+      expect(() => render(<BidHistoryModalRow bid={bid} index={1} />)).not.toThrow();
+    }
+  });
+
+  it('handles 20 different timestamps', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    for (let i = 0; i < 20; i++) {
+      const newBid = { ...bid, timestamp: BigInt(1735689600 + i * 86400) };
+      expect(() => render(<BidHistoryModalRow bid={newBid} index={1} />)).not.toThrow();
+    }
+  });
 });

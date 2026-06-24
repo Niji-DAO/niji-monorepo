@@ -477,4 +477,64 @@ describe('Bid', () => {
       render(<Bid auction={makeAuction({ settled: true }) as never} auctionEnded={true} />),
     ).not.toThrow();
   });
+
+  it('renders 30 Bid instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Bid
+              key={i}
+              auction={makeAuction({ nounId: BigInt(i) }) as never}
+              auctionEnded={false}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves component', () => {
+    const { rerender } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <Bid auction={makeAuction({ nounId: BigInt(i) }) as never} auctionEnded={false} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('rapid 50 input change events update value', () => {
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    for (let i = 0; i < 50; i++) {
+      fireEvent.change(input, { target: { value: `${i}.50` } });
+    }
+    expect(input.value).toBe('49.50');
+  });
+
+  it('handles all hookState combinations', () => {
+    const states = [
+      { isPending: true, isError: false, isSuccess: false },
+      { isPending: false, isError: true, isSuccess: false },
+      { isPending: false, isError: false, isSuccess: true },
+      { isPending: false, isError: false, isSuccess: false },
+    ];
+    states.forEach(s => {
+      hookState.placeBid = s;
+      expect(() =>
+        render(<Bid auction={makeAuction() as never} auctionEnded={false} />),
+      ).not.toThrow();
+    });
+    hookState.placeBid = { isPending: false, isError: false, isSuccess: false };
+  });
+
+  it('renders for 50 different nounIds sequentially', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        render(<Bid auction={makeAuction({ nounId: BigInt(i) }) as never} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
 });

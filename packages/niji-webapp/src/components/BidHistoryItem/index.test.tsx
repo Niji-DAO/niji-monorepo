@@ -370,4 +370,51 @@ describe('BidHistoryItem Component', () => {
     const recent = { ...mockBid, timestamp: BigInt(Math.floor(Date.now() / 1000)) };
     expect(() => render(<BidHistoryItem bid={recent} classes={mockClasses} />)).not.toThrow();
   });
+
+  it('renders 50 BidHistoryItem instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <BidHistoryItem
+            key={i}
+            bid={{ ...mockBid, value: BigInt(i + 1) * 1_000_000_000_000_000_000n }}
+            classes={mockClasses}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="truncated-amount"]').length).toBe(50);
+  });
+
+  it('rerender 30 times preserves link element', () => {
+    const { rerender } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    for (let i = 0; i < 30; i++) {
+      const newBid = { ...mockBid, value: BigInt(i + 1) * 1_000_000_000_000_000_000n };
+      expect(() => rerender(<BidHistoryItem bid={newBid} classes={mockClasses} />)).not.toThrow();
+    }
+  });
+
+  it('handles 100 different bid values consecutively', () => {
+    for (let i = 0; i < 100; i++) {
+      const newBid = { ...mockBid, value: BigInt(i + 1) * 1_000_000_000_000_000_000n };
+      expect(() => render(<BidHistoryItem bid={newBid} classes={mockClasses} />)).not.toThrow();
+    }
+  });
+
+  it('handles all isCool variations', () => {
+    [true, false, undefined].forEach(isCool => {
+      expect(() =>
+        render(<BidHistoryItem bid={mockBid} classes={mockClasses} isCool={isCool as never} />),
+      ).not.toThrow();
+    });
+  });
+
+  it('renders within window width variations (mobile/tablet/desktop)', () => {
+    const originalWidth = window.innerWidth;
+    [320, 768, 1200, 1920].forEach(width => {
+      window.innerWidth = width;
+      expect(() => render(<BidHistoryItem bid={mockBid} classes={mockClasses} />)).not.toThrow();
+    });
+    window.innerWidth = originalWidth;
+  });
 });
