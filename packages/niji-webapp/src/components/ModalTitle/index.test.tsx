@@ -84,4 +84,45 @@ describe('ModalTitle', () => {
     const className = container.querySelector('div')?.className ?? '';
     expect(className).toMatch(/_.+/);
   });
+
+  it('renders unicode children inside h1', () => {
+    const { container } = render(<ModalTitle>タイトル</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('タイトル');
+  });
+
+  it('rerender updates h1 text', () => {
+    const { container, rerender } = render(<ModalTitle>A</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('A');
+    rerender(<ModalTitle>B</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('B');
+  });
+
+  it('renders empty string children as empty h1', () => {
+    const { container } = render(<ModalTitle>{''}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('');
+  });
+
+  it('multiple ModalTitle instances render independently', () => {
+    const { container } = render(
+      <>
+        <ModalTitle>first</ModalTitle>
+        <ModalTitle>second</ModalTitle>
+      </>,
+    );
+    const h1s = container.querySelectorAll('h1');
+    expect(h1s[0].textContent).toBe('first');
+    expect(h1s[1].textContent).toBe('second');
+  });
+
+  it('Fragment children render as inline content inside h1', () => {
+    const { container } = render(
+      <ModalTitle>
+        <>
+          <span>x</span>
+          <span>y</span>
+        </>
+      </ModalTitle>,
+    );
+    expect(container.querySelectorAll('h1 span').length).toBe(2);
+  });
 });
