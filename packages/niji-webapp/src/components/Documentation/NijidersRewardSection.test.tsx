@@ -83,4 +83,37 @@ describe('NijidersRewardSection', () => {
     expect(container.textContent).toContain('Every 10th Niji');
     expect(container.textContent).toContain('5 years');
   });
+
+  it('renders inside accordion without crashing', () => {
+    expect(() => wrap(<NijidersRewardSection />)).not.toThrow();
+  });
+
+  it('contains description paragraph (non-empty body text)', () => {
+    const { container } = wrap(<NijidersRewardSection />);
+    expect((container.textContent ?? '').length).toBeGreaterThan(100);
+  });
+
+  it('all links are external (https scheme)', () => {
+    const { container } = wrap(<NijidersRewardSection />);
+    const links = Array.from(container.querySelectorAll('a'));
+    links.forEach(a => {
+      expect(a.getAttribute('href')?.startsWith('https://')).toBe(true);
+    });
+  });
+
+  it('all link text labels are unique (no duplicate handles)', () => {
+    const { container } = wrap(<NijidersRewardSection />);
+    const texts = Array.from(container.querySelectorAll('a')).map(a => a.textContent);
+    const unique = new Set(texts);
+    expect(unique.size).toBe(10);
+  });
+
+  it('renders in collapsed accordion (no defaultActiveKey)', () => {
+    const { container } = render(
+      <Accordion>
+        <NijidersRewardSection />
+      </Accordion>,
+    );
+    expect((container.textContent ?? '').length).toBeGreaterThan(0);
+  });
 });
