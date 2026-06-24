@@ -431,6 +431,40 @@ describe('ProposalActionModal', () => {
     expect(container.querySelector('[data-testid="function-select"]')).toBeNull();
     expect(container.querySelector('[data-testid="stream-payment"]')).toBeNull();
   });
+
+  it('rerender from show=false to true mounts modal', () => {
+    const { container, rerender } = render(<ProposalActionModal {...baseProps} show={false} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
+    rerender(<ProposalActionModal {...baseProps} show={true} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+  });
+
+  it('select-action mock is called per render', () => {
+    selectStepMock.mockClear();
+    render(<ProposalActionModal {...baseProps} />);
+    expect(selectStepMock).toHaveBeenCalled();
+  });
+
+  it('show=false does not invoke step mocks', () => {
+    selectStepMock.mockClear();
+    render(<ProposalActionModal {...baseProps} show={false} />);
+    expect(selectStepMock).not.toHaveBeenCalled();
+  });
+
+  it('show=true with no other state still renders select-action only', () => {
+    const { container } = render(<ProposalActionModal {...baseProps} />);
+    expect(container.querySelectorAll('[data-testid="select-action"]').length).toBe(1);
+  });
+
+  it('multiple ProposalActionModal independent in DOM', () => {
+    const { container } = render(
+      <>
+        <ProposalActionModal {...baseProps} />
+        <ProposalActionModal {...baseProps} />
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="solid-modal"]').length).toBe(2);
+  });
 });
 
 // dummy reference to silence unused warning

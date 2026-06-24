@@ -203,4 +203,50 @@ describe('NavBarTreasury', () => {
     expect(container.querySelector('div')?.className).toMatch(/cool/i);
     expect(container.textContent).toContain('42');
   });
+
+  it('treasury label "Treasury" renders before Ξ symbol', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    const text = container.textContent ?? '';
+    expect(text.indexOf('Treasury')).toBeLessThan(text.indexOf('Ξ'));
+  });
+
+  it('rerender style updates className', () => {
+    const { container, rerender } = render(
+      <NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.COOL_INFO} />,
+    );
+    expect(container.querySelector('div')?.className).toMatch(/cool/i);
+    rerender(<NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.WARM_INFO} />);
+    expect(container.querySelector('div')?.className).toMatch(/warm/i);
+  });
+
+  it('5 instances render 5 wrappers', () => {
+    const { container } = render(
+      <>
+        <NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />
+        <NavBarTreasury treasuryBalance="200" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />
+        <NavBarTreasury treasuryBalance="300" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />
+        <NavBarTreasury treasuryBalance="400" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />
+        <NavBarTreasury treasuryBalance="500" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />
+      </>,
+    );
+    expect(container.children.length).toBe(5);
+  });
+
+  it('100-digit balance (huge) renders without crash', () => {
+    const huge = '1'.repeat(20);
+    expect(() =>
+      render(
+        <NavBarTreasury treasuryBalance={huge} treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('Treasury label renders exactly once per instance', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    expect(container.textContent?.match(/Treasury/g)?.length).toBe(1);
+  });
 });

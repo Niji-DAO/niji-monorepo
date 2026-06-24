@@ -306,4 +306,52 @@ describe('NavBar', () => {
     useIsDaoGteV3Mock.mockReturnValue(true);
     expect(() => wrap(<NavBar />)).not.toThrow();
   });
+
+  it('rerender from cool to warm bg preserves wrapper', () => {
+    setup();
+    useAtomValueMock.mockReturnValueOnce(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container, rerender } = wrap(<NavBar />);
+    expect(container.querySelector('img[alt="Niji DAO"]')).not.toBeNull();
+    useAtomValueMock.mockReturnValue(false);
+    rerender(
+      <MemoryRouter>
+        <NavBar />
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('img[alt="Niji DAO"]')).not.toBeNull();
+  });
+
+  it('5 NavBar renders do not crash', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    expect(() => {
+      for (let i = 0; i < 5; i++) wrap(<NavBar />);
+    }).not.toThrow();
+  });
+
+  it('chainId=137 (Polygon non-mainnet) shows testnet badge', () => {
+    setup({ CHAIN_ID: 137 });
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('[aria-label="testnet"]')).not.toBeNull();
+  });
+
+  it('chain mainnet hides Faucet link', () => {
+    setup({ CHAIN_ID: 1 });
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('a[href="/faucet"]')).toBeNull();
+  });
+
+  it('logo image renders with proper alt text "Niji DAO"', () => {
+    setup();
+    useAtomValueMock.mockReturnValue(true);
+    useIsDaoGteV3Mock.mockReturnValue(true);
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('img[alt="Niji DAO"]')?.getAttribute('alt')).toBe('Niji DAO');
+  });
 });
