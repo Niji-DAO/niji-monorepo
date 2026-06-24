@@ -649,4 +649,86 @@ describe('CreateCandidateButton', () => {
     );
     expect(container.querySelector('.spinner-border')).toBeNull();
   });
+
+  it('renders 100 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <CreateCandidateButton
+            key={i}
+            isLoading={false}
+            hasActiveOrPendingProposal={false}
+            isFormInvalid={false}
+            handleCreateProposal={() => {}}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(100);
+  });
+
+  it('rapid 200 clicks invoke handler 200 times', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 200; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(200);
+  });
+
+  it('rerender 30 times preserves text content', () => {
+    const { container, rerender } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    for (let i = 0; i < 30; i++) {
+      rerender(
+        <CreateCandidateButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          isFormInvalid={false}
+          handleCreateProposal={() => {}}
+        />,
+      );
+      expect(container.textContent).toContain('Create proposal candidate');
+    }
+  });
+
+  it('handles consecutive 50 renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        render(
+          <CreateCandidateButton
+            isLoading={i % 2 === 0}
+            hasActiveOrPendingProposal={false}
+            isFormInvalid={false}
+            handleCreateProposal={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles isFormInvalid + hasActive both true', () => {
+    expect(() =>
+      render(
+        <CreateCandidateButton
+          isLoading={false}
+          hasActiveOrPendingProposal={true}
+          isFormInvalid={true}
+          handleCreateProposal={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });

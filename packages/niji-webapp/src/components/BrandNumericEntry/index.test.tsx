@@ -287,4 +287,46 @@ describe('BrandNumericEntry', () => {
     expect(container.querySelectorAll('input').length).toBe(1);
     expect(container.querySelectorAll('span').length).toBe(1);
   });
+
+  it('renders 100 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <BrandNumericEntry key={i} label={`L${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(100);
+  });
+
+  it('rerender 30 times preserves input element', () => {
+    const { container, rerender } = render(<BrandNumericEntry label="X" />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<BrandNumericEntry label={`L${i}`} placeholder={`p${i}`} />);
+      expect(container.querySelector('input')).not.toBeNull();
+    }
+  });
+
+  it('handles 30 different placeholder values', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<BrandNumericEntry placeholder={`ph${i}`} />)).not.toThrow();
+    }
+  });
+
+  it('handles unicode label across 5 instances', () => {
+    const { container } = render(
+      <>
+        <BrandNumericEntry label="日本語" />
+        <BrandNumericEntry label="中文" />
+        <BrandNumericEntry label="한국어" />
+        <BrandNumericEntry label="עברית" />
+        <BrandNumericEntry label="العربية" />
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(5);
+  });
+
+  it('renders without crash with isInvalid + label both', () => {
+    expect(() => render(<BrandNumericEntry label="X" isInvalid />)).not.toThrow();
+  });
 });

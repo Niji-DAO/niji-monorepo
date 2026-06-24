@@ -307,4 +307,52 @@ describe('BrandTextEntry', () => {
     }
     expect(onChange).toHaveBeenCalledTimes(30);
   });
+
+  it('renders 100 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <BrandTextEntry key={i} onChange={() => {}} label={`L${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(100);
+  });
+
+  it('rapid 100 change events fire 100 times', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandTextEntry onChange={onChange} />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(input, { target: { value: `v${i}` } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(100);
+  });
+
+  it('rerender 30 times preserves input element', () => {
+    const { container, rerender } = render(<BrandTextEntry onChange={() => {}} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<BrandTextEntry onChange={() => {}} value={`v${i}`} />);
+      expect(container.querySelector('input')).not.toBeNull();
+    }
+  });
+
+  it('handles all type values (string/number/email/password)', () => {
+    ['string', 'number', 'email', 'password', 'text'].forEach(type => {
+      expect(() => render(<BrandTextEntry onChange={() => {}} type={type} />)).not.toThrow();
+    });
+  });
+
+  it('handles unicode label across 5 instances', () => {
+    const { container } = render(
+      <>
+        <BrandTextEntry onChange={() => {}} label="日本語" />
+        <BrandTextEntry onChange={() => {}} label="中文" />
+        <BrandTextEntry onChange={() => {}} label="한국어" />
+        <BrandTextEntry onChange={() => {}} label="עברית" />
+        <BrandTextEntry onChange={() => {}} label="العربية" />
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(5);
+  });
 });

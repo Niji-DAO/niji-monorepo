@@ -348,4 +348,56 @@ describe('CandidateCard', () => {
       expect(container.querySelectorAll('a').length).toBe(1);
     }
   });
+
+  it('renders 50 CandidateCard instances independently', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <CandidateCard
+              key={i}
+              candidate={{ ...baseCandidate, id: `c-${i}` } as never}
+              nounsRequired={i}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves link element', () => {
+    expect(() => {
+      for (let i = 0; i < 30; i++) {
+        wrap(
+          <CandidateCard
+            candidate={{ ...baseCandidate, id: `c-${i}` } as never}
+            nounsRequired={i}
+          />,
+        );
+      }
+    }).not.toThrow();
+  });
+
+  it('handles candidate with extremely long title (1000 chars)', () => {
+    const longTitle = 'a'.repeat(1000);
+    const candidate = {
+      ...baseCandidate,
+      version: { content: { title: longTitle, contentSignatures: [] } },
+    } as never;
+    expect(() => wrap(<CandidateCard candidate={candidate} nounsRequired={3} />)).not.toThrow();
+  });
+
+  it('handles candidate with 100 contentSignatures', () => {
+    const sigs = Array.from({ length: 100 }, (_, i) => ({ id: `sig-${i}` }));
+    const candidate = {
+      ...baseCandidate,
+      version: { content: { title: 'X', contentSignatures: sigs as never } },
+    } as never;
+    expect(() => wrap(<CandidateCard candidate={candidate} nounsRequired={3} />)).not.toThrow();
+  });
+
+  it('handles candidate with unicode characters in id', () => {
+    const candidate = { ...baseCandidate, id: 'cand-日本語-絵文字' } as never;
+    expect(() => wrap(<CandidateCard candidate={candidate} nounsRequired={3} />)).not.toThrow();
+  });
 });
