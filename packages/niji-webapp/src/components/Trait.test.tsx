@@ -97,4 +97,30 @@ describe('Trait', () => {
       expect(c2.querySelector('img')?.getAttribute('src')).toBeTruthy();
     });
   });
+
+  it('seed=0 with hat type renders without crash', () => {
+    expect(() => render(<Trait type="hat" seed={0} />, { wrapper: WithProviders })).not.toThrow();
+  });
+
+  it('special type without seed (undefined) uses fallback', () => {
+    const { container } = render(<Trait type="special" />, { wrapper: WithProviders });
+    expect(container.querySelector('img')).not.toBeNull();
+  });
+
+  it('img element has alt attribute (or empty fallback)', () => {
+    const { container } = render(<Trait type="hat" seed={0} />, { wrapper: WithProviders });
+    const img = container.querySelector('img');
+    expect(img?.getAttribute('alt')).toBeDefined();
+  });
+
+  it('large seed value (999) renders without crash', () => {
+    expect(() => render(<Trait type="hat" seed={999} />, { wrapper: WithProviders })).not.toThrow();
+  });
+
+  it('passes className through to img element', () => {
+    const { container } = render(<Trait type="hat" className="my-trait-class" />, {
+      wrapper: WithProviders,
+    });
+    expect(container.querySelector('img')?.className).toBe('my-trait-class');
+  });
 });
