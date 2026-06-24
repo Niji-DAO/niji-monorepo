@@ -271,4 +271,99 @@ describe('DelegationCandidateInfo', () => {
     expect(shortEls.length).toBe(1);
     expect(shortEls[0].textContent).toBe(ADDR);
   });
+
+  it('rerender from spinner to votes loaded shows short-address', () => {
+    useAccountVotesMock.mockReturnValueOnce(null);
+    const { container, rerender } = render(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.ENTER_DELEGATE_ADDRESS}
+        votesToAdd={0}
+      />,
+    );
+    expect(container.querySelector('[data-testid="spinner"]')).not.toBeNull();
+    useAccountVotesMock.mockReturnValue(3);
+    rerender(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.ENTER_DELEGATE_ADDRESS}
+        votesToAdd={0}
+      />,
+    );
+    expect(container.querySelector('[data-testid="short"]')).not.toBeNull();
+  });
+
+  it('rerender changes state from ENTER to CHANGING', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    const { container, rerender } = render(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.ENTER_DELEGATE_ADDRESS}
+        votesToAdd={0}
+      />,
+    );
+    expect(container.querySelector('[data-testid="vote-info"]')?.getAttribute('data-loading')).toBe(
+      'false',
+    );
+    rerender(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.CHANGING}
+        votesToAdd={2}
+      />,
+    );
+    expect(container.querySelector('[data-testid="vote-info"]')?.getAttribute('data-loading')).toBe(
+      'true',
+    );
+  });
+
+  it('different address renders avatar img', () => {
+    useAccountVotesMock.mockReturnValue(3);
+    const addr2 = '0x1234567890abcdef1234567890abcdef12345678' as const;
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={addr2}
+        changeModalState={ChangeDelegateState.ENTER_DELEGATE_ADDRESS}
+        votesToAdd={0}
+      />,
+    );
+    expect(container.querySelector('img')).not.toBeNull();
+  });
+
+  it('votes=100 with votesToAdd=0 shows 100 in vote-info', () => {
+    useAccountVotesMock.mockReturnValue(100);
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.ENTER_DELEGATE_ADDRESS}
+        votesToAdd={0}
+      />,
+    );
+    expect(container.querySelector('[data-testid="vote-info"]')?.textContent).toContain('100');
+  });
+
+  it('CHANGE_FAILURE state renders short-address (not spinner)', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.CHANGE_FAILURE}
+        votesToAdd={2}
+      />,
+    );
+    expect(container.querySelector('[data-testid="spinner"]')).toBeNull();
+    expect(container.querySelector('[data-testid="short"]')).not.toBeNull();
+  });
+
+  it('different votesToAdd updates willHaveVoteCount', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.CHANGING}
+        votesToAdd={3}
+      />,
+    );
+    expect(container.querySelector('[data-testid="vote-info"]')?.textContent).toContain('8');
+  });
 });
