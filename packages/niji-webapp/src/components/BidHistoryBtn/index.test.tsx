@@ -108,4 +108,35 @@ describe('BidHistoryBtn Component (isCool=true)', () => {
   it('renders without errors when onClick is undefined-like', () => {
     expect(() => render(<BidHistoryBtn onClick={() => undefined} />)).not.toThrow();
   });
+
+  it('outer wrapper has non-empty className', () => {
+    const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    const outer = container.firstElementChild as HTMLDivElement;
+    expect(outer.className).toBeTruthy();
+  });
+
+  it('outer div is exactly 1 element (no siblings)', () => {
+    const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    expect(container.querySelectorAll('div').length).toBeGreaterThanOrEqual(1);
+    expect(container.children.length).toBe(1);
+  });
+
+  it('onClick fires for keyboard event simulation (click event still works)', () => {
+    const onClick = vi.fn();
+    const { container } = render(<BidHistoryBtn onClick={onClick} />);
+    fireEvent.click(container.firstElementChild as HTMLDivElement);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders text exactly without extra whitespace', () => {
+    const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    expect(container.textContent?.trim()).toBe('View all bids');
+  });
+
+  it('inner div className differs from outer div className', () => {
+    const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    const outer = container.firstElementChild as HTMLDivElement;
+    const inner = outer.firstElementChild as HTMLDivElement;
+    expect(outer.className).not.toBe(inner.className);
+  });
 });

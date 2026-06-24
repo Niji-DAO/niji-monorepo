@@ -81,4 +81,45 @@ describe('BrandTextEntry', () => {
     const { container } = render(<BrandTextEntry onChange={() => {}} isInvalid={false} />);
     expect(container.querySelector('input')?.className).not.toMatch(/invalid/i);
   });
+
+  it('rerender label change updates span text', () => {
+    const { container, rerender } = render(<BrandTextEntry onChange={() => {}} label="X" />);
+    expect(container.querySelector('span')?.textContent).toBe('X');
+    rerender(<BrandTextEntry onChange={() => {}} label="Y" />);
+    expect(container.querySelector('span')?.textContent).toBe('Y');
+  });
+
+  it('forwards type="password"', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} type="password" />);
+    expect(container.querySelector('input')?.getAttribute('type')).toBe('password');
+  });
+
+  it('passes event with target value to onChange', () => {
+    let captured = '';
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      captured = e.target.value;
+    };
+    const { container } = render(<BrandTextEntry onChange={onChange} />);
+    const input = container.querySelector('input');
+    if (input) fireEvent.change(input, { target: { value: 'hello' } });
+    expect(captured).toBe('hello');
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <BrandTextEntry onChange={() => {}} value="a" />
+        <BrandTextEntry onChange={() => {}} value="b" />
+      </>,
+    );
+    const inputs = container.querySelectorAll('input');
+    expect(inputs.length).toBe(2);
+    expect(inputs[0].value).toBe('a');
+    expect(inputs[1].value).toBe('b');
+  });
+
+  it('unicode value renders as-is', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} value="あいうえお" />);
+    expect(container.querySelector('input')?.value).toBe('あいうえお');
+  });
 });
