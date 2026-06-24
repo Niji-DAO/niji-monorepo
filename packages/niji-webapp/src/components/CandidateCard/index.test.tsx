@@ -256,4 +256,46 @@ describe('CandidateCard', () => {
       wrap(<CandidateCard candidate={baseCandidate} nounsRequired={10} />);
     }).not.toThrow();
   });
+
+  it('renders 10 instances each with distinct id', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <CandidateCard
+              key={i}
+              candidate={{ ...baseCandidate, id: `c-${i}` } as never}
+              nounsRequired={i}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles candidate with proposerVotes=0', () => {
+    const c = { ...baseCandidate, proposerVotes: 0 } as never;
+    expect(() => wrap(<CandidateCard candidate={c} nounsRequired={3} />)).not.toThrow();
+  });
+
+  it('handles candidate with voteCount=100', () => {
+    const c = { ...baseCandidate, voteCount: 100 } as never;
+    expect(() => wrap(<CandidateCard candidate={c} nounsRequired={3} />)).not.toThrow();
+  });
+
+  it('renders empty contentSignatures array gracefully', () => {
+    const c = {
+      ...baseCandidate,
+      version: { content: { title: 'X', contentSignatures: [] } },
+    } as never;
+    expect(() => wrap(<CandidateCard candidate={c} nounsRequired={3} />)).not.toThrow();
+  });
+
+  it('renders 5 cards consecutively without crash', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        wrap(<CandidateCard candidate={baseCandidate} nounsRequired={i} />),
+      ).not.toThrow();
+    }
+  });
 });

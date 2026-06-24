@@ -231,4 +231,40 @@ describe('BrandTextEntry', () => {
     rerender(<BrandTextEntry onChange={() => {}} isInvalid={false} />);
     expect(container.querySelector('input')?.className).not.toMatch(/invalid/i);
   });
+
+  it('renders 20 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <BrandTextEntry key={i} onChange={() => {}} label={`L${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(20);
+  });
+
+  it('value prop rerender updates input.value', () => {
+    const { container, rerender } = render(<BrandTextEntry onChange={() => {}} value="v1" />);
+    expect(container.querySelector('input')?.value).toBe('v1');
+    rerender(<BrandTextEntry onChange={() => {}} value="v2" />);
+    expect(container.querySelector('input')?.value).toBe('v2');
+  });
+
+  it('placeholder rerender updates attribute', () => {
+    const { container, rerender } = render(
+      <BrandTextEntry onChange={() => {}} placeholder="ph1" />,
+    );
+    expect(container.querySelector('input')?.getAttribute('placeholder')).toBe('ph1');
+    rerender(<BrandTextEntry onChange={() => {}} placeholder="ph2" />);
+    expect(container.querySelector('input')?.getAttribute('placeholder')).toBe('ph2');
+  });
+
+  it('type prop "number" sets type=number', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} type="number" />);
+    expect(container.querySelector('input')?.getAttribute('type')).toBe('number');
+  });
+
+  it('renders without crash for empty label', () => {
+    expect(() => render(<BrandTextEntry onChange={() => {}} label="" />)).not.toThrow();
+  });
 });
