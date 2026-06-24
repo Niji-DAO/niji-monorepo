@@ -146,4 +146,36 @@ describe('VoteCardPager', () => {
     rerender(<VoteCardPager {...defaults} numPages={3} currentPage={2} />);
     expect(container.querySelectorAll('span')[2]?.className).toBe('');
   });
+
+  it('numPages=100 renders 100 dots', () => {
+    const { container } = render(<VoteCardPager {...defaults} numPages={100} />);
+    expect(container.querySelectorAll('span').length).toBe(100);
+  });
+
+  it('left arrow disabled when isLeftArrowDisabled=true with multi page', () => {
+    const { container } = render(
+      <VoteCardPager {...defaults} numPages={5} isLeftArrowDisabled={true} />,
+    );
+    expect(container.querySelectorAll('button')[0]?.disabled).toBe(true);
+  });
+
+  it('right arrow disabled when isRightArrowDisabled=true with multi page', () => {
+    const { container } = render(
+      <VoteCardPager {...defaults} numPages={5} isRightArrowDisabled={true} />,
+    );
+    expect(container.querySelectorAll('button')[1]?.disabled).toBe(true);
+  });
+
+  it('numPages=1 + currentPage=0 disables both arrows', () => {
+    const { container } = render(<VoteCardPager {...defaults} numPages={1} currentPage={0} />);
+    expect(container.querySelectorAll('button')[0]?.disabled).toBe(true);
+    expect(container.querySelectorAll('button')[1]?.disabled).toBe(true);
+  });
+
+  it('middle page (currentPage=2) of 5 page shows middle dot active', () => {
+    const { container } = render(<VoteCardPager {...defaults} numPages={5} currentPage={2} />);
+    expect(container.querySelectorAll('span')[2]?.className).toBe('');
+    expect(container.querySelectorAll('span')[0]?.className).toMatch(/disabledPageDot/);
+    expect(container.querySelectorAll('span')[4]?.className).toMatch(/disabledPageDot/);
+  });
 });

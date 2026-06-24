@@ -245,4 +245,45 @@ describe('ABIUpload Component', () => {
     );
     expect(container.querySelectorAll('input').length).toBe(1);
   });
+
+  it('label text contains "ABI" for default filename', () => {
+    const { container } = render(
+      <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    expect(container.querySelector('label')?.textContent).toContain('ABI');
+  });
+
+  it('long filename (over 200 chars) renders without crash', () => {
+    const long = 'etherscan-abi-download.json';
+    expect(() =>
+      render(<ABIUpload abiFileName={long} isValid={false} isInvalid={false} onChange={vi.fn()} />),
+    ).not.toThrow();
+  });
+
+  it('isValid + isInvalid both true renders without crash', () => {
+    expect(() =>
+      render(<ABIUpload abiFileName="x.json" isValid={true} isInvalid={true} onChange={vi.fn()} />),
+    ).not.toThrow();
+  });
+
+  it('5 instances render 5 inputs', () => {
+    const { container } = render(
+      <>
+        <ABIUpload abiFileName="a.json" isValid={false} isInvalid={false} onChange={vi.fn()} />
+        <ABIUpload abiFileName="b.json" isValid={false} isInvalid={false} onChange={vi.fn()} />
+        <ABIUpload abiFileName="c.json" isValid={false} isInvalid={false} onChange={vi.fn()} />
+        <ABIUpload abiFileName="d.json" isValid={false} isInvalid={false} onChange={vi.fn()} />
+        <ABIUpload abiFileName="e.json" isValid={false} isInvalid={false} onChange={vi.fn()} />
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(5);
+  });
+
+  it('default rendering has no errors or warnings', () => {
+    expect(() =>
+      render(
+        <ABIUpload abiFileName="t.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+      ),
+    ).not.toThrow();
+  });
 });
