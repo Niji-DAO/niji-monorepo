@@ -141,4 +141,66 @@ describe('DelegateHoverCard', () => {
     render(<DelegateHoverCard delegateId="delegate-0xABC" proposalCreationBlock={1n} />);
     expect(useDelegateNounsAtBlockQueryMock).toHaveBeenCalledTimes(1);
   });
+
+  it('renders ShortAddress with full delegate.id (not delegateId prop)', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xFULL_DELEGATE_ID', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(
+      <DelegateHoverCard delegateId="delegate-0xFULL_DELEGATE_ID" proposalCreationBlock={1n} />,
+    );
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(
+      '0xFULL_DELEGATE_ID',
+    );
+  });
+
+  it('does not render error message when error is undefined', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(
+      <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+    );
+    expect(container.textContent).not.toContain('Error');
+  });
+
+  it('renders stack-1 for single niji', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(
+      <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+    );
+    expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-1');
+  });
+
+  it('renders stack-10 for 10 nijis', () => {
+    const nijiList = Array.from({ length: 10 }, (_, i) => ({ id: String(i + 1) }));
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: nijiList }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(
+      <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+    );
+    expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-10');
+  });
+
+  it('large proposalCreationBlock (1000000n) does not crash', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    expect(() =>
+      render(<DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1000000n} />),
+    ).not.toThrow();
+  });
 });

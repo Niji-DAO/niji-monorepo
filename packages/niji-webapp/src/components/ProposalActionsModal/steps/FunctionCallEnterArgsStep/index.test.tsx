@@ -149,4 +149,66 @@ describe('FunctionCallEnterArgsStep', () => {
     fireEvent.change(inputs[1], { target: { value: '1000' } });
     expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(false);
   });
+
+  it('Next stays disabled when only 1 of 2 args filled', () => {
+    const { container } = render(
+      <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+    );
+    const inputs = container.querySelectorAll('input');
+    fireEvent.change(inputs[0], {
+      target: { value: '0x5FbDB2315678afecb367f032d93F642f64180aa3' },
+    });
+    expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(true);
+  });
+
+  it('Next stays disabled when address arg is invalid (e.g. "0xBAD")', () => {
+    const { container } = render(
+      <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+    );
+    const inputs = container.querySelectorAll('input');
+    fireEvent.change(inputs[0], { target: { value: '0xBAD' } });
+    fireEvent.change(inputs[1], { target: { value: '100' } });
+    expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(true);
+  });
+
+  it('Next button calls setState with valid args (transfer path)', () => {
+    const onNext = vi.fn();
+    const setState = vi.fn();
+    const { container } = render(
+      <FunctionCallEnterArgsStep
+        {...defaults}
+        onNextBtnClick={onNext}
+        setState={setState}
+        state={{ abi, function: 'transfer' } as never}
+      />,
+    );
+    const inputs = container.querySelectorAll('input');
+    fireEvent.change(inputs[0], {
+      target: { value: '0x5FbDB2315678afecb367f032d93F642f64180aa3' },
+    });
+    fireEvent.change(inputs[1], { target: { value: '1000' } });
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onNext).toHaveBeenCalledTimes(1);
+    expect(setState).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders exactly 2 buttons (Back + Next)', () => {
+    const { container } = render(
+      <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'noArg' } as never} />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('Back click is independent of arg validity (always works)', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <FunctionCallEnterArgsStep
+        {...defaults}
+        onPrevBtnClick={onPrev}
+        state={{ abi, function: 'transfer' } as never}
+      />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onPrev).toHaveBeenCalledTimes(1);
+  });
 });

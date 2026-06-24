@@ -132,4 +132,58 @@ describe('ABIUpload Component', () => {
     expect(receivedTarget).not.toBeNull();
     expect((receivedTarget as unknown as HTMLInputElement).type).toBe('file');
   });
+
+  it('applies is-valid class when isValid=true', () => {
+    render(
+      <ABIUpload
+        abiFileName="test-file.json"
+        isValid={true}
+        isInvalid={false}
+        onChange={vi.fn()}
+      />,
+    );
+    const input = screen.getByLabelText(/abi/i) as HTMLInputElement;
+    expect(input.className).toContain('is-valid');
+  });
+
+  it('does not apply is-invalid when isInvalid=false', () => {
+    render(
+      <ABIUpload
+        abiFileName="test-file.json"
+        isValid={false}
+        isInvalid={false}
+        onChange={vi.fn()}
+      />,
+    );
+    const input = screen.getByLabelText(/abi/i) as HTMLInputElement;
+    expect(input.className).not.toContain('is-invalid');
+  });
+
+  it('renders empty string filename gracefully (default label)', () => {
+    render(<ABIUpload abiFileName="" isValid={false} isInvalid={false} onChange={vi.fn()} />);
+    expect(screen.getByText('ABI')).toBeInTheDocument();
+  });
+
+  it('multiple change events fire onChange multiple times', () => {
+    const handleChange = vi.fn();
+    render(
+      <ABIUpload abiFileName="t.json" isValid={false} isInvalid={false} onChange={handleChange} />,
+    );
+    const input = screen.getByLabelText(/abi/i) as HTMLInputElement;
+    fireEvent.change(input, {
+      target: { files: [new File(['a'], 'a.json', { type: 'application/json' })] },
+    });
+    fireEvent.change(input, {
+      target: { files: [new File(['b'], 'b.json', { type: 'application/json' })] },
+    });
+    expect(handleChange).toHaveBeenCalledTimes(2);
+  });
+
+  it('exactly 1 input and 1 label rendered', () => {
+    const { container } = render(
+      <ABIUpload abiFileName="t.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    expect(container.querySelectorAll('input').length).toBe(1);
+    expect(container.querySelectorAll('label').length).toBe(1);
+  });
 });
