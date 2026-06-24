@@ -242,4 +242,42 @@ describe('ProposalContent extra cases', () => {
     );
     expect(container.querySelectorAll('[data-testid="markdown"]').length).toBe(5);
   });
+
+  it('renders without crash with empty details array', () => {
+    expect(() =>
+      render(<ProposalContent description="# body" title="T1" details={[] as never} />),
+    ).not.toThrow();
+  });
+
+  it('rerender from description "A" to "B" updates markdown', () => {
+    const { container, rerender } = render(
+      <ProposalContent description="A" title="T" details={details} />,
+    );
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe('[T]A');
+    rerender(<ProposalContent description="B" title="T" details={details} />);
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe('[T]B');
+  });
+
+  it('renders 200 char long description', () => {
+    const longStr = 'x'.repeat(200);
+    const { container } = render(
+      <ProposalContent description={longStr} title="T" details={details} />,
+    );
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toContain(longStr);
+  });
+
+  it('renders unicode description', () => {
+    const { container } = render(
+      <ProposalContent description="日本語提案" title="T" details={details} />,
+    );
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toContain(
+      '日本語提案',
+    );
+  });
+
+  it('linkIfAddress + transactionLink + transactionIconLink utils are exported', () => {
+    expect(typeof linkIfAddress).toBe('function');
+    expect(typeof transactionLink).toBe('function');
+    expect(typeof transactionIconLink).toBe('function');
+  });
 });
