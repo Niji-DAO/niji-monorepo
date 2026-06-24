@@ -144,4 +144,66 @@ describe('DelegationCandidateInfo', () => {
     );
     expect(container.querySelector('[data-testid="vote-info"]')?.textContent).toContain('8');
   });
+
+  it('renders for CHANGE_FAILURE state without crash', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    expect(() =>
+      render(
+        <DelegationCandidateInfo
+          address={ADDR}
+          changeModalState={ChangeDelegateState.CHANGE_FAILURE}
+          votesToAdd={2}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles large votesToAdd (1000)', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.CHANGING}
+        votesToAdd={1000}
+      />,
+    );
+    // willHaveVoteCount = 5 + 1000 = 1005
+    expect(container.querySelector('[data-testid="vote-info"]')?.textContent).toContain('1005');
+  });
+
+  it('renders exactly 1 avatar img', () => {
+    useAccountVotesMock.mockReturnValue(3);
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.ENTER_DELEGATE_ADDRESS}
+        votesToAdd={0}
+      />,
+    );
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('votesToAdd=0 shows same voteCount as account votes', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.CHANGING}
+        votesToAdd={0}
+      />,
+    );
+    expect(container.querySelector('[data-testid="vote-info"]')?.textContent).toContain('5');
+  });
+
+  it('renders for votes=0 (zero balance)', () => {
+    useAccountVotesMock.mockReturnValue(0);
+    const { container } = render(
+      <DelegationCandidateInfo
+        address={ADDR}
+        changeModalState={ChangeDelegateState.ENTER_DELEGATE_ADDRESS}
+        votesToAdd={0}
+      />,
+    );
+    expect(container.querySelector('[data-testid="vote-info"]')?.textContent).toContain('0');
+  });
 });

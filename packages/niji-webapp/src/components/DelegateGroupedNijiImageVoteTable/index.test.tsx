@@ -117,4 +117,46 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
     fireEvent.click(container.querySelector('[data-testid="right"]')!);
     expect(container.querySelector('[data-testid="current-page"]')?.textContent).toBe('1');
   });
+
+  it('renders 1 delegate hover for single delegate single niji data', () => {
+    const data = [makeVote('0xA', ['1'])];
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    expect(container.querySelectorAll('[data-testid="hover"]').length).toBe(1);
+    expect(container.querySelectorAll('[data-testid="stacked"]').length).toBe(1);
+  });
+
+  it('handles 24 delegates (numPages = floor(24/12)+1 = 3)', () => {
+    const data = Array.from({ length: 24 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    // 既存 contract: floor(N / 12) + 1 → 24/12=2, +1=3
+    expect(container.querySelector('[data-testid="num-pages"]')?.textContent).toBe('3');
+  });
+
+  it('starts at currentPage=0 (default)', () => {
+    const data = [makeVote('0xA', ['1'])];
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    expect(container.querySelector('[data-testid="current-page"]')?.textContent).toBe('0');
+  });
+
+  it('left arrow becomes enabled after advancing to page 1', () => {
+    const data = Array.from({ length: 15 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="right"]')!);
+    expect(container.querySelector('[data-testid="left"]')?.disabled).toBe(false);
+  });
+
+  it('renders exactly 1 VoteCardPager instance', () => {
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+    );
+    expect(container.querySelectorAll('[data-testid="pager"]').length).toBe(1);
+  });
 });
