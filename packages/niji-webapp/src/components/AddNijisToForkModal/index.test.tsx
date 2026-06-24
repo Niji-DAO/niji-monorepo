@@ -294,4 +294,37 @@ describe('AddNijisToForkModal', () => {
     );
     expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
   });
+
+  it('isModalOpen=true alone shows main modal', () => {
+    const { container } = render(
+      <AddNijisToForkModal {...baseProps} isModalOpen={true} isConfirmModalOpen={false} />,
+    );
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+  });
+
+  it('rerender from open to closed hides modal', () => {
+    const { container, rerender } = render(
+      <AddNijisToForkModal {...baseProps} isModalOpen={true} />,
+    );
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+    rerender(<AddNijisToForkModal {...baseProps} isModalOpen={false} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
+  });
+
+  it('isConfirmModalOpen=true alone shows confirm modal', () => {
+    const { container } = render(
+      <AddNijisToForkModal {...baseProps} isModalOpen={false} isConfirmModalOpen={true} />,
+    );
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+  });
+
+  it('both modal open renders modal (no crash)', () => {
+    expect(() =>
+      render(<AddNijisToForkModal {...baseProps} isModalOpen={true} isConfirmModalOpen={true} />),
+    ).not.toThrow();
+  });
+
+  it('default props renders without crash', () => {
+    expect(() => render(<AddNijisToForkModal {...baseProps} />)).not.toThrow();
+  });
 });
