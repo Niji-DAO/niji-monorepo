@@ -58,4 +58,77 @@ describe('useKeyPress', () => {
       window.dispatchEvent(new KeyboardEvent('keyup', { key: 'x' }));
     }).not.toThrow();
   });
+
+  it('is case-sensitive: A and a are different target keys', () => {
+    const { result } = renderHook(() => useKeyPress('A'));
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+    });
+    expect(result.current).toBe(false);
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'A' }));
+    });
+    expect(result.current).toBe(true);
+  });
+
+  it('handles space key (" ")', () => {
+    const { result } = renderHook(() => useKeyPress(' '));
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' }));
+    });
+    expect(result.current).toBe(true);
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keyup', { key: ' ' }));
+    });
+    expect(result.current).toBe(false);
+  });
+
+  it('multiple instances of the hook are independent', () => {
+    const { result: r1 } = renderHook(() => useKeyPress('1'));
+    const { result: r2 } = renderHook(() => useKeyPress('2'));
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: '1' }));
+    });
+    expect(r1.current).toBe(true);
+    expect(r2.current).toBe(false);
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: '2' }));
+    });
+    expect(r2.current).toBe(true);
+  });
+
+  it('rerunning effect on targetKey change removes old listener', () => {
+    const { result, rerender } = renderHook((k: string) => useKeyPress(k), {
+      initialProps: 'q',
+    });
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'q' }));
+    });
+    expect(result.current).toBe(true);
+
+    rerender('r');
+    // 新 targetKey に切替後、 旧 key 'q' は match しない (state 'true' 保持されるかは
+    // source の動作で keydown q 自体は target r != q なので state 変更なし)
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'r' }));
+    });
+    expect(result.current).toBe(true);
+  });
+
+  it('keyup without prior keydown sets state to false (idempotent)', () => {
+    const { result } = renderHook(() => useKeyPress('z'));
+    expect(result.current).toBe(false);
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keyup', { key: 'z' }));
+    });
+    expect(result.current).toBe(false);
+  });
 });

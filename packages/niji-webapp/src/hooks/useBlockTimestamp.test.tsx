@@ -46,4 +46,60 @@ describe('useBlockTimestamp', () => {
     await new Promise(resolve => setTimeout(resolve, 50));
     expect(result.current).toBeUndefined();
   });
+
+  it('returns large timestamp under Number.MAX_SAFE_INTEGER', async () => {
+    const large = 9_007_199_254_740_990n; // < 2^53-1
+    getBlockMock.mockReset();
+    getBlockMock.mockResolvedValue({ timestamp: large });
+    const { result } = renderHook(() => useBlockTimestamp(100n));
+    await waitFor(() => expect(result.current).toBe(Number(large)));
+  });
+
+  it('skips fetch when blockNumber is 0n (falsy)', () => {
+    getBlockMock.mockReset();
+    const { result } = renderHook(() => useBlockTimestamp(0n));
+    expect(result.current).toBeUndefined();
+    expect(getBlockMock).not.toHaveBeenCalled();
+  });
+
+  it('passes BigInt(blockNumber) to getBlock with same value', async () => {
+    getBlockMock.mockReset();
+    getBlockMock.mockResolvedValue({ timestamp: 1n });
+    renderHook(() => useBlockTimestamp(42n));
+    await waitFor(() => expect(getBlockMock).toHaveBeenCalled());
+    expect(getBlockMock).toHaveBeenCalledWith({ blockNumber: 42n });
+  });
+
+  it('skips fetch when blockNumber undefined (no getBlock call)', () => {
+    getBlockMock.mockReset();
+    const { result } = renderHook(() => useBlockTimestamp());
+    expect(result.current).toBeUndefined();
+    expect(getBlockMock).not.toHaveBeenCalled();
+  });
+
+  it('passes BigInt() wrap on blockNumber (idempotent for bigint input)', async () => {
+    getBlockMock.mockReset();
+    getBlockMock.mockResolvedValue({ timestamp: 5n });
+    renderHook(() => useBlockTimestamp(7n));
+    await waitFor(() => expect(getBlockMock).toHaveBeenCalled());
+    expect(getBlockMock.mock.calls[0][0].blockNumber).toBe(7n);
+  });
+
+  it('refetches when blockNumber prop changes', async () => {
+    getBlockMock.mockReset();
+    // publicClient mock を fixed instance に統一 (毎 render で同 object を返す)
+    const fixedClient = { getBlock: getBlockMock };
+    usePublicClientMock.mockReturnValue(fixedClient);
+    getBlockMock.mockImplementation(({ blockNumber }: { blockNumber: bigint }) => {
+      if (blockNumber === 1n) return Promise.resolve({ timestamp: 100n });
+      if (blockNumber === 2n) return Promise.resolve({ timestamp: 200n });
+      return Promise.resolve({ timestamp: 0n });
+    });
+    const { result, rerender } = renderHook((n: bigint) => useBlockTimestamp(n), {
+      initialProps: 1n,
+    });
+    await waitFor(() => expect(result.current).toBe(100));
+    rerender(2n);
+    await waitFor(() => expect(result.current).toBe(200));
+  });
 });

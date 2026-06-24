@@ -44,4 +44,38 @@ describe('useActiveLocale', () => {
     renderHook(() => useActiveLocale());
     expect(useAtomValueMock).toHaveBeenCalledTimes(1);
   });
+
+  it('returns fr-FR locale (no transformation)', () => {
+    useAtomValueMock.mockReturnValue('fr-FR');
+    const { result } = renderHook(() => useActiveLocale());
+    expect(result.current).toBe('fr-FR');
+  });
+
+  it('returns whatever atom returns including unconventional values', () => {
+    useAtomValueMock.mockReturnValue('xx-YY');
+    const { result } = renderHook(() => useActiveLocale());
+    expect(result.current).toBe('xx-YY');
+  });
+
+  it('two separate renderHook calls reflect different mock values independently', () => {
+    useAtomValueMock.mockReturnValueOnce('en-US').mockReturnValueOnce('ja-JP');
+    const { result: r1 } = renderHook(() => useActiveLocale());
+    const { result: r2 } = renderHook(() => useActiveLocale());
+    expect(r1.current).toBe('en-US');
+    expect(r2.current).toBe('ja-JP');
+  });
+
+  it('reflects atom value change between rerenders', () => {
+    useAtomValueMock.mockReturnValueOnce('en-US').mockReturnValueOnce('ja-JP');
+    const { result, rerender } = renderHook(() => useActiveLocale());
+    expect(result.current).toBe('en-US');
+    rerender();
+    expect(result.current).toBe('ja-JP');
+  });
+
+  it('returns undefined when atom returns undefined (no defensive default)', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    const { result } = renderHook(() => useActiveLocale());
+    expect(result.current).toBeUndefined();
+  });
 });
