@@ -142,4 +142,65 @@ describe('TightStackedCircleNiji', () => {
     const { container } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
     expect(container.querySelector('circle')).toBeNull();
   });
+
+  it('square=0 still computes cy=-21+0', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const { container } = renderSvg({ nounId: 1, index: 0, square: 0, shift: 3 });
+    expect(container.querySelector('circle')?.getAttribute('cy')).toBe('-21');
+  });
+
+  it('rerender from seed undefined to defined switches LoadingNoun → circle', () => {
+    useNounSeedMock.mockReturnValueOnce(undefined);
+    const { container, rerender } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
+    expect(container.querySelector('[data-testid="loading-noun"]')).not.toBeNull();
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    rerender(
+      <svg>
+        <TightStackedCircleNiji nounId={1} index={0} square={55} shift={3} />
+      </svg>,
+    );
+    expect(container.querySelector('circle')).not.toBeNull();
+  });
+
+  it('huge nounId (Number.MAX_SAFE_INTEGER) renders as string id', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const huge = Number.MAX_SAFE_INTEGER;
+    const { container } = renderSvg({ nounId: huge, index: 0, square: 55, shift: 3 });
+    expect(container.querySelector('circle')?.getAttribute('id')).toBe(String(huge));
+  });
+
+  it('negative shift value computes negative position correctly', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const { container } = renderSvg({ nounId: 1, index: 1, square: 55, shift: -3 });
+    expect(container.querySelector('circle')?.getAttribute('cx')).toBe('25'); // 28 + 1*-3
+  });
+
+  it('multiple instances in same svg render independently', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const { container } = render(
+      <svg>
+        <TightStackedCircleNiji nounId={1} index={0} square={55} shift={3} />
+        <TightStackedCircleNiji nounId={2} index={1} square={55} shift={3} />
+      </svg>,
+    );
+    expect(container.querySelectorAll('circle').length).toBe(2);
+  });
+
+  it('seed null also triggers LoadingNoun', () => {
+    useNounSeedMock.mockReturnValue(null);
+    const { container } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
+    expect(container.querySelector('[data-testid="loading-noun"]')).not.toBeNull();
+  });
+
+  it('image element renders inside SVG when seed present', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'data:img' });
+    const { container } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
+    expect(container.querySelector('svg image')).not.toBeNull();
+  });
 });
