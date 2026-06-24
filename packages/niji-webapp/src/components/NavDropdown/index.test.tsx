@@ -521,4 +521,65 @@ describe('NavDropDown', () => {
       expect(container.querySelector('.dropdown')).not.toBeNull();
     }
   });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <NavDropDown key={i} buttonText={`Menu-${i}`}>
+              <span>item-{i}</span>
+            </NavDropDown>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves nav-button', () => {
+    const { container, rerender } = render(
+      <NavDropDown buttonText="Menu">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    for (let i = 0; i < 30; i++) {
+      rerender(
+        <NavDropDown buttonText={`Menu-${i}`}>
+          <span>item-{i}</span>
+        </NavDropDown>,
+      );
+    }
+    expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
+  });
+
+  it('handles unicode buttonText', () => {
+    const { container } = render(
+      <NavDropDown buttonText="🎉 メニュー">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('🎉 メニュー');
+  });
+
+  it('handles 100 children items', () => {
+    const items = Array.from({ length: 100 }, (_, i) => i);
+    expect(() =>
+      render(
+        <NavDropDown buttonText="Menu">
+          {items.map(n => (
+            <span key={n}>item-{n}</span>
+          ))}
+        </NavDropDown>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without buttonIcon (undefined)', () => {
+    const { container } = render(
+      <NavDropDown buttonText="Menu">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
+  });
 });

@@ -322,4 +322,45 @@ describe('ProposalEditor', () => {
       expect(container.querySelector('textarea')).not.toBeNull();
     }
   });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <ProposalEditor key={i} {...defaults} title={`t-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves input + textarea', () => {
+    const { container, rerender } = render(<ProposalEditor {...defaults} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<ProposalEditor {...defaults} title={`t-${i}`} body={`b-${i}`} />);
+    }
+    expect(container.querySelector('input')).not.toBeNull();
+    expect(container.querySelector('textarea')).not.toBeNull();
+  });
+
+  it('rapid 100 title input events', () => {
+    const onTitleInput = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onTitleInput={onTitleInput} />);
+    const input = container.querySelector('input')!;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(input, { target: { value: `t-${i}` } });
+    }
+    expect(onTitleInput).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles unicode title + body', () => {
+    const { container } = render(<ProposalEditor {...defaults} title="🚀 提案" body="本文 🎉" />);
+    expect(container.querySelector('input')?.getAttribute('value')).toBe('🚀 提案');
+  });
+
+  it('handles very long body (5000 chars)', () => {
+    const long = 'a'.repeat(5000);
+    expect(() => render(<ProposalEditor {...defaults} body={long} />)).not.toThrow();
+  });
 });

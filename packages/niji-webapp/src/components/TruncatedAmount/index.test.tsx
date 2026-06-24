@@ -272,4 +272,39 @@ describe('TruncatedAmount', () => {
     const { container } = render(<TruncatedAmount amount={parseEther('0.000001')} />);
     expect(container.textContent).toMatch(/Ξ \d/);
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <TruncatedAmount key={i} amount={parseEther(`${i + 1}`)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times with varying amounts', () => {
+    const { container, rerender } = render(<TruncatedAmount amount={parseEther('1')} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<TruncatedAmount amount={parseEther(`${i + 1}.5`)} />);
+    }
+    expect(container.textContent).toMatch(/^Ξ \d+\.\d{2}$/);
+  });
+
+  it('formats 1e6 ETH to "Ξ 1000000.00"', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('1000000')} />);
+    expect(container.textContent).toBe('Ξ 1000000.00');
+  });
+
+  it('formats 1 wei to "Ξ 0.00" (truncated to 2 decimals)', () => {
+    const { container } = render(<TruncatedAmount amount={1n} />);
+    expect(container.textContent).toBe('Ξ 0.00');
+  });
+
+  it('formats 999999.999 ETH (rounding up edge)', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('999999.999')} />);
+    expect(container.textContent).toMatch(/^Ξ \d+\.\d{2}$/);
+  });
 });

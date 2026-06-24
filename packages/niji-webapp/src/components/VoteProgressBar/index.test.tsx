@@ -365,4 +365,48 @@ describe('VoteProgressBar', () => {
       expect(container.querySelectorAll('div').length).toBe(2);
     }
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <VoteProgressBar key={i} variant={VoteCardVariant.FOR} percentage={i % 100} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves 2 div structure', () => {
+    const { container, rerender } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      rerender(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={i % 100} />);
+    }
+    expect(container.querySelectorAll('div').length).toBe(2);
+  });
+
+  it('handles negative percentage edge case without crash', () => {
+    expect(() =>
+      render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={-10} />),
+    ).not.toThrow();
+  });
+
+  it('handles percentage > 100 edge case', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.AGAINST} percentage={250} />,
+    );
+    const inner = container.querySelectorAll('div')[1];
+    expect(inner?.getAttribute('style')).toContain('250%');
+  });
+
+  it('handles fractional percentage (33.333)', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.ABSTAIN} percentage={33.333} />,
+    );
+    const inner = container.querySelectorAll('div')[1];
+    expect(inner?.getAttribute('style')).toContain('33.333%');
+  });
 });
