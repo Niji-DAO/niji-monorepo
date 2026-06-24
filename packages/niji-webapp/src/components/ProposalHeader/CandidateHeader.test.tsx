@@ -161,4 +161,52 @@ describe('CandidateHeader', () => {
     const { container } = wrap(<CandidateHeader {...defaults} isActiveForVoting={true} />);
     expect(container.textContent?.length).toBeGreaterThan(0);
   });
+
+  it('renders without title gracefully when title is empty string', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    useActiveLocaleMock.mockReturnValue('en-US');
+    isMobileMock.mockReturnValue(false);
+    useUserVotesAsOfBlockMock.mockReturnValue(5);
+    const { container } = wrap(<CandidateHeader {...defaults} title="" />);
+    expect(container.querySelector('h1')).not.toBeNull();
+  });
+
+  it('renders HoverCard wrapper for proposer (ShortAddress + tx-link inside)', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    useActiveLocaleMock.mockReturnValue('en-US');
+    isMobileMock.mockReturnValue(false);
+    useUserVotesAsOfBlockMock.mockReturnValue(5);
+    const { container } = wrap(<CandidateHeader {...defaults} />);
+    const hover = container.querySelector('[data-testid="hover"]');
+    expect(hover).not.toBeNull();
+    expect(hover?.querySelector('[data-testid="short"]')).not.toBeNull();
+  });
+
+  it('renders Version 5 with history link when versionsCount=5', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    useActiveLocaleMock.mockReturnValue('en-US');
+    isMobileMock.mockReturnValue(false);
+    useUserVotesAsOfBlockMock.mockReturnValue(5);
+    const { container } = wrap(<CandidateHeader {...defaults} versionsCount={5} />);
+    expect(container.textContent).toContain('Version 5');
+    expect(container.querySelector('a[href="/candidates/cand-1/history/"]')).not.toBeNull();
+  });
+
+  it('history link href uses provided id (cand-99)', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    useActiveLocaleMock.mockReturnValue('en-US');
+    isMobileMock.mockReturnValue(false);
+    useUserVotesAsOfBlockMock.mockReturnValue(5);
+    const { container } = wrap(<CandidateHeader {...defaults} id="cand-99" versionsCount={2} />);
+    expect(container.querySelector('a[href="/candidates/cand-99/history/"]')).not.toBeNull();
+  });
+
+  it('renders zh-CN locale layout without crash', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    useActiveLocaleMock.mockReturnValue('zh-CN');
+    isMobileMock.mockReturnValue(false);
+    useUserVotesAsOfBlockMock.mockReturnValue(5);
+    const { container } = wrap(<CandidateHeader {...defaults} />);
+    expect(container.textContent).toContain('My Candidate');
+  });
 });
