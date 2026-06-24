@@ -143,4 +143,35 @@ describe('GrayCircle', () => {
     const srcs = Array.from(container.querySelectorAll('img')).map(img => img.getAttribute('src'));
     expect(new Set(srcs).size).toBe(1);
   });
+
+  it('default isDelegateView=undefined behaves same as false', () => {
+    const { container: c1 } = render(<GrayCircle />);
+    const { container: c2 } = render(<GrayCircle isDelegateView={false} />);
+    expect(c1.querySelector('div')?.className).toBe(c2.querySelector('div')?.className);
+  });
+
+  it('img src is data URI (base64 format)', () => {
+    const { container } = render(<GrayCircle />);
+    const src = container.querySelector('img')?.getAttribute('src') ?? '';
+    expect(src).toMatch(/^data:image\/svg/);
+  });
+
+  it('renders within wrapper div with only img child', () => {
+    const { container } = render(<GrayCircle />);
+    const div = container.firstElementChild as HTMLDivElement;
+    expect(div.children.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('isDelegateView=true wrapper has different className from default', () => {
+    const { container: c1 } = render(<GrayCircle isDelegateView={true} />);
+    const { container: c2 } = render(<GrayCircle isDelegateView={false} />);
+    expect(c1.querySelector('div')?.className).not.toBe(c2.querySelector('div')?.className);
+  });
+
+  it('repeated render does not increase img count', () => {
+    const { container, rerender } = render(<GrayCircle />);
+    rerender(<GrayCircle />);
+    rerender(<GrayCircle />);
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
 });

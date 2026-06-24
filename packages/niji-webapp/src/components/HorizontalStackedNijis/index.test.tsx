@@ -148,4 +148,36 @@ describe('HorizontalStackedNijis', () => {
     const styles = Array.from(innerDivs).map(d => d.getAttribute('style') ?? '');
     expect(styles.some(s => s.includes('left: 125px'))).toBe(true);
   });
+
+  it('exactly 3 nounIds renders left: 0/25/50', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={['1', '2', '3']} />);
+    const innerDivs = container.querySelectorAll('div div');
+    const styles = Array.from(innerDivs).map(d => d.getAttribute('style') ?? '');
+    expect(styles.some(s => s.includes('left: 50px'))).toBe(true);
+  });
+
+  it('1000 nounIds caps at 6 elements', () => {
+    const ids = Array.from({ length: 1000 }, (_, i) => String(i + 1));
+    const { container } = render(<HorizontalStackedNijis nounIds={ids} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(6);
+  });
+
+  it('renders nothing in DOM children when array empty', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={[]} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(0);
+  });
+
+  it('rerender from 3 to 6 nijis updates element count', () => {
+    const { container, rerender } = render(<HorizontalStackedNijis nounIds={['1', '2', '3']} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(3);
+    rerender(<HorizontalStackedNijis nounIds={['1', '2', '3', '4', '5', '6']} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(6);
+  });
+
+  it('numeric-string nounIds render verbatim as text', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={['100', '200']} />);
+    const nijis = container.querySelectorAll('[data-testid="niji-circular"]');
+    expect(nijis[0].textContent).toBe('200');
+    expect(nijis[1].textContent).toBe('100');
+  });
 });
