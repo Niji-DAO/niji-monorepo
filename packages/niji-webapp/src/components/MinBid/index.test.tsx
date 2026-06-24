@@ -329,4 +329,48 @@ describe('MinBid', () => {
       expect(container.querySelectorAll('img').length).toBe(1);
     }
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <MinBid key={i} minBid={parseEther(`${i + 1}`)} onClick={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 100 onClick events fire handler', () => {
+    const onClick = vi.fn();
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={onClick} />);
+    const wrapper = container.querySelector('div')!;
+    for (let i = 0; i < 100; i++) fireEvent.click(wrapper);
+    expect(onClick).toHaveBeenCalledTimes(100);
+  });
+
+  it('rerender 30 times preserves img', () => {
+    const { container, rerender } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<MinBid minBid={parseEther(`${i + 1}.5`)} onClick={() => {}} />);
+    }
+    expect(container.querySelector('img')).not.toBeNull();
+  });
+
+  it('handles 1 wei minBid (very small amount)', () => {
+    const { container } = render(<MinBid minBid={1n} onClick={() => {}} />);
+    expect(container.querySelector('img')).not.toBeNull();
+  });
+
+  it('handles all 100 imgs in single mount', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <MinBid key={i} minBid={parseEther(`${i + 1}`)} onClick={() => {}} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(100);
+  });
 });

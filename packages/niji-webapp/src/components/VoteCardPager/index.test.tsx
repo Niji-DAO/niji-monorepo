@@ -349,4 +349,41 @@ describe('VoteCardPager', () => {
       expect(container.querySelectorAll('span').length).toBe(i);
     }
   });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <VoteCardPager key={i} {...defaults} currentPage={i % 3} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 100 right arrow clicks fire handler', () => {
+    const onRight = vi.fn();
+    const { container } = render(<VoteCardPager {...defaults} onRightArrowClick={onRight} />);
+    const right = container.querySelectorAll('button')[1] as HTMLElement;
+    for (let i = 0; i < 100; i++) fireEvent.click(right);
+    expect(onRight).toHaveBeenCalledTimes(100);
+  });
+
+  it('rapid 100 left arrow clicks fire handler', () => {
+    const onLeft = vi.fn();
+    const { container } = render(<VoteCardPager {...defaults} onLeftArrowClick={onLeft} />);
+    const left = container.querySelectorAll('button')[0] as HTMLElement;
+    for (let i = 0; i < 100; i++) fireEvent.click(left);
+    expect(onLeft).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles very large numPages (100)', () => {
+    const { container } = render(<VoteCardPager {...defaults} numPages={100} currentPage={50} />);
+    expect(container.querySelectorAll('span').length).toBe(100);
+  });
+
+  it('handles negative currentPage edge case', () => {
+    expect(() => render(<VoteCardPager {...defaults} currentPage={-1} />)).not.toThrow();
+  });
 });

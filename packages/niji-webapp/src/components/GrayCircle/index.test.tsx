@@ -337,4 +337,55 @@ describe('GrayCircle', () => {
     );
     expect(container.querySelectorAll('img').length).toBe(3);
   });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <GrayCircle key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 50 times preserves img', () => {
+    const { container, rerender } = render(<GrayCircle />);
+    for (let i = 0; i < 50; i++) {
+      rerender(<GrayCircle isDelegateView={i % 2 === 0} />);
+    }
+    expect(container.querySelector('img')).not.toBeNull();
+  });
+
+  it('all 100 instances render with delegate=true', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <GrayCircle key={i} isDelegateView={true} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(100);
+  });
+
+  it('all imgs have decorative empty alt', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <GrayCircle key={i} />
+        ))}
+      </>,
+    );
+    const imgs = container.querySelectorAll('img');
+    imgs.forEach(img => {
+      expect(img.getAttribute('alt')).toBe('');
+    });
+  });
+
+  it('rapid consecutive renders 100 times without crash', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => render(<GrayCircle />)).not.toThrow();
+    }
+  });
 });

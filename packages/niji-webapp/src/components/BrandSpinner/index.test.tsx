@@ -334,4 +334,57 @@ describe('BrandSpinner', () => {
       expect(container.querySelector('svg')?.getAttribute('width')).toBe(w);
     }
   });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <BrandSpinner key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 50 times preserves svg + path + circle', () => {
+    const { container, rerender } = render(<BrandSpinner />);
+    for (let i = 0; i < 50; i++) {
+      rerender(<BrandSpinner />);
+    }
+    expect(container.querySelector('svg path')).not.toBeNull();
+    expect(container.querySelector('svg circle')).not.toBeNull();
+  });
+
+  it('all 200 instances have width=25 attribute', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    const svgs = container.querySelectorAll('svg');
+    expect(svgs.length).toBe(200);
+    svgs.forEach(svg => {
+      expect(svg.getAttribute('width')).toBe('25');
+    });
+  });
+
+  it('all 50 instances have circle element', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('svg circle').length).toBe(50);
+  });
+
+  it('rapid consecutive renders 100 times without crash', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => render(<BrandSpinner />)).not.toThrow();
+    }
+  });
 });
