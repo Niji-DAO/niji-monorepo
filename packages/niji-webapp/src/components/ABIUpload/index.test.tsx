@@ -583,4 +583,72 @@ describe('ABIUpload Component', () => {
       ).not.toThrow();
     }
   });
+
+  it('renders 30 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ABIUpload
+              key={i}
+              abiFileName={`file-${i}.json`}
+              isValid={false}
+              isInvalid={false}
+              onChange={vi.fn()}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves component', () => {
+    const { rerender } = render(
+      <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <ABIUpload
+            abiFileName={`file-${i}.json`}
+            isValid={i % 2 === 0}
+            isInvalid={i % 3 === 0}
+            onChange={vi.fn()}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles very long abiFileName (1000 char)', () => {
+    const long = `${'a'.repeat(995)}.json`;
+    expect(() =>
+      render(<ABIUpload abiFileName={long} isValid={false} isInvalid={false} onChange={vi.fn()} />),
+    ).not.toThrow();
+  });
+
+  it('handles unicode abiFileName', () => {
+    expect(() =>
+      render(
+        <ABIUpload
+          abiFileName="🎉日本語.json"
+          isValid={false}
+          isInvalid={false}
+          onChange={vi.fn()}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 50 onChange events fire handler', () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={onChange} />,
+    );
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    for (let i = 0; i < 50; i++) {
+      fireEvent.change(input, { target: { files: [] } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(50);
+  });
 });
