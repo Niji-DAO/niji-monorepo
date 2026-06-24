@@ -274,4 +274,63 @@ describe('NijiContent', () => {
     expect(container.querySelector('[data-testid="date-headline"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="niji-title"]')).not.toBeNull();
   });
+
+  it('SettleManuallyBtn hides on chainNow == endTime - 1', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: '0xUSER' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 999n } });
+    const { container } = wrap(<NijiContent {...defaults} auction={makeAuction(1000n)} />);
+    expect(container.querySelector('[data-testid="settle-btn"]')).toBeNull();
+  });
+
+  it('SettleManuallyBtn shows on chainNow == endTime exactly', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: '0xUSER' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 1000n } });
+    const { container } = wrap(<NijiContent {...defaults} auction={makeAuction(1000n)} />);
+    expect(container.querySelector('[data-testid="settle-btn"]')).not.toBeNull();
+  });
+
+  it('multiple ArrowLeft keydown fires onPrev N times', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    wrap(<NijiContent {...defaults} />);
+    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    expect(prevClickMock).toHaveBeenCalledTimes(3);
+  });
+
+  it('AuctionActivity wrapper renders winner inside', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    const { container } = wrap(<NijiContent {...defaults} />);
+    const wrapper = container.querySelector('[data-testid="wrapper"]');
+    expect(wrapper?.querySelector('[data-testid="winner"]')).not.toBeNull();
+  });
+
+  it('current-bid component renders', () => {
+    resetState();
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    const { container } = wrap(<NijiContent {...defaults} />);
+    expect(container.querySelector('[data-testid="current-bid"]')).not.toBeNull();
+  });
+
+  it('Pending state shows pending text instead of just btn (送信中)', () => {
+    resetState();
+    settleHookState.isPending = true;
+    useAtomValueMock.mockReturnValue(true);
+    useAccountMock.mockReturnValue({ address: '0xUSER' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 2000n } });
+    const { container } = wrap(<NijiContent {...defaults} auction={makeAuction(1000n)} />);
+    expect(container.textContent).toContain('送信中');
+  });
 });

@@ -122,4 +122,53 @@ describe('AuctionActivityDateHeadline', () => {
     const { container } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
     expect(container.querySelector('h4')?.getAttribute('style')).toMatch(/brand-/);
   });
+
+  it('December 2024 startTime renders December', () => {
+    useAtomValueMock.mockReturnValue(true);
+    // 1733011200 = 2024-12-01 UTC
+    const { container } = render(<AuctionActivityDateHeadline startTime={1733011200n} />);
+    expect(container.querySelector('h4')?.textContent).toContain('December');
+    expect(container.querySelector('h4')?.textContent).toContain('2024');
+  });
+
+  it('rerender from isCool=true to false switches color', () => {
+    useAtomValueMock.mockReturnValueOnce(true);
+    const { container, rerender } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect(container.querySelector('h4')?.getAttribute('style')).toContain('cool');
+    useAtomValueMock.mockReturnValue(false);
+    rerender(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect(container.querySelector('h4')?.getAttribute('style')).toContain('warm');
+  });
+
+  it('h4 className is non-empty (CSS module applied)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect(container.querySelector('h4')?.className).toBeTruthy();
+  });
+
+  it('div wrapper renders 1 instance per component', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+  });
+
+  it('Mid-February 2025 renders February', () => {
+    useAtomValueMock.mockReturnValue(true);
+    // 1739664000 = 2025-02-16 UTC
+    const { container } = render(<AuctionActivityDateHeadline startTime={1739664000n} />);
+    expect(container.querySelector('h4')?.textContent).toContain('February');
+  });
+
+  it('5 instances render 5 h4 elements', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const times = [1735689600n, 1739664000n, 1720051200n, 4102444800n, 0n];
+    const { container } = render(
+      <>
+        {times.map((t, i) => (
+          <AuctionActivityDateHeadline key={i} startTime={t} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h4').length).toBe(5);
+  });
 });
