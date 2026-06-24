@@ -203,4 +203,47 @@ describe('TightStackedCircleNiji', () => {
     const { container } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
     expect(container.querySelector('svg image')).not.toBeNull();
   });
+
+  it('large index (10) does not crash', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    expect(() => renderSvg({ nounId: 1, index: 10, square: 55, shift: 3 })).not.toThrow();
+  });
+
+  it('cx + cy values are numeric (not NaN)', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const { container } = renderSvg({ nounId: 1, index: 2, square: 55, shift: 3 });
+    const circle = container.querySelector('circle');
+    expect(circle?.getAttribute('cx')).toMatch(/^-?\d+(\.\d+)?$/);
+    expect(circle?.getAttribute('cy')).toMatch(/^-?\d+(\.\d+)?$/);
+  });
+
+  it('different image data renders different href', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'data:img-1' });
+    const { container } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
+    expect(container.querySelector('image')?.getAttribute('href')).toBe('data:img-1');
+  });
+
+  it('square=100 + shift=5 + index=3 calculates correct cx', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'x' });
+    const { container } = renderSvg({ nounId: 1, index: 3, square: 100, shift: 5 });
+    expect(container.querySelector('circle')?.getAttribute('cx')).toBe('43'); // 28 + 3*5
+  });
+
+  it('seed loaded after delay (rerender) shows image', () => {
+    useNounSeedMock.mockReturnValueOnce(undefined);
+    const { container, rerender } = renderSvg({ nounId: 1, index: 0, square: 55, shift: 3 });
+    expect(container.querySelector('image')).toBeNull();
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'data:loaded' });
+    rerender(
+      <svg>
+        <TightStackedCircleNiji nounId={1} index={0} square={55} shift={3} />
+      </svg>,
+    );
+    expect(container.querySelector('image')?.getAttribute('href')).toBe('data:loaded');
+  });
 });
