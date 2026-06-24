@@ -144,4 +144,51 @@ describe('ShortAddress', () => {
     // ENS avatar undefined → blo() fallback
     expect(container.querySelector('img')?.getAttribute('src')).toBe('data:image/png;base64,FAKE');
   });
+
+  it('renders text-only when avatar=false (no img element)', () => {
+    vi.mocked(useEnsName).mockReturnValue(ensReturn(null));
+    vi.mocked(useEnsAvatar).mockReturnValue(ensReturn(undefined));
+    vi.mocked(resolveNijiContractAddress).mockReturnValue(undefined);
+    const { container } = render(<ShortAddress address={ADDR} avatar={false} />);
+    expect(container.querySelector('img')).toBeNull();
+    expect(container.textContent).toMatch(/0x[\dA-Fa-f]{2}\.{3}[\dA-Fa-f]{4}/);
+  });
+
+  it('blocked ENS still resolves to short address regardless of ENS name', () => {
+    vi.mocked(useEnsName).mockReturnValue(ensReturn('blocked-name.eth'));
+    vi.mocked(useEnsAvatar).mockReturnValue(ensReturn(undefined));
+    vi.mocked(resolveNijiContractAddress).mockReturnValue(undefined);
+    vi.mocked(containsBlockedText).mockReturnValue(true);
+    const { container } = render(<ShortAddress address={ADDR} />);
+    expect(container.textContent).not.toContain('blocked-name.eth');
+  });
+
+  it('resolved contract name preserves verbatim case', () => {
+    vi.mocked(useEnsName).mockReturnValue(ensReturn(null));
+    vi.mocked(useEnsAvatar).mockReturnValue(ensReturn(undefined));
+    vi.mocked(resolveNijiContractAddress).mockReturnValue('Niji DAO Token');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<ShortAddress address={ADDR} />);
+    expect(container.textContent).toBe('Niji DAO Token');
+  });
+
+  it('default size for avatar img has dimension set', () => {
+    vi.mocked(useEnsName).mockReturnValue(ensReturn('alice.eth'));
+    vi.mocked(useEnsAvatar).mockReturnValue(ensReturn(undefined));
+    vi.mocked(resolveNijiContractAddress).mockReturnValue(undefined);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<ShortAddress address={ADDR} avatar={true} />);
+    const img = container.querySelector('img');
+    expect(img?.style.width).toBeTruthy();
+    expect(img?.style.height).toBeTruthy();
+  });
+
+  it('contract name takes precedence over fallback short address (blocklist=false)', () => {
+    vi.mocked(useEnsName).mockReturnValue(ensReturn(null));
+    vi.mocked(useEnsAvatar).mockReturnValue(ensReturn(undefined));
+    vi.mocked(resolveNijiContractAddress).mockReturnValue('Treasury');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<ShortAddress address={ADDR} />);
+    expect(container.textContent).toBe('Treasury');
+  });
 });
