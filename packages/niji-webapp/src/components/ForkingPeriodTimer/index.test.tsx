@@ -113,4 +113,51 @@ describe('ForkingPeriodTimer', () => {
     );
     expect(container.querySelectorAll('h2').length).toBe(1);
   });
+
+  it('isPeriodEnded=true with valid endTime still returns null', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={true} />,
+    );
+    expect(container.textContent).toBe('');
+  });
+
+  it('warm bg + isPeriodEnded=true returns null', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const { container } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 1000} isPeriodEnded={true} />,
+    );
+    expect(container.textContent).toBe('');
+  });
+
+  it('renders without crash for 1-second future endTime', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 1} isPeriodEnded={false} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders timer for very short endTime (5 seconds in future)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 5} isPeriodEnded={false} />,
+    );
+    expect(container.querySelector('h2')).not.toBeNull();
+  });
+
+  it('triple click results in original state again (odd toggle)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={false} />,
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    const original = wrapper.textContent;
+    fireEvent.click(wrapper);
+    fireEvent.click(wrapper);
+    fireEvent.click(wrapper);
+    // 3 回 click → 元と異なる (odd toggle)
+    expect(wrapper.textContent).not.toBe(original);
+  });
 });

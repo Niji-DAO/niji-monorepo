@@ -104,4 +104,62 @@ describe('HoverCard', () => {
     );
     expect(container.querySelector('span')?.textContent).toBe('42');
   });
+
+  it('renders trigger string without leaking tip text in default closed state', () => {
+    const { container } = render(
+      <HoverCard hoverCardContent={() => <span>hidden-tip-content</span>} tip="t" id="x">
+        Trigger
+      </HoverCard>,
+      { wrapper: WithProviders },
+    );
+    expect(container.textContent).toBe('Trigger');
+    expect(container.textContent).not.toContain('hidden-tip-content');
+  });
+
+  it('renders unique IDs without collision (two HoverCards)', () => {
+    expect(() =>
+      render(
+        <>
+          <HoverCard hoverCardContent={() => <></>} tip="t1" id="id1">
+            A
+          </HoverCard>
+          <HoverCard hoverCardContent={() => <></>} tip="t2" id="id2">
+            B
+          </HoverCard>
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('does not render content callback for empty tip', () => {
+    const { container } = render(
+      <HoverCard hoverCardContent={() => <span>callback-output</span>} tip="" id="x">
+        Trigger
+      </HoverCard>,
+      { wrapper: WithProviders },
+    );
+    expect(container.textContent).toBe('Trigger');
+  });
+
+  it('renders long trigger text without crash', () => {
+    const long = 'a'.repeat(500);
+    const { container } = render(
+      <HoverCard hoverCardContent={() => <></>} tip="t" id="x">
+        {long}
+      </HoverCard>,
+      { wrapper: WithProviders },
+    );
+    expect(container.querySelector('span')?.textContent?.length).toBe(500);
+  });
+
+  it('boolean children (true=skip) render nothing', () => {
+    const { container } = render(
+      <HoverCard hoverCardContent={() => <></>} tip="t" id="x">
+        {true}
+      </HoverCard>,
+      { wrapper: WithProviders },
+    );
+    expect(container.querySelector('span')?.textContent).toBe('');
+  });
 });

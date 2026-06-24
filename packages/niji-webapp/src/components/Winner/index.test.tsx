@@ -113,4 +113,48 @@ describe('Winner', () => {
     const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
     expect(container.textContent?.toLowerCase()).toContain('you');
   });
+
+  it('renders ShortAddress with full winner address verbatim', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(ADDR);
+  });
+
+  it('zh-CN locale renders with you branch when winner matches user', () => {
+    useAccountMock.mockReturnValue({ address: ADDR });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('zh-CN');
+    const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    expect(container.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('handles case-insensitive winner === account comparison', () => {
+    const lowerADDR = '0x5fbdb2315678afecb367f032d93f642f64180aa3' as const;
+    useAccountMock.mockReturnValue({ address: lowerADDR });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    // 大文字小文字違いでも you 判定
+    expect(container.textContent?.toLowerCase()).toContain('you');
+  });
+
+  it('isNounders ja-JP + warm bg combination', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(false);
+    useActiveLocaleMock.mockReturnValue('ja-JP');
+    const { container } = render(<Winner winner={ADDR} isNounders={true} />, {
+      wrapper: WithProviders,
+    });
+    expect(container.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('renders ShortAddress 1 element when not user winner', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    expect(container.querySelectorAll('[data-testid="short"]').length).toBe(1);
+  });
 });

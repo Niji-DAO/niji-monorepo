@@ -111,4 +111,39 @@ describe('SponsorsFormOverlay', () => {
       render(<SponsorsFormOverlay {...defaults} proposalIdToUpdate={42} />),
     ).not.toThrow();
   });
+
+  it('Success banner shows when isFormDisplayed=false but transactionState=Success', () => {
+    const { container } = render(
+      <SponsorsFormOverlay {...defaults} transactionState="Success" isFormDisplayed={false} />,
+    );
+    expect(container.textContent).toContain('Success!');
+  });
+
+  it('Success state contains success-related text', () => {
+    const { container } = render(<SponsorsFormOverlay {...defaults} transactionState="Success" />);
+    // success keyword check
+    expect(container.textContent?.toLowerCase()).toContain('success');
+  });
+
+  it('close button does NOT exist when isFormDisplayed=false', () => {
+    const { container } = render(<SponsorsFormOverlay {...defaults} isFormDisplayed={false} />);
+    // form is not rendered → close button (signature form 内含む) は出ない
+    expect(container.querySelector('button')).toBeNull();
+  });
+
+  it('handles candidate prop changes via rerender', () => {
+    const { rerender, container } = render(
+      <SponsorsFormOverlay {...defaults} isFormDisplayed={true} candidate={{ a: 1 } as never} />,
+    );
+    expect(container.querySelector('[data-testid="signature-form"]')).not.toBeNull();
+    rerender(
+      <SponsorsFormOverlay {...defaults} isFormDisplayed={true} candidate={{ b: 2 } as never} />,
+    );
+    expect(container.querySelector('[data-testid="signature-form"]')).not.toBeNull();
+  });
+
+  it('renders no signature-form when isFormDisplayed=false', () => {
+    const { container } = render(<SponsorsFormOverlay {...defaults} isFormDisplayed={false} />);
+    expect(container.querySelector('[data-testid="signature-form"]')).toBeNull();
+  });
 });
