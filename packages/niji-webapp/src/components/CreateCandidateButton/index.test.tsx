@@ -563,4 +563,90 @@ describe('CreateCandidateButton', () => {
     );
     expect(container.textContent).toContain('Create proposal candidate');
   });
+
+  it('renders 30 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 30 }, (_, i) => (
+          <CreateCandidateButton
+            key={i}
+            isLoading={false}
+            hasActiveOrPendingProposal={false}
+            isFormInvalid={false}
+            handleCreateProposal={() => {}}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(30);
+  });
+
+  it('rapid 50 clicks fire 50 times', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 50; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(50);
+  });
+
+  it('all 8 flag combinations render without crash', () => {
+    const flags = [true, false];
+    flags.forEach(isLoading => {
+      flags.forEach(hasActive => {
+        flags.forEach(isFormInvalid => {
+          expect(() =>
+            render(
+              <CreateCandidateButton
+                isLoading={isLoading}
+                hasActiveOrPendingProposal={hasActive}
+                isFormInvalid={isFormInvalid}
+                handleCreateProposal={() => {}}
+              />,
+            ),
+          ).not.toThrow();
+        });
+      });
+    });
+  });
+
+  it('renders consistent text across 10 rerenders', () => {
+    const { container, rerender } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    for (let i = 0; i < 10; i++) {
+      rerender(
+        <CreateCandidateButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          isFormInvalid={false}
+          handleCreateProposal={() => {}}
+        />,
+      );
+      expect(container.textContent).toContain('Create proposal candidate');
+    }
+  });
+
+  it('renders without spinner when isLoading=false', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('.spinner-border')).toBeNull();
+  });
 });
