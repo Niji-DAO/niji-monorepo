@@ -1,0 +1,58 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "approved",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint96",
+            "name": "rewarded",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "withdrawn",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint56",
+            "name": "__gap",
+            "type": "uint56"
+          },
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct IClientTokenTypes.ClientMetadata",
+        "name": "metadata",
+        "type": "tuple"
+      }
+    ],
+    "name": "tokenURI",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
