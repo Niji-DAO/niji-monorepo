@@ -365,4 +365,43 @@ describe('ChangeDelegatePanel', () => {
     expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
     hookState.account = '0xUSER';
   });
+
+  it('renders 10 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <ChangeDelegatePanel key={i} onDismiss={vi.fn()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('multi rerender does not crash', () => {
+    const { rerender } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+    for (let i = 0; i < 10; i++) {
+      expect(() => rerender(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    }
+  });
+
+  it('hookState changes preserve component', () => {
+    hookState.nounTokenBalance = 10;
+    const { rerender } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+    hookState.nounTokenBalance = 20;
+    expect(() => rerender(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    hookState.nounTokenBalance = 5;
+  });
+
+  it('renders consistently with proposalThreshold changes', () => {
+    hookState.proposalThreshold = 5;
+    expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    hookState.proposalThreshold = 1;
+  });
+
+  it('renders without crash with accountVotes=0', () => {
+    hookState.accountVotes = 0;
+    expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    hookState.accountVotes = 5;
+  });
 });

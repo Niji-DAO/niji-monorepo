@@ -262,4 +262,47 @@ describe('VoteProgressBar', () => {
     rerender(<VoteProgressBar variant={VoteCardVariant.ABSTAIN} percentage={50} />);
     expect(container.querySelectorAll('div')[1]?.className).toMatch(/abstain/i);
   });
+
+  it('renders 20 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <VoteProgressBar
+            key={i}
+            variant={[VoteCardVariant.FOR, VoteCardVariant.AGAINST, VoteCardVariant.ABSTAIN][i % 3]}
+            percentage={(i * 5) % 100}
+          />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(20);
+  });
+
+  it('handles percentage=0.5 fractional', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={0.5} />,
+    );
+    expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 0.5%');
+  });
+
+  it('handles 200% (over-cap)', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={200} />,
+    );
+    expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 200%');
+  });
+
+  it('handles 0% renders empty progress', () => {
+    const { container } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={0} />);
+    expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 0%');
+  });
+
+  it('rerender percentage 0% to 100% updates style', () => {
+    const { container, rerender } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={0} />,
+    );
+    expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 0%');
+    rerender(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={100} />);
+    expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 100%');
+  });
 });

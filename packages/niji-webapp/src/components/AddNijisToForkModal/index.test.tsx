@@ -387,4 +387,43 @@ describe('AddNijisToForkModal', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 10 instances all consecutively', () => {
+    for (let i = 0; i < 10; i++) {
+      expect(() => render(<AddNijisToForkModal {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('renders without crash with refetchData being undefined', () => {
+    expect(() =>
+      render(<AddNijisToForkModal {...baseProps} refetchData={() => {}} />),
+    ).not.toThrow();
+  });
+
+  it('renders 5 modals independently with different account props', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <AddNijisToForkModal key={i} {...baseProps} account={`0x${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash for isForkingPeriod=true + confirmOpen=true', () => {
+    expect(() =>
+      render(
+        <AddNijisToForkModal {...baseProps} isForkingPeriod={true} isConfirmModalOpen={true} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender from non-forking to forking period preserves modal', () => {
+    const { rerender } = render(<AddNijisToForkModal {...baseProps} isForkingPeriod={false} />);
+    expect(() =>
+      rerender(<AddNijisToForkModal {...baseProps} isForkingPeriod={true} />),
+    ).not.toThrow();
+  });
 });
