@@ -245,4 +245,40 @@ describe('TransferFundsReviewStep', () => {
     fireEvent.click(back);
     expect(onPrev).toHaveBeenCalledTimes(3);
   });
+
+  it('USDC currency state with small amount renders without crash', () => {
+    const state = { ...baseState, amount: '0.001', TransferFundsCurrency: SupportedCurrency.USDC };
+    expect(() => render(<TransferFundsReviewStep {...defaults} state={state} />)).not.toThrow();
+  });
+
+  it('ETH default currency body includes "ETH" keyword', () => {
+    const { container } = render(<TransferFundsReviewStep {...defaults} />);
+    expect(container.textContent).toContain('ETH');
+  });
+
+  it('rerender amount changes display', () => {
+    const { container, rerender } = render(<TransferFundsReviewStep {...defaults} />);
+    expect(container.textContent).toContain('2.5');
+    rerender(<TransferFundsReviewStep {...defaults} state={{ ...baseState, amount: '7.5' }} />);
+    expect(container.textContent).toContain('7.5');
+  });
+
+  it('multi-click on Next fires onDismiss N times', () => {
+    const onNext = vi.fn();
+    const onDismiss = vi.fn();
+    const { container } = render(
+      <TransferFundsReviewStep {...defaults} onNextBtnClick={onNext} onDismiss={onDismiss} />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onDismiss).toHaveBeenCalledTimes(3);
+  });
+
+  it('ShortAddress receives full recipient address', () => {
+    const { container } = render(<TransferFundsReviewStep {...defaults} />);
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(
+      '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+    );
+  });
 });

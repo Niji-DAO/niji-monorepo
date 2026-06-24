@@ -250,4 +250,30 @@ describe('VoteModal', () => {
     const { container } = render(<VoteModal {...baseProps} proposalId="0" />);
     expect(container.textContent).toContain('Vote on Prop 0');
   });
+
+  it('availableVotes=100 renders modal without crash', () => {
+    expect(() => render(<VoteModal {...baseProps} availableVotes={100} />)).not.toThrow();
+  });
+
+  it('isObjectionPeriod=true + availableVotes>0 renders without crash', () => {
+    expect(() =>
+      render(<VoteModal {...baseProps} isObjectionPeriod={true} availableVotes={5} />),
+    ).not.toThrow();
+  });
+
+  it('rerender from show=false to true mounts modal', () => {
+    const { container, rerender } = render(<VoteModal {...baseProps} show={false} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
+    rerender(<VoteModal {...baseProps} show={true} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+  });
+
+  it('proposalId=999 renders Vote on Prop 999', () => {
+    const { container } = render(<VoteModal {...baseProps} proposalId="999" />);
+    expect(container.textContent).toContain('Vote on Prop 999');
+  });
+
+  it('availableVotes=0 still renders modal', () => {
+    expect(() => render(<VoteModal {...baseProps} availableVotes={0} />)).not.toThrow();
+  });
 });
