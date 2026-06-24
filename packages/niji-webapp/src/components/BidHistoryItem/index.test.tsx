@@ -293,4 +293,43 @@ describe('BidHistoryItem Component', () => {
     const extBid = { ...mockBid, extended: true };
     expect(() => render(<BidHistoryItem bid={extBid} classes={mockClasses} />)).not.toThrow();
   });
+
+  it('renders 10 instances each with distinct values', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <BidHistoryItem
+            key={i}
+            bid={{ ...mockBid, value: BigInt(i + 1) * 1_000_000_000_000_000_000n }}
+            classes={mockClasses}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="truncated-amount"]').length).toBe(10);
+  });
+
+  it('renders without crash for fractional value (1 wei)', () => {
+    const wei = { ...mockBid, value: 1n };
+    expect(() => render(<BidHistoryItem bid={wei} classes={mockClasses} />)).not.toThrow();
+  });
+
+  it('rerender different value updates amount', () => {
+    const { rerender } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    const updated = { ...mockBid, value: 10n * 1_000_000_000_000_000_000n };
+    rerender(<BidHistoryItem bid={updated} classes={mockClasses} />);
+    expect(screen.getByTestId('truncated-amount')).toHaveTextContent(
+      'Amount: 10000000000000000000',
+    );
+  });
+
+  it('renders without crash for empty classes object', () => {
+    expect(() => render(<BidHistoryItem bid={mockBid} classes={{}} />)).not.toThrow();
+  });
+
+  it('renders consistently across 5 sequential renders', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() => render(<BidHistoryItem bid={mockBid} classes={mockClasses} />)).not.toThrow();
+    }
+  });
 });

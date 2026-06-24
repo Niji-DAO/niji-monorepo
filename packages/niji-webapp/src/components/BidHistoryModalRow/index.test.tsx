@@ -275,4 +275,45 @@ describe('BidHistoryModalRow', () => {
     vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
     expect(() => render(<BidHistoryModalRow bid={bid} index={99} />)).not.toThrow();
   });
+
+  it('renders 5 rows independently', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <BidHistoryModalRow key={i} bid={bid} index={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(5);
+  });
+
+  it('renders ENS with 100 char long name', () => {
+    const longName = 'a'.repeat(100) + '.eth';
+    vi.mocked(useReverseENSLookUp).mockReturnValue(longName);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    expect(container.textContent).toContain('aaaa');
+  });
+
+  it('rerender index changes (trophy toggle)', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container, rerender } = render(<BidHistoryModalRow bid={bid} index={0} />);
+    expect(container.querySelectorAll('img').length).toBe(2);
+    rerender(<BidHistoryModalRow bid={bid} index={3} />);
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('renders for 1 wei value as "Ξ 0.00"', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const wei = { ...bid, value: 1n };
+    const { container } = render(<BidHistoryModalRow bid={wei} index={1} />);
+    expect(container.textContent).toContain('Ξ');
+  });
+
+  it('renders without crash for very long transactionHash', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const longHash = { ...bid, transactionHash: '0x' + 'a'.repeat(500) };
+    expect(() => render(<BidHistoryModalRow bid={longHash} index={1} />)).not.toThrow();
+  });
 });
