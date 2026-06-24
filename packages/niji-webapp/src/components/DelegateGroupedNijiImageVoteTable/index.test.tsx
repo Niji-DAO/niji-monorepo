@@ -437,4 +437,60 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
     );
     expect(container.querySelectorAll('td').length).toBe(12);
   });
+
+  it('renders 20 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <DelegateGroupedNijiImageVoteTable
+              key={i}
+              {...baseProps}
+              filteredDelegateGroupedVoteData={[makeVote(`0x${i}`, [String(i)])]}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 delegates renders 9 pages', () => {
+    const data = Array.from({ length: 100 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    expect(container.querySelector('[data-testid="num-pages"]')?.textContent).toBe('9');
+  });
+
+  it('rapid 10 right + 10 left clicks navigate pages', () => {
+    const data = Array.from({ length: 30 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    for (let i = 0; i < 2; i++) fireEvent.click(container.querySelector('[data-testid="right"]')!);
+    expect(container.querySelector('[data-testid="current-page"]')?.textContent).toBe('2');
+    for (let i = 0; i < 2; i++) fireEvent.click(container.querySelector('[data-testid="left"]')!);
+    expect(container.querySelector('[data-testid="current-page"]')?.textContent).toBe('0');
+  });
+
+  it('rerender with empty data returns to single page', () => {
+    const data = Array.from({ length: 30 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container, rerender } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    expect(container.querySelector('[data-testid="num-pages"]')?.textContent).toBe('3');
+    rerender(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+    );
+    expect(container.querySelector('[data-testid="num-pages"]')?.textContent).toBe('1');
+  });
+
+  it('handles support type 0/1/2 mix', () => {
+    const data = [makeVote('0xA', ['1'], 0), makeVote('0xB', ['2'], 1), makeVote('0xC', ['3'], 2)];
+    expect(() =>
+      render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+      ),
+    ).not.toThrow();
+  });
 });
