@@ -383,4 +383,44 @@ describe('Bid', () => {
     }
     expect(input.value).toBe('4.01');
   });
+
+  it('renders 5 instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <Bid key={i} auction={makeAuction() as never} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash for nounId=0n auction', () => {
+    expect(() =>
+      render(<Bid auction={makeAuction({ nounId: 0n }) as never} auctionEnded={false} />),
+    ).not.toThrow();
+  });
+
+  it('renders without crash for nounId=999999n', () => {
+    expect(() =>
+      render(<Bid auction={makeAuction({ nounId: 999999n }) as never} auctionEnded={false} />),
+    ).not.toThrow();
+  });
+
+  it('renders consecutive 5 times without crash', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        render(<Bid auction={makeAuction() as never} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('renders for placeBid isPending=true', () => {
+    hookState.placeBid.isPending = true;
+    expect(() =>
+      render(<Bid auction={makeAuction() as never} auctionEnded={false} />),
+    ).not.toThrow();
+    hookState.placeBid.isPending = false;
+  });
 });
