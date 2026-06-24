@@ -138,4 +138,80 @@ describe('CreateProposalButton', () => {
     if (btn) fireEvent.click(btn);
     expect(handle).toHaveBeenCalledTimes(1);
   });
+
+  it('does NOT fire handleCreateProposal when disabled (no enough votes)', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={false}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button');
+    if (btn) fireEvent.click(btn);
+    expect(handle).not.toHaveBeenCalled();
+  });
+
+  it('renders exactly 1 button element', () => {
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(1);
+  });
+
+  it('hasActiveOrPendingProposal warning takes precedence over Create text', () => {
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={true}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.textContent).not.toContain('Create Proposal');
+    expect(container.textContent).toContain('active or pending');
+  });
+
+  it('threshold warning uses proposalThreshold + 1 formula', () => {
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={false}
+        proposalThreshold={10}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    // 10 + 1 = 11 votes
+    expect(container.textContent).toContain('11 votes to submit a proposal');
+  });
+
+  it('multi-click on enabled button fires handler N times', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(3);
+  });
 });
