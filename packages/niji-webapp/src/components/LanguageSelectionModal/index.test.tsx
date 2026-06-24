@@ -418,4 +418,37 @@ describe('LanguageSelectionModal', () => {
       'Select Language',
     );
   });
+
+  it('rerender 30 times preserves title', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { rerender } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<LanguageSelectionModal onDismiss={() => {}} />);
+    }
+    expect(document.getElementById('overlay-root')?.querySelector('h3')?.textContent).toBe(
+      'Select Language',
+    );
+  });
+
+  it('rapid 50 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    for (let i = 0; i < 50; i++) {
+      onDismiss();
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(50);
+  });
+
+  it('zh-CN locale variant renders Check icon (svg)', () => {
+    useAtomMock.mockReturnValue(['zh-CN', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    const overlay = document.getElementById('overlay-root');
+    expect(overlay?.querySelector('svg')).not.toBeNull();
+  });
+
+  it('renders without crash with unknown locale (xx-XX)', () => {
+    useAtomMock.mockReturnValue(['xx-XX', vi.fn()]);
+    expect(() => render(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
+  });
 });

@@ -314,4 +314,47 @@ describe('ModalTitle', () => {
   it('renders without crash with Symbol children', () => {
     expect(() => render(<ModalTitle>{Symbol('x') as never}</ModalTitle>)).not.toThrow();
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ModalTitle key={i}>title-{i}</ModalTitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves h1', () => {
+    const { container, rerender } = render(<ModalTitle>x</ModalTitle>);
+    for (let i = 0; i < 30; i++) {
+      rerender(<ModalTitle>title-{i}</ModalTitle>);
+    }
+    expect(container.querySelector('h1')?.textContent).toContain('29');
+  });
+
+  it('handles array children', () => {
+    const arr = ['a', 'b', 'c'];
+    const { container } = render(
+      <ModalTitle>
+        {arr.map(n => (
+          <span key={n}>{n}</span>
+        ))}
+      </ModalTitle>,
+    );
+    expect(container.querySelectorAll('h1 span').length).toBe(3);
+  });
+
+  it('handles unicode children', () => {
+    const { container } = render(<ModalTitle>🎉 タイトル</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('🎉 タイトル');
+  });
+
+  it('handles 5000 char children (very long)', () => {
+    const long = 'x'.repeat(5000);
+    const { container } = render(<ModalTitle>{long}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent?.length).toBe(5000);
+  });
 });
