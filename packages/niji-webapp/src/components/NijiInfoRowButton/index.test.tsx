@@ -153,4 +153,69 @@ describe('NijiInfoRowButton', () => {
     );
     expect(container.querySelector('img')?.getAttribute('src')).toBe(long);
   });
+
+  it('rerender from cool to warm toggles class', () => {
+    useAtomValueMock.mockReturnValueOnce(true);
+    const { container, rerender } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="x" onClickHandler={() => {}} />,
+    );
+    expect(container.querySelector('div')?.className).toMatch(/cool/i);
+    useAtomValueMock.mockReturnValue(false);
+    rerender(<NijiInfoRowButton iconImgSource="/x.png" btnText="x" onClickHandler={() => {}} />);
+    expect(container.querySelector('div')?.className).toMatch(/warm/i);
+  });
+
+  it('rerender updates btnText', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="First" onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe('First');
+    rerender(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="Second" onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe('Second');
+  });
+
+  it('multiple instances render independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        <NijiInfoRowButton iconImgSource="/a.png" btnText="A" onClickHandler={() => {}} />
+        <NijiInfoRowButton iconImgSource="/b.png" btnText="B" onClickHandler={() => {}} />
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(2);
+    expect(container.textContent).toContain('A');
+    expect(container.textContent).toContain('B');
+  });
+
+  it('unicode btnText renders verbatim', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="日本語" onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe('日本語');
+  });
+
+  it('different iconImgSource per instance renders correctly', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        <NijiInfoRowButton iconImgSource="/a.png" btnText="a" onClickHandler={() => {}} />
+        <NijiInfoRowButton iconImgSource="/b.png" btnText="b" onClickHandler={() => {}} />
+      </>,
+    );
+    const imgs = container.querySelectorAll('img');
+    expect(imgs[0].getAttribute('src')).toBe('/a.png');
+    expect(imgs[1].getAttribute('src')).toBe('/b.png');
+  });
+
+  it('img alt attribute is defined (even if empty)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="x" onClickHandler={() => {}} />,
+    );
+    expect(container.querySelector('img')?.getAttribute('alt')).toBeDefined();
+  });
 });

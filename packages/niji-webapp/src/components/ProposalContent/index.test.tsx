@@ -150,4 +150,58 @@ describe('ProposalContent extra cases', () => {
     const txIdx = html.indexOf('Proposed Transactions');
     expect(descIdx).toBeLessThan(txIdx);
   });
+
+  it('rerender from with description to empty hides markdown', () => {
+    const { container, rerender } = render(
+      <ProposalContent description="hello" title="t" details={details} />,
+    );
+    expect(container.querySelector('[data-testid="markdown"]')).not.toBeNull();
+    rerender(<ProposalContent description="" title="t" details={details} />);
+    expect(container.querySelector('[data-testid="markdown"]')).toBeNull();
+  });
+
+  it('different title prepended via processProposalDescriptionText', () => {
+    const { container } = render(
+      <ProposalContent description="body" title="MYTITLE" details={details} />,
+    );
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe('[MYTITLE]body');
+  });
+
+  it('rerender details count updates ProposalTransactions count', () => {
+    const { container, rerender } = render(
+      <ProposalContent description="d" title="t" details={details} />,
+    );
+    expect(container.querySelector('[data-testid="proposal-tx"]')?.textContent).toBe('tx-count-2');
+    rerender(
+      <ProposalContent
+        description="d"
+        title="t"
+        details={[{ target: '0xA' }, { target: '0xB' }, { target: '0xC' }] as never}
+      />,
+    );
+    expect(container.querySelector('[data-testid="proposal-tx"]')?.textContent).toBe('tx-count-3');
+  });
+
+  it('proposeOnV1=true with original banner contains "treasury"', () => {
+    const { container } = render(
+      <ProposalContent description="d" title="t" details={details} proposeOnV1={true} />,
+    );
+    expect(container.textContent).toContain('treasury');
+  });
+
+  it('rerender from proposeOnV1=true to false hides banner', () => {
+    const { container, rerender } = render(
+      <ProposalContent description="d" title="t" details={details} proposeOnV1={true} />,
+    );
+    expect(container.textContent).toContain('original treasury');
+    rerender(<ProposalContent description="d" title="t" details={details} proposeOnV1={false} />);
+    expect(container.textContent).not.toContain('original treasury');
+  });
+
+  it('renders unicode description through markdown mock', () => {
+    const { container } = render(
+      <ProposalContent description="こんにちは" title="t" details={details} />,
+    );
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe('[t]こんにちは');
+  });
 });

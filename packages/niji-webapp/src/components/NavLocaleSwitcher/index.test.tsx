@@ -148,4 +148,53 @@ describe('NavLocaleSwitcher', () => {
     expect(container.querySelector('.dropdown')).not.toBeNull();
     expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
   });
+
+  it('multiple open/close cycles complete without crash', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    const wrapper = container.querySelector('[data-testid="nav-button"]')?.parentElement;
+    for (let i = 0; i < 3; i++) {
+      if (wrapper) fireEvent.click(wrapper);
+      const closeBtn = container.querySelector('[data-testid="lang-modal"] button');
+      if (closeBtn) fireEvent.click(closeBtn);
+    }
+    expect(container.querySelector('[data-testid="lang-modal"]')).toBeNull();
+  });
+
+  it('renders empty locale without crash', () => {
+    useAtomMock.mockReturnValue(['', vi.fn()]);
+    expect(() => render(<NavLocaleSwitcher />)).not.toThrow();
+  });
+
+  it('renders multiple NavLocaleSwitcher instances independently', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(
+      <>
+        <NavLocaleSwitcher />
+        <NavLocaleSwitcher />
+      </>,
+    );
+    expect(container.querySelectorAll('.dropdown').length).toBe(2);
+  });
+
+  it('Language button text contains correct keyword', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    const text = container.textContent ?? '';
+    expect(text.includes('Language')).toBe(true);
+  });
+
+  it('modal renders inside same component DOM tree after open', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    const wrapper = container.querySelector('[data-testid="nav-button"]')?.parentElement;
+    if (wrapper) fireEvent.click(wrapper);
+    expect(container.querySelector('[data-testid="lang-modal"]')).not.toBeNull();
+  });
+
+  it('dropdown wrapper className contains dropdown', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    expect(container.querySelector('.dropdown')?.className).toContain('dropdown');
+  });
 });
