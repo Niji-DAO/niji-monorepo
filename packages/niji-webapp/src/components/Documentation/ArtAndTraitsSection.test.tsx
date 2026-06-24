@@ -37,4 +37,36 @@ describe('ArtAndTraitsSection', () => {
     expect(text).toContain('Hat');
     expect(text).toContain('Hair');
   });
+
+  it('renders at least 3 accordion items (Traits / On-Chain Artwork / Seeder Contract)', () => {
+    const { container } = wrap(<ArtAndTraitsSection />);
+    const items = container.querySelectorAll('.accordion-item');
+    expect(items.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('contains On-Chain Artwork section content', () => {
+    const { container } = wrap(<ArtAndTraitsSection />);
+    expect(container.textContent).toContain('On-Chain Artwork');
+  });
+
+  it('contains Seeder Contract section', () => {
+    const { container } = wrap(<ArtAndTraitsSection />);
+    expect(container.textContent).toContain('Seeder Contract');
+  });
+
+  it('mentions pseudo-random generation via keccak256', () => {
+    const { container } = wrap(<ArtAndTraitsSection />);
+    expect(container.textContent).toContain('keccak256');
+  });
+
+  it('mentions run-length encoding (RLE) compression strategy', () => {
+    const { container } = wrap(<ArtAndTraitsSection />);
+    expect(container.textContent).toContain('run-length encoding');
+  });
+
+  it('lists trait keys ul wraps multiple li elements (>= 6)', () => {
+    const { container } = wrap(<ArtAndTraitsSection />);
+    const ulItems = container.querySelectorAll('ul li');
+    expect(ulItems.length).toBeGreaterThanOrEqual(6);
+  });
 });
