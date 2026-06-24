@@ -74,4 +74,39 @@ describe('NavLocaleSwitcher', () => {
     const { container } = render(<NavLocaleSwitcher />);
     expect(container.querySelector('[data-testid="lang-modal"]')).toBeNull();
   });
+
+  it('renders for ja-JP locale without crash', () => {
+    useAtomMock.mockReturnValue(['ja-JP', vi.fn()]);
+    expect(() => render(<NavLocaleSwitcher />)).not.toThrow();
+  });
+
+  it('renders for zh-CN locale without crash', () => {
+    useAtomMock.mockReturnValue(['zh-CN', vi.fn()]);
+    expect(() => render(<NavLocaleSwitcher />)).not.toThrow();
+  });
+
+  it('renders exactly 1 dropdown wrapper', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    expect(container.querySelectorAll('.dropdown').length).toBe(1);
+  });
+
+  it('reopens modal after close + click again', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    const wrapper = container.querySelector('[data-testid="nav-button"]')?.parentElement;
+    if (wrapper) fireEvent.click(wrapper);
+    expect(container.querySelector('[data-testid="lang-modal"]')).not.toBeNull();
+    const closeBtn = container.querySelector('[data-testid="lang-modal"] button');
+    if (closeBtn) fireEvent.click(closeBtn);
+    if (wrapper) fireEvent.click(wrapper);
+    expect(container.querySelector('[data-testid="lang-modal"]')).not.toBeNull();
+  });
+
+  it('renders 1+ nav-button (mobile + desktop variants)', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    const buttons = container.querySelectorAll('[data-testid="nav-button"]');
+    expect(buttons.length).toBeGreaterThanOrEqual(1);
+  });
 });

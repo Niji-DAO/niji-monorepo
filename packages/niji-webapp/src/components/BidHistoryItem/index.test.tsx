@@ -121,4 +121,33 @@ describe('BidHistoryItem Component', () => {
     // Reset window width
     window.innerWidth = 1200;
   });
+
+  it('renders large amount (1e24 wei) via TruncatedAmount', () => {
+    const huge = { ...mockBid, value: 1_000_000_000_000_000_000_000_000n };
+    render(<BidHistoryItem bid={huge} classes={mockClasses} />);
+    expect(screen.getByTestId('truncated-amount')).toHaveTextContent('1000000000000000000000000');
+  });
+
+  it('renders extended=true bid normally (no visual difference at item level)', () => {
+    const ext = { ...mockBid, extended: true };
+    render(<BidHistoryItem bid={ext} classes={mockClasses} />);
+    expect(screen.getByTestId('short-address')).toBeInTheDocument();
+    expect(screen.getByTestId('truncated-amount')).toBeInTheDocument();
+  });
+
+  it('link has rel="noreferrer" for external safety', () => {
+    render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    expect(screen.getByRole('link').getAttribute('rel')).toBe('noreferrer');
+  });
+
+  it('link target is "_blank" for new tab', () => {
+    render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    expect(screen.getByRole('link').getAttribute('target')).toBe('_blank');
+  });
+
+  it('handles short transaction hash format (no normalization)', () => {
+    const shortHash = { ...mockBid, transactionHash: '0xshort' };
+    render(<BidHistoryItem bid={shortHash} classes={mockClasses} />);
+    expect(screen.getByRole('link').getAttribute('href')).toBe('https://etherscan.io/tx/0xshort');
+  });
 });

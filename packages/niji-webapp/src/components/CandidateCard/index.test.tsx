@@ -66,4 +66,35 @@ describe('CandidateCard', () => {
     const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
     expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('');
   });
+
+  it('passes candidate.requiredVotes (3) to sponsors regardless of nounsRequired prop', () => {
+    // candidate.requiredVotes=3 を component 内で優先、 nounsRequired prop は ignore される経路
+    const { container } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={99} />);
+    expect(container.querySelector('[data-testid="sponsors"]')?.textContent).toBe('req-3');
+  });
+
+  it('handles unicode title (Japanese)', () => {
+    const candidate = {
+      ...baseCandidate,
+      version: { content: { title: '日本語タイトル', contentSignatures: [] } },
+    } as never;
+    const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
+    expect(container.textContent).toContain('日本語タイトル');
+  });
+
+  it('handles different candidate.id in link path', () => {
+    const candidate = { ...baseCandidate, id: 'cand-xyz-99' } as never;
+    const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
+    expect(container.querySelector('a')?.getAttribute('href')).toBe('/candidates/cand-xyz-99');
+  });
+
+  it('renders exactly 1 anchor (internal link)', () => {
+    const { container } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />);
+    expect(container.querySelectorAll('a').length).toBe(1);
+  });
+
+  it('renders relativeTimestamp string (mocked "1 day ago")', () => {
+    const { container } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />);
+    expect(container.textContent).toContain('1 day ago');
+  });
 });
