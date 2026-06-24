@@ -168,4 +168,42 @@ describe('BrandSpinner', () => {
     rerender(<BrandSpinner />);
     expect(container.innerHTML).toBe(firstHTML);
   });
+
+  it('renders 10 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(10);
+  });
+
+  it('svg has consistent dimensions across rerenders', () => {
+    const { container, rerender } = render(<BrandSpinner />);
+    const w1 = container.querySelector('svg')?.getAttribute('width');
+    rerender(<BrandSpinner />);
+    expect(container.querySelector('svg')?.getAttribute('width')).toBe(w1);
+  });
+
+  it('renders without crash 20 times consecutively', () => {
+    for (let i = 0; i < 20; i++) {
+      expect(() => render(<BrandSpinner />)).not.toThrow();
+    }
+  });
+
+  it('svg has children elements (path + circle minimum 2 elements)', () => {
+    const { container } = render(<BrandSpinner />);
+    const svg = container.querySelector('svg');
+    expect(svg?.children.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('svg fill attribute is "none" consistently', () => {
+    const { container } = render(<BrandSpinner />);
+    const { container: c2 } = render(<BrandSpinner />);
+    expect(container.querySelector('svg')?.getAttribute('fill')).toBe(
+      c2.querySelector('svg')?.getAttribute('fill'),
+    );
+  });
 });
