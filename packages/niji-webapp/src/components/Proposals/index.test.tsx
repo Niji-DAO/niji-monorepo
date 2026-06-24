@@ -311,4 +311,45 @@ describe('Proposals', () => {
     expect(container.textContent).toContain('Solo');
     expect(container.textContent).not.toContain('No proposals found');
   });
+
+  it('empty proposals + empty candidates lists shows "No proposals found"', () => {
+    locationMock.hash = '';
+    const { container } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+    expect(container.textContent).toContain('No proposals found');
+  });
+
+  it('proposals list with 5 items renders 5 entries', () => {
+    const proposals = Array.from({ length: 5 }, (_, i) => ({
+      id: String(i + 1),
+      title: `P${i + 1}`,
+      status: 1,
+      startBlock: 50n,
+      endBlock: 200n,
+      eta: '0',
+    })) as never;
+    const { container } = wrap(<Proposals proposals={proposals} nounsRequired={2} />);
+    expect(container.textContent).toContain('P1');
+    expect(container.textContent).toContain('P5');
+  });
+
+  it('candidates atom empty (null) shows no cards', () => {
+    locationMock.hash = '#candidates';
+    candidatesAtomState.current = null;
+    const { container } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+    expect(container.querySelectorAll('[data-testid="candidate-card"]').length).toBe(0);
+  });
+
+  it('renders without crash when proposals undefined-like (empty list)', () => {
+    expect(() => wrap(<Proposals proposals={[]} nounsRequired={0} />)).not.toThrow();
+  });
+
+  it('candidates list with 10 items renders 10 cards', () => {
+    locationMock.hash = '#candidates';
+    candidatesAtomState.current = Array.from({ length: 10 }, (_, i) => ({
+      id: `c-${i}`,
+      proposalIdToUpdate: '0',
+    }));
+    const { container } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+    expect(container.querySelectorAll('[data-testid="candidate-card"]').length).toBe(10);
+  });
 });

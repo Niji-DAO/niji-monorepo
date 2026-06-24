@@ -258,4 +258,38 @@ describe('SelectProposalActionStep', () => {
       'Function Call',
     );
   });
+
+  it('initial state LUMP_SUM shows Transfer Funds in dropdown', () => {
+    render(<SelectProposalActionStep {...setupProps()} />);
+    expect((screen.getByTestId('action-dropdown') as HTMLSelectElement).value).toBe(
+      'Transfer Funds',
+    );
+  });
+
+  it('dropdown contains exactly 3 option elements', () => {
+    const { container } = render(<SelectProposalActionStep {...setupProps()} />);
+    expect(container.querySelectorAll('option').length).toBe(3);
+  });
+
+  it('setState invoked with new object on dropdown change', () => {
+    const setState = vi.fn();
+    render(<SelectProposalActionStep {...setupProps({ setState })} />);
+    fireEvent.change(screen.getByTestId('action-dropdown'), {
+      target: { value: 'Function Call' },
+    });
+    expect(setState).toHaveBeenCalledTimes(1);
+  });
+
+  it('next-btn click multiple times invokes onNextBtnClick repeatedly', () => {
+    const onNextBtnClick = vi.fn();
+    render(<SelectProposalActionStep {...setupProps({ onNextBtnClick })} />);
+    fireEvent.click(screen.getByTestId('next-btn'));
+    fireEvent.click(screen.getByTestId('next-btn'));
+    expect(onNextBtnClick).toHaveBeenCalledTimes(2);
+  });
+
+  it('title element renders only 1 time', () => {
+    const { container } = render(<SelectProposalActionStep {...setupProps()} />);
+    expect(container.querySelectorAll('[data-testid="title"]').length).toBe(1);
+  });
 });

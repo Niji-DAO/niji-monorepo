@@ -161,4 +161,44 @@ describe('BidHistoryModalRow', () => {
     const { container } = render(<BidHistoryModalRow bid={bid} index={0} />);
     expect(container.querySelectorAll('img').length).toBe(2);
   });
+
+  it('rerender index from 0 to 5 removes trophy', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container, rerender } = render(<BidHistoryModalRow bid={bid} index={0} />);
+    expect(container.querySelectorAll('img').length).toBe(2);
+    rerender(<BidHistoryModalRow bid={bid} index={5} />);
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('rerender amount updates display', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container, rerender } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    expect(container.textContent).toContain('Ξ 1.00');
+    rerender(<BidHistoryModalRow bid={{ ...bid, value: parseEther('5') }} index={1} />);
+    expect(container.textContent).toContain('Ξ 5.00');
+  });
+
+  it('multiple instances render distinct rows', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(
+      <>
+        <BidHistoryModalRow bid={bid} index={1} />
+        <BidHistoryModalRow bid={{ ...bid, transactionHash: '0xother' }} index={2} />
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(2);
+  });
+
+  it('link target is _blank (external link)', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    const link = container.querySelector('a');
+    expect(link?.getAttribute('target')).toBe('_blank');
+  });
+
+  it('link has rel="noreferrer" for safety', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    expect(container.querySelector('a')?.getAttribute('rel')).toContain('noreferrer');
+  });
 });
