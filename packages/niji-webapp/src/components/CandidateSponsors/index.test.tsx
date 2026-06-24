@@ -432,4 +432,42 @@ describe('CandidateSponsors', () => {
       expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
     }
   });
+
+  it('renders 30 instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CandidateSponsors key={i} {...baseProps} blockNumber={BigInt(i + 1)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles requiredVotes=0 + voteCount=0', () => {
+    const c = makeCandidate({ requiredVotes: 0, voteCount: 0 });
+    expect(() => render(<CandidateSponsors {...baseProps} candidate={c} />)).not.toThrow();
+  });
+
+  it('handles 100 contentSignatures', () => {
+    const sigs = Array.from({ length: 100 }, (_, i) => ({ id: `sig-${i}` }));
+    const c = makeCandidate({ contentSignatures: sigs as never });
+    expect(() => render(<CandidateSponsors {...baseProps} candidate={c} />)).not.toThrow();
+  });
+
+  it('rerender does not crash 10 times', () => {
+    const { rerender } = render(<CandidateSponsors {...baseProps} />);
+    for (let i = 0; i < 10; i++) {
+      expect(() =>
+        rerender(<CandidateSponsors {...baseProps} blockNumber={BigInt(i)} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles isAccountSigner true variant', () => {
+    hookState.isAccountSigner = true;
+    expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+    hookState.isAccountSigner = false;
+  });
 });

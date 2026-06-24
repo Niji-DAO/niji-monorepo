@@ -457,4 +457,70 @@ describe('BrandDropdown', () => {
     );
     expect((container.querySelector('select') as HTMLSelectElement)?.value).toBe('b');
   });
+
+  it('renders 30 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 30 }, (_, i) => (
+          <BrandDropdown key={i} onChange={() => {}} value="a">
+            {opts}
+          </BrandDropdown>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('select').length).toBe(30);
+  });
+
+  it('rapid 50 change events fire 50 times', () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <BrandDropdown onChange={onChange} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    const select = container.querySelector('select') as HTMLSelectElement;
+    for (let i = 0; i < 50; i++) {
+      fireEvent.change(select, { target: { value: i % 2 === 0 ? 'a' : 'b' } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(50);
+  });
+
+  it('renders 100 char long label', () => {
+    const long = 'x'.repeat(100);
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="a" label={long}>
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('span')?.textContent).toBe(long);
+  });
+
+  it('renders with many child options (20)', () => {
+    const manyOpts = Array.from({ length: 20 }, (_, i) => (
+      <option key={i} value={`opt-${i}`}>
+        Option {i}
+      </option>
+    ));
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="opt-0">
+        {manyOpts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelectorAll('option').length).toBe(20);
+  });
+
+  it('rerender preserves select element type', () => {
+    const { container, rerender } = render(
+      <BrandDropdown onChange={() => {}} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('select')).not.toBeNull();
+    rerender(
+      <BrandDropdown onChange={() => {}} value="b">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('select')).not.toBeNull();
+  });
 });
