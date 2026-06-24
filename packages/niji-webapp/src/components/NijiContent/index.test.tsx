@@ -378,4 +378,62 @@ describe('NijiContent', () => {
     const { container } = wrap(<NijiContent {...defaults} />);
     expect(container.querySelectorAll('[data-testid="niji-title"]').length).toBe(1);
   });
+
+  it('renders without crash for nounId=0n', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent nounId={0n} auctionId={0n} isCool={false} />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders 5 instances each independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <MemoryRouter>
+        <NijiContent nounId={1n} auctionId={1n} isCool={false} />
+        <NijiContent nounId={2n} auctionId={2n} isCool={false} />
+        <NijiContent nounId={3n} auctionId={3n} isCool={false} />
+        <NijiContent nounId={4n} auctionId={4n} isCool={false} />
+        <NijiContent nounId={5n} auctionId={5n} isCool={false} />
+      </MemoryRouter>,
+    );
+    expect(container.querySelectorAll('[data-testid="niji-title"]').length).toBe(5);
+  });
+
+  it('renders for large bigint nounId (MAX_SAFE)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent nounId={9007199254740991n} auctionId={1n} isCool={false} />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('useAtomValue mock not crashing on false', () => {
+    useAtomValueMock.mockReturnValue(false);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent nounId={1n} auctionId={1n} isCool={false} />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('isCool=true renders without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent nounId={1n} auctionId={1n} isCool={true} />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
 });
