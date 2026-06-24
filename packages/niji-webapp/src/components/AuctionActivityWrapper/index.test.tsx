@@ -239,4 +239,48 @@ describe('AuctionActivityWrapper', () => {
     const { container } = render(<AuctionActivityWrapper>{longStr}</AuctionActivityWrapper>);
     expect(container.querySelector('div')?.textContent).toBe(longStr);
   });
+
+  it('renders 10 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <AuctionActivityWrapper key={i}>{`item-${i}`}</AuctionActivityWrapper>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(10);
+  });
+
+  it('renders unicode children', () => {
+    const { container } = render(<AuctionActivityWrapper>{'日本語テスト'}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe('日本語テスト');
+  });
+
+  it('renders 1000 char long content', () => {
+    const longStr = 'x'.repeat(1000);
+    const { container } = render(<AuctionActivityWrapper>{longStr}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe(longStr);
+  });
+
+  it('rerender same content idempotent', () => {
+    const { container, rerender } = render(<AuctionActivityWrapper>same</AuctionActivityWrapper>);
+    const initial = container.innerHTML;
+    rerender(<AuctionActivityWrapper>same</AuctionActivityWrapper>);
+    expect(container.innerHTML).toBe(initial);
+  });
+
+  it('renders deeply nested 4 levels', () => {
+    const { container } = render(
+      <AuctionActivityWrapper>
+        <div>
+          <span>
+            <strong>
+              <em data-testid="deep">deep</em>
+            </strong>
+          </span>
+        </div>
+      </AuctionActivityWrapper>,
+    );
+    expect(container.querySelector('[data-testid="deep"]')?.textContent).toBe('deep');
+  });
 });
