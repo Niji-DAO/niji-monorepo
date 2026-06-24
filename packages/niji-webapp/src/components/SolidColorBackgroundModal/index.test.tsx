@@ -142,4 +142,44 @@ describe('SolidColorBackgroundModal', () => {
       document.getElementById('overlay-root')?.querySelector('[data-testid="x"]'),
     ).not.toBeNull();
   });
+
+  it('Backdrop transition wrapper renders when show=true', () => {
+    const { container } = render(<Backdrop show={true} onDismiss={() => {}} />);
+    expect(container.querySelector('[data-testid="transition"]')).not.toBeNull();
+  });
+
+  it('Backdrop rerender to show=false hides element', () => {
+    const { rerender, container } = render(<Backdrop show={true} onDismiss={() => {}} />);
+    expect(container.querySelector('[data-testid="transition"]')).not.toBeNull();
+    rerender(<Backdrop show={false} onDismiss={() => {}} />);
+    expect(container.querySelector('[data-testid="transition"]')).toBeNull();
+  });
+
+  it('renders null content gracefully', () => {
+    render(<SolidColorBackgroundModal show={true} onDismiss={() => {}} content={null} />);
+    expect(document.getElementById('overlay-root')?.querySelector('p')).toBeNull();
+  });
+
+  it('renders string content directly', () => {
+    render(
+      <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={'hello' as never} />,
+    );
+    expect(document.getElementById('overlay-root')?.textContent).toContain('hello');
+  });
+
+  it('renders content within overlay-root not backdrop-root', () => {
+    render(
+      <SolidColorBackgroundModal
+        show={true}
+        onDismiss={() => {}}
+        content={<p data-testid="content">v</p>}
+      />,
+    );
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="content"]'),
+    ).not.toBeNull();
+    expect(
+      document.getElementById('backdrop-root')?.querySelector('[data-testid="content"]'),
+    ).toBeNull();
+  });
 });

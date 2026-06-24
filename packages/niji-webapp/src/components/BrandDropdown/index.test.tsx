@@ -138,4 +138,57 @@ describe('BrandDropdown', () => {
     );
     expect(container.querySelectorAll('span').length).toBe(1);
   });
+
+  it('passes selected value via onChange event.target.value', () => {
+    let captured = '';
+    const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      captured = e.target.value;
+    };
+    const { container } = render(
+      <BrandDropdown onChange={onChange} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    const select = container.querySelector('select');
+    if (select) fireEvent.change(select, { target: { value: 'b' } });
+    expect(captured).toBe('b');
+  });
+
+  it('chevron right=0 explicit value applies (not default 10)', () => {
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="a" chevonRight={0}>
+        {opts}
+      </BrandDropdown>,
+    );
+    const chev = container.querySelector('div[style]');
+    expect(chev?.getAttribute('style')).toContain('right: 0px');
+  });
+
+  it('chevron top=0 explicit value applies', () => {
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="a" chevronTop={0}>
+        {opts}
+      </BrandDropdown>,
+    );
+    const chev = container.querySelector('div[style]');
+    expect(chev?.getAttribute('style')).toContain('top: 0px');
+  });
+
+  it('renders no option when children empty', () => {
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="">
+        <></>
+      </BrandDropdown>,
+    );
+    expect(container.querySelectorAll('option').length).toBe(0);
+  });
+
+  it('label text matches provided label prop verbatim', () => {
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="a" label="Custom Label 123">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('span')?.textContent).toBe('Custom Label 123');
+  });
 });
