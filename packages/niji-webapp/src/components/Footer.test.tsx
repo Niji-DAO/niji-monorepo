@@ -87,4 +87,41 @@ describe('Footer', () => {
     const internalLinks = anchors.filter(a => a.getAttribute('href')?.startsWith('/'));
     expect(internalLinks.length).toBeGreaterThan(0);
   });
+
+  it('renders exactly 1 of each social icon (no duplicates)', () => {
+    const { container } = wrap(<Footer />);
+    expect(container.querySelectorAll('[data-testid="discord-icon"]').length).toBe(1);
+    expect(container.querySelectorAll('[data-testid="farcaster-icon"]').length).toBe(1);
+    expect(container.querySelectorAll('[data-testid="github-icon"]').length).toBe(1);
+    expect(container.querySelectorAll('[data-testid="x-icon"]').length).toBe(1);
+  });
+
+  it('all etherscan links use https:// scheme', () => {
+    const { container } = wrap(<Footer />);
+    const anchors = Array.from(container.querySelectorAll('a'));
+    const etherscanLinks = anchors.filter(a => a.getAttribute('href')?.includes('etherscan.io'));
+    etherscanLinks.forEach(a => {
+      expect(a.getAttribute('href')?.startsWith('https://')).toBe(true);
+    });
+  });
+
+  it('copyright text contains "Niji DAO" string', () => {
+    const { container } = wrap(<Footer />);
+    expect(container.textContent).toContain('Niji DAO');
+  });
+
+  it('renders multiple internal links (>= 2)', () => {
+    const { container } = wrap(<Footer />);
+    const anchors = Array.from(container.querySelectorAll('a'));
+    const internal = anchors.filter(a => a.getAttribute('href')?.startsWith('/'));
+    expect(internal.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('noggles-icon appears within copyright area (textContent includes Niji DAO)', () => {
+    const { container } = wrap(<Footer />);
+    const noggles = container.querySelector('[data-testid="noggles-icon"]');
+    expect(noggles).not.toBeNull();
+    // sibling text に Niji DAO の copyright が出る contract pin
+    expect(container.textContent).toContain('Niji DAO');
+  });
 });

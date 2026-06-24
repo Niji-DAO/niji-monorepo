@@ -56,4 +56,40 @@ describe('CurrentBid', () => {
     expect(container.querySelector('h4')?.getAttribute('style')).toContain('brand-warm-light-text');
     expect(container.querySelector('h2')?.getAttribute('style')).toContain('brand-warm-dark-text');
   });
+
+  it('renders huge bid (1000 ETH) with Ξ prefix', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <CurrentBid currentBid={parseEther('1000')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('Ξ 1000.00');
+  });
+
+  it('renders 0 wei bid as "Ξ 0.00"', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<CurrentBid currentBid={0n} auctionEnded={false} />);
+    expect(container.textContent).toContain('Ξ 0.00');
+  });
+
+  it('renders exactly 1 h2 and 1 h4 element', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />);
+    expect(container.querySelectorAll('h2').length).toBe(1);
+    expect(container.querySelectorAll('h4').length).toBe(1);
+  });
+
+  it('parseEther 0.1 ETH renders as Ξ 0.10', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <CurrentBid currentBid={parseEther('0.1')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('Ξ 0.10');
+  });
+
+  it('auctionEnded=true with BID_N_A still renders "-" placeholder', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<CurrentBid currentBid={BID_N_A} auctionEnded={true} />);
+    expect(container.textContent).toContain('-');
+    expect(container.textContent).toContain('Winning bid');
+  });
 });

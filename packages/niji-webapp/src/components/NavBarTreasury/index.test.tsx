@@ -67,4 +67,45 @@ describe('NavBarTreasury', () => {
     expect(wHeader).toMatch(/white/i);
     expect(cHeader).not.toMatch(/whiteTreasuryHeader/);
   });
+
+  it('renders huge balance (1_000_000_000) with thousands separator', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="1000000000" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    expect(container.textContent).toContain('1,000,000,000');
+  });
+
+  it('renders balance 0 (still shows "0")', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="0" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    expect(container.textContent).toContain('0');
+  });
+
+  it('always renders Ξ prefix regardless of style', () => {
+    const styles = [
+      NavBarButtonStyle.WHITE_INFO,
+      NavBarButtonStyle.WARM_INFO,
+      NavBarButtonStyle.COOL_INFO,
+    ];
+    styles.forEach(style => {
+      const { container } = render(<NavBarTreasury treasuryBalance="100" treasuryStyle={style} />);
+      expect(container.textContent).toContain('Ξ');
+    });
+  });
+
+  it('formats 4-digit balance with comma (1,000)', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="1000" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    expect(container.textContent).toContain('1,000');
+  });
+
+  it('outermost wrapper is a single <div>', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    expect(container.children.length).toBe(1);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
 });
