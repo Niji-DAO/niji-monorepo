@@ -33,4 +33,36 @@ describe('GovernanceSection', () => {
     const { container } = wrap(<GovernanceSection />);
     expect(container.textContent).toContain('Nijiders');
   });
+
+  it('renders exactly 4 ul li (veto criteria list)', () => {
+    const { container } = wrap(<GovernanceSection />);
+    const items = container.querySelectorAll('ul li');
+    expect(items.length).toBe(4);
+  });
+
+  it('mentions "veto" as a governance keyword', () => {
+    const { container } = wrap(<GovernanceSection />);
+    expect(container.textContent).toContain('veto');
+  });
+
+  it('mentions Niji Foundation as steward of veto power', () => {
+    const { container } = wrap(<GovernanceSection />);
+    expect(container.textContent).toContain('Niji Foundation');
+  });
+
+  it('mentions "smart contracts" in veto criteria', () => {
+    const { container } = wrap(<GovernanceSection />);
+    expect(container.textContent).toContain('smart contracts');
+  });
+
+  it('mentions treasury multiple times (>= 2 occurrences)', () => {
+    const { container } = wrap(<GovernanceSection />);
+    const matches = container.textContent?.match(/treasury/gi) ?? [];
+    expect(matches.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('renders extensive long-form content (> 1000 chars)', () => {
+    const { container } = wrap(<GovernanceSection />);
+    expect((container.textContent ?? '').length).toBeGreaterThan(1000);
+  });
 });

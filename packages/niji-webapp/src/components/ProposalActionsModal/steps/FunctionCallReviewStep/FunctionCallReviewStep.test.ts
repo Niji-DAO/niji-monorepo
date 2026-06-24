@@ -215,4 +215,93 @@ describe('handleActionAdd', () => {
       }),
     );
   });
+
+  it('uses 0n value when amount is undefined / empty', () => {
+    const state: ProposalActionModalState = {
+      actionType: ProposalActionType.LUMP_SUM,
+      address: '0x6a024f521f83906671e1a23a8B6c560be7e980F4',
+    };
+
+    handleActionAdd(state, mockOnActionAdd);
+
+    expect(mockOnActionAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        value: 0n,
+        calldata: '0x',
+      }),
+    );
+  });
+
+  it('encodes 0-argument function (renounceOwnership)', () => {
+    const state: ProposalActionModalState = {
+      actionType: ProposalActionType.FUNCTION_CALL,
+      address: '0xa58e81fe9b61b5c3fe2afd33cf304c454abfc7cb',
+      abi: ensReverseRegistrarAbi,
+      function: 'renounceOwnership',
+      amount: '0',
+      args: [],
+    };
+
+    handleActionAdd(state, mockOnActionAdd);
+
+    expect(mockOnActionAdd).toHaveBeenCalledOnce();
+    expect(mockOnActionAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        signature: 'renounceOwnership()',
+        decodedCalldata: '[]',
+      }),
+    );
+  });
+
+  it('parses large amount via parseEther (1000 ETH = 1e21 wei)', () => {
+    const state: ProposalActionModalState = {
+      actionType: ProposalActionType.LUMP_SUM,
+      address: '0xa58e81fe9b61b5c3fe2afd33cf304c454abfc7cb',
+      amount: '1000',
+    };
+
+    handleActionAdd(state, mockOnActionAdd);
+
+    expect(mockOnActionAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        value: 1_000_000_000_000_000_000_000n,
+      }),
+    );
+  });
+
+  it('encodes setController with 2 inputs (address + bool)', () => {
+    const state: ProposalActionModalState = {
+      actionType: ProposalActionType.FUNCTION_CALL,
+      address: '0xa58e81fe9b61b5c3fe2afd33cf304c454abfc7cb',
+      abi: ensReverseRegistrarAbi,
+      function: 'setController',
+      amount: '0',
+      args: ['0x0000000000000000000000000000000000000001', true],
+    };
+
+    handleActionAdd(state, mockOnActionAdd);
+
+    expect(mockOnActionAdd).toHaveBeenCalledOnce();
+    expect(mockOnActionAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        signature: 'setController(address,bool)',
+      }),
+    );
+  });
+
+  it('amount string with decimal point parses correctly (0.5 ETH)', () => {
+    const state: ProposalActionModalState = {
+      actionType: ProposalActionType.LUMP_SUM,
+      address: '0xa58e81fe9b61b5c3fe2afd33cf304c454abfc7cb',
+      amount: '0.5',
+    };
+
+    handleActionAdd(state, mockOnActionAdd);
+
+    expect(mockOnActionAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        value: 500_000_000_000_000_000n,
+      }),
+    );
+  });
 });
