@@ -249,4 +249,49 @@ describe('SelectSponsorsToPropose', () => {
     const { container } = wrap(<SelectSponsorsToPropose {...baseProps} />);
     expect(container.textContent).toContain('permission to cancel the proposal');
   });
+
+  it('renders empty signature list without crash', () => {
+    const { container } = wrap(<SelectSponsorsToPropose {...baseProps} signatures={[] as never} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+    const addresses = container.querySelectorAll('[data-testid="short-address"]');
+    expect(addresses.length).toBe(0);
+  });
+
+  it('clicking same signature twice toggles back to no selection', () => {
+    const { container } = wrap(<SelectSponsorsToPropose {...baseProps} />);
+    const sigBtn = Array.from(container.querySelectorAll('button')).find(b =>
+      b.textContent?.includes('0xAAA'),
+    );
+    fireEvent.click(sigBtn!);
+    fireEvent.click(sigBtn!);
+    expect(container.textContent).not.toContain('Submit 3 votes');
+  });
+
+  it('shows "Submitting proposal" copy when proposeState=Mining + no sponsors path', () => {
+    hookState.proposeState = { status: 'Mining' };
+    const { container } = wrap(<SelectSponsorsToPropose {...baseProps} requiredVotes={0} />);
+    expect(container.textContent).toContain('Submitting proposal');
+  });
+
+  it('shows error copy when proposeBySigsState=Fail after selecting sponsors', () => {
+    hookState.proposeBySigsState = { status: 'Fail', errorMessage: 'tx reverted' };
+    const { container } = wrap(<SelectSponsorsToPropose {...baseProps} />);
+    Array.from(container.querySelectorAll('button')).forEach(b => {
+      if (b.textContent?.includes('0xAAA')) fireEvent.click(b);
+    });
+    expect(container.textContent).toContain('tx reverted');
+  });
+
+  it('renders multiple signature rows for >2 signers', () => {
+    const sigs = [
+      makeSig({ signerId: '0xAAA' }),
+      makeSig({ signerId: '0xBBB' }),
+      makeSig({ signerId: '0xCCC' }),
+      makeSig({ signerId: '0xDDD' }),
+    ];
+    const { container } = wrap(
+      <SelectSponsorsToPropose {...baseProps} signatures={sigs as never} />,
+    );
+    expect(container.querySelectorAll('[data-testid="short-address"]').length).toBe(4);
+  });
 });
