@@ -636,4 +636,88 @@ describe('NijiContent', () => {
       ).not.toThrow();
     });
   });
+
+  it('renders 30 instances without crash', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiContent key={i} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves component', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    const { rerender } = render(
+      <MemoryRouter>
+        <NijiContent />
+      </MemoryRouter>,
+    );
+    for (let i = 0; i < 30; i++) {
+      useAtomValueMock.mockReturnValue(BigInt(i));
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <NijiContent />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles rapid hookState transitions 30 times', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    const { rerender } = render(
+      <MemoryRouter>
+        <NijiContent />
+      </MemoryRouter>,
+    );
+    for (let i = 0; i < 30; i++) {
+      settleHookState.isPending = i % 2 === 0;
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <NijiContent />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+    settleHookState.isPending = false;
+  });
+
+  it('handles very large nounId (1e9)', () => {
+    useAtomValueMock.mockReturnValue(1000000000n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles undefined account (disconnected)', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: undefined });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
 });

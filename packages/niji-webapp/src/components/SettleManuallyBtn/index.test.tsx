@@ -456,4 +456,50 @@ describe('SettleManuallyBtn', () => {
       ).not.toThrow();
     });
   });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <SettleManuallyBtn key={i} settleAuctionHandler={() => {}} auction={auction} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves button', () => {
+    const { container, rerender } = render(
+      <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      rerender(<SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />);
+    }
+    expect(container.querySelector('button')).not.toBeNull();
+  });
+
+  it('rapid 100 click events fire handler', () => {
+    const handler = vi.fn();
+    const { container } = render(
+      <SettleManuallyBtn settleAuctionHandler={handler} auction={auction} />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 100; i++) fireEvent.click(btn);
+    expect(handler).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles very large bid amount (1000 ETH)', () => {
+    const a: Auction = { ...auction, amount: 1000000000000000000000n };
+    expect(() =>
+      render(<SettleManuallyBtn auction={a} settleAuctionHandler={() => {}} />),
+    ).not.toThrow();
+  });
+
+  it('handles auction with settled=true', () => {
+    const a: Auction = { ...auction, settled: true };
+    expect(() =>
+      render(<SettleManuallyBtn auction={a} settleAuctionHandler={() => {}} />),
+    ).not.toThrow();
+  });
 });

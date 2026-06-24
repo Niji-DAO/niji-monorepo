@@ -494,4 +494,50 @@ describe('ProposalHeader', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 30 instances without crash', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalHeader key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves component', () => {
+    const { rerender } = wrap(<ProposalHeader {...baseProps} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <ProposalHeader {...baseProps} title={`Title-${i}`} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('rapid 50 isActiveForVoting toggle without crash', () => {
+    const { rerender } = wrap(<ProposalHeader {...baseProps} />);
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <ProposalHeader {...baseProps} isActiveForVoting={i % 2 === 0} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles isObjectionPeriod=true variant', () => {
+    expect(() => wrap(<ProposalHeader {...baseProps} isObjectionPeriod={true} />)).not.toThrow();
+  });
+
+  it('handles isWalletConnected=false variant', () => {
+    expect(() => wrap(<ProposalHeader {...baseProps} isWalletConnected={false} />)).not.toThrow();
+  });
 });

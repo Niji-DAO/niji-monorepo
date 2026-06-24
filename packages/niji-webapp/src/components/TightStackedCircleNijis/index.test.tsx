@@ -314,4 +314,46 @@ describe('TightStackedCircleNijis', () => {
     const { container } = render(<TightStackedCircleNijis nounIds={[]} />);
     expect(container.querySelector('svg')?.getAttribute('width')).toBe('55');
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <TightStackedCircleNijis key={i} nounIds={[i, i + 1, i + 2]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves svg', () => {
+    const { container, rerender } = render(<TightStackedCircleNijis nounIds={[1]} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<TightStackedCircleNijis nounIds={[i, i + 1, i + 2]} />);
+    }
+    expect(container.querySelectorAll('circle').length).toBe(3);
+  });
+
+  it('handles 10000 nounIds (caps to 3)', () => {
+    const ids = Array.from({ length: 10000 }, (_, i) => i);
+    const { container } = render(<TightStackedCircleNijis nounIds={ids} />);
+    expect(container.querySelectorAll('circle').length).toBe(3);
+  });
+
+  it('all 100 instances have 55 width svg', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <TightStackedCircleNijis key={i} nounIds={[i]} />
+        ))}
+      </>,
+    );
+    const svgs = container.querySelectorAll('svg');
+    svgs.forEach(svg => expect(svg.getAttribute('width')).toBe('55'));
+  });
+
+  it('handles negative nounIds', () => {
+    expect(() => render(<TightStackedCircleNijis nounIds={[-1, -2, -3]} />)).not.toThrow();
+  });
 });
