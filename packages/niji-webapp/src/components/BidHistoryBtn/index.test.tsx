@@ -75,4 +75,37 @@ describe('BidHistoryBtn Component (isCool=true)', () => {
     fireEvent.click(outerDiv);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
+
+  it('inner wrapper click also propagates to outer', () => {
+    const onClick = vi.fn();
+    const { container } = render(<BidHistoryBtn onClick={onClick} />);
+    const innerDiv = container.firstElementChild?.firstElementChild as HTMLDivElement;
+    fireEvent.click(innerDiv);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('outer wrapper is a single div element', () => {
+    const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    expect(container.children.length).toBe(1);
+  });
+
+  it('text content exactly matches "View all bids"', () => {
+    const { container } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    expect(container.textContent).toBe('View all bids');
+  });
+
+  it('multiple instances render independently', () => {
+    const onClick1 = vi.fn();
+    const onClick2 = vi.fn();
+    const { container: c1 } = render(<BidHistoryBtn onClick={onClick1} />);
+    const { container: c2 } = render(<BidHistoryBtn onClick={onClick2} />);
+    fireEvent.click(c1.firstElementChild as HTMLDivElement);
+    fireEvent.click(c2.firstElementChild as HTMLDivElement);
+    expect(onClick1).toHaveBeenCalledTimes(1);
+    expect(onClick2).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders without errors when onClick is undefined-like', () => {
+    expect(() => render(<BidHistoryBtn onClick={() => undefined} />)).not.toThrow();
+  });
 });
