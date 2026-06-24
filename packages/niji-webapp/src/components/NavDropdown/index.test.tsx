@@ -452,4 +452,73 @@ describe('NavDropDown', () => {
     );
     expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('A');
   });
+
+  it('renders 100 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <NavDropDown key={i} buttonText={`btn-${i}`}>
+            <span>x</span>
+          </NavDropDown>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="nav-button"]').length).toBe(100);
+  });
+
+  it('rerender 20 times preserves nav-button structure', () => {
+    const { container, rerender } = render(
+      <NavDropDown buttonText="initial">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    for (let i = 0; i < 20; i++) {
+      rerender(
+        <NavDropDown buttonText={`update-${i}`}>
+          <span>x</span>
+        </NavDropDown>,
+      );
+      expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe(
+        `update-${i}`,
+      );
+    }
+  });
+
+  it('renders 500 char long buttonText', () => {
+    const long = 'a'.repeat(500);
+    const { container } = render(
+      <NavDropDown buttonText={long}>
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe(long);
+  });
+
+  it('renders within outer div parent', () => {
+    expect(() =>
+      render(
+        <div data-testid="parent">
+          <NavDropDown buttonText="X">
+            <span>x</span>
+          </NavDropDown>
+        </div>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders consistent dropdown wrapper across 10 rerenders', () => {
+    const { container, rerender } = render(
+      <NavDropDown buttonText="X">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    for (let i = 0; i < 10; i++) {
+      rerender(
+        <NavDropDown buttonText={`item-${i}`}>
+          <span>x</span>
+        </NavDropDown>,
+      );
+      expect(container.querySelector('.dropdown')).not.toBeNull();
+    }
+  });
 });
