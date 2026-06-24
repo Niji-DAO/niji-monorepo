@@ -212,4 +212,41 @@ describe('BrandNumericEntry', () => {
     const { container } = render(<BrandNumericEntry placeholder="" />);
     expect(container.querySelector('input')).not.toBeNull();
   });
+
+  it('renders 20 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <BrandNumericEntry key={i} label={`L${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(20);
+  });
+
+  it('rerender label change updates span text', () => {
+    const { container, rerender } = render(<BrandNumericEntry label="A" />);
+    expect(container.querySelector('span')?.textContent).toBe('A');
+    rerender(<BrandNumericEntry label="B" />);
+    expect(container.querySelector('span')?.textContent).toBe('B');
+  });
+
+  it('rerender label from defined to undefined removes span', () => {
+    const { container, rerender } = render(<BrandNumericEntry label="X" />);
+    expect(container.querySelector('span')).not.toBeNull();
+    rerender(<BrandNumericEntry />);
+    expect(container.querySelector('span')).toBeNull();
+  });
+
+  it('handles placeholder rerenders', () => {
+    const { container, rerender } = render(<BrandNumericEntry placeholder="ph1" />);
+    expect(container.querySelector('input')?.getAttribute('placeholder')).toBe('ph1');
+    rerender(<BrandNumericEntry placeholder="ph2" />);
+    expect(container.querySelector('input')?.getAttribute('placeholder')).toBe('ph2');
+  });
+
+  it('input has type defined', () => {
+    const { container } = render(<BrandNumericEntry />);
+    expect(container.querySelector('input')?.getAttribute('type')).toBeTruthy();
+  });
 });
