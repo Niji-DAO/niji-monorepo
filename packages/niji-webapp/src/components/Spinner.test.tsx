@@ -69,4 +69,40 @@ describe('Spinner', () => {
     const { container } = render(<Spinner />);
     expect(container.querySelectorAll('svg').length).toBe(1);
   });
+
+  it('animate-spin is always present (rotation class)', () => {
+    const { container } = render(<Spinner className="text-foo" />);
+    expect(container.querySelector('svg')?.getAttribute('class')).toContain('animate-spin');
+  });
+
+  it('multiple Spinners render independently', () => {
+    const { container } = render(
+      <>
+        <Spinner />
+        <Spinner />
+        <Spinner />
+      </>,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(3);
+  });
+
+  it('size-8 className overrides default', () => {
+    const { container } = render(<Spinner className="size-8" />);
+    const cls = container.querySelector('svg')?.getAttribute('class') ?? '';
+    expect(cls).toContain('size-8');
+    expect(cls).not.toContain('size-10');
+  });
+
+  it('rerender with className change updates class', () => {
+    const { container, rerender } = render(<Spinner />);
+    expect(container.querySelector('svg')?.getAttribute('class')).toContain('size-10');
+    rerender(<Spinner className="size-6" />);
+    expect(container.querySelector('svg')?.getAttribute('class')).toContain('size-6');
+  });
+
+  it('lucide LoaderCircleIcon outputs valid svg with path/circle', () => {
+    const { container } = render(<Spinner />);
+    const svg = container.querySelector('svg');
+    expect(svg?.children.length).toBeGreaterThan(0);
+  });
 });

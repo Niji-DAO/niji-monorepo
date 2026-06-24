@@ -74,4 +74,46 @@ describe('StartOrEndTime', () => {
     const past = Math.floor(Date.now() / 1000) - 3600;
     expect(() => render(<StartOrEndTime startTime={future} endTime={past} />)).not.toThrow();
   });
+
+  it('1 second future start renders "starts"', () => {
+    const start = Math.floor(Date.now() / 1000) + 1;
+    const end = start + 3600;
+    const { container } = render(<StartOrEndTime startTime={start} endTime={end} />);
+    expect(container.textContent).toContain('starts');
+  });
+
+  it('returns non-empty content for active phase', () => {
+    const pastStart = Math.floor(Date.now() / 1000) - 100;
+    const futureEnd = Math.floor(Date.now() / 1000) + 3600;
+    const { container } = render(<StartOrEndTime startTime={pastStart} endTime={futureEnd} />);
+    expect((container.textContent ?? '').length).toBeGreaterThan(4);
+  });
+
+  it('rerender from starts to ended', () => {
+    const start = Math.floor(Date.now() / 1000) + 3600;
+    const end = start + 3600;
+    const { container, rerender } = render(<StartOrEndTime startTime={start} endTime={end} />);
+    expect(container.textContent).toContain('starts');
+    rerender(<StartOrEndTime startTime={0} endTime={1} />);
+    expect(container.textContent).toContain('ended');
+  });
+
+  it('startTime undefined + endTime in future treats as starts', () => {
+    const futureEnd = Math.floor(Date.now() / 1000) + 3600;
+    const { container } = render(<StartOrEndTime endTime={futureEnd} />);
+    // startTime=0 → past, current > start → 'ends' or 'ended' depending on endTime
+    expect(container.textContent).toContain('ends');
+  });
+
+  it('renders only one of starts/ends/ended (mutex)', () => {
+    const futureStart = Math.floor(Date.now() / 1000) + 3600;
+    const futureEnd = futureStart + 3600;
+    const { container } = render(<StartOrEndTime startTime={futureStart} endTime={futureEnd} />);
+    const text = container.textContent ?? '';
+    const starts = text.includes('starts');
+    const ends = text.includes(' ends ');
+    const ended = text.includes('ended');
+    const trueCount = [starts, ends, ended].filter(Boolean).length;
+    expect(trueCount).toBe(1);
+  });
 });

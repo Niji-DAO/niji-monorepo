@@ -57,4 +57,35 @@ describe('TruncatedAmount', () => {
       expect(container.textContent?.startsWith('Ξ')).toBe(true);
     });
   });
+
+  it('formats 0.5 ETH to "Ξ 0.50"', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('0.5')} />);
+    expect(container.textContent).toBe('Ξ 0.50');
+  });
+
+  it('formats 2.5 ETH to "Ξ 2.50"', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('2.5')} />);
+    expect(container.textContent).toBe('Ξ 2.50');
+  });
+
+  it('formats 10000 ETH to "Ξ 10000.00"', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('10000')} />);
+    expect(container.textContent).toBe('Ξ 10000.00');
+  });
+
+  it('formats 0.001 ETH rounding to "Ξ 0.00"', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('0.001')} />);
+    expect(container.textContent).toBe('Ξ 0.00');
+  });
+
+  it('formats large fractional 3.14159 to "Ξ 3.14"', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('3.14159')} />);
+    expect(container.textContent).toBe('Ξ 3.14');
+  });
+
+  it('always returns exactly "Ξ " prefix + 1 number (no spaces middle)', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('5')} />);
+    const text = container.textContent ?? '';
+    expect(text.split(' ').length).toBe(2);
+  });
 });
