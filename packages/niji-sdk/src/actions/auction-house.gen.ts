@@ -456,6 +456,7 @@ export const nounsAuctionHouseAbi = [
 export const nounsAuctionHouseAddress = {
   1: '0x830BD73E4184ceF73443C15111a1DF14e495C706',
   11155111: '0x488609b7113FCf3B761A05956300d605E8f6BcAf',
+  31337: '0x0000000000000000000000000000000000000000',
 } as const;
 
 /**
