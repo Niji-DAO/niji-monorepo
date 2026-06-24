@@ -122,4 +122,53 @@ describe('ProposalEditor', () => {
     }
     expect(onTitle).toHaveBeenCalledTimes(3);
   });
+
+  it('rerender from empty body to non-empty shows preview', () => {
+    const { container, rerender } = render(<ProposalEditor {...defaults} />);
+    expect(container.querySelector('[data-testid="markdown"]')).toBeNull();
+    rerender(<ProposalEditor {...defaults} body="# Hello" />);
+    expect(container.querySelector('[data-testid="markdown"]')).not.toBeNull();
+  });
+
+  it('renders exactly 1 input element', () => {
+    const { container } = render(<ProposalEditor {...defaults} />);
+    expect(container.querySelectorAll('input').length).toBe(1);
+  });
+
+  it('renders exactly 1 textarea element', () => {
+    const { container } = render(<ProposalEditor {...defaults} />);
+    expect(container.querySelectorAll('textarea').length).toBe(1);
+  });
+
+  it('repeated body change fires onBodyInput N times', () => {
+    const onBody = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onBodyInput={onBody} />);
+    const ta = container.querySelector('textarea');
+    if (ta) {
+      fireEvent.change(ta, { target: { value: 'a' } });
+      fireEvent.change(ta, { target: { value: 'ab' } });
+    }
+    expect(onBody).toHaveBeenCalledTimes(2);
+  });
+
+  it('rerender title updates input value', () => {
+    const { container, rerender } = render(<ProposalEditor {...defaults} title="A" />);
+    expect((container.querySelector('input') as HTMLInputElement).value).toBe('A');
+    rerender(<ProposalEditor {...defaults} title="B" />);
+    expect((container.querySelector('input') as HTMLInputElement).value).toBe('B');
+  });
+
+  it('long body content (500 chars) renders in textarea + markdown', () => {
+    const long = 'a'.repeat(500);
+    const { container } = render(<ProposalEditor {...defaults} body={long} />);
+    expect((container.querySelector('textarea') as HTMLTextAreaElement).value.length).toBe(500);
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent?.length).toBe(500);
+  });
+
+  it('isCandidate=true placeholder is "Proposal candidate title"', () => {
+    const { container } = render(<ProposalEditor {...defaults} isCandidate={true} />);
+    expect(container.querySelector('input')?.getAttribute('placeholder')).toBe(
+      'Proposal candidate title',
+    );
+  });
 });

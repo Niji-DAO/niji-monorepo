@@ -191,4 +191,70 @@ describe('BrandDropdown', () => {
     );
     expect(container.querySelector('span')?.textContent).toBe('Custom Label 123');
   });
+
+  it('rerender label updates span text', () => {
+    const { container, rerender } = render(
+      <BrandDropdown onChange={() => {}} value="a" label="L1">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('span')?.textContent).toBe('L1');
+    rerender(
+      <BrandDropdown onChange={() => {}} value="a" label="L2">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('span')?.textContent).toBe('L2');
+  });
+
+  it('multiple instances render with separate selects', () => {
+    const { container } = render(
+      <>
+        <BrandDropdown onChange={() => {}} value="a">
+          {opts}
+        </BrandDropdown>
+        <BrandDropdown onChange={() => {}} value="b">
+          {opts}
+        </BrandDropdown>
+      </>,
+    );
+    expect(container.querySelectorAll('select').length).toBe(2);
+  });
+
+  it('unicode label renders verbatim', () => {
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="a" label="選択">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('span')?.textContent).toBe('選択');
+  });
+
+  it('chevron position default both 10px when neither chevonRight nor chevronTop set', () => {
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    const chev = container.querySelector('div[style]');
+    expect(chev?.getAttribute('style')).toContain('10px');
+  });
+
+  it('10+ options render correctly', () => {
+    const manyOpts = (
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <option key={i} value={String(i)}>
+            {`Option ${i}`}
+          </option>
+        ))}
+      </>
+    );
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="0">
+        {manyOpts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelectorAll('option').length).toBe(10);
+  });
 });
