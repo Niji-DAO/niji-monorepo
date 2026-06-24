@@ -230,4 +230,42 @@ describe('ModalTitle', () => {
     rerender(<ModalTitle>same</ModalTitle>);
     expect(container.innerHTML).toBe(initial);
   });
+
+  it('renders array children (multiple text nodes)', () => {
+    const { container } = render(<ModalTitle>{['a', 'b', 'c']}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('abc');
+  });
+
+  it('renders 50 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <ModalTitle key={i}>{`title-${i}`}</ModalTitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(50);
+  });
+
+  it('preserves h1 element type across mounts', () => {
+    const { container } = render(<ModalTitle>x</ModalTitle>);
+    expect(container.querySelector('h1')).not.toBeNull();
+  });
+
+  it('renders 1000 char long title', () => {
+    const longStr = 'x'.repeat(1000);
+    const { container } = render(<ModalTitle>{longStr}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe(longStr);
+  });
+
+  it('rerender from text to JSX preserves h1', () => {
+    const { container, rerender } = render(<ModalTitle>plain</ModalTitle>);
+    expect(container.querySelector('h1')).not.toBeNull();
+    rerender(
+      <ModalTitle>
+        <span>jsx</span>
+      </ModalTitle>,
+    );
+    expect(container.querySelector('h1')).not.toBeNull();
+  });
 });

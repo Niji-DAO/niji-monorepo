@@ -242,4 +242,42 @@ describe('ProposalEditor', () => {
     expect((container.querySelector('input') as HTMLInputElement)?.value).toBe('second');
     expect((container.querySelector('textarea') as HTMLTextAreaElement)?.value).toBe('b');
   });
+
+  it('renders 10 instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <ProposalEditor key={i} {...defaults} title={`t${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 20 body input events fire handler 20 times', () => {
+    const onInput = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onBodyInput={onInput} />);
+    const textarea = container.querySelector('textarea')!;
+    for (let i = 0; i < 20; i++) fireEvent.input(textarea, { target: { value: `v${i}` } });
+    expect(onInput).toHaveBeenCalledTimes(20);
+  });
+
+  it('isCandidate=true preserves Candidate label', () => {
+    const { container } = render(<ProposalEditor {...defaults} isCandidate={true} />);
+    expect(container.textContent).toContain('Candidate');
+  });
+
+  it('rerender from Candidate to Proposal switches label', () => {
+    const { container, rerender } = render(<ProposalEditor {...defaults} isCandidate={true} />);
+    expect(container.textContent).toContain('Candidate');
+    rerender(<ProposalEditor {...defaults} isCandidate={false} />);
+    expect(container.textContent).toContain('Proposal');
+  });
+
+  it('renders single input + textarea element type', () => {
+    const { container } = render(<ProposalEditor {...defaults} />);
+    expect(container.querySelectorAll('input').length).toBe(1);
+    expect(container.querySelectorAll('textarea').length).toBe(1);
+  });
 });

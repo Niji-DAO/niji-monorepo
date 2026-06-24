@@ -238,4 +238,43 @@ describe('ModalSubtitle', () => {
     rerender(<ModalSubtitle>same</ModalSubtitle>);
     expect(container.innerHTML).toBe(initial);
   });
+
+  it('renders array children (multiple text nodes)', () => {
+    const { container } = render(<ModalSubtitle>{['a', 'b', 'c']}</ModalSubtitle>);
+    expect(container.querySelector('div')?.textContent).toBe('abc');
+  });
+
+  it('renders 50 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <ModalSubtitle key={i}>{`text-${i}`}</ModalSubtitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(50);
+  });
+
+  it('preserves single div wrapper across mounts', () => {
+    const { container } = render(<ModalSubtitle>x</ModalSubtitle>);
+    expect(container.children.length).toBe(1);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
+
+  it('renders 1000 char long text', () => {
+    const longStr = 'x'.repeat(1000);
+    const { container } = render(<ModalSubtitle>{longStr}</ModalSubtitle>);
+    expect(container.querySelector('div')?.textContent).toBe(longStr);
+  });
+
+  it('rerender from text to JSX preserves wrapper div', () => {
+    const { container, rerender } = render(<ModalSubtitle>plain</ModalSubtitle>);
+    expect(container.children.length).toBe(1);
+    rerender(
+      <ModalSubtitle>
+        <span>jsx</span>
+      </ModalSubtitle>,
+    );
+    expect(container.children.length).toBe(1);
+  });
 });
