@@ -210,6 +210,52 @@ describe('useChainPastAuctions', () => {
     expect(result.auctions[0].bidder).toBeNull();
   });
 
+  it('queryFn rejects when getLogs rejects (error propagation)', async () => {
+    const getLogsSpy = vi.fn().mockRejectedValueOnce(new Error('rpc fail'));
+    usePublicClientMock.mockReturnValue({
+      getBlockNumber: vi.fn().mockResolvedValue(200n),
+      getLogs: getLogsSpy,
+      getBlock: vi.fn().mockResolvedValue({ timestamp: 1701n }),
+    });
+    renderHook(() => useChainPastAuctions(true));
+    await expect(lastUseQueryOptions().queryFn({ signal: undefined })).rejects.toThrow('rpc fail');
+  });
+
+  it('queryKey contains exactly 3 elements (label, address, deployBlock)', () => {
+    renderHook(() => useChainPastAuctions(true));
+    expect(lastUseQueryOptions().queryKey).toHaveLength(3);
+  });
+
+  it('queryFn handles empty AuctionCreated logs (returns empty auctions)', async () => {
+    const getLogsSpy = vi.fn().mockResolvedValue([]);
+    usePublicClientMock.mockReturnValue({
+      getBlockNumber: vi.fn().mockResolvedValue(200n),
+      getLogs: getLogsSpy,
+      getBlock: vi.fn().mockResolvedValue({ timestamp: 1701n }),
+    });
+    renderHook(() => useChainPastAuctions(true));
+    const result = (await lastUseQueryOptions().queryFn({ signal: undefined })) as {
+      auctions: unknown[];
+    };
+    expect(result.auctions).toEqual([]);
+    expect(getLogsSpy).toHaveBeenCalledTimes(3);
+  });
+
+  it('refetchInterval is exactly 10_000ms (10 sec polling)', () => {
+    renderHook(() => useChainPastAuctions(true));
+    expect(lastUseQueryOptions().refetchInterval).toBe(10000);
+  });
+
+  it('enabled=false short-circuits even with valid publicClient', () => {
+    usePublicClientMock.mockReturnValue({
+      getBlockNumber: vi.fn(),
+      getLogs: vi.fn(),
+      getBlock: vi.fn(),
+    });
+    renderHook(() => useChainPastAuctions(false));
+    expect(lastUseQueryOptions().enabled).toBe(false);
+  });
+
   it('queryFn sorts auctions by nounId desc', async () => {
     const getLogsSpy = vi
       .fn()

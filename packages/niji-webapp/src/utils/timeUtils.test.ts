@@ -88,6 +88,54 @@ describe('relativeTimestamp', () => {
     expect(result).not.toBe('just now');
     expect(typeof result).toBe('string');
   });
+
+  it('returns "just now" exactly at 0 min diff (now)', () => {
+    const now = Math.floor(Date.now() / 1000);
+    expect(relativeTimestamp(now)).toBe('just now');
+  });
+
+  it('returns "just now" at 2 min diff (just below 3)', () => {
+    const two_min_ago = Math.floor(Date.now() / 1000) - 120;
+    expect(relativeTimestamp(two_min_ago)).toBe('just now');
+  });
+
+  it('returns fromNow string at exactly 3 min diff (boundary)', () => {
+    const three_min_ago = Math.floor(Date.now() / 1000) - 180;
+    const result = relativeTimestamp(three_min_ago);
+    expect(result).not.toBe('just now');
+  });
+});
+
+describe('currentUnixEpoch — additional', () => {
+  it('returns identical or +1 across 2 consecutive calls (sub-second granularity)', () => {
+    const a = currentUnixEpoch();
+    const b = currentUnixEpoch();
+    expect(b - a).toBeGreaterThanOrEqual(0);
+    expect(b - a).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('toUnixEpoch — additional', () => {
+  it('returns NaN for invalid date string', () => {
+    expect(Number.isNaN(toUnixEpoch('not-a-date'))).toBe(true);
+  });
+});
+
+describe('unixToDateString — additional', () => {
+  it('formats large timestamp (year 2100)', () => {
+    // 2100-01-01 UTC = 4102444800
+    expect(unixToDateString(4102444800)).toBe('January 01, 2100');
+  });
+});
+
+describe('timestampFromBlockNumber — additional', () => {
+  it('handles 1000 block diff (~12000s = 200 min ahead)', () => {
+    const now = dayjs();
+    const result = timestampFromBlockNumber(1100, 100);
+    const diffMin = result.diff(now, 'minute');
+    expect(diffMin).toBeGreaterThanOrEqual(195);
+    expect(diffMin).toBeLessThanOrEqual(205);
+  });
 });
 
 afterAll(() => {

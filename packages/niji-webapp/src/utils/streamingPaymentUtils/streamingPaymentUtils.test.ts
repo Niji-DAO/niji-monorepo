@@ -94,4 +94,56 @@ describe('parseStreamCreationCallData', () => {
     expect(result.streamAddress).toBeUndefined();
     expect(result.nonce).toBe('4');
   });
+
+  it('handles 8+ element input (ignores extra)', () => {
+    const callData = '0xR,1,0xT,1700,1800,5,0xSA,0xExtra,0xMore';
+    const result = parseStreamCreationCallData(callData);
+    expect(result.recipient).toBe('0xR');
+    expect(result.streamAddress).toBe('0xSA');
+    expect(result.nonce).toBe('5');
+  });
+
+  it('handles non-numeric value strings (NaN coercion)', () => {
+    const callData = '0xR,abc,0xT,xyz,xyz,5,0xSA';
+    const result = parseStreamCreationCallData(callData);
+    expect(Number.isNaN(result.streamAmount)).toBe(true);
+    expect(Number.isNaN(result.startTime)).toBe(true);
+  });
+
+  it('returns empty defaults when callData has fewer than 6 elements', () => {
+    expect(parseStreamCreationCallData('a,b').streamAmount).toBe(0);
+    expect(parseStreamCreationCallData('').streamAmount).toBe(0);
+  });
+});
+
+describe('formatTokenAmount — additional', () => {
+  it('USDC handles sub-cent fractional (0.000001 → 1n)', () => {
+    expect(formatTokenAmount(0.000001, SupportedCurrency.USDC)).toBe(1n);
+  });
+
+  it('USDC handles large amount (1_000_000 USDC → 1e12 micro)', () => {
+    expect(formatTokenAmount(1_000_000, SupportedCurrency.USDC)).toBe(1_000_000_000_000n);
+  });
+
+  it('WETH handles negative amount via parseEther (throws or NaN-like)', () => {
+    // parseEther('-1') returns -1e18n (viem 仕様で許容)
+    expect(formatTokenAmount(-1, SupportedCurrency.WETH)).toBe(parseEther('-1'));
+  });
+
+  it('default branch BigInt(0.5) throws? (BigInt() does not accept float strings, source uses BigInt(amount))', () => {
+    // BigInt(0.5) は throw、 ただし 0.5 truthy なので分岐進む
+    // source の `amount ? BigInt(amount) : 0n` で truthy 経路、 BigInt(0.5) で SyntaxError
+    expect(() => formatTokenAmount(0.5)).toThrow();
+  });
+});
+
+describe('getTokenAddressForCurrency — additional', () => {
+  it('chainId 0 falls back to zeroAddress for USDC', () => {
+    expect(getTokenAddressForCurrency(SupportedCurrency.USDC, 0)).toBe(zeroAddress);
+  });
+
+  it('chainId fallback applies to all currencies (WETH/STETH/USDC)', () => {
+    expect(getTokenAddressForCurrency(SupportedCurrency.WETH, 99999)).toBe(zeroAddress);
+    expect(getTokenAddressForCurrency(SupportedCurrency.STETH, 99999)).toBe(zeroAddress);
+  });
 });
