@@ -92,4 +92,42 @@ describe('ModalSubtitle', () => {
     );
     expect(container.querySelector('[data-testid="deep"]')?.textContent).toBe('deep');
   });
+
+  it('renders unicode children verbatim', () => {
+    const { container } = render(<ModalSubtitle>こんにちは</ModalSubtitle>);
+    expect(container.querySelector('div')?.textContent).toBe('こんにちは');
+  });
+
+  it('multiple instances render with same CSS module className', () => {
+    const { container } = render(
+      <>
+        <ModalSubtitle>a</ModalSubtitle>
+        <ModalSubtitle>b</ModalSubtitle>
+      </>,
+    );
+    const divs = container.querySelectorAll('div');
+    expect(divs[0].className).toBe(divs[1].className);
+  });
+
+  it('zero (0) children renders as "0"', () => {
+    const { container } = render(<ModalSubtitle>{0}</ModalSubtitle>);
+    expect(container.querySelector('div')?.textContent).toBe('0');
+  });
+
+  it('rerender with new children updates text', () => {
+    const { container, rerender } = render(<ModalSubtitle>first</ModalSubtitle>);
+    expect(container.textContent).toBe('first');
+    rerender(<ModalSubtitle>second</ModalSubtitle>);
+    expect(container.textContent).toBe('second');
+  });
+
+  it('mixed text + element children', () => {
+    const { container } = render(
+      <ModalSubtitle>
+        text-<strong>strong</strong>
+      </ModalSubtitle>,
+    );
+    expect(container.querySelector('strong')?.textContent).toBe('strong');
+    expect(container.textContent).toContain('text-');
+  });
 });

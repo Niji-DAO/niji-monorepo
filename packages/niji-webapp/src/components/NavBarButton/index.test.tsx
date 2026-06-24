@@ -73,4 +73,51 @@ describe('NavBarButton', () => {
     const inner = container.querySelector('div div div');
     expect(inner?.className).toMatch(/disabled/i);
   });
+
+  it('repeated onClick invokes handler N times', () => {
+    const onClick = vi.fn();
+    const { container } = render(<NavBarButton buttonText="x" onClick={onClick} />);
+    const root = container.firstChild as Element;
+    fireEvent.click(root);
+    fireEvent.click(root);
+    fireEvent.click(root);
+    expect(onClick).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders both buttonText and buttonIcon', () => {
+    const { container } = render(
+      <NavBarButton buttonText="hello" buttonIcon={<span data-testid="icon" />} />,
+    );
+    expect(container.textContent).toContain('hello');
+    expect(container.querySelector('[data-testid="icon"]')).not.toBeNull();
+  });
+
+  it('rerender updates buttonText', () => {
+    const { container, rerender } = render(<NavBarButton buttonText="first" />);
+    expect(container.textContent).toContain('first');
+    rerender(<NavBarButton buttonText="second" />);
+    expect(container.textContent).toContain('second');
+  });
+
+  it('isDropdown=true renders exactly 1 svg (chevron)', () => {
+    const { container } = render(<NavBarButton buttonText="x" isDropdown={true} />);
+    expect(container.querySelectorAll('svg').length).toBe(1);
+  });
+
+  it('disabled=false does NOT apply disabled class', () => {
+    const { container } = render(<NavBarButton buttonText="x" disabled={false} />);
+    const inner = container.querySelector('div div div');
+    expect(inner?.className).not.toMatch(/disabled/i);
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <NavBarButton buttonText="a" />
+        <NavBarButton buttonText="b" />
+      </>,
+    );
+    expect(container.textContent).toContain('a');
+    expect(container.textContent).toContain('b');
+  });
 });

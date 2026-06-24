@@ -142,4 +142,71 @@ describe('NavDropDown', () => {
     );
     expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
   });
+
+  it('multiple NavDropDown instances render independently', () => {
+    const { container } = render(
+      <>
+        <NavDropDown buttonText="First">
+          <span>x</span>
+        </NavDropDown>
+        <NavDropDown buttonText="Second">
+          <span>y</span>
+        </NavDropDown>
+      </>,
+    );
+    const navs = container.querySelectorAll('[data-testid="nav-button"]');
+    expect(navs.length).toBe(2);
+    expect(navs[0].textContent).toBe('First');
+    expect(navs[1].textContent).toBe('Second');
+  });
+
+  it('rerender updates buttonText', () => {
+    const { container, rerender } = render(
+      <NavDropDown buttonText="A">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('A');
+    rerender(
+      <NavDropDown buttonText="B">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('B');
+  });
+
+  it('unicode buttonText (日本語) renders verbatim', () => {
+    const { container } = render(
+      <NavDropDown buttonText="メニュー">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('メニュー');
+  });
+
+  it('dropdown wrapper has className containing "dropdown"', () => {
+    const { container } = render(
+      <NavDropDown buttonText="Menu">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('.dropdown')?.className).toContain('dropdown');
+  });
+
+  it('children prop variation does not affect nav-button rendering', () => {
+    const { container: c1 } = render(
+      <NavDropDown buttonText="Menu">
+        <span>1</span>
+      </NavDropDown>,
+    );
+    const { container: c2 } = render(
+      <NavDropDown buttonText="Menu">
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+      </NavDropDown>,
+    );
+    expect(c1.querySelectorAll('[data-testid="nav-button"]').length).toBe(1);
+    expect(c2.querySelectorAll('[data-testid="nav-button"]').length).toBe(1);
+  });
 });
