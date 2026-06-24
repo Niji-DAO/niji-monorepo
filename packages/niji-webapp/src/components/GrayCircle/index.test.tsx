@@ -30,4 +30,34 @@ describe('GrayCircle', () => {
     const { container } = render(<GrayCircle />);
     expect(container.querySelector('img')?.getAttribute('alt')).toBe('');
   });
+
+  it('renders exactly 1 img element', () => {
+    const { container } = render(<GrayCircle />);
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('img src starts with data:image/svg+xml; prefix', () => {
+    const { container } = render(<GrayCircle />);
+    expect(
+      container.querySelector('img')?.getAttribute('src')?.startsWith('data:image/svg+xml;'),
+    ).toBe(true);
+  });
+
+  it('isDelegateView=false explicit produces empty className (same as undefined)', () => {
+    const { container } = render(<GrayCircle isDelegateView={false} />);
+    expect(container.querySelector('div')?.className).toBe('');
+  });
+
+  it('outermost wrapper is a single <div>', () => {
+    const { container } = render(<GrayCircle />);
+    expect(container.children.length).toBe(1);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
+
+  it('LegacyNoun img alt remains "" regardless of isDelegateView', () => {
+    const { container: c1 } = render(<GrayCircle isDelegateView={true} />);
+    const { container: c2 } = render(<GrayCircle isDelegateView={false} />);
+    expect(c1.querySelector('img')?.getAttribute('alt')).toBe('');
+    expect(c2.querySelector('img')?.getAttribute('alt')).toBe('');
+  });
 });

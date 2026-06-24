@@ -77,4 +77,56 @@ describe('Holder', () => {
     });
     expect(container.textContent?.length).toBeGreaterThan(0);
   });
+
+  it('handles 0n nounId without crashing', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() => render(<Holder nounId={0n} />, { wrapper: WithProviders })).not.toThrow();
+  });
+
+  it('calls useSubgraphQuery exactly once per render (loading state)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockClear();
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    expect(useSubgraphQueryMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders for large bigint nounId (MAX_SAFE_INTEGER)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xLARGE' } } },
+    });
+    expect(() =>
+      render(<Holder nounId={9_007_199_254_740_991n} />, { wrapper: WithProviders }),
+    ).not.toThrow();
+  });
+
+  it('isNounders=false default branch renders ShortAddress (not Nounders branch)', async () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    const { container } = render(<Holder nounId={1n} isNounders={false} />, {
+      wrapper: WithProviders,
+    });
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xOWNER');
+    });
+  });
+
+  it('error string contains "Niji info"', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: new Error('rpc'),
+      data: undefined,
+    });
+    const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    expect(container.textContent).toContain('Niji info');
+  });
 });
