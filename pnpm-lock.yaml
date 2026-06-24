@@ -661,9 +661,6 @@ importers:
       react-tooltip:
         specifier: ^4.5.1
         version: 4.5.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      react-transition-group:
-        specifier: ^4.4.5
-        version: 4.4.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       redux:
         specifier: ^5.0.1
         version: 5.0.1
@@ -770,9 +767,6 @@ importers:
       '@types/react-fontawesome':
         specifier: ^1.6.5
         version: 1.6.8
-      '@types/react-transition-group':
-        specifier: ^4.4.5
-        version: 4.4.12(@types/react@19.1.8)
       '@types/redux-logger':
         specifier: ^3.0.13
         version: 3.0.13
