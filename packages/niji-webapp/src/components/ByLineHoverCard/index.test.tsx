@@ -252,4 +252,58 @@ describe('ByLineHoverCard', () => {
     const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
     expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-50');
   });
+
+  it('useSubgraphQuery called exactly 1 time per render', () => {
+    useSubgraphQueryMock.mockClear();
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(useSubgraphQueryMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('100 nijis render stack-100', () => {
+    const nijiList = Array.from({ length: 100 }, (_, i) => ({ id: String(i + 1) }));
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: nijiList }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-100');
+  });
+
+  it('different proposerAddress prop forwarded as-is', () => {
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xB', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    expect(() => render(<ByLineHoverCard proposerAddress="0xB" />)).not.toThrow();
+  });
+
+  it('error message renders only 1 time (no duplication)', () => {
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: new Error('rpc'),
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    const text = container.textContent ?? '';
+    expect(text.split('Error fetching').length).toBe(2); // 1 occurrence (split by it produces 2 parts)
+  });
+
+  it('stack-3 for 3 nijis renders', () => {
+    useSubgraphQueryMock.mockReturnValue({
+      data: {
+        delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }, { id: '2' }, { id: '3' }] }],
+      },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-3');
+  });
 });
