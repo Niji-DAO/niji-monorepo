@@ -209,4 +209,41 @@ describe('ModalLabel', () => {
     const { container } = render(<ModalLabel>{'絵文字-日本語'}</ModalLabel>);
     expect(container.querySelector('div')?.textContent).toBe('絵文字-日本語');
   });
+
+  it('renders boolean false children as empty', () => {
+    const { container } = render(<ModalLabel>{false}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('renders null children as empty', () => {
+    const { container } = render(<ModalLabel>{null}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('renders 20 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <ModalLabel key={i}>{`label-${i}`}</ModalLabel>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(20);
+  });
+
+  it('renders special characters', () => {
+    const { container } = render(<ModalLabel>{'<>&"\''}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('<>&"\'');
+  });
+
+  it('renders mixed text + nested element', () => {
+    const { container } = render(
+      <ModalLabel>
+        prefix-<span>inner</span>-suffix
+      </ModalLabel>,
+    );
+    expect(container.querySelector('div')?.textContent).toContain('prefix');
+    expect(container.querySelector('div')?.textContent).toContain('inner');
+    expect(container.querySelector('div')?.textContent).toContain('suffix');
+  });
 });

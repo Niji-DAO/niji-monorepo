@@ -215,4 +215,41 @@ describe('ModalTextPrimary', () => {
     const { container } = render(<ModalTextPrimary>{'日本語テキスト'}</ModalTextPrimary>);
     expect(container.querySelector('div')?.textContent).toBe('日本語テキスト');
   });
+
+  it('renders 20 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <ModalTextPrimary key={i}>{`primary-${i}`}</ModalTextPrimary>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(20);
+  });
+
+  it('renders special characters verbatim', () => {
+    const { container } = render(<ModalTextPrimary>{'<>&"\''}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('<>&"\'');
+  });
+
+  it('renders numeric children as string', () => {
+    const { container } = render(<ModalTextPrimary>{99999}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('99999');
+  });
+
+  it('renders null children as empty', () => {
+    const { container } = render(<ModalTextPrimary>{null}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('renders mixed text + nested element', () => {
+    const { container } = render(
+      <ModalTextPrimary>
+        before <strong>middle</strong> after
+      </ModalTextPrimary>,
+    );
+    expect(container.querySelector('div')?.textContent).toContain('before');
+    expect(container.querySelector('div')?.textContent).toContain('middle');
+    expect(container.querySelector('div')?.textContent).toContain('after');
+  });
 });
