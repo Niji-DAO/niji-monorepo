@@ -352,4 +352,56 @@ describe('AuctionActivityWrapper', () => {
     const { container } = render(<AuctionActivityWrapper>{'<>&"\''}</AuctionActivityWrapper>);
     expect(container.querySelector('div')?.textContent).toBe('<>&"\'');
   });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <AuctionActivityWrapper key={i}>{i}</AuctionActivityWrapper>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 50 times preserves div', () => {
+    const { container, rerender } = render(<AuctionActivityWrapper>x</AuctionActivityWrapper>);
+    for (let i = 0; i < 50; i++) {
+      rerender(<AuctionActivityWrapper>val-{i}</AuctionActivityWrapper>);
+    }
+    expect(container.querySelector('div')?.textContent).toContain('49');
+  });
+
+  it('handles 10000 char children', () => {
+    const long = 'a'.repeat(10000);
+    const { container } = render(<AuctionActivityWrapper>{long}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent?.length).toBe(10000);
+  });
+
+  it('handles array of 100 children', () => {
+    const items = Array.from({ length: 100 }, (_, i) => i);
+    const { container } = render(
+      <AuctionActivityWrapper>
+        {items.map(n => (
+          <span key={n}>{n}</span>
+        ))}
+      </AuctionActivityWrapper>,
+    );
+    expect(container.querySelectorAll('span').length).toBe(100);
+  });
+
+  it('all 200 instances have max-lg:mx-4 class', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <AuctionActivityWrapper key={i}>x</AuctionActivityWrapper>
+        ))}
+      </>,
+    );
+    const divs = container.querySelectorAll('div');
+    divs.forEach(div => {
+      expect(div.className).toContain('max-lg:mx-4');
+    });
+  });
 });

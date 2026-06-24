@@ -395,4 +395,56 @@ describe('Auction', () => {
   it('renders for id 0n (boundary repeat)', () => {
     expect(() => wrap(<Auction auction={makeAuction(0n)} />)).not.toThrow();
   });
+
+  it('renders 10 instances without crash', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <Auction key={i} auction={makeAuction(BigInt(i))} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves component', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    const { rerender } = wrap(<Auction auction={makeAuction(0n)} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <Auction auction={makeAuction(BigInt(i))} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles very large bigint nounId (MAX_SAFE_INTEGER)', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    expect(() => wrap(<Auction auction={makeAuction(9_007_199_254_740_991n)} />)).not.toThrow();
+  });
+
+  it('rapid 100 renders with id=5n without crash', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    for (let i = 0; i < 100; i++) {
+      expect(() => wrap(<Auction auction={makeAuction(5n)} />)).not.toThrow();
+    }
+  });
+
+  it('renders all 50 different bid amounts', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <Auction key={i} auction={{ ...makeAuction(BigInt(i)), amount: BigInt(i * 1000) }} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });

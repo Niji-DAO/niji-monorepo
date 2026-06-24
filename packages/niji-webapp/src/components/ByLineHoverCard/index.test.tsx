@@ -519,4 +519,47 @@ describe('ByLineHoverCard', () => {
       render(<ByLineHoverCard proposerAddress={'0x' + 'a'.repeat(200)} />),
     ).not.toThrow();
   });
+
+  it('renders 50 instances without crash', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <ByLineHoverCard key={i} proposerAddress={`0xADDR${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves component', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    const { rerender } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    for (let i = 0; i < 30; i++) {
+      expect(() => rerender(<ByLineHoverCard proposerAddress={`0xA${i}`} />)).not.toThrow();
+    }
+  });
+
+  it('handles rapid loading state transitions 50 times', () => {
+    const { rerender } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    for (let i = 0; i < 50; i++) {
+      useSubgraphQueryMock.mockReturnValue({
+        data: undefined,
+        loading: i % 2 === 0,
+        error: undefined,
+      });
+      expect(() => rerender(<ByLineHoverCard proposerAddress="0xA" />)).not.toThrow();
+    }
+  });
+
+  it('handles empty string proposer address', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    expect(() => render(<ByLineHoverCard proposerAddress="" />)).not.toThrow();
+  });
+
+  it('handles unicode proposer address', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    expect(() => render(<ByLineHoverCard proposerAddress="🚀0xJP" />)).not.toThrow();
+  });
 });
