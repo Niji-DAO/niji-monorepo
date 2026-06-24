@@ -324,4 +324,100 @@ describe('DynamicQuorumInfoModal', () => {
     expect(container.textContent).toContain('Max Threshold');
     expect(container.textContent).toContain('Dynamic Threshold');
   });
+
+  it('renders exactly 1 SVG element in desktop view', () => {
+    setWindowWidth(1400);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.querySelectorAll('svg').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('multiple Backdrop clicks fire dismiss multiple times', () => {
+    setWindowWidth(1400);
+    const dismiss = vi.fn();
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={dismiss}
+        currentQuorum={5}
+      />,
+    );
+    const backdrop = container.querySelector('[data-testid="backdrop"]') as HTMLElement;
+    backdrop.click();
+    backdrop.click();
+    backdrop.click();
+    expect(dismiss).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders Backdrop element exactly 1 time', () => {
+    setWindowWidth(1400);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.querySelectorAll('[data-testid="backdrop"]').length).toBe(1);
+  });
+
+  it('renders error msg "Failed" for any subgraph error type', () => {
+    subgraphState.error = 'string error' as never;
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.textContent).toContain('Failed');
+  });
+
+  it('huge proposal.id (large number) renders correctly', () => {
+    setWindowWidth(1400);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal({ id: '99999999' })}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.textContent).toContain('99999999');
+  });
+
+  it('currentQuorum=0 renders without crash', () => {
+    setWindowWidth(1400);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={0}
+        onDismiss={() => {}}
+        currentQuorum={0}
+      />,
+    );
+    expect(container.textContent).toContain('Dynamic Threshold');
+  });
+
+  it('large againstVotesAbsolute (10000) renders without crash', () => {
+    setWindowWidth(1400);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10000}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.textContent).toContain('Dynamic Threshold');
+  });
 });

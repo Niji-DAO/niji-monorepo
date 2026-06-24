@@ -123,4 +123,61 @@ describe('CurrentBid', () => {
     expect(container.querySelector('h4')).not.toBeNull();
     expect(container.querySelector('h2')).not.toBeNull();
   });
+
+  it('rerender from auctionEnded=false to true switches label', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <CurrentBid currentBid={parseEther('1')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('Current bid');
+    rerender(<CurrentBid currentBid={parseEther('1')} auctionEnded={true} />);
+    expect(container.textContent).toContain('Winning bid');
+  });
+
+  it('rerender from cool to warm switches text style', () => {
+    useAtomValueMock.mockReturnValueOnce(true);
+    const { container, rerender } = render(
+      <CurrentBid currentBid={parseEther('1')} auctionEnded={false} />,
+    );
+    expect(container.querySelector('h2')?.getAttribute('style')).toContain('cool');
+    useAtomValueMock.mockReturnValue(false);
+    rerender(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />);
+    expect(container.querySelector('h2')?.getAttribute('style')).toContain('warm');
+  });
+
+  it('multiple instances render independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        <CurrentBid currentBid={parseEther('1')} auctionEnded={false} />
+        <CurrentBid currentBid={parseEther('2')} auctionEnded={true} />
+      </>,
+    );
+    expect(container.textContent).toContain('Current bid');
+    expect(container.textContent).toContain('Winning bid');
+  });
+
+  it('rerender bid amount updates display', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <CurrentBid currentBid={parseEther('1')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('Ξ 1.00');
+    rerender(<CurrentBid currentBid={parseEther('5')} auctionEnded={false} />);
+    expect(container.textContent).toContain('Ξ 5.00');
+  });
+
+  it('large bid 10000 ETH renders correctly', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <CurrentBid currentBid={parseEther('10000')} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('Ξ 10000.00');
+  });
+
+  it('warm + auctionEnded=true uses warm dark text', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const { container } = render(<CurrentBid currentBid={parseEther('1')} auctionEnded={true} />);
+    expect(container.querySelector('h2')?.getAttribute('style')).toContain('brand-warm-dark-text');
+  });
 });
