@@ -520,4 +520,69 @@ describe('CurrentDelegatePannel', () => {
     rerender(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />);
     expect(container.querySelector('h1')).not.toBeNull();
   });
+
+  it('renders 50 CurrentDelegatePannel instances independently', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xDELEG' });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <CurrentDelegatePannel
+              key={i}
+              onPrimaryBtnClick={() => {}}
+              onSecondaryBtnClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 100 secondary clicks invoke onSec 100 times', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const onSec = vi.fn();
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={onSec} />,
+    );
+    const buttons = container.querySelectorAll('button');
+    for (let i = 0; i < 100; i++) fireEvent.click(buttons[0]);
+    expect(onSec).toHaveBeenCalledTimes(100);
+  });
+
+  it('rerender 30 times preserves h1 + buttons', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xDELEG' });
+    const { container, rerender } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      rerender(
+        <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+      );
+      expect(container.querySelector('h1')).not.toBeNull();
+      expect(container.querySelectorAll('button').length).toBe(2);
+    }
+  });
+
+  it('handles 50 different delegate addresses consecutively', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    for (let i = 0; i < 50; i++) {
+      useReadNijiTokenDelegatesMock.mockReturnValue({ data: `0xDELEG${i}` });
+      expect(() =>
+        render(
+          <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles unicode delegate address', () => {
+    useAccountMock.mockReturnValue({ address: undefined });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xABCあいう' });
+    expect(() =>
+      render(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />),
+    ).not.toThrow();
+  });
 });
