@@ -150,4 +150,45 @@ describe('BidHistoryModal', () => {
         ?.textContent,
     ).toBe('999999');
   });
+
+  it('handles 0 bids without rendering rows', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelectorAll('[data-testid="row"]').length,
+    ).toBe(0);
+  });
+
+  it('renders nounId 0n correctly', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const zeroAuction = { ...auction, nounId: 0n };
+    render(<BidHistoryModal auction={zeroAuction} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="niji-rounded"]')
+        ?.textContent,
+    ).toBe('0');
+  });
+
+  it('Backdrop component (separate export) shows div', () => {
+    const onDismiss = vi.fn();
+    const { container } = render(<Backdrop onDismiss={onDismiss} />);
+    expect(container.querySelector('div')).not.toBeNull();
+  });
+
+  it('Backdrop multiple click invokes onDismiss N times', () => {
+    const onDismiss = vi.fn();
+    const { container } = render(<Backdrop onDismiss={onDismiss} />);
+    const div = container.querySelector('div')!;
+    fireEvent.click(div);
+    fireEvent.click(div);
+    expect(onDismiss).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders 1 bid row correctly when single bid provided', () => {
+    useAuctionBidsMock.mockReturnValue([{ transactionHash: '0xsingle' }]);
+    render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelectorAll('[data-testid="row"]').length,
+    ).toBe(1);
+  });
 });

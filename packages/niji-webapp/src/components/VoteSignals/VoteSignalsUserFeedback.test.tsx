@@ -139,4 +139,56 @@ describe('VoteSignalsUserFeedback', () => {
     );
     expect(container.querySelector('span')).not.toBeNull();
   });
+
+  it('renders span (empty content) when userVoteSupport undefined (no support label)', () => {
+    const { container } = render(<VoteSignalsUserFeedback />);
+    const span = container.querySelector('span');
+    expect(span?.textContent ?? '').toBe('');
+  });
+
+  it('abstain text + reason both present when reason provided', () => {
+    const { container } = render(
+      <VoteSignalsUserFeedback
+        userVoteSupport={
+          { supportDetailed: 2, createdTimestamp: 0, reason: 'abstaining reason' } as never
+        }
+      />,
+    );
+    expect(container.textContent).toContain('abstain');
+    expect(container.textContent).toContain('abstaining reason');
+  });
+
+  it('against text + reason both present when reason provided', () => {
+    const { container } = render(
+      <VoteSignalsUserFeedback
+        userVoteSupport={
+          { supportDetailed: 0, createdTimestamp: 0, reason: 'against reason' } as never
+        }
+      />,
+    );
+    expect(container.textContent).toContain('against');
+    expect(container.textContent).toContain('against reason');
+  });
+
+  it('reason text rendered separately from support keyword', () => {
+    const { container } = render(
+      <VoteSignalsUserFeedback
+        userVoteSupport={{ supportDetailed: 1, createdTimestamp: 0, reason: 'because OK' } as never}
+      />,
+    );
+    expect(container.textContent).toContain('because OK');
+    expect(container.textContent).toContain('for');
+  });
+
+  it('renders multi-line reason without crash', () => {
+    const { container } = render(
+      <VoteSignalsUserFeedback
+        userVoteSupport={
+          { supportDetailed: 1, createdTimestamp: 0, reason: 'line1\nline2' } as never
+        }
+      />,
+    );
+    expect(container.textContent).toContain('line1');
+    expect(container.textContent).toContain('line2');
+  });
 });
