@@ -246,4 +246,42 @@ describe('ModalLabel', () => {
     expect(container.querySelector('div')?.textContent).toContain('inner');
     expect(container.querySelector('div')?.textContent).toContain('suffix');
   });
+
+  it('renders 50 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <ModalLabel key={i}>{`label-${i}`}</ModalLabel>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(50);
+  });
+
+  it('renders array children', () => {
+    const { container } = render(<ModalLabel>{['a', 'b']}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('ab');
+  });
+
+  it('renders 1000 char long content', () => {
+    const longStr = 'x'.repeat(1000);
+    const { container } = render(<ModalLabel>{longStr}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe(longStr);
+  });
+
+  it('rerender preserves div wrapper element', () => {
+    const { container, rerender } = render(<ModalLabel>x</ModalLabel>);
+    expect(container.children.length).toBe(1);
+    rerender(<ModalLabel>y</ModalLabel>);
+    expect(container.children.length).toBe(1);
+  });
+
+  it('renders unicode label across 5 rerenders', () => {
+    const { container, rerender } = render(<ModalLabel>{'絵文字'}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('絵文字');
+    for (let i = 0; i < 5; i++) {
+      rerender(<ModalLabel>{`item-${i}-日本語`}</ModalLabel>);
+      expect(container.querySelector('div')?.textContent).toBe(`item-${i}-日本語`);
+    }
+  });
 });
