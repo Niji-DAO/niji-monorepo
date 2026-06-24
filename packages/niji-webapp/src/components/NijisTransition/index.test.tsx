@@ -194,4 +194,75 @@ describe('NijisTransition', () => {
     );
     expect(container.querySelector('[data-testid="motion-div"]')?.textContent).toBe('hello world');
   });
+
+  it('className updates on rerender', () => {
+    const { container, rerender } = render(
+      <NijisTransition show={true} transitionStyes={styles} className="a">
+        <span>x</span>
+      </NijisTransition>,
+    );
+    expect(container.querySelector('[data-testid="motion-div"]')?.className).toBe('a');
+    rerender(
+      <NijisTransition show={true} transitionStyes={styles} className="b">
+        <span>x</span>
+      </NijisTransition>,
+    );
+    expect(container.querySelector('[data-testid="motion-div"]')?.className).toBe('b');
+  });
+
+  it('unicode children render verbatim', () => {
+    const { container } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        こんにちは
+      </NijisTransition>,
+    );
+    expect(container.querySelector('[data-testid="motion-div"]')?.textContent).toBe('こんにちは');
+  });
+
+  it('multiple instances with show=true render 2 motion-divs', () => {
+    const { container } = render(
+      <>
+        <NijisTransition show={true} transitionStyes={styles}>
+          <span>a</span>
+        </NijisTransition>
+        <NijisTransition show={true} transitionStyes={styles}>
+          <span>b</span>
+        </NijisTransition>
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="motion-div"]').length).toBe(2);
+  });
+
+  it('show=false then onClick assert no crash (no motion-div)', () => {
+    const onClick = vi.fn();
+    const { container } = render(
+      <NijisTransition show={false} transitionStyes={styles} onClick={onClick}>
+        <span>x</span>
+      </NijisTransition>,
+    );
+    expect(container.querySelector('[data-testid="motion-div"]')).toBeNull();
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('long children string (500 chars) renders fully', () => {
+    const long = 'a'.repeat(500);
+    const { container } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        {long}
+      </NijisTransition>,
+    );
+    expect(container.querySelector('[data-testid="motion-div"]')?.textContent?.length).toBe(500);
+  });
+
+  it('Fragment children render inside motion-div', () => {
+    const { container } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        <>
+          <span>x</span>
+          <span>y</span>
+        </>
+      </NijisTransition>,
+    );
+    expect(container.querySelectorAll('span').length).toBe(2);
+  });
 });
