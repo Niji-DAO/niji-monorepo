@@ -188,4 +188,46 @@ describe('ModalTitle', () => {
     const { container } = render(<ModalTitle>日本語タイトル</ModalTitle>);
     expect(container.querySelector('h1')?.textContent).toBe('日本語タイトル');
   });
+
+  it('renders 50 char title exactly', () => {
+    const str50 = 'x'.repeat(50);
+    const { container } = render(<ModalTitle>{str50}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe(str50);
+  });
+
+  it('renders numeric children as string', () => {
+    const { container } = render(<ModalTitle>{42}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('42');
+  });
+
+  it('renders deeply nested 3 levels in h1', () => {
+    const { container } = render(
+      <ModalTitle>
+        <span>
+          <strong>
+            <em data-testid="deep">deep</em>
+          </strong>
+        </span>
+      </ModalTitle>,
+    );
+    expect(container.querySelector('h1 [data-testid="deep"]')?.textContent).toBe('deep');
+  });
+
+  it('renders 7 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 7 }, (_, i) => (
+          <ModalTitle key={i}>{`title-${i}`}</ModalTitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(7);
+  });
+
+  it('rerender same content idempotent', () => {
+    const { container, rerender } = render(<ModalTitle>same</ModalTitle>);
+    const initial = container.innerHTML;
+    rerender(<ModalTitle>same</ModalTitle>);
+    expect(container.innerHTML).toBe(initial);
+  });
 });

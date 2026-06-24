@@ -196,4 +196,46 @@ describe('ModalSubtitle', () => {
     const { container } = render(<ModalSubtitle>日本語テスト</ModalSubtitle>);
     expect(container.textContent).toBe('日本語テスト');
   });
+
+  it('renders 50 char text exactly', () => {
+    const str50 = 'x'.repeat(50);
+    const { container } = render(<ModalSubtitle>{str50}</ModalSubtitle>);
+    expect(container.textContent).toBe(str50);
+  });
+
+  it('renders numeric children as string', () => {
+    const { container } = render(<ModalSubtitle>{42}</ModalSubtitle>);
+    expect(container.textContent).toBe('42');
+  });
+
+  it('renders deeply nested 3 levels', () => {
+    const { container } = render(
+      <ModalSubtitle>
+        <span>
+          <strong>
+            <em data-testid="deep">deep</em>
+          </strong>
+        </span>
+      </ModalSubtitle>,
+    );
+    expect(container.querySelector('[data-testid="deep"]')?.textContent).toBe('deep');
+  });
+
+  it('renders 7 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 7 }, (_, i) => (
+          <ModalSubtitle key={i}>{`text-${i}`}</ModalSubtitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(7);
+  });
+
+  it('rerender same content idempotent', () => {
+    const { container, rerender } = render(<ModalSubtitle>same</ModalSubtitle>);
+    const initial = container.innerHTML;
+    rerender(<ModalSubtitle>same</ModalSubtitle>);
+    expect(container.innerHTML).toBe(initial);
+  });
 });

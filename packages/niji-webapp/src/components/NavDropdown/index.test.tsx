@@ -334,4 +334,62 @@ describe('NavDropDown', () => {
     expect(btns[0].textContent).toBe('One');
     expect(btns[1].textContent).toBe('Two');
   });
+
+  it('renders 10 instances each independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <NavDropDown key={i} buttonText={`btn-${i}`}>
+            <span>x</span>
+          </NavDropDown>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="nav-button"]').length).toBe(10);
+  });
+
+  it('renders unicode buttonText', () => {
+    const { container } = render(
+      <NavDropDown buttonText="日本語ボタン">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('日本語ボタン');
+  });
+
+  it('renders extremely long buttonText (300 char)', () => {
+    const longText = 'x'.repeat(300);
+    const { container } = render(
+      <NavDropDown buttonText={longText}>
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe(longText);
+  });
+
+  it('renders multiple children (Fragment)', () => {
+    const { container } = render(
+      <NavDropDown buttonText="X">
+        <span>A</span>
+        <span>B</span>
+        <span>C</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
+  });
+
+  it('rerender same buttonText idempotent', () => {
+    const { container, rerender } = render(
+      <NavDropDown buttonText="same">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    const initial = container.querySelector('[data-testid="nav-button"]')?.textContent;
+    rerender(
+      <NavDropDown buttonText="same">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe(initial);
+  });
 });
