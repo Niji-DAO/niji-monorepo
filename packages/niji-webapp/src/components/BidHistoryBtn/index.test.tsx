@@ -338,4 +338,57 @@ describe('BidHistoryBtn Component (isCool=true)', () => {
     const inner = container.firstElementChild?.firstElementChild as HTMLElement;
     expect(inner.className.length).toBeGreaterThan(0);
   });
+
+  it('renders 200 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <BidHistoryBtn key={i} onClick={vi.fn()} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(200);
+  });
+
+  it('rapid 200 clicks invoke onClick 200 times', () => {
+    const onClick = vi.fn();
+    const { container } = render(<BidHistoryBtn onClick={onClick} />);
+    const outer = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 200; i++) fireEvent.click(outer);
+    expect(onClick).toHaveBeenCalledTimes(200);
+  });
+
+  it('rerender 50 times preserves structure', () => {
+    const { container, rerender } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    for (let i = 0; i < 50; i++) {
+      rerender(<BidHistoryBtn onClick={vi.fn()} />);
+      expect(container.textContent).toBe('View all bids');
+    }
+  });
+
+  it('handles 100 different onClick handlers', () => {
+    const handlers = Array.from({ length: 100 }, () => vi.fn());
+    const { container } = render(
+      <>
+        {handlers.map((h, i) => (
+          <BidHistoryBtn key={i} onClick={h} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(100);
+  });
+
+  it('renders within deeply nested div', () => {
+    expect(() =>
+      render(
+        <div>
+          <div>
+            <div>
+              <BidHistoryBtn onClick={vi.fn()} />
+            </div>
+          </div>
+        </div>,
+      ),
+    ).not.toThrow();
+  });
 });
