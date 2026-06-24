@@ -42,4 +42,53 @@ describe('compareBidsChronologically', () => {
     expect((sorted[1] as IBid).blockTimestamp).toBe('200');
     expect((sorted[2] as IBid).blockTimestamp).toBe('100');
   });
+
+  it('handles large block timestamps (e.g. 2 billion = future block)', () => {
+    const a = makeBid(2_000_000_000, 1);
+    const b = makeBid(2_000_000_001, 0);
+    expect(compareBidsChronologically(a, b)).toBeGreaterThan(0);
+  });
+
+  it('treats falsy txIndex (undefined / 0) as 0 via `|| 0`', () => {
+    const a = {
+      blockTimestamp: '1000',
+      // txIndex undefined を意図的に欠落
+    } as unknown as IBid;
+    const b = makeBid(1000, 0);
+    // adjusted = 1000 * 1e6 + 0 (両方とも)、 差分 0
+    expect(compareBidsChronologically(a, b)).toBe(0);
+  });
+
+  it('falsy txIndex 0 vs explicit txIndex 5 makes b "later"', () => {
+    const a = {
+      blockTimestamp: '1000',
+    } as unknown as IBid;
+    const b = makeBid(1000, 5);
+    expect(compareBidsChronologically(a, b)).toBeGreaterThan(0);
+  });
+
+  it('sorts many same-block bids by txIndex descending', () => {
+    const bids: IBid[] = [makeBid(1000, 2), makeBid(1000, 5), makeBid(1000, 0), makeBid(1000, 3)];
+    const sorted = [...bids].sort(compareBidsChronologically);
+    expect((sorted[0] as IBid).txIndex).toBe(5);
+    expect((sorted[1] as IBid).txIndex).toBe(3);
+    expect((sorted[2] as IBid).txIndex).toBe(2);
+    expect((sorted[3] as IBid).txIndex).toBe(0);
+  });
+
+  it('multiplier 1_000_000 isolates timestamp from txIndex (no overflow into time bucket)', () => {
+    // txIndex < 1e6 なら timestamp 差で必ず決まる
+    const a = makeBid(1000, 999_999);
+    const b = makeBid(1001, 0);
+    // a score = 1000e6 + 999999 = 1_000_999_999
+    // b score = 1001e6 + 0 = 1_001_000_000
+    // b > a なので b が新しい (positive)
+    expect(compareBidsChronologically(a, b)).toBeGreaterThan(0);
+  });
+
+  it('blockTimestamp as numeric string (no scientific notation)', () => {
+    const a = { blockTimestamp: '1700000000', txIndex: 0 } as unknown as IBid;
+    const b = { blockTimestamp: '1700000001', txIndex: 0 } as unknown as IBid;
+    expect(compareBidsChronologically(a, b)).toBeGreaterThan(0);
+  });
 });
