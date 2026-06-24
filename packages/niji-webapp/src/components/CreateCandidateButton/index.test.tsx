@@ -227,4 +227,111 @@ describe('CreateCandidateButton', () => {
     expect(container.textContent).toContain('active or pending proposal');
     expect(container.querySelector('button')?.disabled).toBe(true);
   });
+
+  it('button enabled by default (all good)', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('button')?.disabled).toBe(false);
+  });
+
+  it('rerender from default to isLoading shows spinner', () => {
+    const { container, rerender } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.textContent).toContain('Create proposal candidate');
+    rerender(
+      <CreateCandidateButton
+        isLoading={true}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+  });
+
+  it('rerender from disabled to enabled allows handler', () => {
+    const handle = vi.fn();
+    const { container, rerender } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={true}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    expect(container.querySelector('button')?.disabled).toBe(true);
+    rerender(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    fireEvent.click(container.querySelector('button')!);
+    expect(handle).toHaveBeenCalledTimes(1);
+  });
+
+  it('multiple instances render independently with own handlers', () => {
+    const h1 = vi.fn();
+    const h2 = vi.fn();
+    const { container } = render(
+      <>
+        <CreateCandidateButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          isFormInvalid={false}
+          handleCreateProposal={h1}
+        />
+        <CreateCandidateButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          isFormInvalid={false}
+          handleCreateProposal={h2}
+        />
+      </>,
+    );
+    const btns = container.querySelectorAll('button');
+    fireEvent.click(btns[0]);
+    fireEvent.click(btns[1]);
+    expect(h1).toHaveBeenCalledTimes(1);
+    expect(h2).toHaveBeenCalledTimes(1);
+  });
+
+  it('isLoading=true + hasActive=true は spinner + disabled 両立', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={true}
+        hasActiveOrPendingProposal={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+    expect(container.querySelector('button')?.disabled).toBe(true);
+  });
+
+  it('isFormInvalid=false + isLoading=false で button text 残る', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.textContent).toContain('Create proposal candidate');
+  });
 });

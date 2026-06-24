@@ -261,4 +261,43 @@ describe('StreamWithdrawModal', () => {
     fireEvent.change(input, { target: { value: '3' } });
     expect(input).not.toBeNull();
   });
+
+  it('shows next-btn (Withdraw button) when shown', () => {
+    const { container } = render(<StreamWithdrawModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="next-btn"]')).not.toBeNull();
+  });
+
+  it('shows prev-btn (Cancel button) when shown', () => {
+    const { container } = render(<StreamWithdrawModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="prev-btn"]')).not.toBeNull();
+  });
+
+  it('rerender from show=true to show=false hides modal', () => {
+    const { container, rerender } = render(<StreamWithdrawModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+    rerender(<StreamWithdrawModal {...baseProps} show={false} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
+  });
+
+  it('different streamAddress prop renders without crash', () => {
+    expect(() =>
+      render(<StreamWithdrawModal {...baseProps} streamAddress={'0xANOTHER' as `0x${string}`} />),
+    ).not.toThrow();
+  });
+
+  it('renders modal-title h1 element', () => {
+    const { container } = render(<StreamWithdrawModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="modal-title"]')).not.toBeNull();
+  });
+
+  it('modal contains 1 numeric input', () => {
+    const { container } = render(<StreamWithdrawModal {...baseProps} />);
+    expect(container.querySelectorAll('[data-testid="brand-numeric-entry"]').length).toBe(1);
+  });
+
+  it('zero withdrawableBalance still renders modal', () => {
+    hookState.withdrawableBalance = 0n;
+    const { container } = render(<StreamWithdrawModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+  });
 });
