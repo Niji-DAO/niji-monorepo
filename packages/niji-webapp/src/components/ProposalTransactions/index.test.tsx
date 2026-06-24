@@ -341,4 +341,68 @@ describe('ProposalTransactions', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 10 ProposalTransactions instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <ProposalTransactions
+              key={i}
+              proposalTransactions={[makeTx('f()', '0x')] as never}
+              onRemoveProposalTransaction={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders with onRemoveProposalTransaction handler', () => {
+    const handler = vi.fn();
+    const { container } = render(
+      <ProposalTransactions
+        proposalTransactions={[makeTx('a()', '0x')] as never}
+        onRemoveProposalTransaction={handler}
+      />,
+    );
+    expect(container.querySelectorAll('button').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders with isProposalUpdate=true', () => {
+    expect(() =>
+      render(
+        <ProposalTransactions
+          proposalTransactions={[makeTx('a()', '0x')] as never}
+          onRemoveProposalTransaction={() => {}}
+          isProposalUpdate={true}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders consecutive 5 times without crash', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        render(
+          <ProposalTransactions
+            proposalTransactions={[] as never}
+            onRemoveProposalTransaction={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('renders with className prop', () => {
+    expect(() =>
+      render(
+        <ProposalTransactions
+          className="custom-cls"
+          proposalTransactions={[] as never}
+          onRemoveProposalTransaction={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });

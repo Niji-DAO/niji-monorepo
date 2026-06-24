@@ -418,4 +418,42 @@ describe('Proposals', () => {
       expect(() => wrap(<Proposals proposals={[]} nounsRequired={i} />)).not.toThrow();
     }
   });
+
+  it('renders 10 instances each independently', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <Proposals key={i} proposals={[]} nounsRequired={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders with nounsRequired=Number.MAX_SAFE_INTEGER', () => {
+    expect(() =>
+      wrap(<Proposals proposals={[]} nounsRequired={Number.MAX_SAFE_INTEGER} />),
+    ).not.toThrow();
+  });
+
+  it('renders with negative nounsRequired', () => {
+    expect(() => wrap(<Proposals proposals={[]} nounsRequired={-1} />)).not.toThrow();
+  });
+
+  it('renders 5 consecutive same input', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() => wrap(<Proposals proposals={[]} nounsRequired={2} />)).not.toThrow();
+    }
+  });
+
+  it('renders Proposals within outer div parent', () => {
+    expect(() =>
+      wrap(
+        <div data-testid="parent">
+          <Proposals proposals={[]} nounsRequired={2} />
+        </div>,
+      ),
+    ).not.toThrow();
+  });
 });
