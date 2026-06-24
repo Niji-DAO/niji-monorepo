@@ -201,4 +201,38 @@ describe('BidHistoryModalRow', () => {
     const { container } = render(<BidHistoryModalRow bid={bid} index={1} />);
     expect(container.querySelector('a')?.getAttribute('rel')).toContain('noreferrer');
   });
+
+  it('avatar img alt is the sender address', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    const avatar = container.querySelector(`img[alt="${bid.sender}"]`);
+    expect(avatar).not.toBeNull();
+  });
+
+  it('blocklist ENS suppresses ENS display', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('blocked.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(true);
+    const { container } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    expect(container.textContent).not.toContain('blocked');
+  });
+
+  it('large index (100) hides trophy', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(<BidHistoryModalRow bid={bid} index={100} />);
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('rerender from index=0 to 5 removes trophy', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container, rerender } = render(<BidHistoryModalRow bid={bid} index={0} />);
+    expect(container.querySelectorAll('img').length).toBe(2);
+    rerender(<BidHistoryModalRow bid={bid} index={5} />);
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('href domain matches etherscan.io', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    expect(container.querySelector('a')?.getAttribute('href')).toContain('etherscan.io');
+  });
 });

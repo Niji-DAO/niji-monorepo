@@ -217,4 +217,41 @@ describe('BidHistoryItem Component', () => {
     render(<BidHistoryItem bid={newHash} classes={mockClasses} />);
     expect(screen.getByRole('link').getAttribute('href')).toBe('https://etherscan.io/tx/0xNEWHASH');
   });
+
+  it('isCool=false sets warm class only (not cool)', () => {
+    render(<BidHistoryItem bid={mockBid} classes={mockClasses} isCool={false} />);
+    const item = screen.getByRole('listitem');
+    expect(item.className).toContain('bidRowWarm');
+    expect(item.className).not.toContain('bidRowCool');
+  });
+
+  it('mobile view (innerWidth=800) renders ShortAddress without avatar', () => {
+    window.innerWidth = 800;
+    render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    expect(screen.getByTestId('short-address')).not.toHaveTextContent('(with avatar)');
+    window.innerWidth = 1200;
+  });
+
+  it('zero bid value (0n) renders Amount: 0', () => {
+    const zero = { ...mockBid, value: 0n };
+    render(<BidHistoryItem bid={zero} classes={mockClasses} />);
+    expect(screen.getByTestId('truncated-amount')).toHaveTextContent('Amount: 0');
+  });
+
+  it('rerender preserves listitem role', () => {
+    const { rerender } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    expect(screen.getByRole('listitem')).toBeInTheDocument();
+    rerender(<BidHistoryItem bid={{ ...mockBid, value: 999n }} classes={mockClasses} />);
+    expect(screen.getByRole('listitem')).toBeInTheDocument();
+  });
+
+  it('multiple BidHistoryItem render distinct items', () => {
+    const { container } = render(
+      <>
+        <BidHistoryItem bid={mockBid} classes={mockClasses} />
+        <BidHistoryItem bid={{ ...mockBid, transactionHash: '0x999' }} classes={mockClasses} />
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(2);
+  });
 });

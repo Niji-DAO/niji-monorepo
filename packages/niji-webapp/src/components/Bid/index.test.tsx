@@ -295,4 +295,48 @@ describe('Bid', () => {
       render(<Bid auction={makeAuction({ nounId: 999n }) as never} auctionEnded={false} />),
     ).not.toThrow();
   });
+
+  it('large amount auction renders without crash', () => {
+    expect(() =>
+      render(
+        <Bid
+          auction={makeAuction({ amount: 999_999_999_999_999_999n }) as never}
+          auctionEnded={false}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender from auction.amount change preserves input', () => {
+    const { container, rerender } = render(
+      <Bid auction={makeAuction() as never} auctionEnded={false} />,
+    );
+    expect(container.querySelector('input')).not.toBeNull();
+    rerender(
+      <Bid
+        auction={makeAuction({ amount: 5_000_000_000_000_000_000n }) as never}
+        auctionEnded={false}
+      />,
+    );
+    expect(container.querySelector('input')).not.toBeNull();
+  });
+
+  it('settled=true auction renders without crash', () => {
+    expect(() =>
+      render(<Bid auction={makeAuction({ settled: true }) as never} auctionEnded={true} />),
+    ).not.toThrow();
+  });
+
+  it('input is empty initially', () => {
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    expect(input.value).toBe('');
+  });
+
+  it('decimal 0.01 input accepted', () => {
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: '0.01' } });
+    expect(input.value).toBe('0.01');
+  });
 });

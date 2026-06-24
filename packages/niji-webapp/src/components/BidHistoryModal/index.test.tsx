@@ -233,4 +233,45 @@ describe('BidHistoryModal', () => {
         ?.textContent,
     ).toBe('100');
   });
+
+  it('renders ul/ol container for bid rows', () => {
+    useAuctionBidsMock.mockReturnValue([{ transactionHash: '0x1' }]);
+    render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    const overlay = document.getElementById('overlay-root');
+    expect(overlay?.querySelectorAll('li').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('50 bids render 50 rows', () => {
+    const bids = Array.from({ length: 50 }, (_, i) => ({ transactionHash: `0x${i}` }));
+    useAuctionBidsMock.mockReturnValue(bids);
+    render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelectorAll('[data-testid="row"]').length,
+    ).toBe(50);
+  });
+
+  it('Backdrop and overlay both render concurrently', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(document.getElementById('backdrop-root')?.children.length).toBe(1);
+    expect((document.getElementById('overlay-root')?.children.length ?? 0) >= 1).toBe(true);
+  });
+
+  it('Different auction nounId 999n renders without crash', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    expect(() =>
+      render(<BidHistoryModal auction={{ ...auction, nounId: 999n }} onDismiss={() => {}} />),
+    ).not.toThrow();
+  });
+
+  it('rerender from null-state to with-bids replaces null text', () => {
+    useAuctionBidsMock.mockReturnValueOnce([]);
+    const { rerender } = render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.textContent).toContain('Bids will appear here');
+    useAuctionBidsMock.mockReturnValue([{ transactionHash: '0xnew' }]);
+    rerender(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.textContent).not.toContain(
+      'Bids will appear here',
+    );
+  });
 });
