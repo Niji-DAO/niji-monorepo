@@ -117,4 +117,44 @@ describe('ProposalStatus', () => {
     expect(cls).toContain('b');
     expect(cls).toContain('c');
   });
+
+  it('rerender from ACTIVE to EXECUTED updates text', () => {
+    const { container, rerender } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
+    expect(container.textContent).toContain('Active');
+    rerender(<ProposalStatus status={ProposalState.EXECUTED} />);
+    expect(container.textContent).toContain('Executed');
+  });
+
+  it('rerender from ACTIVE to EXECUTED updates class', () => {
+    const { container, rerender } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
+    expect(container.querySelector('div')?.className).toMatch(/primary/i);
+    rerender(<ProposalStatus status={ProposalState.EXECUTED} />);
+    expect(container.querySelector('div')?.className).toMatch(/success/i);
+  });
+
+  it('empty className still has default state class', () => {
+    const { container } = render(<ProposalStatus status={ProposalState.ACTIVE} className="" />);
+    expect(container.querySelector('div')?.className).toMatch(/primary/i);
+  });
+
+  it('multiple instances render distinct status texts', () => {
+    const { container } = render(
+      <>
+        <ProposalStatus status={ProposalState.ACTIVE} />
+        <ProposalStatus status={ProposalState.EXECUTED} />
+      </>,
+    );
+    expect(container.textContent).toContain('Active');
+    expect(container.textContent).toContain('Executed');
+  });
+
+  it('CANCELLED text contains exactly "Canceled"', () => {
+    const { container } = render(<ProposalStatus status={ProposalState.CANCELLED} />);
+    expect(container.textContent?.trim()).toBe('Canceled');
+  });
+
+  it('UPDATABLE text contains exactly "Updatable"', () => {
+    const { container } = render(<ProposalStatus status={ProposalState.UPDATABLE} />);
+    expect(container.textContent?.trim()).toBe('Updatable');
+  });
 });
