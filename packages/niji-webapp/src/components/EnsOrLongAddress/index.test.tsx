@@ -329,4 +329,53 @@ describe('EnsOrLongAddress', () => {
     rerender(<EnsOrLongAddress address={addr2} />);
     expect(container.textContent).toBe(addr2);
   });
+
+  it('renders 30 instances each independently', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('alice.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(
+      <>
+        {Array.from({ length: 30 }, (_, i) => (
+          <EnsOrLongAddress key={i} address={ADDR} />
+        ))}
+      </>,
+    );
+    expect(container.textContent).toBe('alice.eth'.repeat(30));
+  });
+
+  it('handles 200 char long ENS name', () => {
+    const longName = 'x'.repeat(200) + '.eth';
+    vi.mocked(useReverseENSLookUp).mockReturnValue(longName);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(longName);
+  });
+
+  it('rerender ENS from defined to undefined fallback to address', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValueOnce('alice.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container, rerender } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('alice.eth');
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    rerender(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(ADDR);
+  });
+
+  it('rerender containsBlockedText from false to true falls back to address', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('name.eth');
+    vi.mocked(containsBlockedText).mockReturnValueOnce(false);
+    const { container, rerender } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('name.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(true);
+    rerender(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(ADDR);
+  });
+
+  it('handles 100 consecutive renders without crash', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('alice.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    for (let i = 0; i < 100; i++) {
+      expect(() => render(<EnsOrLongAddress address={ADDR} />)).not.toThrow();
+    }
+  });
 });
