@@ -218,4 +218,44 @@ describe('StartOrEndTime', () => {
     const { container } = render(<StartOrEndTime startTime={past} endTime={evenMorePast} />);
     expect(container.textContent).toContain('ended');
   });
+
+  it('renders 5 instances each without crash', () => {
+    const now = Math.floor(Date.now() / 1000);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <StartOrEndTime key={i} startTime={now + i * 100} endTime={now + i * 100 + 3600} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender from starting to ending state', () => {
+    const now = Math.floor(Date.now() / 1000);
+    const { container, rerender } = render(
+      <StartOrEndTime startTime={now + 3600} endTime={now + 7200} />,
+    );
+    expect(container.textContent).toContain('starts');
+    rerender(<StartOrEndTime startTime={now - 3600} endTime={now + 3600} />);
+    expect(container.textContent).toContain('ends');
+  });
+
+  it('handles startTime=0 (epoch) + endTime in future', () => {
+    expect(() =>
+      render(<StartOrEndTime startTime={0} endTime={Math.floor(Date.now() / 1000) + 3600} />),
+    ).not.toThrow();
+  });
+
+  it('handles very large endTime (year 2100)', () => {
+    const now = Math.floor(Date.now() / 1000);
+    expect(() => render(<StartOrEndTime startTime={now} endTime={4102444800} />)).not.toThrow();
+  });
+
+  it('handles negative startTime (pre-epoch) without crash', () => {
+    expect(() =>
+      render(<StartOrEndTime startTime={-1000} endTime={Math.floor(Date.now() / 1000) + 3600} />),
+    ).not.toThrow();
+  });
 });
