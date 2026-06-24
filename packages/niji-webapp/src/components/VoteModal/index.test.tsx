@@ -224,4 +224,30 @@ describe('VoteModal', () => {
     expect(container.textContent).toContain('There was an error voting');
     expect(container.textContent).toContain('rpc dead');
   });
+
+  it('show=false hides modal completely', () => {
+    const { container } = render(<VoteModal {...baseProps} show={false} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
+  });
+
+  it('rerender from show=true to show=false hides modal', () => {
+    const { container, rerender } = render(<VoteModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+    rerender(<VoteModal {...baseProps} show={false} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
+  });
+
+  it('isObjectionPeriod=true renders without crash', () => {
+    expect(() => render(<VoteModal {...baseProps} isObjectionPeriod={true} />)).not.toThrow();
+  });
+
+  it('availableVotes=1 renders singular "Niji" (no plural s)', () => {
+    const { container } = render(<VoteModal {...baseProps} availableVotes={1} />);
+    expect(container.textContent).toContain('Voting with');
+  });
+
+  it('proposalId=0 still renders modal title', () => {
+    const { container } = render(<VoteModal {...baseProps} proposalId="0" />);
+    expect(container.textContent).toContain('Vote on Prop 0');
+  });
 });

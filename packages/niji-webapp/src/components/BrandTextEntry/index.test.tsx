@@ -122,4 +122,41 @@ describe('BrandTextEntry', () => {
     const { container } = render(<BrandTextEntry onChange={() => {}} value="あいうえお" />);
     expect(container.querySelector('input')?.value).toBe('あいうえお');
   });
+
+  it('rerender from invalid=false to true updates class', () => {
+    const { container, rerender } = render(
+      <BrandTextEntry onChange={() => {}} isInvalid={false} />,
+    );
+    expect(container.querySelector('input')?.className).not.toMatch(/invalid/i);
+    rerender(<BrandTextEntry onChange={() => {}} isInvalid={true} />);
+    expect(container.querySelector('input')?.className).toMatch(/invalid/i);
+  });
+
+  it('empty value renders empty input', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} value="" />);
+    expect(container.querySelector('input')?.value).toBe('');
+  });
+
+  it('type="search" forwards correctly', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} type="search" />);
+    expect(container.querySelector('input')?.getAttribute('type')).toBe('search');
+  });
+
+  it('placeholder not forwarded does not set placeholder attribute', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} />);
+    expect(container.querySelector('input')?.getAttribute('placeholder')).toBeNull();
+  });
+
+  it('5 instances render 5 inputs', () => {
+    const { container } = render(
+      <>
+        <BrandTextEntry onChange={() => {}} value="1" />
+        <BrandTextEntry onChange={() => {}} value="2" />
+        <BrandTextEntry onChange={() => {}} value="3" />
+        <BrandTextEntry onChange={() => {}} value="4" />
+        <BrandTextEntry onChange={() => {}} value="5" />
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(5);
+  });
 });
