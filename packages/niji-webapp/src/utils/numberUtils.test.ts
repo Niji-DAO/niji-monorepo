@@ -56,4 +56,24 @@ describe('countDecimals', () => {
   it('handles MAX_SAFE_INTEGER as 0 decimals', () => {
     expect(countDecimals(Number.MAX_SAFE_INTEGER)).toBe(0);
   });
+
+  it('handles Infinity (Math.floor(Infinity) === Infinity → 0)', () => {
+    expect(countDecimals(Infinity)).toBe(0);
+  });
+
+  it('handles -Infinity', () => {
+    expect(countDecimals(-Infinity)).toBe(0);
+  });
+
+  it('handles floating point precision artifact (0.1 + 0.2 = 0.30000000000000004)', () => {
+    expect(countDecimals(0.1 + 0.2)).toBe(17);
+  });
+
+  it('handles 1e-3 scientific notation as 0.001 (3 decimals)', () => {
+    expect(countDecimals(1e-3)).toBe(3);
+  });
+
+  it('handles negative zero (-0) as integer (0 decimals)', () => {
+    expect(countDecimals(-0)).toBe(0);
+  });
 });
