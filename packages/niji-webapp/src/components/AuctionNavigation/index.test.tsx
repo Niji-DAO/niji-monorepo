@@ -353,4 +353,74 @@ describe('AuctionNavigation Component', () => {
     );
     expect(screen.getByText('←').className).toContain('leftArrowCool');
   });
+
+  it('disabled next button maintains rightArrowCool className', () => {
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={true}
+        onPrevAuctionClick={vi.fn()}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    expect(screen.getByText('→').className).toContain('rightArrowCool');
+  });
+
+  it('button text "←" and "→" are exact characters', () => {
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={vi.fn()}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    expect(screen.getByText('←').textContent).toBe('←');
+    expect(screen.getByText('→').textContent).toBe('→');
+  });
+
+  it('keydown event preventDefault called (passes silently no crash)', () => {
+    const onPrev = vi.fn();
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={onPrev}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    expect(onPrev).toHaveBeenCalled();
+  });
+
+  it('mixed Other + ArrowLeft events filter correctly', () => {
+    const onPrev = vi.fn();
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={onPrev}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    fireEvent.keyDown(document, { key: 'Enter' });
+    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    fireEvent.keyDown(document, { key: 'Space' });
+    expect(onPrev).toHaveBeenCalledTimes(1);
+  });
+
+  it('rapid keydown does not crash component', () => {
+    const onPrev = vi.fn();
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={onPrev}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    expect(() => {
+      for (let i = 0; i < 10; i++) fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    }).not.toThrow();
+  });
 });

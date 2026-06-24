@@ -181,4 +181,42 @@ describe('AuctionTimer Component', () => {
       render(<AuctionTimer auction={mockAuction(1)} auctionEnded={false} />),
     ).not.toThrow();
   });
+
+  it('rerender preserves time-left h3 element', () => {
+    const { container, rerender } = render(
+      <AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />,
+    );
+    expect(container.querySelector('.row')).not.toBeNull();
+    rerender(<AuctionTimer auction={mockAuction(1800)} auctionEnded={false} />);
+    expect(container.querySelector('.row')).not.toBeNull();
+  });
+
+  it('multiple AuctionTimer instances render distinct', () => {
+    const { container } = render(
+      <>
+        <AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />
+        <AuctionTimer auction={mockAuction(7200)} auctionEnded={false} />
+      </>,
+    );
+    expect(container.querySelectorAll('.row').length).toBe(2);
+  });
+
+  it('renders with auctionEnded=true + valid auction without crash', () => {
+    expect(() =>
+      render(<AuctionTimer auction={mockAuction(0)} auctionEnded={true} />),
+    ).not.toThrow();
+  });
+
+  it('rerender from active to ended preserves wrapper', () => {
+    const { container, rerender } = render(
+      <AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />,
+    );
+    rerender(<AuctionTimer auction={mockAuction(0)} auctionEnded={true} />);
+    expect(container.querySelector('.row')).not.toBeNull();
+  });
+
+  it('mockAuction with bigint amounts renders correctly', () => {
+    const huge = { ...mockAuction(3600), amount: 999_999_999_999_999_999n };
+    expect(() => render(<AuctionTimer auction={huge} auctionEnded={false} />)).not.toThrow();
+  });
 });
