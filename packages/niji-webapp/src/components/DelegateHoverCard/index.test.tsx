@@ -203,4 +203,92 @@ describe('DelegateHoverCard', () => {
       render(<DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1000000n} />),
     ).not.toThrow();
   });
+
+  it('rerender from loading to data shows stacked + short', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValueOnce({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    const { container, rerender } = render(
+      <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+    );
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    rerender(<DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />);
+    expect(container.querySelector('[data-testid="short"]')).not.toBeNull();
+  });
+
+  it('rerender from data to error shows error msg', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValueOnce({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container, rerender } = render(
+      <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+    );
+    expect(container.textContent).not.toContain('Error');
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: new Error('boom'),
+    });
+    rerender(<DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />);
+    expect(container.textContent).toContain('Error');
+  });
+
+  it('error text matches exact "Error fetching Vote info"', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: new Error('rpc'),
+    });
+    const { container } = render(
+      <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+    );
+    expect(container.textContent).toBe('Error fetching Vote info');
+  });
+
+  it('loading=true takes precedence over error', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: true,
+      error: new Error('boom'),
+    });
+    const { container } = render(
+      <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+    );
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+    expect(container.textContent).not.toContain('Error');
+  });
+
+  it('renders stack-0 when delegates have empty nijiRepresented (data branch may differ)', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [] }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(
+      <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+    );
+    expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-0');
+  });
+
+  it('20 nijis renders correctly (large data set)', () => {
+    const nijiList = Array.from({ length: 20 }, (_, i) => ({ id: String(i + 1) }));
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: nijiList }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(
+      <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+    );
+    expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-20');
+  });
 });

@@ -177,4 +177,79 @@ describe('ByLineHoverCard', () => {
     const { container } = render(<ByLineHoverCard proposerAddress="0xB" />);
     expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-2');
   });
+
+  it('rerender from loading to data shows stacked', () => {
+    useSubgraphQueryMock.mockReturnValueOnce({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    const { container, rerender } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    rerender(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelector('[data-testid="stacked"]')).not.toBeNull();
+  });
+
+  it('rerender from data to error shows error msg', () => {
+    useSubgraphQueryMock.mockReturnValueOnce({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container, rerender } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.textContent).not.toContain('Error');
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: new Error('rpc'),
+    });
+    rerender(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.textContent).toContain('Error');
+  });
+
+  it('renders only 1 stacked element regardless of delegate count', () => {
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }, { id: '2' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelectorAll('[data-testid="stacked"]').length).toBe(1);
+  });
+
+  it('error msg in exact text "Error fetching Vote info"', () => {
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: new Error('rpc'),
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.textContent).toBe('Error fetching Vote info');
+  });
+
+  it('stack-0 not rendered when delegates empty (spinner branch)', () => {
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelector('[data-testid="stacked"]')).toBeNull();
+  });
+
+  it('large 50 nijis render in stacked', () => {
+    const nijiList = Array.from({ length: 50 }, (_, i) => ({ id: String(i + 1) }));
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: nijiList }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-50');
+  });
 });
