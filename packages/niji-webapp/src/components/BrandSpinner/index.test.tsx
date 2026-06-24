@@ -289,4 +289,49 @@ describe('BrandSpinner', () => {
     const { container } = render(<BrandSpinner />);
     expect(container.querySelector('svg')?.getAttribute('fill')).toBe('none');
   });
+
+  it('renders 100 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(100);
+  });
+
+  it('all rendered svgs share same outerHTML across many', () => {
+    const { container: c1 } = render(<BrandSpinner />);
+    const { container: c2 } = render(<BrandSpinner />);
+    const { container: c3 } = render(<BrandSpinner />);
+    const html1 = c1.querySelector('svg')?.outerHTML;
+    expect(c2.querySelector('svg')?.outerHTML).toBe(html1);
+    expect(c3.querySelector('svg')?.outerHTML).toBe(html1);
+  });
+
+  it('renders 50 times consecutively without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => render(<BrandSpinner />)).not.toThrow();
+    }
+  });
+
+  it('renders BrandSpinner within outer div parent', () => {
+    expect(() =>
+      render(
+        <div data-testid="parent">
+          <BrandSpinner />
+        </div>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves svg dimensions', () => {
+    const { container, rerender } = render(<BrandSpinner />);
+    const w = container.querySelector('svg')?.getAttribute('width');
+    for (let i = 0; i < 30; i++) {
+      rerender(<BrandSpinner />);
+      expect(container.querySelector('svg')?.getAttribute('width')).toBe(w);
+    }
+  });
 });

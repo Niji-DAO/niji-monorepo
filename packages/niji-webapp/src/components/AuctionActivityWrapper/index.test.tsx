@@ -317,4 +317,39 @@ describe('AuctionActivityWrapper', () => {
     rerender(<AuctionActivityWrapper>b</AuctionActivityWrapper>);
     expect(container.querySelector('div')?.className).toContain('max-lg:mx-4');
   });
+
+  it('renders 100 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <AuctionActivityWrapper key={i}>{`item-${i}`}</AuctionActivityWrapper>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(100);
+  });
+
+  it('rerender 20 times preserves className', () => {
+    const { container, rerender } = render(<AuctionActivityWrapper>a</AuctionActivityWrapper>);
+    for (let i = 0; i < 20; i++) {
+      rerender(<AuctionActivityWrapper>{`item-${i}`}</AuctionActivityWrapper>);
+      expect(container.querySelector('div')?.className).toContain('max-lg:mx-4');
+    }
+  });
+
+  it('renders 10000 char long string', () => {
+    const longStr = 'x'.repeat(10000);
+    const { container } = render(<AuctionActivityWrapper>{longStr}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe(longStr);
+  });
+
+  it('handles emoji content', () => {
+    const { container } = render(<AuctionActivityWrapper>🎉🎊🎁</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe('🎉🎊🎁');
+  });
+
+  it('handles HTML-escaped special chars', () => {
+    const { container } = render(<AuctionActivityWrapper>{'<>&"\''}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe('<>&"\'');
+  });
 });

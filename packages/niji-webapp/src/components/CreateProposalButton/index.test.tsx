@@ -655,4 +655,85 @@ describe('CreateProposalButton', () => {
     );
     expect(container.querySelectorAll('button').length).toBe(1);
   });
+
+  it('renders 30 instances each independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 30 }, (_, i) => (
+          <CreateProposalButton
+            key={i}
+            isLoading={false}
+            hasActiveOrPendingProposal={false}
+            hasEnoughVote={true}
+            isFormInvalid={false}
+            handleCreateProposal={() => {}}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(30);
+  });
+
+  it('rapid 100 clicks invoke handler 100 times', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 100; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(100);
+  });
+
+  it('rerender 20 times preserves button + text', () => {
+    const { container, rerender } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    for (let i = 0; i < 20; i++) {
+      rerender(
+        <CreateProposalButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          hasEnoughVote={true}
+          isFormInvalid={false}
+          handleCreateProposal={() => {}}
+        />,
+      );
+      expect(container.textContent).toContain('Create Proposal');
+    }
+  });
+
+  it('handles isLoading state preservation across rerenders', () => {
+    const { container, rerender } = render(
+      <CreateProposalButton
+        isLoading={true}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+    rerender(
+      <CreateProposalButton
+        isLoading={true}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+  });
 });
