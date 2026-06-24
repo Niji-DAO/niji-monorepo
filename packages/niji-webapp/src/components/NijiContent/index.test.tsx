@@ -436,4 +436,67 @@ describe('NijiContent', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders multiple consecutive rerenders without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { rerender } = render(
+      <MemoryRouter>
+        <NijiContent nounId={1n} auctionId={1n} isCool={false} />
+      </MemoryRouter>,
+    );
+    for (let i = 2; i < 7; i++) {
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <NijiContent nounId={BigInt(i)} auctionId={BigInt(i)} isCool={false} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('renders 10 instances independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <MemoryRouter>
+        {Array.from({ length: 10 }, (_, i) => (
+          <NijiContent key={i} nounId={BigInt(i)} auctionId={BigInt(i)} isCool={false} />
+        ))}
+      </MemoryRouter>,
+    );
+    expect(container.querySelectorAll('[data-testid="niji-title"]').length).toBe(10);
+  });
+
+  it('renders without crash for very large nounId (1 billion)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent nounId={1000000000n} auctionId={1n} isCool={false} />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash for nounId !== auctionId', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent nounId={1n} auctionId={999n} isCool={false} />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('isCool=true + useAtomValue=true both true renders', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent nounId={1n} auctionId={1n} isCool={true} />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
 });
