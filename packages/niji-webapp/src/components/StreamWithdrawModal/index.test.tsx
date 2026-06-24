@@ -300,4 +300,36 @@ describe('StreamWithdrawModal', () => {
     const { container } = render(<StreamWithdrawModal {...baseProps} />);
     expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
   });
+
+  it('large withdrawableBalance (1e10) renders without crash', () => {
+    hookState.withdrawableBalance = 10_000_000_000n;
+    expect(() => render(<StreamWithdrawModal {...baseProps} />)).not.toThrow();
+  });
+
+  it('rerender from Mining to Success transitions correctly', () => {
+    hookState.withdrawTokensState = { status: 'Mining' };
+    const { container, rerender } = render(<StreamWithdrawModal {...baseProps} />);
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(container.querySelector('[data-testid="brand-spinner"]')).not.toBeNull();
+    hookState.withdrawTokensState = { status: 'Success' };
+    rerender(<StreamWithdrawModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="brand-spinner"]')).toBeNull();
+  });
+
+  it('show=true main modal has start-or-end-time component', () => {
+    const { container } = render(<StreamWithdrawModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="start-or-end-time"]')).not.toBeNull();
+  });
+
+  it('streamAmount prop forwarded for display calculation', () => {
+    expect(() =>
+      render(<StreamWithdrawModal {...baseProps} streamAmount={50_000_000} />),
+    ).not.toThrow();
+  });
+
+  it('different tokenAddress (random) renders without crash', () => {
+    expect(() =>
+      render(<StreamWithdrawModal {...baseProps} tokenAddress={'0xABCDEF' as `0x${string}`} />),
+    ).not.toThrow();
+  });
 });

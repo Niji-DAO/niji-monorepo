@@ -143,4 +143,36 @@ describe('BrandNumericEntry', () => {
     );
     expect(container.querySelectorAll('input').length).toBe(5);
   });
+
+  it('value=99999 renders with comma separator', () => {
+    const { container } = render(<BrandNumericEntry value={99999} />);
+    expect(container.querySelector('input')?.value).toContain('99,999');
+  });
+
+  it('multiple onValueChange calls invoke callback N times', () => {
+    const onValueChange = vi.fn();
+    const { container } = render(<BrandNumericEntry onValueChange={onValueChange} />);
+    const input = container.querySelector('input');
+    if (input) {
+      fireEvent.change(input, { target: { value: '1' } });
+      fireEvent.change(input, { target: { value: '2' } });
+      fireEvent.change(input, { target: { value: '3' } });
+    }
+    expect(onValueChange).toHaveBeenCalledTimes(3);
+  });
+
+  it('empty label prop renders without crash', () => {
+    expect(() => render(<BrandNumericEntry label="" />)).not.toThrow();
+  });
+
+  it('value=0.001 renders fractional value', () => {
+    const { container } = render(<BrandNumericEntry value={0.001} />);
+    expect(container.querySelector('input')?.value).toContain('0.001');
+  });
+
+  it('placeholder + label both render correctly', () => {
+    const { container } = render(<BrandNumericEntry label="My Label" placeholder="Type here" />);
+    expect(container.querySelector('span')?.textContent).toBe('My Label');
+    expect(container.querySelector('input')?.getAttribute('placeholder')).toBe('Type here');
+  });
 });

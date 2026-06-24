@@ -222,4 +222,52 @@ describe('ProposalTransactions', () => {
     expect(container.textContent).toContain('Transaction #2');
     expect(container.textContent).toContain('Transaction #3');
   });
+
+  it('50 transactions render 50 entries', () => {
+    const txs = Array.from({ length: 50 }, (_, i) => makeTx(`fn${i}()`, '0x'));
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(50);
+  });
+
+  it('rapid 10 clicks invoke onRemove 10 times', () => {
+    const onRemove = vi.fn();
+    const txs = [makeTx('foo()', '0x')];
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={onRemove} />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 10; i++) fireEvent.click(btn);
+    expect(onRemove).toHaveBeenCalledTimes(10);
+  });
+
+  it('signature with empty string falls back to transfer()', () => {
+    const txs = [makeTx('', '0x'), makeTx('', '0x')];
+    const { container } = render(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.textContent?.match(/transfer\(\)/g)?.length).toBe(2);
+  });
+
+  it('decoded calldata field passed but may not display in textContent', () => {
+    const txs = [makeTx('transfer()', '0xcalldata', 'decoded-text')];
+    expect(() =>
+      render(
+        <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender txs from empty to 5 creates 5 buttons', () => {
+    const { container, rerender } = render(
+      <ProposalTransactions proposalTransactions={[]} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(0);
+    const txs = Array.from({ length: 5 }, (_, i) => makeTx(`fn${i}()`, '0x'));
+    rerender(
+      <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(5);
+  });
 });
