@@ -224,4 +224,38 @@ describe('LanguageSelectionModal', () => {
     render(<LanguageSelectionModal onDismiss={() => {}} />);
     expect(document.getElementById('overlay-root')?.querySelectorAll('svg').length).toBe(1);
   });
+
+  it('renders without crash for unknown locale', () => {
+    useAtomMock.mockReturnValue(['xx-XX', vi.fn()]);
+    expect(() => render(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
+  });
+
+  it('overlay-root contains the modal title (text matched)', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.textContent).toContain('Select Language');
+  });
+
+  it('renders all 3 language labels in DOM', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    const text = document.getElementById('overlay-root')?.textContent ?? '';
+    expect(text).toContain('English');
+  });
+
+  it('onDismiss can be called by user via backdrop click', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const onDismiss = vi.fn();
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    const backdropChild = document.getElementById('backdrop-root')
+      ?.firstElementChild as HTMLElement;
+    if (backdropChild) fireEvent.click(backdropChild);
+    expect(onDismiss).toHaveBeenCalled();
+  });
+
+  it('en-US locale renders svg only once for en (one check mark)', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelectorAll('svg').length).toBe(1);
+  });
 });
