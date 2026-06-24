@@ -731,4 +731,95 @@ describe('CreateCandidateButton', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <CreateCandidateButton
+              key={i}
+              isLoading={false}
+              hasActiveOrPendingProposal={false}
+              isFormInvalid={false}
+              handleCreateProposal={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves component', () => {
+    const { rerender } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <CreateCandidateButton
+            isLoading={i % 2 === 0}
+            hasActiveOrPendingProposal={false}
+            isFormInvalid={false}
+            handleCreateProposal={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('rapid 100 button click events fire handler', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 100; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(100);
+  });
+
+  it('isFormInvalid=true keeps button rendered', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={true}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('button')).not.toBeNull();
+  });
+
+  it('rapid 50 prop switching without crash', () => {
+    const { rerender } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        rerender(
+          <CreateCandidateButton
+            isLoading={false}
+            hasActiveOrPendingProposal={i % 2 === 0}
+            isFormInvalid={i % 3 === 0}
+            handleCreateProposal={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });

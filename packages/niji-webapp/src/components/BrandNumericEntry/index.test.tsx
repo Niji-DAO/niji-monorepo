@@ -329,4 +329,44 @@ describe('BrandNumericEntry', () => {
   it('renders without crash with isInvalid + label both', () => {
     expect(() => render(<BrandNumericEntry label="X" isInvalid />)).not.toThrow();
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <BrandNumericEntry key={i} label={`Amount-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves input', () => {
+    const { container, rerender } = render(<BrandNumericEntry />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<BrandNumericEntry value={i} />);
+    }
+    expect(container.querySelector('input')).not.toBeNull();
+  });
+
+  it('rapid 100 onValueChange events fire handler', () => {
+    const onValueChange = vi.fn();
+    const { container } = render(<BrandNumericEntry onValueChange={onValueChange} />);
+    const input = container.querySelector('input')!;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(input, { target: { value: String(i) } });
+    }
+    expect(onValueChange).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles unicode label', () => {
+    const { container } = render(<BrandNumericEntry label="🎉 金額" />);
+    expect(container.querySelector('span')?.textContent).toBe('🎉 金額');
+  });
+
+  it('handles very large value (1e15)', () => {
+    const { container } = render(<BrandNumericEntry value={1_000_000_000_000_000} />);
+    expect(container.querySelector('input')?.value).toContain('1,000,000,000,000,000');
+  });
 });
