@@ -132,4 +132,74 @@ describe('Tooltip', () => {
       ),
     ).not.toThrow();
   });
+
+  it('TooltipContent renders nested JSX content', () => {
+    render(
+      <TooltipProvider>
+        <Tooltip open={true}>
+          <TooltipTrigger>x</TooltipTrigger>
+          <TooltipContent>
+            <div data-testid="nested-outer">
+              <span data-testid="nested-inner">deep</span>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>,
+    );
+    expect(document.querySelector('[data-testid="nested-outer"]')).not.toBeNull();
+    expect(document.querySelector('[data-testid="nested-inner"]')?.textContent).toBe('deep');
+  });
+
+  it('TooltipTrigger inherits children when wrapping multiple elements', () => {
+    const { container } = render(
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger data-testid="trigger">
+            <span>a</span>
+            <span>b</span>
+          </TooltipTrigger>
+          <TooltipContent>tip</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>,
+    );
+    expect(container.querySelector('[data-testid="trigger"]')?.textContent).toBe('ab');
+  });
+
+  it('multiple Tooltip instances in same provider render independently', () => {
+    render(
+      <TooltipProvider>
+        <Tooltip open={true}>
+          <TooltipTrigger>a</TooltipTrigger>
+          <TooltipContent>
+            <span data-testid="x1">x1</span>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip open={true}>
+          <TooltipTrigger>b</TooltipTrigger>
+          <TooltipContent>
+            <span data-testid="x2">x2</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>,
+    );
+    expect(document.querySelector('[data-testid="x1"]')?.textContent).toBe('x1');
+    expect(document.querySelector('[data-testid="x2"]')?.textContent).toBe('x2');
+  });
+
+  it('TooltipProvider wraps without errors with no children', () => {
+    expect(() => render(<TooltipProvider>{null}</TooltipProvider>)).not.toThrow();
+  });
+
+  it('default TooltipContent has shadow tooltip styling class', () => {
+    render(
+      <TooltipProvider>
+        <Tooltip open={true}>
+          <TooltipTrigger>x</TooltipTrigger>
+          <TooltipContent data-testid="content">tip</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>,
+    );
+    const content = document.querySelector('[data-testid="content"]');
+    expect(content?.className).toContain('text-xs');
+  });
 });

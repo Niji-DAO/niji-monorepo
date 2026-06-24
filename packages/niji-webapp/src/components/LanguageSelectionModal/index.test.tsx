@@ -104,4 +104,40 @@ describe('LanguageSelectionModal', () => {
     render(<LanguageSelectionModal onDismiss={() => {}} />);
     expect(document.getElementById('overlay-root')?.querySelectorAll('h3').length).toBe(1);
   });
+
+  it('SVG check icon present when active locale is en-US', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelector('svg')).not.toBeNull();
+  });
+
+  it('SVG check icon present when active locale is zh-CN', () => {
+    useAtomMock.mockReturnValue(['zh-CN', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelector('svg')).not.toBeNull();
+  });
+
+  it('clicking same active locale still triggers setLocale + onDismiss', () => {
+    const setLocale = vi.fn();
+    const onDismiss = vi.fn();
+    useAtomMock.mockReturnValue(['en-US', setLocale]);
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    const overlay = document.getElementById('overlay-root');
+    const buttons = overlay?.querySelectorAll('div');
+    const enBtn = Array.from(buttons ?? []).find(d => d.textContent === 'English');
+    if (enBtn) fireEvent.click(enBtn);
+    expect(setLocale).toHaveBeenCalledWith('en-US');
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders modal title via overlay-root portal', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.textContent).toContain('Select Language');
+  });
+
+  it('does not crash when setLocale is undefined-like fn', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    expect(() => render(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
+  });
 });
