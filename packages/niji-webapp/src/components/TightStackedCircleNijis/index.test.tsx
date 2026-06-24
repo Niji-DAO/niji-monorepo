@@ -139,4 +139,45 @@ describe('TightStackedCircleNijis', () => {
     const { container } = render(<TightStackedCircleNijis nounIds={[-5]} />);
     expect(container.querySelector('circle')?.getAttribute('data-niji')).toBe('-5');
   });
+
+  it('exactly 2 nounIds renders 2 circles in reverse', () => {
+    const { container } = render(<TightStackedCircleNijis nounIds={[10, 20]} />);
+    const circles = container.querySelectorAll('circle');
+    expect(circles.length).toBe(2);
+    expect(circles[0].getAttribute('data-niji')).toBe('20');
+    expect(circles[1].getAttribute('data-niji')).toBe('10');
+  });
+
+  it('5 instances each render with own svg', () => {
+    const { container } = render(
+      <>
+        <TightStackedCircleNijis nounIds={[1]} />
+        <TightStackedCircleNijis nounIds={[2]} />
+        <TightStackedCircleNijis nounIds={[3]} />
+        <TightStackedCircleNijis nounIds={[4]} />
+        <TightStackedCircleNijis nounIds={[5]} />
+      </>,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(5);
+  });
+
+  it('rerender preserves SVG dimensions across multiple updates', () => {
+    const { container, rerender } = render(<TightStackedCircleNijis nounIds={[1]} />);
+    expect(container.querySelector('svg')?.getAttribute('width')).toBe('55');
+    rerender(<TightStackedCircleNijis nounIds={[1, 2]} />);
+    expect(container.querySelector('svg')?.getAttribute('width')).toBe('55');
+    rerender(<TightStackedCircleNijis nounIds={[1, 2, 3]} />);
+    expect(container.querySelector('svg')?.getAttribute('width')).toBe('55');
+  });
+
+  it('large nounId (MAX_SAFE_INTEGER) renders as string', () => {
+    const huge = Number.MAX_SAFE_INTEGER;
+    const { container } = render(<TightStackedCircleNijis nounIds={[huge]} />);
+    expect(container.querySelector('circle')?.getAttribute('data-niji')).toBe(String(huge));
+  });
+
+  it('SVG outer element renders 1 instance per component', () => {
+    const { container } = render(<TightStackedCircleNijis nounIds={[1, 2, 3]} />);
+    expect(container.children.length).toBe(1);
+  });
 });

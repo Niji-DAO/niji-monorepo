@@ -157,4 +157,46 @@ describe('ProposalStatus', () => {
     const { container } = render(<ProposalStatus status={ProposalState.UPDATABLE} />);
     expect(container.textContent?.trim()).toBe('Updatable');
   });
+
+  it('PENDING text contains exactly "Pending"', () => {
+    const { container } = render(<ProposalStatus status={ProposalState.PENDING} />);
+    expect(container.textContent?.trim()).toBe('Pending');
+  });
+
+  it('EXPIRED text contains exactly "Expired"', () => {
+    const { container } = render(<ProposalStatus status={ProposalState.EXPIRED} />);
+    expect(container.textContent?.trim()).toBe('Expired');
+  });
+
+  it('rerender from undefined to EXECUTED switches text + class', () => {
+    const { container, rerender } = render(<ProposalStatus status={undefined} />);
+    expect(container.textContent).toContain('Undetermined');
+    rerender(<ProposalStatus status={ProposalState.EXECUTED} />);
+    expect(container.textContent).toContain('Executed');
+    expect(container.querySelector('div')?.className).toMatch(/success/i);
+  });
+
+  it('5 instances render 5 distinct statuses', () => {
+    const { container } = render(
+      <>
+        <ProposalStatus status={ProposalState.PENDING} />
+        <ProposalStatus status={ProposalState.ACTIVE} />
+        <ProposalStatus status={ProposalState.EXECUTED} />
+        <ProposalStatus status={ProposalState.DEFEATED} />
+        <ProposalStatus status={ProposalState.VETOED} />
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(5);
+  });
+
+  it('OBJECTION_PERIOD status renders without crash', () => {
+    expect(() => render(<ProposalStatus status={ProposalState.OBJECTION_PERIOD} />)).not.toThrow();
+  });
+
+  it('renders identical DOM on rerender with same status (idempotent)', () => {
+    const { container, rerender } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
+    const firstHTML = container.innerHTML;
+    rerender(<ProposalStatus status={ProposalState.ACTIVE} />);
+    expect(container.innerHTML).toBe(firstHTML);
+  });
 });
