@@ -330,4 +330,39 @@ describe('ChangeDelegatePanel', () => {
     const { container } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
     expect(container.querySelector('[data-testid="delegation-candidate-info"]')).toBeDefined();
   });
+
+  it('renders 3 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          <ChangeDelegatePanel onDismiss={vi.fn()} />
+          <ChangeDelegatePanel onDismiss={vi.fn()} />
+          <ChangeDelegatePanel onDismiss={vi.fn()} />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender does not crash with same onDismiss', () => {
+    const onDismiss = vi.fn();
+    const { rerender } = render(<ChangeDelegatePanel onDismiss={onDismiss} />);
+    expect(() => rerender(<ChangeDelegatePanel onDismiss={onDismiss} />)).not.toThrow();
+  });
+
+  it('rerender does not crash with new onDismiss', () => {
+    const { rerender } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+    expect(() => rerender(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+  });
+
+  it('renders without crash 5 times consecutively', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    }
+  });
+
+  it('account=undefined renders without crash', () => {
+    hookState.account = undefined;
+    expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    hookState.account = '0xUSER';
+  });
 });

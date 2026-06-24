@@ -200,4 +200,44 @@ describe('LegacyNoun — additional edge cases', () => {
     const { container } = render(<LegacyNoun imgPath={longPath} alt="x" />);
     expect(container.querySelector('img')?.getAttribute('src')).toBe(longPath);
   });
+
+  it('LegacyNoun renders with custom className across rerenders', () => {
+    const { container, rerender } = render(
+      <LegacyNoun imgPath="/x.png" alt="x" className="cls1" />,
+    );
+    expect(container.querySelector('img')?.className).toContain('cls1');
+    rerender(<LegacyNoun imgPath="/x.png" alt="x" className="cls2" />);
+    expect(container.querySelector('img')?.className).toContain('cls2');
+  });
+
+  it('LegacyNoun rerender wrapperClassName updates wrapper', () => {
+    const { container, rerender } = render(
+      <LegacyNoun imgPath="/x.png" alt="x" wrapperClassName="wrap1" />,
+    );
+    expect(container.querySelector('div')?.className).toContain('wrap1');
+    rerender(<LegacyNoun imgPath="/x.png" alt="x" wrapperClassName="wrap2" />);
+    expect(container.querySelector('div')?.className).toContain('wrap2');
+  });
+
+  it('LegacyNoun rerender from valid imgPath to empty', () => {
+    const { container, rerender } = render(<LegacyNoun imgPath="/x.png" alt="x" />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('/x.png');
+    rerender(<LegacyNoun imgPath="" alt="x" />);
+    expect(container.querySelector('img')?.getAttribute('src')).toMatch(/loading-skull-noun/i);
+  });
+
+  it('LegacyNoun renders for null-like alt without crash', () => {
+    expect(() => render(<LegacyNoun imgPath="/x.png" alt={undefined as never} />)).not.toThrow();
+  });
+
+  it('LegacyNoun renders 10 instances each independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <LegacyNoun key={i} imgPath={`/img${i}.png`} alt={`alt-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(10);
+  });
 });
