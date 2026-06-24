@@ -173,4 +173,39 @@ describe('MinBid', () => {
     const { container } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
     expect(container.querySelector('img')?.getAttribute('src')).toBe('noun-pointer.png');
   });
+
+  it('rapid 5 clicks invoke onClick 5 times', () => {
+    const onClick = vi.fn();
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={onClick} />);
+    const div = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 5; i++) fireEvent.click(div);
+    expect(onClick).toHaveBeenCalledTimes(5);
+  });
+
+  it('renders for large minBid (1000 ETH)', () => {
+    const { container } = render(<MinBid minBid={parseEther('1000')} onClick={() => {}} />);
+    expect(container.textContent).toContain('Ξ 1000.00');
+  });
+
+  it('rerender from 1 to 5 ETH updates amount', () => {
+    const { container, rerender } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    expect(container.textContent).toContain('Ξ 1.00');
+    rerender(<MinBid minBid={parseEther('5')} onClick={() => {}} />);
+    expect(container.textContent).toContain('Ξ 5.00');
+  });
+
+  it('renders without crash with fractional minBid (0.123)', () => {
+    expect(() => render(<MinBid minBid={parseEther('0.123')} onClick={() => {}} />)).not.toThrow();
+  });
+
+  it('renders multiple instances independently', () => {
+    const { container } = render(
+      <>
+        <MinBid minBid={parseEther('1')} onClick={() => {}} />
+        <MinBid minBid={parseEther('2')} onClick={() => {}} />
+      </>,
+    );
+    expect(container.textContent).toContain('Ξ 1.00');
+    expect(container.textContent).toContain('Ξ 2.00');
+  });
 });
