@@ -391,4 +391,85 @@ describe('CreateProposalButton', () => {
     );
     expect(container.querySelector('.spinner-border')).not.toBeNull();
   });
+
+  it('renders Create Proposal button is enabled by default', () => {
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('button')?.disabled).toBe(false);
+  });
+
+  it('renders 5 clicks invoke handler 5 times', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 5; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(5);
+  });
+
+  it('rerender from loading to non-loading toggles spinner', () => {
+    const { container, rerender } = render(
+      <CreateProposalButton
+        isLoading={true}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+    rerender(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('.spinner-border')).toBeNull();
+  });
+
+  it('renders exactly 1 button element', () => {
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(1);
+  });
+
+  it('repeated 10 clicks invoke handler 10 times', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 10; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(10);
+  });
 });

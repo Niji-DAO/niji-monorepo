@@ -350,4 +350,74 @@ describe('DelegateHoverCard', () => {
     );
     expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-1');
   });
+
+  it('renders spinner consistently while loading', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    const { container } = render(
+      <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={100n} />,
+    );
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+  });
+
+  it('renders multiple instances independently with loading state', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    const { container } = render(
+      <>
+        <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />
+        <DelegateHoverCard delegateId="delegate-0xB" proposalCreationBlock={2n} />
+      </>,
+    );
+    expect(container.querySelectorAll('.spinner-border').length).toBe(2);
+  });
+
+  it('renders without crash for very large proposalCreationBlock', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    expect(() =>
+      render(
+        <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={9007199254740991n} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender from loading to error does not crash', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValueOnce({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    const { rerender } = render(
+      <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+    );
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: false,
+      error: new Error('boom'),
+    });
+    expect(() =>
+      rerender(<DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />),
+    ).not.toThrow();
+  });
+
+  it('renders for delegateId with hex prefix variations', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    expect(() =>
+      render(<DelegateHoverCard delegateId="delegate-0xABCDEF" proposalCreationBlock={5n} />),
+    ).not.toThrow();
+  });
 });

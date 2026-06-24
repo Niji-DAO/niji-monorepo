@@ -220,4 +220,38 @@ describe('Documentation', () => {
     expect(container.querySelectorAll('section').length).toBe(1);
     expect(container.querySelectorAll('[data-testid="about-section"]').length).toBe(1);
   });
+
+  it('renders only 1 about-header instance', () => {
+    const { container } = render(<Documentation />);
+    expect(container.querySelectorAll('[data-testid="about-header"]').length).toBe(1);
+  });
+
+  it('renders only 1 art-section instance', () => {
+    const { container } = render(<Documentation />);
+    expect(container.querySelectorAll('[data-testid="art-section"]').length).toBe(1);
+  });
+
+  it('renders only 1 gov-section instance', () => {
+    const { container } = render(<Documentation />);
+    expect(container.querySelectorAll('[data-testid="gov-section"]').length).toBe(1);
+  });
+
+  it('renders without crash on rerender', () => {
+    const { rerender } = render(<Documentation />);
+    expect(() => rerender(<Documentation />)).not.toThrow();
+  });
+
+  it('renders 5 instances of Documentation independently', () => {
+    expect(() =>
+      render(
+        <>
+          <Documentation />
+          <Documentation />
+          <Documentation />
+          <Documentation />
+          <Documentation />
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });

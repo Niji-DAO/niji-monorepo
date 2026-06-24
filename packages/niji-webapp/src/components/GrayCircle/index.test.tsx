@@ -174,4 +174,47 @@ describe('GrayCircle', () => {
     rerender(<GrayCircle />);
     expect(container.querySelectorAll('img').length).toBe(1);
   });
+
+  it('renders 10 instances each with own img', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <GrayCircle key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(10);
+  });
+
+  it('rerender from delegate to non-delegate updates className', () => {
+    const { container, rerender } = render(<GrayCircle isDelegateView={true} />);
+    expect(container.querySelector('div')?.className).not.toBe('');
+    rerender(<GrayCircle />);
+    expect(container.querySelector('div')?.className).toBe('');
+  });
+
+  it('renders without crash with explicit isDelegateView=false', () => {
+    expect(() => render(<GrayCircle isDelegateView={false} />)).not.toThrow();
+  });
+
+  it('img src is consistent across renders', () => {
+    const { container: c1 } = render(<GrayCircle />);
+    const { container: c2 } = render(<GrayCircle />);
+    expect(c1.querySelector('img')?.getAttribute('src')).toBe(
+      c2.querySelector('img')?.getAttribute('src'),
+    );
+  });
+
+  it('5 mixed isDelegateView instances render independently', () => {
+    const { container } = render(
+      <>
+        <GrayCircle isDelegateView={true} />
+        <GrayCircle isDelegateView={false} />
+        <GrayCircle />
+        <GrayCircle isDelegateView={true} />
+        <GrayCircle isDelegateView={false} />
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(5);
+  });
 });
