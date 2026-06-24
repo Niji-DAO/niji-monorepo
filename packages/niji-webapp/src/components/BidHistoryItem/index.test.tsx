@@ -179,4 +179,42 @@ describe('BidHistoryItem Component', () => {
     render(<BidHistoryItem bid={diffSender} classes={mockClasses} />);
     expect(screen.getByTestId('short-address')).toHaveTextContent('0xBBB');
   });
+
+  it('item has role=listitem', () => {
+    render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    expect(screen.getByRole('listitem')).toBeInTheDocument();
+  });
+
+  it('href starts with etherscan URL pattern', () => {
+    render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    expect(screen.getByRole('link').getAttribute('href')).toContain('etherscan.io/tx/');
+  });
+
+  it('truncated-amount component renders exactly 1 time', () => {
+    const { container } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    expect(container.querySelectorAll('[data-testid="truncated-amount"]').length).toBe(1);
+  });
+
+  it('short-address component renders exactly 1 time', () => {
+    const { container } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    expect(container.querySelectorAll('[data-testid="short-address"]').length).toBe(1);
+  });
+
+  it('link-icon component renders exactly 1 time', () => {
+    const { container } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    expect(container.querySelectorAll('[data-testid="link-icon"]').length).toBe(1);
+  });
+
+  it('isCool=true sets cool class only (not warm)', () => {
+    render(<BidHistoryItem bid={mockBid} classes={mockClasses} isCool={true} />);
+    const item = screen.getByRole('listitem');
+    expect(item.className).toContain('bidRowCool');
+    expect(item.className).not.toContain('bidRowWarm');
+  });
+
+  it('different transaction hash updates href', () => {
+    const newHash = { ...mockBid, transactionHash: '0xNEWHASH' };
+    render(<BidHistoryItem bid={newHash} classes={mockClasses} />);
+    expect(screen.getByRole('link').getAttribute('href')).toBe('https://etherscan.io/tx/0xNEWHASH');
+  });
 });

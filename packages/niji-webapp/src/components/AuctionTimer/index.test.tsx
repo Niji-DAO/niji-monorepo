@@ -143,4 +143,42 @@ describe('AuctionTimer Component', () => {
     };
     expect(() => render(<AuctionTimer auction={now} auctionEnded={false} />)).not.toThrow();
   });
+
+  it('multiple click toggles do not crash', () => {
+    const { container } = render(<AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />);
+    const wrapper = container.querySelector('.row');
+    if (wrapper) {
+      for (let i = 0; i < 5; i++) fireEvent.click(wrapper);
+    }
+    expect(container.querySelector('.row')).not.toBeNull();
+  });
+
+  it('handles ended=true with large endTime past does not crash', () => {
+    const past = { ...mockAuction(-100000), endTime: 100n };
+    expect(() => render(<AuctionTimer auction={past} auctionEnded={true} />)).not.toThrow();
+  });
+
+  it('renders 1 row element in DOM', () => {
+    const { container } = render(<AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />);
+    expect(container.querySelectorAll('.row').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('non-Auction (undefined) returns null container', () => {
+    const { container } = render(
+      <AuctionTimer auction={undefined as unknown as Auction} auctionEnded={true} />,
+    );
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('renders with 30-min remaining (1800s) without crash', () => {
+    expect(() =>
+      render(<AuctionTimer auction={mockAuction(1800)} auctionEnded={false} />),
+    ).not.toThrow();
+  });
+
+  it('renders with 1-second remaining without crash', () => {
+    expect(() =>
+      render(<AuctionTimer auction={mockAuction(1)} auctionEnded={false} />),
+    ).not.toThrow();
+  });
 });

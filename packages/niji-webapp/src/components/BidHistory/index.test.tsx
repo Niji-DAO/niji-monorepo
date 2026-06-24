@@ -204,4 +204,46 @@ describe('BidHistory Component', () => {
     render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
     expect(screen.getByRole('list')).toHaveClass(mockClasses.bidCollection);
   });
+
+  it('rerender from no bids to bids shows items', () => {
+    vi.mocked(useAuctionBids).mockReturnValueOnce(undefined);
+    const { rerender } = render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    expect(screen.queryAllByTestId('bid-history-item').length).toBe(0);
+    vi.mocked(useAuctionBids).mockReturnValue([mockBids[0]]);
+    rerender(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    expect(screen.getAllByTestId('bid-history-item').length).toBe(1);
+  });
+
+  it('max > bids count renders all bids only', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(mockBids);
+    render(<BidHistory auctionId="1" max={100} classes={mockClasses} />);
+    const items = screen.getAllByTestId('bid-history-item');
+    expect(items).toHaveLength(3);
+  });
+
+  it('different auctionId renders independently', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    render(<BidHistory auctionId="999" max={10} classes={mockClasses} />);
+    expect(useAuctionBids).toHaveBeenCalledWith(999n);
+  });
+
+  it('renders no items for empty array (length 0)', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    expect(screen.queryAllByTestId('bid-history-item').length).toBe(0);
+  });
+
+  it('preserves order for already-desc bids', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(mockBids);
+    render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    const items = screen.getAllByTestId('bid-history-item');
+    expect(items[0]).toHaveTextContent('3000000000000000000');
+    expect(items[2]).toHaveTextContent('1000000000000000000');
+  });
+
+  it('list element renders with role=list', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(mockBids);
+    render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    expect(screen.getByRole('list')).toBeInTheDocument();
+  });
 });
