@@ -101,4 +101,74 @@ describe('ModalBottomButtonRow', () => {
     fireEvent.click(container.querySelectorAll('button')[1]);
     expect(onNext).toHaveBeenCalledTimes(1);
   });
+
+  it('prev button uses DELEGATE_BACK style', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="x"
+        nextBtnText="y"
+      />,
+    );
+    expect(container.querySelectorAll('button')[0]?.getAttribute('data-style')).toBe('back');
+  });
+
+  it('connects multiple clicks on prev independently', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={onPrev}
+        onNextBtnClick={() => {}}
+        prevBtnText="x"
+        nextBtnText="y"
+      />,
+    );
+    const prev = container.querySelectorAll('button')[0];
+    fireEvent.click(prev);
+    fireEvent.click(prev);
+    fireEvent.click(prev);
+    expect(onPrev).toHaveBeenCalledTimes(3);
+  });
+
+  it('connects multiple clicks on next independently', () => {
+    const onNext = vi.fn();
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={onNext}
+        prevBtnText="x"
+        nextBtnText="y"
+      />,
+    );
+    const next = container.querySelectorAll('button')[1];
+    fireEvent.click(next);
+    fireEvent.click(next);
+    expect(onNext).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders exactly 2 buttons (no extras)', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="x"
+        nextBtnText="y"
+      />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('renders long button text (200 chars)', () => {
+    const long = 'a'.repeat(200);
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText={long}
+        nextBtnText="y"
+      />,
+    );
+    expect(container.querySelectorAll('button')[0]?.textContent?.length).toBe(200);
+  });
 });
