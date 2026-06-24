@@ -367,4 +367,41 @@ describe('StreamWithdrawModal', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 5 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <StreamWithdrawModal key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders for elapsedTime=0', () => {
+    hookState.elapsedTime = 0;
+    expect(() => render(<StreamWithdrawModal {...baseProps} />)).not.toThrow();
+    hookState.elapsedTime = 50;
+  });
+
+  it('renders for elapsedTime=100 (complete)', () => {
+    hookState.elapsedTime = 100;
+    expect(() => render(<StreamWithdrawModal {...baseProps} />)).not.toThrow();
+    hookState.elapsedTime = 50;
+  });
+
+  it('rerender does not crash 5 times', () => {
+    const { rerender } = render(<StreamWithdrawModal {...baseProps} />);
+    for (let i = 0; i < 5; i++) {
+      expect(() => rerender(<StreamWithdrawModal {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('renders with withdrawTokensState status changes', () => {
+    hookState.withdrawTokensState = { status: 'Mining' };
+    expect(() => render(<StreamWithdrawModal {...baseProps} />)).not.toThrow();
+    hookState.withdrawTokensState = { status: 'None' };
+  });
 });

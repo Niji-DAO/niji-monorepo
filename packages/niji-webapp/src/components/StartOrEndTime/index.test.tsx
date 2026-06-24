@@ -258,4 +258,47 @@ describe('StartOrEndTime', () => {
       render(<StartOrEndTime startTime={-1000} endTime={Math.floor(Date.now() / 1000) + 3600} />),
     ).not.toThrow();
   });
+
+  it('renders 10 instances independently without crash', () => {
+    const now = Math.floor(Date.now() / 1000);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <StartOrEndTime key={i} startTime={now + i * 100} endTime={now + i * 100 + 3600} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles startTime way in the future (year 2100)', () => {
+    const year2100 = 4102444800;
+    expect(() =>
+      render(<StartOrEndTime startTime={year2100} endTime={year2100 + 3600} />),
+    ).not.toThrow();
+  });
+
+  it('handles startTime + endTime both 0 (treated as ended)', () => {
+    const { container } = render(<StartOrEndTime startTime={0} endTime={0} />);
+    expect(container.textContent).toContain('ended');
+  });
+
+  it('renders consistent text across rerenders with same input', () => {
+    const start = Math.floor(Date.now() / 1000) + 3600;
+    const end = start + 3600;
+    const { container, rerender } = render(<StartOrEndTime startTime={start} endTime={end} />);
+    const initial = container.textContent;
+    rerender(<StartOrEndTime startTime={start} endTime={end} />);
+    expect(container.textContent).toBe(initial);
+  });
+
+  it('renders 5 instances each starting in the future', () => {
+    const now = Math.floor(Date.now() / 1000);
+    for (let i = 0; i < 5; i++) {
+      const start = now + 3600 + i * 1000;
+      const { container } = render(<StartOrEndTime startTime={start} endTime={start + 3600} />);
+      expect(container.textContent).toContain('starts');
+    }
+  });
 });
