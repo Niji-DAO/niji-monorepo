@@ -142,4 +142,42 @@ describe('StreamPaymentsReviewStep', () => {
       '0xRECIPIENT',
     );
   });
+
+  it('renders exactly 1 h1 title element', () => {
+    const { container } = render(<StreamPaymentsReviewStep {...defaults} />);
+    expect(container.querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('renders exactly 2 buttons (Back + Next)', () => {
+    const { container } = render(<StreamPaymentsReviewStep {...defaults} />);
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('Back button fires onPrev repeatedly', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <StreamPaymentsReviewStep {...defaults} onPrevBtnClick={onPrev} />,
+    );
+    const backBtn = container.querySelectorAll('button')[0];
+    fireEvent.click(backBtn);
+    fireEvent.click(backBtn);
+    fireEvent.click(backBtn);
+    expect(onPrev).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders ShortAddress 1 個ぴったり', () => {
+    const { container } = render(<StreamPaymentsReviewStep {...defaults} />);
+    expect(container.querySelectorAll('[data-testid="short"]').length).toBe(1);
+  });
+
+  it('different streamStartTimestamp passes through unixToDateString', () => {
+    const state = { ...baseState, streamStartTimestamp: 1900000000 };
+    const { container } = render(<StreamPaymentsReviewStep {...defaults} state={state as never} />);
+    expect(container.textContent).toContain('date-1900000000');
+  });
+
+  it('h1 title 厳密 "Review Streaming Payment Action"', () => {
+    const { container } = render(<StreamPaymentsReviewStep {...defaults} />);
+    expect(container.querySelector('h1')?.textContent).toBe('Review Streaming Payment Action');
+  });
 });
