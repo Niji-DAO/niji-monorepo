@@ -180,4 +180,38 @@ describe('TightStackedCircleNijis', () => {
     const { container } = render(<TightStackedCircleNijis nounIds={[1, 2, 3]} />);
     expect(container.children.length).toBe(1);
   });
+
+  it('handles 100 IDs caps at 3', () => {
+    const ids = Array.from({ length: 100 }, (_, i) => i + 1);
+    const { container } = render(<TightStackedCircleNijis nounIds={ids} />);
+    expect(container.querySelectorAll('circle').length).toBe(3);
+  });
+
+  it('rerender from 0 to 3 IDs adds circles', () => {
+    const { container, rerender } = render(<TightStackedCircleNijis nounIds={[]} />);
+    expect(container.querySelectorAll('circle').length).toBe(0);
+    rerender(<TightStackedCircleNijis nounIds={[1, 2, 3]} />);
+    expect(container.querySelectorAll('circle').length).toBe(3);
+  });
+
+  it('renders 5 instances independently', () => {
+    const { container } = render(
+      <>
+        <TightStackedCircleNijis nounIds={[1]} />
+        <TightStackedCircleNijis nounIds={[1, 2]} />
+        <TightStackedCircleNijis nounIds={[1, 2, 3]} />
+        <TightStackedCircleNijis nounIds={[1, 2, 3, 4]} />
+        <TightStackedCircleNijis nounIds={[]} />
+      </>,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(5);
+  });
+
+  it('renders without crash for very large nounId value', () => {
+    expect(() => render(<TightStackedCircleNijis nounIds={[9007199254740991]} />)).not.toThrow();
+  });
+
+  it('handles negative nounId values without crash', () => {
+    expect(() => render(<TightStackedCircleNijis nounIds={[-1, -2, -3]} />)).not.toThrow();
+  });
 });

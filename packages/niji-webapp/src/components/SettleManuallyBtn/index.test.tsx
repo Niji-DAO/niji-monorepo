@@ -244,4 +244,51 @@ describe('SettleManuallyBtn', () => {
     );
     expect(container.querySelectorAll('p').length).toBe(1);
   });
+
+  it('renders without crash for very old auction', () => {
+    const oldAuction: Auction = {
+      ...auction,
+      endTime: BigInt(Math.floor(Date.now() / 1000) - 100000),
+      startTime: BigInt(Math.floor(Date.now() / 1000) - 200000),
+    };
+    expect(() =>
+      render(<SettleManuallyBtn auction={oldAuction} settleAuction={vi.fn()} />),
+    ).not.toThrow();
+  });
+
+  it('renders without crash for future endTime', () => {
+    const futureAuction: Auction = {
+      ...auction,
+      endTime: BigInt(Math.floor(Date.now() / 1000) + 86400),
+    };
+    expect(() =>
+      render(<SettleManuallyBtn auction={futureAuction} settleAuction={vi.fn()} />),
+    ).not.toThrow();
+  });
+
+  it('rerender with different auction does not crash', () => {
+    const { rerender } = render(<SettleManuallyBtn auction={auction} settleAuction={vi.fn()} />);
+    const newAuction = { ...auction, nounId: 99n };
+    expect(() =>
+      rerender(<SettleManuallyBtn auction={newAuction} settleAuction={vi.fn()} />),
+    ).not.toThrow();
+  });
+
+  it('renders 3 instances each independently', () => {
+    const { container } = render(
+      <>
+        <SettleManuallyBtn auction={auction} settleAuction={vi.fn()} />
+        <SettleManuallyBtn auction={auction} settleAuction={vi.fn()} />
+        <SettleManuallyBtn auction={auction} settleAuction={vi.fn()} />
+      </>,
+    );
+    expect(container.children.length).toBe(3);
+  });
+
+  it('renders for settled=true auction', () => {
+    const settledAuction: Auction = { ...auction, settled: true };
+    expect(() =>
+      render(<SettleManuallyBtn auction={settledAuction} settleAuction={vi.fn()} />),
+    ).not.toThrow();
+  });
 });

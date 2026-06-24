@@ -305,4 +305,41 @@ describe('ProposalHeader', () => {
     hookState.availableVotes = 0;
     expect(() => wrap(<ProposalHeader {...baseProps} />)).not.toThrow();
   });
+
+  it('rerender does not crash (same MemoryRouter wrapper)', () => {
+    expect(() => {
+      wrap(<ProposalHeader {...baseProps} />);
+      wrap(<ProposalHeader {...baseProps} />);
+    }).not.toThrow();
+  });
+
+  it('renders without crash 10 times', () => {
+    for (let i = 0; i < 10; i++) {
+      expect(() => wrap(<ProposalHeader {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('renders 3 instances each independently', () => {
+    expect(() => {
+      wrap(
+        <>
+          <ProposalHeader {...baseProps} />
+          <ProposalHeader {...baseProps} />
+          <ProposalHeader {...baseProps} />
+        </>,
+      );
+    }).not.toThrow();
+  });
+
+  it('renders without crash with default baseProps', () => {
+    expect(() => wrap(<ProposalHeader {...baseProps} />)).not.toThrow();
+  });
+
+  it('renders consecutive 3 times without crash', () => {
+    expect(() => {
+      wrap(<ProposalHeader {...baseProps} />);
+      wrap(<ProposalHeader {...baseProps} />);
+      wrap(<ProposalHeader {...baseProps} />);
+    }).not.toThrow();
+  });
 });
