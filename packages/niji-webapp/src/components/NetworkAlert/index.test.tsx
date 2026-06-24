@@ -192,4 +192,41 @@ describe('NetworkAlert', () => {
     rerender(<NetworkAlert />);
     expect(switchChainMock).toHaveBeenCalledTimes(1);
   });
+
+  it('renders null when chainId matches CHAIN_ID', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 1 });
+    const { container } = render(<NetworkAlert />);
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('does not call switchChain when chainId matches CHAIN_ID', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 1 });
+    render(<NetworkAlert />);
+    expect(switchChainMock).not.toHaveBeenCalled();
+  });
+
+  it('multiple instances render null independently', () => {
+    useAccountMock.mockReturnValue({ isConnected: false, chainId: undefined });
+    const { container } = render(
+      <>
+        <NetworkAlert />
+        <NetworkAlert />
+        <NetworkAlert />
+      </>,
+    );
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('rerender when connected state changes does not crash', () => {
+    useAccountMock.mockReturnValue({ isConnected: false, chainId: undefined });
+    const { rerender } = render(<NetworkAlert />);
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 1 });
+    expect(() => rerender(<NetworkAlert />)).not.toThrow();
+  });
+
+  it('renders null for chainId=undefined', () => {
+    useAccountMock.mockReturnValue({ isConnected: false, chainId: undefined });
+    const { container } = render(<NetworkAlert />);
+    expect(container.firstChild).toBeNull();
+  });
 });
