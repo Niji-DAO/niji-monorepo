@@ -214,4 +214,94 @@ describe('CreateProposalButton', () => {
     fireEvent.click(btn);
     expect(handle).toHaveBeenCalledTimes(3);
   });
+
+  it('button is enabled by default (all good)', () => {
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('button')?.disabled).toBe(false);
+  });
+
+  it('isLoading does NOT disable button (only invalid/votes/active disables)', () => {
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={true}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('button')?.disabled).toBe(false);
+  });
+
+  it('rerender from default to isLoading shows spinner', () => {
+    const { container, rerender } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.textContent).toContain('Create Proposal');
+    rerender(
+      <CreateProposalButton
+        isLoading={true}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+  });
+
+  it('threshold = 1 → 2 votes warning', () => {
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={false}
+        proposalThreshold={1}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.textContent).toContain('2 votes to submit a proposal');
+  });
+
+  it('threshold = 100 → 101 votes warning', () => {
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={false}
+        proposalThreshold={100}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.textContent).toContain('101 votes to submit a proposal');
+  });
+
+  it('button text hidden when both isLoading=true and hasActiveOrPendingProposal=true', () => {
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={true}
+        hasActiveOrPendingProposal={true}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.textContent).not.toContain('Create Proposal');
+  });
 });
