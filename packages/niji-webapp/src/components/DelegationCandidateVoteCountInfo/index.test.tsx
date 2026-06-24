@@ -85,4 +85,49 @@ describe('DelegationCandidateVoteCountInfo', () => {
     );
     expect(container.textContent).toContain('10 Votes');
   });
+
+  it('renders text + vote count both together', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="Bob" voteCount={3} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('Bob');
+    expect(container.textContent).toContain('3');
+  });
+
+  it('isLoading=true still includes text', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="Bob" voteCount={5} isLoading={true} />,
+    );
+    expect(container.textContent).toContain('Bob');
+  });
+
+  it('renders for voteCount=1000000 (huge number)', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="X" voteCount={1000000} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('1000000');
+  });
+
+  it('handles ReactNode text with mixed content', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo
+        text={
+          <>
+            <em>First</em>
+            <strong>Second</strong>
+          </>
+        }
+        voteCount={2}
+        isLoading={false}
+      />,
+    );
+    expect(container.querySelector('em')?.textContent).toBe('First');
+    expect(container.querySelector('strong')?.textContent).toBe('Second');
+  });
+
+  it('renders without crash for voteCount=0 + isLoading=true', () => {
+    expect(() =>
+      render(<DelegationCandidateVoteCountInfo text="x" voteCount={0} isLoading={true} />),
+    ).not.toThrow();
+  });
 });

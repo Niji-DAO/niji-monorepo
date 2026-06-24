@@ -81,4 +81,28 @@ describe('VoteSignalsHeader — additional', () => {
     const { container } = render(<VoteSignalsHeader isCandidate={false} />);
     expect(container.querySelector('p')?.textContent).toContain('Nijis voters');
   });
+
+  it('header always renders h2 element regardless of isCandidate', () => {
+    const { container: c1 } = render(<VoteSignalsHeader isCandidate={true} />);
+    const { container: c2 } = render(<VoteSignalsHeader isCandidate={false} />);
+    expect(c1.querySelector('h2')).not.toBeNull();
+    expect(c2.querySelector('h2')).not.toBeNull();
+  });
+
+  it('VoteSignalsFootnote renders single p element with content', () => {
+    const { container } = render(<VoteSignalsFootnote />);
+    expect(container.querySelector('p')).not.toBeNull();
+    expect((container.querySelector('p')?.textContent ?? '').length).toBeGreaterThan(0);
+  });
+
+  it('Footnote includes governance context word', () => {
+    const { container } = render(<VoteSignalsFootnote />);
+    expect(container.textContent).toContain('Nijis');
+  });
+
+  it('isCandidate=false header text is "Pre-voting feedback" not "proposal"', () => {
+    const { container } = render(<VoteSignalsHeader isCandidate={false} />);
+    expect(container.textContent).toContain('Pre-voting feedback');
+    expect(container.textContent).not.toContain('Pre-proposal feedback');
+  });
 });
