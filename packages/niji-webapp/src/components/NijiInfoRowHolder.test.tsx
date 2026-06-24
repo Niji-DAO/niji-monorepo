@@ -134,4 +134,46 @@ describe('NijiInfoRowHolder', () => {
       expect(container.textContent).toContain('Niji Auction House');
     });
   });
+
+  it('renders anchor even when winner is auction house (with Niji Auction House label)', async () => {
+    executeMock.mockResolvedValue({ auction: { bidder: { id: '0xAUCTIONHOUSE' } } });
+    const { container } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
+    await waitFor(() => {
+      expect(container.textContent).toContain('Niji Auction House');
+    });
+    // anchor は残る (svg link icon が残るため)
+    expect(container.querySelector('a')).not.toBeNull();
+  });
+
+  it('renders only Loading text on initial render (pending state)', () => {
+    executeMock.mockReturnValue(new Promise(() => {}));
+    const { container } = render(<NijiInfoRowHolder nounId={5n} />, { wrapper: WithProviders });
+    expect(container.querySelector('a')).toBeNull();
+    expect(container.querySelector('[data-testid="short"]')).toBeNull();
+  });
+
+  it('handles auction null case (no winner key) without crash', async () => {
+    executeMock.mockResolvedValue({ auction: null });
+    const { container } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
+    await waitFor(() => expect(container.textContent).toBe(''));
+    expect(container.querySelector('a')).toBeNull();
+  });
+
+  it('renders different winner address format correctly', async () => {
+    executeMock.mockResolvedValue({ auction: { bidder: { id: '0x123456' } } });
+    const { container } = render(<NijiInfoRowHolder nounId={3n} />, { wrapper: WithProviders });
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0x1234');
+    });
+  });
+
+  it('etherscan link uses winner id verbatim in href', async () => {
+    executeMock.mockResolvedValue({ auction: { bidder: { id: '0xFOOBAR' } } });
+    const { container } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
+    await waitFor(() => {
+      expect(container.querySelector('a')?.getAttribute('href')).toBe(
+        'https://etherscan.io/address/0xFOOBAR',
+      );
+    });
+  });
 });
