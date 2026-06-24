@@ -186,4 +186,40 @@ describe('TransferFundsDetailsStep', () => {
     expect(onNext).toHaveBeenCalledTimes(1);
     expect(setState).toHaveBeenCalledTimes(1);
   });
+
+  it('title text 厳密に "Add Transfer Funds Action"', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    expect(container.querySelector('h1')?.textContent).toBe('Add Transfer Funds Action');
+  });
+
+  it('Back button fires onPrev repeatedly', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <TransferFundsDetailsStep {...defaults} onPrevBtnClick={onPrev} />,
+    );
+    const backBtn = container.querySelectorAll('button')[0];
+    fireEvent.click(backBtn);
+    fireEvent.click(backBtn);
+    fireEvent.click(backBtn);
+    expect(onPrev).toHaveBeenCalledTimes(3);
+  });
+
+  it('currency dropdown renders exactly 1 element', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('[data-testid="currency"]').length).toBe(1);
+  });
+
+  it('amount + recipient inputs render exactly 1 each', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('[data-testid="amount"]').length).toBe(1);
+    expect(container.querySelectorAll('[data-testid="recipient"]').length).toBe(1);
+  });
+
+  it('Next stays disabled when amount empty even with valid address', () => {
+    const { container } = render(<TransferFundsDetailsStep {...defaults} />);
+    fireEvent.change(container.querySelector('[data-testid="recipient"]')!, {
+      target: { value: ADDR },
+    });
+    expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(true);
+  });
 });

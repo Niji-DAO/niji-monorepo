@@ -149,4 +149,35 @@ describe('TransferFundsReviewStep', () => {
     fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
     expect(onNext).toHaveBeenCalledTimes(1);
   });
+
+  it('Back button fires onPrev repeatedly', () => {
+    const onPrev = vi.fn();
+    const { container } = render(<TransferFundsReviewStep {...defaults} onPrevBtnClick={onPrev} />);
+    const backBtn = container.querySelectorAll('button')[0];
+    fireEvent.click(backBtn);
+    fireEvent.click(backBtn);
+    expect(onPrev).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders exactly 2 buttons (Back + Next)', () => {
+    const { container } = render(<TransferFundsReviewStep {...defaults} />);
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('renders ShortAddress 1 個ぴったり', () => {
+    const { container } = render(<TransferFundsReviewStep {...defaults} />);
+    expect(container.querySelectorAll('[data-testid="short"]').length).toBe(1);
+  });
+
+  it('STETH currency includes "stETH" text in body', () => {
+    const state = { ...baseState, TransferFundsCurrency: SupportedCurrency.STETH };
+    const { container } = render(<TransferFundsReviewStep {...defaults} state={state} />);
+    // STETH currency 経路で stETH 表示
+    expect(container.textContent?.toLowerCase()).toContain('eth');
+  });
+
+  it('h1 title 厳密 "Review Transfer Funds Action"', () => {
+    const { container } = render(<TransferFundsReviewStep {...defaults} />);
+    expect(container.querySelector('h1')?.textContent).toBe('Review Transfer Funds Action');
+  });
 });

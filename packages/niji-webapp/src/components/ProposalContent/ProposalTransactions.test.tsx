@@ -85,4 +85,40 @@ describe('ProposalTransactions', () => {
     const { container } = render(<ProposalTransactions details={[]} />);
     expect(container.querySelectorAll('ol li').length).toBe(0);
   });
+
+  it('renders exactly 1 ol element regardless of details length', () => {
+    const { container } = render(<ProposalTransactions details={[simpleTx, sigTx]} />);
+    expect(container.querySelectorAll('ol').length).toBe(1);
+  });
+
+  it('renders 10 li for 10 details (large array)', () => {
+    const details = Array.from({ length: 10 }, (_, i) => ({
+      target: `0xT${i}`,
+      functionSig: '',
+      callData: `data-${i}`,
+      value: 0n,
+    })) as never;
+    const { container } = render(<ProposalTransactions details={details} />);
+    expect(container.querySelectorAll('ol li').length).toBe(10);
+  });
+
+  it('multiple targets render distinct text', () => {
+    const { container } = render(<ProposalTransactions details={[simpleTx, sigTx]} />);
+    expect(container.textContent).toContain('0xTARGET1');
+    expect(container.textContent).toContain('0xTARGET2');
+  });
+
+  it('renders 1 TokenBuyer banner for 1 tokenBuyer tx in mixed list', () => {
+    const { container } = render(
+      <ProposalTransactions details={[simpleTx, tokenBuyerTx, sigTx]} />,
+    );
+    const matches = container.textContent?.match(/automatically added/g) ?? [];
+    expect(matches.length).toBe(1);
+  });
+
+  it('renders large value (1e18 wei) in non-zero tx', () => {
+    const largeTx = { ...sigTx, value: 1_000_000_000_000_000_000n } as never;
+    const { container } = render(<ProposalTransactions details={[largeTx]} />);
+    expect(container.textContent).toContain('1000000000000000000');
+  });
 });
