@@ -301,4 +301,31 @@ describe('Auction', () => {
   it('renders for MAX_SAFE bigint id', () => {
     expect(() => wrap(<Auction auction={makeAuction(9007199254740991n)} />)).not.toThrow();
   });
+
+  it('renders without crash for negative id (-1n)', () => {
+    expect(() => wrap(<Auction auction={makeAuction(-1n)} />)).not.toThrow();
+  });
+
+  it('renders without crash for id 100n', () => {
+    expect(() => wrap(<Auction auction={makeAuction(100n)} />)).not.toThrow();
+  });
+
+  it('rerender same auction id does not crash', () => {
+    expect(() => {
+      wrap(<Auction auction={makeAuction(5n)} />);
+      wrap(<Auction auction={makeAuction(5n)} />);
+    }).not.toThrow();
+  });
+
+  it('renders 5 different auctions sequentially', () => {
+    expect(() => {
+      for (let i = 0; i < 5; i++) {
+        wrap(<Auction auction={makeAuction(BigInt(i))} />);
+      }
+    }).not.toThrow();
+  });
+
+  it('renders for id 1000n (mid range)', () => {
+    expect(() => wrap(<Auction auction={makeAuction(1000n)} />)).not.toThrow();
+  });
 });

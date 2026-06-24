@@ -198,4 +198,37 @@ describe('NavBarButton', () => {
     const div = container.firstElementChild as HTMLElement;
     expect(() => fireEvent.click(div)).not.toThrow();
   });
+
+  it('renders 20 instances each independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <NavBarButton key={i} buttonText={`btn-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(20);
+  });
+
+  it('renders 100 char long buttonText', () => {
+    const longText = 'a'.repeat(100);
+    const { container } = render(<NavBarButton buttonText={longText} />);
+    expect(container.textContent).toContain(longText);
+  });
+
+  it('rerender empty to non-empty buttonText', () => {
+    const { container, rerender } = render(<NavBarButton buttonText="" />);
+    expect(container.textContent).toBe('');
+    rerender(<NavBarButton buttonText="X" />);
+    expect(container.textContent).toContain('X');
+  });
+
+  it('renders unicode buttonText', () => {
+    const { container } = render(<NavBarButton buttonText="日本語ボタン" />);
+    expect(container.textContent).toContain('日本語ボタン');
+  });
+
+  it('NavBarButtonStyle exports COOL_INFO value', () => {
+    expect(NavBarButtonStyle.COOL_INFO).toBeDefined();
+  });
 });
