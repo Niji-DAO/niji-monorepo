@@ -454,4 +454,69 @@ describe('ByLineHoverCard', () => {
     rerender(<ByLineHoverCard proposerAddress="0xAAA" />);
     expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xAAA');
   });
+
+  it('renders 30 instances each independently', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ByLineHoverCard key={i} proposerAddress={`0x${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders consecutive 20 times without crash', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    for (let i = 0; i < 20; i++) {
+      expect(() => render(<ByLineHoverCard proposerAddress={`0x${i}`} />)).not.toThrow();
+    }
+  });
+
+  it('handles 100 nijis data', () => {
+    const nijiList = Array.from({ length: 100 }, (_, i) => ({ id: String(i + 1) }));
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: nijiList }] },
+      loading: false,
+      error: undefined,
+    });
+    const { container } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe('stack-100');
+  });
+
+  it('rerender from loading→data→error→data sequence', () => {
+    useSubgraphQueryMock.mockReturnValueOnce({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    const { rerender } = render(<ByLineHoverCard proposerAddress="0xA" />);
+    useSubgraphQueryMock.mockReturnValueOnce({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    rerender(<ByLineHoverCard proposerAddress="0xA" />);
+    useSubgraphQueryMock.mockReturnValueOnce({
+      data: undefined,
+      loading: false,
+      error: new Error('x'),
+    });
+    rerender(<ByLineHoverCard proposerAddress="0xA" />);
+    useSubgraphQueryMock.mockReturnValue({
+      data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '2' }] }] },
+      loading: false,
+      error: undefined,
+    });
+    expect(() => rerender(<ByLineHoverCard proposerAddress="0xA" />)).not.toThrow();
+  });
+
+  it('handles very long proposer address', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    expect(() =>
+      render(<ByLineHoverCard proposerAddress={'0x' + 'a'.repeat(200)} />),
+    ).not.toThrow();
+  });
 });
