@@ -248,4 +248,80 @@ describe('DynamicQuorumInfoModal', () => {
     );
     expect(container.textContent).toContain('Threshold');
   });
+
+  it('Backdrop click triggers onDismiss', () => {
+    setWindowWidth(1400);
+    const dismiss = vi.fn();
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={dismiss}
+        currentQuorum={5}
+      />,
+    );
+    const backdrop = container.querySelector('[data-testid="backdrop"]') as HTMLElement;
+    backdrop.click();
+    expect(dismiss).toHaveBeenCalled();
+  });
+
+  it('renders without crash when againstVotesAbsolute is 0', () => {
+    setWindowWidth(1400);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={0}
+        onDismiss={() => {}}
+        currentQuorum={1}
+      />,
+    );
+    expect(container.textContent).toContain('Dynamic Threshold');
+  });
+
+  it('renders without crash for very high quorum coefficient', () => {
+    setWindowWidth(1400);
+    quorumState.current = {
+      minQuorumVotesBPS: 1000,
+      maxQuorumVotesBPS: 4000,
+      quorumCoefficient: 9_999_999_999,
+    };
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={50}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.querySelector('svg')).not.toBeNull();
+  });
+
+  it('renders without crash when adjustedTotalSupply is 0', () => {
+    subgraphState.data = { proposals: [{ adjustedTotalSupply: 0 }] };
+    setWindowWidth(1400);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.textContent).toContain('Dynamic Threshold');
+  });
+
+  it('mobile view (width < 1200) renders Min and Max threshold labels in same render', () => {
+    setWindowWidth(500);
+    const { container } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={10}
+        onDismiss={() => {}}
+        currentQuorum={5}
+      />,
+    );
+    expect(container.textContent).toContain('Min Threshold');
+    expect(container.textContent).toContain('Max Threshold');
+    expect(container.textContent).toContain('Dynamic Threshold');
+  });
 });
