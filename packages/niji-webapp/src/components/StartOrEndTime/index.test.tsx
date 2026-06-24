@@ -44,4 +44,34 @@ describe('StartOrEndTime', () => {
     // start in past, end = 0 → in past too → ended
     expect(container.textContent).toContain('ended');
   });
+
+  it('handles startTime === endTime (both in future, treated as starts)', () => {
+    const ts = Math.floor(Date.now() / 1000) + 3600;
+    const { container } = render(<StartOrEndTime startTime={ts} endTime={ts} />);
+    // start = end = future、 まだ始まっていない → starts
+    expect(container.textContent).toContain('starts');
+  });
+
+  it('handles very large timestamps (year 2100)', () => {
+    const year2100 = 4102444800; // 2100-01-01 UTC
+    const { container } = render(<StartOrEndTime startTime={year2100} endTime={year2100 + 3600} />);
+    expect(container.textContent).toContain('starts');
+  });
+
+  it('handles both 0 (epoch 1970, in past)', () => {
+    const { container } = render(<StartOrEndTime startTime={0} endTime={0} />);
+    expect(container.textContent).toContain('ended');
+  });
+
+  it('handles negative startTime (before epoch, in past)', () => {
+    const pastEnd = Math.floor(Date.now() / 1000) - 100;
+    const { container } = render(<StartOrEndTime startTime={-1000} endTime={pastEnd} />);
+    expect(container.textContent).toContain('ended');
+  });
+
+  it('does not crash when startTime > endTime (anomaly)', () => {
+    const future = Math.floor(Date.now() / 1000) + 3600;
+    const past = Math.floor(Date.now() / 1000) - 3600;
+    expect(() => render(<StartOrEndTime startTime={future} endTime={past} />)).not.toThrow();
+  });
 });

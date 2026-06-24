@@ -74,4 +74,32 @@ describe('AuctionTimer Component', () => {
     // Should render "Auction ended" text without error
     expect(screen.getAllByText('Auction ended').length).toBeGreaterThan(0);
   });
+
+  it('renders for settled=true auction', () => {
+    const settled = { ...mockAuction(0), settled: true };
+    expect(() => render(<AuctionTimer auction={settled} auctionEnded={true} />)).not.toThrow();
+  });
+
+  it('handles large nounId (10000n)', () => {
+    const large = { ...mockAuction(3600), nounId: 10000n };
+    expect(() => render(<AuctionTimer auction={large} auctionEnded={false} />)).not.toThrow();
+  });
+
+  it('handles auction 1 second to end', () => {
+    render(<AuctionTimer auction={mockAuction(1)} auctionEnded={false} />);
+    expect(screen.getByText(/Auction ends in|Time left/)).toBeInTheDocument();
+  });
+
+  it('handles zero-bidder auction (no bid yet)', () => {
+    const zeroBidder = {
+      ...mockAuction(3600),
+      bidder: '0x0000000000000000000000000000000000000000' as `0x${string}`,
+    };
+    expect(() => render(<AuctionTimer auction={zeroBidder} auctionEnded={false} />)).not.toThrow();
+  });
+
+  it('handles 0n amount auction', () => {
+    const zeroAmt = { ...mockAuction(3600), amount: 0n };
+    expect(() => render(<AuctionTimer auction={zeroAmt} auctionEnded={false} />)).not.toThrow();
+  });
 });
