@@ -132,4 +132,46 @@ describe('NijiInfoCard', () => {
     const secondButton = container.querySelectorAll('button')[1];
     expect(secondButton?.textContent).toContain('Etherscan');
   });
+
+  it('renders nounId 0n correctly in holder', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    const { container } = render(<NijiInfoCard nounId={0n} bidHistoryOnClickHandler={() => {}} />);
+    expect(container.querySelector('[data-testid="holder"]')?.textContent).toBe('0');
+  });
+
+  it('shows "Bids" when lastAuctionNounId matches nounId via number string', () => {
+    useAtomValueMock.mockReturnValue('42');
+    const { container } = render(<NijiInfoCard nounId={42n} bidHistoryOnClickHandler={() => {}} />);
+    expect(container.querySelectorAll('button')[0]?.textContent).toBe('Bids');
+  });
+
+  it('does not call bidHistoryOnClickHandler on Etherscan click', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    const handler = vi.fn();
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const { container } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={handler} />);
+    fireEvent.click(container.querySelectorAll('button')[1]);
+    expect(handler).not.toHaveBeenCalled();
+    openSpy.mockRestore();
+  });
+
+  it('Etherscan button click does not affect Bid button handler', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    const handler = vi.fn();
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const { container } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={handler} />);
+    fireEvent.click(container.querySelectorAll('button')[1]);
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(handler).toHaveBeenCalledTimes(1);
+    openSpy.mockRestore();
+  });
+
+  it('Etherscan link uses nounId in query string', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const { container } = render(<NijiInfoCard nounId={7n} bidHistoryOnClickHandler={() => {}} />);
+    fireEvent.click(container.querySelectorAll('button')[1]);
+    expect(openSpy).toHaveBeenCalledWith('https://etherscan.io/token/0xTOKEN?a=7');
+    openSpy.mockRestore();
+  });
 });
