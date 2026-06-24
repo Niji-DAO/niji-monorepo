@@ -80,4 +80,46 @@ describe('AuctionActivityDateHeadline', () => {
     const { container } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
     expect(container.querySelector('h4')?.textContent).toMatch(/January\s+0?1.*2025/);
   });
+
+  it('rerender with different startTime updates the date', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect(container.querySelector('h4')?.textContent).toContain('2025');
+    // 4102444800 = 2100-01-01
+    rerender(<AuctionActivityDateHeadline startTime={4102444800n} />);
+    expect(container.querySelector('h4')?.textContent).toContain('2100');
+  });
+
+  it('mid-year date (2024-07-04) renders July', () => {
+    useAtomValueMock.mockReturnValue(true);
+    // 1720051200 = 2024-07-04 UTC
+    const { container } = render(<AuctionActivityDateHeadline startTime={1720051200n} />);
+    expect(container.querySelector('h4')?.textContent).toContain('July');
+  });
+
+  it('multiple instances render independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        <AuctionActivityDateHeadline startTime={1735689600n} />
+        <AuctionActivityDateHeadline startTime={4102444800n} />
+      </>,
+    );
+    const h4s = container.querySelectorAll('h4');
+    expect(h4s.length).toBe(2);
+    expect(h4s[0].textContent).toContain('2025');
+    expect(h4s[1].textContent).toContain('2100');
+  });
+
+  it('isCool toggle preserves date content', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const { container } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect(container.querySelector('h4')?.textContent).toContain('2025');
+  });
+
+  it('h4 style attribute always contains brand color reference', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect(container.querySelector('h4')?.getAttribute('style')).toMatch(/brand-/);
+  });
 });
