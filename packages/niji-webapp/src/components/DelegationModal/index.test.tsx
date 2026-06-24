@@ -300,4 +300,51 @@ describe('DelegationModal', () => {
       ).not.toThrow();
     }
   });
+
+  it('renders 10 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <DelegationModal key={i} onDismiss={() => {}} delegateTo={`0x${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders for delegateTo=undefined explicitly', () => {
+    expect(() =>
+      render(<DelegationModal onDismiss={() => {}} delegateTo={undefined} />),
+    ).not.toThrow();
+  });
+
+  it('rerender with toggling delegateTo', () => {
+    const { rerender } = render(<DelegationModal onDismiss={() => {}} delegateTo="0xA" />);
+    expect(() =>
+      rerender(<DelegationModal onDismiss={() => {}} delegateTo={undefined} />),
+    ).not.toThrow();
+  });
+
+  it('primary click 5 times sequentially', () => {
+    render(<DelegationModal onDismiss={() => {}} />);
+    const primary = Array.from(
+      document.getElementById('overlay-root')?.querySelectorAll('button') ?? [],
+    ).find(b => b.textContent === 'primary');
+    if (primary) {
+      for (let i = 0; i < 5; i++) fireEvent.click(primary);
+    }
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="change-panel"]'),
+    ).not.toBeNull();
+  });
+
+  it('renders consistent close button across rerenders', () => {
+    const { rerender } = render(<DelegationModal onDismiss={() => {}} />);
+    const initial = document.getElementById('overlay-root')?.querySelectorAll('button').length;
+    rerender(<DelegationModal onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelectorAll('button').length).toBe(
+      initial,
+    );
+  });
 });
