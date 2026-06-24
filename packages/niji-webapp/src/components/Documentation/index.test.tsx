@@ -145,4 +145,47 @@ describe('Documentation', () => {
     const { container } = render(<Documentation />);
     expect(container.querySelector('section')?.className).toBeTruthy();
   });
+
+  it('renders unique data-testids for all 5 subsections', () => {
+    const { container } = render(<Documentation />);
+    const ids = ['about-header', 'about-section', 'gov-section', 'art-section', 'nijiders-section'];
+    ids.forEach(id => {
+      expect(container.querySelector(`[data-testid="${id}"]`)).not.toBeNull();
+    });
+  });
+
+  it('renders only 1 section element in the entire DOM', () => {
+    const { container } = render(<Documentation backgroundColor="#000" />);
+    expect(container.querySelectorAll('section').length).toBe(1);
+  });
+
+  it('rerender from no bg to with bg adds inline style', () => {
+    const { container, rerender } = render(<Documentation />);
+    rerender(<Documentation backgroundColor="#fff" />);
+    expect(container.querySelector('section')?.getAttribute('style')).toContain(
+      'rgb(255, 255, 255)',
+    );
+  });
+
+  it('applies inline style when bg has uppercase hex (HEX normalize)', () => {
+    const { container } = render(<Documentation backgroundColor="#ABCDEF" />);
+    expect(container.querySelector('section')?.getAttribute('style')).toBeTruthy();
+  });
+
+  it('multiple successive renders do not duplicate subsections', () => {
+    const { container, rerender } = render(<Documentation />);
+    rerender(<Documentation />);
+    rerender(<Documentation />);
+    expect(container.querySelectorAll('[data-testid="about-section"]').length).toBe(1);
+  });
+
+  it('all 5 testids exist in container.innerHTML', () => {
+    const { container } = render(<Documentation />);
+    const html = container.innerHTML;
+    expect(html.includes('about-header')).toBe(true);
+    expect(html.includes('about-section')).toBe(true);
+    expect(html.includes('gov-section')).toBe(true);
+    expect(html.includes('art-section')).toBe(true);
+    expect(html.includes('nijiders-section')).toBe(true);
+  });
 });

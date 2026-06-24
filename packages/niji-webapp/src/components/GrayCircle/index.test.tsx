@@ -95,4 +95,52 @@ describe('GrayCircle', () => {
       c2.querySelector('img')?.getAttribute('src'),
     );
   });
+
+  it('img src is identical to mock return value', () => {
+    const { container } = render(<GrayCircle />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe(
+      'data:image/svg+xml;base64,FAKE',
+    );
+  });
+
+  it('multiple instances render 2 imgs', () => {
+    const { container } = render(
+      <>
+        <GrayCircle />
+        <GrayCircle />
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(2);
+  });
+
+  it('outermost is wrapper div, child contains img', () => {
+    const { container } = render(<GrayCircle />);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+    expect(container.querySelector('img')).not.toBeNull();
+  });
+
+  it('isDelegateView=true className is non-empty string', () => {
+    const { container } = render(<GrayCircle isDelegateView={true} />);
+    const cls = container.querySelector('div')?.className ?? '';
+    expect(cls.length).toBeGreaterThan(0);
+  });
+
+  it('img tag is rendered (not falsy)', () => {
+    const { container } = render(<GrayCircle />);
+    expect(container.querySelector('img')).not.toBeNull();
+  });
+
+  it('5 instances all render imgs with same src', () => {
+    const { container } = render(
+      <>
+        <GrayCircle />
+        <GrayCircle />
+        <GrayCircle />
+        <GrayCircle />
+        <GrayCircle />
+      </>,
+    );
+    const srcs = Array.from(container.querySelectorAll('img')).map(img => img.getAttribute('src'));
+    expect(new Set(srcs).size).toBe(1);
+  });
 });

@@ -96,4 +96,46 @@ describe('BrandSpinner', () => {
     const circle = container.querySelector('svg circle');
     expect(circle?.getAttribute('stroke')).toBeTruthy();
   });
+
+  it('svg width === height (square aspect)', () => {
+    const { container } = render(<BrandSpinner />);
+    const svg = container.querySelector('svg');
+    expect(svg?.getAttribute('width')).toBe(svg?.getAttribute('height'));
+  });
+
+  it('rerender returns same DOM signature', () => {
+    const { container, rerender } = render(<BrandSpinner />);
+    const firstHTML = container.innerHTML;
+    rerender(<BrandSpinner />);
+    expect(container.innerHTML).toBe(firstHTML);
+  });
+
+  it('5 instances render 5 svgs in same parent', () => {
+    const { container } = render(
+      <>
+        <BrandSpinner />
+        <BrandSpinner />
+        <BrandSpinner />
+        <BrandSpinner />
+        <BrandSpinner />
+      </>,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(5);
+  });
+
+  it('circle stroke is "black" (matches path stroke)', () => {
+    const { container } = render(<BrandSpinner />);
+    expect(container.querySelector('svg circle')?.getAttribute('stroke')).toBe('black');
+  });
+
+  it('circle stroke-width matches path stroke-width (4)', () => {
+    const { container } = render(<BrandSpinner />);
+    expect(container.querySelector('svg circle')?.getAttribute('stroke-width')).toBe('4');
+  });
+
+  it('viewBox starts at "0 0" origin', () => {
+    const { container } = render(<BrandSpinner />);
+    const vb = container.querySelector('svg')?.getAttribute('viewBox') ?? '';
+    expect(vb.startsWith('0 0')).toBe(true);
+  });
 });
