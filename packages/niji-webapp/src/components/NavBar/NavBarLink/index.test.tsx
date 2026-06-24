@@ -80,4 +80,44 @@ describe('NavBarLink', () => {
     const { container } = wrap(<NavBarLink to="/x">x</NavBarLink>);
     expect(container.querySelectorAll('a').length).toBe(1);
   });
+
+  it('internal link uses default empty target', () => {
+    const { container } = wrap(<NavBarLink to="/internal">x</NavBarLink>);
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('');
+  });
+
+  it('http (non-https) external link uses target=_blank', () => {
+    const { container } = wrap(<NavBarLink to="http://example.com">x</NavBarLink>);
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('_blank');
+  });
+
+  it('rerender with new path updates href', () => {
+    const { container, rerender } = wrap(<NavBarLink to="/a">x</NavBarLink>);
+    expect(container.querySelector('a')?.getAttribute('href')).toBe('/a');
+    rerender(
+      <MemoryRouter>
+        <NavBarLink to="/b">x</NavBarLink>
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('a')?.getAttribute('href')).toBe('/b');
+  });
+
+  it('long URL renders verbatim', () => {
+    const long = 'https://example.com/' + 'x'.repeat(500);
+    const { container } = wrap(<NavBarLink to={long}>x</NavBarLink>);
+    expect(container.querySelector('a')?.getAttribute('href')).toBe(long);
+  });
+
+  it('multiple internal NavBarLink instances render distinct hrefs', () => {
+    const { container } = wrap(
+      <>
+        <NavBarLink to="/a">A</NavBarLink>
+        <NavBarLink to="/b">B</NavBarLink>
+      </>,
+    );
+    const links = container.querySelectorAll('a');
+    expect(links.length).toBe(2);
+    expect(links[0].getAttribute('href')).toBe('/a');
+    expect(links[1].getAttribute('href')).toBe('/b');
+  });
 });
