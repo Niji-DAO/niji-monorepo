@@ -133,4 +133,39 @@ describe('TruncatedAmount', () => {
     const { container } = render(<TruncatedAmount amount={parseEther('1')} />);
     expect(container.children.length).toBeGreaterThanOrEqual(0);
   });
+
+  it('formats 5 ETH to "Ξ 5.00"', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('5')} />);
+    expect(container.textContent).toBe('Ξ 5.00');
+  });
+
+  it('formats 0.99 ETH to "Ξ 0.99"', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('0.99')} />);
+    expect(container.textContent).toBe('Ξ 0.99');
+  });
+
+  it('formats 12345.67 ETH retains 2 decimal places', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('12345.67')} />);
+    expect(container.textContent).toBe('Ξ 12345.67');
+  });
+
+  it('rerender between two amounts updates output', () => {
+    const { container, rerender } = render(<TruncatedAmount amount={parseEther('1')} />);
+    expect(container.textContent).toBe('Ξ 1.00');
+    rerender(<TruncatedAmount amount={parseEther('2')} />);
+    expect(container.textContent).toBe('Ξ 2.00');
+  });
+
+  it('renders 5 instances each with own amount', () => {
+    const { container } = render(
+      <>
+        <TruncatedAmount amount={parseEther('1')} />
+        <TruncatedAmount amount={parseEther('2')} />
+        <TruncatedAmount amount={parseEther('3')} />
+        <TruncatedAmount amount={parseEther('4')} />
+        <TruncatedAmount amount={parseEther('5')} />
+      </>,
+    );
+    expect(container.textContent).toBe('Ξ 1.00Ξ 2.00Ξ 3.00Ξ 4.00Ξ 5.00');
+  });
 });

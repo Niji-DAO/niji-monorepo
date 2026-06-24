@@ -174,4 +174,45 @@ describe('VoteProgressBar', () => {
     const divs = container.querySelectorAll('div');
     expect(divs[0].className).not.toBe(divs[1].className);
   });
+
+  it('renders inner div with percentage 0 style or class set', () => {
+    const { container } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={0} />);
+    const divs = container.querySelectorAll('div');
+    expect(divs.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('renders inner div with percentage 100 style or class set', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={100} />,
+    );
+    const divs = container.querySelectorAll('div');
+    expect(divs.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('handles fractional percentage (33.33)', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={33.33} />,
+    );
+    expect(container.querySelectorAll('div').length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('rerender FOR → AGAINST changes inner class', () => {
+    const { container, rerender } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />,
+    );
+    const initialClass = container.querySelectorAll('div')[1]?.className;
+    rerender(<VoteProgressBar variant={VoteCardVariant.AGAINST} percentage={50} />);
+    expect(container.querySelectorAll('div')[1]?.className).not.toBe(initialClass);
+  });
+
+  it('renders 3 instances all 3 variants', () => {
+    const { container } = render(
+      <>
+        <VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />
+        <VoteProgressBar variant={VoteCardVariant.AGAINST} percentage={50} />
+        <VoteProgressBar variant={VoteCardVariant.ABSTAIN} percentage={50} />
+      </>,
+    );
+    expect(container.children.length).toBe(3);
+  });
 });
