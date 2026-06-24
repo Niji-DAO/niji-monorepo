@@ -105,4 +105,40 @@ describe('BrandDatePicker', () => {
     rerender(<BrandDatePicker onChange={() => {}} label="B" />);
     expect(container.querySelector('span')?.textContent).toBe('B');
   });
+
+  it('isInvalid rerender to false removes invalid class', () => {
+    const { container, rerender } = render(<BrandDatePicker onChange={() => {}} isInvalid />);
+    expect(container.querySelector('input')?.className).toMatch(/invalid/i);
+    rerender(<BrandDatePicker onChange={() => {}} isInvalid={false} />);
+    expect(container.querySelector('input')?.className).not.toMatch(/invalid/i);
+  });
+
+  it('onChange handler fires at least once on user input', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandDatePicker onChange={onChange} />);
+    const inp = container.querySelector('input')!;
+    fireEvent.change(inp, { target: { value: '2025-06-15' } });
+    expect(onChange).toHaveBeenCalled();
+  });
+
+  it('renders without value prop (empty input)', () => {
+    const { container } = render(<BrandDatePicker onChange={() => {}} />);
+    expect(container.querySelector('input')?.value).toBe('');
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <BrandDatePicker onChange={() => {}} label="Start" value="2025-01-01" />
+        <BrandDatePicker onChange={() => {}} label="End" value="2025-12-31" />
+      </>,
+    );
+    const inputs = container.querySelectorAll('input');
+    expect(inputs[0]?.value).toBe('2025-01-01');
+    expect(inputs[1]?.value).toBe('2025-12-31');
+  });
+
+  it('label with empty string renders without crash', () => {
+    expect(() => render(<BrandDatePicker onChange={() => {}} label="" />)).not.toThrow();
+  });
 });

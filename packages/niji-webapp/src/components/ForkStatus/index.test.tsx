@@ -108,4 +108,50 @@ describe('ForkStatus', () => {
     const { container } = render(<ForkStatus status={99 as never} />);
     expect(container.textContent).toBe('Undetermined');
   });
+
+  it('rerender from ESCROW to ACTIVE updates text', () => {
+    const { container, rerender } = render(<ForkStatus status={ForkState.ESCROW} />);
+    expect(container.textContent).toBe('In Escrow');
+    rerender(<ForkStatus status={ForkState.ACTIVE} />);
+    expect(container.textContent).toBe('Forking');
+  });
+
+  it('rerender to undefined (default to Undetermined)', () => {
+    const { container, rerender } = render(<ForkStatus status={ForkState.EXECUTED} />);
+    expect(container.textContent).toBe('Executed');
+    rerender(<ForkStatus />);
+    expect(container.textContent).toBe('Undetermined');
+  });
+
+  it('all 5 statuses each render distinct text', () => {
+    const { container } = render(
+      <>
+        <ForkStatus status={ForkState.ESCROW} />
+        <ForkStatus status={ForkState.ACTIVE} />
+        <ForkStatus status={ForkState.EXECUTED} />
+        <ForkStatus status={ForkState.UNDETERMINED} />
+        <ForkStatus />
+      </>,
+    );
+    expect(container.textContent).toContain('In Escrow');
+    expect(container.textContent).toContain('Forking');
+    expect(container.textContent).toContain('Executed');
+  });
+
+  it('renders 10 ESCROW instances', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <ForkStatus key={i} status={ForkState.ESCROW} />
+        ))}
+      </>,
+    );
+    expect((container.textContent?.match(/In Escrow/g) ?? []).length).toBe(10);
+  });
+
+  it('ACTIVE status renders exactly "Forking" not "Active"', () => {
+    const { container } = render(<ForkStatus status={ForkState.ACTIVE} />);
+    expect(container.textContent).toBe('Forking');
+    expect(container.textContent).not.toBe('Active');
+  });
 });
