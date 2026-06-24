@@ -417,4 +417,39 @@ describe('BidHistoryItem Component', () => {
     });
     window.innerWidth = originalWidth;
   });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <BidHistoryItem key={i} bid={mockBid} classes={mockClasses} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times with varying bid amounts', () => {
+    const { rerender } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    for (let i = 0; i < 30; i++) {
+      const b = { ...mockBid, value: BigInt(i) * 1000000000000000000n };
+      expect(() => rerender(<BidHistoryItem bid={b} classes={mockClasses} />)).not.toThrow();
+    }
+  });
+
+  it('handles very large bid value (1e6 ETH)', () => {
+    const b = { ...mockBid, value: 1000000n * 1000000000000000000n };
+    expect(() => render(<BidHistoryItem bid={b} classes={mockClasses} />)).not.toThrow();
+  });
+
+  it('handles 0 value bid', () => {
+    const b = { ...mockBid, value: 0n };
+    expect(() => render(<BidHistoryItem bid={b} classes={mockClasses} />)).not.toThrow();
+  });
+
+  it('handles extended=true variant', () => {
+    const b = { ...mockBid, extended: true };
+    expect(() => render(<BidHistoryItem bid={b} classes={mockClasses} />)).not.toThrow();
+  });
 });

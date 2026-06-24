@@ -404,4 +404,43 @@ describe('BidHistoryModalRow', () => {
       expect(() => render(<BidHistoryModalRow bid={newBid} index={1} />)).not.toThrow();
     }
   });
+
+  it('renders 50 instances without crash', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <BidHistoryModalRow key={i} bid={bid} index={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times with varying index', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { rerender } = render(<BidHistoryModalRow bid={bid} index={0} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() => rerender(<BidHistoryModalRow bid={bid} index={i} />)).not.toThrow();
+    }
+  });
+
+  it('handles very large bid value (1e6 ETH)', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const b = { ...bid, value: parseEther('1000000') };
+    expect(() => render(<BidHistoryModalRow bid={b} index={1} />)).not.toThrow();
+  });
+
+  it('handles 0 value bid', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const b = { ...bid, value: 0n };
+    expect(() => render(<BidHistoryModalRow bid={b} index={1} />)).not.toThrow();
+  });
+
+  it('handles unicode ENS name', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('日本.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    expect(() => render(<BidHistoryModalRow bid={bid} index={1} />)).not.toThrow();
+  });
 });

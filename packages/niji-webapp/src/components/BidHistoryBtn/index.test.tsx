@@ -391,4 +391,50 @@ describe('BidHistoryBtn Component (isCool=true)', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <BidHistoryBtn key={i} onClick={vi.fn()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves text', () => {
+    const { rerender } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<BidHistoryBtn onClick={vi.fn()} />);
+    }
+    expect(screen.getAllByText('View all bids').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('rapid 100 click events fire handler', () => {
+    const onClick = vi.fn();
+    render(<BidHistoryBtn onClick={onClick} />);
+    const btn = screen.getAllByText('View all bids')[0];
+    for (let i = 0; i < 100; i++) fireEvent.click(btn);
+    expect(onClick).toHaveBeenCalledTimes(100);
+  });
+
+  it('all 50 instances render text', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <BidHistoryBtn key={i} onClick={vi.fn()} />
+        ))}
+      </>,
+    );
+    const found = Array.from(container.children).filter(c => c.textContent?.includes('View'));
+    expect(found.length).toBeGreaterThanOrEqual(50);
+  });
+
+  it('rapid consecutive 100 renders without crash', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => render(<BidHistoryBtn onClick={vi.fn()} />)).not.toThrow();
+    }
+  });
 });
