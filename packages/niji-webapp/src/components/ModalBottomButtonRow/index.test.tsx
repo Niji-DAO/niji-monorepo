@@ -410,4 +410,83 @@ describe('ModalBottomButtonRow', () => {
     );
     expect(container.querySelectorAll('button')[1]?.textContent?.length).toBe(200);
   });
+
+  it('renders without crash for empty prevBtnText', () => {
+    expect(() =>
+      render(
+        <ModalBottomButtonRow
+          prevBtnText=""
+          onPrevBtnClick={() => {}}
+          nextBtnText="Next"
+          onNextBtnClick={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('5 instances render 10 buttons', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <ModalBottomButtonRow
+            key={i}
+            prevBtnText={`prev${i}`}
+            onPrevBtnClick={() => {}}
+            nextBtnText={`next${i}`}
+            onNextBtnClick={() => {}}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(10);
+  });
+
+  it('rerender from "A" to "B" updates prevBtnText', () => {
+    const { container, rerender } = render(
+      <ModalBottomButtonRow
+        prevBtnText="A"
+        onPrevBtnClick={() => {}}
+        nextBtnText="X"
+        onNextBtnClick={() => {}}
+      />,
+    );
+    expect(container.querySelectorAll('button')[0]?.textContent).toBe('A');
+    rerender(
+      <ModalBottomButtonRow
+        prevBtnText="B"
+        onPrevBtnClick={() => {}}
+        nextBtnText="X"
+        onNextBtnClick={() => {}}
+      />,
+    );
+    expect(container.querySelectorAll('button')[0]?.textContent).toBe('B');
+  });
+
+  it('rapid 10 next clicks invoke onNextBtnClick 10 times', () => {
+    const onNext = vi.fn();
+    const { container } = render(
+      <ModalBottomButtonRow
+        prevBtnText="P"
+        onPrevBtnClick={() => {}}
+        nextBtnText="N"
+        onNextBtnClick={onNext}
+      />,
+    );
+    const nextBtn = container.querySelectorAll('button')[1];
+    for (let i = 0; i < 10; i++) fireEvent.click(nextBtn);
+    expect(onNext).toHaveBeenCalledTimes(10);
+  });
+
+  it('renders unicode buttonText', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        prevBtnText="戻る"
+        onPrevBtnClick={() => {}}
+        nextBtnText="次へ"
+        onNextBtnClick={() => {}}
+      />,
+    );
+    expect(container.querySelectorAll('button')[0]?.textContent).toBe('戻る');
+    expect(container.querySelectorAll('button')[1]?.textContent).toBe('次へ');
+  });
 });

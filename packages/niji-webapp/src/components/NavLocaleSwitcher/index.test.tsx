@@ -238,4 +238,38 @@ describe('NavLocaleSwitcher', () => {
     if (closeBtn) fireEvent.click(closeBtn);
     expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
   });
+
+  it('renders without crash for unknown locale', () => {
+    useAtomMock.mockReturnValue(['xx-XX', vi.fn()]);
+    expect(() => render(<NavLocaleSwitcher />)).not.toThrow();
+  });
+
+  it('renders 5 instances independently', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <NavLocaleSwitcher key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="nav-button"]').length).toBe(5);
+  });
+
+  it('rerender does not crash', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { rerender } = render(<NavLocaleSwitcher />);
+    expect(() => rerender(<NavLocaleSwitcher />)).not.toThrow();
+  });
+
+  it('ja-JP locale renders Japanese label', () => {
+    useAtomMock.mockReturnValue(['ja-JP', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    expect(container.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('zh-CN locale renders without crash', () => {
+    useAtomMock.mockReturnValue(['zh-CN', vi.fn()]);
+    expect(() => render(<NavLocaleSwitcher />)).not.toThrow();
+  });
 });

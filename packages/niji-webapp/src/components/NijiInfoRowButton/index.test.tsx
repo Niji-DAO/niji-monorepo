@@ -268,4 +268,55 @@ describe('NijiInfoRowButton', () => {
     );
     expect(container.textContent).toBe('hello');
   });
+
+  it('renders empty btnText', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="" onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe('');
+  });
+
+  it('renders 200 char long btnText', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const longStr = 'x'.repeat(200);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText={longStr} onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe(longStr);
+  });
+
+  it('rerender between btnText updates display', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="first" onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe('first');
+    rerender(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="second" onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe('second');
+  });
+
+  it('renders 5 instances independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        <NijiInfoRowButton iconImgSource="/a.png" btnText="A" onClickHandler={() => {}} />
+        <NijiInfoRowButton iconImgSource="/b.png" btnText="B" onClickHandler={() => {}} />
+        <NijiInfoRowButton iconImgSource="/c.png" btnText="C" onClickHandler={() => {}} />
+        <NijiInfoRowButton iconImgSource="/d.png" btnText="D" onClickHandler={() => {}} />
+        <NijiInfoRowButton iconImgSource="/e.png" btnText="E" onClickHandler={() => {}} />
+      </>,
+    );
+    expect(container.textContent).toBe('ABCDE');
+  });
+
+  it('renders unicode btnText', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="日本語" onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe('日本語');
+  });
 });
