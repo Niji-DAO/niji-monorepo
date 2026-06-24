@@ -144,4 +144,33 @@ describe('MinBid', () => {
     const { container } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
     expect(container.querySelector('h3')?.textContent).toContain('You must bid at least');
   });
+
+  it('img exists in container DOM', () => {
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    expect(container.querySelector('img')).not.toBeNull();
+  });
+
+  it('repeated clicks invoke onClick 5 times', () => {
+    const onClick = vi.fn();
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={onClick} />);
+    const wrapper = container.querySelector('div');
+    if (wrapper) {
+      for (let i = 0; i < 5; i++) fireEvent.click(wrapper);
+    }
+    expect(onClick).toHaveBeenCalledTimes(5);
+  });
+
+  it('renders exactly 1 div wrapper', () => {
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    expect(container.children.length).toBe(1);
+  });
+
+  it('renders without crash for fractional 0.001 ETH', () => {
+    expect(() => render(<MinBid minBid={parseEther('0.001')} onClick={() => {}} />)).not.toThrow();
+  });
+
+  it('img src is full noun-pointer.png URL', () => {
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('noun-pointer.png');
+  });
 });
