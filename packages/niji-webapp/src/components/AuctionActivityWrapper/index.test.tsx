@@ -283,4 +283,38 @@ describe('AuctionActivityWrapper', () => {
     );
     expect(container.querySelector('[data-testid="deep"]')?.textContent).toBe('deep');
   });
+
+  it('renders 50 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <AuctionActivityWrapper key={i}>{`item-${i}`}</AuctionActivityWrapper>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(50);
+  });
+
+  it('handles boolean children (renders empty)', () => {
+    const { container } = render(<AuctionActivityWrapper>{true as never}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('handles null children', () => {
+    const { container } = render(<AuctionActivityWrapper>{null}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('renders 2000 char long content', () => {
+    const longStr = 'a'.repeat(2000);
+    const { container } = render(<AuctionActivityWrapper>{longStr}</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.textContent).toBe(longStr);
+  });
+
+  it('rerender preserves max-lg:mx-4 class', () => {
+    const { container, rerender } = render(<AuctionActivityWrapper>a</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.className).toContain('max-lg:mx-4');
+    rerender(<AuctionActivityWrapper>b</AuctionActivityWrapper>);
+    expect(container.querySelector('div')?.className).toContain('max-lg:mx-4');
+  });
 });

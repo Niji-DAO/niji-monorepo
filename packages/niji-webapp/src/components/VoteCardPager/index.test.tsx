@@ -254,4 +254,54 @@ describe('VoteCardPager', () => {
     rerender(<VoteCardPager {...defaults} currentPage={2} />);
     expect(container.querySelectorAll('span').length).toBe(3);
   });
+
+  it('renders 20 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <VoteCardPager key={i} {...defaults} currentPage={i % 3} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('large numPages (1000) renders 1000 dots', () => {
+    const { container } = render(<VoteCardPager {...defaults} numPages={1000} />);
+    expect(container.querySelectorAll('span').length).toBe(1000);
+  });
+
+  it('rapid 50 click cycles', () => {
+    const onLeft = vi.fn();
+    const onRight = vi.fn();
+    const { container } = render(
+      <VoteCardPager {...defaults} onLeftArrowClick={onLeft} onRightArrowClick={onRight} />,
+    );
+    const buttons = container.querySelectorAll('button');
+    for (let i = 0; i < 50; i++) {
+      fireEvent.click(buttons[1]);
+      fireEvent.click(buttons[0]);
+    }
+    expect(onLeft).toHaveBeenCalledTimes(50);
+    expect(onRight).toHaveBeenCalledTimes(50);
+  });
+
+  it('rerender currentPage progression preserves dot count', () => {
+    const { container, rerender } = render(
+      <VoteCardPager {...defaults} numPages={5} currentPage={0} />,
+    );
+    expect(container.querySelectorAll('span').length).toBe(5);
+    for (let i = 1; i < 5; i++) {
+      rerender(<VoteCardPager {...defaults} numPages={5} currentPage={i} />);
+      expect(container.querySelectorAll('span').length).toBe(5);
+    }
+  });
+
+  it('button count always 2 regardless of numPages', () => {
+    [1, 5, 10, 100].forEach(n => {
+      const { container } = render(<VoteCardPager {...defaults} numPages={n} />);
+      expect(container.querySelectorAll('button').length).toBe(2);
+    });
+  });
 });
