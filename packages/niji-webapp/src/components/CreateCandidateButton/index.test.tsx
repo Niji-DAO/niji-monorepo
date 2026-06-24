@@ -334,4 +334,79 @@ describe('CreateCandidateButton', () => {
     );
     expect(container.textContent).toContain('Create proposal candidate');
   });
+
+  it('isLoading=true は単独で disabled にならない (click 可能)', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={true}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('button')?.disabled).toBe(false);
+  });
+
+  it('rapid 10 clicks invoke handler 10 times', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 10; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(10);
+  });
+
+  it('isFormInvalid=true 単独で disabled (warning text なし)', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={true}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('button')?.disabled).toBe(true);
+    expect(container.textContent).not.toContain('active or pending');
+  });
+
+  it('rerender from disabled to enabled allows handler', () => {
+    const handle = vi.fn();
+    const { container, rerender } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={true}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    expect(container.querySelector('button')?.disabled).toBe(true);
+    rerender(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    fireEvent.click(container.querySelector('button')!);
+    expect(handle).toHaveBeenCalledTimes(1);
+  });
+
+  it('all disabled flags combined render disabled button', () => {
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={true}
+        hasActiveOrPendingProposal={true}
+        isFormInvalid={true}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    expect(container.querySelector('button')?.disabled).toBe(true);
+  });
 });

@@ -271,4 +271,57 @@ describe('CurrentDelegatePannel', () => {
     rerender(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />);
     expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xACCOUNT2');
   });
+
+  it('rerender from no delegate to delegate switches display', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValueOnce({ data: undefined });
+    const { container, rerender } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xACCOUNT');
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xDELEGATE' });
+    rerender(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />);
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xDELEGATE');
+  });
+
+  it('rapid 5 close clicks invoke onSecondary 5 times', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const onSec = vi.fn();
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={onSec} />,
+    );
+    const close = container.querySelectorAll('button')[0];
+    for (let i = 0; i < 5; i++) fireEvent.click(close);
+    expect(onSec).toHaveBeenCalledTimes(5);
+  });
+
+  it('h1 element renders inside wrapper div', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    expect(container.querySelector('div h1')).not.toBeNull();
+  });
+
+  it('button labels Close + Update Delegate render correctly', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    const buttons = container.querySelectorAll('button');
+    expect(buttons[0]?.textContent).toContain('Close');
+    expect(buttons[1]?.textContent).toContain('Update');
+  });
+
+  it('short-address mock renders address verbatim', () => {
+    useAccountMock.mockReturnValue({ address: '0xVERBATIM' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xVERBATIM');
+  });
 });

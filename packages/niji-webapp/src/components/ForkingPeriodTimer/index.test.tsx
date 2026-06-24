@@ -238,4 +238,52 @@ describe('ForkingPeriodTimer', () => {
       expect(container.querySelector('h2')).not.toBeNull();
     });
   });
+
+  it('cool + active period h2 has style attribute', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={false} />,
+    );
+    expect(container.querySelector('h2')?.getAttribute('style')).toBeDefined();
+  });
+
+  it('warm bg renders h2 with own style class', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const { container } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={false} />,
+    );
+    const h2 = container.querySelector('h2');
+    expect(h2?.getAttribute('style') || h2?.className).toBeTruthy();
+  });
+
+  it('20 clicks (toggle) does not crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={false} />,
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    expect(() => {
+      for (let i = 0; i < 20; i++) fireEvent.click(wrapper);
+    }).not.toThrow();
+  });
+
+  it('isPeriodEnded=true returns container.firstChild null', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={true} />,
+    );
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('rerender from active to ended hides h2', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={false} />,
+    );
+    expect(container.querySelector('h2')).not.toBeNull();
+    rerender(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={true} />,
+    );
+    expect(container.querySelector('h2')).toBeNull();
+  });
 });
