@@ -104,4 +104,46 @@ describe('VoteStatusPill', () => {
     expect(container.textContent).toContain('A');
     expect(container.textContent).toContain('B');
   });
+
+  it('rerender from failure to success switches class', () => {
+    const { container, rerender } = render(<VoteStatusPill status="failure" text="x" />);
+    expect(container.querySelector('div')?.className).toMatch(/fail/i);
+    rerender(<VoteStatusPill status="success" text="x" />);
+    expect(container.querySelector('div')?.className).toMatch(/pass/i);
+  });
+
+  it('rerender text updates content', () => {
+    const { container, rerender } = render(<VoteStatusPill status="success" text="First" />);
+    expect(container.textContent).toBe('First');
+    rerender(<VoteStatusPill status="success" text="Second" />);
+    expect(container.textContent).toBe('Second');
+  });
+
+  it('div className is non-empty string', () => {
+    const { container } = render(<VoteStatusPill status="success" text="x" />);
+    expect(container.querySelector('div')?.className).toBeTruthy();
+  });
+
+  it('renders exactly 1 div per pill', () => {
+    const { container } = render(<VoteStatusPill status="success" text="x" />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+  });
+
+  it('boolean false text renders as empty', () => {
+    const { container } = render(<VoteStatusPill status="success" text={false as never} />);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('5 instances render 5 distinct divs', () => {
+    const { container } = render(
+      <>
+        <VoteStatusPill status="success" text="1" />
+        <VoteStatusPill status="failure" text="2" />
+        <VoteStatusPill status="success" text="3" />
+        <VoteStatusPill status="failure" text="4" />
+        <VoteStatusPill status="success" text="5" />
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(5);
+  });
 });

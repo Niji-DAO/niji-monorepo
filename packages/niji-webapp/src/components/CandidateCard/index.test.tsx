@@ -129,4 +129,61 @@ describe('CandidateCard', () => {
     const { container } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />);
     expect(container.querySelectorAll('[data-testid="sponsors"]').length).toBe(1);
   });
+
+  it('long title (300 chars) renders fully', () => {
+    const long = 'a'.repeat(300);
+    const candidate = {
+      ...baseCandidate,
+      version: { content: { title: long, contentSignatures: [] } },
+    } as never;
+    const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
+    expect(container.textContent).toContain(long);
+  });
+
+  it('href contains "candidates/" prefix', () => {
+    const { container } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />);
+    expect(container.querySelector('a')?.getAttribute('href')).toContain('candidates/');
+  });
+
+  it('multiple CandidateCard instances render independently', () => {
+    const c1 = { ...baseCandidate, id: 'c1' } as never;
+    const c2 = { ...baseCandidate, id: 'c2' } as never;
+    const { container } = wrap(
+      <>
+        <CandidateCard candidate={c1} nounsRequired={3} />
+        <CandidateCard candidate={c2} nounsRequired={3} />
+      </>,
+    );
+    const links = container.querySelectorAll('a');
+    expect(links[0].getAttribute('href')).toBe('/candidates/c1');
+    expect(links[1].getAttribute('href')).toBe('/candidates/c2');
+  });
+
+  it('candidate.requiredVotes 0 still renders sponsors req-0', () => {
+    const candidate = { ...baseCandidate, requiredVotes: 0 } as never;
+    const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
+    expect(container.querySelector('[data-testid="sponsors"]')?.textContent).toBe('req-0');
+  });
+
+  it('candidate.requiredVotes 100 renders sponsors req-100', () => {
+    const candidate = { ...baseCandidate, requiredVotes: 100 } as never;
+    const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
+    expect(container.querySelector('[data-testid="sponsors"]')?.textContent).toBe('req-100');
+  });
+
+  it('empty title still renders link', () => {
+    const candidate = {
+      ...baseCandidate,
+      version: { content: { title: '', contentSignatures: [] } },
+    } as never;
+    const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
+    expect(container.querySelector('a')).not.toBeNull();
+  });
+
+  it('proposer prop with hex address renders unchanged', () => {
+    const longAddr = '0x1234567890abcdef1234567890abcdef12345678';
+    const candidate = { ...baseCandidate, proposer: longAddr } as never;
+    const { container } = wrap(<CandidateCard candidate={candidate} nounsRequired={3} />);
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(longAddr);
+  });
 });

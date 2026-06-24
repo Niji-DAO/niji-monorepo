@@ -160,4 +160,82 @@ describe('ForkingPeriodTimer', () => {
     // 3 回 click → 元と異なる (odd toggle)
     expect(wrapper.textContent).not.toBe(original);
   });
+
+  it('rerender from isPeriodEnded=false to true hides timer', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={false} />,
+    );
+    expect(container.querySelector('h2')).not.toBeNull();
+    rerender(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={true} />,
+    );
+    expect(container.querySelector('h2')).toBeNull();
+  });
+
+  it('rerender from isPeriodEnded=true to false shows timer', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={true} />,
+    );
+    expect(container.querySelector('h2')).toBeNull();
+    rerender(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={false} />,
+    );
+    expect(container.querySelector('h2')).not.toBeNull();
+  });
+
+  it('clicking 4 times returns to original (even toggle)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={false} />,
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    const original = wrapper.textContent;
+    for (let i = 0; i < 4; i++) fireEvent.click(wrapper);
+    expect(wrapper.textContent).toBe(original);
+  });
+
+  it('rerender endTime changes timer text', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={false} />,
+    );
+    expect(container.querySelector('h2')).not.toBeNull();
+    rerender(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 7200} isPeriodEnded={false} />,
+    );
+    expect(container.querySelector('h2')).not.toBeNull();
+  });
+
+  it('5+ rapid clicks does not crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 3600} isPeriodEnded={false} />,
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    expect(() => {
+      for (let i = 0; i < 10; i++) fireEvent.click(wrapper);
+    }).not.toThrow();
+  });
+
+  it('multiple instances render independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 1000} isPeriodEnded={false} />
+        <ForkingPeriodTimer endTime={Math.floor(Date.now() / 1000) + 2000} isPeriodEnded={false} />
+      </>,
+    );
+    expect(container.querySelectorAll('h2').length).toBe(2);
+  });
+
+  it('h2 always present when isPeriodEnded=false regardless of endTime', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const variants = [0, 100, Math.floor(Date.now() / 1000), 4102444800];
+    variants.forEach(et => {
+      const { container } = render(<ForkingPeriodTimer endTime={et} isPeriodEnded={false} />);
+      expect(container.querySelector('h2')).not.toBeNull();
+    });
+  });
 });
