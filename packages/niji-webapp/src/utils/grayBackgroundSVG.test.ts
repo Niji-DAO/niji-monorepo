@@ -15,4 +15,33 @@ describe('getGrayBackgroundSVG', () => {
   it('returns the same value on multiple calls (pure constant)', () => {
     expect(getGrayBackgroundSVG()).toBe(getGrayBackgroundSVG());
   });
+
+  it('return type is string', () => {
+    expect(typeof getGrayBackgroundSVG()).toBe('string');
+  });
+
+  it('MIME portion is exactly image/svg+xml', () => {
+    expect(getGrayBackgroundSVG()).toContain('image/svg+xml');
+  });
+
+  it('declares base64 encoding in the data URI', () => {
+    expect(getGrayBackgroundSVG()).toContain(';base64,');
+  });
+
+  it('has non-empty base64 portion after the comma', () => {
+    const portion = getGrayBackgroundSVG().split(',')[1];
+    expect(portion.length).toBeGreaterThan(0);
+  });
+
+  it('strict identity across calls (=== operator)', () => {
+    const a = getGrayBackgroundSVG();
+    const b = getGrayBackgroundSVG();
+    expect(a === b).toBe(true);
+  });
+
+  it('contains valid base64 characters only after comma', () => {
+    const portion = getGrayBackgroundSVG().split(',')[1];
+    // base64 文字セット (A-Z, a-z, 0-9, +, /, =、 加えて意図せず含まれた空白/inline 改行を許容)
+    expect(/^[\d\s+/=A-Za-z]+$/.test(portion)).toBe(true);
+  });
 });
