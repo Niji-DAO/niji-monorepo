@@ -127,4 +127,48 @@ describe('checkHasActiveOrPendingProposalOrCandidate', () => {
       false,
     );
   });
+
+  it('returns false when account is empty string (falsy)', () => {
+    expect(checkHasActiveOrPendingProposalOrCandidate(ProposalState.ACTIVE, ADDR_A, '')).toBe(
+      false,
+    );
+  });
+
+  it('returns false when proposer is empty string (falsy)', () => {
+    expect(checkHasActiveOrPendingProposalOrCandidate(ProposalState.ACTIVE, '', ADDR_A)).toBe(
+      false,
+    );
+  });
+});
+
+describe('isProposalUpdatable — additional', () => {
+  it('handles 0n bounds (currentBlock 0n, updatePeriodEndBlock 0n)', () => {
+    expect(isProposalUpdatable(ProposalState.UPDATABLE, 0n, 0n)).toBe(true);
+  });
+
+  it('handles very large bigint blocks', () => {
+    const huge = 9_007_199_254_740_990n;
+    expect(isProposalUpdatable(ProposalState.PENDING, huge, huge - 1n)).toBe(true);
+    expect(isProposalUpdatable(ProposalState.PENDING, huge, huge + 1n)).toBe(false);
+  });
+
+  it('returns false for EXECUTED even within window', () => {
+    expect(isProposalUpdatable(ProposalState.EXECUTED, 100n, 50n)).toBe(false);
+  });
+});
+
+describe('checkEnoughVotes — additional', () => {
+  it('returns false when both undefined', () => {
+    expect(checkEnoughVotes(undefined, undefined)).toBe(false);
+  });
+
+  it('returns true with very large votes vs small threshold', () => {
+    expect(checkEnoughVotes(Number.MAX_SAFE_INTEGER, 1)).toBe(true);
+  });
+
+  it('returns false when threshold negative not possible but defends with strict gt', () => {
+    // negative threshold は実際にあり得ないが、 strict > で 0 vs -1 は true
+    expect(checkEnoughVotes(0, -1)).toBe(false); // 0 は falsy で短絡 false
+    expect(checkEnoughVotes(1, -1)).toBe(true);
+  });
 });

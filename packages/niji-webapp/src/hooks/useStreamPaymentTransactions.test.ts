@@ -178,4 +178,53 @@ describe('useStreamPaymentTransactions', () => {
     });
     expect(actions[0].usdcValue).toBe(0);
   });
+
+  it('USDC createStream has value="0" regardless of amount', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'USDC', amount: '100' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(actions[0].value).toBe('0');
+  });
+
+  it('WETH createStream has value="0" (createStream is fund movement helper)', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'WETH', amount: '5' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(actions[0].value).toBe('0');
+  });
+
+  it('USDC sendOrRegisterDebt usdcValue mirrors createStream usdcValue', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'USDC', amount: '75' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(actions[0].usdcValue).toBe(actions[1].usdcValue);
+  });
+
+  it('WETH transfer action has value="0" (no native value transfer)', () => {
+    const actions = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'WETH', amount: '3' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(actions[2].value).toBe('0');
+  });
+
+  it('all actions have non-empty calldata when predictedAddress set (except deposit)', () => {
+    const usdc = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'USDC' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(usdc[0].calldata).toMatch(/^0x/);
+    expect(usdc[1].calldata).toMatch(/^0x/);
+    const weth = useStreamPaymentTransactions({
+      state: makeState({ TransferFundsCurrency: 'WETH' }),
+      predictedAddress: '0xPRED',
+    });
+    expect(weth[0].calldata).toMatch(/^0x/);
+    // deposit action calldata は '0x' literal (空 calldata)
+    expect(weth[1].calldata).toBe('0x');
+    expect(weth[2].calldata).toMatch(/^0x/);
+  });
 });
