@@ -315,4 +315,47 @@ describe('LegacyNoun — additional edge cases', () => {
     const { container } = render(<LegacyNoun imgPath="/x.png" alt="日本語ALT文字列" />);
     expect(container.querySelector('img')?.getAttribute('alt')).toBe('日本語ALT文字列');
   });
+
+  it('LegacyNoun renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <LegacyNoun key={i} imgPath={`/img-${i}.png`} alt={`alt-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('LegacyNoun rerender 30 times preserves img', () => {
+    const { container, rerender } = render(<LegacyNoun imgPath="/x.png" alt="x" />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<LegacyNoun imgPath={`/x-${i}.png`} alt={`x-${i}`} />);
+    }
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('/x-29.png');
+  });
+
+  it('LegacyNoun handles very long imgPath (1000 char)', () => {
+    const long = '/x'.repeat(500);
+    const { container } = render(<LegacyNoun imgPath={long} alt="x" />);
+    expect(container.querySelector('img')?.getAttribute('src')?.length).toBe(long.length);
+  });
+
+  it('LegacyNoun handles whitespace-only alt', () => {
+    const { container } = render(<LegacyNoun imgPath="/x.png" alt="   " />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('   ');
+  });
+
+  it('LoadingNoun renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <LoadingNoun key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });

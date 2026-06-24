@@ -493,4 +493,76 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 10 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <DelegateGroupedNijiImageVoteTable
+              key={i}
+              {...baseProps}
+              filteredDelegateGroupedVoteData={[]}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves component', () => {
+    const { rerender } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <DelegateGroupedNijiImageVoteTable
+            {...baseProps}
+            propId={i}
+            filteredDelegateGroupedVoteData={[]}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 500 vote entries', () => {
+    const data = Array.from({ length: 500 }, (_, i) => makeVote(`0xDEL${i}`, [String(i)], 1));
+    expect(() =>
+      render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles very large proposalCreationBlock', () => {
+    expect(() =>
+      render(
+        <DelegateGroupedNijiImageVoteTable
+          propId={1}
+          proposalCreationBlock={9_007_199_254_740_991n}
+          filteredDelegateGroupedVoteData={[]}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles rapid prop change 50 times', () => {
+    const { rerender } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+    );
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        rerender(
+          <DelegateGroupedNijiImageVoteTable
+            {...baseProps}
+            propId={i + 100}
+            proposalCreationBlock={BigInt(100 + i)}
+            filteredDelegateGroupedVoteData={[]}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
