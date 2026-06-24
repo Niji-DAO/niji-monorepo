@@ -126,4 +126,54 @@ describe('ProposalStatusCopy', () => {
     expect(container.textContent).toContain('Active');
     expect(container.textContent).toContain('Executed');
   });
+
+  it('rerender from PENDING to ACTIVE updates text', () => {
+    const { container, rerender } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.PENDING)} />,
+    );
+    expect(container.textContent).toContain('Pending');
+    rerender(<ProposalStatusCopy proposal={makeProposal(ProposalState.ACTIVE)} />);
+    expect(container.textContent).toContain('Active');
+  });
+
+  it('rerender to VETOED state shows Vetoed text', () => {
+    const { container, rerender } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.ACTIVE)} />,
+    );
+    rerender(<ProposalStatusCopy proposal={makeProposal(ProposalState.VETOED)} />);
+    expect(container.textContent).toContain('Vetoed');
+  });
+
+  it('renders 5 instances of CANCELLED', () => {
+    const { container } = render(
+      <>
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.CANCELLED)} />
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.CANCELLED)} />
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.CANCELLED)} />
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.CANCELLED)} />
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.CANCELLED)} />
+      </>,
+    );
+    expect((container.textContent?.match(/Canceled/g) ?? []).length).toBe(5);
+  });
+
+  it('all 3 finished states render distinct texts', () => {
+    const { container } = render(
+      <>
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.EXPIRED)} />
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.DEFEATED)} />
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.QUEUED)} />
+      </>,
+    );
+    expect(container.textContent).toContain('Expired');
+    expect(container.textContent).toContain('Defeated');
+    expect(container.textContent).toContain('Queued');
+  });
+
+  it('SUCCEEDED state renders Succeeded text', () => {
+    const { container } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.SUCCEEDED)} />,
+    );
+    expect(container.textContent).toBe('Succeeded');
+  });
 });

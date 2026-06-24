@@ -107,4 +107,39 @@ describe('Link', () => {
     const { container } = render(<Link text="日本語" url="/x" leavesPage={false} />);
     expect(container.querySelector('a')?.textContent).toBe('日本語');
   });
+
+  it('rerender from leavesPage=true to false updates target', () => {
+    const { container, rerender } = render(<Link text="x" url="/x" leavesPage={true} />);
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('_blank');
+    rerender(<Link text="x" url="/x" leavesPage={false} />);
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('_self');
+  });
+
+  it('rerender url updates href', () => {
+    const { container, rerender } = render(<Link text="x" url="/a" leavesPage={false} />);
+    expect(container.querySelector('a')?.getAttribute('href')).toBe('/a');
+    rerender(<Link text="x" url="/b" leavesPage={false} />);
+    expect(container.querySelector('a')?.getAttribute('href')).toBe('/b');
+  });
+
+  it('renders 10 instances each with own url', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <Link key={i} text={`l${i}`} url={`/url${i}`} leavesPage={false} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(10);
+  });
+
+  it('renders empty text without crash', () => {
+    expect(() => render(<Link text="" url="/x" leavesPage={false} />)).not.toThrow();
+  });
+
+  it('renders 500 char long url', () => {
+    const longUrl = 'https://example.com/' + 'a'.repeat(500);
+    const { container } = render(<Link text="x" url={longUrl} leavesPage={false} />);
+    expect(container.querySelector('a')?.getAttribute('href')).toBe(longUrl);
+  });
 });
