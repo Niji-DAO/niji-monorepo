@@ -217,4 +217,47 @@ describe('GrayCircle', () => {
     );
     expect(container.querySelectorAll('img').length).toBe(5);
   });
+
+  it('renders 20 GrayCircles independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <GrayCircle key={i} isDelegateView={i % 2 === 0} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(20);
+  });
+
+  it('GrayCircle renders within Fragment with sibling', () => {
+    const { container } = render(
+      <>
+        <span>before</span>
+        <GrayCircle />
+        <span>after</span>
+      </>,
+    );
+    expect(container.textContent).toContain('before');
+    expect(container.textContent).toContain('after');
+    expect(container.querySelector('img')).not.toBeNull();
+  });
+
+  it('GrayCircle alt is empty string (decorative)', () => {
+    const { container } = render(<GrayCircle />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('');
+  });
+
+  it('multiple rerenders preserve img src', () => {
+    const { container, rerender } = render(<GrayCircle />);
+    const src1 = container.querySelector('img')?.getAttribute('src');
+    rerender(<GrayCircle />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe(src1);
+  });
+
+  it('img element preserved across isDelegateView toggle', () => {
+    const { container, rerender } = render(<GrayCircle />);
+    const initial = container.querySelector('img')?.getAttribute('src');
+    rerender(<GrayCircle isDelegateView={true} />);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe(initial);
+  });
 });

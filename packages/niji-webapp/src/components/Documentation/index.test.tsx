@@ -254,4 +254,49 @@ describe('Documentation', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders Documentation 20 times consecutively without crash', () => {
+    for (let i = 0; i < 20; i++) {
+      expect(() => render(<Documentation />)).not.toThrow();
+    }
+  });
+
+  it('renders Documentation 10 instances together', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <Documentation key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender same component 5 times', () => {
+    const { rerender } = render(<Documentation />);
+    for (let i = 0; i < 5; i++) {
+      expect(() => rerender(<Documentation />)).not.toThrow();
+    }
+  });
+
+  it('renders Documentation without crash when wrapped in Fragment', () => {
+    expect(() =>
+      render(
+        <>
+          <Documentation />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('Documentation renders within a div parent', () => {
+    expect(() =>
+      render(
+        <div data-testid="parent">
+          <Documentation />
+        </div>,
+      ),
+    ).not.toThrow();
+  });
 });

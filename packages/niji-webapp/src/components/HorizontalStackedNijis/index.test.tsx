@@ -213,4 +213,39 @@ describe('HorizontalStackedNijis', () => {
     const longId = '9'.repeat(100);
     expect(() => render(<HorizontalStackedNijis nounIds={[longId]} />)).not.toThrow();
   });
+
+  it('renders 4 IDs as 4 circles (under cap)', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={['1', '2', '3', '4']} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(4);
+  });
+
+  it('renders 6 IDs as exactly 6 circles (at cap)', () => {
+    const { container } = render(
+      <HorizontalStackedNijis nounIds={['1', '2', '3', '4', '5', '6']} />,
+    );
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(6);
+  });
+
+  it('renders 7 IDs caps at 6', () => {
+    const { container } = render(
+      <HorizontalStackedNijis nounIds={['1', '2', '3', '4', '5', '6', '7']} />,
+    );
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(6);
+  });
+
+  it('renders 10 instances each independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <HorizontalStackedNijis key={i} nounIds={[`${i}`]} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(10);
+  });
+
+  it('renders 3 IDs with 3 circles', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={['42', '100', '200']} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(3);
+  });
 });
