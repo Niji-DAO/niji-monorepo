@@ -284,4 +284,51 @@ describe('ModalLabel', () => {
       expect(container.querySelector('div')?.textContent).toBe(`item-${i}-日本語`);
     }
   });
+
+  it('renders 100 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <ModalLabel key={i}>{`item-${i}`}</ModalLabel>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(100);
+  });
+
+  it('handles array children as concatenation', () => {
+    const { container } = render(<ModalLabel>{['a', 'b', 'c', 'd', 'e']}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('abcde');
+  });
+
+  it('renders 5000 char long text', () => {
+    const longStr = 'a'.repeat(5000);
+    const { container } = render(<ModalLabel>{longStr}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe(longStr);
+  });
+
+  it('rerender 30 times preserves wrapper div', () => {
+    const { container, rerender } = render(<ModalLabel>x</ModalLabel>);
+    for (let i = 0; i < 30; i++) {
+      rerender(<ModalLabel>{`item-${i}`}</ModalLabel>);
+      expect(container.children.length).toBe(1);
+    }
+  });
+
+  it('handles deeply nested 5 level children', () => {
+    const { container } = render(
+      <ModalLabel>
+        <span>
+          <strong>
+            <em>
+              <small>
+                <i data-testid="deep">5</i>
+              </small>
+            </em>
+          </strong>
+        </span>
+      </ModalLabel>,
+    );
+    expect(container.querySelector('[data-testid="deep"]')?.textContent).toBe('5');
+  });
 });

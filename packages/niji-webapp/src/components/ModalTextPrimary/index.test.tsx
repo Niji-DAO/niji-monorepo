@@ -289,4 +289,51 @@ describe('ModalTextPrimary', () => {
       expect(container.querySelector('div')?.textContent).toBe(`item-${i}`);
     }
   });
+
+  it('renders 100 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <ModalTextPrimary key={i}>{`item-${i}`}</ModalTextPrimary>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(100);
+  });
+
+  it('handles array children as concatenation', () => {
+    const { container } = render(<ModalTextPrimary>{['x', 'y', 'z']}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('xyz');
+  });
+
+  it('renders 5000 char long text', () => {
+    const longStr = 'a'.repeat(5000);
+    const { container } = render(<ModalTextPrimary>{longStr}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe(longStr);
+  });
+
+  it('rerender 30 times preserves wrapper div', () => {
+    const { container, rerender } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+    for (let i = 0; i < 30; i++) {
+      rerender(<ModalTextPrimary>{`item-${i}`}</ModalTextPrimary>);
+      expect(container.children.length).toBe(1);
+    }
+  });
+
+  it('handles deeply nested 5 level children', () => {
+    const { container } = render(
+      <ModalTextPrimary>
+        <span>
+          <strong>
+            <em>
+              <small>
+                <i data-testid="deep">5</i>
+              </small>
+            </em>
+          </strong>
+        </span>
+      </ModalTextPrimary>,
+    );
+    expect(container.querySelector('[data-testid="deep"]')?.textContent).toBe('5');
+  });
 });
