@@ -388,4 +388,45 @@ describe('NavBar', () => {
     const interactiveElements = container.querySelectorAll('button, a');
     expect(interactiveElements.length).toBeGreaterThanOrEqual(1);
   });
+
+  it('renders 10 NavBar instances independently', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <NavBar key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender does not crash', () => {
+    expect(() => {
+      wrap(<NavBar />);
+      wrap(<NavBar />);
+      wrap(<NavBar />);
+    }).not.toThrow();
+  });
+
+  it('renders consecutive 5 times', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(() => wrap(<NavBar />)).not.toThrow();
+    }
+  });
+
+  it('NavBar contains logo image', () => {
+    const { container } = wrap(<NavBar />);
+    expect(container.querySelector('img[alt="Niji DAO"]')).not.toBeNull();
+  });
+
+  it('renders within outer parent div', () => {
+    expect(() =>
+      wrap(
+        <div data-testid="parent">
+          <NavBar />
+        </div>,
+      ),
+    ).not.toThrow();
+  });
 });

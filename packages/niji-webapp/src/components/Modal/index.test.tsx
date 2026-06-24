@@ -238,4 +238,58 @@ describe('Modal', () => {
   it('renders for null content', () => {
     expect(() => render(<Modal title="T" content={null} onDismiss={() => {}} />)).not.toThrow();
   });
+
+  it('Backdrop renders 10 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <Backdrop key={i} onDismiss={vi.fn()} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(10);
+  });
+
+  it('rapid 10 close button clicks fire 10 times', () => {
+    const onDismiss = vi.fn();
+    render(<Modal title="x" content={null} onDismiss={onDismiss} />);
+    const btn = document.getElementById('overlay-root')?.querySelector('button');
+    if (btn) {
+      for (let i = 0; i < 10; i++) fireEvent.click(btn);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(10);
+  });
+
+  it('renders Modal with deeply nested content', () => {
+    render(
+      <Modal
+        title="X"
+        content={
+          <div>
+            <span>
+              <strong data-testid="deep">deep</strong>
+            </span>
+          </div>
+        }
+        onDismiss={() => {}}
+      />,
+    );
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="deep"]')?.textContent,
+    ).toBe('deep');
+  });
+
+  it('renders 5 Modals each with different title', () => {
+    for (let i = 0; i < 5; i++) {
+      render(<Modal title={`Modal-${i}`} content={null} onDismiss={() => {}} />);
+    }
+    expect(document.getElementById('overlay-root')?.children.length).toBe(5);
+  });
+
+  it('Backdrop rerender preserves single div', () => {
+    const { container, rerender } = render(<Backdrop onDismiss={vi.fn()} />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+    rerender(<Backdrop onDismiss={vi.fn()} />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+  });
 });
