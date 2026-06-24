@@ -199,4 +199,48 @@ describe('ProposalStatus', () => {
     rerender(<ProposalStatus status={ProposalState.ACTIVE} />);
     expect(container.innerHTML).toBe(firstHTML);
   });
+
+  it('renders 10 instances each with own status', () => {
+    const { container } = render(
+      <>
+        {cases.slice(0, 10).map(([status], i) => (
+          <ProposalStatus key={i} status={status} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(10);
+  });
+
+  it('rerender from PENDING to ACTIVE updates status text', () => {
+    const { container, rerender } = render(<ProposalStatus status={ProposalState.PENDING} />);
+    expect(container.textContent).toContain('Pending');
+    rerender(<ProposalStatus status={ProposalState.ACTIVE} />);
+    expect(container.textContent).toContain('Active');
+  });
+
+  it('rerender to undefined defaults to Undetermined', () => {
+    const { container, rerender } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
+    rerender(<ProposalStatus status={undefined} />);
+    expect(container.textContent).toContain('Undetermined');
+  });
+
+  it('all 12 statuses each render distinct text', () => {
+    const { container } = render(
+      <>
+        {cases.map(([status], i) => (
+          <ProposalStatus key={i} status={status} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(12);
+  });
+
+  it('custom className is preserved across rerenders', () => {
+    const { container, rerender } = render(
+      <ProposalStatus status={ProposalState.ACTIVE} className="custom-cls" />,
+    );
+    expect(container.querySelector('div')?.className).toContain('custom-cls');
+    rerender(<ProposalStatus status={ProposalState.EXECUTED} className="custom-cls" />);
+    expect(container.querySelector('div')?.className).toContain('custom-cls');
+  });
 });

@@ -339,4 +339,48 @@ describe('Bid', () => {
     fireEvent.change(input, { target: { value: '0.01' } });
     expect(input.value).toBe('0.01');
   });
+
+  it('renders 5 instances each without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <Bid key={i} auction={makeAuction() as never} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender from auctionEnded=false to true does not crash', () => {
+    const { rerender } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    expect(() =>
+      rerender(<Bid auction={makeAuction() as never} auctionEnded={true} />),
+    ).not.toThrow();
+  });
+
+  it('renders without crash when account is undefined', () => {
+    hookState.account = undefined;
+    expect(() =>
+      render(<Bid auction={makeAuction() as never} auctionEnded={false} />),
+    ).not.toThrow();
+    hookState.account = '0xUSER';
+  });
+
+  it('renders without crash when minBidIncPercentage is undefined', () => {
+    hookState.minBidIncPercentage = undefined;
+    expect(() =>
+      render(<Bid auction={makeAuction() as never} auctionEnded={false} />),
+    ).not.toThrow();
+    hookState.minBidIncPercentage = 5n;
+  });
+
+  it('input change rapid 5 events updates value', () => {
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    for (let i = 0; i < 5; i++) {
+      fireEvent.change(input, { target: { value: `${i}.01` } });
+    }
+    expect(input.value).toBe('4.01');
+  });
 });

@@ -332,4 +332,61 @@ describe('NijisTransition', () => {
     );
     expect(container.querySelector('[data-testid="nested"]')?.textContent).toBe('nested');
   });
+
+  it('renders without crash with null children', () => {
+    expect(() =>
+      render(
+        <NijisTransition show={true} transitionStyes={styles}>
+          {null}
+        </NijisTransition>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders 5 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <NijisTransition key={i} show={true} transitionStyes={styles}>
+            <div>item-{i}</div>
+          </NijisTransition>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="motion-div"]').length).toBe(5);
+  });
+
+  it('rerender from "A" to "B" updates content', () => {
+    const { container, rerender } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        A
+      </NijisTransition>,
+    );
+    expect(container.textContent).toContain('A');
+    rerender(
+      <NijisTransition show={true} transitionStyes={styles}>
+        B
+      </NijisTransition>,
+    );
+    expect(container.textContent).toContain('B');
+  });
+
+  it('renders 300 char long content', () => {
+    const longStr = 'x'.repeat(300);
+    const { container } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        {longStr}
+      </NijisTransition>,
+    );
+    expect(container.textContent).toContain(longStr);
+  });
+
+  it('renders unicode content', () => {
+    const { container } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        {'日本語'}
+      </NijisTransition>,
+    );
+    expect(container.textContent).toContain('日本語');
+  });
 });
