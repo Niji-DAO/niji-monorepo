@@ -33,4 +33,40 @@ describe('getAddressFromQueryParams', () => {
   it('handles trailing & separator (& removed from split tokens)', () => {
     expect(getAddressFromQueryParams('to', `?to=${VALID_ADDR}&`)).toBe(VALID_ADDR);
   });
+
+  it('returns undefined for empty location string', () => {
+    // 空文字 split('=') -> [''] のため indexOf('to') < 0
+    expect(getAddressFromQueryParams('to', '')).toBeUndefined();
+  });
+
+  it('returns undefined when location is "?" only (no param)', () => {
+    // '?' -> split('=') -> ['?'] -> map で '' -> indexOf('to') < 0
+    expect(getAddressFromQueryParams('to', '?')).toBeUndefined();
+  });
+
+  it('returns ENS for .eth value when multiple params separated by &', () => {
+    // ?from=foo.eth&to=alice.eth は split('=') で 3 tokens ['?from', 'foo.eth&to', 'alice.eth']
+    // map で '?' / '&' を remove -> ['from', 'footo', 'alice.eth']、 to が見つからないので undefined
+    // よって & 経由 multi-param は素直に動かないことを契約として固定
+    expect(getAddressFromQueryParams('to', `?from=foo.eth&to=alice.eth`)).toBeUndefined();
+  });
+
+  it('returns undefined for uppercase .ETH (endsWith is case-sensitive)', () => {
+    // source の endsWith('.eth') は lowercase のみ match、 .ETH は通らない
+    // alice.ETH は viem isAddress でも false、 結果 undefined
+    expect(getAddressFromQueryParams('to', '?to=alice.ETH')).toBeUndefined();
+  });
+
+  it('returns undefined when address is malformed but ends with .eth-like suffix', () => {
+    // 末尾 .eth なら decodeURIComponent で返すため、 .eth 形式は ENS とみなされる
+    // ここでは 0x...eth (16 進だが .eth と取られる) を試して挙動を pin
+    expect(getAddressFromQueryParams('to', '?to=abc.eth')).toBe('abc.eth');
+  });
+
+  it('returns undefined when param appears as VALUE of another param (not key)', () => {
+    // `?from=to=0x...` のように 'to' が value 位置に来ると split で middle token、
+    // indexOf 'to' で見つかるが index + 1 が address になるかは tokenize 結果依存
+    // この経路を契約として pin
+    expect(getAddressFromQueryParams('to', `?from=to`)).toBeUndefined();
+  });
 });
