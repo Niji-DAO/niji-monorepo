@@ -299,4 +299,37 @@ describe('Documentation', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders Documentation 50 times consecutively', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => render(<Documentation />)).not.toThrow();
+    }
+  });
+
+  it('renders 30 instances together', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Documentation key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('contains exactly 1 about-section per instance', () => {
+    const { container } = render(<Documentation />);
+    expect(container.querySelectorAll('[data-testid="about-section"]').length).toBe(1);
+  });
+
+  it('contains exactly 1 art-section per instance', () => {
+    const { container } = render(<Documentation />);
+    expect(container.querySelectorAll('[data-testid="art-section"]').length).toBe(1);
+  });
+
+  it('contains exactly 1 gov-section per instance', () => {
+    const { container } = render(<Documentation />);
+    expect(container.querySelectorAll('[data-testid="gov-section"]').length).toBe(1);
+  });
 });
