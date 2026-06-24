@@ -46,4 +46,31 @@ describe('useProposalStatus', () => {
   it('returns "pending" for EXPIRED', () => {
     expect(useProposalStatus(baseProposal(ProposalState.EXPIRED))).toBe('pending');
   });
+
+  it('returns "pending" for UPDATABLE (default branch)', () => {
+    expect(useProposalStatus(baseProposal(ProposalState.UPDATABLE))).toBe('pending');
+  });
+
+  it('returns "pending" for OBJECTION_PERIOD (default branch)', () => {
+    expect(useProposalStatus(baseProposal(ProposalState.OBJECTION_PERIOD))).toBe('pending');
+  });
+
+  it('returns "pending" for UNDETERMINED (default branch)', () => {
+    expect(useProposalStatus(baseProposal(ProposalState.UNDETERMINED))).toBe('pending');
+  });
+
+  it('3 success cases (SUCCEEDED / EXECUTED / QUEUED) return identical "success" string', () => {
+    const a = useProposalStatus(baseProposal(ProposalState.SUCCEEDED));
+    const b = useProposalStatus(baseProposal(ProposalState.EXECUTED));
+    const c = useProposalStatus(baseProposal(ProposalState.QUEUED));
+    expect(a).toBe(b);
+    expect(b).toBe(c);
+    expect(a).toBe('success');
+  });
+
+  it('2 failure cases (DEFEATED / VETOED) return identical "failure" string', () => {
+    expect(useProposalStatus(baseProposal(ProposalState.DEFEATED))).toBe(
+      useProposalStatus(baseProposal(ProposalState.VETOED)),
+    );
+  });
 });

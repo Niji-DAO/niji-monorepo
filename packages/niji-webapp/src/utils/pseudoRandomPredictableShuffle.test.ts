@@ -40,4 +40,47 @@ describe('pseudoRandomPredictableShuffle', () => {
     const input = [1, 2, 3];
     expect(pseudoRandomPredictableShuffle(input)).toEqual(pseudoRandomPredictableShuffle(input, 1));
   });
+
+  it('seed 0 internal-increment path produces same result as seed 1 (0++ -> 1 before sin)', () => {
+    // source 内 `if (seed === 0) seed++;` で seed=0 開始は seed=1 として進む
+    const input = [1, 2, 3, 4, 5];
+    expect(pseudoRandomPredictableShuffle(input, 0)).toEqual(
+      pseudoRandomPredictableShuffle(input, 1),
+    );
+  });
+
+  it('handles very large seed (1e9) without throw', () => {
+    const input = [1, 2, 3, 4, 5];
+    const result = pseudoRandomPredictableShuffle(input, 1e9);
+    expect(result).toHaveLength(5);
+    expect([...result].sort()).toEqual([...input].sort());
+  });
+
+  it('shuffles string elements correctly (permutation preserved)', () => {
+    const input = ['a', 'b', 'c', 'd'];
+    const result = pseudoRandomPredictableShuffle(input, 42);
+    expect([...result].sort()).toEqual([...input].sort());
+  });
+
+  it('preserves reference identity of object elements (shallow)', () => {
+    const o1 = { id: 1 };
+    const o2 = { id: 2 };
+    const o3 = { id: 3 };
+    const result = pseudoRandomPredictableShuffle([o1, o2, o3], 7);
+    expect(result).toContain(o1);
+    expect(result).toContain(o2);
+    expect(result).toContain(o3);
+  });
+
+  it('does not mutate the input array (immutable contract)', () => {
+    const input = [1, 2, 3, 4, 5];
+    const snapshot = [...input];
+    pseudoRandomPredictableShuffle(input, 99);
+    expect(input).toEqual(snapshot);
+  });
+
+  it('handles default empty input ([]) with default seed', () => {
+    // 引数なし呼出で default input [] + default seed 1
+    expect(pseudoRandomPredictableShuffle()).toEqual([]);
+  });
 });
