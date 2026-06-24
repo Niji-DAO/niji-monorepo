@@ -181,4 +181,38 @@ describe('ModalTextPrimary', () => {
     const { container } = render(<ModalTextPrimary>{'<>&'}</ModalTextPrimary>);
     expect(container.querySelector('div')?.textContent).toBe('<>&');
   });
+
+  it('renders empty children', () => {
+    const { container } = render(<ModalTextPrimary>{''}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('renders 500 char long text', () => {
+    const longStr = 'x'.repeat(500);
+    const { container } = render(<ModalTextPrimary>{longStr}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe(longStr);
+  });
+
+  it('rerender between values updates display', () => {
+    const { container, rerender } = render(<ModalTextPrimary>v1</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('v1');
+    rerender(<ModalTextPrimary>v2</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('v2');
+  });
+
+  it('renders 10 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <ModalTextPrimary key={i}>{`text${i}`}</ModalTextPrimary>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(10);
+  });
+
+  it('renders unicode text', () => {
+    const { container } = render(<ModalTextPrimary>{'日本語テキスト'}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('日本語テキスト');
+  });
 });

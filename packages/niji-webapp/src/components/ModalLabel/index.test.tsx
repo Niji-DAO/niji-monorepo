@@ -169,4 +169,44 @@ describe('ModalLabel', () => {
     rerender(<ModalLabel>y</ModalLabel>);
     expect(container.querySelector('div')?.className).toBe(cls1);
   });
+
+  it('renders nested span children', () => {
+    const { container } = render(
+      <ModalLabel>
+        <span data-testid="inner">inner</span>
+      </ModalLabel>,
+    );
+    expect(container.querySelector('[data-testid="inner"]')?.textContent).toBe('inner');
+  });
+
+  it('renders 300 char long text', () => {
+    const longStr = 'x'.repeat(300);
+    const { container } = render(<ModalLabel>{longStr}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe(longStr);
+  });
+
+  it('rerender from "a" to "b" updates label', () => {
+    const { container, rerender } = render(<ModalLabel>a</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('a');
+    rerender(<ModalLabel>b</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('b');
+  });
+
+  it('renders 5 instances independently', () => {
+    const { container } = render(
+      <>
+        <ModalLabel>A</ModalLabel>
+        <ModalLabel>B</ModalLabel>
+        <ModalLabel>C</ModalLabel>
+        <ModalLabel>D</ModalLabel>
+        <ModalLabel>E</ModalLabel>
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(5);
+  });
+
+  it('renders unicode label verbatim', () => {
+    const { container } = render(<ModalLabel>{'絵文字-日本語'}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('絵文字-日本語');
+  });
 });
