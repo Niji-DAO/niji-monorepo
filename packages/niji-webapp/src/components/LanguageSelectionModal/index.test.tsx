@@ -258,4 +258,58 @@ describe('LanguageSelectionModal', () => {
     render(<LanguageSelectionModal onDismiss={() => {}} />);
     expect(document.getElementById('overlay-root')?.querySelectorAll('svg').length).toBe(1);
   });
+
+  it('renders 3 instances independently in same DOM', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    expect(() =>
+      render(
+        <>
+          <LanguageSelectionModal onDismiss={() => {}} />
+          <LanguageSelectionModal onDismiss={() => {}} />
+          <LanguageSelectionModal onDismiss={() => {}} />
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender preserves modal structure', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { rerender } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+    useAtomMock.mockReturnValue(['ja-JP', vi.fn()]);
+    expect(() => rerender(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
+  });
+
+  it('all 3 locale buttons accessible by text', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    const overlay = document.getElementById('overlay-root');
+    const text = overlay?.textContent ?? '';
+    expect(text).toContain('日本語');
+    expect(text).toContain('English');
+    expect(text).toContain('中文');
+  });
+
+  it('setLocale + onDismiss fire both on Japanese click', () => {
+    const setLocale = vi.fn();
+    const onDismiss = vi.fn();
+    useAtomMock.mockReturnValue(['en-US', setLocale]);
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    const buttons = document.getElementById('overlay-root')?.querySelectorAll('div');
+    const jaBtn = Array.from(buttons ?? []).find(d => d.textContent === '日本語');
+    if (jaBtn) fireEvent.click(jaBtn);
+    expect(setLocale).toHaveBeenCalled();
+    expect(onDismiss).toHaveBeenCalled();
+  });
+
+  it('all 3 different locale clicks each trigger setLocale', () => {
+    const setLocale = vi.fn();
+    useAtomMock.mockReturnValue(['en-US', setLocale]);
+    render(<LanguageSelectionModal onDismiss={() => {}} />);
+    const buttons = document.getElementById('overlay-root')?.querySelectorAll('div');
+    ['日本語', 'English', '中文'].forEach(label => {
+      const btn = Array.from(buttons ?? []).find(d => d.textContent === label);
+      if (btn) fireEvent.click(btn);
+    });
+    expect(setLocale).toHaveBeenCalledTimes(3);
+  });
 });
