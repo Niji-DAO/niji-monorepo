@@ -84,4 +84,37 @@ describe('ProposalStatus', () => {
     const { container } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
     expect(container.querySelectorAll('div').length).toBe(1);
   });
+
+  it('EXPIRED state renders secondary class', () => {
+    const { container } = render(<ProposalStatus status={ProposalState.EXPIRED} />);
+    expect(container.querySelector('div')?.className).toMatch(/secondary/i);
+  });
+
+  it('CANCELLED state renders secondary class', () => {
+    const { container } = render(<ProposalStatus status={ProposalState.CANCELLED} />);
+    expect(container.querySelector('div')?.className).toMatch(/secondary/i);
+  });
+
+  it('undefined status renders Undetermined text', () => {
+    const { container } = render(<ProposalStatus status={undefined} />);
+    expect(container.textContent).toContain('Undetermined');
+  });
+
+  it('custom className appends to default class', () => {
+    const { container } = render(
+      <ProposalStatus status={ProposalState.ACTIVE} className="custom-extra" />,
+    );
+    const cls = container.querySelector('div')?.className ?? '';
+    expect(cls).toContain('custom-extra');
+  });
+
+  it('multi className tokens preserved', () => {
+    const { container } = render(
+      <ProposalStatus status={ProposalState.PENDING} className="a b c" />,
+    );
+    const cls = container.querySelector('div')?.className ?? '';
+    expect(cls).toContain('a');
+    expect(cls).toContain('b');
+    expect(cls).toContain('c');
+  });
 });

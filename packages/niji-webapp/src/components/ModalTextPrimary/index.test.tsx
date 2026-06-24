@@ -59,4 +59,45 @@ describe('ModalTextPrimary', () => {
     const { container } = render(<ModalTextPrimary>{undefined}</ModalTextPrimary>);
     expect(container.querySelector('div')?.textContent).toBe('');
   });
+
+  it('renders nested deep tree', () => {
+    const { container } = render(
+      <ModalTextPrimary>
+        <div data-testid="outer">
+          <span data-testid="inner">deep</span>
+        </div>
+      </ModalTextPrimary>,
+    );
+    expect(container.querySelector('[data-testid="inner"]')?.textContent).toBe('deep');
+  });
+
+  it('renders large 500-char string', () => {
+    const long = 'a'.repeat(500);
+    const { container } = render(<ModalTextPrimary>{long}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent?.length).toBe(500);
+  });
+
+  it('CSS module className contains hash format', () => {
+    const { container } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+    expect(container.querySelector('div')?.className).toMatch(/_.+/);
+  });
+
+  it('renders nested ModalTextPrimary without crash', () => {
+    const { container } = render(
+      <ModalTextPrimary>
+        <ModalTextPrimary>nested</ModalTextPrimary>
+      </ModalTextPrimary>,
+    );
+    expect(container.querySelectorAll('div').length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <ModalTextPrimary>a</ModalTextPrimary>
+        <ModalTextPrimary>b</ModalTextPrimary>
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(2);
+  });
 });
