@@ -194,4 +194,54 @@ describe('SettleManuallyBtn', () => {
       render(<SettleManuallyBtn settleAuctionHandler={() => {}} auction={future} />),
     ).not.toThrow();
   });
+
+  it('5 instances render 5 buttons', () => {
+    const { container } = render(
+      <>
+        <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />
+        <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />
+        <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />
+        <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />
+        <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(5);
+  });
+
+  it('rerender preserves p wrapper', () => {
+    const { container, rerender } = render(
+      <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />,
+    );
+    expect(container.firstElementChild?.tagName).toBe('P');
+    rerender(<SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />);
+    expect(container.firstElementChild?.tagName).toBe('P');
+  });
+
+  it('button text "Settle manually" rendered verbatim', () => {
+    const { container } = render(
+      <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />,
+    );
+    expect(container.textContent).toBe('Settle manually');
+  });
+
+  it('rerender different auction.amount does not crash', () => {
+    const { rerender } = render(
+      <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />,
+    );
+    expect(() =>
+      rerender(
+        <SettleManuallyBtn
+          settleAuctionHandler={() => {}}
+          auction={{ ...auction, amount: 999n }}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('p wrapper renders 1 element exactly', () => {
+    const { container } = render(
+      <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />,
+    );
+    expect(container.querySelectorAll('p').length).toBe(1);
+  });
 });

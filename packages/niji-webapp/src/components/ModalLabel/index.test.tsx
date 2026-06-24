@@ -134,4 +134,39 @@ describe('ModalLabel', () => {
     const { container } = render(<ModalLabel>{huge}</ModalLabel>);
     expect(container.querySelector('div')?.textContent?.length).toBe(1000);
   });
+
+  it('renders 0 (zero) numeric children verbatim', () => {
+    const { container } = render(<ModalLabel>{0}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('0');
+  });
+
+  it('renders 5 instances independently', () => {
+    const { container } = render(
+      <>
+        <ModalLabel>a</ModalLabel>
+        <ModalLabel>b</ModalLabel>
+        <ModalLabel>c</ModalLabel>
+        <ModalLabel>d</ModalLabel>
+        <ModalLabel>e</ModalLabel>
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(5);
+  });
+
+  it('emoji children render verbatim', () => {
+    const { container } = render(<ModalLabel>🎉🎊</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('🎉🎊');
+  });
+
+  it('special characters render correctly', () => {
+    const { container } = render(<ModalLabel>{'<>&"'}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent).toBe('<>&"');
+  });
+
+  it('rerender className stays consistent', () => {
+    const { container, rerender } = render(<ModalLabel>x</ModalLabel>);
+    const cls1 = container.querySelector('div')?.className;
+    rerender(<ModalLabel>y</ModalLabel>);
+    expect(container.querySelector('div')?.className).toBe(cls1);
+  });
 });
