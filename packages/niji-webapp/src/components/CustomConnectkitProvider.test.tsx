@@ -65,4 +65,51 @@ describe('CustomConnectkitProvider', () => {
     );
     expect(optionsCapture.language).toBe('en-US');
   });
+
+  it('renders multiple children inside provider', () => {
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(
+      <CustomConnectkitProvider>
+        <span>a</span>
+        <span>b</span>
+      </CustomConnectkitProvider>,
+    );
+    expect(container.querySelectorAll('span').length).toBe(2);
+  });
+
+  it('renders numeric children', () => {
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(<CustomConnectkitProvider>{42}</CustomConnectkitProvider>);
+    expect(container.querySelector('[data-testid="ckp"]')?.textContent).toBe('42');
+  });
+
+  it('forwards arbitrary non-pseudo locale verbatim (de-DE)', () => {
+    useActiveLocaleMock.mockReturnValue('de-DE');
+    render(
+      <CustomConnectkitProvider>
+        <span>x</span>
+      </CustomConnectkitProvider>,
+    );
+    expect(optionsCapture.language).toBe('de-DE');
+  });
+
+  it('forwards fr-FR locale verbatim', () => {
+    useActiveLocaleMock.mockReturnValue('fr-FR');
+    render(
+      <CustomConnectkitProvider>
+        <span>x</span>
+      </CustomConnectkitProvider>,
+    );
+    expect(optionsCapture.language).toBe('fr-FR');
+  });
+
+  it('renders exactly 1 ConnectKitProvider instance', () => {
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(
+      <CustomConnectkitProvider>
+        <span>x</span>
+      </CustomConnectkitProvider>,
+    );
+    expect(container.querySelectorAll('[data-testid="ckp"]').length).toBe(1);
+  });
 });
