@@ -90,4 +90,48 @@ describe('NijiInfoRowHolder', () => {
       expect(container.querySelector('svg')).not.toBeNull();
     });
   });
+
+  it('handles large bigint nounId without crash', () => {
+    executeMock.mockReturnValue(new Promise(() => {}));
+    expect(() =>
+      render(<NijiInfoRowHolder nounId={9_007_199_254_740_991n} />, { wrapper: WithProviders }),
+    ).not.toThrow();
+  });
+
+  it('renders empty className (no merge crash)', async () => {
+    executeMock.mockResolvedValue({ auction: { bidder: { id: '0xBIDDER' } } });
+    const { container } = render(<NijiInfoRowHolder nounId={1n} className="" />, {
+      wrapper: WithProviders,
+    });
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="short"]')).not.toBeNull();
+    });
+  });
+
+  it('renders exactly 1 svg icon (winner path)', async () => {
+    executeMock.mockResolvedValue({ auction: { bidder: { id: '0xBIDDER' } } });
+    const { container } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
+    await waitFor(() => {
+      expect(container.querySelectorAll('svg').length).toBe(1);
+    });
+  });
+
+  it('etherscan link has noreferrer rel + _blank target (multi attribute)', async () => {
+    executeMock.mockResolvedValue({ auction: { bidder: { id: '0xBIDDER' } } });
+    const { container } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
+    await waitFor(() => {
+      const a = container.querySelector('a');
+      expect(a?.getAttribute('rel')).toBe('noreferrer');
+      expect(a?.getAttribute('target')).toBe('_blank');
+    });
+  });
+
+  it('auction house lowercase comparison still maps to "Niji Auction House" branch', async () => {
+    // mock auction house = '0xAUCTIONHOUSE'、 case-insensitive comparison で同一判定
+    executeMock.mockResolvedValue({ auction: { bidder: { id: '0xauctionhouse' } } });
+    const { container } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
+    await waitFor(() => {
+      expect(container.textContent).toContain('Niji Auction House');
+    });
+  });
 });
