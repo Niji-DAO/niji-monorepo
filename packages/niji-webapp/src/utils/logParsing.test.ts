@@ -52,4 +52,43 @@ describe('keyToFilter', () => {
       topics: ['0x1', '0x2'],
     });
   });
+
+  it('parses multiple flat topics from key', () => {
+    const result = keyToFilter('0xabc:0xa-0xb-0xc');
+    expect(result.topics).toEqual(['0xa', '0xb', '0xc']);
+  });
+
+  it('parses mixed flat + nested topics from key', () => {
+    const result = keyToFilter('0xabc:0x1-0x2;0x3');
+    expect(result.topics).toEqual(['0x1', ['0x2', '0x3']]);
+  });
+});
+
+describe('filterToKey — additional edge cases', () => {
+  it('returns ":" for fully empty filter (no address, no topics)', () => {
+    expect(filterToKey({})).toBe(':');
+  });
+
+  it('joins multiple top-level topics with dash, nested with semicolon', () => {
+    expect(filterToKey({ address: '0xa', topics: [['0x1', '0x2'], '0x3'] })).toBe(
+      '0xa:0x1;0x2-0x3',
+    );
+  });
+
+  it('handles mix of null + non-null topics', () => {
+    expect(filterToKey({ address: '0xa', topics: [null, '0x1'] })).toBe('0xa:\0-0x1');
+  });
+
+  it('ignores fromBlock — only address + topics influence key', () => {
+    const withFromBlock = filterToKey({ address: '0xa', topics: ['0x1'], fromBlock: 100 });
+    const withoutFromBlock = filterToKey({ address: '0xa', topics: ['0x1'] });
+    expect(withFromBlock).toBe(withoutFromBlock);
+  });
+});
+
+describe('logParsing round-trip', () => {
+  it('round-trip preserves nested topics (OR groups)', () => {
+    const original = { address: '0xabc', topics: [['0x1', '0x2']] };
+    expect(keyToFilter(filterToKey(original))).toEqual(original);
+  });
 });
