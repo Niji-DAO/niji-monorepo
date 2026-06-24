@@ -36,4 +36,42 @@ describe('EnsOrLongAddress', () => {
     const { container } = render(<EnsOrLongAddress address={ADDR} />);
     expect(container.textContent).toBe(ADDR);
   });
+
+  it('falls back to long address when ENS is empty string', () => {
+    // '' は ens && truthy ガードで falsy 扱い、 address にフォールバック
+    vi.mocked(useReverseENSLookUp).mockReturnValue('');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(ADDR);
+  });
+
+  it('passes the address argument to useReverseENSLookUp', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('x.eth');
+    render(<EnsOrLongAddress address={ADDR} />);
+    expect(useReverseENSLookUp).toHaveBeenCalledWith(ADDR);
+  });
+
+  it('calls containsBlockedText with English language code', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('alice.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    render(<EnsOrLongAddress address={ADDR} />);
+    expect(containsBlockedText).toHaveBeenCalledWith('alice.eth', 'en');
+  });
+
+  it('calls containsBlockedText with empty string when ENS is undefined', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    render(<EnsOrLongAddress address={ADDR} />);
+    // `ens || ''` で undefined は '' になる
+    expect(containsBlockedText).toHaveBeenCalledWith('', 'en');
+  });
+
+  it('renders different address when prop changes', () => {
+    const ADDR_B = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' as const;
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container: c1 } = render(<EnsOrLongAddress address={ADDR} />);
+    const { container: c2 } = render(<EnsOrLongAddress address={ADDR_B} />);
+    expect(c1.textContent).toBe(ADDR);
+    expect(c2.textContent).toBe(ADDR_B);
+  });
 });
