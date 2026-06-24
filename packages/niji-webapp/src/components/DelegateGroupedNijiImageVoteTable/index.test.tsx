@@ -327,4 +327,47 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
     );
     expect(container.querySelectorAll('td').length).toBe(12);
   });
+
+  it('handles 50 delegates (numPages = floor(50/12)+1 = 5)', () => {
+    const data = Array.from({ length: 50 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    expect(container.querySelector('[data-testid="num-pages"]')?.textContent).toBe('5');
+  });
+
+  it('renders 12 cells consistently for 1 delegate', () => {
+    const data1 = Array.from({ length: 1 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data1} />,
+    );
+    expect(container.querySelectorAll('td').length).toBe(12);
+  });
+
+  it('handles support type 0 (against)', () => {
+    const data = [makeVote('0xA', ['1'], 0)];
+    expect(() =>
+      render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles support type 2 (abstain)', () => {
+    const data = [makeVote('0xA', ['1'], 2)];
+    expect(() =>
+      render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles delegate with no nijis (empty nijiRepresented)', () => {
+    const data = [makeVote('0xA', [])];
+    expect(() =>
+      render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+      ),
+    ).not.toThrow();
+  });
 });

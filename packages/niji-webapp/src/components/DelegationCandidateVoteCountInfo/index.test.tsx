@@ -240,4 +240,52 @@ describe('DelegationCandidateVoteCountInfo', () => {
     expect(container.textContent).toContain('a');
     expect(container.textContent).toContain('5 Votes');
   });
+
+  it('voteCount=2 with isLoading=false renders "2 Votes"', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={2} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('2 Votes');
+  });
+
+  it('voteCount=Infinity renders verbatim', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={Infinity} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('Infinity');
+  });
+
+  it('rerender from isLoading=true to false hides svg', () => {
+    const { container, rerender } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={5} isLoading={true} />,
+    );
+    expect(container.querySelector('svg')).not.toBeNull();
+    rerender(<DelegationCandidateVoteCountInfo text="x" voteCount={5} isLoading={false} />);
+    expect(container.querySelector('svg')).toBeNull();
+  });
+
+  it('renders 7 instances each with distinct text', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 7 }, (_, i) => (
+          <DelegationCandidateVoteCountInfo
+            key={i}
+            text={`name-${i}`}
+            voteCount={i}
+            isLoading={false}
+          />
+        ))}
+      </>,
+    );
+    expect(container.textContent).toContain('name-0');
+    expect(container.textContent).toContain('name-6');
+  });
+
+  it('extremely long text renders verbatim', () => {
+    const longText = 'a'.repeat(500);
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text={longText} voteCount={1} isLoading={false} />,
+    );
+    expect(container.textContent).toContain(longText);
+  });
 });

@@ -242,4 +242,45 @@ describe('EnsOrLongAddress', () => {
     const { container } = render(<EnsOrLongAddress address={ADDR} />);
     expect(container.textContent).toBe(longName);
   });
+
+  it('renders for empty ENS string falls back to address', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('');
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(ADDR);
+  });
+
+  it('renders ENS with very short name', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('a.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('a.eth');
+  });
+
+  it('renders 20 instances each with own ENS', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('shared.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <EnsOrLongAddress key={i} address={ADDR} />
+        ))}
+      </>,
+    );
+    expect(container.textContent).toBe('shared.eth'.repeat(20));
+  });
+
+  it('blocklist takes precedence when ENS is set', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('bad.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(true);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(ADDR);
+    expect(container.textContent).not.toContain('bad.eth');
+  });
+
+  it('different address sets different short address fallback', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const otherAddr = '0x1111111111111111111111111111111111111111';
+    const { container } = render(<EnsOrLongAddress address={otherAddr} />);
+    expect(container.textContent).toBe(otherAddr);
+  });
 });
