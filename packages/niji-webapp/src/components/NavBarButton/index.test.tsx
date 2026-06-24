@@ -231,4 +231,45 @@ describe('NavBarButton', () => {
   it('NavBarButtonStyle exports COOL_INFO value', () => {
     expect(NavBarButtonStyle.COOL_INFO).toBeDefined();
   });
+
+  it('renders 50 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <NavBarButton key={i} buttonText={`btn-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(50);
+  });
+
+  it('rapid 50 clicks invoke onClick 50 times', () => {
+    const onClick = vi.fn();
+    const { container } = render(<NavBarButton buttonText="X" onClick={onClick} />);
+    const div = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 50; i++) fireEvent.click(div);
+    expect(onClick).toHaveBeenCalledTimes(50);
+  });
+
+  it('renders NavBarButton with buttonStyle prop variations', () => {
+    expect(() =>
+      render(<NavBarButton buttonText="X" buttonStyle={NavBarButtonStyle.COOL_INFO} />),
+    ).not.toThrow();
+  });
+
+  it('rerender buttonStyle changes className', () => {
+    const { container, rerender } = render(
+      <NavBarButton buttonText="X" buttonStyle={NavBarButtonStyle.COOL_INFO} />,
+    );
+    const initialClass = (container.firstElementChild as HTMLElement)?.className;
+    rerender(<NavBarButton buttonText="X" buttonStyle={NavBarButtonStyle.WARM_INFO} />);
+    const newClass = (container.firstElementChild as HTMLElement)?.className;
+    expect(newClass).not.toBe(initialClass);
+  });
+
+  it('renders 1000 char long buttonText', () => {
+    const longText = 'a'.repeat(1000);
+    const { container } = render(<NavBarButton buttonText={longText} />);
+    expect(container.textContent).toContain(longText);
+  });
 });

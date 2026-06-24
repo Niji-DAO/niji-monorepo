@@ -412,4 +412,60 @@ describe('Holder', () => {
     });
     expect(() => rerender(<Holder nounId={1n} />)).not.toThrow();
   });
+
+  it('renders 10 instances independently each with own nounId', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <Holder key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders 5 consecutive without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    for (let i = 0; i < 5; i++) {
+      expect(() => render(<Holder nounId={BigInt(i)} />, { wrapper: WithProviders })).not.toThrow();
+    }
+  });
+
+  it('renders for huge bigint nounId', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() =>
+      render(<Holder nounId={BigInt('99999999999999999999')} />, { wrapper: WithProviders }),
+    ).not.toThrow();
+  });
+
+  it('rerender loading transition to error state', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValueOnce({
+      loading: true,
+      error: undefined,
+      data: undefined,
+    });
+    const { rerender } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: new Error('boom'),
+      data: undefined,
+    });
+    expect(() => rerender(<Holder nounId={1n} />)).not.toThrow();
+  });
+
+  it('isNounders=true + loading=true renders nothing yet', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    const { container } = render(<Holder nounId={1n} isNounders={true} />, {
+      wrapper: WithProviders,
+    });
+    expect(container.textContent).toBe('');
+  });
 });

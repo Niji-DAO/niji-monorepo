@@ -240,4 +240,42 @@ describe('LegacyNoun — additional edge cases', () => {
     );
     expect(container.querySelectorAll('img').length).toBe(10);
   });
+
+  it('LegacyNoun renders 50 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <LegacyNoun key={i} imgPath={`/img${i}.png`} alt={`a-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(50);
+  });
+
+  it('LegacyNoun rerender preserves className across imgPath changes', () => {
+    const { container, rerender } = render(
+      <LegacyNoun imgPath="/x.png" alt="x" className="cls1" />,
+    );
+    expect(container.querySelector('img')?.className).toContain('cls1');
+    rerender(<LegacyNoun imgPath="/y.png" alt="x" className="cls1" />);
+    expect(container.querySelector('img')?.className).toContain('cls1');
+  });
+
+  it('LegacyNoun rerender preserves wrapperClassName across alt changes', () => {
+    const { container, rerender } = render(
+      <LegacyNoun imgPath="/x.png" alt="a" wrapperClassName="wrap" />,
+    );
+    expect(container.querySelector('div')?.className).toContain('wrap');
+    rerender(<LegacyNoun imgPath="/x.png" alt="b" wrapperClassName="wrap" />);
+    expect(container.querySelector('div')?.className).toContain('wrap');
+  });
+
+  it('LegacyNoun handles unicode imgPath', () => {
+    expect(() => render(<LegacyNoun imgPath="/日本.png" alt="x" />)).not.toThrow();
+  });
+
+  it('LegacyNoun handles 1000 char imgPath', () => {
+    const longPath = '/' + 'a'.repeat(1000) + '.png';
+    expect(() => render(<LegacyNoun imgPath={longPath} alt="x" />)).not.toThrow();
+  });
 });
