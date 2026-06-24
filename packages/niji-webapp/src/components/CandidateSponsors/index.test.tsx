@@ -367,4 +367,39 @@ describe('CandidateSponsors', () => {
   it('blockNumber=0n renders without crash', () => {
     expect(() => render(<CandidateSponsors {...baseProps} blockNumber={0n} />)).not.toThrow();
   });
+
+  it('renders without crash for very large blockNumber', () => {
+    expect(() =>
+      render(<CandidateSponsors {...baseProps} blockNumber={999999999999n} />),
+    ).not.toThrow();
+  });
+
+  it('renders 5 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <CandidateSponsors key={i} {...baseProps} blockNumber={BigInt(i + 1)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender with new blockNumber does not crash', () => {
+    const { rerender } = render(<CandidateSponsors {...baseProps} blockNumber={1n} />);
+    expect(() => rerender(<CandidateSponsors {...baseProps} blockNumber={100n} />)).not.toThrow();
+  });
+
+  it('renders without crash with account=undefined (logged out)', () => {
+    hookState.account = undefined;
+    expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+    hookState.account = '0xACCT';
+  });
+
+  it('renders without crash with isThresholdMet=true', () => {
+    hookState.isThresholdMet = true;
+    expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+    hookState.isThresholdMet = false;
+  });
 });

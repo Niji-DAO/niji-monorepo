@@ -221,4 +221,39 @@ describe('CandidateCard', () => {
     const candidate = { ...baseCandidate, proposerVotes: 0 } as never;
     expect(() => wrap(<CandidateCard candidate={candidate} nounsRequired={3} />)).not.toThrow();
   });
+
+  it('renders without crash for nounsRequired=0', () => {
+    expect(() => wrap(<CandidateCard candidate={baseCandidate} nounsRequired={0} />)).not.toThrow();
+  });
+
+  it('renders without crash for nounsRequired=100', () => {
+    expect(() =>
+      wrap(<CandidateCard candidate={baseCandidate} nounsRequired={100} />),
+    ).not.toThrow();
+  });
+
+  it('renders 5 instances each independently', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <CandidateCard key={i} candidate={baseCandidate} nounsRequired={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash for very large nounsRequired (10000)', () => {
+    expect(() =>
+      wrap(<CandidateCard candidate={baseCandidate} nounsRequired={10000} />),
+    ).not.toThrow();
+  });
+
+  it('consecutive renders work without crash', () => {
+    expect(() => {
+      wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />);
+      wrap(<CandidateCard candidate={baseCandidate} nounsRequired={10} />);
+    }).not.toThrow();
+  });
 });
