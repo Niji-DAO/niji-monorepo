@@ -272,4 +272,47 @@ describe('NavBarButton', () => {
     const { container } = render(<NavBarButton buttonText={longText} />);
     expect(container.textContent).toContain(longText);
   });
+
+  it('renders 100 instances each independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <NavBarButton key={i} buttonText={`b${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(100);
+  });
+
+  it('rapid 100 clicks invoke onClick 100 times', () => {
+    const onClick = vi.fn();
+    const { container } = render(<NavBarButton buttonText="X" onClick={onClick} />);
+    const div = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 100; i++) fireEvent.click(div);
+    expect(onClick).toHaveBeenCalledTimes(100);
+  });
+
+  it('rerender 30 times preserves outer div', () => {
+    const { container, rerender } = render(<NavBarButton buttonText="X" />);
+    for (let i = 0; i < 30; i++) {
+      rerender(<NavBarButton buttonText={`b${i}`} />);
+      expect(container.firstElementChild).not.toBeNull();
+    }
+  });
+
+  it('renders Number buttonText (numeric)', () => {
+    const { container } = render(<NavBarButton buttonText={42 as never} />);
+    expect(container.textContent).toContain('42');
+  });
+
+  it('handles all 4 styles', () => {
+    [
+      NavBarButtonStyle.COOL_INFO,
+      NavBarButtonStyle.WARM_INFO,
+      NavBarButtonStyle.WHITE_INFO,
+      NavBarButtonStyle.DELEGATE_PRIMARY,
+    ].forEach(style => {
+      expect(() => render(<NavBarButton buttonText="X" buttonStyle={style} />)).not.toThrow();
+    });
+  });
 });
