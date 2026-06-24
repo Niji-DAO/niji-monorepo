@@ -235,4 +235,44 @@ describe('BidHistoryModalRow', () => {
     const { container } = render(<BidHistoryModalRow bid={bid} index={1} />);
     expect(container.querySelector('a')?.getAttribute('href')).toContain('etherscan.io');
   });
+
+  it('renders 5 instances independently', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <BidHistoryModalRow
+            key={i}
+            bid={{ ...bid, value: BigInt(i + 1) * parseEther('1') }}
+            index={i}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(5);
+  });
+
+  it('rerender with new bid does not crash', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { rerender } = render(<BidHistoryModalRow bid={bid} index={0} />);
+    const newBid = { ...bid, value: parseEther('5') };
+    expect(() => rerender(<BidHistoryModalRow bid={newBid} index={0} />)).not.toThrow();
+  });
+
+  it('handles 0n bid value without crash', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const zero = { ...bid, value: 0n };
+    expect(() => render(<BidHistoryModalRow bid={zero} index={0} />)).not.toThrow();
+  });
+
+  it('handles huge bid value without crash', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const huge = { ...bid, value: parseEther('1000000') };
+    expect(() => render(<BidHistoryModalRow bid={huge} index={0} />)).not.toThrow();
+  });
+
+  it('handles different index values without crash', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    expect(() => render(<BidHistoryModalRow bid={bid} index={99} />)).not.toThrow();
+  });
 });

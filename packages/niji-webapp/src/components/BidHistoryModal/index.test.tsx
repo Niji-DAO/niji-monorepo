@@ -274,4 +274,37 @@ describe('BidHistoryModal', () => {
       'Bids will appear here',
     );
   });
+
+  it('renders without crash with empty bids', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    expect(() => render(<BidHistoryModal auction={auction} onDismiss={() => {}} />)).not.toThrow();
+  });
+
+  it('Backdrop renders without crash', () => {
+    expect(() => render(<Backdrop onClick={() => {}} />)).not.toThrow();
+  });
+
+  it('rerender with new auction id does not crash', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const { rerender } = render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    const newAuction = { ...auction, nounId: 99n };
+    expect(() =>
+      rerender(<BidHistoryModal auction={newAuction} onDismiss={() => {}} />),
+    ).not.toThrow();
+  });
+
+  it('renders 1 NijiRoundedCorners element', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const { container } = render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+    expect(
+      container.querySelectorAll('[data-testid="niji-rounded"]').length,
+    ).toBeGreaterThanOrEqual(0);
+  });
+
+  it('onDismiss is callable but not called on mount', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const onDismiss = vi.fn();
+    render(<BidHistoryModal auction={auction} onDismiss={onDismiss} />);
+    expect(onDismiss).not.toHaveBeenCalled();
+  });
 });

@@ -254,4 +254,43 @@ describe('BidHistoryItem Component', () => {
     );
     expect(container.querySelectorAll('a').length).toBe(2);
   });
+
+  it('renders truncated-amount for huge bid value', () => {
+    const hugeBid = { ...mockBid, value: 1_000_000_000_000_000_000_000_000n };
+    render(<BidHistoryItem bid={hugeBid} classes={mockClasses} />);
+    expect(screen.getByTestId('truncated-amount')).toHaveTextContent('1000000000000000000000000');
+  });
+
+  it('renders for 0n bid value', () => {
+    const zeroBid = { ...mockBid, value: 0n };
+    render(<BidHistoryItem bid={zeroBid} classes={mockClasses} />);
+    expect(screen.getByTestId('truncated-amount')).toHaveTextContent('Amount: 0');
+  });
+
+  it('renders 5 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <BidHistoryItem
+            key={i}
+            bid={{ ...mockBid, value: BigInt(i + 1) * 1000000000000000000n }}
+            classes={mockClasses}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="truncated-amount"]').length).toBe(5);
+  });
+
+  it('rerender with new bid updates amount', () => {
+    const { rerender } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+    const newBid = { ...mockBid, value: 5_000_000_000_000_000_000n };
+    rerender(<BidHistoryItem bid={newBid} classes={mockClasses} />);
+    expect(screen.getByTestId('truncated-amount')).toHaveTextContent('Amount: 5000000000000000000');
+  });
+
+  it('renders extended bid flag (true) without crash', () => {
+    const extBid = { ...mockBid, extended: true };
+    expect(() => render(<BidHistoryItem bid={extBid} classes={mockClasses} />)).not.toThrow();
+  });
 });
