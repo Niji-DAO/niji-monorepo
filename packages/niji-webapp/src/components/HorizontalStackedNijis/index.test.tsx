@@ -248,4 +248,38 @@ describe('HorizontalStackedNijis', () => {
     const { container } = render(<HorizontalStackedNijis nounIds={['42', '100', '200']} />);
     expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(3);
   });
+
+  it('handles 50 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <HorizontalStackedNijis key={i} nounIds={[`${i}`]} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(50);
+  });
+
+  it('handles 0 IDs renders empty (no circles)', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={[]} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(0);
+  });
+
+  it('handles 2 IDs renders 2 circles', () => {
+    const { container } = render(<HorizontalStackedNijis nounIds={['1', '2']} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(2);
+  });
+
+  it('rerender from 1 to 5 IDs increases circles', () => {
+    const { container, rerender } = render(<HorizontalStackedNijis nounIds={['1']} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(1);
+    rerender(<HorizontalStackedNijis nounIds={['1', '2', '3', '4', '5']} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(5);
+  });
+
+  it('handles "9999" max IDs caps at 6', () => {
+    const ids = Array.from({ length: 9999 }, (_, i) => String(i + 1));
+    const { container } = render(<HorizontalStackedNijis nounIds={ids} />);
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(6);
+  });
 });

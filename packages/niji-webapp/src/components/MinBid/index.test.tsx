@@ -247,4 +247,41 @@ describe('MinBid', () => {
     rerender(<MinBid minBid={parseEther('5')} onClick={() => {}} />);
     expect(container.querySelector('img')).not.toBeNull();
   });
+
+  it('renders 20 MinBid instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <MinBid key={i} minBid={parseEther(`${i + 1}`)} onClick={vi.fn()} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(20);
+  });
+
+  it('renders for boundary 1 wei (smallest positive)', () => {
+    const { container } = render(<MinBid minBid={1n} onClick={() => {}} />);
+    expect(container.textContent).toContain('Ξ');
+  });
+
+  it('rerender from 0n to fractional ETH', () => {
+    const { container, rerender } = render(<MinBid minBid={0n} onClick={() => {}} />);
+    expect(container.textContent).not.toContain('Ξ 0.50');
+    rerender(<MinBid minBid={parseEther('0.5')} onClick={() => {}} />);
+    expect(container.textContent).toContain('Ξ 0.50');
+  });
+
+  it('img alt attribute consistent across renders', () => {
+    const { container, rerender } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    const alt1 = container.querySelector('img')?.getAttribute('alt');
+    rerender(<MinBid minBid={parseEther('5')} onClick={() => {}} />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe(alt1);
+  });
+
+  it('h3 element preserved across rerenders', () => {
+    const { container, rerender } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+    expect(container.querySelector('h3')).not.toBeNull();
+    rerender(<MinBid minBid={parseEther('100')} onClick={() => {}} />);
+    expect(container.querySelector('h3')).not.toBeNull();
+  });
 });

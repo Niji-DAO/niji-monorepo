@@ -260,4 +260,38 @@ describe('GrayCircle', () => {
     rerender(<GrayCircle isDelegateView={true} />);
     expect(container.querySelector('img')?.getAttribute('src')).toBe(initial);
   });
+
+  it('GrayCircle renders 100 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <GrayCircle key={i} isDelegateView={i % 2 === 0} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(100);
+  });
+
+  it('rerender preserves img alt across isDelegateView toggle', () => {
+    const { container, rerender } = render(<GrayCircle />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('');
+    rerender(<GrayCircle isDelegateView={true} />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('');
+  });
+
+  it('isDelegateView=true wraps img in className with content', () => {
+    const { container } = render(<GrayCircle isDelegateView={true} />);
+    expect(container.querySelector('div')?.className).toBeTruthy();
+  });
+
+  it('isDelegateView=undefined defaults to non-delegate', () => {
+    const { container } = render(<GrayCircle isDelegateView={undefined} />);
+    expect(container.querySelector('div')?.className).toBe('');
+  });
+
+  it('renders without crash 30 times consecutively', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<GrayCircle />)).not.toThrow();
+    }
+  });
 });
