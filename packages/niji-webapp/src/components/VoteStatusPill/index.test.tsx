@@ -146,4 +146,45 @@ describe('VoteStatusPill', () => {
     );
     expect(container.querySelectorAll('div').length).toBe(5);
   });
+
+  it('null text renders as empty', () => {
+    const { container } = render(<VoteStatusPill status="success" text={null} />);
+    expect(container.querySelector('div')?.textContent).toBe('');
+  });
+
+  it('emoji text renders verbatim', () => {
+    const { container } = render(<VoteStatusPill status="success" text="🎉" />);
+    expect(container.querySelector('div')?.textContent).toBe('🎉');
+  });
+
+  it('multi-class status with hyphen still falls to pending (default)', () => {
+    const { container } = render(<VoteStatusPill status="some-other" text="x" />);
+    expect(container.querySelector('div')?.className).toMatch(/pending/i);
+  });
+
+  it('text + element children inside text prop renders', () => {
+    const { container } = render(
+      <VoteStatusPill
+        status="success"
+        text={
+          <>
+            a<strong>b</strong>c
+          </>
+        }
+      />,
+    );
+    expect(container.querySelector('strong')?.textContent).toBe('b');
+  });
+
+  it('rerender from text to JSX updates content', () => {
+    const { container, rerender } = render(<VoteStatusPill status="success" text="first" />);
+    expect(container.textContent).toBe('first');
+    rerender(<VoteStatusPill status="success" text={<span>second</span>} />);
+    expect(container.querySelector('span')?.textContent).toBe('second');
+  });
+
+  it('div tagName is DIV (semantic)', () => {
+    const { container } = render(<VoteStatusPill status="success" text="x" />);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
 });

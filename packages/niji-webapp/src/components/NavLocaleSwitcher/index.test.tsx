@@ -197,4 +197,45 @@ describe('NavLocaleSwitcher', () => {
     const { container } = render(<NavLocaleSwitcher />);
     expect(container.querySelector('.dropdown')?.className).toContain('dropdown');
   });
+
+  it('button click rapidly does not crash', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    const wrapper = container.querySelector('[data-testid="nav-button"]')?.parentElement;
+    expect(() => {
+      if (wrapper) {
+        for (let i = 0; i < 5; i++) fireEvent.click(wrapper);
+      }
+    }).not.toThrow();
+  });
+
+  it('component renders empty content for empty locale (no crash)', () => {
+    useAtomMock.mockReturnValue(['', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    expect(container.querySelector('.dropdown')).not.toBeNull();
+  });
+
+  it('different locale (zh-CN) still shows Language button', () => {
+    useAtomMock.mockReturnValue(['zh-CN', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    expect(container.textContent).toContain('Language');
+  });
+
+  it('rerender preserves dropdown wrapper structure', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container, rerender } = render(<NavLocaleSwitcher />);
+    expect(container.querySelector('.dropdown')).not.toBeNull();
+    rerender(<NavLocaleSwitcher />);
+    expect(container.querySelector('.dropdown')).not.toBeNull();
+  });
+
+  it('exit modal after open returns nav-button intact', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    const wrapper = container.querySelector('[data-testid="nav-button"]')?.parentElement;
+    if (wrapper) fireEvent.click(wrapper);
+    const closeBtn = container.querySelector('[data-testid="lang-modal"] button');
+    if (closeBtn) fireEvent.click(closeBtn);
+    expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
+  });
 });

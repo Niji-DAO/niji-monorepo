@@ -265,4 +265,71 @@ describe('NijisTransition', () => {
     );
     expect(container.querySelectorAll('span').length).toBe(2);
   });
+
+  it('emoji children render verbatim', () => {
+    const { container } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        🎉
+      </NijisTransition>,
+    );
+    expect(container.querySelector('[data-testid="motion-div"]')?.textContent).toBe('🎉');
+  });
+
+  it('repeated show toggle rerenders preserve content when last show=true', () => {
+    const { container, rerender } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        <span>x</span>
+      </NijisTransition>,
+    );
+    rerender(
+      <NijisTransition show={false} transitionStyes={styles}>
+        <span>x</span>
+      </NijisTransition>,
+    );
+    rerender(
+      <NijisTransition show={true} transitionStyes={styles}>
+        <span>x</span>
+      </NijisTransition>,
+    );
+    expect(container.querySelector('span')?.textContent).toBe('x');
+  });
+
+  it('multiple onClick fires N times', () => {
+    const onClick = vi.fn();
+    const { container } = render(
+      <NijisTransition show={true} transitionStyes={styles} onClick={onClick}>
+        <span>x</span>
+      </NijisTransition>,
+    );
+    const div = container.querySelector('[data-testid="motion-div"]');
+    if (div) {
+      for (let i = 0; i < 5; i++) fireEvent.click(div);
+    }
+    expect(onClick).toHaveBeenCalledTimes(5);
+  });
+
+  it('long className (100+ chars) accepted', () => {
+    const long = 'a'.repeat(120);
+    const { container } = render(
+      <NijisTransition show={true} transitionStyes={styles} className={long}>
+        <span>x</span>
+      </NijisTransition>,
+    );
+    expect(container.querySelector('[data-testid="motion-div"]')?.className).toContain(long);
+  });
+
+  it('rerender from string to ReactNode children works', () => {
+    const { container, rerender } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        text
+      </NijisTransition>,
+    );
+    expect(container.querySelector('[data-testid="motion-div"]')?.textContent).toBe('text');
+    rerender(
+      <NijisTransition show={true} transitionStyes={styles}>
+        <span data-testid="nested">nested</span>
+      </NijisTransition>,
+    );
+    expect(container.querySelector('[data-testid="nested"]')?.textContent).toBe('nested');
+  });
 });

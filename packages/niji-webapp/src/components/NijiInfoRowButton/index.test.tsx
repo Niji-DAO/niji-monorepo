@@ -218,4 +218,54 @@ describe('NijiInfoRowButton', () => {
     );
     expect(container.querySelector('img')?.getAttribute('alt')).toBeDefined();
   });
+
+  it('outer div tagName is DIV', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="x" onClickHandler={() => {}} />,
+    );
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
+
+  it('emoji btnText renders verbatim', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="🎉" onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe('🎉');
+  });
+
+  it('rapid 10 clicks invoke handler 10 times', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const onClick = vi.fn();
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="x" onClickHandler={onClick} />,
+    );
+    const div = container.querySelector('div');
+    if (div) {
+      for (let i = 0; i < 10; i++) fireEvent.click(div);
+    }
+    expect(onClick).toHaveBeenCalledTimes(10);
+  });
+
+  it('special chars in btnText render correctly', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText={'<>&'} onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe('<>&');
+  });
+
+  it('rerender from cool to warm preserves text', () => {
+    useAtomValueMock.mockReturnValueOnce(true);
+    const { container, rerender } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="hello" onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe('hello');
+    useAtomValueMock.mockReturnValue(false);
+    rerender(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="hello" onClickHandler={() => {}} />,
+    );
+    expect(container.textContent).toBe('hello');
+  });
 });
