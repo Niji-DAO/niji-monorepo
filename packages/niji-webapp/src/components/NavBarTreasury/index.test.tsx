@@ -149,4 +149,58 @@ describe('NavBarTreasury', () => {
     expect(container.querySelector('div')?.className).toMatch(/white/i);
     expect(container.textContent).toContain('42');
   });
+
+  it('rerender from WARM to COOL updates class', () => {
+    const { container, rerender } = render(
+      <NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.WARM_INFO} />,
+    );
+    expect(container.querySelector('div')?.className).toMatch(/warm/i);
+    rerender(<NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.COOL_INFO} />);
+    expect(container.querySelector('div')?.className).toMatch(/cool/i);
+  });
+
+  it('rerender treasuryBalance updates displayed number', () => {
+    const { container, rerender } = render(
+      <NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    expect(container.textContent).toContain('100');
+    rerender(<NavBarTreasury treasuryBalance="999" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />);
+    expect(container.textContent).toContain('999');
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />
+        <NavBarTreasury treasuryBalance="200" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />
+      </>,
+    );
+    expect(container.textContent).toContain('100');
+    expect(container.textContent).toContain('200');
+  });
+
+  it('renders 7-digit balance (1234567) with comma separator', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="1234567" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    expect(container.textContent).toContain('1,234,567');
+  });
+
+  it('Ξ symbol appears before the number', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="500" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+    );
+    const text = container.textContent ?? '';
+    const xiIdx = text.indexOf('Ξ');
+    const numIdx = text.indexOf('500');
+    expect(xiIdx).toBeLessThan(numIdx);
+  });
+
+  it('cool style applies when COOL_INFO and shows number', () => {
+    const { container } = render(
+      <NavBarTreasury treasuryBalance="42" treasuryStyle={NavBarButtonStyle.COOL_INFO} />,
+    );
+    expect(container.querySelector('div')?.className).toMatch(/cool/i);
+    expect(container.textContent).toContain('42');
+  });
 });

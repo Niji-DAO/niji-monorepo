@@ -122,4 +122,56 @@ describe('VoteProgressBar', () => {
     expect(inner?.getAttribute('style')).toContain('width: 75%');
     expect(inner?.className).toMatch(/abstain/i);
   });
+
+  it('rerender from FOR to AGAINST updates class', () => {
+    const { container, rerender } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />,
+    );
+    expect(container.querySelectorAll('div')[1]?.className).toMatch(/for/i);
+    rerender(<VoteProgressBar variant={VoteCardVariant.AGAINST} percentage={50} />);
+    expect(container.querySelectorAll('div')[1]?.className).toMatch(/against/i);
+  });
+
+  it('rerender percentage updates width style', () => {
+    const { container, rerender } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={10} />,
+    );
+    expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 10%');
+    rerender(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={80} />);
+    expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 80%');
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <VoteProgressBar variant={VoteCardVariant.FOR} percentage={20} />
+        <VoteProgressBar variant={VoteCardVariant.AGAINST} percentage={40} />
+        <VoteProgressBar variant={VoteCardVariant.ABSTAIN} percentage={60} />
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(6);
+  });
+
+  it('outer div is wrapper (first div)', () => {
+    const { container } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
+
+  it('percentage > 100 still applied as-is (no clamping)', () => {
+    const { container } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={150} />,
+    );
+    expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain('width: 150%');
+  });
+
+  it('negative percentage still renders inner div', () => {
+    const { container } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={-5} />);
+    expect(container.querySelectorAll('div')[1]).not.toBeNull();
+  });
+
+  it('outer + inner div have different className', () => {
+    const { container } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+    const divs = container.querySelectorAll('div');
+    expect(divs[0].className).not.toBe(divs[1].className);
+  });
 });

@@ -182,4 +182,65 @@ describe('SolidColorBackgroundModal', () => {
       document.getElementById('backdrop-root')?.querySelector('[data-testid="content"]'),
     ).toBeNull();
   });
+
+  it('Backdrop renders transition wrapper with show=true (no crash on construct)', () => {
+    const onDismiss = vi.fn();
+    const { container } = render(<Backdrop show={true} onDismiss={onDismiss} />);
+    expect(container.querySelector('[data-testid="transition"]')).not.toBeNull();
+  });
+
+  it('multiple modals render independently in same DOM', () => {
+    render(
+      <>
+        <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>A</p>} />
+        <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>B</p>} />
+      </>,
+    );
+    expect(document.getElementById('overlay-root')?.textContent).toContain('A');
+    expect(document.getElementById('overlay-root')?.textContent).toContain('B');
+  });
+
+  it('show=true → false rerender removes content', () => {
+    const { rerender } = render(
+      <SolidColorBackgroundModal
+        show={true}
+        onDismiss={() => {}}
+        content={<p data-testid="x">a</p>}
+      />,
+    );
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="x"]'),
+    ).not.toBeNull();
+    rerender(
+      <SolidColorBackgroundModal
+        show={false}
+        onDismiss={() => {}}
+        content={<p data-testid="x">a</p>}
+      />,
+    );
+    expect(document.getElementById('overlay-root')?.querySelector('[data-testid="x"]')).toBeNull();
+  });
+
+  it('content rerender updates text', () => {
+    const { rerender } = render(
+      <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>First</p>} />,
+    );
+    expect(document.getElementById('overlay-root')?.textContent).toContain('First');
+    rerender(
+      <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>Second</p>} />,
+    );
+    expect(document.getElementById('overlay-root')?.textContent).toContain('Second');
+  });
+
+  it('unicode content renders verbatim', () => {
+    render(
+      <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>こんにちは</p>} />,
+    );
+    expect(document.getElementById('overlay-root')?.textContent).toContain('こんにちは');
+  });
+
+  it('Backdrop renders no transition when show=false', () => {
+    const { container } = render(<Backdrop show={false} onDismiss={() => {}} />);
+    expect(container.querySelector('[data-testid="transition"]')).toBeNull();
+  });
 });
