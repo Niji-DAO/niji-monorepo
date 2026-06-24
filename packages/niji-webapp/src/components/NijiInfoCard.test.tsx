@@ -90,4 +90,46 @@ describe('NijiInfoCard', () => {
     expect(openSpy).toHaveBeenCalledWith('https://etherscan.io/token/0xTOKEN?a=42');
     openSpy.mockRestore();
   });
+
+  it('shows "Bid history" when lastAuctionNounId is undefined', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    const { container } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={() => {}} />);
+    const firstButton = container.querySelectorAll('button')[0];
+    expect(firstButton?.textContent).toBe('Bid history');
+  });
+
+  it('fires bidHistoryOnClickHandler on repeated clicks', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    const handler = vi.fn();
+    const { container } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={handler} />);
+    const btn = container.querySelectorAll('button')[0];
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    expect(handler).toHaveBeenCalledTimes(3);
+  });
+
+  it('handles large bigint nounId (1_000_000)', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const { container } = render(
+      <NijiInfoCard nounId={1_000_000n} bidHistoryOnClickHandler={() => {}} />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[1]);
+    expect(openSpy).toHaveBeenCalledWith('https://etherscan.io/token/0xTOKEN?a=1000000');
+    openSpy.mockRestore();
+  });
+
+  it('renders exactly 1 holder element', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    const { container } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={() => {}} />);
+    expect(container.querySelectorAll('[data-testid="holder"]').length).toBe(1);
+  });
+
+  it('Etherscan button text is "Etherscan"', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    const { container } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={() => {}} />);
+    const secondButton = container.querySelectorAll('button')[1];
+    expect(secondButton?.textContent).toContain('Etherscan');
+  });
 });

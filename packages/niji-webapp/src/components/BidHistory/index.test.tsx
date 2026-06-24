@@ -134,4 +134,40 @@ describe('BidHistory Component', () => {
 
     expect(useAuctionBids).toHaveBeenCalledWith(BigInt(42));
   });
+
+  it('renders single bid when only 1 bid is available', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([mockBids[0]]);
+    render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    const items = screen.getAllByTestId('bid-history-item');
+    expect(items).toHaveLength(1);
+  });
+
+  it('handles large auctionId string (1000000)', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    render(<BidHistory auctionId="1000000" max={10} classes={mockClasses} />);
+    expect(useAuctionBids).toHaveBeenCalledWith(BigInt(1000000));
+  });
+
+  it('renders only 1 item when max=1', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(mockBids);
+    render(<BidHistory auctionId="1" max={1} classes={mockClasses} />);
+    const items = screen.getAllByTestId('bid-history-item');
+    expect(items).toHaveLength(1);
+    // 最新 bid のみ
+    expect(items[0]).toHaveTextContent('3000000000000000000');
+  });
+
+  it('renders extended bids (extended=true) normally', () => {
+    const extendedBids = [{ ...mockBids[0], extended: true }];
+    vi.mocked(useAuctionBids).mockReturnValue(extendedBids);
+    render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    expect(screen.getAllByTestId('bid-history-item')).toHaveLength(1);
+  });
+
+  it('passes isCool=true to BidHistoryItem via mocked atom (Cool: yes)', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([mockBids[0]]);
+    render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    const item = screen.getByTestId('bid-history-item');
+    expect(item).toHaveTextContent('Cool: yes');
+  });
 });
