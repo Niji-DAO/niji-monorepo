@@ -126,4 +126,46 @@ describe('StreamPaymentDateDetailsStep', () => {
     const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
     expect(container.textContent).toContain('Streams start and end at 00:00 UTC');
   });
+
+  it('renders exactly 1 h1 title element', () => {
+    const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('renders exactly 2 date input elements', () => {
+    const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('input[type="date"]').length).toBe(2);
+  });
+
+  it('renders exactly 2 buttons (prev + next)', () => {
+    const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('valid future dates do not mark inputs invalid', () => {
+    const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+    const inputs = container.querySelectorAll('input[type="date"]');
+    // mock currentUnixEpoch = 1700000000 = 2023-11-14、 2030 は未来
+    fireEvent.change(inputs[0], { target: { value: '2030-01-01' } });
+    fireEvent.change(inputs[1], { target: { value: '2030-12-31' } });
+    expect(inputs[0].getAttribute('data-invalid')).toBe('false');
+    expect(inputs[1].getAttribute('data-invalid')).toBe('false');
+  });
+
+  it('repeated Back button clicks fire onPrevBtnClick multiple times', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <StreamPaymentDateDetailsStep {...defaults} onPrevBtnClick={onPrev} />,
+    );
+    const backBtn = container.querySelectorAll('button')[0];
+    fireEvent.click(backBtn);
+    fireEvent.click(backBtn);
+    fireEvent.click(backBtn);
+    expect(onPrev).toHaveBeenCalledTimes(3);
+  });
+
+  it('paragraph (subtitle) is rendered', () => {
+    const { container } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+    expect(container.querySelector('p')).not.toBeNull();
+  });
 });

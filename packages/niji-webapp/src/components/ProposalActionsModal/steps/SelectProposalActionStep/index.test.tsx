@@ -154,4 +154,33 @@ describe('SelectProposalActionStep', () => {
       ProposalActionCreationStep.FUNCTION_CALL_SELECT_FUNCTION,
     );
   });
+
+  it('fires onPrevBtnClick on repeated clicks', () => {
+    const onPrevBtnClick = vi.fn();
+    render(<SelectProposalActionStep {...setupProps({ onPrevBtnClick })} />);
+    fireEvent.click(screen.getByTestId('prev-btn'));
+    fireEvent.click(screen.getByTestId('prev-btn'));
+    fireEvent.click(screen.getByTestId('prev-btn'));
+    expect(onPrevBtnClick).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders prev + next buttons (exactly 2 in ModalBottomButtonRow)', () => {
+    const { container } = render(<SelectProposalActionStep {...setupProps()} />);
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('title text includes "Proposal Action"', () => {
+    render(<SelectProposalActionStep {...setupProps()} />);
+    expect(screen.getByTestId('title').textContent).toContain('Proposal Action');
+  });
+
+  it('renders action-dropdown exactly 1 instance', () => {
+    const { container } = render(<SelectProposalActionStep {...setupProps()} />);
+    expect(container.querySelectorAll('[data-testid="action-dropdown"]').length).toBe(1);
+  });
+
+  it('subtitle is present (data-testid="subtitle")', () => {
+    render(<SelectProposalActionStep {...setupProps()} />);
+    expect(screen.getByTestId('subtitle')).toBeInTheDocument();
+  });
 });

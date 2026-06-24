@@ -73,4 +73,40 @@ describe('AboutSection', () => {
     const { container } = wrapAccordion(<AboutSection {...links} />);
     expect(container.textContent).toContain('public domain');
   });
+
+  it('renders exactly 1 h1 in AboutHeader', () => {
+    const { container } = render(
+      <AboutHeader cryptopunksLink={links.cryptopunksLink} playgroundLink={links.playgroundLink} />,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('AboutHeader renders 2 link injections', () => {
+    const { container } = render(
+      <AboutHeader cryptopunksLink={links.cryptopunksLink} playgroundLink={links.playgroundLink} />,
+    );
+    expect(container.querySelectorAll('a').length).toBe(2);
+  });
+
+  it('AboutSection contains both publicDomain + compoundGov links', () => {
+    const { container } = wrapAccordion(<AboutSection {...links} />);
+    const anchors = Array.from(container.querySelectorAll('a'));
+    const hrefs = anchors.map(a => a.getAttribute('href'));
+    expect(hrefs).toContain('https://creativecommons.org/publicdomain/zero/1.0/');
+    expect(hrefs).toContain('https://compound.finance/governance');
+  });
+
+  it('AboutSection renders extensive body (> 500 chars)', () => {
+    const { container } = wrapAccordion(<AboutSection {...links} />);
+    expect((container.textContent ?? '').length).toBeGreaterThan(500);
+  });
+
+  it('AboutSection link hrefs are all https://', () => {
+    const { container } = wrapAccordion(<AboutSection {...links} />);
+    const anchors = Array.from(container.querySelectorAll('a'));
+    anchors.forEach(a => {
+      const href = a.getAttribute('href') ?? '';
+      expect(href.startsWith('https://')).toBe(true);
+    });
+  });
 });
