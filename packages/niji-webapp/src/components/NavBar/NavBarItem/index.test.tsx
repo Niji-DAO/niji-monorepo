@@ -147,4 +147,46 @@ describe('NavBarItem', () => {
     const { container } = render(<NavBarItem className={long}>y</NavBarItem>);
     expect(container.querySelector('div')?.className).toContain(long);
   });
+
+  it('5 instances render 5 root divs', () => {
+    const { container } = render(
+      <>
+        <NavBarItem>a</NavBarItem>
+        <NavBarItem>b</NavBarItem>
+        <NavBarItem>c</NavBarItem>
+        <NavBarItem>d</NavBarItem>
+        <NavBarItem>e</NavBarItem>
+      </>,
+    );
+    expect(container.children.length).toBe(5);
+  });
+
+  it('emoji children render verbatim', () => {
+    const { container } = render(<NavBarItem>🎉</NavBarItem>);
+    expect(container.querySelector('div')?.textContent).toBe('🎉');
+  });
+
+  it('clicked div receives event correctly', () => {
+    let captured: { type?: string } | null = null;
+    const onClick = (e: { type: string }) => {
+      captured = e;
+    };
+    const { container } = render(<NavBarItem onClick={onClick}>x</NavBarItem>);
+    const div = container.querySelector('div');
+    if (div) fireEvent.click(div);
+    expect(captured).not.toBeNull();
+    expect((captured as unknown as { type: string }).type).toBe('click');
+  });
+
+  it('rerender preserves outer div tag', () => {
+    const { container, rerender } = render(<NavBarItem>x</NavBarItem>);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+    rerender(<NavBarItem>y</NavBarItem>);
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+  });
+
+  it('special chars in children render correctly', () => {
+    const { container } = render(<NavBarItem>{'<>&'}</NavBarItem>);
+    expect(container.querySelector('div')?.textContent).toBe('<>&');
+  });
 });

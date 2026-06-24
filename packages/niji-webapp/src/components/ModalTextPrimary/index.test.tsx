@@ -145,4 +145,40 @@ describe('ModalTextPrimary', () => {
     expect(container.querySelector('strong')?.textContent).toBe('strong');
     expect(container.textContent).toContain('text-');
   });
+
+  it('5 instances render 5 divs', () => {
+    const { container } = render(
+      <>
+        <ModalTextPrimary>a</ModalTextPrimary>
+        <ModalTextPrimary>b</ModalTextPrimary>
+        <ModalTextPrimary>c</ModalTextPrimary>
+        <ModalTextPrimary>d</ModalTextPrimary>
+        <ModalTextPrimary>e</ModalTextPrimary>
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(5);
+  });
+
+  it('emoji children render verbatim', () => {
+    const { container } = render(<ModalTextPrimary>🎉</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('🎉');
+  });
+
+  it('rerender className stays consistent', () => {
+    const { container, rerender } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+    const cls1 = container.querySelector('div')?.className;
+    rerender(<ModalTextPrimary>y</ModalTextPrimary>);
+    expect(container.querySelector('div')?.className).toBe(cls1);
+  });
+
+  it('long array children (1000) renders concatenated', () => {
+    const huge = Array.from({ length: 1000 }, () => 'a');
+    const { container } = render(<ModalTextPrimary>{huge}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent?.length).toBe(1000);
+  });
+
+  it('special chars render correctly', () => {
+    const { container } = render(<ModalTextPrimary>{'<>&'}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent).toBe('<>&');
+  });
 });
