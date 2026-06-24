@@ -371,4 +371,87 @@ describe('FunctionCallReviewStep', () => {
     );
     expect(container.textContent).toContain('500');
   });
+
+  it('renders 2 buttons exactly (Back + Next)', () => {
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        state={{ abi, function: 'noArg', address: ADDR, amount: '0', args: [] } as never}
+      />,
+    );
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('arguments show "to" param verbatim', () => {
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        state={
+          {
+            abi,
+            function: 'transfer',
+            address: ADDR,
+            amount: '0',
+            args: [ADDR, '1000'],
+          } as never
+        }
+      />,
+    );
+    expect(container.textContent).toContain('to');
+  });
+
+  it('Next button repeated clicks invoke onNext N times', () => {
+    const onNext = vi.fn();
+    const onDismiss = vi.fn();
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        onNextBtnClick={onNext}
+        onDismiss={onDismiss}
+        state={{ abi, function: 'noArg', address: ADDR, amount: '0', args: [] } as never}
+      />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onNext).toHaveBeenCalledTimes(2);
+    expect(onDismiss).toHaveBeenCalledTimes(2);
+  });
+
+  it('rerender state.address updates ShortAddress text', () => {
+    const { container, rerender } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        state={{ abi, function: 'noArg', address: ADDR, amount: '0', args: [] } as never}
+      />,
+    );
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(ADDR);
+    const NEW_ADDR = '0x0000000000000000000000000000000000000bad';
+    rerender(
+      <FunctionCallReviewStep
+        {...defaults}
+        state={{ abi, function: 'noArg', address: NEW_ADDR, amount: '0', args: [] } as never}
+      />,
+    );
+    const shorts = container.querySelectorAll('[data-testid="short"]');
+    const found = Array.from(shorts).some(s => s.textContent === NEW_ADDR);
+    expect(found).toBe(true);
+  });
+
+  it('renders 1 next button regardless of args length', () => {
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        state={
+          {
+            abi,
+            function: 'transfer',
+            address: ADDR,
+            amount: '0',
+            args: [ADDR, '1', '2', '3', '4'],
+          } as never
+        }
+      />,
+    );
+    expect(container.querySelectorAll('[data-testid="next-btn"]').length).toBe(1);
+  });
 });

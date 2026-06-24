@@ -125,4 +125,35 @@ describe('ModalTitle', () => {
     );
     expect(container.querySelectorAll('h1 span').length).toBe(2);
   });
+
+  it('h1 element renders inside wrapper div', () => {
+    const { container } = render(<ModalTitle>x</ModalTitle>);
+    expect(container.querySelector('div h1')).not.toBeNull();
+  });
+
+  it('3 instances render 3 h1 elements', () => {
+    const { container } = render(
+      <>
+        <ModalTitle>a</ModalTitle>
+        <ModalTitle>b</ModalTitle>
+        <ModalTitle>c</ModalTitle>
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(3);
+  });
+
+  it('special chars in title render correctly', () => {
+    const { container } = render(<ModalTitle>{'<>&'}</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('<>&');
+  });
+
+  it('emoji title renders verbatim', () => {
+    const { container } = render(<ModalTitle>🎉</ModalTitle>);
+    expect(container.querySelector('h1')?.textContent).toBe('🎉');
+  });
+
+  it('div wrapper renders only 1 instance per ModalTitle', () => {
+    const { container } = render(<ModalTitle>x</ModalTitle>);
+    expect(container.querySelectorAll('div').length).toBe(1);
+  });
 });

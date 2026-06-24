@@ -209,4 +209,70 @@ describe('NavDropDown', () => {
     expect(c1.querySelectorAll('[data-testid="nav-button"]').length).toBe(1);
     expect(c2.querySelectorAll('[data-testid="nav-button"]').length).toBe(1);
   });
+
+  it('5 instances render 5 dropdowns', () => {
+    const { container } = render(
+      <>
+        <NavDropDown buttonText="A">
+          <span>x</span>
+        </NavDropDown>
+        <NavDropDown buttonText="B">
+          <span>x</span>
+        </NavDropDown>
+        <NavDropDown buttonText="C">
+          <span>x</span>
+        </NavDropDown>
+        <NavDropDown buttonText="D">
+          <span>x</span>
+        </NavDropDown>
+        <NavDropDown buttonText="E">
+          <span>x</span>
+        </NavDropDown>
+      </>,
+    );
+    expect(container.querySelectorAll('.dropdown').length).toBe(5);
+  });
+
+  it('long buttonText (500 chars) renders fully', () => {
+    const long = 'a'.repeat(500);
+    const { container } = render(
+      <NavDropDown buttonText={long}>
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent?.length).toBe(500);
+  });
+
+  it('emoji buttonText renders correctly', () => {
+    const { container } = render(
+      <NavDropDown buttonText="🎉">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('🎉');
+  });
+
+  it('renders no nav-button when buttonText is empty string', () => {
+    const { container } = render(
+      <NavDropDown buttonText="">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('');
+  });
+
+  it('rerender from short to long buttonText updates content', () => {
+    const { container, rerender } = render(
+      <NavDropDown buttonText="A">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('A');
+    rerender(
+      <NavDropDown buttonText="AAAAA">
+        <span>x</span>
+      </NavDropDown>,
+    );
+    expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe('AAAAA');
+  });
 });
