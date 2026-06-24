@@ -47,4 +47,61 @@ describe('HoverCard', () => {
     // span 経由でも tip-abc 文字は確認されない (closed state)
     expect(container.textContent).toBe('Trigger');
   });
+
+  it('accepts different id prop without crashing', () => {
+    expect(() =>
+      render(
+        <HoverCard hoverCardContent={() => <></>} tip="t" id="custom-id">
+          x
+        </HoverCard>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders Fragment children unwrapped (multiple inline nodes)', () => {
+    const { container } = render(
+      <HoverCard hoverCardContent={() => <></>} tip="t" id="x">
+        <>
+          <em>a</em>
+          <strong>b</strong>
+        </>
+      </HoverCard>,
+      { wrapper: WithProviders },
+    );
+    expect(container.querySelector('em')?.textContent).toBe('a');
+    expect(container.querySelector('strong')?.textContent).toBe('b');
+  });
+
+  it('renders empty trigger label without crashing', () => {
+    expect(() =>
+      render(
+        <HoverCard hoverCardContent={() => <></>} tip="t" id="x">
+          {''}
+        </HoverCard>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders the trigger span exactly once at default (closed) state', () => {
+    const { container } = render(
+      <HoverCard hoverCardContent={() => <></>} tip="t" id="x">
+        Trigger
+      </HoverCard>,
+      { wrapper: WithProviders },
+    );
+    const spans = container.querySelectorAll('span');
+    expect(spans.length).toBe(1);
+  });
+
+  it('renders numeric children inside trigger span', () => {
+    const { container } = render(
+      <HoverCard hoverCardContent={() => <></>} tip="t" id="x">
+        {42}
+      </HoverCard>,
+      { wrapper: WithProviders },
+    );
+    expect(container.querySelector('span')?.textContent).toBe('42');
+  });
 });
