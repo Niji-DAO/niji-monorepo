@@ -719,4 +719,129 @@ describe('VoteCard', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 10 instances each independently', () => {
+    usePublicClientMock.mockReturnValue({});
+    useActiveLocaleMock.mockReturnValue('en-US');
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <VoteCard
+              key={i}
+              proposal={
+                {
+                  forCount: i,
+                  againstCount: 0,
+                  abstainCount: 0,
+                  status: 1,
+                  quorumVotes: i,
+                } as never
+              }
+              percentage={i * 10}
+              nounIds={[]}
+              variant={VoteCardVariant.FOR}
+              delegateGroupedVoteData={[]}
+              isNounsDAOProp={true}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 10 delegate vote data items', () => {
+    usePublicClientMock.mockReturnValue({});
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const data = Array.from({ length: 10 }, (_, i) => ({
+      delegate: `0x${i}` as never,
+      supportDetailed: 1 as const,
+      nijiRepresented: [String(i)],
+    }));
+    expect(() =>
+      render(
+        <VoteCard
+          proposal={
+            { forCount: 10, againstCount: 0, abstainCount: 0, status: 1, quorumVotes: 10 } as never
+          }
+          percentage={100}
+          nounIds={[]}
+          variant={VoteCardVariant.FOR}
+          delegateGroupedVoteData={data}
+          isNounsDAOProp={true}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender preserves component across percentage changes', () => {
+    usePublicClientMock.mockReturnValue({});
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { rerender } = render(
+      <VoteCard
+        proposal={
+          { forCount: 5, againstCount: 0, abstainCount: 0, status: 1, quorumVotes: 5 } as never
+        }
+        percentage={50}
+        nounIds={[]}
+        variant={VoteCardVariant.FOR}
+        delegateGroupedVoteData={[]}
+        isNounsDAOProp={true}
+      />,
+    );
+    for (let i = 0; i < 10; i++) {
+      expect(() =>
+        rerender(
+          <VoteCard
+            proposal={
+              { forCount: i, againstCount: 0, abstainCount: 0, status: 1, quorumVotes: i } as never
+            }
+            percentage={i * 5}
+            nounIds={[]}
+            variant={VoteCardVariant.FOR}
+            delegateGroupedVoteData={[]}
+            isNounsDAOProp={true}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles ja-JP + AGAINST variant', () => {
+    usePublicClientMock.mockReturnValue({});
+    useActiveLocaleMock.mockReturnValue('ja-JP');
+    expect(() =>
+      render(
+        <VoteCard
+          proposal={
+            { forCount: 0, againstCount: 5, abstainCount: 0, status: 1, quorumVotes: 5 } as never
+          }
+          percentage={50}
+          nounIds={[]}
+          variant={VoteCardVariant.AGAINST}
+          delegateGroupedVoteData={[]}
+          isNounsDAOProp={true}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 0 percentage + 0 nounIds + ABSTAIN', () => {
+    usePublicClientMock.mockReturnValue({});
+    useActiveLocaleMock.mockReturnValue('en-US');
+    expect(() =>
+      render(
+        <VoteCard
+          proposal={
+            { forCount: 0, againstCount: 0, abstainCount: 0, status: 1, quorumVotes: 0 } as never
+          }
+          percentage={0}
+          nounIds={[]}
+          variant={VoteCardVariant.ABSTAIN}
+          delegateGroupedVoteData={[]}
+          isNounsDAOProp={true}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });

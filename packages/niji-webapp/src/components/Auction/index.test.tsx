@@ -358,4 +358,41 @@ describe('Auction', () => {
   it('renders for id=10 (Nounders boundary)', () => {
     expect(() => wrap(<Auction auction={makeAuction(10n)} />)).not.toThrow();
   });
+
+  it('renders 20 Auction instances consecutively', () => {
+    for (let i = 0; i < 20; i++) {
+      expect(() => wrap(<Auction auction={makeAuction(BigInt(i))} />)).not.toThrow();
+    }
+  });
+
+  it('renders 5 Auctions in single wrap', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <Auction key={i} auction={makeAuction(BigInt(i))} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender preserves Auction component', () => {
+    expect(() => {
+      const { rerender } = wrap(<Auction auction={makeAuction(1n)} />);
+      for (let i = 0; i < 10; i++) {
+        rerender(<Auction auction={makeAuction(BigInt(i))} />);
+      }
+    }).not.toThrow();
+  });
+
+  it('renders for very large id (1e18)', () => {
+    expect(() =>
+      wrap(<Auction auction={makeAuction(BigInt('1000000000000000000'))} />),
+    ).not.toThrow();
+  });
+
+  it('renders for id 0n (boundary repeat)', () => {
+    expect(() => wrap(<Auction auction={makeAuction(0n)} />)).not.toThrow();
+  });
 });
