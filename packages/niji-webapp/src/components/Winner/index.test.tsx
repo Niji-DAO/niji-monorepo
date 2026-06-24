@@ -157,4 +157,60 @@ describe('Winner', () => {
     const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
     expect(container.querySelectorAll('[data-testid="short"]').length).toBe(1);
   });
+
+  it('does NOT render ShortAddress when "you" branch fires', () => {
+    useAccountMock.mockReturnValue({ address: ADDR });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    expect(container.querySelector('[data-testid="short"]')).toBeNull();
+  });
+
+  it('rerender from other to user winner switches to you branch', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container, rerender } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    expect(container.querySelector('[data-testid="short"]')).not.toBeNull();
+    useAccountMock.mockReturnValue({ address: ADDR });
+    rerender(<Winner winner={ADDR} />);
+    expect(container.textContent?.toLowerCase()).toContain('you');
+  });
+
+  it('zh-CN locale + isNounders renders without crash', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('zh-CN');
+    const { container } = render(<Winner winner={ADDR} isNounders={true} />, {
+      wrapper: WithProviders,
+    });
+    expect(container.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('different winner address rerender updates short address', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container, rerender } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(ADDR);
+    const ADDR_B = '0x0000000000000000000000000000000000000abc' as const;
+    rerender(<Winner winner={ADDR_B} />);
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe(ADDR_B);
+  });
+
+  it('warm bg + en-US renders with text content', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(false);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    expect(container.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('warm bg + ja-JP + non-user winner renders ShortAddress', () => {
+    useAccountMock.mockReturnValue({ address: '0xOTHER' });
+    useAtomValueMock.mockReturnValue(false);
+    useActiveLocaleMock.mockReturnValue('ja-JP');
+    const { container } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+    expect(container.querySelector('[data-testid="short"]')).not.toBeNull();
+  });
 });

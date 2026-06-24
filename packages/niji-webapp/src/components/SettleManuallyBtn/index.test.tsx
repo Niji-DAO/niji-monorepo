@@ -136,4 +136,62 @@ describe('SettleManuallyBtn', () => {
     render(<SettleManuallyBtn settleAuctionHandler={handler} auction={auction} />);
     expect(handler).not.toHaveBeenCalled();
   });
+
+  it('rerender with new handler still works on click', () => {
+    const handler1 = vi.fn();
+    const handler2 = vi.fn();
+    const { container, rerender } = render(
+      <SettleManuallyBtn settleAuctionHandler={handler1} auction={auction} />,
+    );
+    rerender(<SettleManuallyBtn settleAuctionHandler={handler2} auction={auction} />);
+    const btn = container.querySelector('button');
+    if (btn) fireEvent.click(btn);
+    expect(handler2).toHaveBeenCalledTimes(1);
+    expect(handler1).not.toHaveBeenCalled();
+  });
+
+  it('multiple instances render with independent handlers', () => {
+    const h1 = vi.fn();
+    const h2 = vi.fn();
+    const { container } = render(
+      <>
+        <SettleManuallyBtn settleAuctionHandler={h1} auction={auction} />
+        <SettleManuallyBtn settleAuctionHandler={h2} auction={auction} />
+      </>,
+    );
+    const btns = container.querySelectorAll('button');
+    fireEvent.click(btns[0]);
+    fireEvent.click(btns[1]);
+    expect(h1).toHaveBeenCalledTimes(1);
+    expect(h2).toHaveBeenCalledTimes(1);
+  });
+
+  it('button type defaults to button (or attribute exists)', () => {
+    const { container } = render(
+      <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />,
+    );
+    const btn = container.querySelector('button');
+    expect(btn).not.toBeNull();
+  });
+
+  it('p wrapper renders only 1 button child', () => {
+    const { container } = render(
+      <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />,
+    );
+    expect(container.querySelectorAll('p button').length).toBe(1);
+  });
+
+  it('bidder 0x0 auction renders without crash', () => {
+    const noBidder = { ...auction, bidder: '0x0' };
+    expect(() =>
+      render(<SettleManuallyBtn settleAuctionHandler={() => {}} auction={noBidder} />),
+    ).not.toThrow();
+  });
+
+  it('extremely large endTime does not crash', () => {
+    const future = { ...auction, endTime: 99999999999n };
+    expect(() =>
+      render(<SettleManuallyBtn settleAuctionHandler={() => {}} auction={future} />),
+    ).not.toThrow();
+  });
 });

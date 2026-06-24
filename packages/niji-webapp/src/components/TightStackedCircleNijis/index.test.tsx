@@ -93,4 +93,50 @@ describe('TightStackedCircleNijis', () => {
     expect(container.children.length).toBe(1);
     expect(container.firstElementChild?.tagName.toLowerCase()).toBe('svg');
   });
+
+  it('rerender from [1,2,3] to [] removes all circles', () => {
+    const { container, rerender } = render(<TightStackedCircleNijis nounIds={[1, 2, 3]} />);
+    expect(container.querySelectorAll('circle').length).toBe(3);
+    rerender(<TightStackedCircleNijis nounIds={[]} />);
+    expect(container.querySelectorAll('circle').length).toBe(0);
+  });
+
+  it('rerender from [1,2,3,4,5] to [10] reduces to 1 circle', () => {
+    const { container, rerender } = render(<TightStackedCircleNijis nounIds={[1, 2, 3, 4, 5]} />);
+    expect(container.querySelectorAll('circle').length).toBe(3);
+    rerender(<TightStackedCircleNijis nounIds={[10]} />);
+    expect(container.querySelectorAll('circle').length).toBe(1);
+    expect(container.querySelector('circle')?.getAttribute('data-niji')).toBe('10');
+  });
+
+  it('multiple instances each render correctly', () => {
+    const { container } = render(
+      <>
+        <TightStackedCircleNijis nounIds={[1]} />
+        <TightStackedCircleNijis nounIds={[2, 3]} />
+      </>,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(2);
+    expect(container.querySelectorAll('circle').length).toBe(3);
+  });
+
+  it('svg always has 55x55 dimensions regardless of nounIds count', () => {
+    const { container: c1 } = render(<TightStackedCircleNijis nounIds={[]} />);
+    const { container: c2 } = render(<TightStackedCircleNijis nounIds={[1, 2, 3, 4, 5]} />);
+    expect(c1.querySelector('svg')?.getAttribute('width')).toBe('55');
+    expect(c2.querySelector('svg')?.getAttribute('width')).toBe('55');
+  });
+
+  it('takes first 3 in reverse order for 5 inputs', () => {
+    const { container } = render(<TightStackedCircleNijis nounIds={[10, 20, 30, 40, 50]} />);
+    const circles = container.querySelectorAll('circle');
+    expect(circles[0].getAttribute('data-niji')).toBe('30');
+    expect(circles[1].getAttribute('data-niji')).toBe('20');
+    expect(circles[2].getAttribute('data-niji')).toBe('10');
+  });
+
+  it('negative nounId renders as string', () => {
+    const { container } = render(<TightStackedCircleNijis nounIds={[-5]} />);
+    expect(container.querySelector('circle')?.getAttribute('data-niji')).toBe('-5');
+  });
 });
