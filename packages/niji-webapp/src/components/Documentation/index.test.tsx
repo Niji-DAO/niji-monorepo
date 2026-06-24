@@ -72,4 +72,45 @@ describe('Documentation', () => {
     const { container } = render(<Documentation />);
     expect(container.querySelector('section')?.className).toMatch(/documentation/i);
   });
+
+  it('renders exactly 1 section element', () => {
+    const { container } = render(<Documentation />);
+    expect(container.querySelectorAll('section').length).toBe(1);
+  });
+
+  it('renders 1 instance of each sub-section (no duplication)', () => {
+    const { container } = render(<Documentation />);
+    expect(container.querySelectorAll('[data-testid="about-header"]').length).toBe(1);
+    expect(container.querySelectorAll('[data-testid="about-section"]').length).toBe(1);
+    expect(container.querySelectorAll('[data-testid="gov-section"]').length).toBe(1);
+    expect(container.querySelectorAll('[data-testid="art-section"]').length).toBe(1);
+    expect(container.querySelectorAll('[data-testid="nijiders-section"]').length).toBe(1);
+  });
+
+  it('renders section without crashing when backgroundColor prop is absent', () => {
+    // React JSX 経由で props undefined が渡るとき default param は適用されず、
+    // section style は空 (background: undefined → style attribute 空 or 不在)
+    expect(() => render(<Documentation />)).not.toThrow();
+  });
+
+  it('applies tailwind margin classes (-mb-10 sm:-mb-20)', () => {
+    const { container } = render(<Documentation />);
+    const sectionClass = container.querySelector('section')?.className ?? '';
+    expect(sectionClass).toContain('-mb-10');
+    expect(sectionClass).toContain('sm:-mb-20');
+  });
+
+  it('sub-sections render in expected order (about-header → about → gov → art → nijiders)', () => {
+    const { container } = render(<Documentation />);
+    const html = container.innerHTML;
+    const idxHeader = html.indexOf('about-header');
+    const idxAbout = html.indexOf('about-section');
+    const idxGov = html.indexOf('gov-section');
+    const idxArt = html.indexOf('art-section');
+    const idxNijiders = html.indexOf('nijiders-section');
+    expect(idxHeader).toBeLessThan(idxAbout);
+    expect(idxAbout).toBeLessThan(idxGov);
+    expect(idxGov).toBeLessThan(idxArt);
+    expect(idxArt).toBeLessThan(idxNijiders);
+  });
 });
