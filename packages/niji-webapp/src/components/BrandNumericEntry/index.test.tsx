@@ -68,4 +68,41 @@ describe('BrandNumericEntry', () => {
     const { container } = render(<BrandNumericEntry isInvalid={false} />);
     expect(container.querySelector('input')?.className).not.toMatch(/invalid/i);
   });
+
+  it('rerender label changes update span text', () => {
+    const { container, rerender } = render(<BrandNumericEntry label="First" />);
+    expect(container.querySelector('span')?.textContent).toBe('First');
+    rerender(<BrandNumericEntry label="Second" />);
+    expect(container.querySelector('span')?.textContent).toBe('Second');
+  });
+
+  it('value=100 renders without comma (3 digits)', () => {
+    const { container } = render(<BrandNumericEntry value={100} />);
+    expect(container.querySelector('input')?.value).toBe('100');
+  });
+
+  it('forwards decimal value (1.5)', () => {
+    const { container } = render(<BrandNumericEntry value={1.5} />);
+    expect(container.querySelector('input')?.value).toContain('1.5');
+  });
+
+  it('placeholder renders empty input by default', () => {
+    const { container } = render(<BrandNumericEntry placeholder="placeholder text" />);
+    const input = container.querySelector('input');
+    expect(input?.getAttribute('placeholder')).toBe('placeholder text');
+    expect(input?.value).toBe('');
+  });
+
+  it('multiple BrandNumericEntry instances render independently', () => {
+    const { container } = render(
+      <>
+        <BrandNumericEntry value={1} />
+        <BrandNumericEntry value={2} />
+      </>,
+    );
+    const inputs = container.querySelectorAll('input');
+    expect(inputs.length).toBe(2);
+    expect(inputs[0].value).toBe('1');
+    expect(inputs[1].value).toBe('2');
+  });
 });
