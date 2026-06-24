@@ -135,4 +135,47 @@ describe('ProposalCandidateContent', () => {
       '[t]line1\nline2\nline3',
     );
   });
+
+  it('renders markdown div + proposal-tx div in same render', () => {
+    const { container } = render(<ProposalCandidateContent proposal={baseProposal} />);
+    expect(container.querySelector('[data-testid="markdown"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="proposal-tx"]')).not.toBeNull();
+  });
+
+  it('renders proposal-tx wrapper only when proposal provided', () => {
+    const { container } = render(<ProposalCandidateContent />);
+    expect(container.querySelector('[data-testid="proposal-tx"]')).toBeNull();
+  });
+
+  it('renders markdown wrapper only when description is non-empty', () => {
+    const empty = {
+      version: { content: { title: 't', description: '', details: [] } },
+    } as never;
+    const { container } = render(<ProposalCandidateContent proposal={empty} />);
+    expect(container.querySelector('[data-testid="markdown"]')).toBeNull();
+  });
+
+  it('passes 10 details correctly to ProposalTransactions', () => {
+    const ten = {
+      version: {
+        content: {
+          title: 't',
+          description: 'd',
+          details: Array.from({ length: 10 }, (_, i) => ({ target: `0x${i}` })),
+        },
+      },
+    } as never;
+    const { container } = render(<ProposalCandidateContent proposal={ten} />);
+    expect(container.querySelector('[data-testid="proposal-tx"]')?.textContent).toBe('tx-count=10');
+  });
+
+  it('renders title-prefixed markdown for unicode title', () => {
+    const uni = {
+      version: { content: { title: '日本語タイトル', description: 'body', details: [] } },
+    } as never;
+    const { container } = render(<ProposalCandidateContent proposal={uni} />);
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe(
+      '[日本語タイトル]body',
+    );
+  });
 });

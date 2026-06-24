@@ -139,4 +139,59 @@ describe('NijisTransition', () => {
     );
     expect(container.querySelector('span')).not.toBeNull();
   });
+
+  it('renders nested children correctly', () => {
+    const { container } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        <div data-testid="outer">
+          <span data-testid="inner">nested</span>
+        </div>
+      </NijisTransition>,
+    );
+    expect(container.querySelector('[data-testid="outer"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="inner"]')?.textContent).toBe('nested');
+  });
+
+  it('show=false renders no motion-div', () => {
+    const { container } = render(
+      <NijisTransition show={false} transitionStyes={styles}>
+        <span>x</span>
+      </NijisTransition>,
+    );
+    expect(container.querySelectorAll('[data-testid="motion-div"]').length).toBe(0);
+  });
+
+  it('does not crash without onClick', () => {
+    const { container } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        <span>x</span>
+      </NijisTransition>,
+    );
+    const div = container.querySelector('[data-testid="motion-div"]');
+    expect(() => {
+      if (div) fireEvent.click(div);
+    }).not.toThrow();
+  });
+
+  it('renders multiple sibling children', () => {
+    const { container } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        <span data-testid="s1">a</span>
+        <span data-testid="s2">b</span>
+        <span data-testid="s3">c</span>
+      </NijisTransition>,
+    );
+    expect(container.querySelector('[data-testid="s1"]')?.textContent).toBe('a');
+    expect(container.querySelector('[data-testid="s2"]')?.textContent).toBe('b');
+    expect(container.querySelector('[data-testid="s3"]')?.textContent).toBe('c');
+  });
+
+  it('renders string children directly', () => {
+    const { container } = render(
+      <NijisTransition show={true} transitionStyes={styles}>
+        hello world
+      </NijisTransition>,
+    );
+    expect(container.querySelector('[data-testid="motion-div"]')?.textContent).toBe('hello world');
+  });
 });

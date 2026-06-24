@@ -153,4 +153,55 @@ describe('CurrentDelegatePannel', () => {
       '0xAbCdEf1234567890AbCdEf1234567890AbCdEf12',
     );
   });
+
+  it('renders exactly 1 short-address element', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xDELEGATE' });
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    expect(container.querySelectorAll('[data-testid="short"]').length).toBe(1);
+  });
+
+  it('repeated update clicks invoke onPrimary N times', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const onPri = vi.fn();
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={onPri} onSecondaryBtnClick={() => {}} />,
+    );
+    const buttons = container.querySelectorAll('button');
+    fireEvent.click(buttons[1]);
+    fireEvent.click(buttons[1]);
+    expect(onPri).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders Update Delegate button text', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    const buttons = container.querySelectorAll('button');
+    expect(buttons[1]?.textContent).toContain('Update');
+  });
+
+  it('renders Close button text', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCOUNT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    const buttons = container.querySelectorAll('button');
+    expect(buttons[0]?.textContent).toContain('Close');
+  });
+
+  it('account=null still falls back to "0x"', () => {
+    useAccountMock.mockReturnValue({ address: null });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0x');
+  });
 });
