@@ -246,4 +246,38 @@ describe('BidHistory Component', () => {
     render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
     expect(screen.getByRole('list')).toBeInTheDocument();
   });
+
+  it('mockClasses bidCollection is applied to list', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(mockBids);
+    render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    expect(screen.getByRole('list')).toHaveClass('bidCollection');
+  });
+
+  it('max=3 renders all 3 bids', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(mockBids);
+    render(<BidHistory auctionId="1" max={3} classes={mockClasses} />);
+    expect(screen.getAllByTestId('bid-history-item')).toHaveLength(3);
+  });
+
+  it('auctionId="999" passed as BigInt(999) to hook', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    render(<BidHistory auctionId="999" max={10} classes={mockClasses} />);
+    expect(useAuctionBids).toHaveBeenCalledWith(BigInt(999));
+  });
+
+  it('rerender from 1 bid to 3 bids updates count', () => {
+    vi.mocked(useAuctionBids).mockReturnValueOnce([mockBids[0]]);
+    const { rerender } = render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    expect(screen.getAllByTestId('bid-history-item')).toHaveLength(1);
+    vi.mocked(useAuctionBids).mockReturnValue(mockBids);
+    rerender(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    expect(screen.getAllByTestId('bid-history-item')).toHaveLength(3);
+  });
+
+  it('useAuctionBids called once per render', () => {
+    vi.mocked(useAuctionBids).mockClear();
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    expect(useAuctionBids).toHaveBeenCalledTimes(1);
+  });
 });

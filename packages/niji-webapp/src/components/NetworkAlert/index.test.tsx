@@ -154,4 +154,42 @@ describe('NetworkAlert', () => {
     render(<NetworkAlert />);
     expect(switchChainMock).toHaveBeenCalledWith({ chainId: 1 });
   });
+
+  it('chainId 137 (Polygon) triggers switchChain', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 137 });
+    render(<NetworkAlert />);
+    expect(switchChainMock).toHaveBeenCalledWith({ chainId: 1 });
+  });
+
+  it('rerender from disconnected to connected with wrong chain triggers switchChain', () => {
+    useAccountMock.mockReturnValueOnce({ isConnected: false, chainId: undefined });
+    const { rerender } = render(<NetworkAlert />);
+    expect(switchChainMock).not.toHaveBeenCalled();
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 11155111 });
+    rerender(<NetworkAlert />);
+    expect(switchChainMock).toHaveBeenCalled();
+  });
+
+  it('multiple renders with correct chain do not call switchChain', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 1 });
+    render(<NetworkAlert />);
+    render(<NetworkAlert />);
+    render(<NetworkAlert />);
+    expect(switchChainMock).not.toHaveBeenCalled();
+  });
+
+  it('chainId=10 (Optimism) wrong chain triggers switch', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 10 });
+    render(<NetworkAlert />);
+    expect(switchChainMock).toHaveBeenCalledWith({ chainId: 1 });
+  });
+
+  it('rerender from wrong chain to correct stops further switchChain calls', () => {
+    useAccountMock.mockReturnValueOnce({ isConnected: true, chainId: 11155111 });
+    const { rerender } = render(<NetworkAlert />);
+    expect(switchChainMock).toHaveBeenCalledTimes(1);
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 1 });
+    rerender(<NetworkAlert />);
+    expect(switchChainMock).toHaveBeenCalledTimes(1);
+  });
 });

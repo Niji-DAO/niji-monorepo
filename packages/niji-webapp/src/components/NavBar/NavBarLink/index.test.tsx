@@ -171,4 +171,44 @@ describe('NavBarLink', () => {
     expect(links[0].getAttribute('target')).toBe('');
     expect(links[1].getAttribute('target')).toBe('_blank');
   });
+
+  it('to="/" root path renders as internal link', () => {
+    const { container } = wrap(<NavBarLink to="/">root</NavBarLink>);
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('');
+  });
+
+  it('rerender from external to internal updates target', () => {
+    const { container, rerender } = wrap(<NavBarLink to="https://example.com">x</NavBarLink>);
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('_blank');
+    rerender(
+      <MemoryRouter>
+        <NavBarLink to="/internal">x</NavBarLink>
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('');
+  });
+
+  it('long external URL renders verbatim', () => {
+    const longUrl = 'https://example.com/path/' + 'x'.repeat(300);
+    const { container } = wrap(<NavBarLink to={longUrl}>x</NavBarLink>);
+    expect(container.querySelector('a')?.getAttribute('href')).toBe(longUrl);
+  });
+
+  it('5 internal links render 5 anchors', () => {
+    const { container } = wrap(
+      <>
+        <NavBarLink to="/a">A</NavBarLink>
+        <NavBarLink to="/b">B</NavBarLink>
+        <NavBarLink to="/c">C</NavBarLink>
+        <NavBarLink to="/d">D</NavBarLink>
+        <NavBarLink to="/e">E</NavBarLink>
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(5);
+  });
+
+  it('https:// prefix specifically triggers _blank', () => {
+    const { container } = wrap(<NavBarLink to="https://test.io">x</NavBarLink>);
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('_blank');
+  });
 });
