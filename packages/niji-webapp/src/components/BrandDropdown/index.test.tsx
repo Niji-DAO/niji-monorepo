@@ -257,4 +257,82 @@ describe('BrandDropdown', () => {
     );
     expect(container.querySelectorAll('option').length).toBe(10);
   });
+
+  it('100 options render without crash', () => {
+    const manyOpts = (
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <option key={i} value={String(i)}>
+            {`Option ${i}`}
+          </option>
+        ))}
+      </>
+    );
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="0">
+        {manyOpts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelectorAll('option').length).toBe(100);
+  });
+
+  it('rerender value changes select.value', () => {
+    const { container, rerender } = render(
+      <BrandDropdown onChange={() => {}} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('select')?.value).toBe('a');
+    rerender(
+      <BrandDropdown onChange={() => {}} value="b">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('select')?.value).toBe('b');
+  });
+
+  it('chevron right/top default both 10 when neither prop set', () => {
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    const chev = container.querySelector('div[style]');
+    expect(chev?.getAttribute('style')).toContain('right: 10px');
+    expect(chev?.getAttribute('style')).toContain('top: 10px');
+  });
+
+  it('select element outermost wrapper exists', () => {
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('select')).not.toBeNull();
+  });
+
+  it('long label (200 chars) renders verbatim', () => {
+    const long = 'a'.repeat(200);
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="a" label={long}>
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('span')?.textContent).toBe(long);
+  });
+
+  it('rerender chevron position updates inline style', () => {
+    const { container, rerender } = render(
+      <BrandDropdown onChange={() => {}} value="a" chevonRight={10}>
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('div[style]')?.getAttribute('style')).toContain('right: 10px');
+    rerender(
+      <BrandDropdown onChange={() => {}} value="a" chevonRight={50}>
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('div[style]')?.getAttribute('style')).toContain('right: 50px');
+  });
 });

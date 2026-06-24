@@ -180,4 +180,47 @@ describe('CurrentBid', () => {
     const { container } = render(<CurrentBid currentBid={parseEther('1')} auctionEnded={true} />);
     expect(container.querySelector('h2')?.getAttribute('style')).toContain('brand-warm-dark-text');
   });
+
+  it('rerender from BID_N_A to numeric replaces "-" with amount', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = render(
+      <CurrentBid currentBid={BID_N_A} auctionEnded={false} />,
+    );
+    expect(container.textContent).toContain('-');
+    rerender(<CurrentBid currentBid={parseEther('5')} auctionEnded={false} />);
+    expect(container.textContent).toContain('Ξ 5.00');
+  });
+
+  it('100000 ETH renders without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(<CurrentBid currentBid={parseEther('100000')} auctionEnded={false} />),
+    ).not.toThrow();
+  });
+
+  it('h4 element renders before h2 in DOM order', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />);
+    const html = container.innerHTML;
+    expect(html.indexOf('h4')).toBeLessThan(html.indexOf('h2'));
+  });
+
+  it('5 instances render 5 h2 elements', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        <CurrentBid currentBid={parseEther('1')} auctionEnded={false} />
+        <CurrentBid currentBid={parseEther('2')} auctionEnded={false} />
+        <CurrentBid currentBid={parseEther('3')} auctionEnded={false} />
+        <CurrentBid currentBid={parseEther('4')} auctionEnded={false} />
+        <CurrentBid currentBid={parseEther('5')} auctionEnded={false} />
+      </>,
+    );
+    expect(container.querySelectorAll('h2').length).toBe(5);
+  });
+
+  it('BID_N_A constant value is truthy / non-undefined', () => {
+    expect(BID_N_A).toBeDefined();
+    expect(BID_N_A).not.toBeNull();
+  });
 });
