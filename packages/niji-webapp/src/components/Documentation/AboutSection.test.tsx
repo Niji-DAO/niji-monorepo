@@ -109,4 +109,46 @@ describe('AboutSection', () => {
       expect(href.startsWith('https://')).toBe(true);
     });
   });
+
+  it('AboutHeader renders cryptopunks anchor with correct href', () => {
+    const { container } = render(
+      <AboutHeader cryptopunksLink={links.cryptopunksLink} playgroundLink={links.playgroundLink} />,
+    );
+    const anchors = Array.from(container.querySelectorAll('a'));
+    expect(anchors.some(a => a.getAttribute('href') === 'https://cryptopunks.app/')).toBe(true);
+  });
+
+  it('AboutHeader renders playground anchor with /playground href', () => {
+    const { container } = render(
+      <AboutHeader cryptopunksLink={links.cryptopunksLink} playgroundLink={links.playgroundLink} />,
+    );
+    const anchors = Array.from(container.querySelectorAll('a'));
+    expect(anchors.some(a => a.getAttribute('href') === '/playground')).toBe(true);
+  });
+
+  it('AboutSection accepts only 2 of the 4 prop links variant', () => {
+    const minimal = {
+      ...links,
+      cryptopunksLink: <span />,
+      playgroundLink: <span />,
+    };
+    expect(() => wrapAccordion(<AboutSection {...minimal} />)).not.toThrow();
+  });
+
+  it('AboutSection renders without crash when accordion is closed', () => {
+    const { container } = render(
+      <Accordion>
+        <AboutSection {...links} />
+      </Accordion>,
+    );
+    expect(container.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('AboutHeader does not include unused link types', () => {
+    const { container } = render(
+      <AboutHeader cryptopunksLink={links.cryptopunksLink} playgroundLink={links.playgroundLink} />,
+    );
+    expect(container.textContent).not.toContain('Compound');
+    expect(container.textContent).not.toContain('public domain');
+  });
 });

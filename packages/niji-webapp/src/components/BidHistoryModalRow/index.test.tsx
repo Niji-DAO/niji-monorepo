@@ -124,4 +124,41 @@ describe('BidHistoryModalRow', () => {
     const { container } = render(<BidHistoryModalRow bid={bid} index={1} />);
     expect(container.querySelectorAll('a').length).toBe(1);
   });
+
+  it('renders 0n (zero) amount as "Ξ 0.00"', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const zero = { ...bid, value: 0n };
+    const { container } = render(<BidHistoryModalRow bid={zero} index={1} />);
+    expect(container.textContent).toContain('Ξ 0.00');
+  });
+
+  it('renders fractional amount (0.5 ETH)', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const frac = { ...bid, value: parseEther('0.5') };
+    const { container } = render(<BidHistoryModalRow bid={frac} index={1} />);
+    expect(container.textContent).toContain('Ξ');
+  });
+
+  it('etherscan link uses bid.transactionHash exactly', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const diffHash = { ...bid, transactionHash: '0xabcdef' };
+    const { container } = render(<BidHistoryModalRow bid={diffHash} index={1} />);
+    expect(container.querySelector('a')?.getAttribute('href')).toBe(
+      'https://etherscan.io/tx/0xabcdef',
+    );
+  });
+
+  it('renders sender address in DOM (visible somewhere)', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(<BidHistoryModalRow bid={bid} index={5} />);
+    // ShortAddress or alt
+    const html = container.innerHTML;
+    expect(html.includes('0xaaaa') || html.includes('0xa')).toBe(true);
+  });
+
+  it('renders trophy + avatar (2 imgs) when index=0', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(<BidHistoryModalRow bid={bid} index={0} />);
+    expect(container.querySelectorAll('img').length).toBe(2);
+  });
 });
