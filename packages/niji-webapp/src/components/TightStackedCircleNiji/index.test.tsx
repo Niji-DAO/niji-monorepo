@@ -281,4 +281,53 @@ describe('TightStackedCircleNiji', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders 10 instances each independently', () => {
+    useNounSeedMock.mockReturnValue(undefined);
+    expect(() =>
+      render(
+        <svg>
+          {Array.from({ length: 10 }, (_, i) => (
+            <TightStackedCircleNiji key={i} nounId={i} index={i % 3} square={55} shift={3} />
+          ))}
+        </svg>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles shift=0 without crash', () => {
+    useNounSeedMock.mockReturnValue(undefined);
+    expect(() => renderSvg({ nounId: 1, index: 0, square: 55, shift: 0 })).not.toThrow();
+  });
+
+  it('handles shift=100 without crash', () => {
+    useNounSeedMock.mockReturnValue(undefined);
+    expect(() => renderSvg({ nounId: 1, index: 0, square: 55, shift: 100 })).not.toThrow();
+  });
+
+  it('rerender does not crash 5 times', () => {
+    useNounSeedMock.mockReturnValue(undefined);
+    const { rerender } = render(
+      <svg>
+        <TightStackedCircleNiji nounId={1} index={0} square={55} shift={3} />
+      </svg>,
+    );
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        rerender(
+          <svg>
+            <TightStackedCircleNiji nounId={i + 1} index={i % 3} square={55} shift={3} />
+          </svg>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('renders consistent loading state across multiple renders', () => {
+    useNounSeedMock.mockReturnValue(undefined);
+    for (let i = 0; i < 5; i++) {
+      const { container } = renderSvg({ nounId: i, index: i, square: 55, shift: 3 });
+      expect(container.querySelector('[data-testid="loading-noun"]')).not.toBeNull();
+    }
+  });
 });

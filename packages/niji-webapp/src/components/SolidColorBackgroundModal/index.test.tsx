@@ -328,4 +328,67 @@ describe('SolidColorBackgroundModal', () => {
     );
     expect(document.getElementById('overlay-root')?.textContent).toContain('日本語');
   });
+
+  it('Backdrop renders 10 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 10 }, (_, i) => (
+          <Backdrop key={i} show={true} onDismiss={() => {}} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="transition"]').length).toBe(10);
+  });
+
+  it('renders 5 SolidColorBackgroundModal instances each with own content', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <SolidColorBackgroundModal
+              key={i}
+              show={true}
+              onDismiss={() => {}}
+              content={<p>{`item-${i}`}</p>}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('Backdrop with show=false renders nothing', () => {
+    const { container } = render(<Backdrop show={false} onDismiss={vi.fn()} />);
+    expect(container.querySelector('[data-testid="transition"]')).toBeNull();
+  });
+
+  it('show=true to false rerender removes content from overlay', () => {
+    const { rerender } = render(
+      <SolidColorBackgroundModal
+        show={true}
+        onDismiss={() => {}}
+        content={<p data-testid="x">a</p>}
+      />,
+    );
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="x"]'),
+    ).not.toBeNull();
+    rerender(
+      <SolidColorBackgroundModal
+        show={false}
+        onDismiss={() => {}}
+        content={<p data-testid="x">a</p>}
+      />,
+    );
+    expect(document.getElementById('overlay-root')?.querySelector('[data-testid="x"]')).toBeNull();
+  });
+
+  it('renders consistent content node type across rerenders', () => {
+    const { rerender } = render(
+      <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>v1</p>} />,
+    );
+    expect(document.getElementById('overlay-root')?.querySelector('p')?.textContent).toBe('v1');
+    rerender(<SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>v2</p>} />);
+    expect(document.getElementById('overlay-root')?.querySelector('p')?.textContent).toBe('v2');
+  });
 });
