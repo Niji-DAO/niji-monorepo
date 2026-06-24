@@ -78,4 +78,38 @@ describe('ProposalTransaction', () => {
     const { container } = render(<ProposalTransaction transaction={simpleTx} />);
     expect(container.querySelector('li')).not.toBeNull();
   });
+
+  it('handles different target address', () => {
+    const altTx = { ...simpleTx, target: '0xOTHER' } as never;
+    const { container } = render(<ProposalTransaction transaction={altTx} />);
+    expect(container.textContent).toContain('0xOTHER');
+  });
+
+  it('renders functionSig string in call data area', () => {
+    const customSig = {
+      target: '0xT',
+      functionSig: 'mint(address)',
+      callData: '0xR',
+      value: 0n,
+    } as never;
+    const { container } = render(<ProposalTransaction transaction={customSig} />);
+    expect(container.textContent).toContain('mint(address)');
+  });
+
+  it('renders non-zero value (1 ETH = 1e18 wei)', () => {
+    const ethTx = { ...sigTx, value: 1_000_000_000_000_000_000n } as never;
+    const { container } = render(<ProposalTransaction transaction={ethTx} />);
+    expect(container.textContent).toContain('1000000000000000000');
+  });
+
+  it('renders exactly 1 li root element', () => {
+    const { container } = render(<ProposalTransaction transaction={simpleTx} />);
+    expect(container.querySelectorAll('li').length).toBe(1);
+  });
+
+  it('simpleTx renders exactly 1 linkIfAddr for target (no callData split)', () => {
+    const { container } = render(<ProposalTransaction transaction={simpleTx} />);
+    const links = container.querySelectorAll('[data-testid="link-if-addr"]');
+    expect(links.length).toBe(1);
+  });
 });

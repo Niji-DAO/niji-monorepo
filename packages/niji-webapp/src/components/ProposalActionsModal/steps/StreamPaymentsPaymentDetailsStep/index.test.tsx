@@ -191,4 +191,37 @@ describe('StreamPaymentsPaymentDetailsStep', () => {
       'true',
     );
   });
+
+  it('title contains "Streaming Payment"', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    expect(container.querySelector('h1')?.textContent).toContain('Streaming Payment');
+  });
+
+  it('Back button fires onPrev repeatedly on multi-click', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <StreamPaymentsPaymentDetailsStep {...defaults} onPrevBtnClick={onPrev} />,
+    );
+    const backBtn = container.querySelectorAll('button')[0];
+    fireEvent.click(backBtn);
+    fireEvent.click(backBtn);
+    fireEvent.click(backBtn);
+    expect(onPrev).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders exactly 1 currency dropdown', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('[data-testid="currency"]').length).toBe(1);
+  });
+
+  it('renders exactly 1 amount + 1 recipient input', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('[data-testid="amount"]').length).toBe(1);
+    expect(container.querySelectorAll('[data-testid="recipient"]').length).toBe(1);
+  });
+
+  it('renders exactly 2 buttons (Back + Next)', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    expect(container.querySelectorAll('button').length).toBe(2);
+  });
 });
