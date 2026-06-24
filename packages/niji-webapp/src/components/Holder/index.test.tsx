@@ -129,4 +129,59 @@ describe('Holder', () => {
     const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
     expect(container.textContent).toContain('Niji info');
   });
+
+  it('Nounders branch with data shows non-empty render', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    const { container } = render(<Holder nounId={1n} isNounders={true} />, {
+      wrapper: WithProviders,
+    });
+    expect(container.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('does not render ShortAddress while loading', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    expect(container.querySelector('[data-testid="short"]')).toBeNull();
+  });
+
+  it('does not render ShortAddress when error is set', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: new Error('rpc'),
+      data: undefined,
+    });
+    const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    expect(container.querySelector('[data-testid="short"]')).toBeNull();
+  });
+
+  it('renders ShortAddress with different owner address (0xABC)', async () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xABC' } } },
+    });
+    const { container } = render(<Holder nounId={5n} />, { wrapper: WithProviders });
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0xABC');
+    });
+  });
+
+  it('atom value false also renders error path without crashing', () => {
+    useAtomValueMock.mockReturnValue(false);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: new Error('rpc'),
+      data: undefined,
+    });
+    const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    expect(container.textContent).toContain('Failed to fetch');
+  });
 });

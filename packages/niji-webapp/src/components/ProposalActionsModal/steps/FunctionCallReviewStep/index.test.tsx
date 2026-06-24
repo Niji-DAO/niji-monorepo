@@ -207,4 +207,91 @@ describe('FunctionCallReviewStep', () => {
     fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
     expect(onNext).toHaveBeenCalledTimes(1);
   });
+
+  it('renders address via ShortAddress', () => {
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        state={{ abi, function: 'noArg', address: ADDR, amount: '0', args: [] } as never}
+      />,
+    );
+    const shorts = container.querySelectorAll('[data-testid="short"]');
+    const found = Array.from(shorts).some(s => s.textContent === ADDR);
+    expect(found).toBe(true);
+  });
+
+  it('shows function name "transfer" in review content', () => {
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        state={
+          {
+            abi,
+            function: 'transfer',
+            address: ADDR,
+            amount: '0',
+            args: [ADDR, '1000'],
+          } as never
+        }
+      />,
+    );
+    expect(container.textContent).toContain('transfer');
+  });
+
+  it('Back button click is independent of state args', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        onPrevBtnClick={onPrev}
+        state={
+          {
+            abi,
+            function: 'transfer',
+            address: ADDR,
+            amount: '0',
+            args: [ADDR, '999'],
+          } as never
+        }
+      />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onPrev).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders large argument values without crash', () => {
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        state={
+          {
+            abi,
+            function: 'transfer',
+            address: ADDR,
+            amount: '999999999999999999',
+            args: [ADDR, '999999999999999999'],
+          } as never
+        }
+      />,
+    );
+    expect(container.textContent).toContain('999999999999999999');
+  });
+
+  it('Next + Back click sequence works in any order', () => {
+    const onPrev = vi.fn();
+    const onNext = vi.fn();
+    const { container } = render(
+      <FunctionCallReviewStep
+        {...defaults}
+        onPrevBtnClick={onPrev}
+        onNextBtnClick={onNext}
+        state={{ abi, function: 'noArg', address: ADDR, amount: '0', args: [] } as never}
+      />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onNext).toHaveBeenCalledTimes(2);
+    expect(onPrev).toHaveBeenCalledTimes(1);
+  });
 });

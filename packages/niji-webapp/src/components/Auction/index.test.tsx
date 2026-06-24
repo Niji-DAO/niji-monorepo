@@ -147,4 +147,44 @@ describe('Auction', () => {
     const { container } = wrap(<Auction auction={makeAuction(5n)} />);
     expect(container.querySelector('[data-testid="auction-activity"]')).toBeNull();
   });
+
+  it('isFirstAuction=false for nounId > 0', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    const { container } = wrap(<Auction auction={makeAuction(3n)} />);
+    expect(container.querySelector('[data-testid="prev"]')?.disabled).toBe(false);
+  });
+
+  it('isLastAuction=false when nounId < lastAuctionNounId', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    const { container } = wrap(<Auction auction={makeAuction(3n)} />);
+    expect(container.querySelector('[data-testid="next"]')?.disabled).toBe(false);
+  });
+
+  it('first auction prev click does not navigate (button is disabled)', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    navigateMock.mockReset();
+    const { container } = wrap(<Auction auction={makeAuction(0n)} />);
+    const prevBtn = container.querySelector('[data-testid="prev"]') as HTMLButtonElement;
+    expect(prevBtn.disabled).toBe(true);
+    fireEvent.click(prevBtn);
+    expect(navigateMock).not.toHaveBeenCalled();
+  });
+
+  it('renders NijiWithSeed for large bigint nounId', () => {
+    useAtomValueMock.mockReturnValue(1000n);
+    isNounderMock.mockReturnValue(false);
+    const { container } = wrap(<Auction auction={makeAuction(999n)} />);
+    expect(container.querySelector('[data-testid="niji-with-seed"]')?.textContent).toBe('999');
+  });
+
+  it('Nounder auction (nounId=0, isNounder=true) does not render AuctionActivity', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(true);
+    const { container } = wrap(<Auction auction={makeAuction(0n)} />);
+    expect(container.querySelector('[data-testid="auction-activity"]')).toBeNull();
+    expect(container.querySelector('[data-testid="niji-content"]')).not.toBeNull();
+  });
 });
