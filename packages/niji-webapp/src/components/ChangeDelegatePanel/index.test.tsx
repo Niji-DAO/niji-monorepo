@@ -229,4 +229,47 @@ describe('ChangeDelegatePanel', () => {
     );
     expect(container.querySelector('[data-testid="brand-spinner"]')).not.toBeNull();
   });
+
+  it('Mining state shows "delegating to a new account" copy (CHANGING view)', () => {
+    hookState.delegateState = { status: 'Mining' };
+    const { container } = render(<ChangeDelegatePanel onDismiss={dismissMock} />);
+    expect(container.textContent).toContain('delegated');
+  });
+
+  it('Mining state renders View on Etherscan button', () => {
+    hookState.delegateState = {
+      status: 'Mining',
+      transaction: { hash: '0xtx123' },
+    };
+    const { container } = render(<ChangeDelegatePanel onDismiss={dismissMock} />);
+    const etherscanBtn = Array.from(container.querySelectorAll('button')).find(b =>
+      b.textContent?.includes('View on Etherscan'),
+    );
+    expect(etherscanBtn).not.toBeUndefined();
+  });
+
+  it('Exception status shows failure title (same path as Fail)', () => {
+    hookState.delegateState = { status: 'Exception', errorMessage: 'rpc down' };
+    const { container } = render(<ChangeDelegatePanel onDismiss={dismissMock} />);
+    expect(container.textContent).toContain('Delegate Update Failed');
+  });
+
+  it('passes typed input address directly to delegateVotes (does not auto-resolve ENS)', () => {
+    delegateVotesMock.mockReset();
+    const { container } = render(<ChangeDelegatePanel onDismiss={dismissMock} />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: validAddress } });
+    const buttons = Array.from(container.querySelectorAll('button'));
+    const delegateBtn = buttons.find(b => b.textContent?.includes('Delegate'));
+    fireEvent.click(delegateBtn!);
+    expect(delegateVotesMock).toHaveBeenCalledWith({ args: [validAddress] });
+  });
+
+  it('does not show threshold warning when accountVotes after delegation still meets threshold', () => {
+    hookState.accountVotes = 100;
+    hookState.nounTokenBalance = 5;
+    hookState.proposalThreshold = 1;
+    const { container } = render(<ChangeDelegatePanel onDismiss={dismissMock} />);
+    expect(container.textContent).not.toContain('less than');
+  });
 });
