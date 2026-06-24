@@ -140,4 +140,55 @@ describe('DelegationModal', () => {
     const { container } = render(<Backdrop onDismiss={() => {}} />);
     expect(container.querySelectorAll('div').length).toBe(1);
   });
+
+  it('Backdrop multi-click invokes onDismiss multiple times', () => {
+    const onDismiss = vi.fn();
+    const { container } = render(<Backdrop onDismiss={onDismiss} />);
+    const div = container.querySelector('div');
+    if (div) {
+      fireEvent.click(div);
+      fireEvent.click(div);
+      fireEvent.click(div);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(3);
+  });
+
+  it('overlay renders at least 3 buttons (close + primary + secondary)', () => {
+    render(<DelegationModal onDismiss={() => {}} />);
+    const buttons = document.getElementById('overlay-root')?.querySelectorAll('button');
+    expect((buttons?.length ?? 0) >= 3).toBe(true);
+  });
+
+  it('initial state shows current-panel (not change-panel) with no delegateTo', () => {
+    render(<DelegationModal onDismiss={() => {}} />);
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="current-panel"]'),
+    ).not.toBeNull();
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="change-panel"]'),
+    ).toBeNull();
+  });
+
+  it('initial state with delegateTo shows ONLY change-panel', () => {
+    render(<DelegationModal onDismiss={() => {}} delegateTo="0xFEED" />);
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="current-panel"]'),
+    ).toBeNull();
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="change-panel"]'),
+    ).not.toBeNull();
+  });
+
+  it('change panel after primary click renders change-none text', () => {
+    render(<DelegationModal onDismiss={() => {}} />);
+    const primary = Array.from(
+      document.getElementById('overlay-root')?.querySelectorAll('button') ?? [],
+    ).find(b => b.textContent === 'primary');
+    if (primary) fireEvent.click(primary);
+    const changePanel = document
+      .getElementById('overlay-root')
+      ?.querySelector('[data-testid="change-panel"]');
+    expect(changePanel).not.toBeNull();
+    expect(changePanel?.textContent).toBe('change-none');
+  });
 });

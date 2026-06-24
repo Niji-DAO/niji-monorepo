@@ -115,4 +115,33 @@ describe('EditProposalButton', () => {
     );
     expect(container.textContent).toContain('11 votes to submit a proposal');
   });
+
+  it('isFormInvalid alone disables button (no warning text)', () => {
+    const { container } = render(<EditProposalButton {...defaults} isFormInvalid={true} />);
+    expect(container.querySelector('button')?.disabled).toBe(true);
+  });
+
+  it('threshold = 0 falls to generic warning (falsy guard)', () => {
+    const { container } = render(
+      <EditProposalButton {...defaults} hasEnoughVote={false} proposalThreshold={0} />,
+    );
+    expect(container.textContent).toContain("don't have enough votes");
+  });
+
+  it('isLoading button is NOT disabled (only form invalid / no votes / active disables)', () => {
+    const { container } = render(<EditProposalButton {...defaults} isLoading={true} />);
+    expect(container.querySelector('button')?.disabled).toBe(false);
+  });
+
+  it('rerender from default to isLoading shows spinner', () => {
+    const { container, rerender } = render(<EditProposalButton {...defaults} />);
+    expect(container.textContent).toBe('Update Proposal');
+    rerender(<EditProposalButton {...defaults} isLoading={true} />);
+    expect(container.querySelector('.spinner-border')).not.toBeNull();
+  });
+
+  it('renders exactly 1 button element', () => {
+    const { container } = render(<EditProposalButton {...defaults} />);
+    expect(container.querySelectorAll('button').length).toBe(1);
+  });
 });
