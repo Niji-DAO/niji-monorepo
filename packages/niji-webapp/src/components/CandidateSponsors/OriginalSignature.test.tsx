@@ -65,4 +65,43 @@ describe('OriginalSignature', () => {
     expect(a?.getAttribute('target')).toBe('_blank');
     expect(a?.getAttribute('rel')).toBe('noreferrer');
   });
+
+  it('handles 1000 voteCount with plural', () => {
+    const { container } = render(
+      <OriginalSignature voteCount={1000} signer={SIGNER} isParentProposalUpdatable={true} />,
+    );
+    expect(container.textContent).toContain('1000 votes');
+  });
+
+  it('renders for different signer addresses', () => {
+    const OTHER = '0x0000000000000000000000000000000000000001' as const;
+    const { container } = render(
+      <OriginalSignature voteCount={1} signer={OTHER} isParentProposalUpdatable={true} />,
+    );
+    expect(container.querySelector('a')?.getAttribute('href')).toBe(
+      `https://etherscan.io/address/${OTHER}`,
+    );
+  });
+
+  it('renders exactly 1 anchor element', () => {
+    const { container } = render(
+      <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={true} />,
+    );
+    expect(container.querySelectorAll('a').length).toBe(1);
+  });
+
+  it('isParentProposalUpdatable=false → link still present', () => {
+    const { container } = render(
+      <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={false} />,
+    );
+    expect(container.querySelector('a')).not.toBeNull();
+  });
+
+  it('renders ShortAddress mocked (first 6 chars of signer)', () => {
+    const { container } = render(
+      <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={true} />,
+    );
+    // mock は signer.slice(0, 6)
+    expect(container.textContent).toContain('0x5FbD');
+  });
 });

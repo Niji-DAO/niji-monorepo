@@ -46,4 +46,43 @@ describe('DelegationCandidateVoteCountInfo', () => {
     );
     expect(container.textContent).toContain('my-name');
   });
+
+  it('handles large voteCount (1000) with plural', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="Alice" voteCount={1000} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('1000 Votes');
+  });
+
+  it('renders ReactNode text (nested span)', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo
+        text={<span data-testid="name-span">Alice</span>}
+        voteCount={1}
+        isLoading={false}
+      />,
+    );
+    expect(container.querySelector('[data-testid="name-span"]')?.textContent).toBe('Alice');
+  });
+
+  it('renders exactly 1 svg when isLoading=true (single spinner)', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="Alice" voteCount={1} isLoading={true} />,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(1);
+  });
+
+  it('handles empty text prop without crash', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="" voteCount={2} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('2 Votes');
+  });
+
+  it('voteCount=10 still uses plural', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo text="Alice" voteCount={10} isLoading={false} />,
+    );
+    expect(container.textContent).toContain('10 Votes');
+  });
 });
