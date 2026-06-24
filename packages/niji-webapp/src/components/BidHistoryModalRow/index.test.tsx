@@ -316,4 +316,47 @@ describe('BidHistoryModalRow', () => {
     const longHash = { ...bid, transactionHash: '0x' + 'a'.repeat(500) };
     expect(() => render(<BidHistoryModalRow bid={longHash} index={1} />)).not.toThrow();
   });
+
+  it('renders 20 instances each independently', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <BidHistoryModalRow key={i} bid={bid} index={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(20);
+  });
+
+  it('renders 1000 ETH bid correctly', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const huge = { ...bid, value: parseEther('1000') };
+    const { container } = render(<BidHistoryModalRow bid={huge} index={1} />);
+    expect(container.textContent).toContain('Ξ 1000.00');
+  });
+
+  it('handles rapid 5 rerenders with new bid values', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { rerender } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    for (let i = 1; i <= 5; i++) {
+      const newBid = { ...bid, value: parseEther(`${i}`) };
+      expect(() => rerender(<BidHistoryModalRow bid={newBid} index={1} />)).not.toThrow();
+    }
+  });
+
+  it('handles ENS for unicode address', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('テスト.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    expect(container.textContent).toContain('テスト');
+  });
+
+  it('handles index boundary 0 trophy + index 1 no trophy', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { container: c0 } = render(<BidHistoryModalRow bid={bid} index={0} />);
+    expect(c0.querySelectorAll('img').length).toBe(2);
+    const { container: c1 } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    expect(c1.querySelectorAll('img').length).toBe(1);
+  });
 });
