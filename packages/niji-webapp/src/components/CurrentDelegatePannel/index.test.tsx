@@ -380,4 +380,68 @@ describe('CurrentDelegatePannel', () => {
       render(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />),
     ).not.toThrow();
   });
+
+  it('renders 10 instances independently', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xDELEG' });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <CurrentDelegatePannel
+              key={i}
+              onPrimaryBtnClick={() => {}}
+              onSecondaryBtnClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender with different delegate data', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValueOnce({ data: '0xDELEG1' });
+    const { rerender } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: '0xDELEG2' });
+    expect(() =>
+      rerender(
+        <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders consecutive 5 times', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    for (let i = 0; i < 5; i++) {
+      expect(() =>
+        render(
+          <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('renders consistent h1 title across rerenders', () => {
+    useAccountMock.mockReturnValue({ address: '0xA' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container, rerender } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    expect(container.querySelector('h1')?.textContent).toBe('Delegation');
+    rerender(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />);
+    expect(container.querySelector('h1')?.textContent).toBe('Delegation');
+  });
+
+  it('account null + delegate null shows 0x placeholder', () => {
+    useAccountMock.mockReturnValue({ address: undefined });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+    );
+    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('0x');
+  });
 });

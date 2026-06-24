@@ -395,4 +395,66 @@ describe('BrandDropdown', () => {
     );
     expect(container.querySelector('select')).not.toBeNull();
   });
+
+  it('renders 15 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 15 }, (_, i) => (
+          <BrandDropdown key={i} onChange={() => {}} value="a">
+            {opts}
+          </BrandDropdown>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('select').length).toBe(15);
+  });
+
+  it('renders label rerender from defined to undefined', () => {
+    const { container, rerender } = render(
+      <BrandDropdown onChange={() => {}} value="a" label="L">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('span')?.textContent).toBe('L');
+    rerender(
+      <BrandDropdown onChange={() => {}} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelector('span')).toBeNull();
+  });
+
+  it('handles disabled state via prop', () => {
+    expect(() =>
+      render(
+        <BrandDropdown onChange={() => {}} value="a" disabled>
+          {opts}
+        </BrandDropdown>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('select element has options children', () => {
+    const { container } = render(
+      <BrandDropdown onChange={() => {}} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect(container.querySelectorAll('option').length).toBe(2);
+  });
+
+  it('rerender with new value updates select.value', () => {
+    const { container, rerender } = render(
+      <BrandDropdown onChange={() => {}} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect((container.querySelector('select') as HTMLSelectElement)?.value).toBe('a');
+    rerender(
+      <BrandDropdown onChange={() => {}} value="b">
+        {opts}
+      </BrandDropdown>,
+    );
+    expect((container.querySelector('select') as HTMLSelectElement)?.value).toBe('b');
+  });
 });
