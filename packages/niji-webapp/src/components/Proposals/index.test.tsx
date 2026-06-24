@@ -352,4 +352,40 @@ describe('Proposals', () => {
     const { container } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
     expect(container.querySelectorAll('[data-testid="candidate-card"]').length).toBe(10);
   });
+
+  it('candidates list with 20 items renders 20 cards', () => {
+    locationMock.hash = '#candidates';
+    candidatesAtomState.current = Array.from({ length: 20 }, (_, i) => ({
+      id: `c-${i}`,
+      proposalIdToUpdate: '0',
+    }));
+    const { container } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+    expect(container.querySelectorAll('[data-testid="candidate-card"]').length).toBe(20);
+  });
+
+  it('non-#candidates hash uses Proposals tab by default', () => {
+    locationMock.hash = '#some-other-hash';
+    const { container } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+    expect(container.textContent).toContain('No proposals found');
+  });
+
+  it('large nounsRequired (1000) renders without crash', () => {
+    expect(() => wrap(<Proposals proposals={[]} nounsRequired={1000} />)).not.toThrow();
+  });
+
+  it('rerender from empty to populated proposals updates list', () => {
+    locationMock.hash = '';
+    const { container, rerender } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+    expect(container.textContent).toContain('No proposals found');
+    const proposals = [
+      { id: '1', title: 'Hello', status: 1, startBlock: 50n, endBlock: 200n, eta: '0' },
+    ] as never;
+    rerender(<Proposals proposals={proposals} nounsRequired={2} />);
+    expect(container.textContent).not.toContain('No proposals found');
+  });
+
+  it('account undefined still renders without crash', () => {
+    wagmiState.account = undefined;
+    expect(() => wrap(<Proposals proposals={[]} nounsRequired={2} />)).not.toThrow();
+  });
 });

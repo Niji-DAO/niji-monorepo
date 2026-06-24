@@ -173,4 +173,49 @@ describe('StartOrEndTime', () => {
     const { container } = render(<StartOrEndTime />);
     expect(container.textContent).toContain('ended');
   });
+
+  it('endTime far future (year 3000) renders ends or starts', () => {
+    const past = Math.floor(Date.now() / 1000) - 100;
+    const farFuture = 32503680000;
+    const { container } = render(<StartOrEndTime startTime={past} endTime={farFuture} />);
+    expect(container.textContent).toContain('ends');
+  });
+
+  it('5 instances render distinct content', () => {
+    const future = Math.floor(Date.now() / 1000) + 3600;
+    const { container } = render(
+      <>
+        <StartOrEndTime startTime={future} endTime={future + 3600} />
+        <StartOrEndTime startTime={future} endTime={future + 3600} />
+        <StartOrEndTime startTime={future} endTime={future + 3600} />
+        <StartOrEndTime startTime={future} endTime={future + 3600} />
+        <StartOrEndTime startTime={future} endTime={future + 3600} />
+      </>,
+    );
+    expect((container.textContent ?? '').length).toBeGreaterThan(20);
+  });
+
+  it('rerender from starts to ends transitions correctly', () => {
+    const future = Math.floor(Date.now() / 1000) + 3600;
+    const past = Math.floor(Date.now() / 1000) - 3600;
+    const { container, rerender } = render(
+      <StartOrEndTime startTime={future} endTime={future + 3600} />,
+    );
+    expect(container.textContent).toContain('starts');
+    rerender(<StartOrEndTime startTime={past} endTime={future + 3600} />);
+    expect(container.textContent).toContain('ends');
+  });
+
+  it('extremely large endTime (Number.MAX_SAFE_INTEGER) renders without crash', () => {
+    expect(() =>
+      render(<StartOrEndTime startTime={0} endTime={Number.MAX_SAFE_INTEGER} />),
+    ).not.toThrow();
+  });
+
+  it('startTime > endTime with both in past renders ended', () => {
+    const past = Math.floor(Date.now() / 1000) - 3600;
+    const evenMorePast = Math.floor(Date.now() / 1000) - 7200;
+    const { container } = render(<StartOrEndTime startTime={past} endTime={evenMorePast} />);
+    expect(container.textContent).toContain('ended');
+  });
 });

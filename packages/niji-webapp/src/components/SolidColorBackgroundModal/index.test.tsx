@@ -243,4 +243,51 @@ describe('SolidColorBackgroundModal', () => {
     const { container } = render(<Backdrop show={false} onDismiss={() => {}} />);
     expect(container.querySelector('[data-testid="transition"]')).toBeNull();
   });
+
+  it('emoji content renders verbatim', () => {
+    render(<SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>🎉</p>} />);
+    expect(document.getElementById('overlay-root')?.textContent).toContain('🎉');
+  });
+
+  it('rapid 5 dismiss clicks invoke onDismiss 5 times', () => {
+    const onDismiss = vi.fn();
+    render(<SolidColorBackgroundModal show={true} onDismiss={onDismiss} content={null} />);
+    const btn = document.getElementById('overlay-root')?.querySelector('button');
+    if (btn) {
+      for (let i = 0; i < 5; i++) fireEvent.click(btn);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(5);
+  });
+
+  it('Backdrop rerender from false to true shows transition', () => {
+    const { container, rerender } = render(<Backdrop show={false} onDismiss={() => {}} />);
+    expect(container.querySelector('[data-testid="transition"]')).toBeNull();
+    rerender(<Backdrop show={true} onDismiss={() => {}} />);
+    expect(container.querySelector('[data-testid="transition"]')).not.toBeNull();
+  });
+
+  it('long content text (500 chars) renders fully', () => {
+    const long = 'a'.repeat(500);
+    render(<SolidColorBackgroundModal show={true} onDismiss={() => {}} content={long} />);
+    expect(
+      (document.getElementById('overlay-root')?.textContent ?? '').length,
+    ).toBeGreaterThanOrEqual(500);
+  });
+
+  it('content array (Fragment) renders multiple elements', () => {
+    render(
+      <SolidColorBackgroundModal
+        show={true}
+        onDismiss={() => {}}
+        content={
+          <>
+            <span>a</span>
+            <span>b</span>
+            <span>c</span>
+          </>
+        }
+      />,
+    );
+    expect(document.getElementById('overlay-root')?.querySelectorAll('span').length).toBe(3);
+  });
 });
