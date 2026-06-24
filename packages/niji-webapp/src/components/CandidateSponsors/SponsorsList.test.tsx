@@ -209,4 +209,49 @@ describe('SponsorsList', () => {
     );
     expect(container.querySelectorAll('[data-testid="original-signature"]')).toHaveLength(1);
   });
+
+  it('Sponsor button absent when connectedAccountNounVotes=0', () => {
+    const { container } = wrap(<SponsorsList {...baseProps} connectedAccountNounVotes={0} />);
+    const sponsorBtn = Array.from(container.querySelectorAll('button')).find(
+      b => b.textContent === 'Sponsor',
+    );
+    expect(sponsorBtn).toBeUndefined();
+  });
+
+  it('renders no placeholder when requiredVotes <= voteCount', () => {
+    const candidate = makeCandidate({
+      contentSignatures: [makeSignature()],
+      requiredVotes: 1,
+      voteCount: 1,
+    });
+    const { container } = wrap(<SponsorsList {...baseProps} candidate={candidate} />);
+    const placeholders = Array.from(container.querySelectorAll('li')).filter(li =>
+      li.className.includes('placeholder'),
+    );
+    expect(placeholders).toHaveLength(0);
+  });
+
+  it('renders correct count when many signatures (5 entries)', () => {
+    const candidate = makeCandidate({
+      contentSignatures: Array.from({ length: 5 }, (_, i) =>
+        makeSignature({ signerId: `0xS${i}` }),
+      ),
+    });
+    const { container } = wrap(<SponsorsList {...baseProps} candidate={candidate} />);
+    expect(container.querySelectorAll('[data-testid="signature"]')).toHaveLength(5);
+  });
+
+  it('hides Submit onchain button when threshold not met', () => {
+    const { container } = wrap(
+      <SponsorsList {...baseProps} isProposer={true} isThresholdMet={false} />,
+    );
+    expect(container.textContent).not.toContain('Submit onchain');
+  });
+
+  it('hides Submit onchain button when not proposer (even if threshold met)', () => {
+    const { container } = wrap(
+      <SponsorsList {...baseProps} isProposer={false} isThresholdMet={true} />,
+    );
+    expect(container.textContent).not.toContain('Submit onchain');
+  });
 });
