@@ -236,4 +236,108 @@ describe('ModalBottomButtonRow', () => {
     );
     expect(container.querySelector('[data-testid="custom-next"]')?.textContent).toBe('Go');
   });
+
+  it('rerender from disabled to enabled updates next state', () => {
+    const { container, rerender } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="x"
+        nextBtnText="y"
+        isNextBtnDisabled={true}
+      />,
+    );
+    expect(container.querySelectorAll('button')[1]?.disabled).toBe(true);
+    rerender(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="x"
+        nextBtnText="y"
+        isNextBtnDisabled={false}
+      />,
+    );
+    expect(container.querySelectorAll('button')[1]?.disabled).toBe(false);
+  });
+
+  it('rerender updates prev button text', () => {
+    const { container, rerender } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="Back1"
+        nextBtnText="Next"
+      />,
+    );
+    expect(container.querySelectorAll('button')[0]?.textContent).toBe('Back1');
+    rerender(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="Back2"
+        nextBtnText="Next"
+      />,
+    );
+    expect(container.querySelectorAll('button')[0]?.textContent).toBe('Back2');
+  });
+
+  it('unicode prev text renders verbatim', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="戻る"
+        nextBtnText="次へ"
+      />,
+    );
+    expect(container.querySelectorAll('button')[0]?.textContent).toBe('戻る');
+    expect(container.querySelectorAll('button')[1]?.textContent).toBe('次へ');
+  });
+
+  it('numeric children render as string in button text', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText={123 as never}
+        nextBtnText={456 as never}
+      />,
+    );
+    expect(container.querySelectorAll('button')[0]?.textContent).toBe('123');
+    expect(container.querySelectorAll('button')[1]?.textContent).toBe('456');
+  });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <ModalBottomButtonRow
+          onPrevBtnClick={() => {}}
+          onNextBtnClick={() => {}}
+          prevBtnText="A"
+          nextBtnText="B"
+        />
+        <ModalBottomButtonRow
+          onPrevBtnClick={() => {}}
+          onNextBtnClick={() => {}}
+          prevBtnText="C"
+          nextBtnText="D"
+        />
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(4);
+  });
+
+  it('next disabled with style data-style="disabled"', () => {
+    const { container } = render(
+      <ModalBottomButtonRow
+        onPrevBtnClick={() => {}}
+        onNextBtnClick={() => {}}
+        prevBtnText="x"
+        nextBtnText="y"
+        isNextBtnDisabled={true}
+      />,
+    );
+    const next = container.querySelectorAll('button')[1];
+    expect(next?.getAttribute('data-style')).toBe('disabled');
+  });
 });

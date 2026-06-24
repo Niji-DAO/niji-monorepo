@@ -120,4 +120,55 @@ describe('NavBarLink', () => {
     expect(links[0].getAttribute('href')).toBe('/a');
     expect(links[1].getAttribute('href')).toBe('/b');
   });
+
+  it('rerender from internal to external switches target', () => {
+    const { container, rerender } = wrap(<NavBarLink to="/internal">x</NavBarLink>);
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('');
+    rerender(
+      <MemoryRouter>
+        <NavBarLink to="https://example.com">x</NavBarLink>
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('_blank');
+  });
+
+  it('unicode children render verbatim', () => {
+    const { container } = wrap(<NavBarLink to="/x">日本語</NavBarLink>);
+    expect(container.querySelector('a')?.textContent).toBe('日本語');
+  });
+
+  it('hash-only path (#fragment) treated as internal', () => {
+    const { container } = wrap(<NavBarLink to="#section">jump</NavBarLink>);
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('');
+  });
+
+  it('relative path (./foo) treated as internal', () => {
+    const { container } = wrap(<NavBarLink to="./foo">x</NavBarLink>);
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('');
+  });
+
+  it('5 instances render 5 links', () => {
+    const { container } = wrap(
+      <>
+        <NavBarLink to="/a">A</NavBarLink>
+        <NavBarLink to="/b">B</NavBarLink>
+        <NavBarLink to="/c">C</NavBarLink>
+        <NavBarLink to="/d">D</NavBarLink>
+        <NavBarLink to="/e">E</NavBarLink>
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(5);
+  });
+
+  it('mixed internal + external links have correct target values', () => {
+    const { container } = wrap(
+      <>
+        <NavBarLink to="/internal">int</NavBarLink>
+        <NavBarLink to="https://example.com">ext</NavBarLink>
+      </>,
+    );
+    const links = container.querySelectorAll('a');
+    expect(links[0].getAttribute('target')).toBe('');
+    expect(links[1].getAttribute('target')).toBe('_blank');
+  });
 });

@@ -116,4 +116,42 @@ describe('NetworkAlert', () => {
     const { container } = render(<NetworkAlert />);
     expect(container.children.length).toBe(0);
   });
+
+  it('switchChain called exactly once per render when on wrong chain', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 11155111 });
+    render(<NetworkAlert />);
+    expect(switchChainMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('multiple wrong-chain renders trigger multiple switchChain calls', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 11155111 });
+    render(<NetworkAlert />);
+    render(<NetworkAlert />);
+    render(<NetworkAlert />);
+    expect(switchChainMock).toHaveBeenCalledTimes(3);
+  });
+
+  it('chainId 56 (BSC) triggers switchChain', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 56 });
+    render(<NetworkAlert />);
+    expect(switchChainMock).toHaveBeenCalledWith({ chainId: 1 });
+  });
+
+  it('switchChain not called when isConnected=undefined (treat as false)', () => {
+    useAccountMock.mockReturnValue({ isConnected: undefined, chainId: 11155111 });
+    render(<NetworkAlert />);
+    expect(switchChainMock).not.toHaveBeenCalled();
+  });
+
+  it('renders null with no children regardless of wrong chain', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 99 });
+    const { container } = render(<NetworkAlert />);
+    expect(container.children.length).toBe(0);
+  });
+
+  it('chain 31337 (Hardhat) triggers switchChain to mainnet', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 31337 });
+    render(<NetworkAlert />);
+    expect(switchChainMock).toHaveBeenCalledWith({ chainId: 1 });
+  });
 });

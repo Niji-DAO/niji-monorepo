@@ -116,4 +116,61 @@ describe('StartOrEndTime', () => {
     const trueCount = [starts, ends, ended].filter(Boolean).length;
     expect(trueCount).toBe(1);
   });
+
+  it('rerender from ends to ended', () => {
+    const pastStart = Math.floor(Date.now() / 1000) - 100;
+    const futureEnd = Math.floor(Date.now() / 1000) + 3600;
+    const { container, rerender } = render(
+      <StartOrEndTime startTime={pastStart} endTime={futureEnd} />,
+    );
+    expect(container.textContent).toContain('ends');
+    rerender(<StartOrEndTime startTime={0} endTime={1} />);
+    expect(container.textContent).toContain('ended');
+  });
+
+  it('returns content for far-future start', () => {
+    const farFuture = Math.floor(Date.now() / 1000) + 86400 * 365;
+    const { container } = render(
+      <StartOrEndTime startTime={farFuture} endTime={farFuture + 3600} />,
+    );
+    expect((container.textContent ?? '').length).toBeGreaterThan(4);
+  });
+
+  it('returns content for far-past end', () => {
+    const farPast = 1000000;
+    const { container } = render(<StartOrEndTime startTime={farPast} endTime={farPast + 1000} />);
+    expect((container.textContent ?? '').length).toBeGreaterThan(4);
+  });
+
+  it('renders distinct content for different phase states', () => {
+    const future = Math.floor(Date.now() / 1000) + 3600;
+    const past = Math.floor(Date.now() / 1000) - 3600;
+    const { container: c1 } = render(<StartOrEndTime startTime={future} endTime={future + 3600} />);
+    const { container: c2 } = render(<StartOrEndTime startTime={past - 1000} endTime={past} />);
+    expect(c1.textContent).not.toBe(c2.textContent);
+  });
+
+  it('multiple instances render independently', () => {
+    const future = Math.floor(Date.now() / 1000) + 3600;
+    const past = Math.floor(Date.now() / 1000) - 3600;
+    const { container } = render(
+      <>
+        <StartOrEndTime startTime={future} endTime={future + 3600} />
+        <StartOrEndTime startTime={past - 1000} endTime={past} />
+      </>,
+    );
+    expect(container.textContent).toContain('starts');
+    expect(container.textContent).toContain('ended');
+  });
+
+  it('extreme small startTime (1) treated as past', () => {
+    const futureEnd = Math.floor(Date.now() / 1000) + 3600;
+    const { container } = render(<StartOrEndTime startTime={1} endTime={futureEnd} />);
+    expect(container.textContent).toContain('ends');
+  });
+
+  it('handles startTime + endTime both undefined (both default 0)', () => {
+    const { container } = render(<StartOrEndTime />);
+    expect(container.textContent).toContain('ended');
+  });
 });
