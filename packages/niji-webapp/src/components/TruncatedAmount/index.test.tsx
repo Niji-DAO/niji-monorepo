@@ -200,4 +200,40 @@ describe('TruncatedAmount', () => {
     );
     expect((container.textContent?.match(/Ξ/g) ?? []).length).toBe(10);
   });
+
+  it('renders 20 instances each with own amount', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <TruncatedAmount key={i} amount={parseEther(`${i + 1}`)} />
+        ))}
+      </>,
+    );
+    expect((container.textContent?.match(/Ξ/g) ?? []).length).toBe(20);
+  });
+
+  it('rerender amount updates display', () => {
+    const { container, rerender } = render(<TruncatedAmount amount={parseEther('1')} />);
+    expect(container.textContent).toBe('Ξ 1.00');
+    rerender(<TruncatedAmount amount={parseEther('100')} />);
+    expect(container.textContent).toBe('Ξ 100.00');
+  });
+
+  it('renders for 1.5 ETH (one decimal)', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('1.5')} />);
+    expect(container.textContent).toBe('Ξ 1.50');
+  });
+
+  it('renders for 2.345678 ETH (2 decimal display)', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('2.345678')} />);
+    expect(container.textContent).toMatch(/^Ξ 2\.\d{2}$/);
+  });
+
+  it('renders consistent format across 5 rerenders', () => {
+    const { container, rerender } = render(<TruncatedAmount amount={parseEther('1')} />);
+    for (let i = 1; i <= 5; i++) {
+      rerender(<TruncatedAmount amount={parseEther(`${i}`)} />);
+      expect(container.textContent).toMatch(/^Ξ \d+\.\d{2}$/);
+    }
+  });
 });
