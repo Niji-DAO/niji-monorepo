@@ -113,4 +113,36 @@ describe('Documentation', () => {
     expect(idxGov).toBeLessThan(idxArt);
     expect(idxArt).toBeLessThan(idxNijiders);
   });
+
+  it('renders without crash for transparent background', () => {
+    expect(() => render(<Documentation backgroundColor="transparent" />)).not.toThrow();
+  });
+
+  it('applies green color via inline style', () => {
+    const { container } = render(<Documentation backgroundColor="#00ff00" />);
+    expect(container.querySelector('section')?.getAttribute('style')).toContain('rgb(0, 255, 0)');
+  });
+
+  it('renders multiple backgroundColors across rerenders', () => {
+    const { rerender, container } = render(<Documentation backgroundColor="#ff0000" />);
+    expect(container.querySelector('section')?.getAttribute('style')).toContain('rgb(255, 0, 0)');
+    rerender(<Documentation backgroundColor="#0000ff" />);
+    expect(container.querySelector('section')?.getAttribute('style')).toContain('rgb(0, 0, 255)');
+  });
+
+  it('renders all 4 sub-section + 1 header (total 5 sub-renders)', () => {
+    const { container } = render(<Documentation />);
+    const total =
+      container.querySelectorAll('[data-testid="about-header"]').length +
+      container.querySelectorAll('[data-testid="about-section"]').length +
+      container.querySelectorAll('[data-testid="gov-section"]').length +
+      container.querySelectorAll('[data-testid="art-section"]').length +
+      container.querySelectorAll('[data-testid="nijiders-section"]').length;
+    expect(total).toBe(5);
+  });
+
+  it('renders section className without errors when no bg', () => {
+    const { container } = render(<Documentation />);
+    expect(container.querySelector('section')?.className).toBeTruthy();
+  });
 });

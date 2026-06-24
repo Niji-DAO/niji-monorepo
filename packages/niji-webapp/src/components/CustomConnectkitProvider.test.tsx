@@ -112,4 +112,56 @@ describe('CustomConnectkitProvider', () => {
     );
     expect(container.querySelectorAll('[data-testid="ckp"]').length).toBe(1);
   });
+
+  it('forwards zh-CN locale verbatim', () => {
+    useActiveLocaleMock.mockReturnValue('zh-CN');
+    render(
+      <CustomConnectkitProvider>
+        <span>x</span>
+      </CustomConnectkitProvider>,
+    );
+    expect(optionsCapture.language).toBe('zh-CN');
+  });
+
+  it('forwards ko-KR locale verbatim', () => {
+    useActiveLocaleMock.mockReturnValue('ko-KR');
+    render(
+      <CustomConnectkitProvider>
+        <span>x</span>
+      </CustomConnectkitProvider>,
+    );
+    expect(optionsCapture.language).toBe('ko-KR');
+  });
+
+  it('renders children of provider in DOM', () => {
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(
+      <CustomConnectkitProvider>
+        <div data-testid="my-child">hello</div>
+      </CustomConnectkitProvider>,
+    );
+    expect(container.querySelector('[data-testid="my-child"]')?.textContent).toBe('hello');
+  });
+
+  it('pseudo locale always normalized to en-US', () => {
+    useActiveLocaleMock.mockReturnValue('pseudo');
+    render(
+      <CustomConnectkitProvider>
+        <span>x</span>
+      </CustomConnectkitProvider>,
+    );
+    expect(optionsCapture.language).toBe('en-US');
+    expect(optionsCapture.language).not.toBe('pseudo');
+  });
+
+  it('renders without crash for empty string locale (forwarded verbatim)', () => {
+    useActiveLocaleMock.mockReturnValue('');
+    expect(() =>
+      render(
+        <CustomConnectkitProvider>
+          <span>x</span>
+        </CustomConnectkitProvider>,
+      ),
+    ).not.toThrow();
+  });
 });
