@@ -314,6 +314,94 @@ describe('ProposalActionModal', () => {
     );
     expect(container.querySelector('[data-testid="function-args"]')).not.toBeNull();
   });
+
+  it('FUNCTION_CALL_SELECT prev returns to SELECT_ACTION_TYPE', () => {
+    selectStepMock.mockImplementationOnce(
+      ({ onNextBtnClick }: { onNextBtnClick: (e?: number) => void }) => (
+        <div data-testid="select-action">
+          <button
+            data-testid="goto-fn"
+            onClick={() => onNextBtnClick(ProposalActionCreationStep.FUNCTION_CALL_SELECT_FUNCTION)}
+          />
+        </div>
+      ),
+    );
+    const { container } = render(<ProposalActionModal {...baseProps} />);
+    fireEvent.click(container.querySelector('[data-testid="goto-fn"]') as HTMLButtonElement);
+    fireEvent.click(
+      container.querySelector('[data-testid="function-select-prev"]') as HTMLButtonElement,
+    );
+    expect(container.querySelector('[data-testid="select-action"]')).not.toBeNull();
+  });
+
+  it('STREAM_PAYMENT_PAYMENT_DETAILS prev returns to SELECT_ACTION_TYPE', () => {
+    selectStepMock.mockImplementationOnce(
+      ({ onNextBtnClick }: { onNextBtnClick: (e?: number) => void }) => (
+        <div data-testid="select-action">
+          <button
+            data-testid="goto-stream"
+            onClick={() =>
+              onNextBtnClick(ProposalActionCreationStep.STREAM_PAYMENT_PAYMENT_DETAILS)
+            }
+          />
+        </div>
+      ),
+    );
+    const { container } = render(<ProposalActionModal {...baseProps} />);
+    fireEvent.click(container.querySelector('[data-testid="goto-stream"]') as HTMLButtonElement);
+    fireEvent.click(
+      container.querySelector('[data-testid="stream-payment-prev"]') as HTMLButtonElement,
+    );
+    expect(container.querySelector('[data-testid="select-action"]')).not.toBeNull();
+  });
+
+  it('FUNCTION_CALL_REVIEW non-tx (numeric) does not call onActionAdd', () => {
+    selectStepMock.mockImplementationOnce(
+      ({ onNextBtnClick }: { onNextBtnClick: (e?: number) => void }) => (
+        <div data-testid="select-action">
+          <button
+            data-testid="goto-fn-review"
+            onClick={() => onNextBtnClick(ProposalActionCreationStep.FUNCTION_CALL_REVIEW)}
+          />
+        </div>
+      ),
+    );
+    const { container } = render(<ProposalActionModal {...baseProps} />);
+    fireEvent.click(container.querySelector('[data-testid="goto-fn-review"]') as HTMLButtonElement);
+    fireEvent.click(
+      container.querySelector('[data-testid="function-review-next-with-num"]') as HTMLButtonElement,
+    );
+    expect(onActionAddMock).not.toHaveBeenCalled();
+  });
+
+  it('STREAM_PAYMENT_REVIEW non-tx (numeric) does not call onActionAdd', () => {
+    selectStepMock.mockImplementationOnce(
+      ({ onNextBtnClick }: { onNextBtnClick: (e?: number) => void }) => (
+        <div data-testid="select-action">
+          <button
+            data-testid="goto-stream-review"
+            onClick={() => onNextBtnClick(ProposalActionCreationStep.STREAM_PAYMENT_REVIEW)}
+          />
+        </div>
+      ),
+    );
+    const { container } = render(<ProposalActionModal {...baseProps} />);
+    fireEvent.click(
+      container.querySelector('[data-testid="goto-stream-review"]') as HTMLButtonElement,
+    );
+    fireEvent.click(
+      container.querySelector('[data-testid="stream-review-next-with-num"]') as HTMLButtonElement,
+    );
+    expect(onActionAddMock).not.toHaveBeenCalled();
+  });
+
+  it('renders nothing harmful when show toggles false then true (re-mount)', () => {
+    const { container, rerender } = render(<ProposalActionModal {...baseProps} show={false} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).toBeNull();
+    rerender(<ProposalActionModal {...baseProps} show={true} />);
+    expect(container.querySelector('[data-testid="solid-modal"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="select-action"]')).not.toBeNull();
+  });
 });
 
 // dummy reference to silence unused warning

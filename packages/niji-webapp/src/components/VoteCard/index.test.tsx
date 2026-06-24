@@ -303,4 +303,85 @@ describe('VoteCard', () => {
     const table = container.querySelector('[data-testid="delegate-grouped"]');
     expect(table?.getAttribute('data-count')).toBe('0');
   });
+
+  it('triggers lookupNNSOrENS multiple times for multiple new delegates', async () => {
+    const delegateData = [
+      { delegate: '0xAAA' as `0x${string}`, supportDetailed: 1 as const, nijiRepresented: ['1'] },
+      { delegate: '0xBBB' as `0x${string}`, supportDetailed: 1 as const, nijiRepresented: ['2'] },
+      { delegate: '0xCCC' as `0x${string}`, supportDetailed: 1 as const, nijiRepresented: ['3'] },
+    ];
+    render(
+      <VoteCard
+        proposal={makeProposal()}
+        percentage={50}
+        variant={VoteCardVariant.FOR}
+        delegateGroupedVoteData={delegateData}
+      />,
+    );
+    await waitFor(() => {
+      expect(lookupNNSOrENSMock).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  it('filters out non-matching variant entries from voter count display', () => {
+    const delegateData = [
+      { delegate: '0xAAA' as `0x${string}`, supportDetailed: 1 as const, nijiRepresented: ['1'] },
+      { delegate: '0xBBB' as `0x${string}`, supportDetailed: 0 as const, nijiRepresented: ['2'] },
+      { delegate: '0xCCC' as `0x${string}`, supportDetailed: 2 as const, nijiRepresented: ['3'] },
+    ];
+    const { container } = render(
+      <VoteCard
+        proposal={makeProposal()}
+        percentage={50}
+        variant={VoteCardVariant.ABSTAIN}
+        delegateGroupedVoteData={delegateData}
+      />,
+    );
+    expect(container.textContent).toContain('voter');
+    const table = container.querySelector('[data-testid="delegate-grouped"]');
+    expect(table?.getAttribute('data-count')).toBe('1');
+  });
+
+  it('does not fail when delegateGroupedVoteData entries do not match any variant', () => {
+    const delegateData = [
+      { delegate: '0xAAA' as `0x${string}`, supportDetailed: 0 as const, nijiRepresented: ['1'] },
+    ];
+    const { container } = render(
+      <VoteCard
+        proposal={makeProposal()}
+        percentage={50}
+        variant={VoteCardVariant.FOR}
+        delegateGroupedVoteData={delegateData}
+      />,
+    );
+    expect(container.textContent).not.toContain('voters');
+    const table = container.querySelector('[data-testid="delegate-grouped"]');
+    expect(table?.getAttribute('data-count')).toBe('0');
+  });
+
+  it('passes percentage=0 to VoteProgressBar without rendering issue', () => {
+    const { container } = render(
+      <VoteCard
+        proposal={makeProposal({ forCount: 0 })}
+        percentage={0}
+        variant={VoteCardVariant.FOR}
+        delegateGroupedVoteData={undefined}
+      />,
+    );
+    const bar = container.querySelector('[data-testid="vote-progress"]');
+    expect(bar?.getAttribute('data-percentage')).toBe('0');
+  });
+
+  it('passes percentage=100 to VoteProgressBar for full bar case', () => {
+    const { container } = render(
+      <VoteCard
+        proposal={makeProposal({ forCount: 100 })}
+        percentage={100}
+        variant={VoteCardVariant.FOR}
+        delegateGroupedVoteData={undefined}
+      />,
+    );
+    const bar = container.querySelector('[data-testid="vote-progress"]');
+    expect(bar?.getAttribute('data-percentage')).toBe('100');
+  });
 });

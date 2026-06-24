@@ -224,4 +224,47 @@ describe('StreamPaymentsPaymentDetailsStep', () => {
     const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
     expect(container.querySelectorAll('button').length).toBe(2);
   });
+
+  it('Next remains disabled when only amount is filled (recipient empty)', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    fireEvent.change(container.querySelector('[data-testid="amount"]')!, {
+      target: { value: '100' },
+    });
+    expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(true);
+  });
+
+  it('Next remains disabled when only recipient is filled (amount empty)', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    fireEvent.change(container.querySelector('[data-testid="recipient"]')!, {
+      target: { value: ADDR },
+    });
+    expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(true);
+  });
+
+  it('Next remains disabled when recipient address is invalid even with amount filled', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    fireEvent.change(container.querySelector('[data-testid="amount"]')!, {
+      target: { value: '100' },
+    });
+    fireEvent.change(container.querySelector('[data-testid="recipient"]')!, {
+      target: { value: '0xBAD' },
+    });
+    expect(container.querySelector('[data-testid="next-btn"]')?.disabled).toBe(true);
+  });
+
+  it('amount input accepts decimal values', () => {
+    const { container } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+    const amountInput = container.querySelector('[data-testid="amount"]') as HTMLInputElement;
+    fireEvent.change(amountInput, { target: { value: '0.5' } });
+    expect(amountInput.value).toBe('0.5');
+  });
+
+  it('recipient input is not marked invalid when address is fully cleared to empty string', () => {
+    const { container } = render(
+      <StreamPaymentsPaymentDetailsStep {...defaults} state={{ address: '' } as never} />,
+    );
+    expect(container.querySelector('[data-testid="recipient"]')?.getAttribute('data-invalid')).toBe(
+      'false',
+    );
+  });
 });

@@ -250,4 +250,60 @@ describe('FunctionCallSelectFunctionStep', () => {
     expect(options).toContain('approve');
     expect(options).not.toContain('Transfer');
   });
+
+  it('initial ETH input is empty when state.amount is undefined', () => {
+    const { container } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+    const ethInput = container.querySelector(
+      '[data-testid="input-Included ETH (optional)"]',
+    ) as HTMLInputElement;
+    expect(ethInput.value).toBe('');
+  });
+
+  it('renders empty dropdown when abi has only events (no functions)', () => {
+    const eventOnlyAbi = [{ type: 'event', name: 'Transfer' }];
+    const { container } = render(
+      <FunctionCallSelectFunctionStep
+        {...baseProps}
+        state={{ ...baseProps.state, abi: eventOnlyAbi } as never}
+      />,
+    );
+    const dropdown = container.querySelector(
+      '[data-testid="dropdown-Select Contract Function"]',
+    ) as HTMLSelectElement;
+    expect(dropdown.options.length).toBe(0);
+  });
+
+  it('allows dropdown selection change', () => {
+    const { container } = render(
+      <FunctionCallSelectFunctionStep
+        {...baseProps}
+        state={{ ...baseProps.state, abi: sampleAbi } as never}
+      />,
+    );
+    const dropdown = container.querySelector(
+      '[data-testid="dropdown-Select Contract Function"]',
+    ) as HTMLSelectElement;
+    fireEvent.change(dropdown, { target: { value: 'approve' } });
+    expect(dropdown.value).toBe('approve');
+  });
+
+  it('does not trigger fetch for empty address input', () => {
+    const { container } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+    const addressInput = container.querySelector(
+      '[data-testid="input-Contract Address"]',
+    ) as HTMLInputElement;
+    fireEvent.change(addressInput, { target: { value: '' } });
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('populates ABI filename "etherscan-abi-download.json" when state.abi pre-supplied', () => {
+    const { container } = render(
+      <FunctionCallSelectFunctionStep
+        {...baseProps}
+        state={{ ...baseProps.state, address: validAddress, abi: sampleAbi } as never}
+      />,
+    );
+    const abiUpload = container.querySelector('[data-testid="abi-upload"]');
+    expect(abiUpload?.getAttribute('data-filename')).toBe('etherscan-abi-download.json');
+  });
 });
