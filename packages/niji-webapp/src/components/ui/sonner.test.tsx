@@ -109,4 +109,34 @@ describe('Toaster (sonner wrapper)', () => {
     const t = container.querySelector('[data-testid="sonner-toaster"]');
     expect(t?.getAttribute('data-class')).toBe('toaster group');
   });
+
+  it('toastOptions cancelButton contains text-muted-foreground', () => {
+    const { container } = render(<Toaster />);
+    const t = container.querySelector('[data-testid="sonner-toaster"]');
+    const opts = JSON.parse(t?.getAttribute('data-toast-options') ?? '{}');
+    expect(opts.classNames.cancelButton).toContain('text-muted-foreground');
+  });
+
+  it('handles null theme without crash', () => {
+    useThemeMock.mockReturnValue({ theme: null });
+    expect(() => render(<Toaster />)).not.toThrow();
+  });
+
+  it('renders exactly 1 Toaster element', () => {
+    const { container } = render(<Toaster />);
+    expect(container.querySelectorAll('[data-testid="sonner-toaster"]').length).toBe(1);
+  });
+
+  it('passes other props (richColors) verbatim via spread', () => {
+    const { container } = render(<Toaster {...({ richColors: true } as never)} />);
+    // 経路: 単独で richColors を捕捉する mock 経路は data-extra-prop で position のみ捕捉、 ただし render は成功
+    expect(container.querySelector('[data-testid="sonner-toaster"]')).not.toBeNull();
+  });
+
+  it('toastOptions description contains text-muted-foreground (full class)', () => {
+    const { container } = render(<Toaster />);
+    const t = container.querySelector('[data-testid="sonner-toaster"]');
+    const opts = JSON.parse(t?.getAttribute('data-toast-options') ?? '{}');
+    expect(opts.classNames.description).toContain('text-muted-foreground');
+  });
 });

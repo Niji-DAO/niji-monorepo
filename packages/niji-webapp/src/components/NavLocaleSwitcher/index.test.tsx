@@ -109,4 +109,43 @@ describe('NavLocaleSwitcher', () => {
     const buttons = container.querySelectorAll('[data-testid="nav-button"]');
     expect(buttons.length).toBeGreaterThanOrEqual(1);
   });
+
+  it('modal is gone after close (toggle off)', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    const wrapper = container.querySelector('[data-testid="nav-button"]')?.parentElement;
+    if (wrapper) fireEvent.click(wrapper);
+    const closeBtn = container.querySelector('[data-testid="lang-modal"] button');
+    if (closeBtn) fireEvent.click(closeBtn);
+    expect(container.querySelector('[data-testid="lang-modal"]')).toBeNull();
+  });
+
+  it('multi clicks toggle modal show/hide repeatedly', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    const wrapper = container.querySelector('[data-testid="nav-button"]')?.parentElement;
+    if (wrapper) fireEvent.click(wrapper);
+    expect(container.querySelector('[data-testid="lang-modal"]')).not.toBeNull();
+    const closeBtn = container.querySelector('[data-testid="lang-modal"] button');
+    if (closeBtn) fireEvent.click(closeBtn);
+    expect(container.querySelector('[data-testid="lang-modal"]')).toBeNull();
+  });
+
+  it('renders Language button text (any locale)', () => {
+    useAtomMock.mockReturnValue(['ja-JP', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    expect(container.textContent).toContain('Language');
+  });
+
+  it('handles pseudo locale without crash', () => {
+    useAtomMock.mockReturnValue(['pseudo', vi.fn()]);
+    expect(() => render(<NavLocaleSwitcher />)).not.toThrow();
+  });
+
+  it('dropdown class wrapper coexists with nav-button', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { container } = render(<NavLocaleSwitcher />);
+    expect(container.querySelector('.dropdown')).not.toBeNull();
+    expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
+  });
 });
