@@ -178,4 +178,38 @@ describe('Modal', () => {
     render(<Modal title="x" content={null} onDismiss={() => {}} />);
     expect(document.getElementById('overlay-root')?.querySelectorAll('button').length).toBe(1);
   });
+
+  it('emoji content renders inside overlay', () => {
+    render(<Modal title="x" content="🎉" onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.textContent).toContain('🎉');
+  });
+
+  it('numeric title (0) renders as "0"', () => {
+    render(<Modal title={0 as never} content={null} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelector('h3')?.textContent).toBe('0');
+  });
+
+  it('multiple Modal instances render distinct h3s', () => {
+    render(<Modal title="A" content={null} onDismiss={() => {}} />);
+    render(<Modal title="B" content={null} onDismiss={() => {}} />);
+    const overlay = document.getElementById('overlay-root');
+    const h3s = overlay?.querySelectorAll('h3');
+    expect(h3s?.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('Backdrop click bubbles up to onDismiss', () => {
+    const onDismiss = vi.fn();
+    render(<Modal title="x" content={null} onDismiss={onDismiss} />);
+    const backdrop = document.getElementById('backdrop-root')?.querySelector('div');
+    if (backdrop) {
+      fireEvent.click(backdrop);
+      fireEvent.click(backdrop);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(2);
+  });
+
+  it('img close icon is present per Modal', () => {
+    render(<Modal title="x" content={null} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelectorAll('img').length).toBe(1);
+  });
 });
