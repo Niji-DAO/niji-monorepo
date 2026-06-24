@@ -211,4 +211,75 @@ describe('FunctionCallEnterArgsStep', () => {
     fireEvent.click(container.querySelectorAll('button')[0]);
     expect(onPrev).toHaveBeenCalledTimes(1);
   });
+
+  it('Next button does not fire onPrev', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <FunctionCallEnterArgsStep
+        {...defaults}
+        onPrevBtnClick={onPrev}
+        state={{ abi, function: 'noArg' } as never}
+      />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="next-btn"]')!);
+    expect(onPrev).not.toHaveBeenCalled();
+  });
+
+  it('Back button does not fire onNext', () => {
+    const onNext = vi.fn();
+    const { container } = render(
+      <FunctionCallEnterArgsStep
+        {...defaults}
+        onNextBtnClick={onNext}
+        state={{ abi, function: 'noArg' } as never}
+      />,
+    );
+    fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
+  it('multiple Back clicks invoke onPrev N times', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <FunctionCallEnterArgsStep
+        {...defaults}
+        onPrevBtnClick={onPrev}
+        state={{ abi, function: 'noArg' } as never}
+      />,
+    );
+    const back = container.querySelectorAll('button')[0];
+    fireEvent.click(back);
+    fireEvent.click(back);
+    fireEvent.click(back);
+    expect(onPrev).toHaveBeenCalledTimes(3);
+  });
+
+  it('h1 (ModalTitle) renders exactly 1 time', () => {
+    const { container } = render(
+      <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('rerender from transfer to noArg removes inputs', () => {
+    const { container, rerender } = render(
+      <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+    );
+    expect(container.querySelectorAll('input').length).toBe(2);
+    rerender(
+      <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'noArg' } as never} />,
+    );
+    expect(container.querySelectorAll('input').length).toBe(0);
+  });
+
+  it('rerender from noArg to transfer adds inputs', () => {
+    const { container, rerender } = render(
+      <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'noArg' } as never} />,
+    );
+    expect(container.querySelectorAll('input').length).toBe(0);
+    rerender(
+      <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+    );
+    expect(container.querySelectorAll('input').length).toBe(2);
+  });
 });

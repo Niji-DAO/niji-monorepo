@@ -231,4 +231,59 @@ describe('AuctionActivity', () => {
         ?.querySelector('[data-testid="title-wrap"]'),
     ).not.toBeNull();
   });
+
+  it('isFirstAuction with non-last shows NijiInfoCard', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = wrap(
+      <AuctionActivity
+        {...defaults}
+        isFirstAuction={true}
+        isLastAuction={false}
+        auction={makeAuction() as never}
+      />,
+    );
+    expect(container.querySelector('[data-testid="niji-info-card"]')).not.toBeNull();
+  });
+
+  it('warm mode (isCool false) still renders wrapper', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const { container } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+    expect(container.querySelector('[data-testid="wrapper"]')).not.toBeNull();
+  });
+
+  it('current-bid renders in all auction states', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = wrap(
+      <AuctionActivity {...defaults} isLastAuction={false} auction={makeAuction() as never} />,
+    );
+    expect(container.querySelector('[data-testid="current-bid"]')).not.toBeNull();
+  });
+
+  it('niji-title renders for any auction state', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const ended = makeAuction({ endTime: 1n });
+    const { container } = wrap(<AuctionActivity {...defaults} auction={ended as never} />);
+    expect(container.querySelector('[data-testid="niji-title"]')).not.toBeNull();
+  });
+
+  it('Holder renders for non-last + ended exclusive (not Winner)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const ended = makeAuction({ endTime: 1n });
+    const { container } = wrap(
+      <AuctionActivity {...defaults} isLastAuction={false} auction={ended as never} />,
+    );
+    const holder = container.querySelector('[data-testid="holder"]');
+    const winner = container.querySelector('[data-testid="winner"]');
+    expect(holder).not.toBeNull();
+    expect(winner).toBeNull();
+  });
+
+  it('non-last + active auction renders niji-info-card (no Bid)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = wrap(
+      <AuctionActivity {...defaults} isLastAuction={false} auction={makeAuction() as never} />,
+    );
+    expect(container.querySelector('[data-testid="niji-info-card"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="bid"]')).toBeNull();
+  });
 });
