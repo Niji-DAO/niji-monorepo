@@ -278,4 +278,41 @@ describe('LegacyNoun — additional edge cases', () => {
     const longPath = '/' + 'a'.repeat(1000) + '.png';
     expect(() => render(<LegacyNoun imgPath={longPath} alt="x" />)).not.toThrow();
   });
+
+  it('LegacyNoun renders 100 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <LegacyNoun key={i} imgPath={`/img${i}.png`} alt={`alt-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(100);
+  });
+
+  it('LegacyNoun rerender preserves img across imgPath changes', () => {
+    const { container, rerender } = render(<LegacyNoun imgPath="/x.png" alt="x" />);
+    expect(container.querySelector('img')).not.toBeNull();
+    for (let i = 0; i < 10; i++) {
+      rerender(<LegacyNoun imgPath={`/img${i}.png`} alt={`alt-${i}`} />);
+      expect(container.querySelector('img')).not.toBeNull();
+    }
+  });
+
+  it('LegacyNoun handles className + wrapperClassName both', () => {
+    const { container } = render(
+      <LegacyNoun imgPath="/x.png" alt="x" className="cls1" wrapperClassName="wrap1" />,
+    );
+    expect(container.querySelector('img')?.className).toContain('cls1');
+    expect(container.querySelector('div')?.className).toContain('wrap1');
+  });
+
+  it('LegacyNoun handles symbol-like imgPath', () => {
+    expect(() => render(<LegacyNoun imgPath="/<>&.png" alt="x" />)).not.toThrow();
+  });
+
+  it('LegacyNoun handles unicode alt text', () => {
+    const { container } = render(<LegacyNoun imgPath="/x.png" alt="日本語ALT文字列" />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('日本語ALT文字列');
+  });
 });

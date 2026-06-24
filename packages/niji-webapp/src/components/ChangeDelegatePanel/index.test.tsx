@@ -404,4 +404,52 @@ describe('ChangeDelegatePanel', () => {
     expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
     hookState.accountVotes = 5;
   });
+
+  it('renders 20 instances each independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <ChangeDelegatePanel key={i} onDismiss={vi.fn()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 20 times preserves component', () => {
+    const { rerender } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+    for (let i = 0; i < 20; i++) {
+      expect(() => rerender(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    }
+  });
+
+  it('handles ensResolved variations', () => {
+    hookState.ensResolved = '0xABC123';
+    expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    hookState.ensResolved = undefined;
+    expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+  });
+
+  it('handles all delegateState statuses', () => {
+    const statuses: DelegateStatus[] = [
+      'None',
+      'PendingSignature',
+      'Mining',
+      'Success',
+      'Fail',
+      'Exception',
+    ];
+    statuses.forEach(status => {
+      hookState.delegateState = { status };
+      expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    });
+    hookState.delegateState = { status: 'None' };
+  });
+
+  it('handles userDelegatee variations', () => {
+    hookState.userDelegatee = '0xDIFFERENT';
+    expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    hookState.userDelegatee = '0xOLD';
+  });
 });

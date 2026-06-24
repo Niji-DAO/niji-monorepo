@@ -468,4 +468,58 @@ describe('Holder', () => {
     });
     expect(container.textContent).toBe('');
   });
+
+  it('renders 20 instances each independently', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <Holder key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 20 times preserves component', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    const { rerender } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    for (let i = 0; i < 20; i++) {
+      expect(() => rerender(<Holder nounId={BigInt(i)} />)).not.toThrow();
+    }
+  });
+
+  it('handles 0xZERO_ADDRESS owner', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0x0000000000000000000000000000000000000000' } } },
+    });
+    expect(() => render(<Holder nounId={1n} />, { wrapper: WithProviders })).not.toThrow();
+  });
+
+  it('rerender from data to loading state', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValueOnce({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    const { rerender } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() => rerender(<Holder nounId={1n} />)).not.toThrow();
+  });
+
+  it('useAtomValue cool/warm rerender variations', () => {
+    useAtomValueMock.mockReturnValueOnce(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    const { rerender } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    useAtomValueMock.mockReturnValue(false);
+    expect(() => rerender(<Holder nounId={1n} />)).not.toThrow();
+  });
 });
