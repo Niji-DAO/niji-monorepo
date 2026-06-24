@@ -207,4 +207,56 @@ describe('Bid', () => {
     render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
     expect(toastSuccessMock).toHaveBeenCalled();
   });
+
+  it('renders Pick button as plain anchor (no disabled prop) when auctionEnded', () => {
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={true} />);
+    const pickBtn = Array.from(container.querySelectorAll('button')).find(b =>
+      b.textContent?.includes('Pick the next Niji'),
+    );
+    expect(pickBtn).not.toBeUndefined();
+    expect(pickBtn?.disabled).toBe(false);
+  });
+
+  it('clicking Pick opens /crystal-ball in new tab (does not call settleAuction directly)', () => {
+    const openSpy = vi.spyOn(window, 'open').mockReturnValue(null);
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={true} />);
+    const pickBtn = Array.from(container.querySelectorAll('button')).find(b =>
+      b.textContent?.includes('Pick the next Niji'),
+    );
+    fireEvent.click(pickBtn!);
+    expect(openSpy).toHaveBeenCalledWith('/crystal-ball', '_blank', 'noopener,noreferrer');
+    expect(settleAuctionMock).not.toHaveBeenCalled();
+    openSpy.mockRestore();
+  });
+
+  it('toast.error on settleAuction failure (didSettleFail effect) when auctionEnded', () => {
+    hookState.settleAuction = {
+      isPending: false,
+      isSuccess: false,
+      isError: true,
+      isIdle: false,
+      error: { message: 'settle boom' },
+    };
+    render(<Bid auction={makeAuction() as never} auctionEnded={true} />);
+    expect(toastErrorMock).toHaveBeenCalled();
+  });
+
+  it('toast.success on settleAuction success when auctionEnded=true', () => {
+    hookState.settleAuction = {
+      isPending: false,
+      isSuccess: true,
+      isError: false,
+      isIdle: false,
+      error: null,
+    };
+    render(<Bid auction={makeAuction() as never} auctionEnded={true} />);
+    expect(toastSuccessMock).toHaveBeenCalled();
+  });
+
+  it('shows Spinner inside Bid button while isPlacingBid is true (Bid label hidden)', () => {
+    hookState.placeBid = { isPending: true, isError: false, isSuccess: false };
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    const spinner = container.querySelector('.spinner-border');
+    expect(spinner).not.toBeNull();
+  });
 });

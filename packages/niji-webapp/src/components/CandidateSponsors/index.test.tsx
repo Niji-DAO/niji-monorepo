@@ -246,4 +246,64 @@ describe('CandidateSponsors', () => {
     );
     expect(useDelegateNounsAtBlockQueryMock).toHaveBeenCalledWith(['0xabc'], 100n);
   });
+
+  it('open-update click opens SubmitUpdateProposal modal (with isUpdateToProposal=true)', () => {
+    const { container } = render(
+      <CandidateSponsors
+        {...baseProps}
+        isUpdateToProposal={true}
+        originalProposal={{ id: '42', signers: [] } as never}
+      />,
+    );
+    const openBtn = container.querySelector('[data-testid="open-update"]') as HTMLButtonElement;
+    fireEvent.click(openBtn);
+    const modal = container.querySelector('[data-testid="submit-update"]');
+    expect(modal?.getAttribute('data-open')).toBe('true');
+  });
+
+  it('isParentProposalUpdatable=false when originalProposal.status is not UPDATABLE', () => {
+    const { container } = render(
+      <CandidateSponsors
+        {...baseProps}
+        originalProposal={{ id: '42', signers: [], status: 1 } as never}
+      />,
+    );
+    const list = container.querySelector('[data-testid="sponsors-list"]');
+    expect(list?.getAttribute('data-parent-updatable')).toBe('false');
+  });
+
+  it('SelectSponsorsToPropose starts closed (data-open=false on initial render)', () => {
+    const { container } = render(<CandidateSponsors {...baseProps} />);
+    const modal = container.querySelector('[data-testid="select-sponsors"]');
+    expect(modal?.getAttribute('data-open')).toBe('false');
+  });
+
+  it('multiple original signers passed lowercase to useDelegateNounsAtBlockQuery', () => {
+    render(
+      <CandidateSponsors
+        {...baseProps}
+        originalProposal={
+          {
+            id: '42',
+            signers: [{ id: '0xABC' }, { id: '0xDEF' }, { id: '0x123' }],
+          } as never
+        }
+      />,
+    );
+    expect(useDelegateNounsAtBlockQueryMock).toHaveBeenCalledWith(
+      ['0xabc', '0xdef', '0x123'],
+      100n,
+    );
+  });
+
+  it('uses block number passed via blockNumber prop for useDelegateNounsAtBlockQuery', () => {
+    render(
+      <CandidateSponsors
+        {...baseProps}
+        blockNumber={999n}
+        originalProposal={{ id: '42', signers: [{ id: '0xABC' }] } as never}
+      />,
+    );
+    expect(useDelegateNounsAtBlockQueryMock).toHaveBeenCalledWith(['0xabc'], 999n);
+  });
 });

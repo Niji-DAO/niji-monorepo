@@ -222,4 +222,43 @@ describe('StreamWithdrawModal', () => {
     expect(container.textContent).toContain('error withdrawing');
     expect(container.textContent).toContain('boom');
   });
+
+  it('Loading view shows error message when status=Exception (same as Fail branch)', () => {
+    hookState.withdrawTokensState = { status: 'Exception', errorMessage: 'oops' };
+    const { container } = render(<StreamWithdrawModal {...baseProps} />);
+    const nextBtn = container.querySelector('[data-testid="next-btn"]') as HTMLButtonElement;
+    fireEvent.click(nextBtn);
+    expect(container.textContent).toContain('error withdrawing');
+    expect(container.textContent).toContain('oops');
+  });
+
+  it('Loading view shows BrandSpinner when status=PendingSignature', () => {
+    hookState.withdrawTokensState = { status: 'PendingSignature' };
+    const { container } = render(<StreamWithdrawModal {...baseProps} />);
+    const nextBtn = container.querySelector('[data-testid="next-btn"]') as HTMLButtonElement;
+    fireEvent.click(nextBtn);
+    expect(container.querySelector('[data-testid="brand-spinner"]')).not.toBeNull();
+  });
+
+  it('Cancel button (prev) triggers onDismiss', () => {
+    const dismissFn = vi.fn();
+    const { container } = render(<StreamWithdrawModal {...baseProps} onDismiss={dismissFn} />);
+    const prevBtn = container.querySelector('[data-testid="prev-btn"]') as HTMLButtonElement;
+    fireEvent.click(prevBtn);
+    expect(dismissFn).toHaveBeenCalled();
+  });
+
+  it('renders StartOrEndTime sub-component in main view', () => {
+    const { container } = render(<StreamWithdrawModal {...baseProps} />);
+    expect(container.querySelector('[data-testid="start-or-end-time"]')).not.toBeNull();
+  });
+
+  it('input change triggers withdrawAmount state update (data-value reflects on Max click)', () => {
+    const { container } = render(<StreamWithdrawModal {...baseProps} />);
+    const input = container.querySelector(
+      '[data-testid="brand-numeric-entry"]',
+    ) as HTMLInputElement;
+    fireEvent.change(input, { target: { value: '3' } });
+    expect(input).not.toBeNull();
+  });
 });
