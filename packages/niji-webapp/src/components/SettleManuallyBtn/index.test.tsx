@@ -101,4 +101,39 @@ describe('SettleManuallyBtn', () => {
       render(<SettleManuallyBtn settleAuctionHandler={() => {}} auction={zeroId} />),
     ).not.toThrow();
   });
+
+  it('renders for settled=true auction without crash', () => {
+    const settled = { ...auction, settled: true };
+    expect(() =>
+      render(<SettleManuallyBtn settleAuctionHandler={() => {}} auction={settled} />),
+    ).not.toThrow();
+  });
+
+  it('renders 0n bid amount auction', () => {
+    const zero = { ...auction, amount: 0n };
+    const { container } = render(
+      <SettleManuallyBtn settleAuctionHandler={() => {}} auction={zero} />,
+    );
+    expect(container.querySelector('button')).not.toBeNull();
+  });
+
+  it('renders different nounId (large) without crash', () => {
+    const large = { ...auction, nounId: 999999n };
+    expect(() =>
+      render(<SettleManuallyBtn settleAuctionHandler={() => {}} auction={large} />),
+    ).not.toThrow();
+  });
+
+  it('button text "Settle manually" verbatim', () => {
+    const { container } = render(
+      <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />,
+    );
+    expect(container.querySelector('button')?.textContent).toContain('Settle manually');
+  });
+
+  it('handler not called on initial render (no auto-fire)', () => {
+    const handler = vi.fn();
+    render(<SettleManuallyBtn settleAuctionHandler={handler} auction={auction} />);
+    expect(handler).not.toHaveBeenCalled();
+  });
 });

@@ -102,4 +102,45 @@ describe('AuctionTimer Component', () => {
     const zeroAmt = { ...mockAuction(3600), amount: 0n };
     expect(() => render(<AuctionTimer auction={zeroAmt} auctionEnded={false} />)).not.toThrow();
   });
+
+  it('handles very long endTime (year 2100)', () => {
+    const future = {
+      ...mockAuction(3600),
+      endTime: 4_102_444_800n,
+    };
+    expect(() => render(<AuctionTimer auction={future} auctionEnded={false} />)).not.toThrow();
+  });
+
+  it('renders click handler triggers re-render', () => {
+    const { container } = render(<AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />);
+    const wrapper = container.querySelector('.row');
+    if (wrapper) {
+      fireEvent.click(wrapper);
+      fireEvent.click(wrapper);
+    }
+    expect(container.querySelector('.row')).not.toBeNull();
+  });
+
+  it('startTime in distant past does not crash', () => {
+    const distantPast = {
+      ...mockAuction(3600),
+      startTime: 0n,
+    };
+    expect(() => render(<AuctionTimer auction={distantPast} auctionEnded={false} />)).not.toThrow();
+  });
+
+  it('handles auction with negative remaining time (auctionEnded=true)', () => {
+    const ended = {
+      ...mockAuction(-3600),
+    };
+    expect(() => render(<AuctionTimer auction={ended} auctionEnded={true} />)).not.toThrow();
+  });
+
+  it('renders without crash for boundary endTime exactly = now', () => {
+    const now = {
+      ...mockAuction(0),
+      endTime: BigInt(dayjs().unix()),
+    };
+    expect(() => render(<AuctionTimer auction={now} auctionEnded={false} />)).not.toThrow();
+  });
 });

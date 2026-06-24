@@ -95,4 +95,42 @@ describe('AuctionTitleAndNavWrapper Component', () => {
     );
     expect(container.querySelectorAll('span').length).toBe(2);
   });
+
+  it('renders boolean true children as nothing', () => {
+    const { container } = render(<AuctionTitleAndNavWrapper>{true}</AuctionTitleAndNavWrapper>);
+    expect(container.textContent).toBe('');
+  });
+
+  it('renders empty string children gracefully', () => {
+    const { container } = render(<AuctionTitleAndNavWrapper>{''}</AuctionTitleAndNavWrapper>);
+    expect(container.textContent).toBe('');
+  });
+
+  it('CSS module className includes auctionTitleAndNavContainer hash', () => {
+    const { container } = render(<AuctionTitleAndNavWrapper>x</AuctionTitleAndNavWrapper>);
+    expect(container.firstElementChild?.className).toContain(classes.auctionTitleAndNavContainer);
+  });
+
+  it('renders nested div tree', () => {
+    const { container } = render(
+      <AuctionTitleAndNavWrapper>
+        <div data-testid="outer">
+          <div data-testid="inner">deep</div>
+        </div>
+      </AuctionTitleAndNavWrapper>,
+    );
+    expect(container.querySelector('[data-testid="outer"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="inner"]')?.textContent).toBe('deep');
+  });
+
+  it('renders large number of children (10 spans)', () => {
+    const { container } = render(
+      <AuctionTitleAndNavWrapper>
+        {Array.from({ length: 10 }, (_, i) => (
+          <span key={i}>{i}</span>
+        ))}
+      </AuctionTitleAndNavWrapper>,
+    );
+    expect(container.querySelectorAll('span').length).toBe(10);
+  });
 });
