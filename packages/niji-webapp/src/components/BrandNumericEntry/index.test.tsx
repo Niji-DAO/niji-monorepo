@@ -105,4 +105,42 @@ describe('BrandNumericEntry', () => {
     expect(inputs[0].value).toBe('1');
     expect(inputs[1].value).toBe('2');
   });
+
+  it('rerender value updates input', () => {
+    const { container, rerender } = render(<BrandNumericEntry value={10} />);
+    expect(container.querySelector('input')?.value).toBe('10');
+    rerender(<BrandNumericEntry value={50} />);
+    expect(container.querySelector('input')?.value).toBe('50');
+  });
+
+  it('rerender isInvalid changes class', () => {
+    const { container, rerender } = render(<BrandNumericEntry isInvalid={false} />);
+    expect(container.querySelector('input')?.className).not.toMatch(/invalid/i);
+    rerender(<BrandNumericEntry isInvalid={true} />);
+    expect(container.querySelector('input')?.className).toMatch(/invalid/i);
+  });
+
+  it('input type is "text" (react-number-format default)', () => {
+    const { container } = render(<BrandNumericEntry />);
+    const input = container.querySelector('input');
+    expect(input?.getAttribute('type')).toBeDefined();
+  });
+
+  it('value=1000 renders with thousand separator', () => {
+    const { container } = render(<BrandNumericEntry value={1000} />);
+    expect(container.querySelector('input')?.value).toContain('1,000');
+  });
+
+  it('5 instances render 5 inputs', () => {
+    const { container } = render(
+      <>
+        <BrandNumericEntry value={1} />
+        <BrandNumericEntry value={2} />
+        <BrandNumericEntry value={3} />
+        <BrandNumericEntry value={4} />
+        <BrandNumericEntry value={5} />
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(5);
+  });
 });

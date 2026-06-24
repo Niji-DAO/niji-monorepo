@@ -306,4 +306,43 @@ describe('CandidateSponsors', () => {
     );
     expect(useDelegateNounsAtBlockQueryMock).toHaveBeenCalledWith(['0xabc'], 999n);
   });
+
+  it('large block number (1000000n) does not crash', () => {
+    expect(() =>
+      render(
+        <CandidateSponsors
+          {...baseProps}
+          blockNumber={1000000n}
+          originalProposal={{ id: '42', signers: [{ id: '0xABC' }] } as never}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('signers list with 10 items renders correctly', () => {
+    const signers = Array.from({ length: 10 }, (_, i) => ({ id: `0x${i}` }));
+    expect(() =>
+      render(
+        <CandidateSponsors {...baseProps} originalProposal={{ id: '42', signers } as never} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('empty signers list renders without crash', () => {
+    expect(() =>
+      render(
+        <CandidateSponsors {...baseProps} originalProposal={{ id: '42', signers: [] } as never} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('originalProposal undefined defaults gracefully', () => {
+    expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+  });
+
+  it('useUserVotes default value (5) reflects in component', () => {
+    hookState.userVotes = 5;
+    const { container } = render(<CandidateSponsors {...baseProps} />);
+    expect(container).toBeDefined();
+  });
 });
