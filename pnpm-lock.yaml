@@ -704,9 +704,6 @@ importers:
       '@0no-co/graphqlsp':
         specifier: ^1.12.16
         version: 1.13.0(graphql@16.11.0)(typescript@5.9.2)
-      '@graphprotocol/graph-ts':
-        specifier: ^0.38.1
-        version: 0.38.1
       '@graphql-codegen/cli':
         specifier: ^5.0.6
         version: 5.0.7(@parcel/watcher@2.5.1)(@types/node@22.19.11)(bufferutil@4.0.9)(crossws@0.3.4)(encoding@0.1.13)(enquirer@2.3.6)(graphql@16.11.0)(typescript@5.9.2)(utf-8-validate@5.0.7)
