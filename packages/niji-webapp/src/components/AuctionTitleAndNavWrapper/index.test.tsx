@@ -178,4 +178,41 @@ describe('AuctionTitleAndNavWrapper Component', () => {
     expect(container.querySelector('strong')?.textContent).toBe('strong');
     expect(container.textContent).toContain('text-');
   });
+
+  it('5 instances render 5 wrappers', () => {
+    const { container } = render(
+      <>
+        <AuctionTitleAndNavWrapper>1</AuctionTitleAndNavWrapper>
+        <AuctionTitleAndNavWrapper>2</AuctionTitleAndNavWrapper>
+        <AuctionTitleAndNavWrapper>3</AuctionTitleAndNavWrapper>
+        <AuctionTitleAndNavWrapper>4</AuctionTitleAndNavWrapper>
+        <AuctionTitleAndNavWrapper>5</AuctionTitleAndNavWrapper>
+      </>,
+    );
+    expect(container.children.length).toBe(5);
+  });
+
+  it('emoji children render verbatim', () => {
+    const { container } = render(<AuctionTitleAndNavWrapper>🎉</AuctionTitleAndNavWrapper>);
+    expect(container.textContent).toBe('🎉');
+  });
+
+  it('special chars in children render correctly', () => {
+    const { container } = render(<AuctionTitleAndNavWrapper>{'<>&'}</AuctionTitleAndNavWrapper>);
+    expect(container.textContent).toBe('<>&');
+  });
+
+  it('rerender preserves col-lg-12 class', () => {
+    const { container, rerender } = render(
+      <AuctionTitleAndNavWrapper>a</AuctionTitleAndNavWrapper>,
+    );
+    expect(container.firstElementChild?.className).toContain('col-lg-12');
+    rerender(<AuctionTitleAndNavWrapper>b</AuctionTitleAndNavWrapper>);
+    expect(container.firstElementChild?.className).toContain('col-lg-12');
+  });
+
+  it('0 (numeric) children render as "0"', () => {
+    const { container } = render(<AuctionTitleAndNavWrapper>{0}</AuctionTitleAndNavWrapper>);
+    expect(container.textContent).toBe('0');
+  });
 });

@@ -145,4 +145,32 @@ describe('AuctionActivityNijiTitle', () => {
     const { container } = render(<AuctionActivityNijiTitle nounId={1000n} />);
     expect(container.querySelector('h1')?.textContent).toContain('1000');
   });
+
+  it('h1 style attribute always has color CSS variable reference', () => {
+    const { container } = render(<AuctionActivityNijiTitle nounId={1n} isCool={true} />);
+    expect(container.querySelector('h1')?.getAttribute('style')).toContain('color');
+  });
+
+  it('renders without crash for negative nounId (-1n)', () => {
+    expect(() => render(<AuctionActivityNijiTitle nounId={-1n as never} />)).not.toThrow();
+  });
+
+  it('rerender preserves Niji prefix text', () => {
+    const { container, rerender } = render(<AuctionActivityNijiTitle nounId={1n} />);
+    expect(container.querySelector('h1')?.textContent).toContain('Niji');
+    rerender(<AuctionActivityNijiTitle nounId={2n} />);
+    expect(container.querySelector('h1')?.textContent).toContain('Niji');
+  });
+
+  it('isCool=undefined defaults to warm color', () => {
+    const { container } = render(<AuctionActivityNijiTitle nounId={1n} />);
+    expect(container.querySelector('h1')?.getAttribute('style')).toContain('warm');
+  });
+
+  it('rerender from large to 0 nounId updates text', () => {
+    const { container, rerender } = render(<AuctionActivityNijiTitle nounId={999n} />);
+    expect(container.querySelector('h1')?.textContent).toContain('999');
+    rerender(<AuctionActivityNijiTitle nounId={0n} />);
+    expect(container.querySelector('h1')?.textContent).toContain('0');
+  });
 });
