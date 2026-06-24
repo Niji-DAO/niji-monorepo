@@ -62,4 +62,38 @@ describe('BrandSpinner', () => {
     expect(container.querySelectorAll('svg path').length).toBe(1);
     expect(container.querySelectorAll('svg circle').length).toBe(1);
   });
+
+  it('multiple instances render independently', () => {
+    const { container } = render(
+      <>
+        <BrandSpinner />
+        <BrandSpinner />
+        <BrandSpinner />
+      </>,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(3);
+  });
+
+  it('svg child count is exactly 2 (path + circle)', () => {
+    const { container } = render(<BrandSpinner />);
+    expect(container.querySelector('svg')?.children.length).toBe(2);
+  });
+
+  it('outermost element is the svg itself (no wrapper)', () => {
+    const { container } = render(<BrandSpinner />);
+    expect(container.firstElementChild?.tagName.toLowerCase()).toBe('svg');
+  });
+
+  it('path d attribute is set (non-empty)', () => {
+    const { container } = render(<BrandSpinner />);
+    const path = container.querySelector('svg path');
+    expect(path?.getAttribute('d')).toBeTruthy();
+    expect((path?.getAttribute('d') ?? '').length).toBeGreaterThan(0);
+  });
+
+  it('circle stroke attribute is set', () => {
+    const { container } = render(<BrandSpinner />);
+    const circle = container.querySelector('svg circle');
+    expect(circle?.getAttribute('stroke')).toBeTruthy();
+  });
 });

@@ -60,4 +60,39 @@ describe('GrayCircle', () => {
     expect(c1.querySelector('img')?.getAttribute('alt')).toBe('');
     expect(c2.querySelector('img')?.getAttribute('alt')).toBe('');
   });
+
+  it('img src is identical for both isDelegateView values', () => {
+    const { container: c1 } = render(<GrayCircle isDelegateView={true} />);
+    const { container: c2 } = render(<GrayCircle isDelegateView={false} />);
+    expect(c1.querySelector('img')?.getAttribute('src')).toBe(
+      c2.querySelector('img')?.getAttribute('src'),
+    );
+  });
+
+  it('rerender from default to isDelegateView=true updates className', () => {
+    const { container, rerender } = render(<GrayCircle />);
+    expect(container.querySelector('div')?.className).toBe('');
+    rerender(<GrayCircle isDelegateView={true} />);
+    expect(container.querySelector('div')?.className).not.toBe('');
+  });
+
+  it('renders single img regardless of nested div count', () => {
+    const { container } = render(<GrayCircle />);
+    expect(container.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('rerender from isDelegateView=true to false clears className', () => {
+    const { container, rerender } = render(<GrayCircle isDelegateView={true} />);
+    expect(container.querySelector('div')?.className).not.toBe('');
+    rerender(<GrayCircle isDelegateView={false} />);
+    expect(container.querySelector('div')?.className).toBe('');
+  });
+
+  it('repeated render produces same img src (deterministic mock)', () => {
+    const { container: c1 } = render(<GrayCircle />);
+    const { container: c2 } = render(<GrayCircle />);
+    expect(c1.querySelector('img')?.getAttribute('src')).toBe(
+      c2.querySelector('img')?.getAttribute('src'),
+    );
+  });
 });

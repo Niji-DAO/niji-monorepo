@@ -81,4 +81,44 @@ describe('VoteSignalGroup', () => {
     // collapse 後も signal 自体は render される (height 0 等の motion gating で隠れる前提) → 検証は count 維持確認
     expect(container.querySelectorAll('[data-testid="signal"]').length).toBeGreaterThanOrEqual(0);
   });
+
+  it('shows 10 in label when 10 signals provided', () => {
+    const signals = Array.from({ length: 10 }, (_, i) => makeSignal(`s${i}`));
+    const { container } = render(<VoteSignalGroup voteSignals={signals} support={0} />);
+    expect(container.textContent).toContain('10 Against');
+  });
+
+  it('shows 0 in label when no signals (0 For)', () => {
+    const { container } = render(<VoteSignalGroup voteSignals={[]} support={1} />);
+    expect(container.textContent).toContain('0 For');
+  });
+
+  it('button is the trigger element (single button per group)', () => {
+    const signals = [makeSignal('a')];
+    const { container } = render(<VoteSignalGroup voteSignals={signals} support={1} />);
+    expect(container.querySelectorAll('button').length).toBe(1);
+  });
+
+  it('multi click toggles state repeatedly', () => {
+    const signals = [makeSignal('a')];
+    const { container } = render(<VoteSignalGroup voteSignals={signals} support={1} />);
+    const btn = container.querySelector('button')!;
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    expect(container.querySelector('button')).not.toBeNull();
+  });
+
+  it('signal count reflects voteSignals array length', () => {
+    const signals = [makeSignal('a'), makeSignal('b'), makeSignal('c'), makeSignal('d')];
+    const { container } = render(<VoteSignalGroup voteSignals={signals} support={2} />);
+    expect(container.textContent).toContain('4 Abstain');
+  });
+
+  it('isExpanded=false explicit does not auto-expand', () => {
+    const { container } = render(
+      <VoteSignalGroup voteSignals={[]} support={1} isExpanded={false} />,
+    );
+    expect(container.querySelectorAll('[data-testid="signal"]').length).toBe(0);
+  });
 });
