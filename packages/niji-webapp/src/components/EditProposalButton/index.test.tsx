@@ -78,4 +78,41 @@ describe('EditProposalButton', () => {
     if (btn) fireEvent.click(btn);
     expect(handle).toHaveBeenCalledTimes(1);
   });
+
+  it('repeated click invokes handle N times', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <EditProposalButton {...defaults} handleCreateProposal={handle} />,
+    );
+    const btn = container.querySelector('button')!;
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(3);
+  });
+
+  it('isLoading hides "Update Proposal" text', () => {
+    const { container } = render(<EditProposalButton {...defaults} isLoading={true} />);
+    expect(container.textContent).not.toContain('Update Proposal');
+  });
+
+  it('button is enabled by default (all good)', () => {
+    const { container } = render(<EditProposalButton {...defaults} />);
+    expect(container.querySelector('button')?.disabled).toBe(false);
+  });
+
+  it('isCandidate + active proposal warning combined', () => {
+    const { container } = render(
+      <EditProposalButton {...defaults} isCandidate={true} hasActiveOrPendingProposal={true} />,
+    );
+    expect(container.textContent).toContain('active or pending proposal');
+    expect(container.textContent).not.toContain('Update Proposal Candidate');
+  });
+
+  it('threshold warning uses proposalThreshold + 1 formula (10 → 11 votes)', () => {
+    const { container } = render(
+      <EditProposalButton {...defaults} hasEnoughVote={false} proposalThreshold={10} />,
+    );
+    expect(container.textContent).toContain('11 votes to submit a proposal');
+  });
 });
