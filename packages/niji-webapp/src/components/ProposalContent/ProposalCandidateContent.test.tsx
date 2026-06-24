@@ -71,4 +71,68 @@ describe('ProposalCandidateContent', () => {
     const { container } = render(<ProposalCandidateContent proposal={baseProposal} />);
     expect(container.querySelector('[data-testid="proposal-tx"]')?.textContent).toBe('tx-count=2');
   });
+
+  it('handles 5 details (large details array)', () => {
+    const proposal5 = {
+      version: {
+        content: {
+          title: 't',
+          description: 'd',
+          details: [
+            { target: '0xA' },
+            { target: '0xB' },
+            { target: '0xC' },
+            { target: '0xD' },
+            { target: '0xE' },
+          ],
+        },
+      },
+    } as never;
+    const { container } = render(<ProposalCandidateContent proposal={proposal5} />);
+    expect(container.querySelector('[data-testid="proposal-tx"]')?.textContent).toBe('tx-count=5');
+  });
+
+  it('handles 0 details (empty array)', () => {
+    const proposal0 = {
+      version: {
+        content: { title: 't', description: 'd', details: [] },
+      },
+    } as never;
+    const { container } = render(<ProposalCandidateContent proposal={proposal0} />);
+    expect(container.querySelector('[data-testid="proposal-tx"]')?.textContent).toBe('tx-count=0');
+  });
+
+  it('Description heading appears before Proposed Transactions heading', () => {
+    const { container } = render(<ProposalCandidateContent proposal={baseProposal} />);
+    const html = container.innerHTML;
+    const descIdx = html.indexOf('Description');
+    const txIdx = html.indexOf('Proposed Transactions');
+    expect(descIdx).toBeLessThan(txIdx);
+  });
+
+  it('handles empty title (still passes "[]" prefix to ReactMarkdown)', () => {
+    const proposalNoTitle = {
+      version: {
+        content: { title: '', description: 'body', details: [] },
+      },
+    } as never;
+    const { container } = render(<ProposalCandidateContent proposal={proposalNoTitle} />);
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe('[]body');
+  });
+
+  it('handles multi-line description', () => {
+    const proposalMultiLine = {
+      version: {
+        content: {
+          title: 't',
+          description: 'line1\nline2\nline3',
+          details: [],
+        },
+      },
+    } as never;
+    const { container } = render(<ProposalCandidateContent proposal={proposalMultiLine} />);
+    expect(container.querySelector('[data-testid="markdown"]')?.textContent).toBe(
+      '[t]line1\nline2\nline3',
+    );
+  });
 });
