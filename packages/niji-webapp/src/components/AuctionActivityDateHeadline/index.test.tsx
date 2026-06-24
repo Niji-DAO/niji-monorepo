@@ -171,4 +171,38 @@ describe('AuctionActivityDateHeadline', () => {
     );
     expect(container.querySelectorAll('h4').length).toBe(5);
   });
+
+  it('h4 style contains "color" property', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect(container.querySelector('h4')?.getAttribute('style')).toContain('color');
+  });
+
+  it('March 2025 startTime renders March', () => {
+    useAtomValueMock.mockReturnValue(true);
+    // 1741996800 = 2025-03-15 UTC
+    const { container } = render(<AuctionActivityDateHeadline startTime={1741996800n} />);
+    expect(container.querySelector('h4')?.textContent).toContain('March');
+  });
+
+  it('h4 textContent length is non-zero', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect((container.querySelector('h4')?.textContent ?? '').length).toBeGreaterThan(0);
+  });
+
+  it('rerender from cool to warm preserves date content', () => {
+    useAtomValueMock.mockReturnValueOnce(true);
+    const { container, rerender } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect(container.querySelector('h4')?.textContent).toContain('2025');
+    useAtomValueMock.mockReturnValue(false);
+    rerender(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect(container.querySelector('h4')?.textContent).toContain('2025');
+  });
+
+  it('h4 renders within wrapper div', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
+    expect(container.querySelector('div h4')).not.toBeNull();
+  });
 });

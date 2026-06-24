@@ -286,4 +286,54 @@ describe('AuctionActivity', () => {
     expect(container.querySelector('[data-testid="niji-info-card"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="bid"]')).toBeNull();
   });
+
+  it('displayGraphDepComps=false hides BidHistory', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = wrap(
+      <AuctionActivity
+        {...defaults}
+        displayGraphDepComps={false}
+        auction={makeAuction() as never}
+      />,
+    );
+    expect(container.querySelector('[data-testid="bid-history"]')).toBeNull();
+  });
+
+  it('wrapper renders exactly 1 time', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+    expect(container.querySelectorAll('[data-testid="wrapper"]').length).toBe(1);
+  });
+
+  it('rerender from isLastAuction=true to false shows niji-info-card', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container, rerender } = wrap(
+      <AuctionActivity {...defaults} auction={makeAuction() as never} />,
+    );
+    expect(container.querySelector('[data-testid="bid"]')).not.toBeNull();
+    rerender(
+      <MemoryRouter>
+        <AuctionActivity {...defaults} isLastAuction={false} auction={makeAuction() as never} />
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('[data-testid="niji-info-card"]')).not.toBeNull();
+  });
+
+  it('current-bid renders for both first + last auction states', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container: c1 } = wrap(
+      <AuctionActivity {...defaults} isFirstAuction={true} auction={makeAuction() as never} />,
+    );
+    const { container: c2 } = wrap(
+      <AuctionActivity {...defaults} isLastAuction={true} auction={makeAuction() as never} />,
+    );
+    expect(c1.querySelector('[data-testid="current-bid"]')).not.toBeNull();
+    expect(c2.querySelector('[data-testid="current-bid"]')).not.toBeNull();
+  });
+
+  it('large nounId auction renders without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const huge = makeAuction({ nounId: 999999n });
+    expect(() => wrap(<AuctionActivity {...defaults} auction={huge as never} />)).not.toThrow();
+  });
 });
