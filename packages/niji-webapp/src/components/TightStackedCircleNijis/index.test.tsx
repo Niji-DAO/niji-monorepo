@@ -214,4 +214,35 @@ describe('TightStackedCircleNijis', () => {
   it('handles negative nounId values without crash', () => {
     expect(() => render(<TightStackedCircleNijis nounIds={[-1, -2, -3]} />)).not.toThrow();
   });
+
+  it('renders 20 instances independently', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 20 }, (_, i) => (
+          <TightStackedCircleNijis key={i} nounIds={[i, i + 1, i + 2]} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(20);
+  });
+
+  it('renders 1 noun id with 1 circle', () => {
+    const { container } = render(<TightStackedCircleNijis nounIds={[1]} />);
+    expect(container.querySelectorAll('circle').length).toBe(1);
+  });
+
+  it('renders 4 ids caps at 3 (MAX 3)', () => {
+    const { container } = render(<TightStackedCircleNijis nounIds={[1, 2, 3, 4]} />);
+    expect(container.querySelectorAll('circle').length).toBe(3);
+  });
+
+  it('renders 2 ids with 2 circles', () => {
+    const { container } = render(<TightStackedCircleNijis nounIds={[10, 20]} />);
+    expect(container.querySelectorAll('circle').length).toBe(2);
+  });
+
+  it('renders without crash for 50 ids', () => {
+    const ids = Array.from({ length: 50 }, (_, i) => i);
+    expect(() => render(<TightStackedCircleNijis nounIds={ids} />)).not.toThrow();
+  });
 });

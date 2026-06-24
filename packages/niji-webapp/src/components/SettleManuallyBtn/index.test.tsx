@@ -291,4 +291,56 @@ describe('SettleManuallyBtn', () => {
       render(<SettleManuallyBtn auction={settledAuction} settleAuction={vi.fn()} />),
     ).not.toThrow();
   });
+
+  it('renders for auction with bidder=0x (non-zero address)', () => {
+    const nonZero = {
+      ...auction,
+      bidder: '0xabcdef1234567890abcdef1234567890abcdef12' as `0x${string}`,
+    };
+    expect(() =>
+      render(<SettleManuallyBtn auction={nonZero} settleAuctionHandler={() => {}} />),
+    ).not.toThrow();
+  });
+
+  it('renders 10 instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 10 }, (_, i) => (
+            <SettleManuallyBtn key={i} auction={auction} settleAuctionHandler={vi.fn()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('repeated 10 clicks invoke handler 10 times', () => {
+    const handler = vi.fn();
+    const { container } = render(
+      <SettleManuallyBtn auction={auction} settleAuctionHandler={handler} />,
+    );
+    const btn = container.querySelector('button');
+    if (btn) {
+      for (let i = 0; i < 10; i++) fireEvent.click(btn);
+    }
+    expect(handler).toHaveBeenCalledTimes(10);
+  });
+
+  it('rerender same auction with same handler still works on click', () => {
+    const handler = vi.fn();
+    const { container, rerender } = render(
+      <SettleManuallyBtn auction={auction} settleAuctionHandler={handler} />,
+    );
+    rerender(<SettleManuallyBtn auction={auction} settleAuctionHandler={handler} />);
+    const btn = container.querySelector('button');
+    if (btn) fireEvent.click(btn);
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders without crash for auction with 1 wei amount', () => {
+    const wei = { ...auction, amount: 1n };
+    expect(() =>
+      render(<SettleManuallyBtn auction={wei} settleAuctionHandler={() => {}} />),
+    ).not.toThrow();
+  });
 });
