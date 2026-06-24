@@ -74,4 +74,38 @@ describe('ForkStatus', () => {
     const undet = render(<ForkStatus status={ForkState.UNDETERMINED} />).container.textContent;
     expect(new Set([escrow, active, executed, undet]).size).toBe(4);
   });
+
+  it('renders 1 div element exactly', () => {
+    const { container } = render(<ForkStatus status={ForkState.ESCROW} />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+  });
+
+  it('rerender with new status updates text content', () => {
+    const { container, rerender } = render(<ForkStatus status={ForkState.ESCROW} />);
+    expect(container.textContent).toBe('In Escrow');
+    rerender(<ForkStatus status={ForkState.ACTIVE} />);
+    expect(container.textContent).toBe('Forking');
+  });
+
+  it('multiple instances render independently with different statuses', () => {
+    const { container } = render(
+      <>
+        <ForkStatus status={ForkState.ESCROW} />
+        <ForkStatus status={ForkState.EXECUTED} />
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(2);
+    expect(container.textContent).toContain('In Escrow');
+    expect(container.textContent).toContain('Executed');
+  });
+
+  it('default class is present even without className prop', () => {
+    const { container } = render(<ForkStatus status={ForkState.ACTIVE} />);
+    expect(container.querySelector('div')?.className).toBeTruthy();
+  });
+
+  it('numeric status value (99) falls to Undetermined', () => {
+    const { container } = render(<ForkStatus status={99 as never} />);
+    expect(container.textContent).toBe('Undetermined');
+  });
 });

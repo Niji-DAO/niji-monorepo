@@ -69,4 +69,40 @@ describe('BrandDatePicker', () => {
     const { container } = render(<BrandDatePicker onChange={() => {}} />);
     expect(container.querySelectorAll('input').length).toBe(1);
   });
+
+  it('label text is rendered verbatim (no trimming)', () => {
+    const { container } = render(<BrandDatePicker onChange={() => {}} label="  My Date  " />);
+    expect(container.querySelector('span')?.textContent).toBe('  My Date  ');
+  });
+
+  it('long label (200 chars) renders', () => {
+    const long = 'a'.repeat(200);
+    const { container } = render(<BrandDatePicker onChange={() => {}} label={long} />);
+    expect(container.querySelector('span')?.textContent?.length).toBe(200);
+  });
+
+  it('passes change event with target value to onChange', () => {
+    let capturedValue = '';
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      capturedValue = e.target.value;
+    };
+    const { container } = render(<BrandDatePicker onChange={onChange} />);
+    const input = container.querySelector('input');
+    if (input) fireEvent.change(input, { target: { value: '2030-12-25' } });
+    expect(capturedValue).toBe('2030-12-25');
+  });
+
+  it('isInvalid=true + value still renders input', () => {
+    const { container } = render(
+      <BrandDatePicker onChange={() => {}} isInvalid value="2025-01-01" />,
+    );
+    expect(container.querySelector('input')?.value).toBe('2025-01-01');
+  });
+
+  it('rerender label change updates span text', () => {
+    const { container, rerender } = render(<BrandDatePicker onChange={() => {}} label="A" />);
+    expect(container.querySelector('span')?.textContent).toBe('A');
+    rerender(<BrandDatePicker onChange={() => {}} label="B" />);
+    expect(container.querySelector('span')?.textContent).toBe('B');
+  });
 });

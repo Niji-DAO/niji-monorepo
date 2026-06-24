@@ -70,4 +70,41 @@ describe('Link', () => {
     const { container } = render(<Link text="x" url="/x" leavesPage={true} />);
     expect(container.querySelectorAll('a').length).toBe(1);
   });
+
+  it('long url renders verbatim', () => {
+    const long = 'https://example.com/' + 'a'.repeat(500);
+    const { container } = render(<Link text="x" url={long} leavesPage={true} />);
+    expect(container.querySelector('a')?.getAttribute('href')).toBe(long);
+  });
+
+  it('rerender from leavesPage=true to false updates target', () => {
+    const { container, rerender } = render(<Link text="x" url="/a" leavesPage={true} />);
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('_blank');
+    rerender(<Link text="x" url="/a" leavesPage={false} />);
+    expect(container.querySelector('a')?.getAttribute('target')).toBe('_self');
+  });
+
+  it('http and https URLs render with same anchor structure', () => {
+    const { container: c1 } = render(<Link text="x" url="http://a.com" leavesPage={true} />);
+    const { container: c2 } = render(<Link text="x" url="https://a.com" leavesPage={true} />);
+    expect(c1.querySelector('a')?.tagName).toBe(c2.querySelector('a')?.tagName);
+  });
+
+  it('multiple Link instances render distinct hrefs', () => {
+    const { container } = render(
+      <>
+        <Link text="a" url="/a" leavesPage={false} />
+        <Link text="b" url="/b" leavesPage={false} />
+      </>,
+    );
+    const links = container.querySelectorAll('a');
+    expect(links.length).toBe(2);
+    expect(links[0].getAttribute('href')).toBe('/a');
+    expect(links[1].getAttribute('href')).toBe('/b');
+  });
+
+  it('unicode text renders correctly', () => {
+    const { container } = render(<Link text="日本語" url="/x" leavesPage={false} />);
+    expect(container.querySelector('a')?.textContent).toBe('日本語');
+  });
 });
