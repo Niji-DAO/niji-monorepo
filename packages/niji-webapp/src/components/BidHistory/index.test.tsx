@@ -280,4 +280,47 @@ describe('BidHistory Component', () => {
     render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
     expect(useAuctionBids).toHaveBeenCalledTimes(1);
   });
+
+  it('renders without crash with empty bids array', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    expect(() => render(<BidHistory auctionId={1n} max={5} classes={mockClasses} />)).not.toThrow();
+  });
+
+  it('renders max=10 bids when 10 provided', () => {
+    const bids = Array.from({ length: 10 }, (_, i) => ({
+      value: BigInt(i + 1) * 1000000000000000000n,
+      sender: `0x${i.toString().padStart(40, '0')}` as Address,
+      transactionHash: `0xhash${i}` as Address,
+      timestamp: BigInt(1000000 + i),
+    }));
+    vi.mocked(useAuctionBids).mockReturnValue(bids);
+    const { container } = render(<BidHistory auctionId={1n} max={10} classes={mockClasses} />);
+    expect(container.querySelectorAll('[data-testid="bid-history-item"]').length).toBe(10);
+  });
+
+  it('rerender with different auctionId calls useAuctionBids again', () => {
+    vi.mocked(useAuctionBids).mockClear();
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    const { rerender } = render(<BidHistory auctionId={1n} max={5} classes={mockClasses} />);
+    rerender(<BidHistory auctionId={2n} max={5} classes={mockClasses} />);
+    expect(useAuctionBids).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders without crash for max=0', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    expect(() => render(<BidHistory auctionId={1n} max={0} classes={mockClasses} />)).not.toThrow();
+  });
+
+  it('renders 5 instances independently', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <BidHistory key={i} auctionId={BigInt(i)} max={5} classes={mockClasses} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });

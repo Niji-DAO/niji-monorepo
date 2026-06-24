@@ -219,4 +219,39 @@ describe('AuctionTimer Component', () => {
     const huge = { ...mockAuction(3600), amount: 999_999_999_999_999_999n };
     expect(() => render(<AuctionTimer auction={huge} auctionEnded={false} />)).not.toThrow();
   });
+
+  it('renders without crash for auctionEnded=true', () => {
+    expect(() =>
+      render(<AuctionTimer auction={mockAuction(0)} auctionEnded={true} />),
+    ).not.toThrow();
+  });
+
+  it('renders 5 instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <AuctionTimer key={i} auction={mockAuction(3600)} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender from auctionEnded=false to true', () => {
+    const { rerender } = render(<AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />);
+    expect(() =>
+      rerender(<AuctionTimer auction={mockAuction(3600)} auctionEnded={true} />),
+    ).not.toThrow();
+  });
+
+  it('renders without crash for small bid amount', () => {
+    const small = { ...mockAuction(3600), amount: 1n };
+    expect(() => render(<AuctionTimer auction={small} auctionEnded={false} />)).not.toThrow();
+  });
+
+  it('renders without crash for very small endTime', () => {
+    const tiny = { ...mockAuction(0), endTime: 1n };
+    expect(() => render(<AuctionTimer auction={tiny} auctionEnded={true} />)).not.toThrow();
+  });
 });

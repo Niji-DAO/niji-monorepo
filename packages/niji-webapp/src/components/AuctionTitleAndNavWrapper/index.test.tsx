@@ -215,4 +215,51 @@ describe('AuctionTitleAndNavWrapper Component', () => {
     const { container } = render(<AuctionTitleAndNavWrapper>{0}</AuctionTitleAndNavWrapper>);
     expect(container.textContent).toBe('0');
   });
+
+  it('renders empty string children', () => {
+    const { container } = render(<AuctionTitleAndNavWrapper>{''}</AuctionTitleAndNavWrapper>);
+    expect(container.textContent).toBe('');
+  });
+
+  it('renders 200 char long content', () => {
+    const longStr = 'x'.repeat(200);
+    const { container } = render(<AuctionTitleAndNavWrapper>{longStr}</AuctionTitleAndNavWrapper>);
+    expect(container.textContent).toBe(longStr);
+  });
+
+  it('rerender from text to nested element', () => {
+    const { container, rerender } = render(
+      <AuctionTitleAndNavWrapper>simple</AuctionTitleAndNavWrapper>,
+    );
+    expect(container.textContent).toBe('simple');
+    rerender(
+      <AuctionTitleAndNavWrapper>
+        <span>nested</span>
+      </AuctionTitleAndNavWrapper>,
+    );
+    expect(container.textContent).toBe('nested');
+  });
+
+  it('renders 5 instances independently', () => {
+    const { container } = render(
+      <>
+        <AuctionTitleAndNavWrapper>A</AuctionTitleAndNavWrapper>
+        <AuctionTitleAndNavWrapper>B</AuctionTitleAndNavWrapper>
+        <AuctionTitleAndNavWrapper>C</AuctionTitleAndNavWrapper>
+        <AuctionTitleAndNavWrapper>D</AuctionTitleAndNavWrapper>
+        <AuctionTitleAndNavWrapper>E</AuctionTitleAndNavWrapper>
+      </>,
+    );
+    expect(container.textContent).toBe('ABCDE');
+  });
+
+  it('renders multiple sibling children', () => {
+    const { container } = render(
+      <AuctionTitleAndNavWrapper>
+        <span>X</span>
+        <span>Y</span>
+      </AuctionTitleAndNavWrapper>,
+    );
+    expect(container.querySelectorAll('span').length).toBe(2);
+  });
 });

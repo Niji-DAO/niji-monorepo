@@ -423,4 +423,86 @@ describe('AuctionNavigation Component', () => {
       for (let i = 0; i < 10; i++) fireEvent.keyDown(document, { key: 'ArrowLeft' });
     }).not.toThrow();
   });
+
+  it('renders 5 instances each with own handlers', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <AuctionNavigation
+            key={i}
+            isFirstAuction={false}
+            isLastAuction={false}
+            onPrevAuctionClick={vi.fn()}
+            onNextAuctionClick={vi.fn()}
+          />
+        ))}
+      </>,
+    );
+    const prevButtons = container.querySelectorAll('button');
+    expect(prevButtons.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it('rerender from isFirst=false to true updates state', () => {
+    const { rerender } = render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={vi.fn()}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    expect(() =>
+      rerender(
+        <AuctionNavigation
+          isFirstAuction={true}
+          isLastAuction={false}
+          onPrevAuctionClick={vi.fn()}
+          onNextAuctionClick={vi.fn()}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders without crash with both first and last true', () => {
+    expect(() =>
+      render(
+        <AuctionNavigation
+          isFirstAuction={true}
+          isLastAuction={true}
+          onPrevAuctionClick={vi.fn()}
+          onNextAuctionClick={vi.fn()}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 10 prev clicks invoke onPrev 10 times', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={onPrev}
+        onNextAuctionClick={vi.fn()}
+      />,
+    );
+    const buttons = container.querySelectorAll('button');
+    for (let i = 0; i < 10; i++) fireEvent.click(buttons[0]);
+    expect(onPrev).toHaveBeenCalledTimes(10);
+  });
+
+  it('rapid 10 next clicks invoke onNext 10 times', () => {
+    const onNext = vi.fn();
+    const { container } = render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={vi.fn()}
+        onNextAuctionClick={onNext}
+      />,
+    );
+    const buttons = container.querySelectorAll('button');
+    for (let i = 0; i < 10; i++) fireEvent.click(buttons[1]);
+    expect(onNext).toHaveBeenCalledTimes(10);
+  });
 });
