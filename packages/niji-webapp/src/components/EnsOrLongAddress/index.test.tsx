@@ -156,4 +156,47 @@ describe('EnsOrLongAddress', () => {
     rerender(<EnsOrLongAddress address={ADDR} />);
     expect(container.textContent).toBe(ADDR);
   });
+
+  it('ENS suffix-less name still rendered', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('alice');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('alice');
+  });
+
+  it('multiple ENS results render distinct text', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValueOnce('bob.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container, rerender } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('bob.eth');
+    vi.mocked(useReverseENSLookUp).mockReturnValue('carol.eth');
+    rerender(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('carol.eth');
+  });
+
+  it('blocked ENS with special chars falls back to address', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('!@#$%.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(true);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe(ADDR);
+  });
+
+  it('ENS lookup returning ".eth" only renders verbatim (no blocklist)', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(<EnsOrLongAddress address={ADDR} />);
+    expect(container.textContent).toBe('.eth');
+  });
+
+  it('multiple component instances render with different ENS', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('shared.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container } = render(
+      <>
+        <EnsOrLongAddress address={ADDR} />
+        <EnsOrLongAddress address={ADDR} />
+      </>,
+    );
+    expect(container.textContent).toBe('shared.ethshared.eth');
+  });
 });

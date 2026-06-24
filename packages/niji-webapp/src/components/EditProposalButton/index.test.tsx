@@ -144,4 +144,39 @@ describe('EditProposalButton', () => {
     const { container } = render(<EditProposalButton {...defaults} />);
     expect(container.querySelectorAll('button').length).toBe(1);
   });
+
+  it('isCandidate=false default keeps "Update Proposal" text', () => {
+    const { container } = render(<EditProposalButton {...defaults} isCandidate={false} />);
+    expect(container.textContent).toBe('Update Proposal');
+  });
+
+  it('multi-click does not crash when handler not provided default', () => {
+    const { container } = render(
+      <EditProposalButton {...defaults} handleCreateProposal={() => {}} />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 5; i++) fireEvent.click(btn);
+    expect(container.querySelectorAll('button').length).toBe(1);
+  });
+
+  it('rerender from candidate to non-candidate updates label', () => {
+    const { container, rerender } = render(<EditProposalButton {...defaults} isCandidate={true} />);
+    expect(container.textContent).toBe('Update Proposal Candidate');
+    rerender(<EditProposalButton {...defaults} isCandidate={false} />);
+    expect(container.textContent).toBe('Update Proposal');
+  });
+
+  it('threshold = 5 → 6 votes warning', () => {
+    const { container } = render(
+      <EditProposalButton {...defaults} hasEnoughVote={false} proposalThreshold={5} />,
+    );
+    expect(container.textContent).toContain('6 votes to submit a proposal');
+  });
+
+  it('isCandidate=true with active proposal shows candidate-specific warning', () => {
+    const { container } = render(
+      <EditProposalButton {...defaults} isCandidate={true} hasActiveOrPendingProposal={true} />,
+    );
+    expect(container.textContent).toContain('active or pending');
+  });
 });

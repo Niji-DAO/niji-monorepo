@@ -191,4 +191,34 @@ describe('DelegationModal', () => {
     expect(changePanel).not.toBeNull();
     expect(changePanel?.textContent).toBe('change-none');
   });
+
+  it('overlay-root receives at least 1 child (portal-mounted modal)', () => {
+    render(<DelegationModal onDismiss={() => {}} />);
+    expect((document.getElementById('overlay-root')?.children.length ?? 0) >= 1).toBe(true);
+  });
+
+  it('backdrop-root receives 1 child (portal-mounted backdrop)', () => {
+    render(<DelegationModal onDismiss={() => {}} />);
+    expect(document.getElementById('backdrop-root')?.children.length).toBe(1);
+  });
+
+  it('delegateTo with mixed-case address passes through', () => {
+    render(<DelegationModal onDismiss={() => {}} delegateTo="0xAbCdEf" />);
+    const panel = document
+      .getElementById('overlay-root')
+      ?.querySelector('[data-testid="change-panel"]');
+    expect(panel?.textContent).toBe('change-0xAbCdEf');
+  });
+
+  it('Backdrop component renders div alone without children', () => {
+    const { container } = render(<Backdrop onDismiss={() => {}} />);
+    expect(container.querySelectorAll('div').length).toBe(1);
+  });
+
+  it('change-panel exists when delegateTo prop is provided', () => {
+    render(<DelegationModal onDismiss={() => {}} delegateTo="0xDEAD" />);
+    expect(
+      document.getElementById('overlay-root')?.querySelector('[data-testid="change-panel"]'),
+    ).not.toBeNull();
+  });
 });
