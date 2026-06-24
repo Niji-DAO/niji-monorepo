@@ -170,4 +170,38 @@ describe('BidHistory Component', () => {
     const item = screen.getByTestId('bid-history-item');
     expect(item).toHaveTextContent('Cool: yes');
   });
+
+  it('list role element is rendered always (even with no bids)', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    expect(screen.getByRole('list')).toBeInTheDocument();
+  });
+
+  it('renders 0 bid items when max=0', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(mockBids);
+    render(<BidHistory auctionId="1" max={0} classes={mockClasses} />);
+    expect(screen.queryAllByTestId('bid-history-item').length).toBe(0);
+  });
+
+  it('handles auctionId="0" (BigInt(0))', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    render(<BidHistory auctionId="0" max={10} classes={mockClasses} />);
+    expect(useAuctionBids).toHaveBeenCalledWith(0n);
+  });
+
+  it('preserves desc order even when bids initially unordered', () => {
+    const unordered = [mockBids[2], mockBids[0], mockBids[1]];
+    vi.mocked(useAuctionBids).mockReturnValue(unordered);
+    render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    const items = screen.getAllByTestId('bid-history-item');
+    expect(items[0]).toHaveTextContent('3000000000000000000');
+    expect(items[1]).toHaveTextContent('2000000000000000000');
+    expect(items[2]).toHaveTextContent('1000000000000000000');
+  });
+
+  it('applies bidCollection class to list element', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    render(<BidHistory auctionId="1" max={10} classes={mockClasses} />);
+    expect(screen.getByRole('list')).toHaveClass(mockClasses.bidCollection);
+  });
 });

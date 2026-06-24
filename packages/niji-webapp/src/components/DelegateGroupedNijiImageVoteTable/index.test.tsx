@@ -159,4 +159,52 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
     );
     expect(container.querySelectorAll('[data-testid="pager"]').length).toBe(1);
   });
+
+  it('right arrow does not advance past last page', () => {
+    const data = Array.from({ length: 5 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    // numPages = 1, right arrow disabled (only 1 page)
+    expect(container.querySelector('[data-testid="right"]')?.disabled).toBe(true);
+  });
+
+  it('renders multi-page setup with 30 delegates (numPages = floor(30/12)+1 = 3)', () => {
+    const data = Array.from({ length: 30 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    expect(container.querySelector('[data-testid="num-pages"]')?.textContent).toBe('3');
+  });
+
+  it('left arrow stays disabled at page=0 when right click is not used', () => {
+    const data = Array.from({ length: 24 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    expect(container.querySelector('[data-testid="left"]')?.disabled).toBe(true);
+  });
+
+  it('left arrow click returns from page 1 back to page 0', () => {
+    const data = Array.from({ length: 15 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    fireEvent.click(container.querySelector('[data-testid="right"]')!);
+    expect(container.querySelector('[data-testid="current-page"]')?.textContent).toBe('1');
+    fireEvent.click(container.querySelector('[data-testid="left"]')!);
+    expect(container.querySelector('[data-testid="current-page"]')?.textContent).toBe('0');
+  });
+
+  it('respects propId passed in baseProps (no crash for propId=999)', () => {
+    const data = [makeVote('0xA', ['1'])];
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable
+        propId={999}
+        proposalCreationBlock={100n}
+        filteredDelegateGroupedVoteData={data}
+      />,
+    );
+    expect(container.querySelectorAll('[data-testid="hover"]').length).toBe(1);
+  });
 });

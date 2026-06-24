@@ -157,4 +157,81 @@ describe('ProposalTransactionsDiffs', () => {
       ),
     ).not.toThrow();
   });
+
+  it('renders without crash for bigint values', () => {
+    const old = [makeTx('0xA', 'transfer', 1000000n) as never];
+    const ne = [makeTx('0xA', 'transfer', 2000000n) as never];
+    expect(() =>
+      render(
+        <ProposalTransactionsDiffs
+          oldTransactions={old}
+          newTransactions={ne}
+          activeVersionNumber={2}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles activeVersionNumber large (999)', () => {
+    expect(() =>
+      render(
+        <ProposalTransactionsDiffs
+          oldTransactions={[makeTx('0xA') as never]}
+          newTransactions={[makeTx('0xB') as never]}
+          activeVersionNumber={999}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles non-empty callData differences without crash', () => {
+    const old = [makeTx('0xA', 'transfer', 0n, '0x00') as never];
+    const ne = [makeTx('0xA', 'transfer', 0n, '0xDEADBEEF') as never];
+    expect(() =>
+      render(
+        <ProposalTransactionsDiffs
+          oldTransactions={old}
+          newTransactions={ne}
+          activeVersionNumber={1}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('identical arrays produce same length output (1 entry)', () => {
+    const same = [makeTx('0xA') as never];
+    const { container } = render(
+      <ProposalTransactionsDiffs
+        oldTransactions={same}
+        newTransactions={same}
+        activeVersionNumber={1}
+      />,
+    );
+    const totalElements =
+      container.querySelectorAll('[data-testid="diff"]').length +
+      container.querySelectorAll('[data-testid="tx"]').length;
+    expect(totalElements).toBeGreaterThanOrEqual(1);
+  });
+
+  it('handles old > new where excess old transactions become diff entries', () => {
+    const old = [
+      makeTx('0xA') as never,
+      makeTx('0xB') as never,
+      makeTx('0xC') as never,
+      makeTx('0xD') as never,
+    ];
+    const ne = [makeTx('0xA') as never];
+    const { container } = render(
+      <ProposalTransactionsDiffs
+        oldTransactions={old}
+        newTransactions={ne}
+        activeVersionNumber={1}
+      />,
+    );
+    const totalElements =
+      container.querySelectorAll('[data-testid="diff"]').length +
+      container.querySelectorAll('[data-testid="tx"]').length;
+    // 4 (longer = old)
+    expect(totalElements).toBeGreaterThanOrEqual(4);
+  });
 });
