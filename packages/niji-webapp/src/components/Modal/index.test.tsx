@@ -60,4 +60,54 @@ describe('Modal', () => {
     render(<Modal content={null} onDismiss={() => {}} />);
     expect(document.getElementById('overlay-root')?.querySelector('h3')).not.toBeNull();
   });
+
+  it('close button fires onDismiss on repeated clicks', () => {
+    const onDismiss = vi.fn();
+    render(<Modal title="x" content={null} onDismiss={onDismiss} />);
+    const btn = document.getElementById('overlay-root')?.querySelector('button');
+    if (btn) {
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders multiple content nodes via Fragment', () => {
+    render(
+      <Modal
+        title="x"
+        content={
+          <>
+            <p>line1</p>
+            <p>line2</p>
+          </>
+        }
+        onDismiss={() => {}}
+      />,
+    );
+    expect(document.getElementById('overlay-root')?.querySelectorAll('p').length).toBe(2);
+  });
+
+  it('Backdrop multi-click fires onDismiss repeatedly', () => {
+    const onDismiss = vi.fn();
+    const { container } = render(<Backdrop onDismiss={onDismiss} />);
+    const div = container.querySelector('div');
+    if (div) {
+      fireEvent.click(div);
+      fireEvent.click(div);
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders exactly 1 img (close icon) in overlay', () => {
+    render(<Modal title="x" content={null} onDismiss={() => {}} />);
+    expect(document.getElementById('overlay-root')?.querySelectorAll('img').length).toBe(1);
+  });
+
+  it('overlay-root receives single modal instance', () => {
+    render(<Modal title="x" content={<p>body</p>} onDismiss={() => {}} />);
+    // overlay-root の直下 children は 1 個 (modal portal)
+    expect(document.getElementById('overlay-root')?.children.length).toBe(1);
+  });
 });
