@@ -174,4 +174,56 @@ describe('Trait', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Trait traitType="hat" traitIndex={0} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances in single mount', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Trait key={i} traitType="hat" traitIndex={0} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different className values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <Trait traitType="hat" traitIndex={0} className={`r2-cls-${i}`} />,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different traitIndex values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Trait traitType="hat" traitIndex={i} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 rerenders rotating className', () => {
+    const { rerender } = render(<Trait traitType="hat" traitIndex={0} />, {
+      wrapper: WithProviders,
+    });
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(<Trait traitType="hat" traitIndex={0} className={`r2-${i}`} />),
+      ).not.toThrow();
+    }
+  });
 });
