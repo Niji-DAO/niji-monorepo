@@ -460,4 +460,47 @@ describe('ProposalContent extra cases', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalContent description="r5" title="r5" details={[]} />);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalContent key={i} description={`r5-${i}`} title={`r5-${i}`} details={[]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 different title values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalContent description="d" title={`r5-title-${i}`} details={[]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<ProposalContent description="d" title="t" details={[]} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ProposalContent description="d" title="t" details={[]} />);
+      unmount();
+    }
+  });
 });
