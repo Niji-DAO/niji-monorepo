@@ -221,4 +221,51 @@ describe('SignatureFormFields', () => {
     }
     expect(setReasonText).toHaveBeenCalledTimes(300);
   });
+
+  it('round-3 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<SignatureFormFields {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <SignatureFormFields key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 50 different reasonText values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<SignatureFormFields {...defaults} reasonText={`r3-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-3 50 different expirationDate values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <SignatureFormFields {...defaults} expirationDate={1700000000 + i * 86400} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 rapid 300 setReasonText events', () => {
+    const setReasonText = vi.fn();
+    const { container } = render(
+      <SignatureFormFields {...defaults} setReasonText={setReasonText} />,
+    );
+    const textarea = container.querySelector('textarea')!;
+    for (let i = 0; i < 300; i++) {
+      fireEvent.change(textarea, { target: { value: `r3-r-${i}` } });
+    }
+    expect(setReasonText).toHaveBeenCalledTimes(300);
+  });
 });
