@@ -164,4 +164,59 @@ describe('Alert extra cases', () => {
       }
     });
   });
+
+  it('round-2 Alert mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<Alert />);
+      unmount();
+    }
+  });
+
+  it('round-2 Alert renders 1500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <Alert key={i}>r2-{i}</Alert>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 all 500 alerts have role=alert', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <Alert key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div[role="alert"]').length).toBe(500);
+  });
+
+  it('round-2 AlertTitle + AlertDescription 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <Alert key={i}>
+              <AlertTitle>r2-t-{i}</AlertTitle>
+              <AlertDescription>r2-d-{i}</AlertDescription>
+            </Alert>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles all 2 variants 50 times each', () => {
+    const variants = ['default', 'destructive'] as const;
+    variants.forEach(v => {
+      for (let i = 0; i < 50; i++) {
+        const { unmount } = render(<Alert variant={v}>r2-x</Alert>);
+        unmount();
+      }
+    });
+  });
 });

@@ -193,4 +193,58 @@ describe('OriginalSignature', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(
+        <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={true} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <OriginalSignature
+              key={i}
+              voteCount={i}
+              signer={SIGNER}
+              isParentProposalUpdatable={true}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different voteCount values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <OriginalSignature voteCount={i + 100} signer={SIGNER} isParentProposalUpdatable={true} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 50 different signer addresses', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { unmount } = render(
+        <OriginalSignature voteCount={1} signer={addr} isParentProposalUpdatable={true} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 isParentProposalUpdatable combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
 });

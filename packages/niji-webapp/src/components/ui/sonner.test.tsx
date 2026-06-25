@@ -189,4 +189,54 @@ describe('Toaster (sonner wrapper)', () => {
       expect(() => render(<Toaster />)).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 200 cycles', () => {
+    useThemeMock.mockReturnValue({ theme: 'system' });
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<Toaster />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    useThemeMock.mockReturnValue({ theme: 'light' });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <Toaster key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different theme values', () => {
+    const themes = ['light', 'dark', 'system'];
+    for (let i = 0; i < 50; i++) {
+      useThemeMock.mockReturnValue({ theme: themes[i % 3] });
+      const { unmount } = render(<Toaster />);
+      unmount();
+    }
+  });
+
+  it('round-2 50 instances render without crash', () => {
+    useThemeMock.mockReturnValue({ theme: 'light' });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <Toaster key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 200 renders without crash', () => {
+    useThemeMock.mockReturnValue({ theme: 'dark' });
+    for (let i = 0; i < 200; i++) {
+      expect(() => render(<Toaster />)).not.toThrow();
+    }
+  });
 });
