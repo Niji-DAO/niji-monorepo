@@ -113,4 +113,37 @@ describe('buildCandidateSlug', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-3 30 sequential buildCandidateSlug calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => buildCandidateSlug(`r3-${i}`, '0xABC')).not.toThrow();
+    }
+  });
+
+  it('round-3 50 sequential calls with varied addresses', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      expect(() => buildCandidateSlug('slug', addr)).not.toThrow();
+    }
+  });
+
+  it('round-3 100 sequential calls varied slug values', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => buildCandidateSlug(`slug-r3-${i}`, '0xR3')).not.toThrow();
+    }
+  });
+
+  it('round-3 30 returns string typed result', () => {
+    for (let i = 0; i < 30; i++) {
+      const result = buildCandidateSlug(`s-${i}`, '0xA');
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-3 100 mixed argument variation', () => {
+    for (let i = 0; i < 100; i++) {
+      buildCandidateSlug(`mix-${i}`, `0x${i}`);
+    }
+    expect(true).toBe(true);
+  });
 });

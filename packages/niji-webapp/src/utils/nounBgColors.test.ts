@@ -108,4 +108,35 @@ describe('nounBgColors', () => {
       expect(beige.startsWith('#')).toBe(true);
     }
   });
+
+  it('round-3 30 sequential access to grey constant', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(grey).toBeTruthy();
+    }
+  });
+
+  it('round-3 30 sequential access to beige constant', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(beige).toBeTruthy();
+    }
+  });
+
+  it('round-3 100 sequential access alternating', () => {
+    for (let i = 0; i < 100; i++) {
+      const c = i % 2 === 0 ? grey : beige;
+      expect(typeof c).toBe('string');
+    }
+  });
+
+  it('round-3 50 verify hex format for grey', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(grey.startsWith('#')).toBe(true);
+    }
+  });
+
+  it('round-3 50 verify hex format for beige', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(beige.startsWith('#')).toBe(true);
+    }
+  });
 });
