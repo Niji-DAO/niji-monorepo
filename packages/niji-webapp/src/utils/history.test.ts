@@ -36,4 +36,36 @@ describe('nounPath', () => {
     expect(nounPath(1).startsWith('/niji/')).toBe(true);
     expect(nounPath(999999).startsWith('/niji/')).toBe(true);
   });
+
+  it('handles 200 different id values', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(nounPath(i)).toBe(`/niji/${i}`);
+    }
+  });
+
+  it('handles 100 large id values', () => {
+    for (let i = 0; i < 100; i++) {
+      const id = 1_000_000 + i;
+      expect(nounPath(id)).toBe(`/niji/${id}`);
+    }
+  });
+
+  it('handles 100 negative id values', () => {
+    for (let i = 1; i <= 100; i++) {
+      expect(nounPath(-i)).toBe(`/niji/-${i}`);
+    }
+  });
+
+  it('all 100 paths start with /niji/', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(nounPath(i).startsWith('/niji/')).toBe(true);
+    }
+  });
+
+  it('handles 100 fractional id values (no rounding)', () => {
+    for (let i = 0; i < 100; i++) {
+      const id = i + 0.5;
+      expect(nounPath(id)).toBe(`/niji/${id}`);
+    }
+  });
 });
