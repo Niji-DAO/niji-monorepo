@@ -1682,4 +1682,48 @@ describe('VoteCard', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <VoteCard proposal={makeProposal()} variant={VoteCardVariant.FOR} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteCard key={i} proposal={makeProposal()} variant={VoteCardVariant.FOR} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<VoteCard proposal={makeProposal()} variant={VoteCardVariant.FOR} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <VoteCard proposal={makeProposal()} variant={VoteCardVariant.FOR} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof VoteCard).toBe('function');
+    }
+  });
 });
