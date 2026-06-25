@@ -508,4 +508,43 @@ describe('CandidateSponsors', () => {
     expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
     hookState.userVotes = 5;
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles 4 state combinations', () => {
+    [true, false].forEach(thresholdMet => {
+      [true, false].forEach(isSigner => {
+        hookState.isThresholdMet = thresholdMet;
+        hookState.isAccountSigner = isSigner;
+        expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+      });
+    });
+    hookState.isThresholdMet = false;
+    hookState.isAccountSigner = false;
+  });
+
+  it('handles 50 different blockNumber values', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        render(<CandidateSponsors {...baseProps} blockNumber={BigInt(i + 1)} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles undefined account', () => {
+    hookState.account = undefined;
+    expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+    hookState.account = '0xACCT';
+  });
+
+  it('handles userVotes=0 edge case', () => {
+    hookState.userVotes = 0;
+    expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+    hookState.userVotes = 5;
+  });
 });

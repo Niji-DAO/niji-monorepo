@@ -582,4 +582,62 @@ describe('NavDropDown', () => {
     );
     expect(container.querySelector('[data-testid="nav-button"]')).not.toBeNull();
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <NavDropDown buttonText={`Menu-${i}`}>
+          <span>x</span>
+        </NavDropDown>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles deeply nested children (5 levels) without crash', () => {
+    expect(() =>
+      render(
+        <NavDropDown buttonText="Menu">
+          <span>
+            <strong>
+              <em>
+                <small>
+                  <i>deep</i>
+                </small>
+              </em>
+            </strong>
+          </span>
+        </NavDropDown>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <NavDropDown key={i} buttonText={`Menu-${i}`}>
+              <span>x</span>
+            </NavDropDown>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles empty children', () => {
+    expect(() => render(<NavDropDown buttonText="Menu">{null}</NavDropDown>)).not.toThrow();
+  });
+
+  it('handles very long buttonText (10000 char)', () => {
+    const long = 'a'.repeat(10000);
+    expect(() =>
+      render(
+        <NavDropDown buttonText={long}>
+          <span>x</span>
+        </NavDropDown>,
+      ),
+    ).not.toThrow();
+  });
 });

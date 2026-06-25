@@ -438,4 +438,64 @@ describe('DelegationCandidateVoteCountInfo', () => {
     );
     expect(container.textContent).toContain('🚀日本語');
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <DelegationCandidateVoteCountInfo text="x" voteCount={1} isLoading={false} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <DelegationCandidateVoteCountInfo
+              key={i}
+              text={`t-${i}`}
+              voteCount={i}
+              isLoading={false}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different voteCount values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(
+        <DelegationCandidateVoteCountInfo text="x" voteCount={i} isLoading={false} />,
+      );
+      expect(container.textContent).toContain(String(i));
+      unmount();
+    }
+  });
+
+  it('handles all 4 boolean combinations', () => {
+    [
+      { vc: 0, il: false },
+      { vc: 0, il: true },
+      { vc: 1, il: false },
+      { vc: 1, il: true },
+    ].forEach(({ vc, il }) => {
+      expect(() =>
+        render(<DelegationCandidateVoteCountInfo text="x" voteCount={vc} isLoading={il} />),
+      ).not.toThrow();
+    });
+  });
+
+  it('handles JSX text node', () => {
+    const { container } = render(
+      <DelegationCandidateVoteCountInfo
+        text={<span data-testid="text-jsx">Hello</span>}
+        voteCount={5}
+        isLoading={false}
+      />,
+    );
+    expect(container.querySelector('[data-testid="text-jsx"]')?.textContent).toBe('Hello');
+  });
 });
