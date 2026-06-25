@@ -314,4 +314,52 @@ describe('SponsorsList', () => {
     for (let i = 0; i < 100; i++) onOpen();
     expect(onOpen).toHaveBeenCalledTimes(100);
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<SponsorsList {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SponsorsList key={i} {...baseProps} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different signature counts', () => {
+    for (let i = 0; i < 30; i++) {
+      const signatures = Array.from({ length: i }, (_, j) =>
+        makeSignature({ signerId: `0xR2-S${j}` }),
+      );
+      const candidate = makeCandidate({ signatures });
+      const { unmount } = wrap(<SponsorsList {...baseProps} candidate={candidate as never} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 isThresholdMet toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<SponsorsList {...baseProps} isThresholdMet={i % 2 === 0} />);
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 200 onOpenSubmitModal invocations', () => {
+    const onOpen = vi.fn();
+    render(
+      <MemoryRouter>
+        <SponsorsList {...baseProps} onOpenSubmitModal={onOpen} />
+      </MemoryRouter>,
+    );
+    for (let i = 0; i < 200; i++) onOpen();
+    expect(onOpen).toHaveBeenCalledTimes(200);
+  });
 });

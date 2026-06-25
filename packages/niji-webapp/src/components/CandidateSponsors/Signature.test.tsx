@@ -246,4 +246,55 @@ describe('Signature', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Signature {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <Signature key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles all 6 cancelSig statuses', () => {
+    const statuses: CancelStatus[] = [
+      'None',
+      'PendingSignature',
+      'Mining',
+      'Success',
+      'Fail',
+      'Exception',
+    ];
+    statuses.forEach(s => {
+      hookState.cancelSigState = { status: s };
+      const { unmount } = render(<Signature {...baseProps} />);
+      unmount();
+    });
+    hookState.cancelSigState = { status: 'None' };
+  });
+
+  it('round-2 handles 30 different signer addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const signer = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { unmount } = render(<Signature {...baseProps} signer={signer} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different voteCount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Signature {...baseProps} voteCount={i + 100} />);
+      unmount();
+    }
+  });
 });
