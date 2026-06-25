@@ -505,4 +505,89 @@ describe('AuctionNavigation Component', () => {
     for (let i = 0; i < 10; i++) fireEvent.click(buttons[1]);
     expect(onNext).toHaveBeenCalledTimes(10);
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <AuctionNavigation
+          isFirstAuction={false}
+          isLastAuction={false}
+          onPrevAuctionClick={() => {}}
+          onNextAuctionClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <AuctionNavigation
+              key={i}
+              isFirstAuction={false}
+              isLastAuction={false}
+              onPrevAuctionClick={() => {}}
+              onNextAuctionClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 1000 prev clicks fire handler', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={onPrev}
+        onNextAuctionClick={() => {}}
+      />,
+    );
+    const buttons = container.querySelectorAll('button');
+    for (let i = 0; i < 1000; i++) fireEvent.click(buttons[0]);
+    expect(onPrev).toHaveBeenCalledTimes(1000);
+  });
+
+  it('handles all 4 isFirst/isLast combinations 30 times each', () => {
+    [
+      [true, true],
+      [true, false],
+      [false, true],
+      [false, false],
+    ].forEach(([f, l]) => {
+      for (let i = 0; i < 30; i++) {
+        const { unmount } = render(
+          <AuctionNavigation
+            isFirstAuction={f}
+            isLastAuction={l}
+            onPrevAuctionClick={() => {}}
+            onNextAuctionClick={() => {}}
+          />,
+        );
+        unmount();
+      }
+    });
+  });
+
+  it('all 500 instances render 2 buttons each', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <AuctionNavigation
+            key={i}
+            isFirstAuction={false}
+            isLastAuction={false}
+            onPrevAuctionClick={() => {}}
+            onNextAuctionClick={() => {}}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(1000);
+  });
 });

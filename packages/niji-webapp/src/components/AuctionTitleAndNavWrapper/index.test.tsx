@@ -262,4 +262,54 @@ describe('AuctionTitleAndNavWrapper Component', () => {
     );
     expect(container.querySelectorAll('span').length).toBe(2);
   });
+
+  it('mount-unmount 2000 cycles', () => {
+    for (let i = 0; i < 2000; i++) {
+      const { unmount } = render(<AuctionTitleAndNavWrapper>x</AuctionTitleAndNavWrapper>);
+      unmount();
+    }
+  });
+
+  it('renders 3000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 3000 }, (_, i) => (
+            <AuctionTitleAndNavWrapper key={i}>{i}</AuctionTitleAndNavWrapper>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different children types', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(
+        <AuctionTitleAndNavWrapper>content-{i}</AuctionTitleAndNavWrapper>,
+      );
+      expect(container.textContent).toContain(`content-${i}`);
+      unmount();
+    }
+  });
+
+  it('all 1000 wrappers render single div root', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 1000 }, (_, i) => (
+          <AuctionTitleAndNavWrapper key={i}>x</AuctionTitleAndNavWrapper>
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(1000);
+  });
+
+  it('handles 100 rerender cycles', () => {
+    const { container, rerender } = render(
+      <AuctionTitleAndNavWrapper>x</AuctionTitleAndNavWrapper>,
+    );
+    for (let i = 0; i < 100; i++) {
+      rerender(<AuctionTitleAndNavWrapper>v-{i}</AuctionTitleAndNavWrapper>);
+    }
+    expect(container.textContent).toContain('99');
+  });
 });
