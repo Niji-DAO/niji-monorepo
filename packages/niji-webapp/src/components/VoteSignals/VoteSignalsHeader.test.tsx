@@ -105,4 +105,49 @@ describe('VoteSignalsHeader — additional', () => {
     expect(container.textContent).toContain('Pre-voting feedback');
     expect(container.textContent).not.toContain('Pre-proposal feedback');
   });
+
+  it('VoteSignalsHeader mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<VoteSignalsHeader />);
+      unmount();
+    }
+  });
+
+  it('VoteSignalsHeader renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <VoteSignalsHeader key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 isCandidate toggle cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteSignalsHeader isCandidate={i % 2 === 0} />);
+      unmount();
+    }
+  });
+
+  it('VoteSignalsFootnote mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<VoteSignalsFootnote />);
+      unmount();
+    }
+  });
+
+  it('VoteSignalsFootnote renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <VoteSignalsFootnote key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });

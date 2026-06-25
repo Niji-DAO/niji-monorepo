@@ -121,4 +121,47 @@ describe('VoteSignalGroup', () => {
     );
     expect(container.querySelectorAll('[data-testid="signal"]').length).toBe(0);
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<VoteSignalGroup voteSignals={[]} support={1} />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <VoteSignalGroup key={i} voteSignals={[]} support={i % 3} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different signal counts', () => {
+    for (let i = 1; i <= 50; i++) {
+      const sigs = Array.from({ length: i }, (_, j) => makeSignal(`0x${j}`));
+      const { unmount } = render(<VoteSignalGroup voteSignals={sigs} support={1} />);
+      unmount();
+    }
+  });
+
+  it('handles all 3 support values', () => {
+    for (let s = 0; s <= 2; s++) {
+      for (let i = 0; i < 30; i++) {
+        const { unmount } = render(<VoteSignalGroup voteSignals={[]} support={s} />);
+        unmount();
+      }
+    }
+  });
+
+  it('handles 100 different mixed support cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteSignalGroup voteSignals={[]} support={i % 3} />);
+      unmount();
+    }
+  });
 });
