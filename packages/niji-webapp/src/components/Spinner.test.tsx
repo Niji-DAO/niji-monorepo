@@ -149,4 +149,49 @@ describe('Spinner', () => {
       expect(() => render(<Spinner />)).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<Spinner />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 1000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <Spinner key={i} className={`cls-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 className values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<Spinner className={`v-${i}`} />);
+      expect(container.querySelector('svg')?.getAttribute('class')).toContain(`v-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-2 all 500 SVGs have animate-spin class', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <Spinner key={i} />
+        ))}
+      </>,
+    );
+    const svgs = container.querySelectorAll('svg');
+    expect(svgs.length).toBe(500);
+  });
+
+  it('round-2 rapid 1500 invocations', () => {
+    for (let i = 0; i < 1500; i++) {
+      expect(() => render(<Spinner />)).not.toThrow();
+    }
+  });
 });

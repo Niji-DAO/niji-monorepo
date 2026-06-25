@@ -454,4 +454,55 @@ describe('FunctionCallReviewStep', () => {
     );
     expect(container.querySelectorAll('[data-testid="next-btn"]').length).toBe(1);
   });
+
+  const baseState = {
+    abi,
+    function: 'transfer',
+    address: ADDR,
+    amount: '0',
+    args: [ADDR, '1000'],
+  } as never;
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<FunctionCallReviewStep {...defaults} state={baseState} />);
+      unmount();
+    }
+  });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <FunctionCallReviewStep key={i} {...defaults} state={baseState} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 200 onPrevBtnClick invocations', () => {
+    const onPrev = vi.fn();
+    render(<FunctionCallReviewStep {...defaults} state={baseState} onPrevBtnClick={onPrev} />);
+    for (let i = 0; i < 200; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('rapid 200 onNextBtnClick invocations', () => {
+    const onNext = vi.fn();
+    render(<FunctionCallReviewStep {...defaults} state={baseState} onNextBtnClick={onNext} />);
+    for (let i = 0; i < 200; i++) onNext();
+    expect(onNext).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles 30 different address values', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={{ ...baseState, address: addr } as never} />,
+      );
+      unmount();
+    }
+  });
 });

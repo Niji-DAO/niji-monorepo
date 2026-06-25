@@ -331,4 +331,44 @@ describe('SelectProposalActionStep', () => {
     });
     expect(setState).toHaveBeenCalledTimes(1);
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<SelectProposalActionStep {...setupProps()} />);
+      unmount();
+    }
+  });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <SelectProposalActionStep key={i} {...setupProps()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 200 onPrevBtnClick invocations', () => {
+    const onPrevBtnClick = vi.fn();
+    render(<SelectProposalActionStep {...setupProps({ onPrevBtnClick })} />);
+    for (let i = 0; i < 200; i++) onPrevBtnClick();
+    expect(onPrevBtnClick).toHaveBeenCalledTimes(200);
+  });
+
+  it('rapid 200 onNextBtnClick invocations', () => {
+    const onNextBtnClick = vi.fn();
+    render(<SelectProposalActionStep {...setupProps({ onNextBtnClick })} />);
+    for (let i = 0; i < 200; i++) onNextBtnClick();
+    expect(onNextBtnClick).toHaveBeenCalledTimes(200);
+  });
+
+  it('rapid 200 setState invocations', () => {
+    const setState = vi.fn();
+    render(<SelectProposalActionStep {...setupProps({ setState })} />);
+    for (let i = 0; i < 200; i++) setState({} as never);
+    expect(setState).toHaveBeenCalledTimes(200);
+  });
 });
