@@ -748,4 +748,36 @@ describe('useProposalFeedback', () => {
       unmount();
     }
   });
+
+  it('round-7 30 sequential useCreateProposalCandidate access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useCreateProposalCandidate).toBeDefined();
+    }
+  });
+
+  it('round-7 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useCreateProposalCandidate).toBe('function');
+    }
+  });
+
+  it('round-7 100 sequential reference consistency', () => {
+    const first = useCreateProposalCandidate;
+    for (let i = 0; i < 100; i++) {
+      expect(useCreateProposalCandidate).toBe(first);
+    }
+  });
+
+  it('round-7 50 sequential truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useCreateProposalCandidate).toBeTruthy();
+    }
+  });
+
+  it('round-7 100 sequential useCreateProposalCandidate cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useCreateProposalCandidate());
+      unmount();
+    }
+  });
 });

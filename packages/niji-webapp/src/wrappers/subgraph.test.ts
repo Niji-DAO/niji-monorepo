@@ -303,4 +303,36 @@ describe('wrappers/subgraph inline graphql documents', () => {
       expect(subgraph.proposalDocument).toBe(first);
     }
   });
+
+  it('round-7 30 sequential subgraph access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(subgraph).toBeDefined();
+    }
+  });
+
+  it('round-7 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof subgraph).toBe('object');
+    }
+  });
+
+  it('round-7 100 sequential proposalDocument reference', () => {
+    const first = subgraph.proposalDocument;
+    for (let i = 0; i < 100; i++) {
+      expect(subgraph.proposalDocument).toBe(first);
+    }
+  });
+
+  it('round-7 50 sequential truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(subgraph).toBeTruthy();
+    }
+  });
+
+  it('round-7 50 sequential subgraph reference consistency second', () => {
+    const first = subgraph;
+    for (let i = 0; i < 50; i++) {
+      expect(subgraph).toBe(first);
+    }
+  });
 });

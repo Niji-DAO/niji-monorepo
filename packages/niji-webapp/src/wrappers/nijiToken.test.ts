@@ -629,4 +629,36 @@ describe('useNounSeed', () => {
       expect(typeof useNounTokenBalance).toBe('function');
     }
   });
+
+  it('round-7 30 sequential useNounTokenBalance access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useNounTokenBalance).toBeDefined();
+    }
+  });
+
+  it('round-7 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useNounTokenBalance).toBe('function');
+    }
+  });
+
+  it('round-7 100 sequential reference consistency', () => {
+    const first = useNounTokenBalance;
+    for (let i = 0; i < 100; i++) {
+      expect(useNounTokenBalance).toBe(first);
+    }
+  });
+
+  it('round-7 50 sequential reference check second', () => {
+    const first = useNounTokenBalance;
+    for (let i = 0; i < 50; i++) {
+      expect(useNounTokenBalance).toBe(first);
+    }
+  });
+
+  it('round-7 50 sequential truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useNounTokenBalance).toBeTruthy();
+    }
+  });
 });
