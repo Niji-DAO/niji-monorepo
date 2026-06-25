@@ -430,4 +430,62 @@ describe('VoteCardPager', () => {
   it('handles numPages=0 edge case', () => {
     expect(() => render(<VoteCardPager {...defaults} numPages={0} />)).not.toThrow();
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<VoteCardPager {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <VoteCardPager key={i} {...defaults} currentPage={i % 3} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles rapid 100 right + left click cycle', () => {
+    const onRight = vi.fn();
+    const onLeft = vi.fn();
+    const { container } = render(
+      <VoteCardPager {...defaults} onRightArrowClick={onRight} onLeftArrowClick={onLeft} />,
+    );
+    const left = container.querySelectorAll('button')[0];
+    const right = container.querySelectorAll('button')[1];
+    for (let i = 0; i < 100; i++) {
+      fireEvent.click(right);
+      fireEvent.click(left);
+    }
+    expect(onRight).toHaveBeenCalledTimes(100);
+    expect(onLeft).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles 50 different numPages sequentially', () => {
+    for (let i = 1; i <= 50; i++) {
+      const { container, unmount } = render(<VoteCardPager {...defaults} numPages={i} />);
+      expect(container.querySelectorAll('span').length).toBe(i);
+      unmount();
+    }
+  });
+
+  it('handles all 4 disabled combinations', () => {
+    [
+      { ld: true, rd: true },
+      { ld: true, rd: false },
+      { ld: false, rd: true },
+      { ld: false, rd: false },
+    ].forEach(({ ld, rd }) => {
+      const { container, unmount } = render(
+        <VoteCardPager {...defaults} isLeftArrowDisabled={ld} isRightArrowDisabled={rd} />,
+      );
+      expect(container.querySelectorAll('button').length).toBe(2);
+      unmount();
+    });
+  });
 });

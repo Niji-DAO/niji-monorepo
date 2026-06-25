@@ -448,4 +448,54 @@ describe('BrandSpinner', () => {
       expect(svg.getAttribute('fill')).toBe('none');
     });
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<BrandSpinner />);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <BrandSpinner key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 500 svg have viewBox', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    const svgs = container.querySelectorAll('svg');
+    svgs.forEach(svg => {
+      expect(svg.getAttribute('viewBox')).toBe('0 0 25 25');
+    });
+  });
+
+  it('all 200 svg have path element', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('svg path').length).toBe(200);
+  });
+
+  it('rapid consecutive 500 renders without crash', () => {
+    for (let i = 0; i < 500; i++) {
+      expect(() => render(<BrandSpinner />)).not.toThrow();
+    }
+  });
 });
