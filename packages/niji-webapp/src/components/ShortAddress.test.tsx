@@ -232,4 +232,48 @@ describe('ShortAddress', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<ShortAddress address="0xABC" />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <ShortAddress
+              key={i}
+              address={('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 different addresses again', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { unmount } = render(<ShortAddress address={addr} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 avatar sizes', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ShortAddress address="0xABC" avatar={true} size={i + 1} />);
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 100 mount-unmount', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ShortAddress address="0xABC" />);
+      unmount();
+    }
+  });
 });
