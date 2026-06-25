@@ -284,4 +284,51 @@ describe('VoteSignal', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-4 mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <VoteSignal support={1} voteCount={1} reason="r4" address={ADDR} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 renders 200 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <VoteSignal key={i} support={i % 3} voteCount={i} reason={`r4-${i}`} address={ADDR} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different support cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <VoteSignal support={i % 3} voteCount={1} reason="ok" address={ADDR} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 30 different voteCount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <VoteSignal support={1} voteCount={i + 500} reason="ok" address={ADDR} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<VoteSignal support={1} voteCount={1} reason="x" address={ADDR} />),
+      ).not.toThrow();
+    }
+  });
 });
