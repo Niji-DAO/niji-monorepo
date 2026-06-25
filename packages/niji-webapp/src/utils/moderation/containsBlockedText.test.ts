@@ -132,4 +132,36 @@ describe('containsBlockedText', () => {
       expect(r1).toBe(r2);
     }
   });
+
+  it('round-3 30 sequential containsBlockedText calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => containsBlockedText(`r3-text-${i}`, 'all')).not.toThrow();
+    }
+  });
+
+  it('round-3 50 returns boolean-typed result', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof containsBlockedText(`r3-${i}`, 'all')).toBe('boolean');
+    }
+  });
+
+  it('round-3 100 sequential calls', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof containsBlockedText(`r3-${i}`, 'all')).toBe('boolean');
+    }
+  });
+
+  it('round-3 50 different test strings', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => containsBlockedText(`safe-text-${i}`, 'all')).not.toThrow();
+    }
+  });
+
+  it('round-3 30 deterministic results', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = containsBlockedText('safe', 'all');
+      const r2 = containsBlockedText('safe', 'all');
+      expect(r1).toBe(r2);
+    }
+  });
 });
