@@ -657,4 +657,45 @@ describe('ModalTitle', () => {
     }
     expect(container.textContent).toContain('99');
   });
+
+  it('round-5 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<ModalTitle>r5</ModalTitle>);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <ModalTitle key={i}>r5-{i}</ModalTitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ModalTitle>r5-c-{i}</ModalTitle>);
+      unmount();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ModalTitle>x</ModalTitle>);
+      unmount();
+    }
+  });
+
+  it('round-5 100 rerender cycles', () => {
+    const { container, rerender } = render(<ModalTitle>x</ModalTitle>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<ModalTitle>r5-r-{i}</ModalTitle>);
+    }
+    expect(container.textContent).toContain('99');
+  });
 });
