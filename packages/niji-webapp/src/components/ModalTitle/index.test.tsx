@@ -515,4 +515,54 @@ describe('ModalTitle', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<ModalTitle>x</ModalTitle>);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 2000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <ModalTitle key={i}>r2-{i}</ModalTitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 200 different children values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(<ModalTitle>r2-v-{i}</ModalTitle>);
+      expect(container.querySelector('h1')?.textContent).toBe(`r2-v-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-2 all 500 h1 elements exist', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <ModalTitle key={i}>title-r2-{i}</ModalTitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(500);
+    expect(container.textContent).toContain('title-r2-499');
+  });
+
+  it('round-2 handles 50 different ReactNode types', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ModalTitle>
+          <span data-testid={`r2-n-${i}`}>{i}</span>
+        </ModalTitle>,
+      );
+      unmount();
+    }
+  });
 });

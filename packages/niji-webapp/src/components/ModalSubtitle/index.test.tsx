@@ -526,4 +526,54 @@ describe('ModalSubtitle', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<ModalSubtitle>x</ModalSubtitle>);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 2000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <ModalSubtitle key={i}>r2-{i}</ModalSubtitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 200 different children values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(<ModalSubtitle>r2-v-{i}</ModalSubtitle>);
+      expect(container.querySelector('div')?.textContent).toBe(`r2-v-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-2 all 500 div wrappers exist', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <ModalSubtitle key={i}>sub-r2-{i}</ModalSubtitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(500);
+    expect(container.textContent).toContain('sub-r2-499');
+  });
+
+  it('round-2 handles 50 different nested ReactNodes', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ModalSubtitle>
+          <span data-testid={`r2-n-${i}`}>{i}</span>
+        </ModalSubtitle>,
+      );
+      unmount();
+    }
+  });
 });
