@@ -73,4 +73,37 @@ describe('useProposalStatus', () => {
       useProposalStatus(baseProposal(ProposalState.VETOED)),
     );
   });
+
+  /* eslint-disable react-hooks/rules-of-hooks */
+  it('handles 50 cycles of SUCCEEDED state', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useProposalStatus(baseProposal(ProposalState.SUCCEEDED))).toBe('success');
+    }
+  });
+
+  it('handles 50 cycles of EXECUTED state', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useProposalStatus(baseProposal(ProposalState.EXECUTED))).toBe('success');
+    }
+  });
+
+  it('handles 50 cycles of ACTIVE state', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useProposalStatus(baseProposal(ProposalState.ACTIVE))).toBe('string');
+    }
+  });
+
+  it('handles 100 sequential evaluations', () => {
+    const states = [ProposalState.ACTIVE, ProposalState.PENDING, ProposalState.SUCCEEDED];
+    for (let i = 0; i < 100; i++) {
+      expect(typeof useProposalStatus(baseProposal(states[i % 3]))).toBe('string');
+    }
+  });
+
+  it('rapid 100 invocations with EXECUTED', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => useProposalStatus(baseProposal(ProposalState.EXECUTED))).not.toThrow();
+    }
+  });
+  /* eslint-enable react-hooks/rules-of-hooks */
 });

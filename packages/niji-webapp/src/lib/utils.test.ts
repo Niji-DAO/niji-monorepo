@@ -35,4 +35,34 @@ describe('cn (clsx + tailwind-merge)', () => {
   it('handles tailwind color conflict (text-red vs text-blue)', () => {
     expect(cn('text-red-500', 'text-blue-500')).toBe('text-blue-500');
   });
+
+  it('handles 200 different single class inputs', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(cn(`cls-${i}`)).toBe(`cls-${i}`);
+    }
+  });
+
+  it('handles 100 two-class merge operations', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(cn(`a-${i}`, `b-${i}`)).toBe(`a-${i} b-${i}`);
+    }
+  });
+
+  it('handles 100 falsy filter operations', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(cn(`cls-${i}`, false, null, undefined, '')).toBe(`cls-${i}`);
+    }
+  });
+
+  it('handles 100 tailwind conflict resolutions', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(cn(`p-${i % 8}`, `p-${(i + 1) % 8}`)).toBe(`p-${(i + 1) % 8}`);
+    }
+  });
+
+  it('rapid 500 invocations', () => {
+    for (let i = 0; i < 500; i++) {
+      expect(() => cn('text-red-500', 'font-bold')).not.toThrow();
+    }
+  });
 });

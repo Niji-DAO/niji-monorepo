@@ -75,4 +75,35 @@ describe('traitName', () => {
   it('rainbow hair filename returns Rainbow', () => {
     expect(traitName('hair', 0)).toBe('Rainbow');
   });
+
+  it('handles 100 cycles of hair trait', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(traitName('hair', 0)).toBe('Rainbow');
+    }
+  });
+
+  it('handles 100 cycles of hat trait', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => traitName('hat', 0)).not.toThrow();
+    }
+  });
+
+  it('handles 100 cycles of clothing trait', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => traitName('clothing', 0)).not.toThrow();
+    }
+  });
+
+  it('handles 100 cycles of background trait', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => traitName('background', 0)).not.toThrow();
+    }
+  });
+
+  it('rapid 200 sequential trait lookups', () => {
+    const traits = ['hair', 'hat', 'choker', 'special'] as const;
+    for (let i = 0; i < 200; i++) {
+      expect(() => traitName(traits[i % 4], 0)).not.toThrow();
+    }
+  });
 });
