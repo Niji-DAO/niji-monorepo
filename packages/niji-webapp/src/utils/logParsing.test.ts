@@ -91,4 +91,38 @@ describe('logParsing round-trip', () => {
     const original = { address: '0xabc', topics: [['0x1', '0x2']] };
     expect(keyToFilter(filterToKey(original))).toEqual(original);
   });
+
+  it('filterToKey handles 100 different addresses', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      expect(filterToKey({ address: addr, topics: ['0xt'] })).toBe(`${addr}:0xt`);
+    }
+  });
+
+  it('filterToKey handles 100 different topics', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(filterToKey({ address: '0xabc', topics: [`0xtopic-${i}`] })).toBe(
+        `0xabc:0xtopic-${i}`,
+      );
+    }
+  });
+
+  it('roundtrip filterToKey/keyToFilter 50 cycles do not throw', () => {
+    for (let i = 0; i < 50; i++) {
+      const original = { address: `0xabc${i}`, topics: [`0xt${i}`] };
+      expect(() => keyToFilter(filterToKey(original))).not.toThrow();
+    }
+  });
+
+  it('keyToFilter handles 100 different keys', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => keyToFilter(`0xa-${i}:0xb-${i}`)).not.toThrow();
+    }
+  });
+
+  it('rapid 200 filterToKey invocations', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => filterToKey({ address: '0xa', topics: ['0xb'] })).not.toThrow();
+    }
+  });
 });

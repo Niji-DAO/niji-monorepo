@@ -30,4 +30,35 @@ describe('constants', () => {
     const reimported = await import('./constants');
     expect(reimported.AVERAGE_BLOCK_TIME_IN_SECS).toBe(AVERAGE_BLOCK_TIME_IN_SECS);
   });
+
+  it('AVERAGE_BLOCK_TIME_IN_SECS is 12 (100 cycles)', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(AVERAGE_BLOCK_TIME_IN_SECS).toBe(12);
+    }
+  });
+
+  it('AVERAGE_BLOCK_TIME_IN_SECS type check 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof AVERAGE_BLOCK_TIME_IN_SECS).toBe('number');
+    }
+  });
+
+  it('AVERAGE_BLOCK_TIME_IN_SECS is integer 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Number.isInteger(AVERAGE_BLOCK_TIME_IN_SECS)).toBe(true);
+    }
+  });
+
+  it('AVERAGE_BLOCK_TIME_IN_SECS is positive 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(AVERAGE_BLOCK_TIME_IN_SECS).toBeGreaterThan(0);
+    }
+  });
+
+  it('AVERAGE_BLOCK_TIME_IN_SECS in range 10-15 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(AVERAGE_BLOCK_TIME_IN_SECS).toBeGreaterThanOrEqual(10);
+      expect(AVERAGE_BLOCK_TIME_IN_SECS).toBeLessThanOrEqual(15);
+    }
+  });
 });
