@@ -539,4 +539,40 @@ describe('useForkThreshold / useNumTokensInForkEscrow / useAdjustedTotalSupply',
       unmount();
     }
   });
+
+  it('round-3 30 renderHook cycles useProposalCount', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useProposalCount());
+      unmount();
+    }
+  });
+
+  it('round-3 30 renderHook cycles useProposalThreshold', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useProposalThreshold());
+      unmount();
+    }
+  });
+
+  it('round-3 50 mixed renderHook cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount: u1 } = renderHook(() => useProposalCount());
+      u1();
+      const { unmount: u2 } = renderHook(() => useProposalThreshold());
+      u2();
+    }
+  });
+
+  it('round-3 hook returns without crash for 30 calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useProposalCount())).not.toThrow();
+    }
+  });
+
+  it('round-3 100 sequential useProposalThreshold renderHook', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useProposalThreshold());
+      unmount();
+    }
+  });
 });
