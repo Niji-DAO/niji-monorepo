@@ -191,4 +191,45 @@ describe('ShortAddress', () => {
     const { container } = render(<ShortAddress address={ADDR} />);
     expect(container.textContent).toBe('Treasury');
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<ShortAddress address="0xABC" />);
+      unmount();
+    }
+  });
+
+  it('renders 300 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <ShortAddress key={i} address={`0x${i.toString(16).padStart(40, '0')}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different addresses', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(<ShortAddress address={addr} />);
+      unmount();
+    }
+  });
+
+  it('handles 50 different size variants', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ShortAddress address="0xABC" size={i + 1} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 avatar combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ShortAddress address="0xABC" avatar={i % 2 === 0} />);
+      unmount();
+    }
+  });
 });

@@ -176,4 +176,56 @@ describe('NijiInfoRowHolder', () => {
       );
     });
   });
+
+  it('mount-unmount 50 cycles', () => {
+    executeMock.mockResolvedValue({ auction: { bidder: { id: '0xAA' } } });
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('handles 30 different nounId values', () => {
+    executeMock.mockResolvedValue({ auction: { bidder: { id: '0xAA' } } });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={BigInt(i)} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('handles 30 different bidder addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      executeMock.mockResolvedValue({
+        auction: { bidder: { id: `0x${i.toString(16).padStart(40, '0')}` } },
+      });
+      const { unmount } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('renders 30 instances all without crash', () => {
+    executeMock.mockResolvedValue({ auction: { bidder: { id: '0xAA' } } });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiInfoRowHolder key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different undefined bidder cases', () => {
+    for (let i = 0; i < 30; i++) {
+      executeMock.mockResolvedValue({ auction: { bidder: null } });
+      const { unmount } = render(<NijiInfoRowHolder nounId={BigInt(i)} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
 });
