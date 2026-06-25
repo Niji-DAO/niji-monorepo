@@ -102,4 +102,38 @@ describe('subgraphAuctionsToReduxSafe', () => {
     } as never);
     expect(out[0].bids).toEqual([]);
   });
+
+  it('subgraphAuctionsToReduxSafe handles 100 different auction inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      const a = makeAuction({ id: String(i) });
+      expect(() => subgraphAuctionsToReduxSafe([a])).not.toThrow();
+    }
+  });
+
+  it('subgraphAuctionsToReduxSafe handles 100 different bidder addresses', () => {
+    for (let i = 0; i < 100; i++) {
+      const a = makeAuction({ bidder: { id: '0x' + i.toString(16).padStart(40, '0') } });
+      expect(() => subgraphAuctionsToReduxSafe([a])).not.toThrow();
+    }
+  });
+
+  it('subgraphAuctionsToReduxSafe handles 50 large auction arrays without crash', () => {
+    for (let i = 1; i <= 50; i++) {
+      const arr = Array.from({ length: i }, (_, j) => makeAuction({ id: String(j) }));
+      expect(() => subgraphAuctionsToReduxSafe(arr)).not.toThrow();
+    }
+  });
+
+  it('subgraphAuctionsToReduxSafe handles 30 different amounts without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = makeAuction({ amount: String((i + 1) * 1000) });
+      expect(() => subgraphAuctionsToReduxSafe([a])).not.toThrow();
+    }
+  });
+
+  it('pastAuctionsAtom is defined 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(pastAuctionsAtom).toBeDefined();
+    }
+  });
 });
