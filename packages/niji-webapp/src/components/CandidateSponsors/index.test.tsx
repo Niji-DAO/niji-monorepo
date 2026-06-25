@@ -547,4 +547,60 @@ describe('CandidateSponsors', () => {
     expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
     hookState.userVotes = 5;
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles 100 different blockNumber values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} blockNumber={BigInt(i)} />);
+      unmount();
+    }
+  });
+
+  it('renders 30 instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CandidateSponsors key={i} {...baseProps} blockNumber={BigInt(i)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different userVotes values', () => {
+    const orig = hookState.userVotes;
+    for (let i = 0; i < 30; i++) {
+      hookState.userVotes = i;
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+    hookState.userVotes = orig;
+  });
+
+  it('handles all 8 state combinations', () => {
+    const origState = {
+      isThresholdMet: hookState.isThresholdMet,
+      isAccountSigner: hookState.isAccountSigner,
+      isOriginalSigner: hookState.isOriginalSigner,
+    };
+    [true, false].forEach(t => {
+      [true, false].forEach(s => {
+        [true, false].forEach(o => {
+          hookState.isThresholdMet = t;
+          hookState.isAccountSigner = s;
+          hookState.isOriginalSigner = o;
+          const { unmount } = render(<CandidateSponsors {...baseProps} />);
+          unmount();
+        });
+      });
+    });
+    Object.assign(hookState, origState);
+  });
 });

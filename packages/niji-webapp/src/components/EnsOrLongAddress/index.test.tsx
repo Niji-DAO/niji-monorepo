@@ -474,4 +474,54 @@ describe('EnsOrLongAddress', () => {
     const { container } = render(<EnsOrLongAddress address={ADDR} />);
     expect(container.textContent).toBe(ADDR);
   });
+
+  it('mount-unmount 200 cycles', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<EnsOrLongAddress address={ADDR} />);
+      unmount();
+    }
+  });
+
+  it('renders 300 instances without crash', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <EnsOrLongAddress key={i} address={ADDR} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different addresses', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { unmount } = render(<EnsOrLongAddress address={addr} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different ENS names with blocked check', () => {
+    for (let i = 0; i < 30; i++) {
+      vi.mocked(useReverseENSLookUp).mockReturnValue(`ens-${i}.eth`);
+      vi.mocked(containsBlockedText).mockReturnValue(i % 5 === 0);
+      const { unmount } = render(<EnsOrLongAddress address={ADDR} />);
+      unmount();
+    }
+  });
+
+  it('rerender 100 times with stable ENS name', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue('stable.eth');
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    const { container, rerender } = render(<EnsOrLongAddress address={ADDR} />);
+    for (let i = 0; i < 100; i++) {
+      rerender(<EnsOrLongAddress address={ADDR} />);
+    }
+    expect(container.textContent).toBe('stable.eth');
+  });
 });
