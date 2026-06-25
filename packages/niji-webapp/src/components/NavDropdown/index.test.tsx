@@ -640,4 +640,62 @@ describe('NavDropDown', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <NavDropDown buttonText="Menu">
+          <span>x</span>
+        </NavDropDown>,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 300 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <NavDropDown key={i} buttonText={`Menu-${i}`}>
+              <span>x</span>
+            </NavDropDown>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different buttonText values sequentially', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(
+        <NavDropDown buttonText={`Menu-${i}`}>
+          <span>x</span>
+        </NavDropDown>,
+      );
+      expect(container.querySelector('[data-testid="nav-button"]')?.textContent).toBe(`Menu-${i}`);
+      unmount();
+    }
+  });
+
+  it('handles 30 different children counts', () => {
+    for (let i = 1; i <= 30; i++) {
+      const children = Array.from({ length: i }, (_, j) => <span key={j}>item-{j}</span>);
+      const { unmount } = render(<NavDropDown buttonText="Menu">{children}</NavDropDown>);
+      unmount();
+    }
+  });
+
+  it('all 100 instances have exactly 1 nav-button each', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <NavDropDown key={i} buttonText="x">
+            <span>y</span>
+          </NavDropDown>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="nav-button"]').length).toBe(100);
+  });
 });
