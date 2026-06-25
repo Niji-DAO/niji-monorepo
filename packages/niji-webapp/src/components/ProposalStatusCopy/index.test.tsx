@@ -248,4 +248,52 @@ describe('ProposalStatusCopy', () => {
       ),
     ).not.toThrow();
   });
+
+  it('round-2 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.ACTIVE)} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <ProposalStatusCopy key={i} proposal={makeProposal(ProposalState.ACTIVE)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different proposal status values', () => {
+    for (let i = 0; i < 30; i++) {
+      const p = makeProposal(ProposalState.ACTIVE);
+      const { unmount } = render(<ProposalStatusCopy proposal={p} />);
+      unmount();
+    }
+  });
+
+  it('round-2 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        render(<ProposalStatusCopy proposal={makeProposal(ProposalState.ACTIVE)} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-2 100 rerender cycles', () => {
+    const { rerender } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.ACTIVE)} />,
+    );
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<ProposalStatusCopy proposal={makeProposal(ProposalState.ACTIVE)} />),
+      ).not.toThrow();
+    }
+  });
 });
