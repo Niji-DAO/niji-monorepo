@@ -272,4 +272,54 @@ describe('VoteStatusPill', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<VoteStatusPill status="success" text="x" />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 1000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <VoteStatusPill key={i} status="success" text={`r2-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 different text values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <VoteStatusPill status="success" text={`r2-text-${i}`} />,
+      );
+      expect(container.querySelector('div')?.textContent).toBe(`r2-text-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-2 all 200 instances render div root', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <VoteStatusPill key={i} status="success" text={`x-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(200);
+  });
+
+  it('round-2 rapid 100 status transitions', () => {
+    const statuses = ['success', 'failure', 'pending', 'unknown'];
+    const { rerender } = render(<VoteStatusPill status="success" text="x" />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<VoteStatusPill status={statuses[i % 4]} text={`r2-${i}`} />),
+      ).not.toThrow();
+    }
+  });
 });

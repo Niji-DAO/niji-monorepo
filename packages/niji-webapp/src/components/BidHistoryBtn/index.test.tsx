@@ -571,4 +571,50 @@ describe('BidHistoryBtn Component (isCool=true)', () => {
       expect(() => rerender(<BidHistoryBtn onClick={vi.fn()} />)).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<BidHistoryBtn onClick={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <BidHistoryBtn key={i} onClick={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 500 click events fire handler', () => {
+    const onClick = vi.fn();
+    const { container } = render(<BidHistoryBtn onClick={onClick} />);
+    const target = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 500; i++) fireEvent.click(target);
+    expect(onClick).toHaveBeenCalledTimes(500);
+  });
+
+  it('round-2 all 200 instances render root', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <BidHistoryBtn key={i} onClick={() => {}} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(200);
+  });
+
+  it('round-2 50 sequential renders with new handler', () => {
+    for (let i = 0; i < 50; i++) {
+      const onClick = vi.fn();
+      const { unmount } = render(<BidHistoryBtn onClick={onClick} />);
+      unmount();
+    }
+  });
 });

@@ -556,4 +556,50 @@ describe('LegacyNoun — additional edge cases', () => {
       ),
     ).not.toThrow();
   });
+
+  it('round-2 mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<LegacyNoun imgPath="/x.png" alt="x" />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 1500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <LegacyNoun key={i} imgPath={`/r2-${i}.png`} alt={`r2-alt-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 different imgPath values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<LegacyNoun imgPath={`/r2-img-${i}.png`} alt="x" />);
+      expect(container.querySelector('img')?.getAttribute('src')).toBe(`/r2-img-${i}.png`);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 100 different alt values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<LegacyNoun imgPath="/x.png" alt={`r2-alt-${i}`} />);
+      expect(container.querySelector('img')?.getAttribute('alt')).toBe(`r2-alt-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-2 all 500 instances have img element', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <LegacyNoun key={i} imgPath="/x.png" alt={`a-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(500);
+  });
 });
