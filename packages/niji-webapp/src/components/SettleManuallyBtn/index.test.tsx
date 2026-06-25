@@ -646,4 +646,54 @@ describe('SettleManuallyBtn', () => {
     for (let i = 0; i < 1000; i++) fireEvent.click(btn);
     expect(handler).toHaveBeenCalledTimes(1000);
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(
+        <SettleManuallyBtn auction={auction} settleAuctionHandler={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 1500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <SettleManuallyBtn key={i} auction={auction} settleAuctionHandler={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different nounIds', () => {
+    for (let i = 0; i < 200; i++) {
+      const a = { ...auction, nounId: BigInt(i) };
+      const { unmount } = render(<SettleManuallyBtn auction={a} settleAuctionHandler={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('all 700 instances have button element', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 700 }, (_, i) => (
+          <SettleManuallyBtn key={i} auction={auction} settleAuctionHandler={() => {}} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(700);
+  });
+
+  it('rapid 2000 click events fire handler', () => {
+    const handler = vi.fn();
+    const { container } = render(
+      <SettleManuallyBtn auction={auction} settleAuctionHandler={handler} />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 2000; i++) fireEvent.click(btn);
+    expect(handler).toHaveBeenCalledTimes(2000);
+  });
 });

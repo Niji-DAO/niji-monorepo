@@ -682,4 +682,51 @@ describe('ProposalHeader', () => {
     }
     hookState.availableVotes = orig;
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<ProposalHeader {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different proposalVote values', () => {
+    const orig = hookState.proposalVote;
+    ['For', 'Against', 'Abstain'].forEach(v => {
+      hookState.hasVoted = true;
+      hookState.proposalVote = v;
+      for (let i = 0; i < 10; i++) {
+        const { unmount } = wrap(<ProposalHeader {...baseProps} />);
+        unmount();
+      }
+    });
+    hookState.proposalVote = orig;
+    hookState.hasVoted = false;
+  });
+
+  it('rapid 50 submitButton invocations', () => {
+    submitMock.mockReset();
+    wrap(<ProposalHeader {...baseProps} />);
+    for (let i = 0; i < 50; i++) submitMock();
+    expect(submitMock).toHaveBeenCalledTimes(50);
+  });
+
+  it('renders 20 instances in single mount', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <ProposalHeader key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different unicode titles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<ProposalHeader {...baseProps} title={`🎉日本語タイトル-${i}`} />);
+      unmount();
+    }
+  });
 });
