@@ -233,4 +233,59 @@ describe('ProposalCandidateContent', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ProposalCandidateContent proposal={baseProposal} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ProposalCandidateContent key={i} proposal={baseProposal} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different titles', () => {
+    for (let i = 0; i < 50; i++) {
+      const p = {
+        version: { content: { title: `R2-Title-${i}`, description: 'body', details: [] } },
+      } as never;
+      const { unmount } = render(<ProposalCandidateContent proposal={p} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 50 different descriptions', () => {
+    for (let i = 0; i < 50; i++) {
+      const p = {
+        version: { content: { title: 'Title', description: `r2-desc-${i}`, details: [] } },
+      } as never;
+      const { unmount } = render(<ProposalCandidateContent proposal={p} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 20 different tx count cycles', () => {
+    for (let i = 0; i < 20; i++) {
+      const p = {
+        version: {
+          content: {
+            title: 't',
+            description: 'd',
+            details: Array.from({ length: i + 10 }, () => ({ target: '0x' })),
+          },
+        },
+      } as never;
+      const { unmount } = render(<ProposalCandidateContent proposal={p} />);
+      unmount();
+    }
+  });
 });

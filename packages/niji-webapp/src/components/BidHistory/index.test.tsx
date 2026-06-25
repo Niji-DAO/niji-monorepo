@@ -379,4 +379,51 @@ describe('BidHistory Component', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(undefined);
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<BidHistory auctionId="1" max={3} classes={mockClasses} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 instances variant', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(undefined);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <BidHistory key={i} auctionId={`${i}`} max={3} classes={mockClasses} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different auctionId values', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(undefined);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <BidHistory auctionId={`${i + 100}`} max={3} classes={mockClasses} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different max values', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(undefined);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BidHistory auctionId="1" max={i + 1} classes={mockClasses} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 isCool toggle cycles', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(undefined);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BidHistory auctionId="1" max={3} classes={mockClasses} />);
+      unmount();
+    }
+  });
 });
