@@ -176,4 +176,76 @@ describe('ProposalStatusCopy', () => {
     );
     expect(container.textContent).toBe('Succeeded');
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.ACTIVE)} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 1500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <ProposalStatusCopy key={i} proposal={makeProposal(ProposalState.ACTIVE)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 cycles per main state', () => {
+    [
+      ProposalState.ACTIVE,
+      ProposalState.PENDING,
+      ProposalState.SUCCEEDED,
+      ProposalState.EXECUTED,
+      ProposalState.QUEUED,
+    ].forEach(s => {
+      for (let i = 0; i < 30; i++) {
+        const { unmount } = render(<ProposalStatusCopy proposal={makeProposal(s)} />);
+        unmount();
+      }
+    });
+  });
+
+  it('rapid 200 status transitions rerender', () => {
+    const states = [
+      ProposalState.ACTIVE,
+      ProposalState.PENDING,
+      ProposalState.SUCCEEDED,
+      ProposalState.EXECUTED,
+    ];
+    const { rerender } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.ACTIVE)} />,
+    );
+    for (let i = 0; i < 200; i++) {
+      expect(() =>
+        rerender(<ProposalStatusCopy proposal={makeProposal(states[i % 4])} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('all 500 instances render different states without crash', () => {
+    const states = [
+      ProposalState.ACTIVE,
+      ProposalState.PENDING,
+      ProposalState.SUCCEEDED,
+      ProposalState.EXECUTED,
+      ProposalState.QUEUED,
+    ];
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <ProposalStatusCopy key={i} proposal={makeProposal(states[i % 5])} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });
