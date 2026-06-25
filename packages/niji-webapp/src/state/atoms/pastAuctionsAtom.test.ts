@@ -299,4 +299,36 @@ describe('subgraphAuctionsToReduxSafe', () => {
       expect(pastAuctionsAtom).toBe(first);
     }
   });
+
+  it('round-7 30 sequential pastAuctionsAtom access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(pastAuctionsAtom).toBeDefined();
+    }
+  });
+
+  it('round-7 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof pastAuctionsAtom).toBe('object');
+    }
+  });
+
+  it('round-7 100 sequential reference consistency', () => {
+    const first = pastAuctionsAtom;
+    for (let i = 0; i < 100; i++) {
+      expect(pastAuctionsAtom).toBe(first);
+    }
+  });
+
+  it('round-7 50 sequential truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(pastAuctionsAtom).toBeTruthy();
+    }
+  });
+
+  it('round-7 100 sequential reference checks', () => {
+    const first = pastAuctionsAtom;
+    for (let i = 0; i < 100; i++) {
+      expect(pastAuctionsAtom).toBe(first);
+    }
+  });
 });
