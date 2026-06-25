@@ -327,4 +327,43 @@ describe('VoteSignals', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteSignals {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteSignals key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<VoteSignals {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('round-3 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<VoteSignals {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 different proposalId cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteSignals {...baseProps} proposalId={String(i + 100)} />);
+      unmount();
+    }
+  });
 });
