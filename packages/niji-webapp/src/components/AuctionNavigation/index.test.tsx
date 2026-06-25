@@ -590,4 +590,79 @@ describe('AuctionNavigation Component', () => {
     );
     expect(container.querySelectorAll('button').length).toBe(1000);
   });
+
+  it('round-2 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <AuctionNavigation
+          isFirstAuction={false}
+          isLastAuction={false}
+          onPrevAuctionClick={() => {}}
+          onNextAuctionClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <AuctionNavigation
+              key={i}
+              isFirstAuction={false}
+              isLastAuction={false}
+              onPrevAuctionClick={() => {}}
+              onNextAuctionClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 500 onPrevAuctionClick events', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={onPrev}
+        onNextAuctionClick={() => {}}
+      />,
+    );
+    const btns = container.querySelectorAll('button');
+    for (let i = 0; i < 500; i++) fireEvent.click(btns[0]);
+    expect(onPrev).toHaveBeenCalledTimes(500);
+  });
+
+  it('round-2 handles 30 isFirstAuction toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <AuctionNavigation
+          isFirstAuction={i % 2 === 0}
+          isLastAuction={false}
+          onPrevAuctionClick={() => {}}
+          onNextAuctionClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 isLastAuction toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <AuctionNavigation
+          isFirstAuction={false}
+          isLastAuction={i % 2 === 0}
+          onPrevAuctionClick={() => {}}
+          onNextAuctionClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
 });
