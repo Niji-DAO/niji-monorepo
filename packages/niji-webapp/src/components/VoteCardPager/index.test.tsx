@@ -534,4 +534,49 @@ describe('VoteCardPager', () => {
     );
     expect(container.querySelectorAll('button').length).toBe(200);
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<VoteCardPager {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <VoteCardPager key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different currentPage values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<VoteCardPager {...defaults} currentPage={i} />);
+      unmount();
+    }
+  });
+
+  it('all 500 instances render 2 buttons each', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <VoteCardPager key={i} {...defaults} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(1000);
+  });
+
+  it('rapid 1000 left clicks fire handler', () => {
+    const onLeft = vi.fn();
+    const { container } = render(<VoteCardPager {...defaults} onLeftArrowClick={onLeft} />);
+    const left = container.querySelectorAll('button')[0];
+    for (let i = 0; i < 1000; i++) fireEvent.click(left);
+    expect(onLeft).toHaveBeenCalledTimes(1000);
+  });
 });

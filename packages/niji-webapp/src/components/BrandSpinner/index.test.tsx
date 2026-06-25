@@ -549,4 +549,56 @@ describe('BrandSpinner', () => {
       expect(() => render(<BrandSpinner />)).not.toThrow();
     }
   });
+
+  it('mount-unmount 2000 cycles', () => {
+    for (let i = 0; i < 2000; i++) {
+      const { unmount } = render(<BrandSpinner />);
+      unmount();
+    }
+  });
+
+  it('renders 3000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 3000 }, (_, i) => (
+            <BrandSpinner key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 1500 svgs have width=25 height=25', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 1500 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    const svgs = container.querySelectorAll('svg');
+    expect(svgs.length).toBe(1500);
+    svgs.forEach(svg => {
+      expect(svg.getAttribute('width')).toBe('25');
+      expect(svg.getAttribute('height')).toBe('25');
+    });
+  });
+
+  it('all 1000 svgs have circle child', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 1000 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('svg circle').length).toBe(1000);
+  });
+
+  it('rapid 2000 renders without crash', () => {
+    for (let i = 0; i < 2000; i++) {
+      expect(() => render(<BrandSpinner />)).not.toThrow();
+    }
+  });
 });
