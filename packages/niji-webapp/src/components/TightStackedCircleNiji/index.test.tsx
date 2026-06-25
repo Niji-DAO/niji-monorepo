@@ -459,4 +459,46 @@ describe('TightStackedCircleNiji', () => {
       expect(() => rerender(<TightStackedCircleNiji index={i} nounId={BigInt(i)} />)).not.toThrow();
     }
   });
+
+  it('round-4 mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<TightStackedCircleNiji index={0} nounId={1n} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 200 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <TightStackedCircleNiji key={i} index={i} nounId={BigInt(i + 500)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different nounId values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<TightStackedCircleNiji index={0} nounId={BigInt(i + 1000)} />);
+      unmount();
+    }
+  });
+
+  it('round-4 100 rerender cycles', () => {
+    const { rerender } = render(<TightStackedCircleNiji index={0} nounId={1n} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<TightStackedCircleNiji index={i} nounId={BigInt(i + 2000)} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-4 50 different index values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<TightStackedCircleNiji index={i + 100} nounId={1n} />);
+      unmount();
+    }
+  });
 });
