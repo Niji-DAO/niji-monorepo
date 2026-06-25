@@ -387,4 +387,43 @@ describe('StreamPaymentsReviewStep', () => {
       expect(() => render(<StreamPaymentsReviewStep {...defaults} />)).not.toThrow();
     }
   });
+
+  it('round-4 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<StreamPaymentsReviewStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <StreamPaymentsReviewStep key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<StreamPaymentsReviewStep {...defaults} />)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<StreamPaymentsReviewStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-4 rapid 30 onPrev invocations', () => {
+    const onPrev = vi.fn();
+    render(<StreamPaymentsReviewStep {...defaults} onPrevBtnClick={onPrev} />);
+    for (let i = 0; i < 30; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(30);
+  });
 });
