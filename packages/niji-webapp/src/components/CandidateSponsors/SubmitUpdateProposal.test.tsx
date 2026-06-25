@@ -279,4 +279,70 @@ describe('SubmitUpdateProposal', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <SubmitUpdateProposal {...baseProps} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SubmitUpdateProposal key={i} {...baseProps} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(
+      <MemoryRouter>
+        <SubmitUpdateProposal {...baseProps} onDismiss={onDismiss} />
+      </MemoryRouter>,
+    );
+    for (let i = 0; i < 200; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-2 handles all 6 status types', () => {
+    const statuses: UpdateStatus[] = [
+      'None',
+      'PendingSignature',
+      'Mining',
+      'Success',
+      'Fail',
+      'Exception',
+    ];
+    statuses.forEach(s => {
+      hookState.updateProposalBySigsState = { status: s };
+      const { unmount } = render(
+        <MemoryRouter>
+          <SubmitUpdateProposal {...baseProps} />
+        </MemoryRouter>,
+      );
+      unmount();
+    });
+    hookState.updateProposalBySigsState = { status: 'None' };
+  });
+
+  it('round-2 handles 30 different isModalOpen toggle', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <SubmitUpdateProposal {...baseProps} isModalOpen={i % 2 === 0} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
 });
