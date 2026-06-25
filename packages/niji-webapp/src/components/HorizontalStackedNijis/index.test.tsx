@@ -557,4 +557,45 @@ describe('HorizontalStackedNijis', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<HorizontalStackedNijis nounIds={['1']} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 200 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <HorizontalStackedNijis key={i} nounIds={[`${i}`]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different nijiIds arrays', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<HorizontalStackedNijis nounIds={[`${i + 100}`]} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 arrays of various sizes', () => {
+    for (let i = 1; i <= 30; i++) {
+      const ids = Array.from({ length: i }, (_, j) => `${j}`);
+      const { unmount } = render(<HorizontalStackedNijis nounIds={ids} />);
+      unmount();
+    }
+  });
+
+  it('round-2 100 rerender cycles', () => {
+    const { rerender } = render(<HorizontalStackedNijis nounIds={['1']} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<HorizontalStackedNijis nounIds={[`${i}`]} />)).not.toThrow();
+    }
+  });
 });
