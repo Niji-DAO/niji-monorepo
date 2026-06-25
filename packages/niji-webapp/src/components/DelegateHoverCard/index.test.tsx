@@ -809,4 +809,85 @@ describe('DelegateHoverCard', () => {
       render(<DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={0n} />),
     ).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different delegates with full data', () => {
+    for (let i = 0; i < 30; i++) {
+      useDelegateNounsAtBlockQueryMock.mockReturnValue({
+        data: {
+          delegates: [{ id: `0xD${i}`, nijiRepresented: [{ id: String(i) }] }],
+        },
+        loading: false,
+        error: undefined,
+      });
+      const { unmount } = render(
+        <DelegateHoverCard delegateId={`delegate-0xD${i}`} proposalCreationBlock={1n} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 30 instances all in loading state', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DelegateHoverCard
+              key={i}
+              delegateId={`delegate-0xX${i}`}
+              proposalCreationBlock={BigInt(i)}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different niji counts in stacked', () => {
+    for (let i = 1; i <= 30; i++) {
+      const niji = Array.from({ length: i }, (_, j) => ({ id: String(j) }));
+      useDelegateNounsAtBlockQueryMock.mockReturnValue({
+        data: { delegates: [{ id: '0xA', nijiRepresented: niji }] },
+        loading: false,
+        error: undefined,
+      });
+      const { container, unmount } = render(
+        <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+      );
+      expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe(`stack-${i}`);
+      unmount();
+    }
+  });
+
+  it('handles 30 different proposalCreationBlock values', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={BigInt(i * 100)} />,
+      );
+      unmount();
+    }
+  });
 });

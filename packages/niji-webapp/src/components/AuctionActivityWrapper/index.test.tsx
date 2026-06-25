@@ -461,4 +461,59 @@ describe('AuctionActivityWrapper', () => {
     );
     expect(container.querySelectorAll('div').length).toBe(300);
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<AuctionActivityWrapper>x</AuctionActivityWrapper>);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <AuctionActivityWrapper key={i}>{i}</AuctionActivityWrapper>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different ReactNode children', () => {
+    for (let i = 0; i < 30; i++) {
+      const { container, unmount } = render(
+        <AuctionActivityWrapper>
+          <span data-testid={`child-${i}`}>{i}</span>
+        </AuctionActivityWrapper>,
+      );
+      expect(container.querySelector(`[data-testid="child-${i}"]`)).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it('handles 50 different string children', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(
+        <AuctionActivityWrapper>str-{i}</AuctionActivityWrapper>,
+      );
+      expect(container.querySelector('div')?.textContent).toContain(`str-${i}`);
+      unmount();
+    }
+  });
+
+  it('all 100 wrappers contain unique children content', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <AuctionActivityWrapper key={i}>content-{i}</AuctionActivityWrapper>
+        ))}
+      </>,
+    );
+    const divs = container.querySelectorAll('div');
+    divs.forEach((div, i) => {
+      expect(div.textContent).toContain(`content-${i}`);
+    });
+  });
 });
