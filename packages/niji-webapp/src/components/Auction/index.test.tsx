@@ -595,4 +595,56 @@ describe('Auction', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Auction auction={makeAuction(5n) as never} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different startTime values', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const a = { ...makeAuction(5n), startTime: BigInt(i * 100) };
+      const { unmount } = wrap(<Auction auction={a as never} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different amount values', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const a = { ...makeAuction(5n), amount: BigInt(i * 1000) };
+      const { unmount } = wrap(<Auction auction={a as never} />);
+      unmount();
+    }
+  });
+
+  it('renders 30 instances all undefined auction', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Auction key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles rapid 30 isNounder + auction nounId combinations', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    for (let i = 0; i < 30; i++) {
+      isNounderMock.mockReturnValue(i % 2 === 0);
+      const { unmount } = wrap(<Auction auction={makeAuction(BigInt(i)) as never} />);
+      unmount();
+    }
+    isNounderMock.mockReturnValue(false);
+  });
 });

@@ -570,4 +570,61 @@ describe('AuctionActivityWrapper', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 2000 cycles', () => {
+    for (let i = 0; i < 2000; i++) {
+      const { unmount } = render(<AuctionActivityWrapper>x</AuctionActivityWrapper>);
+      unmount();
+    }
+  });
+
+  it('renders 3000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 3000 }, (_, i) => (
+            <AuctionActivityWrapper key={i}>{i}</AuctionActivityWrapper>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different children', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(
+        <AuctionActivityWrapper>content-{i}</AuctionActivityWrapper>,
+      );
+      expect(container.querySelector('div')?.textContent).toBe(`content-${i}`);
+      unmount();
+    }
+  });
+
+  it('all 1000 wrappers have max-lg:mx-4 class', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 1000 }, (_, i) => (
+          <AuctionActivityWrapper key={i}>x</AuctionActivityWrapper>
+        ))}
+      </>,
+    );
+    const divs = container.querySelectorAll('div');
+    expect(divs.length).toBe(1000);
+    divs.forEach(div => {
+      expect(div.className).toContain('max-lg:mx-4');
+    });
+  });
+
+  it('handles 50 different nested ReactNode', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <AuctionActivityWrapper>
+          <div>
+            <span data-testid={`nested-${i}`}>{i}</span>
+          </div>
+        </AuctionActivityWrapper>,
+      );
+      unmount();
+    }
+  });
 });

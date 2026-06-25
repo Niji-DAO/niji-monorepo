@@ -728,4 +728,59 @@ describe('ByLineHoverCard', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 200 cycles', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<ByLineHoverCard proposerAddress="0xA" />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances all in loading state', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <ByLineHoverCard key={i} proposerAddress={`0xA${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different proposer addresses', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ByLineHoverCard proposerAddress={`0xADDR${i}`} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different error message types', () => {
+    for (let i = 0; i < 30; i++) {
+      useSubgraphQueryMock.mockReturnValue({
+        data: undefined,
+        loading: false,
+        error: new Error(`err-${i}`),
+      });
+      const { unmount } = render(<ByLineHoverCard proposerAddress="0xA" />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different delegates niji counts', () => {
+    for (let i = 1; i <= 30; i++) {
+      const niji = Array.from({ length: i }, (_, j) => ({ id: String(j) }));
+      useSubgraphQueryMock.mockReturnValue({
+        data: { delegates: [{ id: '0xA', nijiRepresented: niji }] },
+        loading: false,
+        error: undefined,
+      });
+      const { container, unmount } = render(<ByLineHoverCard proposerAddress="0xA" />);
+      expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe(`stack-${i}`);
+      unmount();
+    }
+  });
 });
