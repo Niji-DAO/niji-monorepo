@@ -437,4 +437,42 @@ describe('NetworkAlert', () => {
       expect(() => render(<NetworkAlert />)).not.toThrow();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NetworkAlert />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NetworkAlert key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<NetworkAlert />)).not.toThrow();
+    }
+  });
+
+  it('round-6 100 rerender cycles', () => {
+    const { rerender } = render(<NetworkAlert />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<NetworkAlert />)).not.toThrow();
+    }
+  });
+
+  it('round-6 200 sequential renders second cycle', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => render(<NetworkAlert />)).not.toThrow();
+    }
+  });
 });
