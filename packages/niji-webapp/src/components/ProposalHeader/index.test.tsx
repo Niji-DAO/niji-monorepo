@@ -729,4 +729,50 @@ describe('ProposalHeader', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<ProposalHeader {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances in single MemoryRouter mount', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalHeader key={i} {...baseProps} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different blockNumber values', () => {
+    for (let i = 0; i < 30; i++) {
+      useBlockNumberMock.mockReturnValue({ data: BigInt(i * 100) });
+      const { unmount } = wrap(<ProposalHeader {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 cycles with proposal variations', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    for (let i = 0; i < 30; i++) {
+      const p = { ...baseProps.proposal, id: String(i + 1000) } as never;
+      const { unmount } = wrap(<ProposalHeader {...baseProps} proposal={p} />);
+      unmount();
+    }
+  });
+
+  it('round-2 50 sequential renders without crash', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<ProposalHeader {...baseProps} />);
+      unmount();
+    }
+  });
 });
