@@ -268,4 +268,49 @@ describe('NijiInfoCard', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 50 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <NijiInfoCard key={i} nounId={BigInt(i)} bidHistoryOnClickHandler={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different nounIds', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiInfoCard nounId={BigInt(i + 100)} bidHistoryOnClickHandler={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={() => {}} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-3 30 mount cycles second', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiInfoCard nounId={BigInt(i)} bidHistoryOnClickHandler={() => {}} />,
+      );
+      unmount();
+    }
+  });
 });
