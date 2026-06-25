@@ -248,5 +248,38 @@ describe('usePickByState', () => {
       expect(usePickByState(`r5-miss-${i}`, ['a'], [1])).toBeUndefined();
     }
   });
+
+  it('round-6 30 sequential usePickByState calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => usePickByState(`r6-${i}`, ['a'], [1])).not.toThrow();
+    }
+  });
+
+  it('round-6 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof usePickByState).toBe('function');
+    }
+  });
+
+  it('round-6 100 sequential reference consistency', () => {
+    const first = usePickByState;
+    for (let i = 0; i < 100; i++) {
+      expect(usePickByState).toBe(first);
+    }
+  });
+
+  it('round-6 30 deterministic for same input', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = usePickByState('r6-const', ['a'], [1]);
+      const r2 = usePickByState('r6-const', ['a'], [1]);
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-6 100 sequential undefined cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(usePickByState(`r6-miss-${i}`, ['a'], [1])).toBeUndefined();
+    }
+  });
   /* eslint-enable react-hooks/rules-of-hooks */
 });

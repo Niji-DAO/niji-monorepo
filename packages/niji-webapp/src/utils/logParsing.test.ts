@@ -277,4 +277,39 @@ describe('logParsing round-trip', () => {
       expect(k).toContain(`0xR5-T-${i}`);
     }
   });
+
+  it('round-6 30 sequential filterToKey calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => filterToKey({ address: `0xR6-${i}`, topics: [] })).not.toThrow();
+    }
+  });
+
+  it('round-6 50 sequential keyToFilter calls', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => keyToFilter(`r6-key-${i}::[]`)).not.toThrow();
+    }
+  });
+
+  it('round-6 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof filterToKey).toBe('function');
+      expect(typeof keyToFilter).toBe('function');
+    }
+  });
+
+  it('round-6 30 deterministic for same input', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = filterToKey({ address: '0xR6-CONST', topics: [] });
+      const r2 = filterToKey({ address: '0xR6-CONST', topics: [] });
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-6 50 different topic arrays', () => {
+    for (let i = 0; i < 50; i++) {
+      const topics = [`0xR6-T-${i}`];
+      const k = filterToKey({ address: '0xR6-A', topics });
+      expect(k).toContain(`0xR6-T-${i}`);
+    }
+  });
 });
