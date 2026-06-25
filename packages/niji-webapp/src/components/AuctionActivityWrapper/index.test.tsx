@@ -675,4 +675,52 @@ describe('AuctionActivityWrapper', () => {
     }
     expect(container.textContent).toContain('49');
   });
+
+  it('round-3 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<AuctionActivityWrapper>r3-x</AuctionActivityWrapper>);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <AuctionActivityWrapper key={i}>r3-{i}</AuctionActivityWrapper>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 100 different children values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <AuctionActivityWrapper>r3-v-{i}</AuctionActivityWrapper>,
+      );
+      expect(container.textContent).toBe(`r3-v-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-3 all 200 wrappers exist', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <AuctionActivityWrapper key={i}>x</AuctionActivityWrapper>
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(200);
+  });
+
+  it('round-3 50 rerender cycles', () => {
+    const { container, rerender } = render(<AuctionActivityWrapper>x</AuctionActivityWrapper>);
+    for (let i = 0; i < 50; i++) {
+      rerender(<AuctionActivityWrapper>r3-r-{i}</AuctionActivityWrapper>);
+    }
+    expect(container.textContent).toContain('49');
+  });
 });

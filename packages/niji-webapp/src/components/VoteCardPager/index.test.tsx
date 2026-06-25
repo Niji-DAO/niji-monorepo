@@ -664,4 +664,43 @@ describe('VoteCardPager', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<VoteCardPager {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 200 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <VoteCardPager key={i} {...defaults} currentPage={i % 5} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different currentPage values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteCardPager {...defaults} currentPage={i} numPages={100} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<VoteCardPager {...defaults} />)).not.toThrow();
+    }
+  });
+
+  it('round-3 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<VoteCardPager {...defaults} />);
+      unmount();
+    }
+  });
 });
