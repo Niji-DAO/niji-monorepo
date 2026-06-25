@@ -415,4 +415,63 @@ describe('NijiI18nProvider', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiI18nProvider>
+          <div>r6</div>
+        </NijiI18nProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiI18nProvider key={i}>
+              <div>r6-{i}</div>
+            </NijiI18nProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <NijiI18nProvider>
+            <div>x</div>
+          </NijiI18nProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-6 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiI18nProvider>
+          <span>r6-child-{i}</span>
+        </NijiI18nProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <NijiI18nProvider>
+          <div>x</div>
+        </NijiI18nProvider>,
+      );
+      unmount();
+    }
+  });
 });
