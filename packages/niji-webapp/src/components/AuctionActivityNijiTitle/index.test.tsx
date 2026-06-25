@@ -448,4 +448,55 @@ describe('AuctionActivityNijiTitle', () => {
     const matches = (container.textContent ?? '').match(/Niji/g);
     expect(matches?.length).toBe(300);
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<AuctionActivityNijiTitle nounId={1n} />);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <AuctionActivityNijiTitle key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different nounIds with isCool=true', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <AuctionActivityNijiTitle nounId={BigInt(i)} isCool={true} />,
+      );
+      expect(container.querySelector('h1')?.textContent).toContain(String(i));
+      unmount();
+    }
+  });
+
+  it('all 200 h1 elements have non-empty className', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <AuctionActivityNijiTitle key={i} nounId={BigInt(i)} />
+        ))}
+      </>,
+    );
+    const h1s = container.querySelectorAll('h1');
+    h1s.forEach(h1 => {
+      expect(h1.className).toBeTruthy();
+    });
+  });
+
+  it('rapid rerender 100 times preserves Niji prefix', () => {
+    const { container, rerender } = render(<AuctionActivityNijiTitle nounId={0n} />);
+    for (let i = 0; i < 100; i++) {
+      rerender(<AuctionActivityNijiTitle nounId={BigInt(i)} />);
+    }
+    expect(container.querySelector('h1')?.textContent).toContain('Niji');
+  });
 });

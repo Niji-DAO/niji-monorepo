@@ -654,4 +654,46 @@ describe('Bid', () => {
     }
     expect(input).not.toBeNull();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different account addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      hookState.account = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+      unmount();
+    }
+    hookState.account = '0xUSER';
+  });
+
+  it('rapid 30 auctionEnded toggle', () => {
+    const { rerender } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(<Bid auction={makeAuction() as never} auctionEnded={i % 2 === 0} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 30 different bid amounts in auction', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = makeAuction({ amount: BigInt(i) * 1_000_000_000_000_000_000n });
+      const { unmount } = render(<Bid auction={a as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('handles undefined minBidIncPercentage', () => {
+    const orig = hookState.minBidIncPercentage;
+    hookState.minBidIncPercentage = undefined;
+    expect(() =>
+      render(<Bid auction={makeAuction() as never} auctionEnded={false} />),
+    ).not.toThrow();
+    hookState.minBidIncPercentage = orig;
+  });
 });
