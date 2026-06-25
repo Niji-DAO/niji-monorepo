@@ -106,4 +106,38 @@ describe('traitName', () => {
       expect(() => traitName(traits[i % 4], 0)).not.toThrow();
     }
   });
+
+  it('round-2 30 sequential traitName calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => traitName('special', i)).not.toThrow();
+    }
+  });
+
+  it('round-2 50 different trait keys', () => {
+    const keys = ['special', 'leftHand', 'choker', 'hat', 'headphone'];
+    for (let i = 0; i < 50; i++) {
+      const result = traitName(keys[i % 5], 99);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-2 100 sequential calls produce string-typed result', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof traitName('special', 99)).toBe('string');
+    }
+  });
+
+  it('round-2 50 large index values', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => traitName('special', 1000 + i)).not.toThrow();
+    }
+  });
+
+  it('round-2 100 deterministic for same key+index', () => {
+    for (let i = 0; i < 100; i++) {
+      const r1 = traitName('special', 99);
+      const r2 = traitName('special', 99);
+      expect(r1).toBe(r2);
+    }
+  });
 });
