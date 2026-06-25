@@ -356,4 +356,63 @@ describe('CustomConnectkitProvider', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <CustomConnectkitProvider>
+          <div>r4</div>
+        </CustomConnectkitProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 30 instances rendered together', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CustomConnectkitProvider key={i}>
+              <div>r4-{i}</div>
+            </CustomConnectkitProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <CustomConnectkitProvider>
+            <div>x</div>
+          </CustomConnectkitProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <CustomConnectkitProvider>
+          <div>x</div>
+        </CustomConnectkitProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <CustomConnectkitProvider>
+          <div>r4-child-{i}</div>
+        </CustomConnectkitProvider>,
+      );
+      unmount();
+    }
+  });
 });
