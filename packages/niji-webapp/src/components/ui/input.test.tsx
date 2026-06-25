@@ -161,4 +161,49 @@ describe('Input', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<Input />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 1000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <Input key={i} placeholder={`r3-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different type values', () => {
+    const types = ['text', 'password', 'number', 'email', 'tel'];
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Input type={types[i % 5]} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 different className values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Input className={`r3-cls-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-3 all 200 instances render input', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <Input key={i} placeholder={`r3-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(200);
+  });
 });
