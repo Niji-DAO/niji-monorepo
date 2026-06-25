@@ -905,4 +905,91 @@ describe('CreateCandidateButton', () => {
       });
     });
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <CreateCandidateButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          isFormInvalid={false}
+          handleCreateProposal={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <CreateCandidateButton
+              key={i}
+              isLoading={false}
+              hasActiveOrPendingProposal={false}
+              isFormInvalid={false}
+              handleCreateProposal={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 500 click events fire handler', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 500; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(500);
+  });
+
+  it('all 100 instances render button', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <CreateCandidateButton
+            key={i}
+            isLoading={false}
+            hasActiveOrPendingProposal={false}
+            isFormInvalid={false}
+            handleCreateProposal={() => {}}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(100);
+  });
+
+  it('handles rapid 100 prop rerender', () => {
+    const { rerender } = render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(
+          <CreateCandidateButton
+            isLoading={i % 2 === 0}
+            hasActiveOrPendingProposal={i % 3 === 0}
+            isFormInvalid={i % 5 === 0}
+            handleCreateProposal={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });

@@ -657,4 +657,76 @@ describe('CurrentDelegatePannel', () => {
       ).not.toThrow();
     });
   });
+
+  it('mount-unmount 100 cycles', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <CurrentDelegatePannel
+              key={i}
+              onPrimaryBtnClick={() => {}}
+              onSecondaryBtnClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 500 onSecondary clicks', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const onSec = vi.fn();
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={onSec} />,
+    );
+    const buttons = container.querySelectorAll('button');
+    for (let i = 0; i < 500; i++) fireEvent.click(buttons[0]);
+    expect(onSec).toHaveBeenCalledTimes(500);
+  });
+
+  it('handles 100 different sdk delegate addresses', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    for (let i = 0; i < 100; i++) {
+      useReadNijiTokenDelegatesMock.mockReturnValue({
+        data: '0x' + i.toString(16).padStart(40, '0'),
+      });
+      const { unmount } = render(
+        <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('all 50 instances render h1 + 2 buttons', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <CurrentDelegatePannel
+            key={i}
+            onPrimaryBtnClick={() => {}}
+            onSecondaryBtnClick={() => {}}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(50);
+    expect(container.querySelectorAll('button').length).toBe(100);
+  });
 });

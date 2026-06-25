@@ -449,4 +449,58 @@ describe('CurrentBid', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 200 cycles', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <CurrentBid key={i} currentBid={parseEther(`${i + 1}`)} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different currentBid values', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <CurrentBid currentBid={parseEther(`${i + 1}`)} auctionEnded={false} />,
+      );
+      expect(container.textContent).toMatch(/Ξ \d+\.\d{2}/);
+      unmount();
+    }
+  });
+
+  it('all 100 h2 elements present', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <CurrentBid key={i} currentBid={parseEther(`${i + 1}`)} auctionEnded={false} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h2').length).toBe(100);
+  });
+
+  it('rapid 50 rerender with toggling auctionEnded + isCool', () => {
+    const { rerender } = render(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />);
+    for (let i = 0; i < 50; i++) {
+      useAtomValueMock.mockReturnValue(i % 2 === 0);
+      expect(() =>
+        rerender(<CurrentBid currentBid={parseEther('1')} auctionEnded={i % 3 === 0} />),
+      ).not.toThrow();
+    }
+  });
 });
