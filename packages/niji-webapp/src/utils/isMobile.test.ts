@@ -79,4 +79,51 @@ describe('isMobileScreen', () => {
     setWidth(NaN);
     expect(isMobileScreen()).toBe(false);
   });
+
+  it('handles 100 different width values below threshold', () => {
+    for (let i = 0; i < 100; i++) {
+      Object.defineProperty(window, 'innerWidth', {
+        value: 100 + i,
+        writable: true,
+        configurable: true,
+      });
+      expect(isMobileScreen()).toBe(true);
+    }
+  });
+
+  it('handles 100 different width values above threshold', () => {
+    for (let i = 0; i < 100; i++) {
+      Object.defineProperty(window, 'innerWidth', {
+        value: 1000 + i,
+        writable: true,
+        configurable: true,
+      });
+      expect(isMobileScreen()).toBe(false);
+    }
+  });
+
+  it('handles 100 evaluations at exact same width', () => {
+    Object.defineProperty(window, 'innerWidth', { value: 500, writable: true, configurable: true });
+    for (let i = 0; i < 100; i++) {
+      expect(typeof isMobileScreen()).toBe('boolean');
+    }
+  });
+
+  it('handles rapid 100 width changes', () => {
+    for (let i = 0; i < 100; i++) {
+      Object.defineProperty(window, 'innerWidth', {
+        value: 100 + i * 10,
+        writable: true,
+        configurable: true,
+      });
+      expect(() => isMobileScreen()).not.toThrow();
+    }
+  });
+
+  it('handles 100 rapid invocations with same width', () => {
+    Object.defineProperty(window, 'innerWidth', { value: 800, writable: true, configurable: true });
+    for (let i = 0; i < 100; i++) {
+      expect(() => isMobileScreen()).not.toThrow();
+    }
+  });
 });
