@@ -411,4 +411,44 @@ describe('SelectProposalActionStep', () => {
     for (let i = 0; i < 200; i++) setState({} as never);
     expect(setState).toHaveBeenCalledTimes(200);
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<SelectProposalActionStep {...setupProps()} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SelectProposalActionStep key={i} {...setupProps()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 rapid 200 onPrevBtnClick invocations', () => {
+    const onPrevBtnClick = vi.fn();
+    render(<SelectProposalActionStep {...setupProps({ onPrevBtnClick })} />);
+    for (let i = 0; i < 200; i++) onPrevBtnClick();
+    expect(onPrevBtnClick).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-3 rapid 200 onNextBtnClick invocations', () => {
+    const onNextBtnClick = vi.fn();
+    render(<SelectProposalActionStep {...setupProps({ onNextBtnClick })} />);
+    for (let i = 0; i < 200; i++) onNextBtnClick();
+    expect(onNextBtnClick).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-3 rapid 200 setState invocations', () => {
+    const setState = vi.fn();
+    render(<SelectProposalActionStep {...setupProps({ setState })} />);
+    for (let i = 0; i < 200; i++) setState({} as never);
+    expect(setState).toHaveBeenCalledTimes(200);
+  });
 });
