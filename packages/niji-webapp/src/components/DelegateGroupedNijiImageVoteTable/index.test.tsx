@@ -626,4 +626,68 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 50 different propIds', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable
+          {...baseProps}
+          propId={i}
+          filteredDelegateGroupedVoteData={[]}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different proposalCreationBlock values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable
+          {...baseProps}
+          proposalCreationBlock={BigInt(i * 100)}
+          filteredDelegateGroupedVoteData={[]}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles vote data with mixed support values', () => {
+    const data = [
+      makeVote('0xA', ['1'], 0),
+      makeVote('0xB', ['2'], 1),
+      makeVote('0xC', ['3'], 2),
+      makeVote('0xD', ['4', '5'], 0),
+      makeVote('0xE', ['6', '7', '8'], 1),
+    ];
+    expect(() =>
+      render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 30 prev/next page click cycle', () => {
+    const data = Array.from({ length: 36 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    const right = container.querySelector('[data-testid="right"]') as HTMLButtonElement;
+    const left = container.querySelector('[data-testid="left"]') as HTMLButtonElement;
+    for (let i = 0; i < 30; i++) {
+      fireEvent.click(right);
+      fireEvent.click(left);
+    }
+    expect(container.querySelector('[data-testid="current-page"]')?.textContent).toBe('0');
+  });
 });

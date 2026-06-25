@@ -402,4 +402,54 @@ describe('NavBarButton', () => {
       expect(() => render(<NavBarButton buttonText="X" buttonStyle={style} />)).not.toThrow();
     });
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<NavBarButton buttonText="x" />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <NavBarButton key={i} buttonText={`btn-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different buttonText values sequentially', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<NavBarButton buttonText={`btn-${i}`} />);
+      expect(container.textContent).toContain(`btn-${i}`);
+      unmount();
+    }
+  });
+
+  it('handles 30 different buttonIcon ReactNodes', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NavBarButton buttonText={`btn-${i}`} buttonIcon={<span>i-{i}</span>} />,
+      );
+      unmount();
+    }
+  });
+
+  it('getNavBarButtonVariant returns truthy for all 7 styles', () => {
+    [
+      NavBarButtonStyle.COOL_INFO,
+      NavBarButtonStyle.WARM_INFO,
+      NavBarButtonStyle.DELEGATE_PRIMARY,
+      NavBarButtonStyle.DELEGATE_BACK,
+      NavBarButtonStyle.FOR_VOTE_SUBMIT,
+      NavBarButtonStyle.AGAINST_VOTE_SUBMIT,
+      NavBarButtonStyle.ABSTAIN_VOTE_SUBMIT,
+    ].forEach(style => {
+      expect(getNavBarButtonVariant(style)).toBeTruthy();
+    });
+  });
 });
