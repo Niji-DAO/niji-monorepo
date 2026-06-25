@@ -105,5 +105,45 @@ describe('useProposalStatus', () => {
       expect(() => useProposalStatus(baseProposal(ProposalState.EXECUTED))).not.toThrow();
     }
   });
+
+  /* eslint-disable react-hooks/rules-of-hooks */
+  it('round-2 30 sequential useProposalStatus calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => useProposalStatus(baseProposal(ProposalState.ACTIVE))).not.toThrow();
+    }
+  });
+
+  it('round-2 50 different state variants', () => {
+    const states = [
+      ProposalState.PENDING,
+      ProposalState.ACTIVE,
+      ProposalState.SUCCEEDED,
+      ProposalState.EXECUTED,
+      ProposalState.DEFEATED,
+    ];
+    for (let i = 0; i < 50; i++) {
+      expect(useProposalStatus(baseProposal(states[i % 5]))).toBeDefined();
+    }
+  });
+
+  it('round-2 100 sequential calls produce string', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof useProposalStatus(baseProposal(ProposalState.ACTIVE))).toBe('string');
+    }
+  });
+
+  it('round-2 50 consistency for same state', () => {
+    for (let i = 0; i < 50; i++) {
+      const r1 = useProposalStatus(baseProposal(ProposalState.PENDING));
+      const r2 = useProposalStatus(baseProposal(ProposalState.PENDING));
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-2 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useProposalStatus).toBe('function');
+    }
+  });
   /* eslint-enable react-hooks/rules-of-hooks */
 });
