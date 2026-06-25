@@ -97,4 +97,38 @@ describe('pickSupportedLocale', () => {
       expect(() => pickSupportedLocale(['en-US', 'ja-JP'])).not.toThrow();
     }
   });
+
+  it('round-2 30 sequential pickSupportedLocale calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => pickSupportedLocale('en-US')).not.toThrow();
+    }
+  });
+
+  it('round-2 50 different locale values', () => {
+    const locales = ['en-US', 'ja-JP', 'fr-FR', 'de-DE', 'es-ES'];
+    for (let i = 0; i < 50; i++) {
+      const result = pickSupportedLocale(locales[i % 5]);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-2 100 sequential calls produce non-empty', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(pickSupportedLocale('en-US').length).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-2 50 invalid locale values', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => pickSupportedLocale(`invalid-${i}`)).not.toThrow();
+    }
+  });
+
+  it('round-2 100 deterministic for same input', () => {
+    for (let i = 0; i < 100; i++) {
+      const r1 = pickSupportedLocale('en-US');
+      const r2 = pickSupportedLocale('en-US');
+      expect(r1).toBe(r2);
+    }
+  });
 });

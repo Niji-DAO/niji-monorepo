@@ -106,4 +106,35 @@ describe('SUPPORTED_LOCALE_TO_DAYSJS_LOCALE', () => {
       expect(Object.keys(LOCALE_LABEL).length).toBeGreaterThan(0);
     }
   });
+
+  it('round-2 30 sequential SUPPORTED_LOCALES access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(SUPPORTED_LOCALES).toBeDefined();
+    }
+  });
+
+  it('round-2 50 DEFAULT_LOCALE access', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof DEFAULT_LOCALE).toBe('string');
+    }
+  });
+
+  it('round-2 100 LOCALE_LABEL access', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(LOCALE_LABEL).toBeDefined();
+    }
+  });
+
+  it('round-2 50 SUPPORTED_LOCALES length cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(SUPPORTED_LOCALES.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-2 100 reference consistency check', () => {
+    const first = SUPPORTED_LOCALES;
+    for (let i = 0; i < 100; i++) {
+      expect(SUPPORTED_LOCALES).toBe(first);
+    }
+  });
 });
