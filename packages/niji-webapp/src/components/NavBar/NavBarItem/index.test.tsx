@@ -361,4 +361,45 @@ describe('NavBarItem', () => {
     }
     expect(container.querySelector('div')?.textContent).toContain('99');
   });
+
+  it('round-6 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<NavBarItem>r6</NavBarItem>);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <NavBarItem key={i}>r6-{i}</NavBarItem>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NavBarItem>r6-c-{i}</NavBarItem>);
+      unmount();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<NavBarItem>x</NavBarItem>);
+      unmount();
+    }
+  });
+
+  it('round-6 100 rerender cycles', () => {
+    const { container, rerender } = render(<NavBarItem>x</NavBarItem>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<NavBarItem>r6-r-{i}</NavBarItem>);
+    }
+    expect(container.querySelector('div')?.textContent).toContain('99');
+  });
 });
