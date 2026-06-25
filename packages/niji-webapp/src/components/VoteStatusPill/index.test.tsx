@@ -461,4 +461,46 @@ describe('VoteStatusPill', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteStatusPill status="success" text="r6" />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteStatusPill key={i} status="success" text={`r6-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<VoteStatusPill status="success" text="x" />)).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<VoteStatusPill status="success" text="x" />);
+      unmount();
+    }
+  });
+
+  it('round-6 100 status transitions', () => {
+    const statuses = ['success', 'failure', 'pending', 'unknown'];
+    const { rerender } = render(<VoteStatusPill status="success" text="x" />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<VoteStatusPill status={statuses[i % 4]} text={`r6-${i}`} />),
+      ).not.toThrow();
+    }
+  });
 });

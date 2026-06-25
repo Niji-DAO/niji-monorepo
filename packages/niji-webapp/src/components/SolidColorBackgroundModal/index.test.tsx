@@ -687,4 +687,62 @@ describe('SolidColorBackgroundModal', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<div>r6</div>} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SolidColorBackgroundModal
+              key={i}
+              show={true}
+              onDismiss={() => {}}
+              content={<div>r6-{i}</div>}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<div>x</div>} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<div>x</div>} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 30 different content cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SolidColorBackgroundModal
+          show={true}
+          onDismiss={() => {}}
+          content={<div data-testid={`r6-${i}`}>{i + 9000}</div>}
+        />,
+      );
+      unmount();
+    }
+  });
 });
