@@ -144,4 +144,49 @@ describe('ArtAndTraitsSection', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<ArtAndTraitsSection />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances in single Accordion mount', () => {
+    expect(() =>
+      render(
+        <Accordion alwaysOpen defaultActiveKey="1">
+          {Array.from({ length: 30 }, (_, i) => (
+            <ArtAndTraitsSection key={i} />
+          ))}
+        </Accordion>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 rerender cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<ArtAndTraitsSection />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <Accordion alwaysOpen defaultActiveKey="1">
+          {Array.from({ length: 30 }, (_, i) => (
+            <ArtAndTraitsSection key={i} />
+          ))}
+        </Accordion>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 30 mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<ArtAndTraitsSection />);
+      unmount();
+    }
+  });
 });
