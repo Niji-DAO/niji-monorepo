@@ -933,4 +933,47 @@ describe('AuctionActivity', () => {
       ),
     ).not.toThrow();
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionActivity key={i} {...defaults} auction={makeAuction() as never} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different auction nounIds', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = { ...makeAuction(), nounId: BigInt(i + 100) };
+      const { unmount } = wrap(<AuctionActivity {...defaults} auction={a as never} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different amount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = { ...makeAuction(), amount: BigInt(i + 1) * BigInt(10n ** 18n) };
+      const { unmount } = wrap(<AuctionActivity {...defaults} auction={a as never} />);
+      unmount();
+    }
+  });
+
+  it('round-2 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />),
+      ).not.toThrow();
+    }
+  });
 });
