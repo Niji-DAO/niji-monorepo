@@ -561,4 +561,48 @@ describe('ModalTextPrimary', () => {
     }
     expect(container.querySelector('div')?.textContent).toContain('99');
   });
+
+  it('round-2 mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<ModalTextPrimary text="x" />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 2000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <ModalTextPrimary key={i} text={`r2-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 200 different text values no crash', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<ModalTextPrimary text={`r2-text-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-2 all 500 div wrappers exist', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <ModalTextPrimary key={i} text={`txt-r2-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(500);
+  });
+
+  it('round-2 100 rerender cycles no crash', () => {
+    const { rerender } = render(<ModalTextPrimary text="x" />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<ModalTextPrimary text={`r2-r-${i}`} />)).not.toThrow();
+    }
+  });
 });
