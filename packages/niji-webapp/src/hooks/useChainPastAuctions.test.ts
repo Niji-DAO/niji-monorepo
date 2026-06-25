@@ -292,4 +292,39 @@ describe('useChainPastAuctions', () => {
     };
     expect(result.auctions.map(a => a.id)).toEqual(['5', '3', '1']);
   });
+
+  it('handles 30 useQuery invocations', () => {
+    useQueryMock.mockReturnValue({ data: undefined, isLoading: false, isError: false });
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useChainPastAuctions(BigInt(i), 5))).not.toThrow();
+    }
+  });
+
+  it('handles 30 different from values', () => {
+    useQueryMock.mockReturnValue({ data: undefined, isLoading: false, isError: false });
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useChainPastAuctions(BigInt(100 + i), 5))).not.toThrow();
+    }
+  });
+
+  it('handles 30 different limit values', () => {
+    useQueryMock.mockReturnValue({ data: undefined, isLoading: false, isError: false });
+    for (let i = 1; i <= 30; i++) {
+      expect(() => renderHook(() => useChainPastAuctions(10n, i))).not.toThrow();
+    }
+  });
+
+  it('handles 30 isLoading cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      useQueryMock.mockReturnValue({ data: undefined, isLoading: true, isError: false });
+      expect(() => renderHook(() => useChainPastAuctions(10n, 5))).not.toThrow();
+    }
+  });
+
+  it('handles 30 isError cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      useQueryMock.mockReturnValue({ data: undefined, isLoading: false, isError: true });
+      expect(() => renderHook(() => useChainPastAuctions(10n, 5))).not.toThrow();
+    }
+  });
 });

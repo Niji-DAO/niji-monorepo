@@ -78,4 +78,43 @@ describe('useActiveLocale', () => {
     const { result } = renderHook(() => useActiveLocale());
     expect(result.current).toBeUndefined();
   });
+
+  it('handles 100 different locales', () => {
+    for (let i = 0; i < 100; i++) {
+      useAtomValueMock.mockReturnValue(`locale-${i}`);
+      const { result } = renderHook(() => useActiveLocale());
+      expect(result.current).toBe(`locale-${i}`);
+    }
+  });
+
+  it('handles 100 en-US cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      useAtomValueMock.mockReturnValue('en-US');
+      const { result } = renderHook(() => useActiveLocale());
+      expect(result.current).toBe('en-US');
+    }
+  });
+
+  it('handles 100 ja-JP cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      useAtomValueMock.mockReturnValue('ja-JP');
+      const { result } = renderHook(() => useActiveLocale());
+      expect(result.current).toBe('ja-JP');
+    }
+  });
+
+  it('handles 100 undefined cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      useAtomValueMock.mockReturnValue(undefined);
+      const { result } = renderHook(() => useActiveLocale());
+      expect(result.current).toBeUndefined();
+    }
+  });
+
+  it('rapid 200 invocations', () => {
+    useAtomValueMock.mockReturnValue('en-US');
+    for (let i = 0; i < 200; i++) {
+      expect(() => renderHook(() => useActiveLocale())).not.toThrow();
+    }
+  });
 });
