@@ -396,4 +396,63 @@ describe('ThemeProvider', () => {
       unmount();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>r5</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 30 instances rendered together', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ThemeProvider key={i}>
+              <div>r5-{i}</div>
+            </ThemeProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ThemeProvider>
+            <div>x</div>
+          </ThemeProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>x</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>r5-child-{i}</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
 });
