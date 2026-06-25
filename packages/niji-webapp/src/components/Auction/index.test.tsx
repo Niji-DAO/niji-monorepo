@@ -447,4 +447,43 @@ describe('Auction', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Auction auction={makeAuction(BigInt(i)) as never} />);
+      unmount();
+    }
+  });
+
+  it('handles 100 different nounIds sequentially', () => {
+    useAtomValueMock.mockReturnValue(100n);
+    isNounderMock.mockReturnValue(false);
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<Auction auction={makeAuction(BigInt(i)) as never} />);
+      unmount();
+    }
+  });
+
+  it('handles isNounder=true variant for 10 different ids', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(true);
+    for (let i = 0; i < 10; i++) {
+      expect(() => wrap(<Auction auction={makeAuction(BigInt(i)) as never} />)).not.toThrow();
+    }
+    isNounderMock.mockReturnValue(false);
+  });
+
+  it('handles auction with settled=true', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    const settledAuction = { ...makeAuction(5n), settled: true };
+    expect(() => wrap(<Auction auction={settledAuction as never} />)).not.toThrow();
+  });
+
+  it('handles undefined auction (loading)', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    expect(() => wrap(<Auction />)).not.toThrow();
+  });
 });
