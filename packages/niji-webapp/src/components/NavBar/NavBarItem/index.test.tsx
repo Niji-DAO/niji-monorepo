@@ -235,4 +235,50 @@ describe('NavBarItem', () => {
     }
     expect(container.querySelector('div')?.textContent).toContain('99');
   });
+
+  it('round-3 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<NavBarItem>r3-x</NavBarItem>);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <NavBarItem key={i}>r3-{i}</NavBarItem>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 100 different children values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<NavBarItem>r3-v-{i}</NavBarItem>);
+      expect(container.querySelector('div')?.textContent).toBe(`r3-v-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-3 all 200 div wrappers exist', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <NavBarItem key={i}>x</NavBarItem>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(200);
+  });
+
+  it('round-3 100 rerender cycles', () => {
+    const { container, rerender } = render(<NavBarItem>x</NavBarItem>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<NavBarItem>r3-r-{i}</NavBarItem>);
+    }
+    expect(container.querySelector('div')?.textContent).toContain('99');
+  });
 });

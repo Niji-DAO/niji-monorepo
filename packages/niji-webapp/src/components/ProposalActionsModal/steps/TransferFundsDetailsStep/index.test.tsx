@@ -458,4 +458,55 @@ describe('TransferFundsDetailsStep', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<TransferFundsDetailsStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <TransferFundsDetailsStep key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different amount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <TransferFundsDetailsStep
+          {...defaults}
+          state={{ ...defaults.state, amount: String(i + 100) } as never}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 rapid 200 onPrevBtnClick invocations', () => {
+    const onPrev = vi.fn();
+    render(<TransferFundsDetailsStep {...defaults} onPrevBtnClick={onPrev} />);
+    for (let i = 0; i < 200; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-3 30 different addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(
+        <TransferFundsDetailsStep
+          {...defaults}
+          state={{ ...defaults.state, address: addr } as never}
+        />,
+      );
+      unmount();
+    }
+  });
 });

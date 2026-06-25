@@ -218,4 +218,47 @@ describe('SignatureStatusOverlay', () => {
       expect(() => render(<SignatureStatusOverlay {...defaults} />)).not.toThrow();
     }
   });
+
+  it('round-3 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<SignatureStatusOverlay {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <SignatureStatusOverlay key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different isWaiting/isLoading toggle combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SignatureStatusOverlay {...defaults} isWaiting={i % 2 === 0} isLoading={i % 3 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 30 isOverlayVisible toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SignatureStatusOverlay {...defaults} isOverlayVisible={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => render(<SignatureStatusOverlay {...defaults} />)).not.toThrow();
+    }
+  });
 });
