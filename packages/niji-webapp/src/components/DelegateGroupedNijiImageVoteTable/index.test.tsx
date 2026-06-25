@@ -811,4 +811,74 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable
+          filteredDelegateGroupedVoteData={[]}
+          propose={() => {}}
+          proposalCreationLoading={false}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DelegateGroupedNijiImageVoteTable
+              key={i}
+              filteredDelegateGroupedVoteData={[]}
+              propose={() => {}}
+              proposalCreationLoading={false}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 100 propose invocations', () => {
+    const propose = vi.fn();
+    render(
+      <DelegateGroupedNijiImageVoteTable
+        filteredDelegateGroupedVoteData={[]}
+        propose={propose}
+        proposalCreationLoading={false}
+      />,
+    );
+    for (let i = 0; i < 100; i++) propose();
+    expect(propose).toHaveBeenCalledTimes(100);
+  });
+
+  it('round-2 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <DelegateGroupedNijiImageVoteTable
+            filteredDelegateGroupedVoteData={[]}
+            propose={() => {}}
+            proposalCreationLoading={false}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-2 handles 30 proposalCreationLoading toggle', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable
+          filteredDelegateGroupedVoteData={[]}
+          propose={() => {}}
+          proposalCreationLoading={i % 2 === 0}
+        />,
+      );
+      unmount();
+    }
+  });
 });

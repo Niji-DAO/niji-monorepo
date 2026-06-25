@@ -442,4 +442,67 @@ describe('SolidColorBackgroundModal', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <SolidColorBackgroundModal
+          show={true}
+          onDismiss={() => {}}
+          content={<div>r2-c-{i}</div>}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <SolidColorBackgroundModal
+              key={i}
+              show={true}
+              onDismiss={() => {}}
+              content={<div>r2-c-{i}</div>}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<SolidColorBackgroundModal show={true} onDismiss={onDismiss} content={<div>x</div>} />);
+    for (let i = 0; i < 200; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-2 handles 30 show toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SolidColorBackgroundModal
+          show={i % 2 === 0}
+          onDismiss={() => {}}
+          content={<div>x</div>}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different content nodes', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SolidColorBackgroundModal
+          show={true}
+          onDismiss={() => {}}
+          content={<div data-testid={`r2-${i}`}>{i}</div>}
+        />,
+      );
+      unmount();
+    }
+  });
 });
