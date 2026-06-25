@@ -419,4 +419,45 @@ describe('ModalLabel', () => {
     );
     expect(container.querySelectorAll('div').length).toBe(100);
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<ModalLabel>x</ModalLabel>);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <ModalLabel key={i}>{i}</ModalLabel>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different children', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<ModalLabel>v-{i}</ModalLabel>);
+      expect(container.querySelector('div')?.textContent).toBe(`v-${i}`);
+      unmount();
+    }
+  });
+
+  it('rapid rerender 100 times with varying children', () => {
+    const { container, rerender } = render(<ModalLabel>0</ModalLabel>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<ModalLabel>v-{i}</ModalLabel>);
+    }
+    expect(container.querySelector('div')?.textContent).toContain('99');
+  });
+
+  it('handles 100000 char children (very large)', () => {
+    const long = 'a'.repeat(100000);
+    const { container } = render(<ModalLabel>{long}</ModalLabel>);
+    expect(container.querySelector('div')?.textContent?.length).toBe(100000);
+  });
 });
