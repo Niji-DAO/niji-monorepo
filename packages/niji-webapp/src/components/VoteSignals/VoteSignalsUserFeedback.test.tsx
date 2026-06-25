@@ -191,4 +191,71 @@ describe('VoteSignalsUserFeedback', () => {
     expect(container.textContent).toContain('line1');
     expect(container.textContent).toContain('line2');
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <VoteSignalsUserFeedback
+          userVoteSupport={{ supportDetailed: 1, createdTimestamp: 0, reason: '' } as never}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <VoteSignalsUserFeedback
+              key={i}
+              userVoteSupport={
+                { supportDetailed: i % 3, createdTimestamp: 0, reason: `r-${i}` } as never
+              }
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different reason values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <VoteSignalsUserFeedback
+          userVoteSupport={
+            { supportDetailed: 1, createdTimestamp: 0, reason: `reason-${i}` } as never
+          }
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles all 3 supportDetailed cycles 50 times each', () => {
+    for (let s = 0; s < 3; s++) {
+      for (let i = 0; i < 50; i++) {
+        const { unmount } = render(
+          <VoteSignalsUserFeedback
+            userVoteSupport={{ supportDetailed: s, createdTimestamp: 0, reason: '' } as never}
+          />,
+        );
+        unmount();
+      }
+    }
+  });
+
+  it('handles 100 cycles with supportDetailed=1 + non-empty reason', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <VoteSignalsUserFeedback
+          userVoteSupport={
+            { supportDetailed: 1, createdTimestamp: 0, reason: `feedback-${i}` } as never
+          }
+        />,
+      );
+      unmount();
+    }
+  });
 });
