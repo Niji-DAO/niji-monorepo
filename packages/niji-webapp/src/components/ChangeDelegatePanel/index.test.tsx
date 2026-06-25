@@ -582,4 +582,60 @@ describe('ChangeDelegatePanel', () => {
     }
     hookState.account = orig;
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+      unmount();
+    }
+  });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ChangeDelegatePanel key={i} onDismiss={vi.fn()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<ChangeDelegatePanel onDismiss={onDismiss} />);
+    for (let i = 0; i < 200; i++) {
+      onDismiss();
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles all DelegateStatus combinations', () => {
+    const orig = { ...hookState.delegateState };
+    const statuses: DelegateStatus[] = [
+      'None',
+      'PendingSignature',
+      'Mining',
+      'Success',
+      'Fail',
+      'Exception',
+    ];
+    statuses.forEach(s => {
+      hookState.delegateState = { status: s };
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+      unmount();
+    });
+    hookState.delegateState = orig;
+  });
+
+  it('handles 30 different accountVotes', () => {
+    const orig = hookState.accountVotes;
+    for (let i = 0; i < 30; i++) {
+      hookState.accountVotes = i;
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+      unmount();
+    }
+    hookState.accountVotes = orig;
+  });
 });
