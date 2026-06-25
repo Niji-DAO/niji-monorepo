@@ -850,4 +850,43 @@ describe('CandidateSponsors', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CandidateSponsors key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-6 100 mount cycles third', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+  });
 });
