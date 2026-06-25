@@ -546,4 +546,51 @@ describe('BidHistoryItem Component', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances in ul without crash', () => {
+    expect(() =>
+      render(
+        <ul>
+          {Array.from({ length: 200 }, (_, i) => (
+            <BidHistoryItem key={i} bid={mockBid} classes={mockClasses} />
+          ))}
+        </ul>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 100 instances render link-icon', () => {
+    const { container } = render(
+      <ul>
+        {Array.from({ length: 100 }, (_, i) => (
+          <BidHistoryItem key={i} bid={mockBid} classes={mockClasses} />
+        ))}
+      </ul>,
+    );
+    expect(container.querySelectorAll('[data-testid="link-icon"]').length).toBe(100);
+  });
+
+  it('handles 30 different bid timestamps', () => {
+    for (let i = 0; i < 30; i++) {
+      const b = { ...mockBid, timestamp: BigInt(1700000000 + i * 86400) };
+      const { unmount } = render(<BidHistoryItem bid={b} classes={mockClasses} />);
+      unmount();
+    }
+  });
+
+  it('handles all 30 isCool combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <BidHistoryItem bid={mockBid} classes={mockClasses} isCool={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
 });

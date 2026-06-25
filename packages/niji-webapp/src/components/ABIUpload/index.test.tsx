@@ -798,4 +798,74 @@ describe('ABIUpload Component', () => {
     }
     expect(handleChange).toHaveBeenCalledTimes(50);
   });
+
+  it('mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(
+        <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 300 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <ABIUpload
+              key={i}
+              abiFileName={`f-${i}.json`}
+              isValid={false}
+              isInvalid={false}
+              onChange={vi.fn()}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different filenames sequentially', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <ABIUpload
+          abiFileName={`f-${i}.json`}
+          isValid={false}
+          isInvalid={false}
+          onChange={vi.fn()}
+        />,
+      );
+      expect(container.querySelector('input')).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it('handles 30 different isValid/isInvalid combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ABIUpload
+          abiFileName="x.json"
+          isValid={i % 2 === 0}
+          isInvalid={i % 3 === 0}
+          onChange={vi.fn()}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 100 change events fire handler', () => {
+    const handleChange = vi.fn();
+    render(
+      <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={handleChange} />,
+    );
+    const input = screen.getByLabelText(/abi/i) as HTMLInputElement;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(input, {
+        target: { files: [new File([`c${i}`], `f${i}.json`, { type: 'application/json' })] },
+      });
+    }
+    expect(handleChange).toHaveBeenCalledTimes(100);
+  });
 });
