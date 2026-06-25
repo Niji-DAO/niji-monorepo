@@ -304,4 +304,77 @@ describe('handleActionAdd', () => {
       }),
     );
   });
+
+  it('handleActionAdd 30 cycles with same input', () => {
+    const onActionAdd = vi.fn();
+    const state: ProposalActionModalState = {
+      actionType: ProposalActionType.FUNCTION_CALL,
+      address: '0xADDR' as `0x${string}`,
+      ABI: ensReverseRegistrarAbi as never,
+      function: 'setName',
+      args: ['hello.eth'],
+    };
+    for (let i = 0; i < 30; i++) {
+      onActionAdd.mockClear();
+      handleActionAdd(state, onActionAdd);
+    }
+    expect(onActionAdd).toHaveBeenCalledTimes(1);
+  });
+
+  it('handleActionAdd 30 different args', () => {
+    const onActionAdd = vi.fn();
+    for (let i = 0; i < 30; i++) {
+      const state: ProposalActionModalState = {
+        actionType: ProposalActionType.FUNCTION_CALL,
+        address: '0xADDR' as `0x${string}`,
+        ABI: ensReverseRegistrarAbi as never,
+        function: 'setName',
+        args: [`name-${i}.eth`],
+      };
+      expect(() => handleActionAdd(state, onActionAdd)).not.toThrow();
+    }
+  });
+
+  it('handleActionAdd 30 different addresses', () => {
+    const onActionAdd = vi.fn();
+    for (let i = 0; i < 30; i++) {
+      const state: ProposalActionModalState = {
+        actionType: ProposalActionType.FUNCTION_CALL,
+        address: ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`,
+        ABI: ensReverseRegistrarAbi as never,
+        function: 'setName',
+        args: ['x.eth'],
+      };
+      expect(() => handleActionAdd(state, onActionAdd)).not.toThrow();
+    }
+  });
+
+  it('handleActionAdd 50 sequential invocations', () => {
+    const onActionAdd = vi.fn();
+    const state: ProposalActionModalState = {
+      actionType: ProposalActionType.FUNCTION_CALL,
+      address: '0xADDR' as `0x${string}`,
+      ABI: ensReverseRegistrarAbi as never,
+      function: 'setName',
+      args: ['hello.eth'],
+    };
+    for (let i = 0; i < 50; i++) {
+      handleActionAdd(state, onActionAdd);
+    }
+    expect(onActionAdd).toHaveBeenCalledTimes(50);
+  });
+
+  it('handleActionAdd 30 different function names cycles', () => {
+    const onActionAdd = vi.fn();
+    for (let i = 0; i < 30; i++) {
+      const state: ProposalActionModalState = {
+        actionType: ProposalActionType.FUNCTION_CALL,
+        address: '0xADDR' as `0x${string}`,
+        ABI: ensReverseRegistrarAbi as never,
+        function: 'setName',
+        args: [`name-${i}.eth`],
+      };
+      expect(() => handleActionAdd(state, onActionAdd)).not.toThrow();
+    }
+  });
 });
