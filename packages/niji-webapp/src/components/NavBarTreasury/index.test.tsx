@@ -550,4 +550,60 @@ describe('NavBarTreasury', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-4 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NavBarTreasury
+              key={i}
+              treasuryBalance={String(i + 100)}
+              treasuryStyle={NavBarButtonStyle.WHITE_INFO}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different treasuryBalance values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NavBarTreasury
+          treasuryBalance={String(i + 1000)}
+          treasuryStyle={NavBarButtonStyle.WHITE_INFO}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <NavBarTreasury treasuryBalance="100" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <NavBarTreasury treasuryBalance="500" treasuryStyle={NavBarButtonStyle.WHITE_INFO} />,
+      );
+      unmount();
+    }
+  });
 });
