@@ -180,4 +180,37 @@ describe('shouldUseStateBg', () => {
       expect(typeof shouldUseStateBg({ pathname: path })).toBe('boolean');
     }
   });
+
+  it('round-5 30 sequential shouldUseStateBg calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => shouldUseStateBg({ pathname: '/' })).not.toThrow();
+    }
+  });
+
+  it('round-5 50 different pathname values', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => shouldUseStateBg({ pathname: `/r5-${i}` })).not.toThrow();
+    }
+  });
+
+  it('round-5 100 returns boolean-typed result', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof shouldUseStateBg({ pathname: `/r5-${i}` })).toBe('boolean');
+    }
+  });
+
+  it('round-5 50 deterministic for same pathname', () => {
+    for (let i = 0; i < 50; i++) {
+      const r1 = shouldUseStateBg({ pathname: '/r5' });
+      const r2 = shouldUseStateBg({ pathname: '/r5' });
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-5 100 various pathname patterns', () => {
+    for (let i = 0; i < 100; i++) {
+      const path = i % 2 === 0 ? '/' : `/r5-noun-${i}`;
+      expect(typeof shouldUseStateBg({ pathname: path })).toBe('boolean');
+    }
+  });
 });

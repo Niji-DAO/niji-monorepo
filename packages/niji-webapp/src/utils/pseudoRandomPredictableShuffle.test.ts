@@ -231,4 +231,40 @@ describe('pseudoRandomPredictableShuffle', () => {
       expect(r1).toEqual(r2);
     }
   });
+
+  it('round-5 30 sequential pseudoRandomPredictableShuffle calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => pseudoRandomPredictableShuffle([1, 2, 3, 4, 5], i + 500)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 sequential calls with varied seeds', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = pseudoRandomPredictableShuffle([1, 2, 3, 4, 5], i + 700);
+      expect(Array.isArray(result)).toBe(true);
+    }
+  });
+
+  it('round-5 30 sequential calls preserve array length', () => {
+    for (let i = 0; i < 30; i++) {
+      const result = pseudoRandomPredictableShuffle([1, 2, 3, 4, 5], i + 900);
+      expect(result.length).toBe(5);
+    }
+  });
+
+  it('round-5 100 sequential calls with varied input sizes', () => {
+    for (let i = 1; i <= 100; i++) {
+      const input = Array.from({ length: i }, (_, j) => j);
+      const result = pseudoRandomPredictableShuffle(input, i + 1100);
+      expect(result.length).toBe(i);
+    }
+  });
+
+  it('round-5 deterministic 30 cycles with same seed', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = pseudoRandomPredictableShuffle([1, 2, 3, 4, 5], 333);
+      const r2 = pseudoRandomPredictableShuffle([1, 2, 3, 4, 5], 333);
+      expect(r1).toEqual(r2);
+    }
+  });
 });
