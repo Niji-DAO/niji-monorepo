@@ -383,4 +383,65 @@ describe('HoverCard', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={() => <div />} tip="r4" id="r4-x">
+          <div>r4</div>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 30 different tip values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={() => <div />} tip={`r4-tip-${i}`} id="r4">
+          <div>x</div>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <HoverCard hoverCardContent={() => <div />} tip="x" id="r4-x">
+            <div>x</div>
+          </HoverCard>,
+          { wrapper: WithProviders },
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-4 50 different id values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={() => <div />} tip="x" id={`r4-id-${i}`}>
+          <div>x</div>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={() => <div />} tip="r4-2" id="r4-x">
+          <div>x</div>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
 });
