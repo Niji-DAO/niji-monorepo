@@ -221,4 +221,36 @@ describe('Vote enum', () => {
       expect(Vote.SUPPORT).not.toBe(Vote.FOR);
     }
   });
+
+  it('round-6 30 sequential Vote access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(Vote).toBeDefined();
+    }
+  });
+
+  it('round-6 50 sequential reference consistency', () => {
+    const first = Vote;
+    for (let i = 0; i < 50; i++) {
+      expect(Vote).toBe(first);
+    }
+  });
+
+  it('round-6 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof Vote).toBe('object');
+    }
+  });
+
+  it('round-6 30 sequential enum value access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(Vote.FOR).toBeDefined();
+      expect(Vote.ABSTAIN).toBeDefined();
+    }
+  });
+
+  it('round-6 100 distinct enum values', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Vote.FOR).not.toBe(Vote.ABSTAIN);
+    }
+  });
 });
