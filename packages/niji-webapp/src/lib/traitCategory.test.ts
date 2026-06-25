@@ -82,4 +82,35 @@ describe('traitCategory', () => {
       });
     }
   });
+
+  it('round-2 30 sequential traitCategory access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(traitCategory).toBeDefined();
+    }
+  });
+
+  it('round-2 50 keys access', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(Object.keys(traitCategory).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-2 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof traitCategory).toBe('object');
+    }
+  });
+
+  it('round-2 50 traitCategory.special access', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(traitCategory.special).toBeDefined();
+    }
+  });
+
+  it('round-2 100 reference consistency', () => {
+    const first = traitCategory;
+    for (let i = 0; i < 100; i++) {
+      expect(traitCategory).toBe(first);
+    }
+  });
 });

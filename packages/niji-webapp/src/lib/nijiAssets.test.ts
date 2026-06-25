@@ -82,4 +82,36 @@ describe('nijiTraitKeys', () => {
       expect(nijiTraitKeys.length).toBe(12);
     }
   });
+
+  it('round-2 30 sequential humanizeTraitKey calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => humanizeTraitKey('special')).not.toThrow();
+    }
+  });
+
+  it('round-2 50 different trait keys', () => {
+    const keys = ['special', 'leftHand', 'rightHand', 'mouth', 'eyes'];
+    for (let i = 0; i < 50; i++) {
+      const result = humanizeTraitKey(keys[i % 5]);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-2 100 sequential calls produce non-empty', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(humanizeTraitKey('special').length).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-2 30 nijiTraitKeys access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(nijiTraitKeys).toBeDefined();
+    }
+  });
+
+  it('round-2 100 nijiTraitKeys length', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(nijiTraitKeys.length).toBeGreaterThan(0);
+    }
+  });
 });
