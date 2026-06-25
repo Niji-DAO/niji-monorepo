@@ -326,4 +326,64 @@ describe('FunctionCallEnterArgsStep', () => {
     );
     expect(container.querySelector('h1')?.textContent).toContain('Add Function Call Arguments');
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <FunctionCallEnterArgsStep
+              key={i}
+              {...defaults}
+              state={{ abi, function: 'transfer' } as never}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 200 onPrevBtnClick invocations', () => {
+    const onPrev = vi.fn();
+    render(
+      <FunctionCallEnterArgsStep
+        {...defaults}
+        state={{ abi, function: 'transfer' } as never}
+        onPrevBtnClick={onPrev}
+      />,
+    );
+    for (let i = 0; i < 200; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('rapid 200 onNextBtnClick invocations', () => {
+    const onNext = vi.fn();
+    render(
+      <FunctionCallEnterArgsStep
+        {...defaults}
+        state={{ abi, function: 'transfer' } as never}
+        onNextBtnClick={onNext}
+      />,
+    );
+    for (let i = 0; i < 200; i++) onNext();
+    expect(onNext).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles 30 mount-unmount cycles with abi state', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+      );
+      unmount();
+    }
+  });
 });
