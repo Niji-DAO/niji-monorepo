@@ -647,4 +647,48 @@ describe('Auction', () => {
     }
     isNounderMock.mockReturnValue(false);
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Auction currentAuction={makeAuction(1n)} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Auction key={i} currentAuction={makeAuction(1n)} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different nounIds', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = { ...makeAuction(1n), nounId: BigInt(i + 100) };
+      const { unmount } = wrap(<Auction currentAuction={a} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 isNounder toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      isNounderMock.mockReturnValue(i % 2 === 0);
+      const { unmount } = wrap(<Auction currentAuction={makeAuction(1n)} />);
+      unmount();
+    }
+    isNounderMock.mockReturnValue(false);
+  });
+
+  it('round-2 handles 30 different amount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = { ...makeAuction(1n), amount: BigInt(i + 1) * BigInt(10n ** 18n) };
+      const { unmount } = wrap(<Auction currentAuction={a} />);
+      unmount();
+    }
+  });
 });
