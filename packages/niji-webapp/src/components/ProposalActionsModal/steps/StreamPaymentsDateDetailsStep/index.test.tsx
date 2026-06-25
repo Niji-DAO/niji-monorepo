@@ -376,4 +376,48 @@ describe('StreamPaymentDateDetailsStep', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <StreamPaymentDateDetailsStep key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<StreamPaymentDateDetailsStep {...defaults} />)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 different streamStartTimestamp cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <StreamPaymentDateDetailsStep
+          {...defaults}
+          state={{ ...defaults.state, streamStartTimestamp: 2000000000 + i * 7200 } as never}
+        />,
+      );
+      unmount();
+    }
+  });
 });
