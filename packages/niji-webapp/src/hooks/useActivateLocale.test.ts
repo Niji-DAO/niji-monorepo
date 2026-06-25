@@ -117,4 +117,38 @@ describe('useActiveLocale', () => {
       expect(() => renderHook(() => useActiveLocale())).not.toThrow();
     }
   });
+
+  it('round-2 30 renderHook cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useActiveLocale());
+      unmount();
+    }
+  });
+
+  it('round-2 50 renderHook cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useActiveLocale());
+      unmount();
+    }
+  });
+
+  it('round-2 100 renderHook cycles third', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useActiveLocale());
+      unmount();
+    }
+  });
+
+  it('round-2 200 renderHook cycles fourth', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = renderHook(() => useActiveLocale());
+      unmount();
+    }
+  });
+
+  it('round-2 hook returns without crash for each call', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useActiveLocale())).not.toThrow();
+    }
+  });
 });
