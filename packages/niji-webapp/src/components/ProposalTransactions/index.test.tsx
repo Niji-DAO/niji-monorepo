@@ -459,4 +459,61 @@ describe('ProposalTransactions', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <ProposalTransactions proposalTransactions={[]} onRemoveProposalTransaction={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ProposalTransactions
+              key={i}
+              proposalTransactions={[]}
+              onRemoveProposalTransaction={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 100 sequential renders without crash', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        render(
+          <ProposalTransactions proposalTransactions={[]} onRemoveProposalTransaction={() => {}} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-2 30 rerender cycles', () => {
+    const { rerender } = render(
+      <ProposalTransactions proposalTransactions={[]} onRemoveProposalTransaction={() => {}} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <ProposalTransactions proposalTransactions={[]} onRemoveProposalTransaction={() => {}} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-2 30 mount-unmount cycles second', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalTransactions proposalTransactions={[]} onRemoveProposalTransaction={() => {}} />,
+      );
+      unmount();
+    }
+  });
 });
