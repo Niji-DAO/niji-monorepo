@@ -386,4 +386,48 @@ describe('VoteCardPager', () => {
   it('handles negative currentPage edge case', () => {
     expect(() => render(<VoteCardPager {...defaults} currentPage={-1} />)).not.toThrow();
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteCardPager {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <VoteCardPager key={i} {...defaults} currentPage={i % 3} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles isLeftArrowDisabled + isRightArrowDisabled combinations', () => {
+    [
+      { ld: true, rd: true },
+      { ld: true, rd: false },
+      { ld: false, rd: true },
+      { ld: false, rd: false },
+    ].forEach(({ ld, rd }) => {
+      expect(() =>
+        render(<VoteCardPager {...defaults} isLeftArrowDisabled={ld} isRightArrowDisabled={rd} />),
+      ).not.toThrow();
+    });
+  });
+
+  it('handles 30 different numPages values', () => {
+    for (let i = 1; i <= 30; i++) {
+      const { container, unmount } = render(<VoteCardPager {...defaults} numPages={i} />);
+      expect(container.querySelectorAll('span').length).toBe(i);
+      unmount();
+    }
+  });
+
+  it('handles numPages=0 edge case', () => {
+    expect(() => render(<VoteCardPager {...defaults} numPages={0} />)).not.toThrow();
+  });
 });

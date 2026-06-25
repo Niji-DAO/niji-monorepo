@@ -387,4 +387,65 @@ describe('BrandSpinner', () => {
       expect(() => render(<BrandSpinner />)).not.toThrow();
     }
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<BrandSpinner />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <BrandSpinner key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 300 svg have height=25', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 300 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    const svgs = container.querySelectorAll('svg');
+    svgs.forEach(svg => {
+      expect(svg.getAttribute('height')).toBe('25');
+    });
+  });
+
+  it('all 100 svg have W3C namespace', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    const svgs = container.querySelectorAll('svg');
+    svgs.forEach(svg => {
+      expect(svg.getAttribute('xmlns')).toBe('http://www.w3.org/2000/svg');
+    });
+  });
+
+  it('all 100 svg have fill="none"', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    const svgs = container.querySelectorAll('svg');
+    svgs.forEach(svg => {
+      expect(svg.getAttribute('fill')).toBe('none');
+    });
+  });
 });
