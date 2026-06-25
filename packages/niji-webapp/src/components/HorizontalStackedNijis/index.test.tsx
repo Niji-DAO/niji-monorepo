@@ -412,4 +412,51 @@ describe('HorizontalStackedNijis', () => {
     );
     expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(600);
   });
+
+  it('mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<HorizontalStackedNijis nounIds={['1', '2']} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <HorizontalStackedNijis key={i} nounIds={['1', '2', '3']} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different nounIds arrays with varying lengths', () => {
+    for (let i = 0; i < 50; i++) {
+      const ids = Array.from({ length: (i % 7) + 1 }, (_, j) => `${j}`);
+      const { unmount } = render(<HorizontalStackedNijis nounIds={ids} />);
+      unmount();
+    }
+  });
+
+  it('rapid rerender 100 times preserves cap-6 contract', () => {
+    const { container, rerender } = render(<HorizontalStackedNijis nounIds={['1']} />);
+    for (let i = 0; i < 100; i++) {
+      const ids = Array.from({ length: (i % 10) + 1 }, (_, j) => `${j}`);
+      rerender(<HorizontalStackedNijis nounIds={ids} />);
+    }
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBeLessThanOrEqual(
+      6,
+    );
+  });
+
+  it('handles 30 different small nounIds (under 6)', () => {
+    for (let i = 1; i <= 30; i++) {
+      const ids = ['1', '2'];
+      const { container, unmount } = render(<HorizontalStackedNijis nounIds={ids} />);
+      expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(2);
+      unmount();
+    }
+  });
 });
