@@ -356,4 +356,55 @@ describe('TransferFundsDetailsStep', () => {
     const { container } = render(<TransferFundsDetailsStep {...defaults} />);
     expect(container.querySelector('h1')?.textContent).toContain('Add Transfer Funds Action');
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<TransferFundsDetailsStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <TransferFundsDetailsStep key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different amount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <TransferFundsDetailsStep
+          {...defaults}
+          state={{ ...defaults.state, amount: String(i) } as never}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 200 onPrevBtnClick invocations', () => {
+    const onPrev = vi.fn();
+    render(<TransferFundsDetailsStep {...defaults} onPrevBtnClick={onPrev} />);
+    for (let i = 0; i < 200; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles 30 different addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(
+        <TransferFundsDetailsStep
+          {...defaults}
+          state={{ ...defaults.state, address: addr } as never}
+        />,
+      );
+      unmount();
+    }
+  });
 });

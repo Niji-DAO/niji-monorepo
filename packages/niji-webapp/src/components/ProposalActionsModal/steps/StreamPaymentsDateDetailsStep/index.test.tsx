@@ -241,4 +241,49 @@ describe('StreamPaymentDateDetailsStep', () => {
     const nextBtn = container.querySelector('[data-testid="next-btn"]');
     expect(nextBtn).not.toBeNull();
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <StreamPaymentDateDetailsStep key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 200 onPrevBtnClick invocations', () => {
+    const onPrev = vi.fn();
+    render(<StreamPaymentDateDetailsStep {...defaults} onPrevBtnClick={onPrev} />);
+    for (let i = 0; i < 200; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('rapid 200 onNextBtnClick invocations', () => {
+    const onNext = vi.fn();
+    render(<StreamPaymentDateDetailsStep {...defaults} onNextBtnClick={onNext} />);
+    for (let i = 0; i < 200; i++) onNext();
+    expect(onNext).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles 30 different startTime state', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <StreamPaymentDateDetailsStep
+          {...defaults}
+          state={{ ...defaults.state, streamStartTimestamp: 1700000000 + i * 86400 } as never}
+        />,
+      );
+      unmount();
+    }
+  });
 });

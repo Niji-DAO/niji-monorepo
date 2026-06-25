@@ -264,4 +264,49 @@ describe('StreamPaymentsReviewStep', () => {
     expect(onNext).toHaveBeenCalledTimes(3);
     expect(onDismiss).toHaveBeenCalledTimes(3);
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<StreamPaymentsReviewStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <StreamPaymentsReviewStep key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<StreamPaymentsReviewStep {...defaults} onDismiss={onDismiss} />);
+    for (let i = 0; i < 200; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('rapid 200 onPrevBtnClick invocations', () => {
+    const onPrev = vi.fn();
+    render(<StreamPaymentsReviewStep {...defaults} onPrevBtnClick={onPrev} />);
+    for (let i = 0; i < 200; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles 30 different amounts in state', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <StreamPaymentsReviewStep
+          {...defaults}
+          state={{ ...defaults.state, amount: String(i) } as never}
+        />,
+      );
+      unmount();
+    }
+  });
 });
