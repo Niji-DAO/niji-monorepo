@@ -345,4 +345,49 @@ describe('AuctionTimer Component', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-3 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <AuctionTimer key={i} auction={mockAuction(3600)} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different endTime offsets', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <AuctionTimer auction={mockAuction(60 + i * 60)} auctionEnded={false} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 30 auctionEnded toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <AuctionTimer auction={mockAuction(1000)} auctionEnded={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        render(<AuctionTimer auction={mockAuction(3600 + i)} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
 });
