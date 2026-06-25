@@ -152,4 +152,49 @@ describe('Footer', () => {
   it('renders for empty MemoryRouter without crash', () => {
     expect(() => wrap(<Footer />)).not.toThrow();
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<Footer />);
+      unmount();
+    }
+  });
+
+  it('renders 50 instances in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 50 }, (_, i) => (
+            <Footer key={i} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 200 renders in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 200 }, (_, i) => (
+            <Footer key={i} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 mount-unmount cycles via wrap', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Footer />);
+      unmount();
+    }
+  });
+
+  it('handles all 100 mount-unmount + render combinations', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<Footer />);
+      unmount();
+    }
+  });
 });

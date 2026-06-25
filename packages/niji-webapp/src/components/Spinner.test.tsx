@@ -105,4 +105,48 @@ describe('Spinner', () => {
     const svg = container.querySelector('svg');
     expect(svg?.children.length).toBeGreaterThan(0);
   });
+
+  it('mount-unmount 2000 cycles', () => {
+    for (let i = 0; i < 2000; i++) {
+      const { unmount } = render(<Spinner />);
+      unmount();
+    }
+  });
+
+  it('renders 3000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 3000 }, (_, i) => (
+            <Spinner key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 1500 instances render svg', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 1500 }, (_, i) => (
+          <Spinner key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(1500);
+  });
+
+  it('handles 100 different className values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<Spinner className={`cls-${i}`} />);
+      expect(container.querySelector('svg')?.getAttribute('class')).toContain(`cls-${i}`);
+      unmount();
+    }
+  });
+
+  it('rapid 2000 renders without crash', () => {
+    for (let i = 0; i < 2000; i++) {
+      expect(() => render(<Spinner />)).not.toThrow();
+    }
+  });
 });
