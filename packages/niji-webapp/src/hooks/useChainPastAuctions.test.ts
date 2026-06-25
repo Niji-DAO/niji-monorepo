@@ -327,4 +327,38 @@ describe('useChainPastAuctions', () => {
       expect(() => renderHook(() => useChainPastAuctions(10n, 5))).not.toThrow();
     }
   });
+
+  it('round-2 30 renderHook cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useChainPastAuctions(true));
+      unmount();
+    }
+  });
+
+  it('round-2 50 renderHook cycles false', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useChainPastAuctions(false));
+      unmount();
+    }
+  });
+
+  it('round-2 50 renderHook cycles toggle', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useChainPastAuctions(i % 2 === 0));
+      unmount();
+    }
+  });
+
+  it('round-2 hook returns without crash for each call', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useChainPastAuctions(true))).not.toThrow();
+    }
+  });
+
+  it('round-2 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useChainPastAuctions(i % 2 === 0));
+      unmount();
+    }
+  });
 });
