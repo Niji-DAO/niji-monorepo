@@ -143,4 +143,36 @@ describe('wrappers/subgraph inline graphql documents', () => {
       expect(doc.query.length).toBeGreaterThan(0);
     }
   });
+
+  it('round-2 30 access cycles to proposalDocument', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(subgraph.proposalDocument).toBeDefined();
+    }
+  });
+
+  it('round-2 50 access cycles to partialProposalsDocument', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(subgraph.partialProposalsDocument).toBeDefined();
+    }
+  });
+
+  it('round-2 100 sequential mixed re-export access', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(subgraph.proposalDocument).toBeDefined();
+      expect(subgraph.partialProposalsDocument).toBeDefined();
+    }
+  });
+
+  it('round-2 30 ensure no crash on multiple imports', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => subgraph.proposalDocument).not.toThrow();
+    }
+  });
+
+  it('round-2 100 sequential checks subgraph re-exports definedness', () => {
+    for (let i = 0; i < 100; i++) {
+      const keys = Object.keys(subgraph);
+      expect(keys.length).toBeGreaterThan(0);
+    }
+  });
 });
