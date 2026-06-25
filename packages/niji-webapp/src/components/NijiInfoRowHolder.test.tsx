@@ -280,4 +280,50 @@ describe('NijiInfoRowHolder', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-3 30 different nounIds variant', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={BigInt(i + 200)} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders }),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-3 30 instances rendered together', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiInfoRowHolder key={i} nounId={BigInt(i + 300)} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 50 different className values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={1n} className={`r3-cls-${i}`} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
 });
