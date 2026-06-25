@@ -367,4 +367,34 @@ describe('AuctionActivityNijiTitle', () => {
       ).not.toThrow();
     }
   });
+
+  it('renders 200 instances', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <AuctionActivityNijiTitle key={i} nounId={BigInt(i)} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(200);
+  });
+
+  it('handles 1000000000n (1e9) nounId', () => {
+    const { container } = render(<AuctionActivityNijiTitle nounId={1000000000n} />);
+    expect(container.querySelector('h1')?.textContent).toContain('1000000000');
+  });
+
+  it('all 50 instances with isCool=true have cool style', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <AuctionActivityNijiTitle key={i} nounId={BigInt(i)} isCool={true} />
+        ))}
+      </>,
+    );
+    const h1s = container.querySelectorAll('h1');
+    h1s.forEach(h1 => {
+      expect(h1.getAttribute('style')).toContain('cool');
+    });
+  });
 });
