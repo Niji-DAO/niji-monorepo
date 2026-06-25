@@ -612,4 +612,51 @@ describe('VoteProgressBar', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <VoteProgressBar key={i} variant={VoteCardVariant.FOR} percentage={i % 100} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 different percentage values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <VoteProgressBar variant={VoteCardVariant.FOR} percentage={i + 1} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles all 3 variant cycles 50 times each', () => {
+    const variants = [VoteCardVariant.FOR, VoteCardVariant.AGAINST, VoteCardVariant.ABSTAIN];
+    for (let i = 0; i < 50; i++) {
+      for (const v of variants) {
+        const { unmount } = render(<VoteProgressBar variant={v} percentage={50} />);
+        unmount();
+      }
+    }
+  });
+
+  it('round-2 rapid 200 rerender cycles', () => {
+    const { rerender } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+    for (let i = 0; i < 200; i++) {
+      expect(() =>
+        rerender(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={i % 100} />),
+      ).not.toThrow();
+    }
+  });
 });
