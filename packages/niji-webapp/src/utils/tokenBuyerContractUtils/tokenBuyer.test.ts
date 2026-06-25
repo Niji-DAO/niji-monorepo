@@ -148,4 +148,38 @@ describe('useEthNeeded', () => {
       expect(() => renderHook(() => useEthNeeded('0xA' as `0x${string}`, 100n))).not.toThrow();
     }
   });
+
+  it('round-2 30 renderHook cycles useEthNeeded', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useEthNeeded('0xADDR', i + 1));
+      unmount();
+    }
+  });
+
+  it('round-2 50 renderHook varied addresses', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = renderHook(() => useEthNeeded(addr, 100));
+      unmount();
+    }
+  });
+
+  it('round-2 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useEthNeeded('0xADDR', i));
+      unmount();
+    }
+  });
+
+  it('round-2 50 hook does not throw', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useEthNeeded('0xADDR', i))).not.toThrow();
+    }
+  });
+
+  it('round-2 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useEthNeeded).toBe('function');
+    }
+  });
 });

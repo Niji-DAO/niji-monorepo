@@ -109,4 +109,51 @@ describe('getProposalVoteIcon', () => {
       expect(() => getProposalVoteIcon(makeProposal(ProposalState.ACTIVE), Vote.FOR)).not.toThrow();
     }
   });
+
+  it('round-2 30 sequential getProposalVoteIcon calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        getProposalVoteIcon(makeProposal(ProposalState.SUCCEEDED), Vote.SUPPORT),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-2 50 different state combinations', () => {
+    const states = [
+      ProposalState.PENDING,
+      ProposalState.ACTIVE,
+      ProposalState.SUCCEEDED,
+      ProposalState.EXECUTED,
+      ProposalState.DEFEATED,
+    ];
+    for (let i = 0; i < 50; i++) {
+      const result = getProposalVoteIcon(makeProposal(states[i % 5]), Vote.SUPPORT);
+      expect(result).toBeDefined();
+    }
+  });
+
+  it('round-2 100 sequential vote variants', () => {
+    const votes = [Vote.SUPPORT, Vote.FOR, Vote.ABSTAIN];
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        getProposalVoteIcon(makeProposal(ProposalState.ACTIVE), votes[i % 3]),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-2 50 undefined vote cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        getProposalVoteIcon(makeProposal(ProposalState.PENDING), undefined),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-2 100 deterministic for same input', () => {
+    for (let i = 0; i < 100; i++) {
+      const r1 = getProposalVoteIcon(makeProposal(ProposalState.SUCCEEDED), Vote.SUPPORT);
+      const r2 = getProposalVoteIcon(makeProposal(ProposalState.SUCCEEDED), Vote.SUPPORT);
+      expect(r1).toEqual(r2);
+    }
+  });
 });

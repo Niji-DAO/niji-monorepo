@@ -98,4 +98,38 @@ describe('containsBlockedText', () => {
       expect(() => containsBlockedText('hello world', 'en')).not.toThrow();
     }
   });
+
+  it('round-2 30 sequential containsBlockedText calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => containsBlockedText(`hello world ${i}`, 'en')).not.toThrow();
+    }
+  });
+
+  it('round-2 50 different input strings', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = containsBlockedText(`text-${i}`, 'en');
+      expect(typeof result).toBe('boolean');
+    }
+  });
+
+  it('round-2 100 sequential calls produce boolean', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof containsBlockedText(`r2-${i}`, 'en')).toBe('boolean');
+    }
+  });
+
+  it('round-2 50 different language values', () => {
+    const langs = ['en', 'ja', 'fr', 'de', 'es'];
+    for (let i = 0; i < 50; i++) {
+      expect(() => containsBlockedText(`text-${i}`, langs[i % 5])).not.toThrow();
+    }
+  });
+
+  it('round-2 100 deterministic for same input', () => {
+    for (let i = 0; i < 100; i++) {
+      const r1 = containsBlockedText('safe text', 'en');
+      const r2 = containsBlockedText('safe text', 'en');
+      expect(r1).toBe(r2);
+    }
+  });
 });
