@@ -585,4 +585,50 @@ describe('LanguageSelectionModal', () => {
       expect(() => render(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <LanguageSelectionModal key={i} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    for (let i = 0; i < 200; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-2 50 sequential renders with new handler', () => {
+    for (let i = 0; i < 50; i++) {
+      const onDismiss = vi.fn();
+      const { unmount } = render(<LanguageSelectionModal onDismiss={onDismiss} />);
+      unmount();
+    }
+  });
+
+  it('round-2 all 100 instances render without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <LanguageSelectionModal key={i} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });

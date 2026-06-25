@@ -1340,4 +1340,96 @@ describe('VoteCard', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <VoteCard
+          proposal={makeProposal()}
+          percentage={50}
+          nounIds={[]}
+          variant={VoteCardVariant.FOR}
+          onClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <VoteCard
+              key={i}
+              proposal={makeProposal()}
+              percentage={50}
+              nounIds={[]}
+              variant={VoteCardVariant.FOR}
+              onClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different percentage values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <VoteCard
+          proposal={makeProposal()}
+          percentage={i}
+          nounIds={[]}
+          variant={VoteCardVariant.FOR}
+          onClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles all 3 variants 30 times each', () => {
+    const variants = [VoteCardVariant.FOR, VoteCardVariant.AGAINST, VoteCardVariant.ABSTAIN];
+    for (let i = 0; i < 30; i++) {
+      for (const v of variants) {
+        const { unmount } = render(
+          <VoteCard
+            proposal={makeProposal()}
+            percentage={50}
+            nounIds={[]}
+            variant={v}
+            onClick={() => {}}
+          />,
+        );
+        unmount();
+      }
+    }
+  });
+
+  it('round-2 200 rerender cycles', () => {
+    const { rerender } = render(
+      <VoteCard
+        proposal={makeProposal()}
+        percentage={50}
+        nounIds={[]}
+        variant={VoteCardVariant.FOR}
+        onClick={() => {}}
+      />,
+    );
+    for (let i = 0; i < 200; i++) {
+      expect(() =>
+        rerender(
+          <VoteCard
+            proposal={makeProposal()}
+            percentage={i % 100}
+            nounIds={[]}
+            variant={VoteCardVariant.FOR}
+            onClick={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
