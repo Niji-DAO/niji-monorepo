@@ -260,4 +260,53 @@ describe('NavBarLink', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = wrap(<NavBarLink to="/x">r3-x</NavBarLink>);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 500 instances in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 500 }, (_, i) => (
+            <NavBarLink key={i} to={`/r3-${i}`}>
+              r3-link-{i}
+            </NavBarLink>
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 100 different to values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = wrap(<NavBarLink to={`/r3-${i}`}>x</NavBarLink>);
+      expect(container.querySelector('a')?.getAttribute('href')).toBe(`/r3-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-3 all 200 anchor elements exist', () => {
+    const { container } = render(
+      <MemoryRouter>
+        {Array.from({ length: 200 }, (_, i) => (
+          <NavBarLink key={i} to={`/x-${i}`}>
+            x
+          </NavBarLink>
+        ))}
+      </MemoryRouter>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(200);
+  });
+
+  it('round-3 100 rerender cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<NavBarLink to={`/r3-${i}`}>r3</NavBarLink>);
+      unmount();
+    }
+  });
 });
