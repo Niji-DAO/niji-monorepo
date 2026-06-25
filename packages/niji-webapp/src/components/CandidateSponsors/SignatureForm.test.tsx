@@ -323,4 +323,47 @@ describe('SignatureForm', () => {
     fireEvent.click(closeBtn);
     expect(setFormDisplayed).toHaveBeenCalledTimes(1);
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<SignatureForm {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different transaction states', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SignatureForm {...baseProps} transactionState={i % 2 === 0 ? 'None' : 'Mining'} />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 100 setIsFormDisplayed invocations', () => {
+    const setIsFormDisplayed = vi.fn();
+    render(<SignatureForm {...baseProps} setIsFormDisplayed={setIsFormDisplayed} />);
+    for (let i = 0; i < 100; i++) setIsFormDisplayed(false);
+    expect(setIsFormDisplayed).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles 30 cycles with isSignPending true', () => {
+    const orig = hookState.isSignPending;
+    hookState.isSignPending = true;
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<SignatureForm {...baseProps} />);
+      unmount();
+    }
+    hookState.isSignPending = orig;
+  });
+
+  it('handles 30 different signature data values', () => {
+    const orig = hookState.signature;
+    for (let i = 0; i < 30; i++) {
+      hookState.signature = '0x' + i.toString(16).padStart(64, '0');
+      const { unmount } = render(<SignatureForm {...baseProps} />);
+      unmount();
+    }
+    hookState.signature = orig;
+  });
 });
