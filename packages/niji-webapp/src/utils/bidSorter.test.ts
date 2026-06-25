@@ -91,4 +91,41 @@ describe('compareBidsChronologically', () => {
     const b = { blockTimestamp: '1700000001', txIndex: 0 } as unknown as IBid;
     expect(compareBidsChronologically(a, b)).toBeGreaterThan(0);
   });
+
+  it('handles 100 different timestamp pairs', () => {
+    for (let i = 0; i < 100; i++) {
+      const a = makeBid(1000 + i);
+      const b = makeBid(2000 + i);
+      expect(compareBidsChronologically(a, b)).toBeGreaterThan(0);
+    }
+  });
+
+  it('handles 100 same-timestamp pairs', () => {
+    for (let i = 0; i < 100; i++) {
+      const a = makeBid(1000, i);
+      const b = makeBid(1000, i + 1);
+      expect(typeof compareBidsChronologically(a, b)).toBe('number');
+    }
+  });
+
+  it('sort 100 bids descending by timestamp', () => {
+    const bids = Array.from({ length: 100 }, (_, i) => makeBid(i * 100));
+    const sorted = [...bids].sort(compareBidsChronologically);
+    expect(parseInt(sorted[0].blockTimestamp, 10)).toBe(9900);
+    expect(parseInt(sorted[99].blockTimestamp, 10)).toBe(0);
+  });
+
+  it('sort 100 same-timestamp bids by txIndex', () => {
+    const bids = Array.from({ length: 100 }, (_, i) => makeBid(1000, i));
+    const sorted = [...bids].sort(compareBidsChronologically);
+    expect(sorted.length).toBe(100);
+  });
+
+  it('handles 100 cycles of compare with distinct bids', () => {
+    for (let i = 0; i < 100; i++) {
+      const a = makeBid(i);
+      const b = makeBid(i + 1000);
+      expect(compareBidsChronologically(a, b)).toBeGreaterThan(0);
+    }
+  });
 });

@@ -156,4 +156,45 @@ describe('shortENS — boundary', () => {
     const ens15 = 'abcdefghijklmno';
     expect(shortENS(ens15)).toBe(ens15);
   });
+
+  it('formatShortAddress handles 100 different addresses', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as Address;
+      expect(() => formatShortAddress(addr)).not.toThrow();
+    }
+  });
+
+  it('veryShortAddress handles 100 different addresses', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as Address;
+      expect(() => veryShortAddress(addr)).not.toThrow();
+    }
+  });
+
+  it('shortENS handles 100 different ENS names', () => {
+    for (let i = 0; i < 100; i++) {
+      const ens = `name-${i}.eth`;
+      expect(() => shortENS(ens)).not.toThrow();
+    }
+  });
+
+  it('veryShortENS handles 100 different ENS names', () => {
+    for (let i = 0; i < 100; i++) {
+      const ens = `name-${i}.eth`;
+      expect(() => veryShortENS(ens)).not.toThrow();
+    }
+  });
+
+  it('all 4 functions process 30 inputs', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as Address;
+      const ens = `name-${i}.eth`;
+      expect(() => {
+        formatShortAddress(addr);
+        veryShortAddress(addr);
+        shortENS(ens);
+        veryShortENS(ens);
+      }).not.toThrow();
+    }
+  });
 });
