@@ -443,4 +443,41 @@ describe('Winner', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-4 30 different winner addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR4' + i.toString(16).padStart(38, '0')) as `0x${string}`;
+      const { unmount } = render(<Winner winner={addr} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<Winner winner={ADDR} />, { wrapper: WithProviders })).not.toThrow();
+    }
+  });
+
+  it('round-4 30 isNounders toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Winner winner={ADDR} isNounders={i % 2 === 0} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
 });
