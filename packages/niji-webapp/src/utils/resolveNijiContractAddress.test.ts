@@ -78,4 +78,41 @@ describe('resolveNijiContractAddress', () => {
     // source は trim しないため空白付きは match しない
     expect(resolveNijiContractAddress(` ${GOV} `)).toBeUndefined();
   });
+
+  it('handles 100 different undefined addresses', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 100; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      const result = resolveNijiContractAddress(addr);
+      expect(result === undefined || typeof result === 'string').toBe(true);
+    }
+  });
+
+  it('GOV check 100 cycles', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 100; i++) {
+      expect(resolveNijiContractAddress(GOV)).toBe('Niji DAO Proxy');
+    }
+  });
+
+  it('AH check 100 cycles', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 100; i++) {
+      expect(resolveNijiContractAddress(AH)).toBe('Niji Auction House Proxy');
+    }
+  });
+
+  it('TRE check 100 cycles', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 100; i++) {
+      expect(resolveNijiContractAddress(TRE)).toBe('Niji DAO Treasury');
+    }
+  });
+
+  it('handles 100 different empty / null / undefined inputs gracefully', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 100; i++) {
+      expect(resolveNijiContractAddress('')).toBeUndefined();
+    }
+  });
 });

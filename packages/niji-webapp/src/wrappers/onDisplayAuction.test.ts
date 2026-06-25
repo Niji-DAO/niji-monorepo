@@ -244,4 +244,71 @@ describe('useOnDisplayAuction additional cases', () => {
     expect(result.current?.startTime).toBe(100n);
     expect(result.current?.endTime).toBe(500n);
   });
+
+  it('handles 50 different nounIds in active auction', () => {
+    for (let i = 0; i < 50; i++) {
+      atomValues.auction = {
+        activeAuction: makeAuction({ nounId: String(i), startTime: '0', endTime: '100' }),
+        bids: [],
+      };
+      atomValues.onDisplay = i;
+      atomValues.pastAuctions = [];
+      const { result } = renderHook(() => useOnDisplayAuction());
+      expect(result.current?.nounId).toBe(BigInt(i));
+    }
+  });
+
+  it('handles 50 different bid counts', () => {
+    for (let i = 0; i < 50; i++) {
+      atomValues.auction = {
+        activeAuction: makeAuction({ nounId: '5', startTime: '0', endTime: '100' }),
+        bids: Array.from({ length: i }, (_, j) => ({ id: String(j) })),
+      };
+      atomValues.onDisplay = 5;
+      atomValues.pastAuctions = [];
+      expect(() => renderHook(() => useOnDisplayAuction())).not.toThrow();
+    }
+  });
+
+  it('handles 30 undefined onDisplay cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      atomValues.auction = { activeAuction: undefined, bids: [] };
+      atomValues.onDisplay = undefined;
+      atomValues.pastAuctions = [];
+      expect(() => renderHook(() => useOnDisplayAuction())).not.toThrow();
+    }
+  });
+
+  it('handles 30 different pastAuctions counts', () => {
+    for (let i = 0; i < 30; i++) {
+      atomValues.auction = {
+        activeAuction: makeAuction({ nounId: String(i + 1000), startTime: '0', endTime: '100' }),
+        bids: [],
+      };
+      atomValues.onDisplay = i;
+      atomValues.pastAuctions = Array.from({ length: i }, (_, j) => ({
+        nounId: String(j),
+        startTime: '0',
+        endTime: '100',
+      }));
+      expect(() => renderHook(() => useOnDisplayAuction())).not.toThrow();
+    }
+  });
+
+  it('handles 50 different startTime values', () => {
+    for (let i = 0; i < 50; i++) {
+      atomValues.auction = {
+        activeAuction: makeAuction({
+          nounId: '5',
+          startTime: String(i * 100),
+          endTime: String(i * 100 + 1000),
+        }),
+        bids: [],
+      };
+      atomValues.onDisplay = 5;
+      atomValues.pastAuctions = [];
+      const { result } = renderHook(() => useOnDisplayAuction());
+      expect(result.current?.startTime).toBe(BigInt(i * 100));
+    }
+  });
 });
