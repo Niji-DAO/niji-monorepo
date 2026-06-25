@@ -207,4 +207,43 @@ describe('VoteSignalGroup', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<VoteSignalGroup voteSignals={[]} support={1} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 200 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <VoteSignalGroup key={i} voteSignals={[]} support={i % 3} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different support cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteSignalGroup voteSignals={[]} support={i % 3} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<VoteSignalGroup voteSignals={[]} support={1} />)).not.toThrow();
+    }
+  });
+
+  it('round-3 100 sequential mount cycles second', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteSignalGroup voteSignals={[]} support={1} />);
+      unmount();
+    }
+  });
 });
