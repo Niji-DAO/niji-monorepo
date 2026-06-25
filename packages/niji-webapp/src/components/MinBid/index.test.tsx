@@ -421,4 +421,52 @@ describe('MinBid', () => {
     fireEvent.click(container.firstElementChild as HTMLElement);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <MinBid key={i} minBid={parseEther(`${i + 1}`)} onClick={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different minBid amounts', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <MinBid minBid={parseEther(`${i + 1}`)} onClick={() => {}} />,
+      );
+      expect(container.querySelector('img')).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it('all 100 instances have h3 element', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <MinBid key={i} minBid={parseEther(`${i + 1}`)} onClick={() => {}} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h3').length).toBe(100);
+  });
+
+  it('rapid 500 click events fire handler', () => {
+    const onClick = vi.fn();
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={onClick} />);
+    const wrapper = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 500; i++) fireEvent.click(wrapper);
+    expect(onClick).toHaveBeenCalledTimes(500);
+  });
 });

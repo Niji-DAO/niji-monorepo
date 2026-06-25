@@ -433,4 +433,50 @@ describe('GrayCircle', () => {
       expect(() => rerender(<GrayCircle isDelegateView={i % 2 === 0} />)).not.toThrow();
     }
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<GrayCircle />);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <GrayCircle key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 200 imgs have src starting with data:image', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <GrayCircle key={i} />
+        ))}
+      </>,
+    );
+    const imgs = container.querySelectorAll('img');
+    imgs.forEach(img => {
+      expect(img.getAttribute('src')).toMatch(/^data:image/);
+    });
+  });
+
+  it('isDelegateView=true mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<GrayCircle isDelegateView={true} />);
+      unmount();
+    }
+  });
+
+  it('rapid 500 consecutive renders without crash', () => {
+    for (let i = 0; i < 500; i++) {
+      expect(() => render(<GrayCircle />)).not.toThrow();
+    }
+  });
 });
