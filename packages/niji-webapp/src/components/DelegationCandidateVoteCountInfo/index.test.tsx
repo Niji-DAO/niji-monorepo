@@ -557,4 +557,69 @@ describe('DelegationCandidateVoteCountInfo', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <DelegationCandidateVoteCountInfo text="x" voteCount={1} isLoading={false} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <DelegationCandidateVoteCountInfo
+              key={i}
+              text={`t-${i}`}
+              voteCount={i}
+              isLoading={false}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different voteCount values with isLoading=true', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <DelegationCandidateVoteCountInfo text="x" voteCount={i} isLoading={true} />,
+      );
+      expect(container.querySelector('svg')).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it('all 300 vote-info instances have correct count', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 300 }, (_, i) => (
+          <DelegationCandidateVoteCountInfo
+            key={i}
+            text="x"
+            voteCount={i + 100}
+            isLoading={false}
+          />
+        ))}
+      </>,
+    );
+    expect(container.textContent).toContain('100');
+    expect(container.textContent).toContain('399');
+  });
+
+  it('handles 30 different text values with rerender', () => {
+    const { container, rerender } = render(
+      <DelegationCandidateVoteCountInfo text="initial" voteCount={1} isLoading={false} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      rerender(
+        <DelegationCandidateVoteCountInfo text={`t-${i}`} voteCount={1} isLoading={false} />,
+      );
+    }
+    expect(container.textContent).toContain('t-29');
+  });
 });

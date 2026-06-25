@@ -603,4 +603,46 @@ describe('CandidateSponsors', () => {
     });
     Object.assign(hookState, origState);
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles rapid 100 prop transitions', () => {
+    const { rerender } = render(<CandidateSponsors {...baseProps} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<CandidateSponsors {...baseProps} blockNumber={BigInt(i + 1)} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 30 different proposal candidate ids', () => {
+    for (let i = 0; i < 30; i++) {
+      const candidate = makeCandidate({ id: `cand-${i}` });
+      const { unmount } = render(<CandidateSponsors {...baseProps} candidate={candidate} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different requiredVotes values', () => {
+    for (let i = 0; i < 30; i++) {
+      const candidate = makeCandidate({ requiredVotes: i });
+      const { unmount } = render(<CandidateSponsors {...baseProps} candidate={candidate} />);
+      unmount();
+    }
+  });
+
+  it('handles all hookState account variations', () => {
+    const orig = hookState.account;
+    ['0xACCT', '0xUSER', undefined, '0x'].forEach(acct => {
+      hookState.account = acct;
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    });
+    hookState.account = orig;
+  });
 });
