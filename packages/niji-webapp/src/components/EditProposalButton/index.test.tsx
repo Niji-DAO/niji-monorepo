@@ -688,4 +688,47 @@ describe('EditProposalButton', () => {
     );
     expect(container.querySelectorAll('button').length).toBe(200);
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<EditProposalButton {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <EditProposalButton key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<EditProposalButton {...defaults} />)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<EditProposalButton {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-5 all 200 buttons render', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <EditProposalButton key={i} {...defaults} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(200);
+  });
 });
