@@ -704,4 +704,71 @@ describe('Holder', () => {
     });
     expect(() => render(<Holder nounId={1n} />, { wrapper: WithProviders })).not.toThrow();
   });
+
+  it('mount-unmount 100 cycles', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Holder nounId={BigInt(i)} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('renders 30 instances all with data', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xX' } } },
+    });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Holder key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different owner ids', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 50; i++) {
+      useSubgraphQueryMock.mockReturnValue({
+        loading: false,
+        error: undefined,
+        data: { noun: { owner: { id: `0xOWN${i}` } } },
+      });
+      const { unmount } = render(<Holder nounId={BigInt(i)} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('rapid 30 isNounders toggle', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    const { rerender } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    for (let i = 0; i < 30; i++) {
+      expect(() => rerender(<Holder nounId={1n} isNounders={i % 2 === 0} />)).not.toThrow();
+    }
+  });
+
+  it('handles 30 different error message types', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 30; i++) {
+      useSubgraphQueryMock.mockReturnValue({
+        loading: false,
+        error: new Error(`err-${i}-${i * 100}`),
+        data: undefined,
+      });
+      const { unmount } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
 });

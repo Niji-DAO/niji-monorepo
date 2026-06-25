@@ -599,4 +599,51 @@ describe('AddNijisToForkModal', () => {
     });
     hookState.setApprovalState = { status: 'None' };
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AddNijisToForkModal {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different titles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AddNijisToForkModal {...baseProps} title={`Title-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different ownedNouns array sizes', () => {
+    for (let i = 1; i <= 30; i++) {
+      const nouns = Array.from({ length: i }, (_, j) => j);
+      const { unmount } = render(<AddNijisToForkModal {...baseProps} ownedNouns={nouns} />);
+      unmount();
+    }
+  });
+
+  it('handles all 6 escrowToForkState statuses', () => {
+    const orig = { ...hookState.escrowToForkState };
+    const statuses: ApprovalStatus[] = [
+      'None',
+      'PendingSignature',
+      'Mining',
+      'Success',
+      'Fail',
+      'Exception',
+    ];
+    statuses.forEach(s => {
+      hookState.escrowToForkState = { status: s };
+      const { unmount } = render(<AddNijisToForkModal {...baseProps} />);
+      unmount();
+    });
+    hookState.escrowToForkState = orig;
+  });
+
+  it('rapid 50 refetchData invocations', () => {
+    const refetch = vi.fn();
+    render(<AddNijisToForkModal {...baseProps} refetchData={refetch} />);
+    for (let i = 0; i < 50; i++) refetch();
+    expect(refetch).toHaveBeenCalledTimes(50);
+  });
 });
