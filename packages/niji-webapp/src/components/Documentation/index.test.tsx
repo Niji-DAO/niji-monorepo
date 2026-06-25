@@ -745,4 +745,43 @@ describe('Documentation', () => {
       unmount();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Documentation />);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Documentation key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<Documentation />)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Documentation />);
+      unmount();
+    }
+  });
+
+  it('round-5 100 mount cycles third', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Documentation />);
+      unmount();
+    }
+  });
 });
