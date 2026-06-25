@@ -747,4 +747,71 @@ describe('DelegationCandidateInfo', () => {
       ).not.toThrow();
     }
   });
+
+  it('mount-unmount 100 cycles', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <DelegationCandidateInfo address={ADDR} changeModalState={0 as never} votesToAdd={0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <DelegationCandidateInfo
+              key={i}
+              address={ADDR}
+              changeModalState={0 as never}
+              votesToAdd={i}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different votesToAdd values', () => {
+    useAccountVotesMock.mockReturnValue(10);
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <DelegationCandidateInfo address={ADDR} changeModalState={1 as never} votesToAdd={i} />,
+      );
+      expect(container.querySelector('[data-testid="vote-info"]')).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it('handles 30 different addresses', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { unmount } = render(
+        <DelegationCandidateInfo address={addr} changeModalState={0 as never} votesToAdd={0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('all 50 instances with state 0 have vote-info', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <DelegationCandidateInfo
+            key={i}
+            address={ADDR}
+            changeModalState={0 as never}
+            votesToAdd={0}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="vote-info"]').length).toBe(50);
+  });
 });
