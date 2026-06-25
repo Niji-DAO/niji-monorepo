@@ -429,4 +429,57 @@ describe('NavBar', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<NavBar />);
+      unmount();
+    }
+  });
+
+  it('renders 30 instances in single MemoryRouter mount', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NavBar key={i} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different isConnected combinations', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const orig = connectKitState.isConnected;
+    for (let i = 0; i < 30; i++) {
+      connectKitState.isConnected = i % 2 === 0;
+      const { unmount } = wrap(<NavBar />);
+      unmount();
+    }
+    connectKitState.isConnected = orig;
+  });
+
+  it('handles 30 different addresses', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const orig = connectKitState.address;
+    for (let i = 0; i < 30; i++) {
+      connectKitState.address = '0x' + i.toString(16).padStart(40, '0');
+      connectKitState.isConnected = true;
+      const { unmount } = wrap(<NavBar />);
+      unmount();
+    }
+    connectKitState.address = orig;
+    connectKitState.isConnected = false;
+  });
+
+  it('handles rapid 30 mount-unmount via wrap (atom alternating)', () => {
+    for (let i = 0; i < 30; i++) {
+      useAtomValueMock.mockReturnValue(i % 2 === 0);
+      const { unmount } = wrap(<NavBar />);
+      unmount();
+    }
+  });
 });

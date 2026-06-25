@@ -224,4 +224,52 @@ describe('VoteStatusPill', () => {
     const { container } = render(<VoteStatusPill status="success" text="日本語ステータス" />);
     expect(container.querySelector('div')?.textContent).toBe('日本語ステータス');
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<VoteStatusPill status="success" text="x" />);
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <VoteStatusPill key={i} status="success" text={`x-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different text values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(<VoteStatusPill status="success" text={`text-${i}`} />);
+      expect(container.querySelector('div')?.textContent).toBe(`text-${i}`);
+      unmount();
+    }
+  });
+
+  it('all 500 instances render div root', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <VoteStatusPill key={i} status="success" text={`x-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(500);
+  });
+
+  it('rapid 200 status transitions rerender', () => {
+    const statuses = ['success', 'failure', 'pending', 'unknown'];
+    const { rerender } = render(<VoteStatusPill status="success" text="x" />);
+    for (let i = 0; i < 200; i++) {
+      expect(() =>
+        rerender(<VoteStatusPill status={statuses[i % 4]} text={`x-${i}`} />),
+      ).not.toThrow();
+    }
+  });
 });
