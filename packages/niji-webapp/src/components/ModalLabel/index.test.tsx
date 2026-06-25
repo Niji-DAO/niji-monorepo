@@ -510,4 +510,50 @@ describe('ModalLabel', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 2000 cycles', () => {
+    for (let i = 0; i < 2000; i++) {
+      const { unmount } = render(<ModalLabel>x</ModalLabel>);
+      unmount();
+    }
+  });
+
+  it('renders 3000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 3000 }, (_, i) => (
+            <ModalLabel key={i}>{i}</ModalLabel>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 300 different children values', () => {
+    for (let i = 0; i < 300; i++) {
+      const { container, unmount } = render(<ModalLabel>v-{i}</ModalLabel>);
+      expect(container.querySelector('div')?.textContent).toBe(`v-${i}`);
+      unmount();
+    }
+  });
+
+  it('all 1000 div wrappers exist', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 1000 }, (_, i) => (
+          <ModalLabel key={i}>label-{i}</ModalLabel>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(1000);
+  });
+
+  it('handles 100 rerender cycles', () => {
+    const { container, rerender } = render(<ModalLabel>x</ModalLabel>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<ModalLabel>val-{i}</ModalLabel>);
+    }
+    expect(container.querySelector('div')?.textContent).toContain('99');
+  });
 });

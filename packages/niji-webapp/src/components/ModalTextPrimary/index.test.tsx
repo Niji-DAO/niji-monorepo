@@ -515,4 +515,50 @@ describe('ModalTextPrimary', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 2000 cycles', () => {
+    for (let i = 0; i < 2000; i++) {
+      const { unmount } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+      unmount();
+    }
+  });
+
+  it('renders 3000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 3000 }, (_, i) => (
+            <ModalTextPrimary key={i}>{i}</ModalTextPrimary>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 300 different children values', () => {
+    for (let i = 0; i < 300; i++) {
+      const { container, unmount } = render(<ModalTextPrimary>v-{i}</ModalTextPrimary>);
+      expect(container.querySelector('div')?.textContent).toBe(`v-${i}`);
+      unmount();
+    }
+  });
+
+  it('all 1000 div wrappers exist', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 1000 }, (_, i) => (
+          <ModalTextPrimary key={i}>text-{i}</ModalTextPrimary>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(1000);
+  });
+
+  it('handles 100 rerender cycles', () => {
+    const { container, rerender } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<ModalTextPrimary>val-{i}</ModalTextPrimary>);
+    }
+    expect(container.querySelector('div')?.textContent).toContain('99');
+  });
 });
