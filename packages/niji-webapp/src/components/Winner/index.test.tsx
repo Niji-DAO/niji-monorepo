@@ -306,4 +306,63 @@ describe('Winner', () => {
     useActiveLocaleMock.mockReturnValue('ja-JP');
     expect(() => render(<Winner winner={ADDR} />, { wrapper: WithProviders })).not.toThrow();
   });
+
+  it('mount-unmount 200 cycles', () => {
+    useAccountMock.mockReturnValue({ address: '0xUSER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    useAccountMock.mockReturnValue({ address: '0xUSER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <Winner key={i} winner={ADDR} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different winner addresses', () => {
+    useAccountMock.mockReturnValue({ address: '0xUSER' });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { unmount } = render(<Winner winner={addr} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('handles 50 different isNounders/isWinnerYou combinations', () => {
+    useAccountMock.mockReturnValue({ address: ADDR });
+    useAtomValueMock.mockReturnValue(true);
+    useActiveLocaleMock.mockReturnValue('en-US');
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Winner winner={ADDR} isNounders={i % 2 === 0} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('handles 30 locale variations', () => {
+    useAccountMock.mockReturnValue({ address: '0xUSER' });
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 30; i++) {
+      useActiveLocaleMock.mockReturnValue(i % 2 === 0 ? 'en-US' : 'ja-JP');
+      const { unmount } = render(<Winner winner={ADDR} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
 });

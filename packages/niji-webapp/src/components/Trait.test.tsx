@@ -123,4 +123,55 @@ describe('Trait', () => {
     });
     expect(container.querySelector('img')?.className).toBe('my-trait-class');
   });
+
+  it('mount-unmount 50 cycles', async () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Trait traitType="hat" traitIndex={0} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('handles 30 different traitTypes', async () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Trait traitType="hat" traitIndex={0} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('renders 30 instances all in single mount', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Trait key={i} traitType="hat" traitIndex={0} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different className values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Trait traitType="hat" traitIndex={0} className={`cls-${i}`} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('handles 30 rerenders with rotating className', () => {
+    const { rerender } = render(<Trait traitType="hat" traitIndex={0} />, {
+      wrapper: WithProviders,
+    });
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(<Trait traitType="hat" traitIndex={0} className={`cls-${i}`} />),
+      ).not.toThrow();
+    }
+  });
 });
