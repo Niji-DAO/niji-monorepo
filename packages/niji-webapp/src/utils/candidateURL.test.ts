@@ -212,4 +212,37 @@ describe('buildCandidateSlug', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-6 30 sequential buildCandidateSlug calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => buildCandidateSlug(`r6-${i}`, '0xR6')).not.toThrow();
+    }
+  });
+
+  it('round-6 50 sequential calls with varied addresses', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = '0xR6' + i.toString(16).padStart(38, '0');
+      expect(() => buildCandidateSlug('slug', addr)).not.toThrow();
+    }
+  });
+
+  it('round-6 100 sequential calls varied slug values', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => buildCandidateSlug(`r6-slug-${i}`, '0xR6')).not.toThrow();
+    }
+  });
+
+  it('round-6 30 returns string typed result', () => {
+    for (let i = 0; i < 30; i++) {
+      const result = buildCandidateSlug(`s-${i}`, '0xR6');
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-6 100 mixed argument variation', () => {
+    for (let i = 0; i < 100; i++) {
+      buildCandidateSlug(`r6-mix-${i}`, `0x${i}`);
+    }
+    expect(true).toBe(true);
+  });
 });
