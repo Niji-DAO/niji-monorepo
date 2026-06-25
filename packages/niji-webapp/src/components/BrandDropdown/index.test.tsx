@@ -657,4 +657,68 @@ describe('BrandDropdown', () => {
     );
     expect(container.querySelectorAll('select').length).toBe(200);
   });
+
+  it('round-2 mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(
+        <BrandDropdown onChange={() => {}} value="a">
+          {opts}
+        </BrandDropdown>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <BrandDropdown key={i} onChange={() => {}} value="a">
+              {opts}
+            </BrandDropdown>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different label values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(
+        <BrandDropdown onChange={() => {}} value="a" label={`R2-${i}`}>
+          {opts}
+        </BrandDropdown>,
+      );
+      expect(container.querySelector('span')?.textContent).toBe(`R2-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 50 onChange events', () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <BrandDropdown onChange={onChange} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    const select = container.querySelector('select')!;
+    for (let i = 0; i < 50; i++) {
+      fireEvent.change(select, { target: { value: i % 2 === 0 ? 'a' : 'b' } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(50);
+  });
+
+  it('round-2 100 instances render select', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <BrandDropdown key={i} onChange={() => {}} value="a">
+            {opts}
+          </BrandDropdown>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('select').length).toBe(100);
+  });
 });

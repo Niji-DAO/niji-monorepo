@@ -438,4 +438,58 @@ describe('ForkingPeriodTimer', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 300 cycles', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const now = Math.floor(Date.now() / 1000);
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<ForkingPeriodTimer endTime={now + 1000} isPeriodEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const now = Math.floor(Date.now() / 1000);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <ForkingPeriodTimer key={i} endTime={now + 1000 + i} isPeriodEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different endTime values', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const now = Math.floor(Date.now() / 1000);
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ForkingPeriodTimer endTime={now + i * 60} isPeriodEnded={false} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 isPeriodEnded toggle', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const now = Math.floor(Date.now() / 1000);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ForkingPeriodTimer endTime={now + 1000} isPeriodEnded={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different atom mock states', () => {
+    const now = Math.floor(Date.now() / 1000);
+    for (let i = 0; i < 30; i++) {
+      useAtomValueMock.mockReturnValue(i % 2 === 0);
+      const { unmount } = render(<ForkingPeriodTimer endTime={now + 1000} isPeriodEnded={false} />);
+      unmount();
+    }
+  });
 });
