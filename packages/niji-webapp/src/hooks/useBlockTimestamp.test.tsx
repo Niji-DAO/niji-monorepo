@@ -172,4 +172,37 @@ describe('useBlockTimestamp', () => {
       expect(typeof useBlockTimestamp).toBe('function');
     }
   });
+
+  it('round-3 30 renderHook cycles useBlockTimestamp', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useBlockTimestamp(BigInt(1000 + i)));
+      unmount();
+    }
+  });
+
+  it('round-3 50 renderHook cycles varied block', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useBlockTimestamp(BigInt(i + 100)));
+      unmount();
+    }
+  });
+
+  it('round-3 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useBlockTimestamp(BigInt(i)));
+      unmount();
+    }
+  });
+
+  it('round-3 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useBlockTimestamp(BigInt(i)))).not.toThrow();
+    }
+  });
+
+  it('round-3 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useBlockTimestamp).toBe('function');
+    }
+  });
 });

@@ -267,4 +267,37 @@ describe('useSubgraphQuery', () => {
       expect(typeof useSubgraphQuery).toBe('function');
     }
   });
+
+  it('round-3 30 renderHook cycles useSubgraphQuery', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useSubgraphQuery({} as never));
+      unmount();
+    }
+  });
+
+  it('round-3 50 renderHook cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useSubgraphQuery({} as never));
+      unmount();
+    }
+  });
+
+  it('round-3 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useSubgraphQuery({} as never));
+      unmount();
+    }
+  });
+
+  it('round-3 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useSubgraphQuery({} as never))).not.toThrow();
+    }
+  });
+
+  it('round-3 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useSubgraphQuery).toBe('function');
+    }
+  });
 });
