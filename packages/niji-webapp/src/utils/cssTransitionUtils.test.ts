@@ -89,3 +89,47 @@ describe('mobileModalSlideInFromBottm — transition format', () => {
     expect(exited.transition).toBeUndefined();
   });
 });
+
+describe('cssTransitionUtils consistency', () => {
+  it('basicFadeInOut returns same object 100 times', () => {
+    const first = basicFadeInOut.enteringStyle;
+    for (let i = 0; i < 100; i++) {
+      expect(basicFadeInOut.enteringStyle).toEqual(first);
+    }
+  });
+
+  it('basicFadeInOut 4 styles always defined 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(basicFadeInOut.enteringStyle).toBeDefined();
+      expect(basicFadeInOut.enteredStyle).toBeDefined();
+      expect(basicFadeInOut.exitingStyle).toBeDefined();
+      expect(basicFadeInOut.exitedStyle).toBeDefined();
+    }
+  });
+
+  it('mobileModalSlideInFromBottm 4 styles defined 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(mobileModalSlideInFromBottm.enteringStyle).toBeDefined();
+      expect(mobileModalSlideInFromBottm.enteredStyle).toBeDefined();
+      expect(mobileModalSlideInFromBottm.exitingStyle).toBeDefined();
+      expect(mobileModalSlideInFromBottm.exitedStyle).toBeDefined();
+    }
+  });
+
+  it('desktopModalSlideInFromTopAndGrow 4 styles defined 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(desktopModalSlideInFromTopAndGrow.enteringStyle).toBeDefined();
+      expect(desktopModalSlideInFromTopAndGrow.enteredStyle).toBeDefined();
+      expect(desktopModalSlideInFromTopAndGrow.exitingStyle).toBeDefined();
+      expect(desktopModalSlideInFromTopAndGrow.exitedStyle).toBeDefined();
+    }
+  });
+
+  it('all 3 transition objects have 4 keys 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(Object.keys(basicFadeInOut).length).toBeGreaterThanOrEqual(4);
+      expect(Object.keys(mobileModalSlideInFromBottm).length).toBeGreaterThanOrEqual(4);
+      expect(Object.keys(desktopModalSlideInFromTopAndGrow).length).toBeGreaterThanOrEqual(4);
+    }
+  });
+});

@@ -69,4 +69,35 @@ describe('getAddressFromQueryParams', () => {
     // この経路を契約として pin
     expect(getAddressFromQueryParams('to', `?from=to`)).toBeUndefined();
   });
+
+  it('handles 100 different valid addresses', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      expect(getAddressFromQueryParams('to', `?to=${addr}`)).toBe(addr);
+    }
+  });
+
+  it('handles 100 different param keys', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(getAddressFromQueryParams(`key-${i}`, `?key-${i}=${VALID_ADDR}`)).toBe(VALID_ADDR);
+    }
+  });
+
+  it('handles 100 missing params', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(getAddressFromQueryParams('to', `?other-${i}=value`)).toBeUndefined();
+    }
+  });
+
+  it('handles 100 different query strings', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => getAddressFromQueryParams('to', `?key-${i}=val`)).not.toThrow();
+    }
+  });
+
+  it('rapid 200 evaluations with valid address', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(getAddressFromQueryParams('to', `?to=${VALID_ADDR}`)).toBe(VALID_ADDR);
+    }
+  });
 });
