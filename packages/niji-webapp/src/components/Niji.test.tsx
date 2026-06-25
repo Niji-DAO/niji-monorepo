@@ -423,4 +423,43 @@ describe('Niji', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Niji nounId={1n} />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <Niji key={i} nounId={BigInt(i + 500)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 different nounId values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Niji nounId={BigInt(i + 9000)} />);
+      unmount();
+    }
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<Niji nounId={1n} />)).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Niji nounId={BigInt(i + 9500)} />);
+      unmount();
+    }
+  });
 });

@@ -455,4 +455,63 @@ describe('ThemeProvider', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>r6</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ThemeProvider key={i}>
+              <div>r6-{i}</div>
+            </ThemeProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ThemeProvider>
+            <div>x</div>
+          </ThemeProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>x</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>r6-child-{i}</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
 });
