@@ -469,4 +469,53 @@ describe('MinBid', () => {
     for (let i = 0; i < 500; i++) fireEvent.click(wrapper);
     expect(onClick).toHaveBeenCalledTimes(500);
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <MinBid key={i} minBid={parseEther(`${i + 1}`)} onClick={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different fractional minBid amounts', () => {
+    for (let i = 0; i < 100; i++) {
+      const v = (i + 1) * 0.1;
+      const { container, unmount } = render(
+        <MinBid minBid={parseEther(`${v}`)} onClick={() => {}} />,
+      );
+      expect(container.querySelector('h3')).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it('all 500 imgs are present', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <MinBid key={i} minBid={parseEther(`${i + 1}`)} onClick={() => {}} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(500);
+  });
+
+  it('rapid 1000 click events fire handler', () => {
+    const onClick = vi.fn();
+    const { container } = render(<MinBid minBid={parseEther('1')} onClick={onClick} />);
+    const wrapper = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 1000; i++) fireEvent.click(wrapper);
+    expect(onClick).toHaveBeenCalledTimes(1000);
+  });
 });

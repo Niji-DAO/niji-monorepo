@@ -488,4 +488,50 @@ describe('VoteCardPager', () => {
       unmount();
     });
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<VoteCardPager {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <VoteCardPager key={i} {...defaults} currentPage={i % 3} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different numPages values', () => {
+    for (let i = 1; i <= 100; i++) {
+      const { container, unmount } = render(<VoteCardPager {...defaults} numPages={i} />);
+      expect(container.querySelectorAll('span').length).toBe(i);
+      unmount();
+    }
+  });
+
+  it('rapid 500 right clicks fire handler', () => {
+    const onRight = vi.fn();
+    const { container } = render(<VoteCardPager {...defaults} onRightArrowClick={onRight} />);
+    const right = container.querySelectorAll('button')[1];
+    for (let i = 0; i < 500; i++) fireEvent.click(right);
+    expect(onRight).toHaveBeenCalledTimes(500);
+  });
+
+  it('all 100 instances have exactly 2 buttons each', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <VoteCardPager key={i} {...defaults} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(200);
+  });
 });

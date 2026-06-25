@@ -498,4 +498,55 @@ describe('BrandSpinner', () => {
       expect(() => render(<BrandSpinner />)).not.toThrow();
     }
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<BrandSpinner />);
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <BrandSpinner key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 1000 svg are width=25', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 1000 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    const svgs = container.querySelectorAll('svg');
+    expect(svgs.length).toBe(1000);
+    svgs.forEach(svg => {
+      expect(svg.getAttribute('width')).toBe('25');
+    });
+  });
+
+  it('all 500 svg have circle inside', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <BrandSpinner key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('svg circle').length).toBe(500);
+  });
+
+  it('rapid 1000 renders without crash', () => {
+    for (let i = 0; i < 1000; i++) {
+      expect(() => render(<BrandSpinner />)).not.toThrow();
+    }
+  });
 });
