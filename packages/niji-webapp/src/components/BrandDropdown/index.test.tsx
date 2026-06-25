@@ -721,4 +721,67 @@ describe('BrandDropdown', () => {
     );
     expect(container.querySelectorAll('select').length).toBe(100);
   });
+
+  it('round-3 mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(
+        <BrandDropdown onChange={() => {}} value="a">
+          <option>r3-x</option>
+        </BrandDropdown>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <BrandDropdown key={i} onChange={() => {}} value={`r3-${i}`}>
+              <option>{i}</option>
+            </BrandDropdown>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 50 different value cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <BrandDropdown onChange={() => {}} value={`r3-v-${i}`}>
+          <option>x</option>
+        </BrandDropdown>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 rapid 500 onChange events', () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <BrandDropdown onChange={onChange} value="a">
+        <option>x</option>
+      </BrandDropdown>,
+    );
+    const select = container.querySelector('select')!;
+    for (let i = 0; i < 500; i++) {
+      fireEvent.change(select, { target: { value: `r3-${i}` } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(500);
+  });
+
+  it('round-3 all 200 select elements exist', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <BrandDropdown key={i} onChange={() => {}} value={`${i}`}>
+            <option>x</option>
+          </BrandDropdown>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('select').length).toBe(200);
+  });
 });

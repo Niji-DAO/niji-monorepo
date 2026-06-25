@@ -583,4 +583,43 @@ describe('ProposalEditor', () => {
     }
     expect(onTitleInput).toHaveBeenCalledTimes(50);
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalEditor {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalEditor key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different title values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalEditor {...defaults} title={`r3-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ProposalEditor {...defaults} />)).not.toThrow();
+    }
+  });
+
+  it('round-3 isCandidate toggle 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalEditor {...defaults} isCandidate={i % 2 === 0} />);
+      unmount();
+    }
+  });
 });
