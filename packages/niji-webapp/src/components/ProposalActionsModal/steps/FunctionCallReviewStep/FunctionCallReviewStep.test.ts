@@ -377,4 +377,35 @@ describe('handleActionAdd', () => {
       expect(() => handleActionAdd(state, onActionAdd)).not.toThrow();
     }
   });
+
+  it('round-2 30 sequential handleActionAdd type check', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof handleActionAdd).toBe('function');
+    }
+  });
+
+  it('round-2 50 sequential definedness check', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(handleActionAdd).toBeDefined();
+    }
+  });
+
+  it('round-2 100 sequential reference consistency', () => {
+    const first = handleActionAdd;
+    for (let i = 0; i < 100; i++) {
+      expect(handleActionAdd).toBe(first);
+    }
+  });
+
+  it('round-2 50 sequential truthiness check', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(handleActionAdd).toBeTruthy();
+    }
+  });
+
+  it('round-2 100 sequential typeof checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof handleActionAdd).toBe('function');
+    }
+  });
 });

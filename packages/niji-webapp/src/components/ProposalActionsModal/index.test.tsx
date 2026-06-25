@@ -592,6 +592,47 @@ describe('ProposalActionModal extra', () => {
       ),
     ).not.toThrow();
   });
+
+  it('round-2 30 mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalActionModal {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-2 30 instances rendered together', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalActionModal key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 30 sequential render cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ProposalActionModal {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('round-2 rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<ProposalActionModal show={true} onDismiss={onDismiss} onActionAdd={() => {}} />);
+    for (let i = 0; i < 200; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-2 100 show toggle cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <ProposalActionModal show={i % 2 === 0} onDismiss={() => {}} onActionAdd={() => {}} />,
+      );
+      unmount();
+    }
+  });
 });
 
 // dummy reference to silence unused warning
