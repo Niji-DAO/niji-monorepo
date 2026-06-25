@@ -589,4 +589,47 @@ describe('BrandNumericEntry', () => {
     );
     expect(container.querySelectorAll('input').length).toBe(100);
   });
+
+  it('round-4 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<BrandNumericEntry value={0} onValueChange={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <BrandNumericEntry key={i} value={i + 100} onValueChange={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 50 different value cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<BrandNumericEntry value={i + 500} onValueChange={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<BrandNumericEntry value={0} onValueChange={() => {}} />)).not.toThrow();
+    }
+  });
+
+  it('round-4 all 100 instances render input', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <BrandNumericEntry key={i} value={i + 200} onValueChange={() => {}} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(100);
+  });
 });
