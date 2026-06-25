@@ -221,4 +221,51 @@ describe('NijiInfoCard', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 100 different nounIds', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <NijiInfoCard nounId={BigInt(i + 1000)} bidHistoryOnClickHandler={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 200 bidHistory click handler invocations', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    const handler = vi.fn();
+    const { container } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={handler} />);
+    for (let i = 0; i < 200; i++) fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(handler).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-2 renders 50 instances in single mount', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <NijiInfoCard key={i} nounId={BigInt(i)} bidHistoryOnClickHandler={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different auctionEndTime values', () => {
+    for (let i = 0; i < 30; i++) {
+      useAtomValueMock.mockReturnValue(BigInt(1700000000 + i * 7200));
+      const { unmount } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={() => {}} />);
+      unmount();
+    }
+  });
 });

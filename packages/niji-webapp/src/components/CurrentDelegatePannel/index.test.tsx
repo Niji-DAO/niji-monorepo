@@ -801,4 +801,76 @@ describe('CurrentDelegatePannel', () => {
     const matches = (container.textContent ?? '').match(/Delegation/g);
     expect(matches?.length).toBe(200);
   });
+
+  it('round-2 mount-unmount 200 cycles', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 500 instances variant', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <CurrentDelegatePannel
+              key={i}
+              onPrimaryBtnClick={() => {}}
+              onSecondaryBtnClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 500 onPrimary clicks', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const onPri = vi.fn();
+    const { container } = render(
+      <CurrentDelegatePannel onPrimaryBtnClick={onPri} onSecondaryBtnClick={() => {}} />,
+    );
+    const buttons = container.querySelectorAll('button');
+    for (let i = 0; i < 500; i++) fireEvent.click(buttons[1]);
+    expect(onPri).toHaveBeenCalledTimes(500);
+  });
+
+  it('round-2 handles 50 different delegate addresses', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    for (let i = 0; i < 50; i++) {
+      useReadNijiTokenDelegatesMock.mockReturnValue({
+        data: '0x' + i.toString(16).padStart(40, '0'),
+      });
+      const { unmount } = render(
+        <CurrentDelegatePannel onPrimaryBtnClick={() => {}} onSecondaryBtnClick={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 all 100 instances render Delegation h1', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useReadNijiTokenDelegatesMock.mockReturnValue({ data: undefined });
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <CurrentDelegatePannel
+            key={i}
+            onPrimaryBtnClick={() => {}}
+            onSecondaryBtnClick={() => {}}
+          />
+        ))}
+      </>,
+    );
+    const matches = (container.textContent ?? '').match(/Delegation/g);
+    expect(matches?.length).toBe(100);
+  });
 });
