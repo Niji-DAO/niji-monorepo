@@ -648,4 +648,48 @@ describe('LegacyNoun — additional edge cases', () => {
     );
     expect(container.querySelectorAll('img').length).toBe(500);
   });
+
+  it('round-4 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<LegacyNoun imgPath="/x.png" alt="r4" />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <LegacyNoun key={i} imgPath={`/r4-${i}.png`} alt={`r4-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different alt values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<LegacyNoun imgPath="/x.png" alt={`r4-alt-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 different imgPath values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<LegacyNoun imgPath={`/r4-${i}.png`} alt="x" />);
+      unmount();
+    }
+  });
+
+  it('round-4 all 500 imgs render', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <LegacyNoun key={i} imgPath="/r4.png" alt={`r4-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(500);
+  });
 });
