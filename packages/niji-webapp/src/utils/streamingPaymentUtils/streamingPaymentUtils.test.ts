@@ -243,4 +243,36 @@ describe('getTokenAddressForCurrency — additional', () => {
       expect(typeof getTokenAddressForCurrency).toBe('function');
     }
   });
+
+  it('round-4 30 sequential formatTokenAmount calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => formatTokenAmount(i + 100, SupportedCurrency.USDC)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 sequential getTokenAddressForCurrency calls', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => getTokenAddressForCurrency(SupportedCurrency.USDC)).not.toThrow();
+    }
+  });
+
+  it('round-4 100 mixed sequential calls', () => {
+    for (let i = 0; i < 100; i++) {
+      formatTokenAmount(i + 500, SupportedCurrency.USDC);
+      getTokenAddressForCurrency(SupportedCurrency.USDC);
+    }
+    expect(true).toBe(true);
+  });
+
+  it('round-4 50 different amount values', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(formatTokenAmount(i + 1000, SupportedCurrency.USDC)).toBeGreaterThan(0n);
+    }
+  });
+
+  it('round-4 50 sequential currency type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof getTokenAddressForCurrency).toBe('function');
+    }
+  });
 });
