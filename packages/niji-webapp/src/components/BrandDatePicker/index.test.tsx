@@ -141,4 +141,61 @@ describe('BrandDatePicker', () => {
   it('label with empty string renders without crash', () => {
     expect(() => render(<BrandDatePicker onChange={() => {}} label="" />)).not.toThrow();
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<BrandDatePicker onChange={() => {}} label="Date" />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <BrandDatePicker key={i} onChange={() => {}} label={`L-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different label values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <BrandDatePicker onChange={() => {}} label={`Lab-${i}`} />,
+      );
+      expect(container.querySelector('span')?.textContent).toBe(`Lab-${i}`);
+      unmount();
+    }
+  });
+
+  it('rapid 100 onChange events do not throw', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandDatePicker onChange={onChange} label="Date" />);
+    const inputs = container.querySelectorAll('input');
+    const dateInput = Array.from(inputs).find(i => i.type === 'date');
+    if (dateInput) {
+      for (let i = 0; i < 100; i++) {
+        expect(() =>
+          fireEvent.change(dateInput, { target: { value: `2025-01-${(i % 28) + 1}` } }),
+        ).not.toThrow();
+      }
+    }
+  });
+
+  it('handles 30 different min/max date pairs', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <BrandDatePicker
+          onChange={() => {}}
+          label="Date"
+          min={`2025-01-${(i % 28) + 1}`}
+          max={`2025-12-${(i % 28) + 1}`}
+        />,
+      );
+      unmount();
+    }
+  });
 });

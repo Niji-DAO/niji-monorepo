@@ -593,4 +593,68 @@ describe('BrandDropdown', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <BrandDropdown onChange={() => {}} value="a">
+          {opts}
+        </BrandDropdown>,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <BrandDropdown key={i} onChange={() => {}} value="a">
+              {opts}
+            </BrandDropdown>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different label values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <BrandDropdown onChange={() => {}} value="a" label={`L-${i}`}>
+          {opts}
+        </BrandDropdown>,
+      );
+      expect(container.querySelector('span')?.textContent).toBe(`L-${i}`);
+      unmount();
+    }
+  });
+
+  it('rapid 100 onChange events fire handler', () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <BrandDropdown onChange={onChange} value="a">
+        {opts}
+      </BrandDropdown>,
+    );
+    const select = container.querySelector('select')!;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(select, { target: { value: i % 2 === 0 ? 'a' : 'b' } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(100);
+  });
+
+  it('all 200 instances render select', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <BrandDropdown key={i} onChange={() => {}} value="a">
+            {opts}
+          </BrandDropdown>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('select').length).toBe(200);
+  });
 });

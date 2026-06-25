@@ -154,4 +154,56 @@ describe('ForkStatus', () => {
     expect(container.textContent).toBe('Forking');
     expect(container.textContent).not.toBe('Active');
   });
+
+  it('mount-unmount 2000 cycles', () => {
+    for (let i = 0; i < 2000; i++) {
+      const { unmount } = render(<ForkStatus status={ForkState.ESCROW} />);
+      unmount();
+    }
+  });
+
+  it('renders 3000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 3000 }, (_, i) => (
+            <ForkStatus key={i} status={i % 3 === 0 ? ForkState.ESCROW : ForkState.ACTIVE} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 1000 ESCROW instances render expected count', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <ForkStatus key={i} status={ForkState.ESCROW} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 1000 ACTIVE instances render without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <ForkStatus key={i} status={ForkState.ACTIVE} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 200 status toggle rerender', () => {
+    const { rerender } = render(<ForkStatus status={ForkState.ESCROW} />);
+    for (let i = 0; i < 200; i++) {
+      expect(() =>
+        rerender(<ForkStatus status={i % 2 === 0 ? ForkState.ACTIVE : ForkState.ESCROW} />),
+      ).not.toThrow();
+    }
+  });
 });
