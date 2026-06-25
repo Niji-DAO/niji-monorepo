@@ -492,4 +492,49 @@ describe('ProposalEditor', () => {
     const long = 'a'.repeat(10000);
     expect(() => render(<ProposalEditor {...defaults} body={long} />)).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalEditor {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different body markdown values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalEditor {...defaults} body={`# Body ${i}\n\n- item ${i}`} />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 100 onBodyInput events', () => {
+    const onBodyInput = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onBodyInput={onBodyInput} />);
+    const ta = container.querySelector('textarea')!;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(ta, { target: { value: `b-${i}` } });
+    }
+    expect(onBodyInput).toHaveBeenCalledTimes(100);
+  });
+
+  it('rapid 100 onTitleInput events', () => {
+    const onTitleInput = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onTitleInput={onTitleInput} />);
+    const input = container.querySelector('input')!;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(input, { target: { value: `t-${i}` } });
+    }
+    expect(onTitleInput).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles 30 different title + body rerenders', () => {
+    const { rerender } = render(<ProposalEditor {...defaults} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(<ProposalEditor {...defaults} title={`T-${i}`} body={`# B-${i}`} />),
+      ).not.toThrow();
+    }
+  });
 });

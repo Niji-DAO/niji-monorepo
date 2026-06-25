@@ -561,4 +561,55 @@ describe('VoteProgressBar', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <VoteProgressBar key={i} variant={VoteCardVariant.FOR} percentage={i % 100} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different percentage values with AGAINST', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(
+        <VoteProgressBar variant={VoteCardVariant.AGAINST} percentage={i % 100} />,
+      );
+      const inner = container.querySelectorAll('div')[1];
+      expect(inner?.className).toMatch(/against/i);
+      unmount();
+    }
+  });
+
+  it('all 500 instances render 2 divs each', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <VoteProgressBar key={i} variant={VoteCardVariant.ABSTAIN} percentage={i % 100} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(1000);
+  });
+
+  it('rapid 200 rerender with variant + percentage transitions', () => {
+    const variants = [VoteCardVariant.FOR, VoteCardVariant.AGAINST, VoteCardVariant.ABSTAIN];
+    const { rerender } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={0} />);
+    for (let i = 0; i < 200; i++) {
+      expect(() =>
+        rerender(<VoteProgressBar variant={variants[i % 3]} percentage={i % 100} />),
+      ).not.toThrow();
+    }
+  });
 });

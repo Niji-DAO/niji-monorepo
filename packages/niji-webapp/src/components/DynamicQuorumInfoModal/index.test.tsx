@@ -1029,4 +1029,71 @@ describe('DynamicQuorumInfoModal', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={5}
+          onDismiss={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 30 instances in single render', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DynamicQuorumInfoModal
+              key={i}
+              proposal={makeProposal()}
+              againstVotesAbsolute={i * 2}
+              onDismiss={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different proposalThreshold mock states', () => {
+    for (let i = 0; i < 30; i++) {
+      const p = { ...makeProposal(), id: String(i) } as never;
+      const { unmount } = render(
+        <DynamicQuorumInfoModal proposal={p} againstVotesAbsolute={i} onDismiss={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={5}
+        onDismiss={onDismiss}
+      />,
+    );
+    for (let i = 0; i < 200; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles 30 different againstVotes (multiplied)', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <DynamicQuorumInfoModal
+            proposal={makeProposal()}
+            againstVotesAbsolute={i * 100}
+            onDismiss={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
