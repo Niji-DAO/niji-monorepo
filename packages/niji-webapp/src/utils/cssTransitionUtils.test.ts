@@ -312,4 +312,36 @@ describe('cssTransitionUtils consistency', () => {
       expect(basicFadeInOut).toBe(first);
     }
   });
+
+  it('round-7 30 sequential basicFadeInOut access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(basicFadeInOut).toBeDefined();
+    }
+  });
+
+  it('round-7 50 sequential desktopModalSlideInFromTopAndGrow access', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(desktopModalSlideInFromTopAndGrow).toBeDefined();
+    }
+  });
+
+  it('round-7 100 reference consistency basicFadeInOut', () => {
+    const first = basicFadeInOut;
+    for (let i = 0; i < 100; i++) {
+      expect(basicFadeInOut).toBe(first);
+    }
+  });
+
+  it('round-7 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof basicFadeInOut).toBe('object');
+    }
+  });
+
+  it('round-7 100 sequential consistency check basicFadeInOut', () => {
+    const first = basicFadeInOut;
+    for (let i = 0; i < 100; i++) {
+      expect(basicFadeInOut).toBe(first);
+    }
+  });
 });
