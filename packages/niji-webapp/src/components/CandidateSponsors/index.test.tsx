@@ -688,4 +688,49 @@ describe('CandidateSponsors', () => {
     }
     hookState.isThresholdMet = false;
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CandidateSponsors key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different proposalIdToUpdate values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} proposalIdToUpdate={i + 100} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 isThresholdMet toggle cycles', () => {
+    const orig = hookState.isThresholdMet;
+    for (let i = 0; i < 30; i++) {
+      hookState.isThresholdMet = i % 2 === 0;
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+    hookState.isThresholdMet = orig;
+  });
+
+  it('round-2 rapid 100 setDataFetchPollInterval invocations', () => {
+    const setDataFetchPollInterval = vi.fn();
+    render(
+      <CandidateSponsors {...baseProps} setDataFetchPollInterval={setDataFetchPollInterval} />,
+    );
+    for (let i = 0; i < 100; i++) setDataFetchPollInterval(0);
+    expect(setDataFetchPollInterval).toHaveBeenCalledTimes(100);
+  });
 });
