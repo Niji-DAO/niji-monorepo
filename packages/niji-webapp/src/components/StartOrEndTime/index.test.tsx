@@ -553,4 +553,53 @@ describe('StartOrEndTime', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    const start = Math.floor(Date.now() / 1000);
+    const end = start + 3600;
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<StartOrEndTime startTime={start} endTime={end} />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    const start = Math.floor(Date.now() / 1000);
+    const end = start + 3600;
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <StartOrEndTime key={i} startTime={start + i} endTime={end + i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    const start = Math.floor(Date.now() / 1000);
+    const end = start + 3600;
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<StartOrEndTime startTime={start} endTime={end} />)).not.toThrow();
+    }
+  });
+
+  it('round-6 30 different start/end pairs', () => {
+    for (let i = 0; i < 30; i++) {
+      const start = 1700000000 + i + 8000;
+      const end = start + 3600;
+      const { unmount } = render(<StartOrEndTime startTime={start} endTime={end} />);
+      unmount();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    const start = Math.floor(Date.now() / 1000);
+    const end = start + 3600;
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<StartOrEndTime startTime={start} endTime={end} />);
+      unmount();
+    }
+  });
 });
