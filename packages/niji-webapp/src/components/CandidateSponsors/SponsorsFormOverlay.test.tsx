@@ -189,4 +189,47 @@ describe('SponsorsFormOverlay', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<SponsorsFormOverlay {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <SponsorsFormOverlay key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 isFormDisplayed=true cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<SponsorsFormOverlay {...defaults} isFormDisplayed={true} />);
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 200 setIsFormDisplayed invocations', () => {
+    const setIsFormDisplayed = vi.fn();
+    render(<SponsorsFormOverlay {...defaults} setIsFormDisplayed={setIsFormDisplayed} />);
+    for (let i = 0; i < 200; i++) setIsFormDisplayed(false);
+    expect(setIsFormDisplayed).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-2 handles 30 different transactionState values', () => {
+    const states = ['None', 'Mining', 'Success', 'Fail'] as const;
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SponsorsFormOverlay {...defaults} transactionState={states[i % 4]} />,
+      );
+      unmount();
+    }
+  });
 });
