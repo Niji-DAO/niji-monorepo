@@ -548,4 +548,49 @@ describe('FunctionCallSelectFunctionStep', () => {
       unmount();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <FunctionCallSelectFunctionStep key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<FunctionCallSelectFunctionStep {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-5 30 different address values', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR5' + i.toString(16).padStart(38, '0')) as `0x${string}`;
+      const { unmount } = render(
+        <FunctionCallSelectFunctionStep
+          {...baseProps}
+          state={{ ...baseProps.state, address: addr } as never}
+        />,
+      );
+      unmount();
+    }
+  });
 });
