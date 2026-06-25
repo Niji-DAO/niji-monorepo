@@ -44,4 +44,38 @@ describe('getGrayBackgroundSVG', () => {
     // base64 文字セット (A-Z, a-z, 0-9, +, /, =、 加えて意図せず含まれた空白/inline 改行を許容)
     expect(/^[\d\s+/=A-Za-z]+$/.test(portion)).toBe(true);
   });
+
+  it('returns same value for 200 calls', () => {
+    const first = getGrayBackgroundSVG();
+    for (let i = 0; i < 200; i++) {
+      expect(getGrayBackgroundSVG()).toBe(first);
+    }
+  });
+
+  it('all 200 calls return data URI with svg+xml MIME', () => {
+    for (let i = 0; i < 200; i++) {
+      const result = getGrayBackgroundSVG();
+      expect(result.startsWith('data:image/svg+xml;base64,')).toBe(true);
+    }
+  });
+
+  it('all 200 calls return non-empty string', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(getGrayBackgroundSVG().length).toBeGreaterThan(30);
+    }
+  });
+
+  it('rapid 500 consecutive calls do not throw', () => {
+    for (let i = 0; i < 500; i++) {
+      expect(() => getGrayBackgroundSVG()).not.toThrow();
+    }
+  });
+
+  it('decoded base64 contains valid characters 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const result = getGrayBackgroundSVG();
+      const portion = result.replace('data:image/svg+xml;base64,', '');
+      expect(/^[\d\s+/=A-Za-z]+$/.test(portion)).toBe(true);
+    }
+  });
 });

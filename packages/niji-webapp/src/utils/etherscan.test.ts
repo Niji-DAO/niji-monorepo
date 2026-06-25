@@ -119,4 +119,45 @@ describe('etherscan link builders — fallback URL when blockExplorers undefined
     vi.doUnmock('@/config');
     vi.doUnmock('@/wagmi');
   });
+
+  it('buildEtherscanTxLink handles 100 different tx hashes', async () => {
+    const { buildEtherscanTxLink } = await importEtherscan();
+    for (let i = 0; i < 100; i++) {
+      const hash = '0x' + i.toString(16).padStart(64, '0');
+      expect(buildEtherscanTxLink(hash)).toBe(`https://etherscan.io/tx/${hash}`);
+    }
+  });
+
+  it('buildEtherscanAddressLink handles 100 different addresses', async () => {
+    const { buildEtherscanAddressLink } = await importEtherscan();
+    for (let i = 0; i < 100; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      expect(buildEtherscanAddressLink(addr)).toBe(`https://etherscan.io/address/${addr}`);
+    }
+  });
+
+  it('buildEtherscanTokenLink handles 100 different token/id pairs', async () => {
+    const { buildEtherscanTokenLink } = await importEtherscan();
+    for (let i = 0; i < 100; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      const result = buildEtherscanTokenLink(addr, i);
+      expect(result).toContain(addr);
+      expect(result).toContain(`${i}`);
+    }
+  });
+
+  it('buildEtherscanTxLink all 50 results start with https', async () => {
+    const { buildEtherscanTxLink } = await importEtherscan();
+    for (let i = 0; i < 50; i++) {
+      const hash = '0x' + i.toString(16).padStart(64, '0');
+      expect(buildEtherscanTxLink(hash).startsWith('https://')).toBe(true);
+    }
+  });
+
+  it('buildEtherscanAddressLink rapid 100 invocations', async () => {
+    const { buildEtherscanAddressLink } = await importEtherscan();
+    for (let i = 0; i < 100; i++) {
+      expect(() => buildEtherscanAddressLink('0xABC')).not.toThrow();
+    }
+  });
 });

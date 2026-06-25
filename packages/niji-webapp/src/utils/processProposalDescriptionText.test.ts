@@ -78,4 +78,43 @@ describe('processProposalDescriptionText', () => {
     // 重複 title 'aa' を 'a' で removal、 最初の 'a' のみ removal
     expect(processProposalDescriptionText('aaaa', 'a')).toBe('aaa');
   });
+
+  it('handles 100 different title/description pairs', () => {
+    for (let i = 0; i < 100; i++) {
+      const title = `T-${i}`;
+      const desc = `${title} body-${i}`;
+      const result = processProposalDescriptionText(desc, title);
+      expect(result).toBe(` body-${i}`);
+    }
+  });
+
+  it('handles 100 long descriptions', () => {
+    for (let i = 0; i < 100; i++) {
+      const title = `t-${i}`;
+      const body = 'a'.repeat(i + 100);
+      const desc = `${title}${body}`;
+      expect(processProposalDescriptionText(desc, title)).toBe(body);
+    }
+  });
+
+  it('handles 50 unicode title/description pairs', () => {
+    for (let i = 0; i < 50; i++) {
+      const title = `日本語-${i}`;
+      const desc = `${title} 本文-${i}`;
+      expect(processProposalDescriptionText(desc, title)).toBe(` 本文-${i}`);
+    }
+  });
+
+  it('handles 50 empty title cases', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => processProposalDescriptionText(`body-${i}`, '')).not.toThrow();
+    }
+  });
+
+  it('handles 100 same title repeated removal cases', () => {
+    for (let i = 0; i < 100; i++) {
+      const result = processProposalDescriptionText('aaaa', 'a');
+      expect(result).toBe('aaa');
+    }
+  });
 });
