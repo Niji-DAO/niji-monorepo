@@ -141,3 +141,37 @@ describe('timestampFromBlockNumber — additional', () => {
 afterAll(() => {
   // no-op (dayjs extend は global、 unmount は不要)
 });
+
+describe('timeUtils stress', () => {
+  it('currentUnixEpoch returns integer 100 times', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Number.isInteger(currentUnixEpoch())).toBe(true);
+    }
+  });
+
+  it('currentUnixEpoch returns positive 100 times', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(currentUnixEpoch()).toBeGreaterThan(0);
+    }
+  });
+
+  it('toUnixEpoch handles 100 different Date inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      const date = new Date(1700000000000 + i * 1000);
+      expect(() => toUnixEpoch(date)).not.toThrow();
+    }
+  });
+
+  it('unixToDateString handles 100 different unix values', () => {
+    for (let i = 0; i < 100; i++) {
+      const unix = 1700000000 + i * 86400;
+      expect(typeof unixToDateString(unix)).toBe('string');
+    }
+  });
+
+  it('timestampFromBlockNumber handles 50 different block inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => timestampFromBlockNumber(100 + i, 100, 1700000000)).not.toThrow();
+    }
+  });
+});

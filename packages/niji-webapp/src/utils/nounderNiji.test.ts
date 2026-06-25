@@ -69,4 +69,42 @@ describe('isNounderNiji', () => {
       expect(isNounderNiji(id)).toBe(true);
     });
   });
+
+  it('all 100 multiples of 10 return true', () => {
+    for (let i = 0; i <= 100; i++) {
+      const id = BigInt(i * 10);
+      if (id <= 1820n) {
+        expect(isNounderNiji(id)).toBe(true);
+      }
+    }
+  });
+
+  it('all 100 non-multiples return false', () => {
+    for (let i = 0; i < 100; i++) {
+      const id = BigInt(i * 10 + 1);
+      if (id <= 1820n) {
+        expect(isNounderNiji(id)).toBe(false);
+      }
+    }
+  });
+
+  it('handles 100 large id values', () => {
+    for (let i = 0; i < 100; i++) {
+      const id = BigInt(2000 + i * 10);
+      expect(typeof isNounderNiji(id)).toBe('boolean');
+    }
+  });
+
+  it('handles 100 small id values', () => {
+    for (let i = 1; i <= 100; i++) {
+      const id = BigInt(i);
+      expect(typeof isNounderNiji(id)).toBe('boolean');
+    }
+  });
+
+  it('rapid 500 evaluations', () => {
+    for (let i = 0; i < 500; i++) {
+      expect(() => isNounderNiji(BigInt(i))).not.toThrow();
+    }
+  });
 });
