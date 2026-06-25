@@ -748,4 +748,43 @@ describe('BidHistoryModalRow', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BidHistoryModalRow bid={bid} index={0} />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <BidHistoryModalRow key={i} bid={bid} index={i + 11000} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<BidHistoryModalRow bid={bid} index={i} />)).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<BidHistoryModalRow bid={bid} index={i + 13000} />);
+      unmount();
+    }
+  });
+
+  it('round-6 30 different index values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BidHistoryModalRow bid={bid} index={i + 15000} />);
+      unmount();
+    }
+  });
 });
