@@ -441,4 +441,51 @@ describe('ProposalStatus', () => {
       unmount();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalStatus key={i} status={ProposalState.ACTIVE} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ProposalStatus status={ProposalState.ACTIVE} />)).not.toThrow();
+    }
+  });
+
+  it('round-5 30 different status cycles', () => {
+    const states = [
+      ProposalState.ACTIVE,
+      ProposalState.PENDING,
+      ProposalState.SUCCEEDED,
+      ProposalState.EXECUTED,
+    ];
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalStatus status={states[i % 4]} />);
+      unmount();
+    }
+  });
+
+  it('round-5 30 different className values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalStatus status={ProposalState.ACTIVE} className={`r5-cls-${i}`} />,
+      );
+      unmount();
+    }
+  });
 });
