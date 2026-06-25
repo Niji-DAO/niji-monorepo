@@ -449,4 +449,53 @@ describe('EditProposalButton', () => {
       ).not.toThrow();
     }
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<EditProposalButton {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <EditProposalButton key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 500 click events fire handler', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <EditProposalButton {...defaults} handleCreateProposal={handle} />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 500; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(500);
+  });
+
+  it('handles 30 different proposalThreshold values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <EditProposalButton {...defaults} hasEnoughVote={false} proposalThreshold={i} />,
+      );
+      unmount();
+    }
+  });
+
+  it('all 100 instances render button', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <EditProposalButton key={i} {...defaults} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(100);
+  });
 });

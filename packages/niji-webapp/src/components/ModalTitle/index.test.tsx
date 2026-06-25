@@ -412,4 +412,57 @@ describe('ModalTitle', () => {
     );
     expect(container.querySelectorAll('h1').length).toBe(200);
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<ModalTitle>x</ModalTitle>);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <ModalTitle key={i}>{i}</ModalTitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different children with rerender', () => {
+    const { container, rerender } = render(<ModalTitle>x</ModalTitle>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<ModalTitle>val-{i}</ModalTitle>);
+    }
+    expect(container.querySelector('h1')?.textContent).toContain('99');
+  });
+
+  it('all 500 h1 elements exist', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <ModalTitle key={i}>{i}</ModalTitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(500);
+  });
+
+  it('handles deeply nested fragments', () => {
+    const { container } = render(
+      <ModalTitle>
+        <>
+          <>
+            <>
+              <span data-testid="deep-frag-title">deep</span>
+            </>
+          </>
+        </>
+      </ModalTitle>,
+    );
+    expect(container.querySelector('[data-testid="deep-frag-title"]')?.textContent).toBe('deep');
+  });
 });
