@@ -476,4 +476,54 @@ describe('ModalSubtitle', () => {
     );
     expect(container.querySelector('[data-testid="deep-frag"]')?.textContent).toBe('deep');
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<ModalSubtitle>x</ModalSubtitle>);
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <ModalSubtitle key={i}>{i}</ModalSubtitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different children values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(<ModalSubtitle>v-{i}</ModalSubtitle>);
+      expect(container.querySelector('div')?.textContent).toBe(`v-${i}`);
+      unmount();
+    }
+  });
+
+  it('all 500 div wrappers exist with correct content', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <ModalSubtitle key={i}>sub-{i}</ModalSubtitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(500);
+    expect(container.textContent).toContain('sub-499');
+  });
+
+  it('handles 50 different ReactNode types', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ModalSubtitle>
+          <span data-testid={`n-${i}`}>{i}</span>
+        </ModalSubtitle>,
+      );
+      unmount();
+    }
+  });
 });

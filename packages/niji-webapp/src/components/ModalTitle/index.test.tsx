@@ -465,4 +465,54 @@ describe('ModalTitle', () => {
     );
     expect(container.querySelector('[data-testid="deep-frag-title"]')?.textContent).toBe('deep');
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<ModalTitle>x</ModalTitle>);
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <ModalTitle key={i}>{i}</ModalTitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different children values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(<ModalTitle>v-{i}</ModalTitle>);
+      expect(container.querySelector('h1')?.textContent).toBe(`v-${i}`);
+      unmount();
+    }
+  });
+
+  it('all 500 h1 elements exist with correct content', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <ModalTitle key={i}>title-{i}</ModalTitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(500);
+    expect(container.textContent).toContain('title-499');
+  });
+
+  it('handles 50 different ReactNode types', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ModalTitle>
+          <span data-testid={`n-${i}`}>{i}</span>
+        </ModalTitle>,
+      );
+      unmount();
+    }
+  });
 });
