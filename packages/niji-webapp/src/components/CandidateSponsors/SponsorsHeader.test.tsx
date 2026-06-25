@@ -328,4 +328,51 @@ describe('SponsorsHeader (update flow)', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SponsorsHeader candidate={baseCandidate} isThresholdMet={true} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SponsorsHeader key={i} candidate={baseCandidate} isThresholdMet={i % 2 === 0} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<SponsorsHeader candidate={baseCandidate} isThresholdMet={true} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <SponsorsHeader candidate={baseCandidate} isThresholdMet={true} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 30 isThresholdMet toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SponsorsHeader candidate={baseCandidate} isThresholdMet={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
 });
