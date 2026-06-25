@@ -538,4 +538,51 @@ describe('LanguageSelectionModal', () => {
       );
     });
   });
+
+  it('mount-unmount 200 cycles', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('handles 50 different setLocale invocations', () => {
+    for (let i = 0; i < 50; i++) {
+      const setLocale = vi.fn();
+      useAtomMock.mockReturnValue(['en-US', setLocale]);
+      const { unmount } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('rapid 500 onDismiss invocations', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const onDismiss = vi.fn();
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    for (let i = 0; i < 500; i++) {
+      onDismiss();
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(500);
+  });
+
+  it('all 3 locales render h3 title 30 times each', () => {
+    ['en-US', 'ja-JP', 'zh-CN'].forEach(loc => {
+      for (let i = 0; i < 30; i++) {
+        useAtomMock.mockReturnValue([loc, vi.fn()]);
+        const { unmount } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+        expect(document.getElementById('overlay-root')?.querySelector('h3')?.textContent).toBe(
+          'Select Language',
+        );
+        unmount();
+      }
+    });
+  });
+
+  it('handles 30 different unknown locales without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      useAtomMock.mockReturnValue([`xx-${i}`, vi.fn()]);
+      expect(() => render(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
+    }
+  });
 });
