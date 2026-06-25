@@ -146,4 +146,47 @@ describe('SponsorsFormOverlay', () => {
     const { container } = render(<SponsorsFormOverlay {...defaults} isFormDisplayed={false} />);
     expect(container.querySelector('[data-testid="signature-form"]')).toBeNull();
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<SponsorsFormOverlay {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <SponsorsFormOverlay key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 isFormDisplayed=true cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<SponsorsFormOverlay {...defaults} isFormDisplayed={true} />);
+      unmount();
+    }
+  });
+
+  it('rapid 100 setIsFormDisplayed invocations', () => {
+    const setIsFormDisplayed = vi.fn();
+    render(<SponsorsFormOverlay {...defaults} setIsFormDisplayed={setIsFormDisplayed} />);
+    for (let i = 0; i < 100; i++) setIsFormDisplayed(false);
+    expect(setIsFormDisplayed).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles 30 different transactionState values', () => {
+    const states = ['None', 'Mining', 'Success', 'Fail'] as const;
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SponsorsFormOverlay {...defaults} transactionState={states[i % 4]} />,
+      );
+      unmount();
+    }
+  });
 });

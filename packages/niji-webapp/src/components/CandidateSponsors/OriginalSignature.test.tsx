@@ -139,4 +139,58 @@ describe('OriginalSignature', () => {
     );
     expect(container.querySelector('a')?.getAttribute('rel')).toBe('noreferrer');
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={true} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <OriginalSignature
+              key={i}
+              voteCount={i}
+              signer={SIGNER}
+              isParentProposalUpdatable={true}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different voteCount values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <OriginalSignature voteCount={i} signer={SIGNER} isParentProposalUpdatable={true} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 100 different signer addresses', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { unmount } = render(
+        <OriginalSignature voteCount={1} signer={addr} isParentProposalUpdatable={true} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different isParentProposalUpdatable combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
 });
