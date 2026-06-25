@@ -624,4 +624,47 @@ describe('Documentation', () => {
     }
     expect(container.querySelector('[data-testid="about-header"]')).not.toBeNull();
   });
+
+  it('round-2 mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<Documentation />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 200 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <Documentation key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 all 100 instances render about-header', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <Documentation key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="about-header"]').length).toBe(100);
+  });
+
+  it('round-2 rapid 100 mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Documentation />);
+      unmount();
+    }
+  });
+
+  it('round-2 30 sequential renders do not crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<Documentation />)).not.toThrow();
+    }
+  });
 });

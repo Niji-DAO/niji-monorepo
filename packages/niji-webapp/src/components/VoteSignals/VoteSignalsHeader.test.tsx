@@ -150,4 +150,49 @@ describe('VoteSignalsHeader — additional', () => {
       ),
     ).not.toThrow();
   });
+
+  it('round-2 VoteSignalsHeader mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<VoteSignalsHeader />);
+      unmount();
+    }
+  });
+
+  it('round-2 VoteSignalsHeader renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <VoteSignalsHeader key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 isCandidate toggle cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<VoteSignalsHeader isCandidate={i % 2 === 0} />);
+      unmount();
+    }
+  });
+
+  it('round-2 VoteSignalsFootnote mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<VoteSignalsFootnote />);
+      unmount();
+    }
+  });
+
+  it('round-2 VoteSignalsFootnote renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <VoteSignalsFootnote key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });
