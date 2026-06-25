@@ -583,4 +583,48 @@ describe('GrayCircle', () => {
       expect(() => render(<GrayCircle />)).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<GrayCircle isDelegateView={false} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 2000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <GrayCircle key={i} isDelegateView={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 isDelegateView toggle cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<GrayCircle isDelegateView={i % 2 === 0} />);
+      unmount();
+    }
+  });
+
+  it('round-2 all 500 instances render', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <GrayCircle key={i} isDelegateView={false} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(500);
+  });
+
+  it('round-2 100 rerender cycles', () => {
+    const { rerender } = render(<GrayCircle isDelegateView={false} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<GrayCircle isDelegateView={i % 2 === 0} />)).not.toThrow();
+    }
+  });
 });

@@ -812,4 +812,63 @@ describe('NavDropDown', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <NavDropDown buttonText="x" buttonIcon={null} buttonStyle={0}>
+          <div>menu</div>
+        </NavDropDown>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 50 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <NavDropDown key={i} buttonText={`r2-${i}`} buttonIcon={null} buttonStyle={0}>
+              <div>menu</div>
+            </NavDropDown>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different buttonText values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NavDropDown buttonText={`r2-b-${i}`} buttonIcon={null} buttonStyle={0}>
+          <div>menu</div>
+        </NavDropDown>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different buttonStyle values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NavDropDown buttonText="x" buttonIcon={null} buttonStyle={i % 3}>
+          <div>menu</div>
+        </NavDropDown>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        render(
+          <NavDropDown buttonText="x" buttonIcon={null} buttonStyle={0}>
+            <div>menu</div>
+          </NavDropDown>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
