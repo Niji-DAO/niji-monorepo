@@ -1097,4 +1097,51 @@ describe('DelegateHoverCard', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<DelegateHoverCard delegateId="0xABC" proposerAddress="0xPROP" />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DelegateHoverCard
+              key={i}
+              delegateId={('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`}
+              proposerAddress="0xPROP"
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different delegateId values', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { unmount } = render(<DelegateHoverCard delegateId={addr} proposerAddress="0xPROP" />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 different proposerAddress values', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { unmount } = render(<DelegateHoverCard delegateId="0xABC" proposerAddress={addr} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<DelegateHoverCard delegateId="0xABC" proposerAddress="0xPROP" />),
+      ).not.toThrow();
+    }
+  });
 });
