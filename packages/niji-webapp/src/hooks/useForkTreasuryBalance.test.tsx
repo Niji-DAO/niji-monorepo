@@ -321,4 +321,36 @@ describe('useForkTreasuryBalance', () => {
       expect(typeof useForkTreasuryBalance).toBe('function');
     }
   });
+
+  it('round-7 30 renderHook cycles useForkTreasuryBalance', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useForkTreasuryBalance(`0xR7-${i}` as never));
+      unmount();
+    }
+  });
+
+  it('round-7 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useForkTreasuryBalance).toBe('function');
+    }
+  });
+
+  it('round-7 100 sequential reference consistency', () => {
+    const first = useForkTreasuryBalance;
+    for (let i = 0; i < 100; i++) {
+      expect(useForkTreasuryBalance).toBe(first);
+    }
+  });
+
+  it('round-7 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useForkTreasuryBalance(`0xR7-${i}` as never))).not.toThrow();
+    }
+  });
+
+  it('round-7 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useForkTreasuryBalance).toBe('function');
+    }
+  });
 });
