@@ -689,4 +689,65 @@ describe('AuctionActivity', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+      unmount();
+    }
+  });
+
+  it('handles displayGraphDepComps toggle 30 times', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const { rerender } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <AuctionActivity
+              {...defaults}
+              displayGraphDepComps={i % 2 === 0}
+              auction={makeAuction() as never}
+            />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles ended auction with isLastAuction=false', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const ended = makeAuction({ endTime: 1n });
+    expect(() =>
+      wrap(<AuctionActivity {...defaults} isLastAuction={false} auction={ended as never} />),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different startTime values', () => {
+    useAtomValueMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const a = makeAuction({ startTime: BigInt(1700000000 + i * 3600) });
+      const { unmount } = wrap(<AuctionActivity {...defaults} auction={a as never} />);
+      unmount();
+    }
+  });
+
+  it('renders 20 instances all isLastAuction=false', () => {
+    useAtomValueMock.mockReturnValue(false);
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <AuctionActivity
+              key={i}
+              {...defaults}
+              isLastAuction={false}
+              auction={makeAuction() as never}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });
