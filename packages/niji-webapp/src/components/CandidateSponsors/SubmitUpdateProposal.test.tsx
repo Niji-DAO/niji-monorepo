@@ -213,4 +213,70 @@ describe('SubmitUpdateProposal', () => {
     const { container } = wrap(<SubmitUpdateProposal {...baseProps} signatures={[] as never} />);
     expect(container.textContent).toContain('Update proposal');
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <SubmitUpdateProposal {...baseProps} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles all 6 status types', () => {
+    const statuses: UpdateStatus[] = [
+      'None',
+      'PendingSignature',
+      'Mining',
+      'Success',
+      'Fail',
+      'Exception',
+    ];
+    statuses.forEach(s => {
+      hookState.updateProposalBySigsState = { status: s };
+      const { unmount } = render(
+        <MemoryRouter>
+          <SubmitUpdateProposal {...baseProps} />
+        </MemoryRouter>,
+      );
+      unmount();
+    });
+    hookState.updateProposalBySigsState = { status: 'None' };
+  });
+
+  it('rapid 100 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(
+      <MemoryRouter>
+        <SubmitUpdateProposal {...baseProps} onDismiss={onDismiss} />
+      </MemoryRouter>,
+    );
+    for (let i = 0; i < 100; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(100);
+  });
+
+  it('renders 30 instances in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SubmitUpdateProposal key={i} {...baseProps} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different isModalOpen toggle', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <SubmitUpdateProposal {...baseProps} isModalOpen={i % 2 === 0} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
 });

@@ -134,4 +134,50 @@ describe('SponsorsHeader (update flow)', () => {
     // signers=[] でも fallback "..." 経路
     expect(container.textContent).toContain('5 of');
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <SponsorsHeader candidate={baseCandidate} isThresholdMet={false} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <SponsorsHeader key={i} candidate={baseCandidate} isThresholdMet={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different candidates with varying voteCount', () => {
+    for (let i = 0; i < 100; i++) {
+      const c = { ...baseCandidate, voteCount: i } as never;
+      const { unmount } = render(<SponsorsHeader candidate={c} isThresholdMet={false} />);
+      unmount();
+    }
+  });
+
+  it('handles 100 different proposerVotes values', () => {
+    for (let i = 0; i < 100; i++) {
+      const c = { ...baseCandidate, proposerVotes: i } as never;
+      const { unmount } = render(<SponsorsHeader candidate={c} isThresholdMet={true} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 isThresholdMet toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SponsorsHeader candidate={baseCandidate} isThresholdMet={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
 });

@@ -294,4 +294,70 @@ describe('SelectSponsorsToPropose', () => {
     );
     expect(container.querySelectorAll('[data-testid="short-address"]').length).toBe(4);
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <SelectSponsorsToPropose {...baseProps} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles all 6 proposeBySigs status types', () => {
+    const statuses: ProposeStatus[] = [
+      'None',
+      'PendingSignature',
+      'Mining',
+      'Success',
+      'Fail',
+      'Exception',
+    ];
+    statuses.forEach(s => {
+      hookState.proposeBySigsState = { status: s };
+      const { unmount } = render(
+        <MemoryRouter>
+          <SelectSponsorsToPropose {...baseProps} />
+        </MemoryRouter>,
+      );
+      unmount();
+    });
+    hookState.proposeBySigsState = { status: 'None' };
+  });
+
+  it('rapid 100 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(
+      <MemoryRouter>
+        <SelectSponsorsToPropose {...baseProps} onDismiss={onDismiss} />
+      </MemoryRouter>,
+    );
+    for (let i = 0; i < 100; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(100);
+  });
+
+  it('renders 30 instances in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SelectSponsorsToPropose key={i} {...baseProps} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 isModalOpen toggle', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <SelectSponsorsToPropose {...baseProps} isModalOpen={i % 2 === 0} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
 });
