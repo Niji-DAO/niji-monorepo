@@ -202,4 +202,85 @@ describe('Tooltip', () => {
     const content = document.querySelector('[data-testid="content"]');
     expect(content?.className).toContain('text-xs');
   });
+
+  it('round-2 Tooltip mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>x</TooltipTrigger>
+            <TooltipContent>tip</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 Tooltip instances in single Provider', () => {
+    expect(() =>
+      render(
+        <TooltipProvider>
+          {Array.from({ length: 100 }, (_, i) => (
+            <Tooltip key={i}>
+              <TooltipTrigger>r2-x-{i}</TooltipTrigger>
+              <TooltipContent>r2-tip-{i}</TooltipContent>
+            </Tooltip>
+          ))}
+        </TooltipProvider>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different content values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>x</TooltipTrigger>
+            <TooltipContent>r2-content-{i}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        render(
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>x</TooltipTrigger>
+              <TooltipContent>tip</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-2 50 rerender cycles', () => {
+    const { rerender } = render(
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>x</TooltipTrigger>
+          <TooltipContent>tip</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>,
+    );
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        rerender(
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>r2-x-{i}</TooltipTrigger>
+              <TooltipContent>r2-{i}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
