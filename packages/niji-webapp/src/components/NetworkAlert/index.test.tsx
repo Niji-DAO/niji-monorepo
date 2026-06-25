@@ -229,4 +229,52 @@ describe('NetworkAlert', () => {
     const { container } = render(<NetworkAlert />);
     expect(container.firstChild).toBeNull();
   });
+
+  it('mount-unmount 500 cycles (disconnected)', () => {
+    useAccountMock.mockReturnValue({ isConnected: false, chainId: undefined });
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<NetworkAlert />);
+      unmount();
+    }
+  });
+
+  it('mount-unmount 500 cycles (wrong network)', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 999 });
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<NetworkAlert />);
+      unmount();
+    }
+  });
+
+  it('handles 100 different wrong chainId values', () => {
+    for (let i = 100; i < 200; i++) {
+      useAccountMock.mockReturnValue({ isConnected: true, chainId: i });
+      const { unmount } = render(<NetworkAlert />);
+      unmount();
+    }
+  });
+
+  it('renders 100 instances all wrong network', () => {
+    useAccountMock.mockReturnValue({ isConnected: true, chainId: 999 });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <NetworkAlert key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles isConnected toggle 100 times', () => {
+    const { rerender } = render(<NetworkAlert />);
+    for (let i = 0; i < 100; i++) {
+      useAccountMock.mockReturnValue({
+        isConnected: i % 2 === 0,
+        chainId: i % 2 === 0 ? 999 : 1,
+      });
+      expect(() => rerender(<NetworkAlert />)).not.toThrow();
+    }
+  });
 });

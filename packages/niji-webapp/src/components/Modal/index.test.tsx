@@ -292,4 +292,52 @@ describe('Modal', () => {
     rerender(<Backdrop onDismiss={vi.fn()} />);
     expect(container.querySelectorAll('div').length).toBe(1);
   });
+
+  it('Backdrop mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<Backdrop onDismiss={vi.fn()} />);
+      unmount();
+    }
+  });
+
+  it('Backdrop renders 1500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <Backdrop key={i} onDismiss={vi.fn()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('Backdrop rapid 1000 clicks fire handler', () => {
+    const onDismiss = vi.fn();
+    const { container } = render(<Backdrop onDismiss={onDismiss} />);
+    const div = container.querySelector('div')!;
+    for (let i = 0; i < 1000; i++) fireEvent.click(div);
+    expect(onDismiss).toHaveBeenCalledTimes(1000);
+  });
+
+  it('Backdrop 30 sequential renders with new handler', () => {
+    for (let i = 0; i < 30; i++) {
+      const handler = vi.fn();
+      const { container, unmount } = render(<Backdrop onDismiss={handler} />);
+      fireEvent.click(container.querySelector('div')!);
+      expect(handler).toHaveBeenCalledTimes(1);
+      unmount();
+    }
+  });
+
+  it('Backdrop all 500 instances render div root', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <Backdrop key={i} onDismiss={vi.fn()} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(500);
+  });
 });

@@ -489,4 +489,83 @@ describe('ModalBottomButtonRow', () => {
     expect(container.querySelectorAll('button')[0]?.textContent).toBe('戻る');
     expect(container.querySelectorAll('button')[1]?.textContent).toBe('次へ');
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <ModalBottomButtonRow
+          prevBtnText="Prev"
+          onPrevBtnClick={() => {}}
+          nextBtnText="Next"
+          onNextBtnClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <ModalBottomButtonRow
+              key={i}
+              prevBtnText="Prev"
+              onPrevBtnClick={() => {}}
+              nextBtnText="Next"
+              onNextBtnClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 1000 prev clicks fire handler', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <ModalBottomButtonRow
+        prevBtnText="Prev"
+        onPrevBtnClick={onPrev}
+        nextBtnText="Next"
+        onNextBtnClick={() => {}}
+      />,
+    );
+    const prevBtn = container.querySelectorAll('button')[0];
+    for (let i = 0; i < 1000; i++) fireEvent.click(prevBtn);
+    expect(onPrev).toHaveBeenCalledTimes(1000);
+  });
+
+  it('handles 100 different prevBtnText values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <ModalBottomButtonRow
+          prevBtnText={`Prev-${i}`}
+          onPrevBtnClick={() => {}}
+          nextBtnText="Next"
+          onNextBtnClick={() => {}}
+        />,
+      );
+      expect(container.querySelectorAll('button')[0]?.textContent).toBe(`Prev-${i}`);
+      unmount();
+    }
+  });
+
+  it('all 200 instances render 2 buttons each', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <ModalBottomButtonRow
+            key={i}
+            prevBtnText="P"
+            onPrevBtnClick={() => {}}
+            nextBtnText="N"
+            onNextBtnClick={() => {}}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(400);
+  });
 });
