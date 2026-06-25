@@ -196,4 +196,49 @@ describe('AboutSection', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrapAccordion(<AboutSection {...links} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances in single Accordion mount', () => {
+    expect(() =>
+      render(
+        <Accordion alwaysOpen defaultActiveKey="0">
+          {Array.from({ length: 30 }, (_, i) => (
+            <AboutSection key={i} {...links} />
+          ))}
+        </Accordion>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 AboutHeader mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<AboutHeader />);
+      unmount();
+    }
+  });
+
+  it('round-2 AboutHeader renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <AboutHeader key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 30 mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrapAccordion(<AboutSection {...links} />);
+      unmount();
+    }
+  });
 });

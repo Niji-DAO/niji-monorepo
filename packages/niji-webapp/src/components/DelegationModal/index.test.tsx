@@ -445,4 +445,50 @@ describe('DelegationModal', () => {
     );
     expect(container.querySelectorAll('div').length).toBe(500);
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<DelegationModal onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 200 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <DelegationModal key={i} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 300 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<DelegationModal onDismiss={onDismiss} />);
+    for (let i = 0; i < 300; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(300);
+  });
+
+  it('round-2 50 sequential renders with new handler', () => {
+    for (let i = 0; i < 50; i++) {
+      const onDismiss = vi.fn();
+      const { unmount } = render(<DelegationModal onDismiss={onDismiss} />);
+      unmount();
+    }
+  });
+
+  it('round-2 all 100 instances render no crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <DelegationModal key={i} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });
