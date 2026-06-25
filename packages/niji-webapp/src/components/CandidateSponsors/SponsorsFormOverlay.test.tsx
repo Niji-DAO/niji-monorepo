@@ -232,4 +232,48 @@ describe('SponsorsFormOverlay', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<SponsorsFormOverlay {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <SponsorsFormOverlay key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 isFormDisplayed toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SponsorsFormOverlay {...defaults} isFormDisplayed={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 30 different transactionState cycles', () => {
+    const states = ['Pending', 'Success', 'Failed', 'None'];
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SponsorsFormOverlay {...defaults} transactionState={states[i % 4] as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<SponsorsFormOverlay {...defaults} />)).not.toThrow();
+    }
+  });
 });
