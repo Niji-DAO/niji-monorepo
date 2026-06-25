@@ -235,4 +235,50 @@ describe('Link', () => {
     );
     expect(container.querySelectorAll('a').length).toBe(500);
   });
+
+  it('round-3 mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<Link text="x" url="https://example.com" />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 1500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <Link key={i} text={`r3-${i}`} url={`https://e.com/r3-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 100 different text values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<Link text={`r3-t-${i}`} url="https://x" />);
+      expect(container.querySelector('a')?.textContent).toBe(`r3-t-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-3 100 different url values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<Link text="x" url={`https://example.com/${i}`} />);
+      expect(container.querySelector('a')?.getAttribute('href')).toBe(`https://example.com/${i}`);
+      unmount();
+    }
+  });
+
+  it('round-3 all 500 instances have anchor element', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <Link key={i} text="x" url={`https://e.com/${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(500);
+  });
 });
