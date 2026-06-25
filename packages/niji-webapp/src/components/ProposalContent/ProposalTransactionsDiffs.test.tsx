@@ -234,4 +234,75 @@ describe('ProposalTransactionsDiffs', () => {
     // 4 (longer = old)
     expect(totalElements).toBeGreaterThanOrEqual(4);
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalTransactionsDiffs
+          oldTransactions={[]}
+          newTransactions={[]}
+          activeVersionNumber={1}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 30 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalTransactionsDiffs
+              key={i}
+              oldTransactions={[]}
+              newTransactions={[]}
+              activeVersionNumber={1}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different transaction count pairs', () => {
+    for (let i = 1; i <= 30; i++) {
+      const txs = Array.from({ length: i }, (_, j) => makeTx(`0xT${j}`) as never);
+      const { unmount } = render(
+        <ProposalTransactionsDiffs
+          oldTransactions={[]}
+          newTransactions={txs}
+          activeVersionNumber={i}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different activeVersionNumber values', () => {
+    for (let i = 1; i <= 30; i++) {
+      const { unmount } = render(
+        <ProposalTransactionsDiffs
+          oldTransactions={[]}
+          newTransactions={[]}
+          activeVersionNumber={i}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 cycles with both arrays populated', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ProposalTransactionsDiffs
+            oldTransactions={[makeTx('0xA') as never]}
+            newTransactions={[makeTx('0xB') as never]}
+            activeVersionNumber={i + 1}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
