@@ -594,4 +594,44 @@ describe('AuctionActivityNijiTitle', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<AuctionActivityNijiTitle nounId={1n} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <AuctionActivityNijiTitle key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 different nounIds', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<AuctionActivityNijiTitle nounId={BigInt(i + 1000)} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 50 large nounIds', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<AuctionActivityNijiTitle nounId={BigInt(1_000_000 + i)} />);
+      unmount();
+    }
+  });
+
+  it('round-2 100 rerender cycles', () => {
+    const { rerender } = render(<AuctionActivityNijiTitle nounId={1n} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<AuctionActivityNijiTitle nounId={BigInt(i)} />)).not.toThrow();
+    }
+  });
 });

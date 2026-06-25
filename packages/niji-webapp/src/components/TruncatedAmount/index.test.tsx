@@ -486,4 +486,49 @@ describe('TruncatedAmount', () => {
     }
     expect(container.textContent).toMatch(/^Ξ \d+\.\d{2}$/);
   });
+
+  it('round-2 mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<TruncatedAmount amount={5n * 10n ** 18n} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 1000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <TruncatedAmount key={i} amount={BigInt(i + 1) * 10n ** 18n} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 different amount values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<TruncatedAmount amount={BigInt(i + 100) * 10n ** 17n} />);
+      unmount();
+    }
+  });
+
+  it('round-2 all 200 instances render Ξ prefix', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <TruncatedAmount key={i} amount={BigInt(i + 1) * 10n ** 18n} />
+        ))}
+      </>,
+    );
+    const matches = (container.textContent ?? '').match(/Ξ/g);
+    expect(matches?.length).toBe(200);
+  });
+
+  it('round-2 100 rerender cycles', () => {
+    const { rerender } = render(<TruncatedAmount amount={1n * 10n ** 18n} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<TruncatedAmount amount={BigInt(i + 1) * 10n ** 18n} />)).not.toThrow();
+    }
+  });
 });
