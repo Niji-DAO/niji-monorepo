@@ -258,4 +258,71 @@ describe('VoteSignalsUserFeedback', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <VoteSignalsUserFeedback
+          userVoteSupport={{ supportDetailed: 1, createdTimestamp: 0, reason: '' } as never}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 200 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <VoteSignalsUserFeedback
+              key={i}
+              userVoteSupport={
+                { supportDetailed: i % 3, createdTimestamp: 0, reason: `r2-${i}` } as never
+              }
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different reason values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <VoteSignalsUserFeedback
+          userVoteSupport={
+            { supportDetailed: 1, createdTimestamp: 0, reason: `r2-reason-${i}` } as never
+          }
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles all 3 supportDetailed cycles 30 times each', () => {
+    for (let s = 0; s < 3; s++) {
+      for (let i = 0; i < 30; i++) {
+        const { unmount } = render(
+          <VoteSignalsUserFeedback
+            userVoteSupport={{ supportDetailed: s, createdTimestamp: 0, reason: '' } as never}
+          />,
+        );
+        unmount();
+      }
+    }
+  });
+
+  it('round-2 handles 100 cycles with supportDetailed=2', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <VoteSignalsUserFeedback
+          userVoteSupport={
+            { supportDetailed: 2, createdTimestamp: 0, reason: `r2-fb-${i}` } as never
+          }
+        />,
+      );
+      unmount();
+    }
+  });
 });

@@ -212,4 +212,47 @@ describe('VoteSignalsForm extra cases', () => {
       unmount();
     }
   });
+
+  it('round-2 VoteSignalsForm mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteSignalsForm {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <VoteSignalsForm key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different support values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<VoteSignalsForm {...defaults} support={i % 3} />);
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 300 setReasonText events', () => {
+    const setReasonText = vi.fn();
+    const { container } = render(<VoteSignalsForm {...defaults} setReasonText={setReasonText} />);
+    const textarea = container.querySelector('textarea')!;
+    for (let i = 0; i < 300; i++) {
+      fireEvent.change(textarea, { target: { value: `r2-r-${i}` } });
+    }
+    expect(setReasonText).toHaveBeenCalledTimes(300);
+  });
+
+  it('round-2 VoteSignalsPending mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<VoteSignalsPending />);
+      unmount();
+    }
+  });
 });
