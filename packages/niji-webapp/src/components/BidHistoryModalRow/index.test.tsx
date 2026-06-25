@@ -535,4 +535,52 @@ describe('BidHistoryModalRow', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 300 cycles', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<BidHistoryModalRow bid={bid} index={i} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <BidHistoryModalRow key={i} bid={bid} index={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different ENS names', () => {
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    for (let i = 0; i < 100; i++) {
+      vi.mocked(useReverseENSLookUp).mockReturnValue(`ens-${i}.eth`);
+      const { unmount } = render(<BidHistoryModalRow bid={bid} index={1} />);
+      unmount();
+    }
+  });
+
+  it('handles 100 different bid values', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    for (let i = 0; i < 100; i++) {
+      const b = { ...bid, value: parseEther(`${i + 1}`) };
+      const { unmount } = render(<BidHistoryModalRow bid={b} index={1} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different containsBlockedText combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      vi.mocked(useReverseENSLookUp).mockReturnValue(`x-${i}.eth`);
+      vi.mocked(containsBlockedText).mockReturnValue(i % 2 === 0);
+      const { unmount } = render(<BidHistoryModalRow bid={bid} index={1} />);
+      unmount();
+    }
+  });
 });

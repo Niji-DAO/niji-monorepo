@@ -567,4 +567,63 @@ describe('CandidateCard', () => {
       expect(link.getAttribute('href')).toBe(`/candidates/c-${i}`);
     });
   });
+
+  it('mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <CandidateCard candidate={baseCandidate} nounsRequired={3} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <CandidateCard
+              key={i}
+              candidate={{ ...baseCandidate, id: `c-${i}` } as never}
+              nounsRequired={3}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different proposer addresses', () => {
+    for (let i = 0; i < 100; i++) {
+      const c = { ...baseCandidate, proposer: '0x' + i.toString(16).padStart(40, '0') } as never;
+      const { unmount } = wrap(<CandidateCard candidate={c} nounsRequired={3} />);
+      unmount();
+    }
+  });
+
+  it('all 100 instances have sponsors element', () => {
+    const { container } = wrap(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <CandidateCard
+            key={i}
+            candidate={{ ...baseCandidate, id: `c-${i}` } as never}
+            nounsRequired={3}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="sponsors"]').length).toBe(100);
+  });
+
+  it('handles 30 different candidate.requiredVotes values', () => {
+    for (let i = 0; i < 30; i++) {
+      const c = { ...baseCandidate, requiredVotes: i } as never;
+      const { container, unmount } = wrap(<CandidateCard candidate={c} nounsRequired={3} />);
+      expect(container.querySelector('[data-testid="sponsors"]')?.textContent).toBe(`req-${i}`);
+      unmount();
+    }
+  });
 });
