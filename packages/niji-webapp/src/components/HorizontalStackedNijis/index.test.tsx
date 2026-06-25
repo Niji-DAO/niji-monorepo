@@ -362,4 +362,54 @@ describe('HorizontalStackedNijis', () => {
     );
     expect(container.querySelectorAll('div').length).toBeGreaterThanOrEqual(100);
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<HorizontalStackedNijis nounIds={['1', '2']} />);
+      unmount();
+    }
+  });
+
+  it('renders 300 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <HorizontalStackedNijis key={i} nounIds={['1', '2', '3']} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different nounIds arrays', () => {
+    for (let i = 0; i < 50; i++) {
+      const ids = Array.from({ length: (i % 10) + 1 }, (_, j) => `${j}`);
+      const { container, unmount } = render(<HorizontalStackedNijis nounIds={ids} />);
+      const count = Math.min(ids.length, 6);
+      expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(count);
+      unmount();
+    }
+  });
+
+  it('handles all combinations of 0-6 nounIds (boundary)', () => {
+    [0, 1, 2, 3, 4, 5, 6].forEach(n => {
+      const ids = Array.from({ length: n }, (_, j) => `${j}`);
+      const { container, unmount } = render(<HorizontalStackedNijis nounIds={ids} />);
+      expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(n);
+      unmount();
+    });
+  });
+
+  it('all 100 instances cap at 6', () => {
+    const ids = Array.from({ length: 20 }, (_, i) => `${i}`);
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <HorizontalStackedNijis key={i} nounIds={ids} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="niji-circular"]').length).toBe(600);
+  });
 });

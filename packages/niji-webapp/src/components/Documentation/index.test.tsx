@@ -431,4 +431,54 @@ describe('Documentation', () => {
     expect(container.querySelectorAll('[data-testid="gov-section"]').length).toBe(10);
     expect(container.querySelectorAll('[data-testid="nijiders-section"]').length).toBe(10);
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Documentation />);
+      unmount();
+    }
+  });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <Documentation key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 50 instances have about-header', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <Documentation key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="about-header"]').length).toBe(50);
+  });
+
+  it('all 50 instances have nijiders-section', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <Documentation key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="nijiders-section"]').length).toBe(50);
+  });
+
+  it('rapid rerender 50 times preserves structure', () => {
+    const { container, rerender } = render(<Documentation />);
+    for (let i = 0; i < 50; i++) {
+      rerender(<Documentation />);
+    }
+    expect(container.querySelector('[data-testid="about-section"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="art-section"]')).not.toBeNull();
+  });
 });
