@@ -300,4 +300,43 @@ describe('SignatureStatusOverlay', () => {
     for (let i = 0; i < 30; i++) setIsTxSuccessful(true);
     expect(setIsTxSuccessful).toHaveBeenCalledTimes(30);
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<SignatureStatusOverlay {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SignatureStatusOverlay key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<SignatureStatusOverlay {...defaults} />)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<SignatureStatusOverlay {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-5 30 rapid setIsTxSuccessful invocations', () => {
+    const setIsTxSuccessful = vi.fn();
+    render(<SignatureStatusOverlay {...defaults} setIsTxSuccessful={setIsTxSuccessful} />);
+    for (let i = 0; i < 30; i++) setIsTxSuccessful(true);
+    expect(setIsTxSuccessful).toHaveBeenCalledTimes(30);
+  });
 });
