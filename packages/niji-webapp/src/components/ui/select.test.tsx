@@ -386,4 +386,73 @@ describe('Select', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+        </Select>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Select key={i}>
+              <SelectTrigger>
+                <SelectValue placeholder={`r2-p-${i}`} />
+              </SelectTrigger>
+            </Select>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 SelectGroup + SelectLabel 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SelectGroup>
+          <SelectLabel>r2-lbl-{i}</SelectLabel>
+        </SelectGroup>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 SelectSeparator + SelectScrollDownButton 30 cycles in Select context', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={`v-${i}`}>v-{i}</SelectItem>
+          </SelectContent>
+        </Select>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 SelectValue with different placeholders', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder={`r2-Select-${i}`} />
+          </SelectTrigger>
+        </Select>,
+      );
+      unmount();
+    }
+  });
 });

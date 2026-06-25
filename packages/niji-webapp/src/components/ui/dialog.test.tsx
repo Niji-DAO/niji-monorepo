@@ -284,4 +284,70 @@ describe('Dialog', () => {
       unmount();
     }
   });
+
+  it('round-2 Dialog mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <Dialog>
+          <DialogTrigger>open</DialogTrigger>
+        </Dialog>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 Dialog instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <Dialog key={i}>
+              <DialogTrigger>r2-btn-{i}</DialogTrigger>
+            </Dialog>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 Dialog with title+desc 30 instances', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Dialog key={i}>
+              <DialogContent>
+                <DialogTitle>r2-t-{i}</DialogTitle>
+                <DialogDescription>r2-d-{i}</DialogDescription>
+              </DialogContent>
+            </Dialog>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 DialogHeader + DialogFooter 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <>
+          <DialogHeader>h-r2-{i}</DialogHeader>
+          <DialogFooter>f-r2-{i}</DialogFooter>
+        </>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 DialogTrigger 100 rapid click events', () => {
+    const handler = vi.fn();
+    const { container } = render(
+      <Dialog>
+        <DialogTrigger onClick={handler}>open</DialogTrigger>
+      </Dialog>,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 100; i++) fireEvent.click(btn);
+    expect(handler.mock.calls.length).toBeGreaterThan(50);
+  });
 });
