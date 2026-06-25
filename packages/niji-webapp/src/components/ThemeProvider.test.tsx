@@ -514,4 +514,63 @@ describe('ThemeProvider', () => {
       unmount();
     }
   });
+
+  it('round-7 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>r7</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-7 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ThemeProvider key={i}>
+              <div>r7-{i}</div>
+            </ThemeProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ThemeProvider>
+            <div>x</div>
+          </ThemeProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-7 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>x</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-7 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>r7-child-{i}</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
 });
