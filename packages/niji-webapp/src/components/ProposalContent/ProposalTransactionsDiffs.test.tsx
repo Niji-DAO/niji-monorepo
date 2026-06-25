@@ -376,4 +376,75 @@ describe('ProposalTransactionsDiffs', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalTransactionsDiffs
+          oldTransactions={[]}
+          newTransactions={[]}
+          activeVersionNumber={1}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalTransactionsDiffs
+              key={i}
+              oldTransactions={[]}
+              newTransactions={[]}
+              activeVersionNumber={i + 1}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different transaction count pairs', () => {
+    for (let i = 1; i <= 30; i++) {
+      const txs = Array.from({ length: i }, (_, j) => makeTx(`0xR3-T${j}`) as never);
+      const { unmount } = render(
+        <ProposalTransactionsDiffs
+          oldTransactions={[]}
+          newTransactions={txs}
+          activeVersionNumber={i}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 30 different activeVersionNumber values', () => {
+    for (let i = 1; i <= 30; i++) {
+      const { unmount } = render(
+        <ProposalTransactionsDiffs
+          oldTransactions={[]}
+          newTransactions={[]}
+          activeVersionNumber={i + 200}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 30 cycles with both arrays populated', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ProposalTransactionsDiffs
+            oldTransactions={[makeTx('0xR3A') as never]}
+            newTransactions={[makeTx('0xR3B') as never]}
+            activeVersionNumber={i + 300}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
