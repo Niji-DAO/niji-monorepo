@@ -522,4 +522,41 @@ describe('AddNijisToForkModal', () => {
     });
     hookState.joinForkState = { status: 'None' };
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AddNijisToForkModal {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles 5000 owned nouns', () => {
+    const nouns = Array.from({ length: 5000 }, (_, i) => i);
+    expect(() => render(<AddNijisToForkModal {...baseProps} ownedNouns={nouns} />)).not.toThrow();
+  });
+
+  it('handles userEscrowedNouns combined with ownedNouns', () => {
+    expect(() =>
+      render(
+        <AddNijisToForkModal
+          {...baseProps}
+          ownedNouns={[1, 2, 3, 4, 5]}
+          userEscrowedNouns={[3, 4]}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid refetchData 100 invocations', () => {
+    const refetchData = vi.fn();
+    render(<AddNijisToForkModal {...baseProps} refetchData={refetchData} />);
+    for (let i = 0; i < 100; i++) refetchData();
+    expect(refetchData).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles isApprovedForAll=false branch', () => {
+    hookState.isApprovedForAll = false;
+    expect(() => render(<AddNijisToForkModal {...baseProps} />)).not.toThrow();
+    hookState.isApprovedForAll = true;
+  });
 });

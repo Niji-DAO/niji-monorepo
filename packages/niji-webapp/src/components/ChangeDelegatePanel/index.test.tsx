@@ -497,4 +497,38 @@ describe('ChangeDelegatePanel', () => {
     expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
     hookState.accountVotes = 5;
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+      unmount();
+    }
+  });
+
+  it('handles all locale variants', () => {
+    ['en-US', 'ja-JP', 'zh-CN'].forEach(loc => {
+      hookState.locale = loc;
+      expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    });
+    hookState.locale = 'en-US';
+  });
+
+  it('handles undefined account', () => {
+    hookState.account = undefined;
+    expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    hookState.account = '0xUSER';
+  });
+
+  it('handles ensResolved set + ensFetched=true', () => {
+    hookState.ensResolved = '0xRESOLVED';
+    hookState.ensFetched = true;
+    expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    hookState.ensResolved = undefined;
+  });
+
+  it('handles 0 nounTokenBalance', () => {
+    hookState.nounTokenBalance = 0;
+    expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
+    hookState.nounTokenBalance = 5;
+  });
 });

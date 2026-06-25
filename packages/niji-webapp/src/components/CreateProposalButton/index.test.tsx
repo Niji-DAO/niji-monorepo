@@ -823,4 +823,89 @@ describe('CreateProposalButton', () => {
     );
     expect(container.querySelector('button')).not.toBeNull();
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <CreateProposalButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          hasEnoughVote={true}
+          isFormInvalid={false}
+          handleCreateProposal={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <CreateProposalButton
+              key={i}
+              isLoading={false}
+              hasActiveOrPendingProposal={false}
+              hasEnoughVote={true}
+              isFormInvalid={false}
+              handleCreateProposal={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles all 16 boolean prop combinations', () => {
+    [true, false].forEach(isLoading => {
+      [true, false].forEach(hasActive => {
+        [true, false].forEach(hasEnough => {
+          [true, false].forEach(isInvalid => {
+            expect(() =>
+              render(
+                <CreateProposalButton
+                  isLoading={isLoading}
+                  hasActiveOrPendingProposal={hasActive}
+                  hasEnoughVote={hasEnough}
+                  isFormInvalid={isInvalid}
+                  handleCreateProposal={() => {}}
+                />,
+              ),
+            ).not.toThrow();
+          });
+        });
+      });
+    });
+  });
+
+  it('handles undefined proposalThreshold', () => {
+    expect(() =>
+      render(
+        <CreateProposalButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          hasEnoughVote={false}
+          isFormInvalid={false}
+          handleCreateProposal={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 0 proposalThreshold', () => {
+    expect(() =>
+      render(
+        <CreateProposalButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          hasEnoughVote={false}
+          isFormInvalid={false}
+          proposalThreshold={0}
+          handleCreateProposal={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });

@@ -584,4 +584,68 @@ describe('Holder', () => {
       expect(() => rerender(<Holder nounId={1n} />)).not.toThrow();
     }
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Holder nounId={BigInt(i)} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('renders 50 instances with different nounIds', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <Holder key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles isNounders=true rerender 30 times', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    const { rerender } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    for (let i = 0; i < 30; i++) {
+      expect(() => rerender(<Holder nounId={1n} isNounders={i % 2 === 0} />)).not.toThrow();
+    }
+  });
+
+  it('handles atomValue false with data', () => {
+    useAtomValueMock.mockReturnValue(false);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    expect(() => render(<Holder nounId={1n} />, { wrapper: WithProviders })).not.toThrow();
+  });
+
+  it('handles 50 different owner addresses', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 50; i++) {
+      useSubgraphQueryMock.mockReturnValue({
+        loading: false,
+        error: undefined,
+        data: { noun: { owner: { id: `0xOWNER${i}` } } },
+      });
+      const { unmount } = render(<Holder nounId={BigInt(i)} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
 });
