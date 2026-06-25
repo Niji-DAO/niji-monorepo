@@ -302,4 +302,39 @@ describe('useBreakpointDown', () => {
       expect(typeof useBreakpointValues).toBe('function');
     }
   });
+
+  it('round-5 30 renderHook cycles useBreakpointValues', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useBreakpointValues({ base: i + 5000 }));
+      unmount();
+    }
+  });
+
+  it('round-5 50 renderHook cycles varied breakpoints', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() =>
+        useBreakpointValues({ base: i + 6000, md: i + 7000, lg: i + 8000 }),
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useBreakpointValues({ base: i + 9000 }));
+      unmount();
+    }
+  });
+
+  it('round-5 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useBreakpointValues({ base: i + 11000 }))).not.toThrow();
+    }
+  });
+
+  it('round-5 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useBreakpointValues).toBe('function');
+    }
+  });
 });
