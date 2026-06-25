@@ -199,4 +199,47 @@ describe('ProposalTransactions', () => {
       expect(() => render(<ProposalTransactions details={[]} />)).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<ProposalTransactions details={[simpleTx]} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <ProposalTransactions key={i} details={[simpleTx]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different details counts', () => {
+    for (let i = 1; i <= 50; i++) {
+      const details = Array.from({ length: i }, () => simpleTx);
+      const { unmount } = render(<ProposalTransactions details={details} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 50 different target addresses', () => {
+    for (let i = 0; i < 50; i++) {
+      const target = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(
+        <ProposalTransactions details={[{ ...simpleTx, target } as never]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 100 renders with empty details', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => render(<ProposalTransactions details={[]} />)).not.toThrow();
+    }
+  });
 });
