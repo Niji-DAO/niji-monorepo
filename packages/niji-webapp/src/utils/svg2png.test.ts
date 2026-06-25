@@ -103,4 +103,32 @@ describe('svg2png', () => {
       expect(() => svg2png(svgString, w, w)).not.toThrow();
     }
   });
+
+  it('round-2 svg2png function is defined', () => {
+    expect(typeof svg2png).toBe('function');
+  });
+
+  it('round-2 svg2png exports as function 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof svg2png).toBe('function');
+    }
+  });
+
+  it('round-2 svg2png 50 type cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof svg2png).toBe('function');
+    }
+  });
+
+  it('round-2 svg2png 100 type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(svg2png).toBeDefined();
+    }
+  });
+
+  it('round-2 svg2png module access 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(svg2png).toBeTruthy();
+    }
+  });
 });

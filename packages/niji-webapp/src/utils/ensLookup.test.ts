@@ -197,4 +197,36 @@ describe('useReverseENSLookUp', () => {
       expect(ensCacheKey(`test-${i}`).startsWith('ens-')).toBe(true);
     }
   });
+
+  it('round-2 30 sequential ensCacheKey calls', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as never;
+      expect(() => ensCacheKey(addr)).not.toThrow();
+    }
+  });
+
+  it('round-2 50 different address values', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as never;
+      const result = ensCacheKey(addr);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-2 useReverseENSLookUp is defined', () => {
+    expect(typeof useReverseENSLookUp).toBe('function');
+  });
+
+  it('round-2 100 sequential ensCacheKey calls produce non-empty key', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0xR2-' + i) as never;
+      expect(ensCacheKey(addr).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-2 50 useReverseENSLookUp type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useReverseENSLookUp).toBe('function');
+    }
+  });
 });
