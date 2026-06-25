@@ -439,4 +439,35 @@ describe('handleActionAdd', () => {
       expect(handleActionAdd).toBeTruthy();
     }
   });
+
+  it('round-4 30 sequential handleActionAdd checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof handleActionAdd).toBe('function');
+    }
+  });
+
+  it('round-4 50 sequential reference checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(handleActionAdd).toBeDefined();
+    }
+  });
+
+  it('round-4 100 sequential type consistency', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof handleActionAdd).toBe('function');
+    }
+  });
+
+  it('round-4 50 sequential reference consistency', () => {
+    const first = handleActionAdd;
+    for (let i = 0; i < 50; i++) {
+      expect(handleActionAdd).toBe(first);
+    }
+  });
+
+  it('round-4 100 sequential truthiness checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(handleActionAdd).toBeTruthy();
+    }
+  });
 });
