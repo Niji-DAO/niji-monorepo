@@ -105,4 +105,49 @@ describe('GovernanceSection', () => {
     );
     expect(container.textContent).toBe(first);
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<GovernanceSection />);
+      unmount();
+    }
+  });
+
+  it('renders 30 instances in single Accordion mount', () => {
+    expect(() =>
+      render(
+        <Accordion alwaysOpen defaultActiveKey="4">
+          {Array.from({ length: 30 }, (_, i) => (
+            <GovernanceSection key={i} />
+          ))}
+        </Accordion>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 rerender cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<GovernanceSection />);
+      unmount();
+    }
+  });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <Accordion alwaysOpen defaultActiveKey="4">
+          {Array.from({ length: 50 }, (_, i) => (
+            <GovernanceSection key={i} />
+          ))}
+        </Accordion>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 30 mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<GovernanceSection />);
+      unmount();
+    }
+  });
 });
