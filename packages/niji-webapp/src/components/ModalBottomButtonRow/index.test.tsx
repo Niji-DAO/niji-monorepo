@@ -568,4 +568,80 @@ describe('ModalBottomButtonRow', () => {
     );
     expect(container.querySelectorAll('button').length).toBe(400);
   });
+
+  it('round-2 mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(
+        <ModalBottomButtonRow
+          prevBtnText="x"
+          onPrevBtnClick={() => {}}
+          nextBtnText="y"
+          onNextBtnClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <ModalBottomButtonRow
+              key={i}
+              prevBtnText={`p-${i}`}
+              onPrevBtnClick={() => {}}
+              nextBtnText={`n-${i}`}
+              onNextBtnClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 200 onPrevBtnClick events', () => {
+    const onPrev = vi.fn();
+    const { container } = render(
+      <ModalBottomButtonRow
+        prevBtnText="prev"
+        onPrevBtnClick={onPrev}
+        nextBtnText="next"
+        onNextBtnClick={() => {}}
+      />,
+    );
+    const btn = container.querySelectorAll('button')[0];
+    for (let i = 0; i < 200; i++) fireEvent.click(btn);
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-2 rapid 200 onNextBtnClick events', () => {
+    const onNext = vi.fn();
+    const { container } = render(
+      <ModalBottomButtonRow
+        prevBtnText="prev"
+        onPrevBtnClick={() => {}}
+        nextBtnText="next"
+        onNextBtnClick={onNext}
+      />,
+    );
+    const btn = container.querySelectorAll('button')[1];
+    for (let i = 0; i < 200; i++) fireEvent.click(btn);
+    expect(onNext).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-2 handles 30 different text values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ModalBottomButtonRow
+          prevBtnText={`r2-p-${i}`}
+          onPrevBtnClick={() => {}}
+          nextBtnText={`r2-n-${i}`}
+          onNextBtnClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
 });
