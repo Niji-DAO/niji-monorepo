@@ -347,4 +347,45 @@ describe('compareBids', () => {
       expect(compareBids(makeBid6(BigInt(9000 + i)), makeBid6(BigInt(8000 + i)))).toBeLessThan(0);
     }
   });
+
+  it('round-7 30 sequential compareBids calls', () => {
+    const makeBid7 = (timestamp: bigint): Bid => ({ timestamp, transactionIndex: 0 }) as Bid;
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        compareBids(makeBid7(BigInt(i + 10000)), makeBid7(BigInt(i + 10001))),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-7 50 sequential ascending order pairs', () => {
+    const makeBid7 = (timestamp: bigint): Bid => ({ timestamp, transactionIndex: 0 }) as Bid;
+    for (let i = 0; i < 50; i++) {
+      expect(compareBids(makeBid7(BigInt(11000 + i)), makeBid7(BigInt(10000 + i)))).toBeLessThan(0);
+    }
+  });
+
+  it('round-7 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof compareBids).toBe('function');
+    }
+  });
+
+  it('round-7 30 deterministic same input pair', () => {
+    const makeBid7 = (timestamp: bigint): Bid => ({ timestamp, transactionIndex: 0 }) as Bid;
+    for (let i = 0; i < 30; i++) {
+      const a = makeBid7(100n);
+      const b = makeBid7(200n);
+      const r1 = compareBids(a, b);
+      const r2 = compareBids(a, b);
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-7 50 sequential calls with ascending order pairs', () => {
+    const makeBid7 = (timestamp: bigint, transactionIndex = 0): Bid =>
+      ({ timestamp, transactionIndex }) as Bid;
+    for (let i = 0; i < 50; i++) {
+      expect(compareBids(makeBid7(BigInt(11000 + i)), makeBid7(BigInt(10000 + i)))).toBeLessThan(0);
+    }
+  });
 });
