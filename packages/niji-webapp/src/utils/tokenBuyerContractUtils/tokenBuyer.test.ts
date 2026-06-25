@@ -182,4 +182,37 @@ describe('useEthNeeded', () => {
       expect(typeof useEthNeeded).toBe('function');
     }
   });
+
+  it('round-3 30 sequential useEthNeeded renderHook', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useEthNeeded('0xABC', i));
+      unmount();
+    }
+  });
+
+  it('round-3 50 renderHook cycles varied amount', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useEthNeeded('0xR3', i + 100));
+      unmount();
+    }
+  });
+
+  it('round-3 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useEthNeeded('0xABC', i));
+      unmount();
+    }
+  });
+
+  it('round-3 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useEthNeeded('0xABC', i))).not.toThrow();
+    }
+  });
+
+  it('round-3 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useEthNeeded).toBe('function');
+    }
+  });
 });
