@@ -198,4 +198,61 @@ describe('BrandDatePicker', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<BrandDatePicker onChange={() => {}} label="Date" />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <BrandDatePicker key={i} onChange={() => {}} label={`L-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different label values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(
+        <BrandDatePicker onChange={() => {}} label={`R2-${i}`} />,
+      );
+      expect(container.querySelector('span')?.textContent).toBe(`R2-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 50 onChange events', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandDatePicker onChange={onChange} label="Date" />);
+    const inputs = container.querySelectorAll('input');
+    const dateInput = Array.from(inputs).find(i => i.type === 'date');
+    if (dateInput) {
+      for (let i = 0; i < 50; i++) {
+        expect(() =>
+          fireEvent.change(dateInput, { target: { value: `2025-01-${(i % 28) + 1}` } }),
+        ).not.toThrow();
+      }
+    }
+  });
+
+  it('round-2 handles 30 min/max pairs', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <BrandDatePicker
+          onChange={() => {}}
+          label="Date"
+          min={`2025-01-${(i % 28) + 1}`}
+          max={`2025-12-${(i % 28) + 1}`}
+        />,
+      );
+      unmount();
+    }
+  });
 });
