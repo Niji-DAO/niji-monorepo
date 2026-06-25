@@ -293,4 +293,36 @@ describe('useReverseENSLookUp', () => {
       expect(ensCacheKey(addr)).toBe(first);
     }
   });
+
+  it('round-5 useReverseENSLookUp is defined', () => {
+    expect(typeof useReverseENSLookUp).toBe('function');
+  });
+
+  it('round-5 100 sequential ensCacheKey calls produce non-empty key', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0xR5-' + i) as never;
+      expect(ensCacheKey(addr).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-5 50 useReverseENSLookUp type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useReverseENSLookUp).toBe('function');
+    }
+  });
+
+  it('round-5 30 ensCacheKey different addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR5' + i.toString(16).padStart(38, '0')) as never;
+      expect(() => ensCacheKey(addr)).not.toThrow();
+    }
+  });
+
+  it('round-5 30 ensCacheKey consistency check', () => {
+    const addr = '0xR5-CONST' as never;
+    const first = ensCacheKey(addr);
+    for (let i = 0; i < 30; i++) {
+      expect(ensCacheKey(addr)).toBe(first);
+    }
+  });
 });

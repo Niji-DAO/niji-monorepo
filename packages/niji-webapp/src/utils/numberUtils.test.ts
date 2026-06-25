@@ -208,4 +208,37 @@ describe('countDecimals', () => {
       expect(typeof countDecimals(n)).toBe('number');
     }
   });
+
+  it('round-5 30 sequential countDecimals calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => countDecimals(i + 5000)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 returns number-typed count', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = countDecimals(i + 6000.5);
+      expect(typeof result).toBe('number');
+    }
+  });
+
+  it('round-5 100 sequential calls produce non-negative count', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(countDecimals(i + 7000)).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('round-5 50 different fractional inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      const n = (i + 1000) / (i + 2000);
+      expect(() => countDecimals(n)).not.toThrow();
+    }
+  });
+
+  it('round-5 100 sequential alternating int / float', () => {
+    for (let i = 0; i < 100; i++) {
+      const n = i % 2 === 0 ? i + 8000 : i + 8000.625;
+      expect(typeof countDecimals(n)).toBe('number');
+    }
+  });
 });

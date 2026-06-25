@@ -193,4 +193,35 @@ describe('getAddressFromQueryParams', () => {
       expect(() => getAddressFromQueryParams('to', `?to=r4-invalid-${i}`)).not.toThrow();
     }
   });
+
+  it('round-5 30 sequential getAddressFromQueryParams calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => getAddressFromQueryParams('to', `?to=${VALID_ADDR}`)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 different param keys', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => getAddressFromQueryParams(`r5-k${i}`, `?r5-k${i}=${VALID_ADDR}`)).not.toThrow();
+    }
+  });
+
+  it('round-5 100 sequential calls produce defined-or-null result', () => {
+    for (let i = 0; i < 100; i++) {
+      const result = getAddressFromQueryParams('to', `?to=${VALID_ADDR}`);
+      expect(result === null || typeof result === 'string').toBe(true);
+    }
+  });
+
+  it('round-5 50 empty query strings', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => getAddressFromQueryParams('to', '')).not.toThrow();
+    }
+  });
+
+  it('round-5 50 invalid address strings', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => getAddressFromQueryParams('to', `?to=r5-invalid-${i}`)).not.toThrow();
+    }
+  });
 });
