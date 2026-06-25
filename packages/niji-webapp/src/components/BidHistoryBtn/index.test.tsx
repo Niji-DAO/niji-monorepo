@@ -525,4 +525,50 @@ describe('BidHistoryBtn Component (isCool=true)', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<BidHistoryBtn onClick={vi.fn()} />);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <BidHistoryBtn key={i} onClick={vi.fn()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 500 instances render View all bids text', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <BidHistoryBtn key={i} onClick={vi.fn()} />
+        ))}
+      </>,
+    );
+    const matches = (container.textContent ?? '').match(/View all bids/g);
+    expect(matches?.length).toBe(500);
+  });
+
+  it('rapid 1000 click events fire handler', () => {
+    const onClick = vi.fn();
+    render(<BidHistoryBtn onClick={onClick} />);
+    const btn = screen.getAllByText('View all bids')[0];
+    for (let i = 0; i < 1000; i++) fireEvent.click(btn);
+    expect(onClick).toHaveBeenCalledTimes(1000);
+  });
+
+  it('handles 100 sequential rerenders with new onClick', () => {
+    const { rerender } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<BidHistoryBtn onClick={vi.fn()} />)).not.toThrow();
+    }
+  });
 });
