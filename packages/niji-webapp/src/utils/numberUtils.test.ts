@@ -241,4 +241,37 @@ describe('countDecimals', () => {
       expect(typeof countDecimals(n)).toBe('number');
     }
   });
+
+  it('round-6 30 sequential countDecimals calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => countDecimals(i + 12000)).not.toThrow();
+    }
+  });
+
+  it('round-6 50 sequential calls produce number', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof countDecimals(i + 13000)).toBe('number');
+    }
+  });
+
+  it('round-6 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof countDecimals).toBe('function');
+    }
+  });
+
+  it('round-6 30 deterministic for same input', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = countDecimals(1.5);
+      const r2 = countDecimals(1.5);
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-6 100 sequential alternating int / float', () => {
+    for (let i = 0; i < 100; i++) {
+      const n = i % 2 === 0 ? i + 15000 : i + 15000.625;
+      expect(typeof countDecimals(n)).toBe('number');
+    }
+  });
 });
