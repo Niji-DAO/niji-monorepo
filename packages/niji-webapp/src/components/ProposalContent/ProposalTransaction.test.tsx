@@ -202,4 +202,49 @@ describe('ProposalTransaction', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<ProposalTransaction transaction={simpleTx} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <ProposalTransaction key={i} transaction={simpleTx} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 cycles of sigTx', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ProposalTransaction transaction={sigTx} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 50 different target addresses', () => {
+    for (let i = 0; i < 50; i++) {
+      const target = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(
+        <ProposalTransaction transaction={{ ...simpleTx, target } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 50 different signatures', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ProposalTransaction transaction={{ ...sigTx, functionSig: `r2-fn${i}` } as never} />,
+      );
+      unmount();
+    }
+  });
 });

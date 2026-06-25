@@ -355,4 +355,55 @@ describe('StartOrEndTime', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 300 cycles', () => {
+    const now = Math.floor(Date.now() / 1000);
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<StartOrEndTime startTime={now + 3600} endTime={now + 7200} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    const now = Math.floor(Date.now() / 1000);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <StartOrEndTime key={i} startTime={now + i} endTime={now + 7200 + i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different startTime values', () => {
+    const now = Math.floor(Date.now() / 1000);
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <StartOrEndTime startTime={now + i * 60} endTime={now + 7200 + i * 60} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 50 different endTime values', () => {
+    const now = Math.floor(Date.now() / 1000);
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <StartOrEndTime startTime={now + 3600} endTime={now + 7200 + i * 3600} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 100 rerender cycles', () => {
+    const now = Math.floor(Date.now() / 1000);
+    const { rerender } = render(<StartOrEndTime startTime={now + 3600} endTime={now + 7200} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<StartOrEndTime startTime={now + 3600 + i * 60} endTime={now + 7200 + i * 60} />),
+      ).not.toThrow();
+    }
+  });
 });

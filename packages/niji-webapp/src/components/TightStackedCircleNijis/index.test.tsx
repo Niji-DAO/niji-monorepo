@@ -563,4 +563,49 @@ describe('TightStackedCircleNijis', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<TightStackedCircleNijis nounIds={[1]} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <TightStackedCircleNijis key={i} nounIds={[i]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different nounIds arrays', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<TightStackedCircleNijis nounIds={[i + 100]} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 arrays of various sizes', () => {
+    for (let i = 1; i <= 30; i++) {
+      const ids = Array.from({ length: i }, (_, j) => j);
+      const { unmount } = render(<TightStackedCircleNijis nounIds={ids} />);
+      unmount();
+    }
+  });
+
+  it('round-2 all 200 instances have svg root', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <TightStackedCircleNijis key={i} nounIds={[i]} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('svg').length).toBe(200);
+  });
 });
