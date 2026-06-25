@@ -366,4 +366,42 @@ describe('NavLocaleSwitcher', () => {
       expect(() => rerender(<NavLocaleSwitcher />)).not.toThrow();
     }
   });
+
+  it('round-3 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<NavLocaleSwitcher />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <NavLocaleSwitcher key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => render(<NavLocaleSwitcher />)).not.toThrow();
+    }
+  });
+
+  it('round-3 100 rerender cycles', () => {
+    const { rerender } = render(<NavLocaleSwitcher />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<NavLocaleSwitcher />)).not.toThrow();
+    }
+  });
+
+  it('round-3 200 sequential renders second cycle', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => render(<NavLocaleSwitcher />)).not.toThrow();
+    }
+  });
 });

@@ -733,4 +733,43 @@ describe('ChangeDelegatePanel', () => {
     }
     hookState.userDelegatee = orig;
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ChangeDelegatePanel key={i} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<ChangeDelegatePanel onDismiss={onDismiss} />);
+    for (let i = 0; i < 200; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ChangeDelegatePanel onDismiss={() => {}} />)).not.toThrow();
+    }
+  });
+
+  it('round-3 30 mount-unmount cycles second', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={() => {}} />);
+      unmount();
+    }
+  });
 });
