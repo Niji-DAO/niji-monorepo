@@ -379,4 +379,49 @@ describe('ModalTextPrimary', () => {
     const { container } = render(<ModalTextPrimary>🚀 テキスト</ModalTextPrimary>);
     expect(container.querySelector('div')?.textContent).toBe('🚀 テキスト');
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <ModalTextPrimary key={i}>{i}</ModalTextPrimary>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50000 char children (very large)', () => {
+    const long = 'a'.repeat(50000);
+    const { container } = render(<ModalTextPrimary>{long}</ModalTextPrimary>);
+    expect(container.querySelector('div')?.textContent?.length).toBe(50000);
+  });
+
+  it('handles ReactNode array (mixed elements)', () => {
+    const { container } = render(
+      <ModalTextPrimary>
+        {[<strong key="s">bold</strong>, <em key="e">em</em>, <i key="i">italic</i>]}
+      </ModalTextPrimary>,
+    );
+    expect(container.querySelectorAll('strong, em, i').length).toBe(3);
+  });
+
+  it('all 100 instances have div wrapper', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <ModalTextPrimary key={i}>{i}</ModalTextPrimary>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(100);
+  });
 });
