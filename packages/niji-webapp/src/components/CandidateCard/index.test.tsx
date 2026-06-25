@@ -444,4 +444,66 @@ describe('CandidateCard', () => {
     } as never;
     expect(() => wrap(<CandidateCard candidate={candidate} nounsRequired={3} />)).not.toThrow();
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <CandidateCard
+              key={i}
+              candidate={{ ...baseCandidate, id: `c-${i}` } as never}
+              nounsRequired={i}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <CandidateCard candidate={baseCandidate} nounsRequired={i} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 50 different candidate ids', () => {
+    for (let i = 0; i < 50; i++) {
+      const c = { ...baseCandidate, id: `cand-${i}` } as never;
+      expect(() => wrap(<CandidateCard candidate={c} nounsRequired={3} />)).not.toThrow();
+    }
+  });
+
+  it('all 50 instances render anchor link', () => {
+    const { container } = wrap(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <CandidateCard
+            key={i}
+            candidate={{ ...baseCandidate, id: `c-${i}` } as never}
+            nounsRequired={3}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(50);
+  });
+
+  it('rapid rerender 50 times with varying nounsRequired', () => {
+    const { rerender } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={0} />);
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <CandidateCard candidate={baseCandidate} nounsRequired={i} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });

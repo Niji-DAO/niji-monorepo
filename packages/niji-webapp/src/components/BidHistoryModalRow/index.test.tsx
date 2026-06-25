@@ -443,4 +443,47 @@ describe('BidHistoryModalRow', () => {
     vi.mocked(containsBlockedText).mockReturnValue(false);
     expect(() => render(<BidHistoryModalRow bid={bid} index={1} />)).not.toThrow();
   });
+
+  it('renders 100 instances without crash', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <BidHistoryModalRow key={i} bid={bid} index={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('mount-unmount 30 cycles', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BidHistoryModalRow bid={bid} index={i} />);
+      unmount();
+    }
+  });
+
+  it('handles negative index', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    expect(() => render(<BidHistoryModalRow bid={bid} index={-1} />)).not.toThrow();
+  });
+
+  it('handles 50 different sender addresses', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    for (let i = 0; i < 50; i++) {
+      const b = { ...bid, sender: ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}` };
+      expect(() => render(<BidHistoryModalRow bid={b} index={1} />)).not.toThrow();
+    }
+  });
+
+  it('rapid rerender 50 times with varying value', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    const { rerender } = render(<BidHistoryModalRow bid={bid} index={1} />);
+    for (let i = 0; i < 50; i++) {
+      const b = { ...bid, value: parseEther(`${i + 1}`) };
+      expect(() => rerender(<BidHistoryModalRow bid={b} index={1} />)).not.toThrow();
+    }
+  });
 });

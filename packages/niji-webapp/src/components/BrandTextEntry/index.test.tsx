@@ -396,4 +396,41 @@ describe('BrandTextEntry', () => {
     const { container } = render(<BrandTextEntry onChange={() => {}} value={long} />);
     expect(container.querySelector('input')?.value.length).toBe(5000);
   });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <BrandTextEntry key={i} onChange={() => {}} value={`v-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<BrandTextEntry onChange={() => {}} value={`v-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('handles type=password attribute forwarded', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} type="password" />);
+    expect(container.querySelector('input')?.getAttribute('type')).toBe('password');
+  });
+
+  it('handles min attribute forwarded', () => {
+    const { container } = render(<BrandTextEntry onChange={() => {}} type="number" min="0" />);
+    expect(container.querySelector('input')?.getAttribute('min')).toBe('0');
+  });
+
+  it('rapid rerender 50 times with varying value', () => {
+    const { container, rerender } = render(<BrandTextEntry onChange={() => {}} value="" />);
+    for (let i = 0; i < 50; i++) {
+      rerender(<BrandTextEntry onChange={() => {}} value={`v-${i}`} />);
+    }
+    expect(container.querySelector('input')).not.toBeNull();
+  });
 });
