@@ -730,4 +730,72 @@ describe('ABIUpload Component', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <ABIUpload
+              key={i}
+              abiFileName={`f-${i}.json`}
+              isValid={false}
+              isInvalid={false}
+              onChange={vi.fn()}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different filenames', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(
+        <ABIUpload
+          abiFileName={`file-${i}.json`}
+          isValid={false}
+          isInvalid={false}
+          onChange={vi.fn()}
+        />,
+      );
+      expect(container.querySelector('input')).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it('handles etherscan-abi-download.json shows full filename label', () => {
+    render(
+      <ABIUpload
+        abiFileName="etherscan-abi-download.json"
+        isValid={false}
+        isInvalid={false}
+        onChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByText('etherscan-abi-download.json')).toBeInTheDocument();
+  });
+
+  it('handles 50 onChange events in succession', () => {
+    const handleChange = vi.fn();
+    render(
+      <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={handleChange} />,
+    );
+    const input = screen.getByLabelText(/abi/i) as HTMLInputElement;
+    for (let i = 0; i < 50; i++) {
+      fireEvent.change(input, {
+        target: { files: [new File([`c${i}`], `f${i}.json`, { type: 'application/json' })] },
+      });
+    }
+    expect(handleChange).toHaveBeenCalledTimes(50);
+  });
 });

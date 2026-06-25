@@ -499,4 +499,51 @@ describe('BidHistoryItem Component', () => {
     );
     expect(container.querySelectorAll('li').length).toBe(50);
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+      unmount();
+    }
+  });
+
+  it('renders 100 instances in ul without crash', () => {
+    expect(() =>
+      render(
+        <ul>
+          {Array.from({ length: 100 }, (_, i) => (
+            <BidHistoryItem key={i} bid={mockBid} classes={mockClasses} />
+          ))}
+        </ul>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different bid values', () => {
+    for (let i = 0; i < 100; i++) {
+      const b = { ...mockBid, value: BigInt(i) * 1000000000000000000n };
+      const { unmount } = render(<BidHistoryItem bid={b} classes={mockClasses} />);
+      unmount();
+    }
+  });
+
+  it('all 50 instances render link element', () => {
+    const { container } = render(
+      <ul>
+        {Array.from({ length: 50 }, (_, i) => (
+          <BidHistoryItem key={i} bid={mockBid} classes={mockClasses} />
+        ))}
+      </ul>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(50);
+  });
+
+  it('handles 30 different transactionHash values', () => {
+    for (let i = 0; i < 30; i++) {
+      const b = { ...mockBid, transactionHash: `0x${i.toString(16).padStart(64, '0')}` };
+      const { container, unmount } = render(<BidHistoryItem bid={b} classes={mockClasses} />);
+      expect(container.querySelector('a')?.getAttribute('href')).toContain(b.transactionHash);
+      unmount();
+    }
+  });
 });
