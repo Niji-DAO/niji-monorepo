@@ -537,4 +537,50 @@ describe('ProposalEditor', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalEditor {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalEditor key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different body values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalEditor {...defaults} body={`# r2-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 50 onBodyInput events', () => {
+    const onBodyInput = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onBodyInput={onBodyInput} />);
+    const ta = container.querySelector('textarea')!;
+    for (let i = 0; i < 50; i++) {
+      fireEvent.change(ta, { target: { value: `r2-${i}` } });
+    }
+    expect(onBodyInput).toHaveBeenCalledTimes(50);
+  });
+
+  it('round-2 rapid 50 onTitleInput events', () => {
+    const onTitleInput = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onTitleInput={onTitleInput} />);
+    const input = container.querySelector('input')!;
+    for (let i = 0; i < 50; i++) {
+      fireEvent.change(input, { target: { value: `r2-t-${i}` } });
+    }
+    expect(onTitleInput).toHaveBeenCalledTimes(50);
+  });
 });
