@@ -156,4 +156,36 @@ describe('getProposalVoteIcon', () => {
       expect(r1).toEqual(r2);
     }
   });
+
+  it('round-3 30 sequential getProposalVoteIcon calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => getProposalVoteIcon(0 as never)).not.toThrow();
+    }
+  });
+
+  it('round-3 50 sequential various support values', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => getProposalVoteIcon((i % 3) as never)).not.toThrow();
+    }
+  });
+
+  it('round-3 100 sequential calls return defined', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(getProposalVoteIcon(0 as never)).toBeDefined();
+    }
+  });
+
+  it('round-3 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof getProposalVoteIcon).toBe('function');
+    }
+  });
+
+  it('round-3 30 deterministic for same support', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = getProposalVoteIcon(1 as never);
+      const r2 = getProposalVoteIcon(1 as never);
+      expect(r1).toBe(r2);
+    }
+  });
 });

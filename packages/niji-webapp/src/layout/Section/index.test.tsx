@@ -221,4 +221,63 @@ describe('Section', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-3 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <div>r3</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <Section key={i} fullWidth={false}>
+              <div>r3-{i}</div>
+            </Section>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 fullWidth toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Section fullWidth={i % 2 === 0}>
+          <div>x</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 50 different children values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <div>r3-child-{i}</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 100 sequential renders without crash', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        render(
+          <Section fullWidth={false}>
+            <div>x</div>
+          </Section>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
