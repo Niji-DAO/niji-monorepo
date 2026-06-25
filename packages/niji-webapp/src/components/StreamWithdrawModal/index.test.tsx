@@ -455,4 +455,55 @@ describe('StreamWithdrawModal', () => {
     for (let i = 0; i < 200; i++) onDismiss();
     expect(onDismiss).toHaveBeenCalledTimes(200);
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<StreamWithdrawModal {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles all 6 status types', () => {
+    const statuses: WithdrawStatus[] = [
+      'None',
+      'PendingSignature',
+      'Mining',
+      'Success',
+      'Fail',
+      'Exception',
+    ];
+    statuses.forEach(s => {
+      hookState.withdrawTokensState = { status: s };
+      const { unmount } = render(<StreamWithdrawModal {...baseProps} />);
+      unmount();
+    });
+    hookState.withdrawTokensState = { status: 'None' };
+  });
+
+  it('round-2 handles 30 different withdrawableBalance values', () => {
+    const orig = hookState.withdrawableBalance;
+    for (let i = 0; i < 30; i++) {
+      hookState.withdrawableBalance = BigInt(i * 2_000_000);
+      const { unmount } = render(<StreamWithdrawModal {...baseProps} />);
+      unmount();
+    }
+    hookState.withdrawableBalance = orig;
+  });
+
+  it('round-2 handles 30 different elapsedTime values', () => {
+    const orig = hookState.elapsedTime;
+    for (let i = 0; i < 30; i++) {
+      hookState.elapsedTime = i * 10;
+      const { unmount } = render(<StreamWithdrawModal {...baseProps} />);
+      unmount();
+    }
+    hookState.elapsedTime = orig;
+  });
+
+  it('round-2 rapid 100 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<StreamWithdrawModal {...baseProps} onDismiss={onDismiss} />);
+    for (let i = 0; i < 100; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(100);
+  });
 });

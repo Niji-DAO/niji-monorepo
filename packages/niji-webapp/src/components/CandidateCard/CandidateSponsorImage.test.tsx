@@ -134,4 +134,52 @@ describe('CandidateSponsorImage', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<CandidateSponsorImage nounId={1n} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <CandidateSponsorImage key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 different nounIds', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<CandidateSponsorImage nounId={BigInt(i + 500)} />);
+      expect(container.querySelector('[data-testid="niji-image"]')?.textContent).toBe(
+        String(i + 500),
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 all 200 instances have niji-image testid', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <CandidateSponsorImage key={i} nounId={BigInt(i)} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="niji-image"]').length).toBe(200);
+  });
+
+  it('round-2 handles 50 different huge bigint nounIds', () => {
+    for (let i = 0; i < 50; i++) {
+      const huge = BigInt(10_000_000) + BigInt(i);
+      const { unmount } = render(<CandidateSponsorImage nounId={huge} />);
+      unmount();
+    }
+  });
 });
