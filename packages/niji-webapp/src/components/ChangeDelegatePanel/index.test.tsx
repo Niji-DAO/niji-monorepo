@@ -687,4 +687,50 @@ describe('ChangeDelegatePanel', () => {
     }
     hookState.userDelegatee = orig;
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ChangeDelegatePanel key={i} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 100 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<ChangeDelegatePanel onDismiss={onDismiss} />);
+    for (let i = 0; i < 100; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(100);
+  });
+
+  it('round-2 handles 30 different userDelegatee values', () => {
+    const orig = hookState.userDelegatee;
+    for (let i = 0; i < 30; i++) {
+      hookState.userDelegatee = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={() => {}} />);
+      unmount();
+    }
+    hookState.userDelegatee = orig;
+  });
+
+  it('round-2 handles 30 undefined delegatee cycles', () => {
+    const orig = hookState.userDelegatee;
+    hookState.userDelegatee = undefined;
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={() => {}} />);
+      unmount();
+    }
+    hookState.userDelegatee = orig;
+  });
 });

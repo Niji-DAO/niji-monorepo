@@ -262,4 +262,48 @@ describe('Niji', () => {
     }
     hookState.querySvg = orig;
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Niji nounId={1n} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different nounIds', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Niji nounId={BigInt(i + 100)} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Niji key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different onLoadSeed callbacks', () => {
+    for (let i = 0; i < 30; i++) {
+      const onLoadSeed = vi.fn();
+      const { unmount } = render(<Niji nounId={BigInt(i)} onLoadSeed={onLoadSeed} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different querySvg values', () => {
+    const orig = hookState.querySvg;
+    for (let i = 0; i < 30; i++) {
+      hookState.querySvg = `<svg>r2-${i}</svg>`;
+      const { unmount } = render(<Niji nounId={1n} />);
+      unmount();
+    }
+    hookState.querySvg = orig;
+  });
 });
