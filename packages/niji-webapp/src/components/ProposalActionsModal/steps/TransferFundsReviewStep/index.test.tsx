@@ -504,4 +504,48 @@ describe('TransferFundsReviewStep', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<TransferFundsReviewStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <TransferFundsReviewStep key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<TransferFundsReviewStep {...defaults} />)).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<TransferFundsReviewStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-6 30 different amount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <TransferFundsReviewStep
+          {...defaults}
+          state={{ ...defaults.state, amount: String(i + 9000) } as never}
+        />,
+      );
+      unmount();
+    }
+  });
 });
