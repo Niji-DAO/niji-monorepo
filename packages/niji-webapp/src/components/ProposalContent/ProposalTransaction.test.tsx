@@ -157,4 +157,49 @@ describe('ProposalTransaction', () => {
     const { container } = render(<ProposalTransaction transaction={altTx} />);
     expect(container.textContent).toContain('0xWEIRD');
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ProposalTransaction transaction={simpleTx} />);
+      unmount();
+    }
+  });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ProposalTransaction key={i} transaction={simpleTx} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 cycles of sigTx', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ProposalTransaction transaction={sigTx} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different target addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const target = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(
+        <ProposalTransaction transaction={{ ...simpleTx, target } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different signatures', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalTransaction transaction={{ ...sigTx, functionSig: `fn${i}` } as never} />,
+      );
+      unmount();
+    }
+  });
 });

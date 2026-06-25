@@ -156,4 +156,47 @@ describe('ProposalTransactions', () => {
     expect(container.textContent).toContain('999');
     expect(container.textContent).toContain('transfer');
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ProposalTransactions details={[simpleTx]} />);
+      unmount();
+    }
+  });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ProposalTransactions key={i} details={[simpleTx]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different details counts', () => {
+    for (let i = 1; i <= 30; i++) {
+      const details = Array.from({ length: i }, () => simpleTx);
+      const { unmount } = render(<ProposalTransactions details={details} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different target addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const target = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(
+        <ProposalTransactions details={[{ ...simpleTx, target } as never]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 50 renders with empty details', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => render(<ProposalTransactions details={[]} />)).not.toThrow();
+    }
+  });
 });
