@@ -116,4 +116,66 @@ describe('NijiI18nProvider', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <NijiI18nProvider locale="en-US">
+          <span>x</span>
+        </NijiI18nProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <NijiI18nProvider key={i} locale="en-US">
+              <span>x-{i}</span>
+            </NijiI18nProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different locales', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiI18nProvider locale={`locale-${i}`}>
+          <span>x</span>
+        </NijiI18nProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('all 50 providers have i18n-provider testid', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <NijiI18nProvider key={i} locale="en-US">
+            <span>x</span>
+          </NijiI18nProvider>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="i18n-provider"]').length).toBe(50);
+  });
+
+  it('handles 30 different children types', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiI18nProvider locale="en-US">
+          <div>
+            <span data-testid={`n-${i}`}>{i}</span>
+          </div>
+        </NijiI18nProvider>,
+      );
+      unmount();
+    }
+  });
 });

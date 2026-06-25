@@ -463,4 +463,44 @@ describe('useForkThreshold / useNumTokensInForkEscrow / useAdjustedTotalSupply',
     const { result } = renderHook(() => useAdjustedTotalSupply());
     expect(result.current).toBe(100);
   });
+
+  it('useAdjustedTotalSupply handles 100 different values', () => {
+    for (let i = 0; i < 100; i++) {
+      hookState.adjustedTotalSupply = BigInt(i + 1);
+      const { result } = renderHook(() => useAdjustedTotalSupply());
+      expect(result.current).toBe(i + 1);
+    }
+  });
+
+  it('useNumTokensInForkEscrow handles 100 different values', () => {
+    for (let i = 0; i < 100; i++) {
+      hookState.numTokensInForkEscrow = BigInt(i);
+      const { result } = renderHook(() => useNumTokensInForkEscrow());
+      expect(result.current).toBe(i);
+    }
+  });
+
+  it('useAdjustedTotalSupply undefined 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      hookState.adjustedTotalSupply = undefined;
+      const { result } = renderHook(() => useAdjustedTotalSupply());
+      expect(result.current).toBeUndefined();
+    }
+  });
+
+  it('useAdjustedTotalSupply large values 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const big = BigInt(1_000_000 + i);
+      hookState.adjustedTotalSupply = big;
+      const { result } = renderHook(() => useAdjustedTotalSupply());
+      expect(result.current).toBe(Number(big));
+    }
+  });
+
+  it('useAdjustedTotalSupply rapid 50 alternating cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      hookState.adjustedTotalSupply = i % 2 === 0 ? undefined : BigInt(i);
+      expect(() => renderHook(() => useAdjustedTotalSupply())).not.toThrow();
+    }
+  });
 });
