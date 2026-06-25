@@ -546,4 +546,43 @@ describe('Proposals', () => {
     }
     wagmiState.blockNumber = orig;
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 instances rendered together', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Proposals key={i} proposals={[]} nounsRequired={i + 1} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different nounsRequired values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Proposals proposals={[]} nounsRequired={i + 1} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => wrap(<Proposals proposals={[]} nounsRequired={2} />)).not.toThrow();
+    }
+  });
+
+  it('round-3 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+      unmount();
+    }
+  });
 });
