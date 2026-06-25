@@ -222,4 +222,46 @@ describe('buttonVariants (cva)', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<Button>r4-x</Button>);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 1000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <Button key={i}>r4-{i}</Button>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different variant cycles', () => {
+    const variants = ['default', 'destructive', 'outline', 'secondary', 'ghost'] as const;
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Button variant={variants[i % 5]}>x</Button>);
+      unmount();
+    }
+  });
+
+  it('round-4 30 different size cycles', () => {
+    const sizes = ['default', 'sm', 'lg', 'icon'] as const;
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Button size={sizes[i % 4]}>x</Button>);
+      unmount();
+    }
+  });
+
+  it('round-4 30 disabled toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Button disabled={i % 2 === 0}>x</Button>);
+      unmount();
+    }
+  });
 });

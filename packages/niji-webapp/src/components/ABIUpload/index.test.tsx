@@ -978,4 +978,69 @@ describe('ABIUpload Component', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-4 mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <ABIUpload abiFileName="r4.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 renders 200 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <ABIUpload
+              key={i}
+              abiFileName={`r4-${i}.json`}
+              isValid={false}
+              isInvalid={false}
+              onChange={vi.fn()}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different abiFileName values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ABIUpload
+          abiFileName={`r4-file-${i}.json`}
+          isValid={false}
+          isInvalid={false}
+          onChange={vi.fn()}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 30 isValid toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ABIUpload
+          abiFileName="r4.json"
+          isValid={i % 2 === 0}
+          isInvalid={false}
+          onChange={vi.fn()}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ABIUpload abiFileName="x.json" isValid={false} isInvalid={false} onChange={vi.fn()} />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
