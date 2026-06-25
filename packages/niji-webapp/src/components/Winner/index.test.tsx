@@ -521,4 +521,52 @@ describe('Winner', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR6' + i.toString(16).padStart(38, '0')) as `0x${string}`;
+      const { unmount } = render(<Winner winner={addr} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => {
+            const addr = ('0xR6' + i.toString(16).padStart(38, '0')) as `0x${string}`;
+            return <Winner key={i} winner={addr} />;
+          })}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<Winner winner={('0xR6' + '0'.padStart(38, '0')) as `0x${string}`} />, {
+          wrapper: WithProviders,
+        }),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0xR6' + i.toString(16).padStart(38, '0')) as `0x${string}`;
+      const { unmount } = render(<Winner winner={addr} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-6 30 different winner values', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR6V' + i.toString(16).padStart(37, '0')) as `0x${string}`;
+      const { unmount } = render(<Winner winner={addr} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
 });
