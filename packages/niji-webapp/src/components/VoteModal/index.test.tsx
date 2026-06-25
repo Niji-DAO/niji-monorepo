@@ -391,4 +391,43 @@ describe('VoteModal', () => {
       ),
     ).not.toThrow();
   });
+
+  it('round-2 30 mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteModal {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-2 30 instances rendered together', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteModal key={i} {...baseProps} proposalId={`r2-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 30 different proposalId values cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteModal {...baseProps} proposalId={`r2-id-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-2 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<VoteModal {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('round-2 100 show toggle cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteModal {...baseProps} show={i % 2 === 0} />);
+      unmount();
+    }
+  });
 });
