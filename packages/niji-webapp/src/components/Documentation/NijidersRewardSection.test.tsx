@@ -284,4 +284,43 @@ describe('NijidersRewardSection', () => {
       unmount();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<NijidersRewardSection />);
+      unmount();
+    }
+  });
+
+  it('round-5 30 instances rendered together', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijidersRewardSection key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => wrap(<NijidersRewardSection />)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<NijidersRewardSection />);
+      unmount();
+    }
+  });
+
+  it('round-5 100 sequential mount cycles third', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<NijidersRewardSection />);
+      unmount();
+    }
+  });
 });
