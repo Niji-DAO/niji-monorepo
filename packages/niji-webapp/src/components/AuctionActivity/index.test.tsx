@@ -750,4 +750,82 @@ describe('AuctionActivity', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different displayGraphDepComps + isFirst combinations', () => {
+    useAtomValueMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(
+        <AuctionActivity
+          {...defaults}
+          displayGraphDepComps={i % 2 === 0}
+          isFirstAuction={i % 3 === 0}
+          auction={makeAuction() as never}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 50 instances all with displayGraphDepComps=true', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <AuctionActivity
+              key={i}
+              {...defaults}
+              displayGraphDepComps={true}
+              auction={makeAuction({ nounId: BigInt(i) }) as never}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different auctionEnded (endTime variations)', () => {
+    useAtomValueMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const a = makeAuction({ endTime: i < 15 ? 1n : Math.floor(Date.now() / 1000) + 3600 });
+      const { unmount } = wrap(<AuctionActivity {...defaults} auction={a as never} />);
+      unmount();
+    }
+  });
+
+  it('handles rapid 30 onPrev/onNext click handler rerender', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const onPrev = vi.fn();
+    const onNext = vi.fn();
+    const { rerender } = wrap(
+      <AuctionActivity
+        {...defaults}
+        onPrevAuctionClick={onPrev}
+        onNextAuctionClick={onNext}
+        auction={makeAuction() as never}
+      />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <AuctionActivity
+              {...defaults}
+              onPrevAuctionClick={onPrev}
+              onNextAuctionClick={onNext}
+              auction={makeAuction({ nounId: BigInt(i) }) as never}
+            />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
