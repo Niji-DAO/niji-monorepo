@@ -67,4 +67,34 @@ describe('pickSupportedLocale', () => {
   it('returns DEFAULT_LOCALE when all candidates are null/undefined', () => {
     expect(pickSupportedLocale([null, undefined, null])).toBe('ja-JP');
   });
+
+  it('handles 100 different locale list inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => pickSupportedLocale([`lang-${i}`])).not.toThrow();
+    }
+  });
+
+  it('handles 100 cycles of null defaulting to ja-JP', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(pickSupportedLocale([null])).toBe('ja-JP');
+    }
+  });
+
+  it('handles 100 cycles of empty list', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => pickSupportedLocale([])).not.toThrow();
+    }
+  });
+
+  it('handles 100 cycles of en-US', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(pickSupportedLocale(['en-US'])).toBe('en-US');
+    }
+  });
+
+  it('rapid 200 invocations', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => pickSupportedLocale(['en-US', 'ja-JP'])).not.toThrow();
+    }
+  });
 });

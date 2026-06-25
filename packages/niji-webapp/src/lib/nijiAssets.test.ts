@@ -52,4 +52,34 @@ describe('nijiTraitKeys', () => {
     ];
     expect([...nijiTraitKeys].sort()).toEqual(required.sort());
   });
+
+  it('humanizeTraitKey handles 100 different inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => humanizeTraitKey(`trait-${i}`)).not.toThrow();
+    }
+  });
+
+  it('humanizeTraitKey leftHand 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(humanizeTraitKey('leftHand')).toBe('Left Hand');
+    }
+  });
+
+  it('humanizeTraitKey hat 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(humanizeTraitKey('hat')).toBe('Hat');
+    }
+  });
+
+  it('nijiTraitKeys length check 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(nijiTraitKeys.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('nijiTraitKeys all 12 entries check 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(nijiTraitKeys.length).toBe(12);
+    }
+  });
 });
