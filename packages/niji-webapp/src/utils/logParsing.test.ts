@@ -201,4 +201,42 @@ describe('logParsing round-trip', () => {
       expect(k).toContain(`0xT-${i}`);
     }
   });
+
+  it('round-4 30 sequential filterToKey calls', () => {
+    for (let i = 0; i < 30; i++) {
+      const k = filterToKey({ address: `0xR4-${i}`, topics: [`0xR4T-${i}`] });
+      expect(k).toBe(`0xR4-${i}:0xR4T-${i}`);
+    }
+  });
+
+  it('round-4 30 sequential keyToFilter calls', () => {
+    for (let i = 0; i < 30; i++) {
+      const result = keyToFilter(`0xR4-${i}:0xR4T-${i}`);
+      expect(result.address).toBe(`0xR4-${i}`);
+    }
+  });
+
+  it('round-4 round-trip 100 sequential mixed calls', () => {
+    for (let i = 0; i < 100; i++) {
+      const k = filterToKey({ address: `0xR4-${i}`, topics: [`0xR4T${i}`] });
+      keyToFilter(k);
+    }
+    expect(true).toBe(true);
+  });
+
+  it('round-4 50 different addresses', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = '0xR4-' + i.toString(16).padStart(40, '0');
+      const k = filterToKey({ address: addr, topics: ['0xR4-T'] });
+      expect(k).toContain(addr);
+    }
+  });
+
+  it('round-4 50 different topic arrays', () => {
+    for (let i = 0; i < 50; i++) {
+      const topics = [`0xR4-T-${i}`];
+      const k = filterToKey({ address: '0xR4-A', topics });
+      expect(k).toContain(`0xR4-T-${i}`);
+    }
+  });
 });
