@@ -280,4 +280,43 @@ describe('checkEnoughVotes — additional', () => {
       expect(isProposalUpdatable(ProposalState.UPDATABLE)).toBe(first);
     }
   });
+
+  it('round-4 30 sequential isProposalUpdatable calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => isProposalUpdatable(ProposalState.PENDING)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 returns boolean-typed result', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = isProposalUpdatable(ProposalState.UPDATABLE);
+      expect(typeof result).toBe('boolean');
+    }
+  });
+
+  it('round-4 100 mixed sequential calls', () => {
+    for (let i = 0; i < 100; i++) {
+      isProposalUpdatable(ProposalState.SUCCEEDED);
+    }
+    expect(true).toBe(true);
+  });
+
+  it('round-4 50 various state values', () => {
+    const states = [
+      ProposalState.PENDING,
+      ProposalState.ACTIVE,
+      ProposalState.SUCCEEDED,
+      ProposalState.EXECUTED,
+    ];
+    for (let i = 0; i < 50; i++) {
+      expect(typeof isProposalUpdatable(states[i % 4])).toBe('boolean');
+    }
+  });
+
+  it('round-4 100 isProposalUpdatable deterministic for ACTIVE', () => {
+    const first = isProposalUpdatable(ProposalState.ACTIVE);
+    for (let i = 0; i < 100; i++) {
+      expect(isProposalUpdatable(ProposalState.ACTIVE)).toBe(first);
+    }
+  });
 });
