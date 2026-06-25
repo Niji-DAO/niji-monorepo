@@ -302,4 +302,43 @@ describe('Trait', () => {
       unmount();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Trait type="hat" seed={i + 1000} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-5 30 different type values', () => {
+    const types = ['hat', 'body', 'accessory'];
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Trait type={types[i % 3] as never} seed={i + 1500} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<Trait type="hat" seed={i + 2000} />, { wrapper: WithProviders }),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Trait type="hat" seed={i + 5000} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-5 30 different seed values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Trait type="hat" seed={i * 13} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
 });
