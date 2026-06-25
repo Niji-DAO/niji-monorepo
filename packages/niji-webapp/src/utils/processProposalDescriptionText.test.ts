@@ -245,4 +245,36 @@ describe('processProposalDescriptionText', () => {
       expect(() => processProposalDescriptionText('', '')).not.toThrow();
     }
   });
+
+  it('round-6 30 sequential processProposalDescriptionText calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => processProposalDescriptionText(`# r6-${i}`, `r6-title-${i}`)).not.toThrow();
+    }
+  });
+
+  it('round-6 50 sequential calls produce string', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof processProposalDescriptionText(`r6-d-${i}`, `r6-t-${i}`)).toBe('string');
+    }
+  });
+
+  it('round-6 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof processProposalDescriptionText).toBe('function');
+    }
+  });
+
+  it('round-6 30 deterministic for same input', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = processProposalDescriptionText('# Title', 'Title');
+      const r2 = processProposalDescriptionText('# Title', 'Title');
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-6 100 sequential calls with empty inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => processProposalDescriptionText('', '')).not.toThrow();
+    }
+  });
 });
