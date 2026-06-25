@@ -358,4 +358,51 @@ describe('LegacyNoun — additional edge cases', () => {
       ),
     ).not.toThrow();
   });
+
+  it('LegacyNoun mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<LegacyNoun imgPath={`/x-${i}.png`} alt="x" />);
+      unmount();
+    }
+  });
+
+  it('LegacyNoun renders 300 instances', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <LegacyNoun key={i} imgPath={`/img-${i}.png`} alt={`alt-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('LegacyNoun handles 50 different alts', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(<LegacyNoun imgPath="/x.png" alt={`alt-${i}`} />);
+      expect(container.querySelector('img')?.getAttribute('alt')).toBe(`alt-${i}`);
+      unmount();
+    }
+  });
+
+  it('LegacyNoun handles className + wrapperClassName combined', () => {
+    const { container } = render(
+      <LegacyNoun imgPath="/x.png" alt="x" className="img-cls" wrapperClassName="wrap-cls" />,
+    );
+    expect(container.querySelector('img')?.className).toContain('img-cls');
+    expect(container.querySelector('div')?.className).toContain('wrap-cls');
+  });
+
+  it('LoadingNoun renders 200 instances', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <LoadingNoun key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });
