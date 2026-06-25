@@ -255,4 +255,45 @@ describe('BrandDatePicker', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<BrandDatePicker onChange={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 200 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <BrandDatePicker key={i} onChange={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different value cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const date = new Date(2025, 0, i + 1).toISOString().slice(0, 10);
+      const { unmount } = render(<BrandDatePicker onChange={() => {}} value={date} />);
+      unmount();
+    }
+  });
+
+  it('round-3 50 different label values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<BrandDatePicker onChange={() => {}} label={`r3-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-3 100 mount-unmount cycles second', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<BrandDatePicker onChange={() => {}} />);
+      unmount();
+    }
+  });
 });
