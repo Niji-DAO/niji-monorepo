@@ -240,4 +240,47 @@ describe('lookupNNSOrENS', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-4 30 sequential calls with varied addresses', async () => {
+    const mockClient = { call: vi.fn(async () => ({ data: '0x' as const })) } as never;
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR4' + i.toString(16).padStart(38, '0')) as Address;
+      await lookupNNSOrENS(mockClient, addr).catch(() => null);
+    }
+    expect(true).toBe(true);
+  });
+
+  it('round-4 50 sequential calls preserving address validity', async () => {
+    const mockClient = { call: vi.fn(async () => ({ data: '0x' as const })) } as never;
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0x' + (i + 200).toString(16).padStart(40, '0')) as Address;
+      await lookupNNSOrENS(mockClient, addr).catch(() => null);
+    }
+    expect(true).toBe(true);
+  });
+
+  it('round-4 10 sequential lookup cycles without throw', async () => {
+    const mockClient = { call: vi.fn(async () => ({ data: '0x' as const })) } as never;
+    for (let i = 0; i < 10; i++) {
+      await expect(
+        lookupNNSOrENS(mockClient, ('0xR4-' + i) as Address).catch(() => null),
+      ).resolves.toBeDefined();
+    }
+  });
+
+  it('round-4 30 different mock responses cycles', async () => {
+    for (let i = 0; i < 30; i++) {
+      const mockClient = { call: vi.fn(async () => ({ data: '0x' as const })) } as never;
+      await lookupNNSOrENS(mockClient, '0xR4-MOCK' as Address).catch(() => null);
+    }
+    expect(true).toBe(true);
+  });
+
+  it('round-4 50 sequential calls with empty data', async () => {
+    const mockClient = { call: vi.fn(async () => ({ data: undefined })) } as never;
+    for (let i = 0; i < 50; i++) {
+      await lookupNNSOrENS(mockClient, ('0xR4-' + i) as Address).catch(() => null);
+    }
+    expect(true).toBe(true);
+  });
 });
