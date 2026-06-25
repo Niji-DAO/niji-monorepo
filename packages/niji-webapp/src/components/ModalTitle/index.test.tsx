@@ -565,4 +565,50 @@ describe('ModalTitle', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<ModalTitle>x</ModalTitle>);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 1000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <ModalTitle key={i}>r3-{i}</ModalTitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 handles 200 different children values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(<ModalTitle>r3-v-{i}</ModalTitle>);
+      expect(container.textContent).toBe(`r3-v-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-3 all 500 instances render', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <ModalTitle key={i}>x</ModalTitle>
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(500);
+  });
+
+  it('round-3 100 rerender cycles', () => {
+    const { container, rerender } = render(<ModalTitle>x</ModalTitle>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<ModalTitle>r3-r-{i}</ModalTitle>);
+    }
+    expect(container.textContent).toContain('99');
+  });
 });
