@@ -731,4 +731,82 @@ describe('DelegateHoverCard', () => {
       ).not.toThrow();
     }
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 50 different delegate ids', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <DelegateHoverCard delegateId={`delegate-0x${i}`} proposalCreationBlock={1n} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 100 instances without crash', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <DelegateHoverCard
+              key={i}
+              delegateId={`delegate-0x${i}`}
+              proposalCreationBlock={BigInt(i)}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles all 4 query state combinations', () => {
+    [
+      { loading: true, error: undefined, data: undefined },
+      { loading: false, error: new Error('e'), data: undefined },
+      { loading: false, error: undefined, data: { delegates: [] } },
+      {
+        loading: false,
+        error: undefined,
+        data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      },
+    ].forEach(state => {
+      useDelegateNounsAtBlockQueryMock.mockReturnValue(state);
+      expect(() =>
+        render(<DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />),
+      ).not.toThrow();
+    });
+  });
+
+  it('handles 0n proposalCreationBlock edge case', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    expect(() =>
+      render(<DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={0n} />),
+    ).not.toThrow();
+  });
 });

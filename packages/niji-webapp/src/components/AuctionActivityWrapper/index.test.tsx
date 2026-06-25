@@ -404,4 +404,61 @@ describe('AuctionActivityWrapper', () => {
       expect(div.className).toContain('max-lg:mx-4');
     });
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<AuctionActivityWrapper>{i}</AuctionActivityWrapper>);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <AuctionActivityWrapper key={i}>{i}</AuctionActivityWrapper>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different children', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(
+        <AuctionActivityWrapper>child-{i}</AuctionActivityWrapper>,
+      );
+      expect(container.querySelector('div')?.textContent).toContain(`child-${i}`);
+      unmount();
+    }
+  });
+
+  it('handles deeply nested children (10 levels)', () => {
+    const { container } = render(
+      <AuctionActivityWrapper>
+        <span>
+          <span>
+            <span>
+              <span>
+                <span data-testid="deep10">deep</span>
+              </span>
+            </span>
+          </span>
+        </span>
+      </AuctionActivityWrapper>,
+    );
+    expect(container.querySelector('[data-testid="deep10"]')?.textContent).toBe('deep');
+  });
+
+  it('all 300 instances have div wrapper', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 300 }, (_, i) => (
+          <AuctionActivityWrapper key={i}>x</AuctionActivityWrapper>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(300);
+  });
 });
