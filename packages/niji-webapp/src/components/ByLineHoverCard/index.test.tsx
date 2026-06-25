@@ -669,4 +669,63 @@ describe('ByLineHoverCard', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 100 cycles', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ByLineHoverCard proposerAddress="0xA" />);
+      unmount();
+    }
+  });
+
+  it('renders 100 instances all loading', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ByLineHoverCard key={i} proposerAddress={`0xA${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different proposer addresses with data', () => {
+    for (let i = 0; i < 50; i++) {
+      useSubgraphQueryMock.mockReturnValue({
+        data: { delegates: [{ id: `0xD${i}`, nijiRepresented: [{ id: '1' }] }] },
+        loading: false,
+        error: undefined,
+      });
+      const { unmount } = render(<ByLineHoverCard proposerAddress={`0xP${i}`} />);
+      unmount();
+    }
+  });
+
+  it('all 30 loading instances render spinner', () => {
+    useSubgraphQueryMock.mockReturnValue({ data: undefined, loading: true, error: undefined });
+    const { container } = render(
+      <>
+        {Array.from({ length: 30 }, (_, i) => (
+          <ByLineHoverCard key={i} proposerAddress="0xA" />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('.spinner-border').length).toBeGreaterThanOrEqual(30);
+  });
+
+  it('handles 30 different niji counts in stacked', () => {
+    for (let i = 1; i <= 30; i++) {
+      const niji = Array.from({ length: i }, (_, j) => ({ id: String(j) }));
+      useSubgraphQueryMock.mockReturnValue({
+        data: { delegates: [{ id: '0xA', nijiRepresented: niji }] },
+        loading: false,
+        error: undefined,
+      });
+      const { container, unmount } = render(<ByLineHoverCard proposerAddress="0xA" />);
+      expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe(`stack-${i}`);
+      unmount();
+    }
+  });
 });
