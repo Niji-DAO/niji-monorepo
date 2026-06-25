@@ -104,4 +104,51 @@ describe('useForkTreasuryBalance', () => {
     // `ethBalanceData?.value ?? 0n` で undefined → 0n、 stETH 500 のみ
     expect(result.current).toBe(500n);
   });
+
+  it('handles 100 different ETH balances', () => {
+    useReadStEthBalanceOfMock.mockReturnValue({ data: 0n });
+    for (let i = 0; i < 100; i++) {
+      useBalanceMock.mockReturnValue({ data: { value: BigInt(i * 1000) } });
+      const { result } = renderHook(() => useForkTreasuryBalance(TREASURY));
+      expect(result.current).toBe(BigInt(i * 1000));
+    }
+  });
+
+  it('handles 100 different stETH balances', () => {
+    useBalanceMock.mockReturnValue({ data: { value: 0n } });
+    for (let i = 0; i < 100; i++) {
+      useReadStEthBalanceOfMock.mockReturnValue({ data: BigInt(i * 1000) });
+      const { result } = renderHook(() => useForkTreasuryBalance(TREASURY));
+      expect(result.current).toBe(BigInt(i * 1000));
+    }
+  });
+
+  it('handles 30 different combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      useBalanceMock.mockReturnValue({ data: { value: BigInt(i * 100) } });
+      useReadStEthBalanceOfMock.mockReturnValue({ data: BigInt(i * 200) });
+      const { result } = renderHook(() => useForkTreasuryBalance(TREASURY));
+      expect(result.current).toBe(BigInt(i * 100 + i * 200));
+    }
+  });
+
+  it('handles 200 huge ETH amounts', () => {
+    useReadStEthBalanceOfMock.mockReturnValue({ data: 0n });
+    for (let i = 0; i < 200; i++) {
+      const huge = BigInt(i) * 10n ** 18n;
+      useBalanceMock.mockReturnValue({ data: { value: huge } });
+      const { result } = renderHook(() => useForkTreasuryBalance(TREASURY));
+      expect(result.current).toBe(huge);
+    }
+  });
+
+  it('handles 30 different treasury addresses', () => {
+    useBalanceMock.mockReturnValue({ data: { value: 100n } });
+    useReadStEthBalanceOfMock.mockReturnValue({ data: 50n });
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { result } = renderHook(() => useForkTreasuryBalance(addr));
+      expect(result.current).toBe(150n);
+    }
+  });
 });

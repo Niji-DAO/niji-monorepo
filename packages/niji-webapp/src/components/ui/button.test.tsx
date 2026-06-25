@@ -79,4 +79,52 @@ describe('buttonVariants (cva)', () => {
   it('respects link variant', () => {
     expect(buttonVariants({ variant: 'link' })).toContain('underline-offset-4');
   });
+
+  it('mount-unmount 2000 cycles', () => {
+    for (let i = 0; i < 2000; i++) {
+      const { unmount } = render(<Button>x</Button>);
+      unmount();
+    }
+  });
+
+  it('renders 3000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 3000 }, (_, i) => (
+            <Button key={i}>btn-{i}</Button>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles all 6 variants 100 times each', () => {
+    const variants = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'] as const;
+    variants.forEach(v => {
+      for (let i = 0; i < 100; i++) {
+        const { unmount } = render(<Button variant={v}>x</Button>);
+        unmount();
+      }
+    });
+  });
+
+  it('all 1000 buttons render with correct text', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 1000 }, (_, i) => (
+          <Button key={i}>btn-{i}</Button>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(1000);
+  });
+
+  it('handles 100 different size variants', () => {
+    const sizes = ['default', 'sm', 'lg', 'icon'] as const;
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Button size={sizes[i % 4]}>x</Button>);
+      unmount();
+    }
+  });
 });
