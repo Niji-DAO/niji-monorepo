@@ -178,4 +178,64 @@ describe('NijiI18nProvider', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiI18nProvider locale="ja-JP">
+          <div>r2-x</div>
+        </NijiI18nProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiI18nProvider key={i} locale="ja-JP">
+              <div>r2-{i}</div>
+            </NijiI18nProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different locale values cycles', () => {
+    const locales = ['ja-JP', 'en-US'];
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiI18nProvider locale={locales[i % 2]}>
+          <div>x</div>
+        </NijiI18nProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiI18nProvider locale="ja-JP">
+          <div>r2-children-{i}</div>
+        </NijiI18nProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <NijiI18nProvider locale="ja-JP">
+            <div>x</div>
+          </NijiI18nProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });

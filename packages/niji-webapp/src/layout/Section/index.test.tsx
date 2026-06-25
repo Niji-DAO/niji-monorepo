@@ -157,4 +157,68 @@ describe('Section', () => {
       ),
     ).not.toThrow();
   });
+
+  it('round-2 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <div>r2-x</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <Section key={i} fullWidth={false}>
+              <div>r2-{i}</div>
+            </Section>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 different children values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <div>r2-v-{i}</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 fullWidth toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Section fullWidth={i % 2 === 0}>
+          <div>x</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 100 rerender cycles', () => {
+    const { rerender } = render(
+      <Section fullWidth={false}>
+        <div>x</div>
+      </Section>,
+    );
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(
+          <Section fullWidth={false}>
+            <div>r2-r-{i}</div>
+          </Section>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
