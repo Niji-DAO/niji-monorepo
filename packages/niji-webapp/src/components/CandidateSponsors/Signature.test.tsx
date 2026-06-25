@@ -336,4 +336,43 @@ describe('Signature', () => {
       expect(() => render(<Signature {...baseProps} />)).not.toThrow();
     }
   });
+
+  it('round-4 mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Signature {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 50 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <Signature key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different voteCount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Signature {...baseProps} voteCount={i + 500} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 isAccountSigner toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Signature {...baseProps} isAccountSigner={i % 2 === 0} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<Signature {...baseProps} />)).not.toThrow();
+    }
+  });
 });
