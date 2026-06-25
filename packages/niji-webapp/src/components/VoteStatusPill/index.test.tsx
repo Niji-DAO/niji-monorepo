@@ -372,4 +372,51 @@ describe('VoteStatusPill', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-4 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<VoteStatusPill status="success" text="r4" />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 1000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <VoteStatusPill key={i} status="success" text={`r4-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 100 different text values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteStatusPill status="success" text={`r4-text-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-4 all 200 instances render div root', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <VoteStatusPill key={i} status="success" text={`r4-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(200);
+  });
+
+  it('round-4 100 status transitions', () => {
+    const statuses = ['success', 'failure', 'pending', 'unknown'];
+    const { rerender } = render(<VoteStatusPill status="success" text="x" />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<VoteStatusPill status={statuses[i % 4]} text={`r4-${i}`} />),
+      ).not.toThrow();
+    }
+  });
 });
