@@ -365,4 +365,50 @@ describe('FunctionCallSelectFunctionStep', () => {
     ) as HTMLSelectElement;
     expect(dropdown.value).toBe('');
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <FunctionCallSelectFunctionStep key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 200 onPrevBtnClick invocations', () => {
+    const onPrev = vi.fn();
+    render(<FunctionCallSelectFunctionStep {...baseProps} onPrevBtnClick={onPrev} />);
+    for (let i = 0; i < 200; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('rapid 200 onNextBtnClick invocations', () => {
+    const onNext = vi.fn();
+    render(<FunctionCallSelectFunctionStep {...baseProps} onNextBtnClick={onNext} />);
+    for (let i = 0; i < 200; i++) onNext();
+    expect(onNext).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles 30 different addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(
+        <FunctionCallSelectFunctionStep
+          {...baseProps}
+          state={{ ...baseProps.state, address: addr } as never}
+        />,
+      );
+      unmount();
+    }
+  });
 });

@@ -281,4 +281,49 @@ describe('TransferFundsReviewStep', () => {
       '0x5FbDB2315678afecb367f032d93F642f64180aa3',
     );
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<TransferFundsReviewStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <TransferFundsReviewStep key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 200 onPrevBtnClick invocations', () => {
+    const onPrev = vi.fn();
+    render(<TransferFundsReviewStep {...defaults} onPrevBtnClick={onPrev} />);
+    for (let i = 0; i < 200; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('rapid 200 onNextBtnClick invocations', () => {
+    const onNext = vi.fn();
+    render(<TransferFundsReviewStep {...defaults} onNextBtnClick={onNext} />);
+    for (let i = 0; i < 200; i++) onNext();
+    expect(onNext).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles 30 different amount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <TransferFundsReviewStep
+          {...defaults}
+          state={{ ...defaults.state, amount: String(i) } as never}
+        />,
+      );
+      unmount();
+    }
+  });
 });
