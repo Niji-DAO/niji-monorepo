@@ -580,4 +580,54 @@ describe('ProposalHeader', () => {
   it('handles unicode title', () => {
     expect(() => wrap(<ProposalHeader {...baseProps} title="🎉日本語タイトル" />)).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<ProposalHeader {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different proposal ids', () => {
+    for (let i = 0; i < 30; i++) {
+      const p = makeProposal({ id: String(i) });
+      const { unmount } = wrap(<ProposalHeader {...baseProps} proposal={p} />);
+      unmount();
+    }
+  });
+
+  it('handles all 3 hookState combinations', () => {
+    const orig = { ...hookState };
+    [
+      { hasVoted: true, proposalVote: 'For', availableVotes: 5, isDaoGteV3: true },
+      { hasVoted: false, proposalVote: 'Against', availableVotes: 0, isDaoGteV3: false },
+      { hasVoted: true, proposalVote: 'Abstain', availableVotes: 100, isDaoGteV3: true },
+    ].forEach(state => {
+      Object.assign(hookState, state);
+      const { unmount } = wrap(<ProposalHeader {...baseProps} />);
+      unmount();
+    });
+    Object.assign(hookState, orig);
+  });
+
+  it('rapid 30 isObjectionPeriod toggle', () => {
+    const { rerender } = wrap(<ProposalHeader {...baseProps} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <ProposalHeader {...baseProps} isObjectionPeriod={i % 2 === 0} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles all 3 locale variants', () => {
+    ['en-US', 'ja-JP', 'zh-CN'].forEach(loc => {
+      useActiveLocaleMock.mockReturnValue(loc);
+      const { unmount } = wrap(<ProposalHeader {...baseProps} />);
+      unmount();
+    });
+  });
 });
