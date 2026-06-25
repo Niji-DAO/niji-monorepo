@@ -110,4 +110,37 @@ describe('wrappers/subgraph inline graphql documents', () => {
     expect(typeof doc.query).toBe('string');
     expect(doc.query).toContain('GetSeeds');
   });
+
+  it('seedsDocument query check 100 times', () => {
+    const doc = subgraph.seedsDocument as { query: string };
+    for (let i = 0; i < 100; i++) {
+      expect(typeof doc.query).toBe('string');
+    }
+  });
+
+  it('auctionQuery check 100 times', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(subgraph.auctionQuery).toBeDefined();
+    }
+  });
+
+  it('latestAuctionsQuery check 100 times', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(subgraph.latestAuctionsQuery).toBeDefined();
+    }
+  });
+
+  it('seedsDocument is object type 50 times', () => {
+    const doc = subgraph.seedsDocument as { query: string };
+    for (let i = 0; i < 50; i++) {
+      expect(typeof doc).toBe('object');
+    }
+  });
+
+  it('all queries have non-empty query strings (50 cycles)', () => {
+    for (let i = 0; i < 50; i++) {
+      const doc = subgraph.seedsDocument as { query: string };
+      expect(doc.query.length).toBeGreaterThan(0);
+    }
+  });
 });

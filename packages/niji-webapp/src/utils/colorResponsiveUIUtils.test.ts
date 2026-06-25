@@ -50,4 +50,35 @@ describe('shouldUseStateBg', () => {
   it('returns false for path that only resembles "noun" without slash', () => {
     expect(shouldUseStateBg({ pathname: '/nope' })).toBe(false);
   });
+
+  it('handles 200 different / variant paths', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(shouldUseStateBg({ pathname: `/path-${i}` })).toBe(false);
+    }
+  });
+
+  it('handles 200 different /noun variant paths', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(shouldUseStateBg({ pathname: `/noun/${i}` })).toBe(true);
+    }
+  });
+
+  it('handles 200 different /auction variant paths', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(shouldUseStateBg({ pathname: `/auction/${i}` })).toBe(true);
+    }
+  });
+
+  it('handles 100 different /vote variant paths', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(shouldUseStateBg({ pathname: `/vote/${i}` })).toBe(false);
+    }
+  });
+
+  it('handles 100 different long paths', () => {
+    for (let i = 0; i < 100; i++) {
+      const longPath = '/' + 'a'.repeat(100 + i);
+      expect(typeof shouldUseStateBg({ pathname: longPath })).toBe('boolean');
+    }
+  });
 });
