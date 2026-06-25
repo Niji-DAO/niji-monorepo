@@ -406,4 +406,49 @@ describe('BrandNumericEntry', () => {
     }
     expect(container.querySelector('input')).not.toBeNull();
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<BrandNumericEntry value={i} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <BrandNumericEntry key={i} value={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different label values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<BrandNumericEntry label={`label-${i}`} />);
+      expect(container.querySelector('span')?.textContent).toBe(`label-${i}`);
+      unmount();
+    }
+  });
+
+  it('rapid 100 onValueChange events fire handler', () => {
+    const onValueChange = vi.fn();
+    const { container } = render(<BrandNumericEntry onValueChange={onValueChange} />);
+    const input = container.querySelector('input')!;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(input, { target: { value: String(i) } });
+    }
+    expect(onValueChange).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles 30 different placeholders', () => {
+    for (let i = 0; i < 30; i++) {
+      const { container, unmount } = render(<BrandNumericEntry placeholder={`ph-${i}`} />);
+      expect(container.querySelector('input')?.getAttribute('placeholder')).toBe(`ph-${i}`);
+      unmount();
+    }
+  });
 });
