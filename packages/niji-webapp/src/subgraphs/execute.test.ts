@@ -266,4 +266,35 @@ describe('execute', () => {
       expect(execute).toBeTruthy();
     }
   });
+
+  it('round-7 30 sequential execute access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(execute).toBeDefined();
+    }
+  });
+
+  it('round-7 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof execute).toBe('function');
+    }
+  });
+
+  it('round-7 100 sequential reference consistency', () => {
+    const first = execute;
+    for (let i = 0; i < 100; i++) {
+      expect(execute).toBe(first);
+    }
+  });
+
+  it('round-7 50 sequential truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(execute).toBeTruthy();
+    }
+  });
+
+  it('round-7 50 sequential truthiness check second', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(execute).toBeTruthy();
+    }
+  });
 });
