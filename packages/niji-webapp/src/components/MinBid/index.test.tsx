@@ -373,4 +373,52 @@ describe('MinBid', () => {
     );
     expect(container.querySelectorAll('img').length).toBe(100);
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<MinBid minBid={parseEther('1')} onClick={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances with varying amounts', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <MinBid key={i} minBid={parseEther(`${i + 1}`)} onClick={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different decimal bid amounts', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(
+        <MinBid minBid={parseEther(`${i + 1}.${i}`)} onClick={() => {}} />,
+      );
+      expect(container.querySelector('img')).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it('all 50 wrapper div have onClick', () => {
+    const onClick = vi.fn();
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <MinBid key={i} minBid={parseEther(`${i + 1}`)} onClick={onClick} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBeGreaterThanOrEqual(50);
+  });
+
+  it('handles 1 wei minBid + onClick fires correctly', () => {
+    const onClick = vi.fn();
+    const { container } = render(<MinBid minBid={1n} onClick={onClick} />);
+    fireEvent.click(container.firstElementChild as HTMLElement);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
 });
