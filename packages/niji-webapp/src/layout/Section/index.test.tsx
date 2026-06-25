@@ -95,4 +95,66 @@ describe('Section', () => {
     );
     expect(container.firstChild).not.toBeNull();
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <span>x</span>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 1500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <Section key={i} fullWidth={false}>
+              <span>x-{i}</span>
+            </Section>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different children values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(
+        <Section fullWidth={false}>
+          <span data-testid={`v-${i}`}>val-{i}</span>
+        </Section>,
+      );
+      expect(container.querySelector(`[data-testid="v-${i}"]`)?.textContent).toBe(`val-${i}`);
+      unmount();
+    }
+  });
+
+  it('handles 100 fullWidth toggle cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <Section fullWidth={i % 2 === 0}>
+          <span>x</span>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 500 instances mixed fullWidth states', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <Section key={i} fullWidth={i % 2 === 0}>
+              <span>x-{i}</span>
+            </Section>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });

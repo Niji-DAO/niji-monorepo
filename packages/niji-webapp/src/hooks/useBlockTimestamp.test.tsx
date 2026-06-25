@@ -102,4 +102,41 @@ describe('useBlockTimestamp', () => {
     rerender(2n);
     await waitFor(() => expect(result.current).toBe(200));
   });
+
+  it('handles 50 different blockNumbers without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      getBlockMock.mockResolvedValue({ timestamp: BigInt(1700000000 + i) });
+      expect(() => renderHook(() => useBlockTimestamp(BigInt(i)))).not.toThrow();
+    }
+  });
+
+  it('handles 30 undefined blockNumber cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      getBlockMock.mockReset();
+      const { result } = renderHook(() => useBlockTimestamp(undefined));
+      expect(result.current).toBeUndefined();
+    }
+  });
+
+  it('handles 50 different large blockNumber values without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      const block = BigInt(1000000 + i);
+      getBlockMock.mockResolvedValue({ timestamp: BigInt(1700000000 + i * 12) });
+      expect(() => renderHook(() => useBlockTimestamp(block))).not.toThrow();
+    }
+  });
+
+  it('handles 30 same blockNumber re-renders without crash', () => {
+    getBlockMock.mockResolvedValue({ timestamp: 1700000000n });
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useBlockTimestamp(100n))).not.toThrow();
+    }
+  });
+
+  it('handles 50 different timestamps with same blockNumber', () => {
+    for (let i = 0; i < 50; i++) {
+      getBlockMock.mockResolvedValue({ timestamp: BigInt(1700000000 + i * 60) });
+      expect(() => renderHook(() => useBlockTimestamp(100n))).not.toThrow();
+    }
+  });
 });
