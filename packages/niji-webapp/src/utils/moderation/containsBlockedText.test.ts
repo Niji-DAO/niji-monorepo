@@ -196,4 +196,37 @@ describe('containsBlockedText', () => {
       expect(r1).toBe(r2);
     }
   });
+
+  it('round-5 30 sequential containsBlockedText calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => containsBlockedText(`r5-text-${i}`, 'all')).not.toThrow();
+    }
+  });
+
+  it('round-5 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof containsBlockedText(`r5-${i}`, 'all')).toBe('boolean');
+    }
+  });
+
+  it('round-5 100 sequential calls', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof containsBlockedText(`r5-loop-${i}`, 'all')).toBe('boolean');
+    }
+  });
+
+  it('round-5 50 deterministic results', () => {
+    for (let i = 0; i < 50; i++) {
+      const r1 = containsBlockedText('r5-safe', 'all');
+      const r2 = containsBlockedText('r5-safe', 'all');
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-5 100 sequential mixed allowed / blocked checks', () => {
+    for (let i = 0; i < 100; i++) {
+      const text = i % 2 === 0 ? `r5-clean-${i}` : `r5-text-${i}`;
+      expect(typeof containsBlockedText(text, 'all')).toBe('boolean');
+    }
+  });
 });
