@@ -365,4 +365,45 @@ describe('Winner', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Winner winner="0xWIN" />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 50 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <Winner key={i} winner={('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different winner addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { unmount } = render(<Winner winner={addr} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 isNounder toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Winner winner="0xWIN" isNounder={i % 2 === 0} />);
+      unmount();
+    }
+  });
+
+  it('round-2 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Winner winner="0xWIN" />);
+      unmount();
+    }
+  });
 });
