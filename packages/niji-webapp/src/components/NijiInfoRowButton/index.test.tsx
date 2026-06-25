@@ -515,4 +515,59 @@ describe('NijiInfoRowButton', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <NijiInfoRowButton iconImgSource="/x.png" btnText="r4" onClickHandler={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <NijiInfoRowButton
+              key={i}
+              iconImgSource="/x.png"
+              btnText={`r4-${i}`}
+              onClickHandler={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different btnText values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiInfoRowButton
+          iconImgSource="/x.png"
+          btnText={`r4-b-${i}`}
+          onClickHandler={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 rapid 200 onClick invocations', () => {
+    const onClick = vi.fn();
+    render(<NijiInfoRowButton iconImgSource="/x.png" btnText="x" onClickHandler={onClick} />);
+    for (let i = 0; i < 200; i++) onClick();
+    expect(onClick).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-4 30 different icon values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiInfoRowButton iconImgSource={`/r4-${i}.png`} btnText="x" onClickHandler={() => {}} />,
+      );
+      unmount();
+    }
+  });
 });

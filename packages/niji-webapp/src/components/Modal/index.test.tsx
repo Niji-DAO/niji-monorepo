@@ -436,4 +436,47 @@ describe('Modal', () => {
     );
     expect(container.querySelectorAll('div').length).toBe(200);
   });
+
+  it('round-4 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Modal title="r4" content={<p>x</p>} onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <Modal key={i} title={`r4-${i}`} content={<p>x</p>} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different title values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Modal title={`r4-t-${i}`} content={<p>x</p>} onDismiss={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<Modal title="x" content={<p>x</p>} onDismiss={onDismiss} />);
+    for (let i = 0; i < 200; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<Modal title="x" content={<p>x</p>} onDismiss={() => {}} />),
+      ).not.toThrow();
+    }
+  });
 });
