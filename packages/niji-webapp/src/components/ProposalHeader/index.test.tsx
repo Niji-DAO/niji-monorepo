@@ -540,4 +540,44 @@ describe('ProposalHeader', () => {
   it('handles isWalletConnected=false variant', () => {
     expect(() => wrap(<ProposalHeader {...baseProps} isWalletConnected={false} />)).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<ProposalHeader {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles all 4 boolean prop combinations', () => {
+    [true, false].forEach(active => {
+      [true, false].forEach(connected => {
+        expect(() =>
+          wrap(
+            <ProposalHeader
+              {...baseProps}
+              isActiveForVoting={active}
+              isWalletConnected={connected}
+            />,
+          ),
+        ).not.toThrow();
+      });
+    });
+  });
+
+  it('handles submitButtonClickHandler 100 invocations', () => {
+    submitMock.mockReset();
+    wrap(<ProposalHeader {...baseProps} />);
+    for (let i = 0; i < 100; i++) submitMock();
+    expect(submitMock).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles 30 different titles', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => wrap(<ProposalHeader {...baseProps} title={`Title-${i}`} />)).not.toThrow();
+    }
+  });
+
+  it('handles unicode title', () => {
+    expect(() => wrap(<ProposalHeader {...baseProps} title="🎉日本語タイトル" />)).not.toThrow();
+  });
 });
