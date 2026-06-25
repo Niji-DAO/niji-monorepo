@@ -142,4 +142,51 @@ describe('Link', () => {
     const { container } = render(<Link text="x" url={longUrl} leavesPage={false} />);
     expect(container.querySelector('a')?.getAttribute('href')).toBe(longUrl);
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<Link text="x" url="https://x.com" leavesPage={false} />);
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <Link key={i} text={`t-${i}`} url={`https://x.com/${i}`} leavesPage={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different text values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(
+        <Link text={`text-${i}`} url="https://x.com" leavesPage={false} />,
+      );
+      expect(container.querySelector('a')?.textContent).toBe(`text-${i}`);
+      unmount();
+    }
+  });
+
+  it('all 500 instances render anchor', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <Link key={i} text="x" url={`https://x.com/${i}`} leavesPage={false} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(500);
+  });
+
+  it('handles 30 different leavesPage combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Link text="x" url="https://x.com" leavesPage={i % 2 === 0} />);
+      unmount();
+    }
+  });
 });
