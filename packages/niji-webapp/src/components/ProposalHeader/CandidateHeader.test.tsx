@@ -270,4 +270,65 @@ describe('CandidateHeader', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <CandidateHeader {...defaults} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different blockNumber values', () => {
+    for (let i = 0; i < 30; i++) {
+      useBlockNumberMock.mockReturnValue({ data: BigInt(i * 100) });
+      const { unmount } = render(
+        <MemoryRouter>
+          <CandidateHeader {...defaults} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances in single MemoryRouter mount', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CandidateHeader key={i} {...defaults} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different versionsCount values', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <CandidateHeader {...defaults} versionsCount={i} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different isActiveForVoting combinations', () => {
+    useBlockNumberMock.mockReturnValue({ data: 100n });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <CandidateHeader {...defaults} isActiveForVoting={i % 2 === 0} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
 });

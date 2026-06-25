@@ -501,4 +501,49 @@ describe('Proposals', () => {
     }
     wagmiState.blockNumber = orig;
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different nounsRequired values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Proposals proposals={[]} nounsRequired={i} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Proposals key={i} proposals={[]} nounsRequired={i} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 location.hash variations', () => {
+    for (let i = 0; i < 30; i++) {
+      locationMock.hash = `#r2-section-${i}`;
+      const { unmount } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+      unmount();
+    }
+    locationMock.hash = '';
+  });
+
+  it('round-2 handles 30 different blockNumber values', () => {
+    const orig = wagmiState.blockNumber;
+    for (let i = 0; i < 30; i++) {
+      wagmiState.blockNumber = BigInt(i * 1000);
+      const { unmount } = wrap(<Proposals proposals={[]} nounsRequired={2} />);
+      unmount();
+    }
+    wagmiState.blockNumber = orig;
+  });
 });
