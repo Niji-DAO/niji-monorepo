@@ -908,4 +908,94 @@ describe('CreateProposalButton', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <CreateProposalButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          hasEnoughVote={true}
+          isFormInvalid={false}
+          handleCreateProposal={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different proposalThreshold values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <CreateProposalButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          hasEnoughVote={false}
+          isFormInvalid={false}
+          proposalThreshold={i}
+          handleCreateProposal={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 100 instances with mixed props', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <CreateProposalButton
+              key={i}
+              isLoading={i % 2 === 0}
+              hasActiveOrPendingProposal={i % 3 === 0}
+              hasEnoughVote={i % 5 === 0}
+              isFormInvalid={i % 7 === 0}
+              handleCreateProposal={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles rapid 30 prop transitions', () => {
+    const { rerender } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={() => {}}
+      />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <CreateProposalButton
+            isLoading={i % 2 === 0}
+            hasActiveOrPendingProposal={i % 3 === 0}
+            hasEnoughVote={i % 4 === 0}
+            isFormInvalid={false}
+            handleCreateProposal={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles MAX_SAFE_INTEGER proposalThreshold', () => {
+    expect(() =>
+      render(
+        <CreateProposalButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          hasEnoughVote={false}
+          isFormInvalid={false}
+          proposalThreshold={Number.MAX_SAFE_INTEGER}
+          handleCreateProposal={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });

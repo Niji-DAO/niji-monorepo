@@ -648,4 +648,60 @@ describe('Holder', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Holder nounId={BigInt(i)} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('handles 30 different error types', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 30; i++) {
+      useSubgraphQueryMock.mockReturnValue({
+        loading: false,
+        error: new Error(`err-${i}`),
+        data: undefined,
+      });
+      const { unmount } = render(<Holder nounId={BigInt(i)} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('renders 30 instances all with loading state', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Holder key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles atomValue toggle 50 times', () => {
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    const { rerender } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    for (let i = 0; i < 50; i++) {
+      useAtomValueMock.mockReturnValue(i % 2 === 0);
+      expect(() => rerender(<Holder nounId={1n} />)).not.toThrow();
+    }
+  });
+
+  it('handles empty owner string', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '' } } },
+    });
+    expect(() => render(<Holder nounId={1n} />, { wrapper: WithProviders })).not.toThrow();
+  });
 });

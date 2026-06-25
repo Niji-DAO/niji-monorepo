@@ -559,4 +559,44 @@ describe('AddNijisToForkModal', () => {
     expect(() => render(<AddNijisToForkModal {...baseProps} />)).not.toThrow();
     hookState.isApprovedForAll = true;
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AddNijisToForkModal {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different account addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const props = { ...baseProps, account: '0x' + i.toString(16).padStart(40, '0') };
+      const { unmount } = render(<AddNijisToForkModal {...props} />);
+      unmount();
+    }
+  });
+
+  it('handles rapid 30 isForkingPeriod toggle', () => {
+    const { rerender } = render(<AddNijisToForkModal {...baseProps} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(<AddNijisToForkModal {...baseProps} isForkingPeriod={i % 2 === 0} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 10000 user escrowed nouns', () => {
+    const escrowed = Array.from({ length: 10000 }, (_, i) => i);
+    expect(() =>
+      render(<AddNijisToForkModal {...baseProps} userEscrowedNouns={escrowed} />),
+    ).not.toThrow();
+  });
+
+  it('handles all 5 setApprovalState statuses', () => {
+    const statuses: ApprovalStatus[] = ['None', 'PendingSignature', 'Mining', 'Success', 'Fail'];
+    statuses.forEach(s => {
+      hookState.setApprovalState = { status: s };
+      expect(() => render(<AddNijisToForkModal {...baseProps} />)).not.toThrow();
+    });
+    hookState.setApprovalState = { status: 'None' };
+  });
 });
