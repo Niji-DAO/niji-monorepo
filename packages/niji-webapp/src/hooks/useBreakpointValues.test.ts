@@ -158,4 +158,44 @@ describe('useBreakpointDown', () => {
     const { result } = renderHook(() => useBreakpointDown('nonexistent' as never));
     expect(result.current).toBe(false);
   });
+
+  it('useBreakpointValues handles 30 different widths', () => {
+    for (let i = 0; i < 30; i++) {
+      setWindowWidth(400 + i * 100);
+      expect(() =>
+        renderHook(() => useBreakpointValues({ sm: 'a', md: 'b', lg: 'c' })),
+      ).not.toThrow();
+    }
+  });
+
+  it('useCurrentBreakpoint handles 30 width changes', () => {
+    for (let i = 0; i < 30; i++) {
+      setWindowWidth(300 + i * 50);
+      expect(() => renderHook(() => useCurrentBreakpoint())).not.toThrow();
+    }
+  });
+
+  it('useBreakpointUp handles 30 cycles', () => {
+    setWindowWidth(1000);
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useBreakpointUp('md'))).not.toThrow();
+    }
+  });
+
+  it('useBreakpointDown handles 30 cycles', () => {
+    setWindowWidth(500);
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useBreakpointDown('md'))).not.toThrow();
+    }
+  });
+
+  it('handles rapid 50 resize events', () => {
+    setWindowWidth(800);
+    const { result } = renderHook(() => useBreakpointValues({ sm: 'a', md: 'b', lg: 'c' }));
+    for (let i = 0; i < 50; i++) {
+      setWindowWidth(400 + i * 30);
+      fireResize();
+    }
+    expect(result.current).toBeDefined();
+  });
 });
