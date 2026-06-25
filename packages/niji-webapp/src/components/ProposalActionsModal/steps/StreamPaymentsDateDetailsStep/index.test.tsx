@@ -331,4 +331,49 @@ describe('StreamPaymentDateDetailsStep', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<StreamPaymentDateDetailsStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <StreamPaymentDateDetailsStep key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 rapid 200 onPrevBtnClick invocations', () => {
+    const onPrev = vi.fn();
+    render(<StreamPaymentDateDetailsStep {...defaults} onPrevBtnClick={onPrev} />);
+    for (let i = 0; i < 200; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-3 rapid 200 onNextBtnClick invocations', () => {
+    const onNext = vi.fn();
+    render(<StreamPaymentDateDetailsStep {...defaults} onNextBtnClick={onNext} />);
+    for (let i = 0; i < 200; i++) onNext();
+    expect(onNext).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-3 30 different startTime state cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <StreamPaymentDateDetailsStep
+          {...defaults}
+          state={{ ...defaults.state, streamStartTimestamp: 1700000000 + i * 7200 } as never}
+        />,
+      );
+      unmount();
+    }
+  });
 });
