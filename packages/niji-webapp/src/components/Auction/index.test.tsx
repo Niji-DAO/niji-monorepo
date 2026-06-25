@@ -535,4 +535,64 @@ describe('Auction', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Auction auction={makeAuction(5n) as never} />);
+      unmount();
+    }
+  });
+
+  it('handles 50 different lastAuctionNounIds', () => {
+    isNounderMock.mockReturnValue(false);
+    for (let i = 0; i < 50; i++) {
+      useAtomValueMock.mockReturnValue(BigInt(i));
+      const { unmount } = wrap(
+        <Auction auction={makeAuction(BigInt(Math.floor(i / 2))) as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 30 nounId rerender', () => {
+    useAtomValueMock.mockReturnValue(100n);
+    isNounderMock.mockReturnValue(false);
+    const { rerender } = wrap(<Auction auction={makeAuction(0n) as never} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <Auction auction={makeAuction(BigInt(i)) as never} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles all 4 boolean state combinations (Nounder × first/last)', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    [
+      { isNounder: true, nounId: 0n },
+      { isNounder: true, nounId: 5n },
+      { isNounder: false, nounId: 0n },
+      { isNounder: false, nounId: 10n },
+    ].forEach(({ isNounder, nounId }) => {
+      isNounderMock.mockReturnValue(isNounder);
+      const { unmount } = wrap(<Auction auction={makeAuction(nounId) as never} />);
+      unmount();
+    });
+    isNounderMock.mockReturnValue(false);
+  });
+
+  it('handles 30 different bidder addresses', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    isNounderMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const a = { ...makeAuction(5n), bidder: `0xBID${i}` };
+      const { unmount } = wrap(<Auction auction={a as never} />);
+      unmount();
+    }
+  });
 });
