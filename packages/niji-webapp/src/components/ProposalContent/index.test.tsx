@@ -319,4 +319,51 @@ describe('ProposalContent extra cases', () => {
       }).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalContent description="r2-body" title="r2-T" details={[]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalContent key={i} description={`r2-d-${i}`} title={`r2-t-${i}`} details={[]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different title values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalContent description="d" title={`r2-T-${i}`} details={[]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different description values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalContent description={`r2-d-${i}`} title="t" details={[]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<ProposalContent description="d" title="t" details={[]} />),
+      ).not.toThrow();
+    }
+  });
 });
