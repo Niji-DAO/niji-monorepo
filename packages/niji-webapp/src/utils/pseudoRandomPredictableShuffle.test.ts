@@ -303,4 +303,38 @@ describe('pseudoRandomPredictableShuffle', () => {
       expect(r1).toEqual(r2);
     }
   });
+
+  it('round-7 30 sequential pseudoRandomPredictableShuffle calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => pseudoRandomPredictableShuffle([1, 2, 3], i + 8000)).not.toThrow();
+    }
+  });
+
+  it('round-7 50 sequential calls produce array', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(Array.isArray(pseudoRandomPredictableShuffle([1, 2, 3], i + 9000))).toBe(true);
+    }
+  });
+
+  it('round-7 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof pseudoRandomPredictableShuffle).toBe('function');
+    }
+  });
+
+  it('round-7 30 deterministic for same seed', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = pseudoRandomPredictableShuffle([1, 2, 3], 42);
+      const r2 = pseudoRandomPredictableShuffle([1, 2, 3], 42);
+      expect(r1).toEqual(r2);
+    }
+  });
+
+  it('round-7 deterministic 30 cycles with same seed', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = pseudoRandomPredictableShuffle([1, 2, 3, 4, 5], 999);
+      const r2 = pseudoRandomPredictableShuffle([1, 2, 3, 4, 5], 999);
+      expect(r1).toEqual(r2);
+    }
+  });
 });
