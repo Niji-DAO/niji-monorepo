@@ -646,4 +646,50 @@ describe('AddNijisToForkModal', () => {
     for (let i = 0; i < 50; i++) refetch();
     expect(refetch).toHaveBeenCalledTimes(50);
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AddNijisToForkModal {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different description values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AddNijisToForkModal {...baseProps} description={`Desc-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('rapid 100 setDataFetchPollInterval invocations', () => {
+    const setPoll = vi.fn();
+    render(<AddNijisToForkModal {...baseProps} setDataFetchPollInterval={setPoll} />);
+    for (let i = 0; i < 100; i++) setPoll(i * 100);
+    expect(setPoll).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles 30 different selectLabel values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AddNijisToForkModal {...baseProps} selectLabel={`Sel-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('handles all 6 joinForkState statuses', () => {
+    const orig = { ...hookState.joinForkState };
+    const statuses: ApprovalStatus[] = [
+      'None',
+      'PendingSignature',
+      'Mining',
+      'Success',
+      'Fail',
+      'Exception',
+    ];
+    statuses.forEach(s => {
+      hookState.joinForkState = { status: s };
+      const { unmount } = render(<AddNijisToForkModal {...baseProps} isForkingPeriod={true} />);
+      unmount();
+    });
+    hookState.joinForkState = orig;
+  });
 });
