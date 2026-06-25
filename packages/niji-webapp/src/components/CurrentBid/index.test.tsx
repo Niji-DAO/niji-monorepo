@@ -651,4 +651,49 @@ describe('CurrentBid', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-4 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<CurrentBid currentBid={1n * 10n ** 18n} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <CurrentBid key={i} currentBid={BigInt(i + 500) * 10n ** 18n} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<CurrentBid currentBid={1n * 10n ** 18n} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-4 30 auctionEnded toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <CurrentBid currentBid={1n * 10n ** 18n} auctionEnded={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 100 rerender cycles', () => {
+    const { rerender } = render(<CurrentBid currentBid={1n * 10n ** 18n} auctionEnded={false} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<CurrentBid currentBid={BigInt(i + 5000) * 10n ** 18n} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
 });
