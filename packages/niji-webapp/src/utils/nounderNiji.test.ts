@@ -206,4 +206,37 @@ describe('isNounderNiji', () => {
       expect(r1).toBe(r2);
     }
   });
+
+  it('round-5 30 sequential isNounderNiji calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => isNounderNiji(BigInt(i + 5000))).not.toThrow();
+    }
+  });
+
+  it('round-5 50 returns boolean-typed result', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = isNounderNiji(BigInt(i + 6000));
+      expect(typeof result).toBe('boolean');
+    }
+  });
+
+  it('round-5 100 sequential nounId variants', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof isNounderNiji(BigInt(i + 7000))).toBe('boolean');
+    }
+  });
+
+  it('round-5 50 large nounId variants', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => isNounderNiji(BigInt(100000 + i))).not.toThrow();
+    }
+  });
+
+  it('round-5 deterministic for same nounId 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = isNounderNiji(555n);
+      const r2 = isNounderNiji(555n);
+      expect(r1).toBe(r2);
+    }
+  });
 });
