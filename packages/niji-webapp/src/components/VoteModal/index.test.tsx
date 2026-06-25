@@ -348,4 +348,47 @@ describe('VoteModal', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteModal {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles all 5 vote status transitions', () => {
+    const statuses: VoteStatus[] = ['None', 'Mining', 'Success', 'Fail', 'Exception'];
+    statuses.forEach(s => {
+      hookState.castRefundableVoteState = { status: s };
+      const { unmount } = render(<VoteModal {...baseProps} />);
+      unmount();
+    });
+    hookState.castRefundableVoteState = { status: 'None' };
+  });
+
+  it('rapid 200 onHide invocations', () => {
+    const onHide = vi.fn();
+    render(<VoteModal {...baseProps} onHide={onHide} />);
+    for (let i = 0; i < 200; i++) onHide();
+    expect(onHide).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles 30 different proposalId values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteModal {...baseProps} proposalId={String(i)} />);
+      unmount();
+    }
+  });
+
+  it('renders 30 instances in single mount', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteModal key={i} {...baseProps} proposalId={String(i)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });

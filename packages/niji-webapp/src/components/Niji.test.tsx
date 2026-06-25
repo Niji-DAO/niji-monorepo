@@ -202,4 +202,64 @@ describe('Niji', () => {
     wrap(<NijiWithSeed nounId={1n} onLoadSeed={onLoadSeedMock} />);
     expect(onLoadSeedMock).toHaveBeenCalledWith(hookState.fetchedSeed);
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <Niji nounId={1n} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different nounIds', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <Niji nounId={BigInt(i)} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 30 instances in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Niji key={i} nounId={BigInt(i)} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different onLoadSeed callbacks', () => {
+    for (let i = 0; i < 30; i++) {
+      const onLoad = vi.fn();
+      const { unmount } = render(
+        <MemoryRouter>
+          <Niji nounId={1n} onLoadSeed={onLoad} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different querySvg values', () => {
+    const orig = hookState.querySvg;
+    for (let i = 0; i < 30; i++) {
+      hookState.querySvg = `<svg>v-${i}</svg>`;
+      const { unmount } = render(
+        <MemoryRouter>
+          <Niji nounId={1n} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+    hookState.querySvg = orig;
+  });
 });
