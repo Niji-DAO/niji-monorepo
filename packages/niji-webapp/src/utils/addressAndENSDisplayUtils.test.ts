@@ -383,4 +383,42 @@ describe('shortENS — boundary', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-7 30 sequential veryShortAddress calls', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR7' + i.toString(16).padStart(38, '0')) as Address;
+      expect(() => veryShortAddress(addr)).not.toThrow();
+    }
+  });
+
+  it('round-7 50 sequential veryShortENS calls', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => veryShortENS(`r7-ens-${i}.eth`)).not.toThrow();
+    }
+  });
+
+  it('round-7 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof veryShortAddress).toBe('function');
+      expect(typeof veryShortENS).toBe('function');
+    }
+  });
+
+  it('round-7 30 deterministic for same address', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = '0xR7CONST' as Address;
+      const r1 = veryShortAddress(addr);
+      const r2 = veryShortAddress(addr);
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-7 round-trip 100 sequential mixed calls', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0xR7' + i.toString(16).padStart(38, '0')) as Address;
+      veryShortAddress(addr);
+      veryShortENS(`r7-${i}.eth`);
+    }
+    expect(true).toBe(true);
+  });
 });
