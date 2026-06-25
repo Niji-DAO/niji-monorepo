@@ -623,4 +623,44 @@ describe('NavBarButton', () => {
       expect(() => render(<NavBarButton buttonText="x" />)).not.toThrow();
     }
   });
+
+  it('round-4 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<NavBarButton buttonText="r4" />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <NavBarButton key={i} buttonText={`r4-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different buttonText values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NavBarButton buttonText={`r4-btn-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-4 rapid 500 onClick events', () => {
+    const onClick = vi.fn();
+    const { container } = render(<NavBarButton buttonText="x" onClick={onClick} />);
+    const target = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 500; i++) fireEvent.click(target);
+    expect(onClick.mock.calls.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<NavBarButton buttonText="x" />)).not.toThrow();
+    }
+  });
 });
