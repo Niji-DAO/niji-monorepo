@@ -281,4 +281,43 @@ describe('Link', () => {
     );
     expect(container.querySelectorAll('a').length).toBe(500);
   });
+
+  it('round-4 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<Link text="r4" url="https://r4.io" />);
+      unmount();
+    }
+  });
+
+  it('round-4 100 different url values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Link text="x" url={`https://r4-url-${i}.io`} />);
+      unmount();
+    }
+  });
+
+  it('round-4 100 different text values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Link text={`r4-text-${i}`} url="https://x.io" />);
+      unmount();
+    }
+  });
+
+  it('round-4 all 500 anchors render', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <Link key={i} text="r4" url={`https://r4-${i}.com`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('a').length).toBe(500);
+  });
+
+  it('round-4 100 rerender cycles', () => {
+    const { rerender } = render(<Link text="x" url="https://x.io" />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<Link text={`r${i}`} url={`https://r4-${i}.io`} />)).not.toThrow();
+    }
+  });
 });
