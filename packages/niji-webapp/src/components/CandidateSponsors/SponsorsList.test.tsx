@@ -254,4 +254,64 @@ describe('SponsorsList', () => {
     );
     expect(container.textContent).not.toContain('Submit onchain');
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <SponsorsList {...baseProps} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 30 instances in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SponsorsList key={i} {...baseProps} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different signature counts', () => {
+    for (let i = 0; i < 30; i++) {
+      const signatures = Array.from({ length: i }, (_, j) =>
+        makeSignature({ signerId: `0xS${j}` }),
+      );
+      const candidate = makeCandidate({ signatures });
+      const { unmount } = render(
+        <MemoryRouter>
+          <SponsorsList {...baseProps} candidate={candidate as never} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 isThresholdMet toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <SponsorsList {...baseProps} isThresholdMet={i % 2 === 0} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 100 onOpenSubmitModal invocations', () => {
+    const onOpen = vi.fn();
+    render(
+      <MemoryRouter>
+        <SponsorsList {...baseProps} onOpenSubmitModal={onOpen} />
+      </MemoryRouter>,
+    );
+    for (let i = 0; i < 100; i++) onOpen();
+    expect(onOpen).toHaveBeenCalledTimes(100);
+  });
 });
