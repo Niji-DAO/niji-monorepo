@@ -330,4 +330,53 @@ describe('TightStackedCircleNiji', () => {
       expect(container.querySelector('[data-testid="loading-noun"]')).not.toBeNull();
     }
   });
+
+  it('mount-unmount 500 cycles', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'svg-data' });
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<TightStackedCircleNiji nounId={1} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances all in single mount', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'svg-data' });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <TightStackedCircleNiji key={i} nounId={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different nounIds', () => {
+    useNounSeedMock.mockReturnValue({});
+    getNijiMock.mockReturnValue({ image: 'svg-data' });
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<TightStackedCircleNiji nounId={i} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different seed combinations', () => {
+    getNijiMock.mockReturnValue({ image: 'svg-data' });
+    for (let i = 0; i < 30; i++) {
+      useNounSeedMock.mockReturnValue({ seed: i });
+      const { unmount } = render(<TightStackedCircleNiji nounId={i} />);
+      unmount();
+    }
+  });
+
+  it('handles undefined seed (loading state) 100 times', () => {
+    useNounSeedMock.mockReturnValue(undefined);
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<TightStackedCircleNiji nounId={i} />);
+      unmount();
+    }
+  });
 });

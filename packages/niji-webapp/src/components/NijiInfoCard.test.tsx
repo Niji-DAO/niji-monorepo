@@ -174,4 +174,51 @@ describe('NijiInfoCard', () => {
     expect(openSpy).toHaveBeenCalledWith('https://etherscan.io/token/0xTOKEN?a=7');
     openSpy.mockRestore();
   });
+
+  it('mount-unmount 100 cycles', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('handles 100 different nounIds', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <NijiInfoCard nounId={BigInt(i)} bidHistoryOnClickHandler={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 200 bidHistoryOnClickHandler invocations', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    const handler = vi.fn();
+    const { container } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={handler} />);
+    for (let i = 0; i < 200; i++) fireEvent.click(container.querySelectorAll('button')[0]);
+    expect(handler).toHaveBeenCalledTimes(200);
+  });
+
+  it('renders 50 instances in single mount', () => {
+    useAtomValueMock.mockReturnValue(undefined);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <NijiInfoCard key={i} nounId={BigInt(i)} bidHistoryOnClickHandler={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different auctionEndTime values', () => {
+    for (let i = 0; i < 30; i++) {
+      useAtomValueMock.mockReturnValue(BigInt(1700000000 + i * 3600));
+      const { unmount } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={() => {}} />);
+      unmount();
+    }
+  });
 });
