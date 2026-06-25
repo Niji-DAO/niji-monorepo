@@ -126,4 +126,48 @@ describe('useScrollToLocation', () => {
     renderHook(() => useScrollToLocation());
     expect(scrollToMock).toHaveBeenCalledWith(expect.objectContaining({ behavior: 'smooth' }));
   });
+
+  it('handles 30 different hashes', () => {
+    for (let i = 0; i < 30; i++) {
+      locationState.hash = `#section-${i}`;
+      getElementByIdMock.mockReturnValue({ getBoundingClientRect: () => ({ top: 100 }) });
+      expect(() => renderHook(() => useScrollToLocation())).not.toThrow();
+    }
+  });
+
+  it('handles 30 empty hash cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      locationState.hash = '';
+      expect(() => renderHook(() => useScrollToLocation())).not.toThrow();
+    }
+  });
+
+  it('handles 30 null element cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      locationState.hash = `#section-${i}`;
+      getElementByIdMock.mockReturnValue(null);
+      expect(() => renderHook(() => useScrollToLocation())).not.toThrow();
+    }
+  });
+
+  it('handles 30 rapid hash transitions', () => {
+    for (let i = 0; i < 30; i++) {
+      locationState.hash = i % 2 === 0 ? '' : `#h-${i}`;
+      getElementByIdMock.mockReturnValue({ getBoundingClientRect: () => ({ top: i * 10 }) });
+      expect(() => renderHook(() => useScrollToLocation())).not.toThrow();
+    }
+  });
+
+  it('handles 30 different scroll positions', () => {
+    locationState.hash = '#section';
+    for (let i = 0; i < 30; i++) {
+      Object.defineProperty(window, 'pageYOffset', {
+        value: i * 100,
+        writable: true,
+        configurable: true,
+      });
+      getElementByIdMock.mockReturnValue({ getBoundingClientRect: () => ({ top: i }) });
+      expect(() => renderHook(() => useScrollToLocation())).not.toThrow();
+    }
+  });
 });

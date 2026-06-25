@@ -166,4 +166,72 @@ describe('useSubgraphQuery', () => {
     );
     expect(result.current.refetch).toBe(refetchMock);
   });
+
+  it('handles 30 different queryKey values', () => {
+    useQueryMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    });
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        renderHook(() => useSubgraphQuery({ queryKey: [`key-${i}`], document: fakeDocument })),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 30 isLoading cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      useQueryMock.mockReturnValue({
+        data: undefined,
+        isLoading: true,
+        isError: false,
+        refetch: vi.fn(),
+      });
+      const { result } = renderHook(() =>
+        useSubgraphQuery({ queryKey: fakeQueryKey, document: fakeDocument }),
+      );
+      expect(result.current.loading).toBe(true);
+    }
+  });
+
+  it('handles 30 different data cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      useQueryMock.mockReturnValue({
+        data: { value: i },
+        isLoading: false,
+        isError: false,
+        refetch: vi.fn(),
+      });
+      const { result } = renderHook(() =>
+        useSubgraphQuery({ queryKey: fakeQueryKey, document: fakeDocument }),
+      );
+      expect(result.current.data).toEqual({ value: i });
+    }
+  });
+
+  it('handles 30 isError cycles without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      useQueryMock.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        refetch: vi.fn(),
+      });
+      expect(() =>
+        renderHook(() => useSubgraphQuery({ queryKey: fakeQueryKey, document: fakeDocument })),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 30 refetch invocations', () => {
+    const refetch = vi.fn();
+    useQueryMock.mockReturnValue({ data: undefined, isLoading: false, isError: false, refetch });
+    const { result } = renderHook(() =>
+      useSubgraphQuery({ queryKey: fakeQueryKey, document: fakeDocument }),
+    );
+    for (let i = 0; i < 30; i++) result.current.refetch();
+    expect(refetch).toHaveBeenCalledTimes(30);
+  });
 });
