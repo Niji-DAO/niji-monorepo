@@ -499,4 +499,51 @@ describe('BrandNumericEntry', () => {
     }
     expect(onValueChange).toHaveBeenCalledTimes(100);
   });
+
+  it('round-2 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<BrandNumericEntry value={0} onValueChange={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <BrandNumericEntry key={i} value={i} onValueChange={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 different value values no crash', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<BrandNumericEntry value={i + 1000} onValueChange={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 200 onValueChange events', () => {
+    const onValueChange = vi.fn();
+    const { container } = render(<BrandNumericEntry value={0} onValueChange={onValueChange} />);
+    const input = container.querySelector('input')!;
+    for (let i = 1; i <= 200; i++) {
+      fireEvent.change(input, { target: { value: `${i + 1000}` } });
+    }
+    expect(onValueChange.mock.calls.length).toBeGreaterThan(150);
+  });
+
+  it('round-2 all 200 instances have single input', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <BrandNumericEntry key={i} value={i} onValueChange={() => {}} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(200);
+  });
 });

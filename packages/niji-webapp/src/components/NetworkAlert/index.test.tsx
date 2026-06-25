@@ -277,4 +277,50 @@ describe('NetworkAlert', () => {
       expect(() => rerender(<NetworkAlert />)).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    useAccountMock.mockReturnValue({ chainId: 1 });
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<NetworkAlert />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 200 instances variant', () => {
+    useAccountMock.mockReturnValue({ chainId: 1 });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <NetworkAlert key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different chainIds', () => {
+    for (let i = 0; i < 30; i++) {
+      useAccountMock.mockReturnValue({ chainId: i + 1 });
+      const { unmount } = render(<NetworkAlert />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 mismatch chainIds', () => {
+    for (let i = 0; i < 30; i++) {
+      useAccountMock.mockReturnValue({ chainId: i + 100 });
+      const { unmount } = render(<NetworkAlert />);
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 50 rerender cycles', () => {
+    useAccountMock.mockReturnValue({ chainId: 1 });
+    const { rerender } = render(<NetworkAlert />);
+    for (let i = 0; i < 50; i++) {
+      useAccountMock.mockReturnValue({ chainId: i % 2 === 0 ? 1 : 11155111 });
+      expect(() => rerender(<NetworkAlert />)).not.toThrow();
+    }
+  });
 });
