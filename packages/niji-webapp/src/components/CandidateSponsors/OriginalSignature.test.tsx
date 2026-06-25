@@ -301,4 +301,58 @@ describe('OriginalSignature', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-4 mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={true} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 renders 50 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <OriginalSignature
+              key={i}
+              voteCount={i + 100}
+              signer={SIGNER}
+              isParentProposalUpdatable={true}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different voteCount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <OriginalSignature voteCount={i + 500} signer={SIGNER} isParentProposalUpdatable={true} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 30 isParentProposalUpdatable toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <OriginalSignature voteCount={1} signer={SIGNER} isParentProposalUpdatable={true} />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
