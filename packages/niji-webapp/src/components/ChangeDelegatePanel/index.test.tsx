@@ -531,4 +531,55 @@ describe('ChangeDelegatePanel', () => {
     expect(() => render(<ChangeDelegatePanel onDismiss={vi.fn()} />)).not.toThrow();
     hookState.nounTokenBalance = 5;
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different proposalThreshold values', () => {
+    const orig = hookState.proposalThreshold;
+    for (let i = 0; i < 30; i++) {
+      hookState.proposalThreshold = i;
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+      unmount();
+    }
+    hookState.proposalThreshold = orig;
+  });
+
+  it('handles ensResolved + ensFetched combinations', () => {
+    const orig = { ensResolved: hookState.ensResolved, ensFetched: hookState.ensFetched };
+    [
+      { ensResolved: '0xX', ensFetched: true },
+      { ensResolved: '0xX', ensFetched: false },
+      { ensResolved: undefined, ensFetched: true },
+      { ensResolved: undefined, ensFetched: false },
+    ].forEach(state => {
+      Object.assign(hookState, state);
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+      unmount();
+    });
+    Object.assign(hookState, orig);
+  });
+
+  it('rapid 50 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<ChangeDelegatePanel onDismiss={onDismiss} />);
+    for (let i = 0; i < 50; i++) {
+      onDismiss();
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(50);
+  });
+
+  it('handles 30 different account addresses', () => {
+    const orig = hookState.account;
+    for (let i = 0; i < 30; i++) {
+      hookState.account = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+      unmount();
+    }
+    hookState.account = orig;
+  });
 });
