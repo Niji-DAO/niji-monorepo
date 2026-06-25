@@ -479,4 +479,57 @@ describe('GrayCircle', () => {
       expect(() => render(<GrayCircle />)).not.toThrow();
     }
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<GrayCircle />);
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <GrayCircle key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 500 imgs have data:image src', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <GrayCircle key={i} />
+        ))}
+      </>,
+    );
+    const imgs = container.querySelectorAll('img');
+    imgs.forEach(img => {
+      expect(img.getAttribute('src')).toMatch(/^data:image/);
+    });
+  });
+
+  it('all 100 instances with isDelegateView=true have non-empty wrapper class', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <GrayCircle key={i} isDelegateView={true} />
+        ))}
+      </>,
+    );
+    const divs = container.querySelectorAll('div');
+    divs.forEach(div => {
+      expect(div.className).toBeTruthy();
+    });
+  });
+
+  it('rapid 1000 renders without crash', () => {
+    for (let i = 0; i < 1000; i++) {
+      expect(() => render(<GrayCircle />)).not.toThrow();
+    }
+  });
 });
