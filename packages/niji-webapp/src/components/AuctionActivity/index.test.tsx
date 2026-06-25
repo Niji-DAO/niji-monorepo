@@ -1019,4 +1019,51 @@ describe('AuctionActivity', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-4 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 instances rendered together', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionActivity key={i} {...defaults} auction={makeAuction() as never} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 different displayGraphDepComps cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(
+        <AuctionActivity
+          {...defaults}
+          auction={makeAuction() as never}
+          displayGraphDepComps={i % 2 === 0}
+        />,
+      );
+      unmount();
+    }
+  });
 });
