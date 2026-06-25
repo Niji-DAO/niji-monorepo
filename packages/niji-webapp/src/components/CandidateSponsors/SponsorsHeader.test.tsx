@@ -226,4 +226,55 @@ describe('SponsorsHeader (update flow)', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <SponsorsHeader candidate={baseCandidate} isThresholdMet={true} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <SponsorsHeader key={i} candidate={baseCandidate} isThresholdMet={true} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 isThresholdMet toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SponsorsHeader candidate={baseCandidate} isThresholdMet={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 30 isUpdateToProposal toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SponsorsHeader
+          candidate={baseCandidate}
+          isThresholdMet={false}
+          isUpdateToProposal={i % 2 === 0}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<SponsorsHeader candidate={baseCandidate} isThresholdMet={true} />),
+      ).not.toThrow();
+    }
+  });
 });
