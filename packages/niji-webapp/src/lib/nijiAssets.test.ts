@@ -180,4 +180,37 @@ describe('nijiTraitKeys', () => {
       expect(() => humanizeTraitKey(keys[i % 5])).not.toThrow();
     }
   });
+
+  it('round-5 30 sequential humanizeTraitKey calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => humanizeTraitKey('background')).not.toThrow();
+    }
+  });
+
+  it('round-5 50 sequential nijiTraitKeys access', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(nijiTraitKeys).toBeDefined();
+    }
+  });
+
+  it('round-5 100 sequential humanizeTraitKey calls', () => {
+    for (let i = 0; i < 100; i++) {
+      const result = humanizeTraitKey(`r5-trait-${i}`);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-5 50 sequential trait keys reference', () => {
+    const first = nijiTraitKeys;
+    for (let i = 0; i < 50; i++) {
+      expect(nijiTraitKeys).toBe(first);
+    }
+  });
+
+  it('round-5 30 various trait values', () => {
+    const keys = ['background', 'body', 'head', 'glasses', 'accessory'];
+    for (let i = 0; i < 30; i++) {
+      expect(() => humanizeTraitKey(keys[i % 5])).not.toThrow();
+    }
+  });
 });

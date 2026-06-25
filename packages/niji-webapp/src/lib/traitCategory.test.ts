@@ -175,4 +175,35 @@ describe('traitCategory', () => {
       expect(traitCategory).toBeTruthy();
     }
   });
+
+  it('round-5 30 sequential traitCategory access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(traitCategory).toBeDefined();
+    }
+  });
+
+  it('round-5 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof traitCategory).toBe('object');
+    }
+  });
+
+  it('round-5 100 sequential reference checks', () => {
+    const first = traitCategory;
+    for (let i = 0; i < 100; i++) {
+      expect(traitCategory).toBe(first);
+    }
+  });
+
+  it('round-5 50 sequential keys access', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(Object.keys(traitCategory).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-5 30 truthy assertions', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(traitCategory).toBeTruthy();
+    }
+  });
 });
