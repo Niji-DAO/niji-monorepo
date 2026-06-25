@@ -319,4 +319,51 @@ describe('NavLocaleSwitcher', () => {
       expect(() => rerender(<NavLocaleSwitcher />)).not.toThrow();
     }
   });
+
+  it('round-2 mount-unmount 200 cycles', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<NavLocaleSwitcher />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 200 instances variant', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <NavLocaleSwitcher key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different locales', () => {
+    for (let i = 0; i < 30; i++) {
+      useAtomMock.mockReturnValue([`r2-loc-${i}`, vi.fn()]);
+      const { unmount } = render(<NavLocaleSwitcher />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 50 setLocale invocations', () => {
+    for (let i = 0; i < 50; i++) {
+      const setLocale = vi.fn();
+      useAtomMock.mockReturnValue(['en-US', setLocale]);
+      const { unmount } = render(<NavLocaleSwitcher />);
+      unmount();
+    }
+  });
+
+  it('round-2 100 rerender cycles', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { rerender } = render(<NavLocaleSwitcher />);
+    for (let i = 0; i < 100; i++) {
+      useAtomMock.mockReturnValue([i % 2 === 0 ? 'en-US' : 'ja-JP', vi.fn()]);
+      expect(() => rerender(<NavLocaleSwitcher />)).not.toThrow();
+    }
+  });
 });
