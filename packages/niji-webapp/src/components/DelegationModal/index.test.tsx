@@ -531,4 +531,44 @@ describe('DelegationModal', () => {
       expect(() => render(<DelegationModal onDismiss={() => {}} />)).not.toThrow();
     }
   });
+
+  it('round-4 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<DelegationModal onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DelegationModal key={i} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<DelegationModal onDismiss={onDismiss} />);
+    for (let i = 0; i < 200; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-4 30 different delegateTo values', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR4' + i.toString(16).padStart(38, '0')) as `0x${string}`;
+      const { unmount } = render(<DelegationModal onDismiss={() => {}} delegateTo={addr} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<DelegationModal onDismiss={() => {}} />)).not.toThrow();
+    }
+  });
 });

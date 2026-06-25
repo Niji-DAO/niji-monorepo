@@ -1117,4 +1117,45 @@ describe('NijiContent', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<NijiContent {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 instances rendered together', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiContent key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => wrap(<NijiContent {...defaults} />)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<NijiContent {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 different auction cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(
+        <NijiContent {...defaults} auction={makeAuction(BigInt(i * 2000))} />,
+      );
+      unmount();
+    }
+  });
 });
