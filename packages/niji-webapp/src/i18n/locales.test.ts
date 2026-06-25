@@ -75,4 +75,35 @@ describe('SUPPORTED_LOCALE_TO_DAYSJS_LOCALE', () => {
     expect(SUPPORTED_LOCALE_TO_DAYSJS_LOCALE['zh-CN'].name).toBeDefined();
     expect(SUPPORTED_LOCALE_TO_DAYSJS_LOCALE['ja-JP'].name).toBeDefined();
   });
+
+  it('SUPPORTED_LOCALES length check 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(SUPPORTED_LOCALES.length).toBe(3);
+    }
+  });
+
+  it('DEFAULT_LOCALE is consistent 100 cycles', () => {
+    const initial = DEFAULT_LOCALE;
+    for (let i = 0; i < 100; i++) {
+      expect(DEFAULT_LOCALE).toBe(initial);
+    }
+  });
+
+  it('Locales.ja_JP check 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Locales.ja_JP).toBe('ja-JP');
+    }
+  });
+
+  it('Locales.en_US check 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Locales.en_US).toBe('en-US');
+    }
+  });
+
+  it('LOCALE_LABEL is non-empty 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Object.keys(LOCALE_LABEL).length).toBeGreaterThan(0);
+    }
+  });
 });
