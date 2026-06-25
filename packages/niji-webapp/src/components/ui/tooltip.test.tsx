@@ -427,4 +427,76 @@ describe('Tooltip', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>r5</TooltipTrigger>
+            <TooltipContent>r5</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>x</TooltipTrigger>
+              <TooltipContent>y</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-5 30 different trigger values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>r5-t-{i}</TooltipTrigger>
+            <TooltipContent>r5-c-{i}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>x</TooltipTrigger>
+            <TooltipContent>y</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 100 sequential renders without crash', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        render(
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>x</TooltipTrigger>
+              <TooltipContent>y</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
