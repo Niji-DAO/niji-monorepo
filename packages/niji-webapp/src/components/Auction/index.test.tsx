@@ -730,4 +730,43 @@ describe('Auction', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Auction />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 instances rendered together', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Auction key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => wrap(<Auction />)).not.toThrow();
+    }
+  });
+
+  it('round-4 30 different auction values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Auction auction={makeAuction(BigInt(i + 500))} />);
+      unmount();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<Auction />);
+      unmount();
+    }
+  });
 });
