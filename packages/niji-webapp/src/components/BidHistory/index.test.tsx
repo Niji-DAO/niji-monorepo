@@ -570,4 +570,52 @@ describe('BidHistory Component', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(undefined);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BidHistory auctionId="1" max={3} classes={mockClasses} />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(undefined);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <BidHistory key={i} auctionId={`${i + 8000}`} max={3} classes={mockClasses} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(undefined);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<BidHistory auctionId="1" max={3} classes={mockClasses} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(undefined);
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<BidHistory auctionId="1" max={3} classes={mockClasses} />);
+      unmount();
+    }
+  });
+
+  it('round-6 30 different auctionId values', () => {
+    vi.mocked(useAuctionBids).mockReturnValue(undefined);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <BidHistory auctionId={`${i + 9000}`} max={3} classes={mockClasses} />,
+      );
+      unmount();
+    }
+  });
 });
