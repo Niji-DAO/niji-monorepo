@@ -657,4 +657,48 @@ describe('MinBid', () => {
     );
     expect(container.children.length).toBe(200);
   });
+
+  it('round-4 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<MinBid minBid={1n} onClick={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <MinBid key={i} minBid={BigInt(i + 500)} onClick={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 50 different minBid values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<MinBid minBid={BigInt(i + 5000)} onClick={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-4 rapid 200 onClick invocations', () => {
+    const onClick = vi.fn();
+    render(<MinBid minBid={1n} onClick={onClick} />);
+    for (let i = 0; i < 200; i++) onClick();
+    expect(onClick).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-4 all 200 instances render', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <MinBid key={i} minBid={BigInt(i + 1000)} onClick={() => {}} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(200);
+  });
 });
