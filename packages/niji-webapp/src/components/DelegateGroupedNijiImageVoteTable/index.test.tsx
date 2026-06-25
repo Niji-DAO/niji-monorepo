@@ -565,4 +565,65 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
       ).not.toThrow();
     }
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles all 3 supportDetailed variants', () => {
+    [0, 1, 2].forEach(s => {
+      const data = [makeVote('0xA', ['1'], s as 0 | 1 | 2)];
+      expect(() =>
+        render(
+          <DelegateGroupedNijiImageVoteTable
+            {...baseProps}
+            filteredDelegateGroupedVoteData={data}
+          />,
+        ),
+      ).not.toThrow();
+    });
+  });
+
+  it('renders 5 instances independently', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 5 }, (_, i) => (
+            <DelegateGroupedNijiImageVoteTable
+              key={i}
+              {...baseProps}
+              propId={i}
+              filteredDelegateGroupedVoteData={[]}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 1000 vote entries', () => {
+    const data = Array.from({ length: 1000 }, (_, i) => makeVote(`0xDEL${i}`, [String(i)], 1));
+    expect(() =>
+      render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 0n proposalCreationBlock edge case', () => {
+    expect(() =>
+      render(
+        <DelegateGroupedNijiImageVoteTable
+          propId={1}
+          proposalCreationBlock={0n}
+          filteredDelegateGroupedVoteData={[]}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });

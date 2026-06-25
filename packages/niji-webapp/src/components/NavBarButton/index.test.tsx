@@ -354,4 +354,52 @@ describe('NavBarButton', () => {
     const { container } = render(<NavBarButton buttonText={long} />);
     expect(container.textContent?.length).toBeGreaterThanOrEqual(1000);
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<NavBarButton buttonText="x" />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <NavBarButton key={i} buttonText={`btn-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different buttonText sequentially', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(<NavBarButton buttonText={`btn-${i}`} />);
+      expect(container.textContent).toContain(`btn-${i}`);
+      unmount();
+    }
+  });
+
+  it('renders with JSX buttonText', () => {
+    const { container } = render(
+      <NavBarButton buttonText={<strong data-testid="jsx-text">Bold</strong>} />,
+    );
+    expect(container.querySelector('[data-testid="jsx-text"]')?.textContent).toBe('Bold');
+  });
+
+  it('handles all 7 NavBarButtonStyle variants', () => {
+    [
+      NavBarButtonStyle.COOL_INFO,
+      NavBarButtonStyle.WARM_INFO,
+      NavBarButtonStyle.DELEGATE_PRIMARY,
+      NavBarButtonStyle.DELEGATE_BACK,
+      NavBarButtonStyle.FOR_VOTE_SUBMIT,
+      NavBarButtonStyle.AGAINST_VOTE_SUBMIT,
+      NavBarButtonStyle.ABSTAIN_VOTE_SUBMIT,
+    ].forEach(style => {
+      expect(() => render(<NavBarButton buttonText="X" buttonStyle={style} />)).not.toThrow();
+    });
+  });
 });
