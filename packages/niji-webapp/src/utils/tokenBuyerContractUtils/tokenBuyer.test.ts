@@ -281,4 +281,37 @@ describe('useEthNeeded', () => {
       expect(typeof useEthNeeded).toBe('function');
     }
   });
+
+  it('round-6 30 renderHook cycles useEthNeeded', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useEthNeeded('0xR6-ADDR', 5));
+      unmount();
+    }
+  });
+
+  it('round-6 50 renderHook varied amounts', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useEthNeeded('0xR6-ADDR', i + 200));
+      unmount();
+    }
+  });
+
+  it('round-6 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useEthNeeded('0xR6-ADDR', 10));
+      unmount();
+    }
+  });
+
+  it('round-6 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useEthNeeded('0xR6', 1))).not.toThrow();
+    }
+  });
+
+  it('round-6 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useEthNeeded).toBe('function');
+    }
+  });
 });

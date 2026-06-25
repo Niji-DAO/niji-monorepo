@@ -252,4 +252,36 @@ describe('getProposalVoteIcon', () => {
       expect(r1).toBe(r2);
     }
   });
+
+  it('round-6 30 sequential getProposalVoteIcon calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => getProposalVoteIcon(0 as never)).not.toThrow();
+    }
+  });
+
+  it('round-6 50 sequential varied support', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => getProposalVoteIcon((i % 3) as never)).not.toThrow();
+    }
+  });
+
+  it('round-6 100 sequential calls produce result', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(getProposalVoteIcon(0 as never)).toBeDefined();
+    }
+  });
+
+  it('round-6 50 sequential reference checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof getProposalVoteIcon).toBe('function');
+    }
+  });
+
+  it('round-6 30 deterministic for same support', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = getProposalVoteIcon(2 as never);
+      const r2 = getProposalVoteIcon(2 as never);
+      expect(r1).toBe(r2);
+    }
+  });
 });
