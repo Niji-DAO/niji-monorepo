@@ -579,4 +579,89 @@ describe('VoteCardPager', () => {
     for (let i = 0; i < 1000; i++) fireEvent.click(left);
     expect(onLeft).toHaveBeenCalledTimes(1000);
   });
+
+  it('round-2 mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <VoteCardPager
+          onLeftArrowClick={() => {}}
+          onRightArrowClick={() => {}}
+          isLeftArrowDisabled={false}
+          isRightArrowDisabled={false}
+          numPages={5}
+          currentPage={1}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 200 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <VoteCardPager
+              key={i}
+              onLeftArrowClick={() => {}}
+              onRightArrowClick={() => {}}
+              isLeftArrowDisabled={false}
+              isRightArrowDisabled={false}
+              numPages={5}
+              currentPage={i % 5}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 300 onLeft click events', () => {
+    const onLeft = vi.fn();
+    const { container } = render(
+      <VoteCardPager
+        onLeftArrowClick={onLeft}
+        onRightArrowClick={() => {}}
+        isLeftArrowDisabled={false}
+        isRightArrowDisabled={false}
+        numPages={5}
+        currentPage={1}
+      />,
+    );
+    const btns = container.querySelectorAll('button');
+    for (let i = 0; i < 300; i++) fireEvent.click(btns[0]);
+    expect(onLeft).toHaveBeenCalledTimes(300);
+  });
+
+  it('round-2 handles 50 different currentPage values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <VoteCardPager
+          onLeftArrowClick={() => {}}
+          onRightArrowClick={() => {}}
+          isLeftArrowDisabled={false}
+          isRightArrowDisabled={false}
+          numPages={100}
+          currentPage={i}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 isLeftArrowDisabled toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <VoteCardPager
+          onLeftArrowClick={() => {}}
+          onRightArrowClick={() => {}}
+          isLeftArrowDisabled={i % 2 === 0}
+          isRightArrowDisabled={false}
+          numPages={5}
+          currentPage={1}
+        />,
+      );
+      unmount();
+    }
+  });
 });
