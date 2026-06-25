@@ -202,4 +202,49 @@ describe('CandidateSponsors', () => {
       render(<CandidateSponsors signers={[makeSigner('0xA')]} nounsRequired={3} />),
     ).not.toThrow();
   });
+
+  it('mount-unmount 500 cycles', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({ data: undefined });
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<CandidateSponsors signers={[]} nounsRequired={3} />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({ data: undefined });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <CandidateSponsors key={i} signers={[]} nounsRequired={i % 5} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different nounsRequired values', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({ data: undefined });
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<CandidateSponsors signers={[]} nounsRequired={i} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different empty-signer counts', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({ data: undefined });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsors signers={[]} nounsRequired={i + 1} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 rerenders with nounsRequired changes', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({ data: undefined });
+    const { rerender } = render(<CandidateSponsors signers={[]} nounsRequired={3} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() => rerender(<CandidateSponsors signers={[]} nounsRequired={i} />)).not.toThrow();
+    }
+  });
 });

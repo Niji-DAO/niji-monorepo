@@ -88,4 +88,50 @@ describe('CandidateSponsorImage', () => {
     // mock NijiImage は nounId.toString() を render するので bigint で渡されている証
     expect(container.querySelector('[data-testid="niji-image"]')?.textContent).toBe('42');
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<CandidateSponsorImage nounId={1n} />);
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <CandidateSponsorImage key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different nounIds', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(<CandidateSponsorImage nounId={BigInt(i)} />);
+      expect(container.querySelector('[data-testid="niji-image"]')?.textContent).toBe(String(i));
+      unmount();
+    }
+  });
+
+  it('all 500 instances render niji-image testid', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <CandidateSponsorImage key={i} nounId={BigInt(i)} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="niji-image"]').length).toBe(500);
+  });
+
+  it('handles 100 huge bigint nounIds', () => {
+    for (let i = 0; i < 100; i++) {
+      const huge = BigInt(1_000_000) + BigInt(i);
+      const { unmount } = render(<CandidateSponsorImage nounId={huge} />);
+      unmount();
+    }
+  });
 });
