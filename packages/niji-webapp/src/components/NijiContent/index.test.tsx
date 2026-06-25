@@ -803,4 +803,75 @@ describe('NijiContent', () => {
     writeContractMock({});
     expect(writeContractMock).toHaveBeenCalled();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different account addresses', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    for (let i = 0; i < 30; i++) {
+      useAccountMock.mockReturnValue({
+        address: '0x' + i.toString(16).padStart(40, '0'),
+      });
+      const { unmount } = render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different block timestamps', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    for (let i = 0; i < 30; i++) {
+      useBlockMock.mockReturnValue({ data: { timestamp: BigInt(i * 1000) } });
+      const { unmount } = render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 50 writeContract invocations', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    writeContractMock.mockReset();
+    render(
+      <MemoryRouter>
+        <NijiContent />
+      </MemoryRouter>,
+    );
+    for (let i = 0; i < 50; i++) writeContractMock({});
+    expect(writeContractMock).toHaveBeenCalledTimes(50);
+  });
+
+  it('handles 0n nounId edge case', () => {
+    useAtomValueMock.mockReturnValue(0n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
 });

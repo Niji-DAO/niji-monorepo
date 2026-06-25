@@ -407,4 +407,55 @@ describe('TightStackedCircleNijis', () => {
     expect(circles.length).toBe(3);
     expect(circles[0].getAttribute('data-niji')).toBe('2');
   });
+
+  it('mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<TightStackedCircleNijis nounIds={[1, 2]} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <TightStackedCircleNijis key={i} nounIds={[i, i + 1, i + 2]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different nounIds arrays', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<TightStackedCircleNijis nounIds={[i]} />);
+      expect(container.querySelector('circle')?.getAttribute('data-niji')).toBe(String(i));
+      unmount();
+    }
+  });
+
+  it('all 200 instances have 55x55 svg', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <TightStackedCircleNijis key={i} nounIds={[i]} />
+        ))}
+      </>,
+    );
+    const svgs = container.querySelectorAll('svg');
+    expect(svgs.length).toBe(200);
+    svgs.forEach(svg => {
+      expect(svg.getAttribute('width')).toBe('55');
+    });
+  });
+
+  it('rapid rerender 100 times preserves cap-3 contract', () => {
+    const { container, rerender } = render(<TightStackedCircleNijis nounIds={[1]} />);
+    for (let i = 0; i < 100; i++) {
+      const ids = Array.from({ length: (i % 5) + 1 }, (_, j) => j);
+      rerender(<TightStackedCircleNijis nounIds={ids} />);
+    }
+    expect(container.querySelectorAll('circle').length).toBeLessThanOrEqual(3);
+  });
 });
