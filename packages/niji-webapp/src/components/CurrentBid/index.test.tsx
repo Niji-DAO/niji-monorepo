@@ -503,4 +503,60 @@ describe('CurrentBid', () => {
       ).not.toThrow();
     }
   });
+
+  it('mount-unmount 500 cycles', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <CurrentBid key={i} currentBid={parseEther(`${i + 1}`)} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different bid amounts', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(
+        <CurrentBid currentBid={parseEther(`${i + 1}`)} auctionEnded={false} />,
+      );
+      expect(container.textContent).toMatch(/Ξ \d/);
+      unmount();
+    }
+  });
+
+  it('all 300 instances render h4 + h2', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        {Array.from({ length: 300 }, (_, i) => (
+          <CurrentBid key={i} currentBid={parseEther('1')} auctionEnded={false} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h4').length).toBe(300);
+    expect(container.querySelectorAll('h2').length).toBe(300);
+  });
+
+  it('handles BID_N_A with 100 different auctionEnded states', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <CurrentBid currentBid={BID_N_A} auctionEnded={i % 2 === 0} />,
+      );
+      expect(container.textContent).toContain('-');
+      unmount();
+    }
+  });
 });

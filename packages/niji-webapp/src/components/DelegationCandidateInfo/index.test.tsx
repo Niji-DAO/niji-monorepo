@@ -814,4 +814,72 @@ describe('DelegationCandidateInfo', () => {
     );
     expect(container.querySelectorAll('[data-testid="vote-info"]').length).toBe(50);
   });
+
+  it('mount-unmount 200 cycles', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <DelegationCandidateInfo address={ADDR} changeModalState={0 as never} votesToAdd={0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <DelegationCandidateInfo
+              key={i}
+              address={ADDR}
+              changeModalState={0 as never}
+              votesToAdd={i}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different votesToAdd values', () => {
+    useAccountVotesMock.mockReturnValue(10);
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <DelegationCandidateInfo address={ADDR} changeModalState={1 as never} votesToAdd={i} />,
+      );
+      expect(container.querySelector('[data-testid="vote-info"]')).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it('handles 100 different addresses', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { unmount } = render(
+        <DelegationCandidateInfo address={addr} changeModalState={0 as never} votesToAdd={0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles rapid 100 changeModalState transitions', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    const { rerender } = render(
+      <DelegationCandidateInfo address={ADDR} changeModalState={0 as never} votesToAdd={0} />,
+    );
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(
+          <DelegationCandidateInfo
+            address={ADDR}
+            changeModalState={(i % 4) as never}
+            votesToAdd={i}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
