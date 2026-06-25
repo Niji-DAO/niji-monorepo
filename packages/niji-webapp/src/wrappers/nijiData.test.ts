@@ -598,4 +598,42 @@ describe('useProposalFeedback', () => {
       unmount();
     }
   });
+
+  it('round-3 30 renderHook cycles useCreateProposalCandidate', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useCreateProposalCandidate());
+      unmount();
+    }
+  });
+
+  it('round-3 30 renderHook cycles useCancelCandidate', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useCancelCandidate());
+      unmount();
+    }
+  });
+
+  it('round-3 hook returns without crash for 30 calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useCreateProposalCandidate())).not.toThrow();
+      expect(() => renderHook(() => useCancelCandidate())).not.toThrow();
+    }
+  });
+
+  it('round-3 50 alternating useCreateProposalCandidate / useCancelCandidate', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } =
+        i % 2 === 0
+          ? renderHook(() => useCreateProposalCandidate())
+          : renderHook(() => useCancelCandidate());
+      unmount();
+    }
+  });
+
+  it('round-3 100 sequential useCreateProposalCandidate renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useCreateProposalCandidate());
+      unmount();
+    }
+  });
 });
