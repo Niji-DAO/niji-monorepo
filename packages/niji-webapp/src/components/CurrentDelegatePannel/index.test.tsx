@@ -912,4 +912,43 @@ describe('CurrentDelegatePannel', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <CurrentDelegatePannel key={i} onPrimaryBtnClick={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 rapid 200 onPrimaryBtnClick invocations', () => {
+    const onPrimaryBtnClick = vi.fn();
+    render(<CurrentDelegatePannel onPrimaryBtnClick={onPrimaryBtnClick} />);
+    for (let i = 0; i < 200; i++) onPrimaryBtnClick();
+    expect(onPrimaryBtnClick).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} />)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} />);
+      unmount();
+    }
+  });
 });

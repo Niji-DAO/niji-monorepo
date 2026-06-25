@@ -455,4 +455,53 @@ describe('StartOrEndTime', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 200 cycles', () => {
+    const start = Math.floor(Date.now() / 1000) + 1000;
+    const end = Math.floor(Date.now() / 1000) + 5000;
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<StartOrEndTime startTime={start} endTime={end} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 200 instances variant', () => {
+    const start = Math.floor(Date.now() / 1000) + 2000;
+    const end = Math.floor(Date.now() / 1000) + 6000;
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <StartOrEndTime key={i} startTime={start + i} endTime={end + i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different time pairs', () => {
+    for (let i = 0; i < 30; i++) {
+      const s = Math.floor(Date.now() / 1000) + i * 200;
+      const e = s + 1000;
+      const { unmount } = render(<StartOrEndTime startTime={s} endTime={e} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    const start = Math.floor(Date.now() / 1000);
+    const end = start + 3600;
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<StartOrEndTime startTime={start} endTime={end} />)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    const start = Math.floor(Date.now() / 1000);
+    const end = start + 3600;
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<StartOrEndTime startTime={start} endTime={end} />);
+      unmount();
+    }
+  });
 });
