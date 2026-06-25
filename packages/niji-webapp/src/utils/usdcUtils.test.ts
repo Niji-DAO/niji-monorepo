@@ -113,4 +113,41 @@ describe('contract2humanUSDCFormat edge cases', () => {
   it('handles allDecimals=true with very large number', () => {
     expect(contract2humanUSDCFormat('1000000000000', true)).toBe('1000000');
   });
+
+  it('human2Contract handles 100 different amounts', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(human2ContractUSDCFormat(String(i + 1))).toBe(String((i + 1) * 1_000_000));
+    }
+  });
+
+  it('contract2human handles 100 different amounts', () => {
+    for (let i = 0; i < 100; i++) {
+      const contractAmt = String((i + 1) * 1_000_000);
+      const result = contract2humanUSDCFormat(contractAmt);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('roundtrip 100 cycles preserve whole number values', () => {
+    for (let i = 1; i <= 100; i++) {
+      const human = String(i);
+      const contract = human2ContractUSDCFormat(human);
+      const back = contract2humanUSDCFormat(contract, true);
+      expect(back).toBe(human);
+    }
+  });
+
+  it('contract2human truncated 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const result = contract2humanUSDCFormat(String((i + 1) * 1_000_000), true);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('handles 50 large contract values', () => {
+    for (let i = 0; i < 50; i++) {
+      const large = String((1_000_000 + i) * 1_000_000);
+      expect(typeof contract2humanUSDCFormat(large)).toBe('string');
+    }
+  });
 });

@@ -524,4 +524,40 @@ describe('useProposalFeedback', () => {
     const { result } = renderHook(() => useProposalFeedback('prop-1'));
     expect(result.current.data).toEqual([]);
   });
+
+  it('useProposalFeedback handles 30 different proposalIds', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useProposalFeedback(`prop-${i}`))).not.toThrow();
+    }
+  });
+
+  it('useProposalFeedback handles 30 cycles with empty data', () => {
+    for (let i = 0; i < 30; i++) {
+      const { result } = renderHook(() => useProposalFeedback(`prop-${i}`));
+      expect(result.current.data).toEqual([]);
+    }
+  });
+
+  it('useProposalFeedback handles 30 cycles renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      const { result } = renderHook(() => useProposalFeedback(`prop-${i}`));
+      expect(Array.isArray(result.current.data)).toBe(true);
+    }
+  });
+
+  it('useProposalFeedback handles 30 large proposalIds', () => {
+    for (let i = 0; i < 30; i++) {
+      const longId = 'prop-' + 'x'.repeat(50 + i);
+      const { result } = renderHook(() => useProposalFeedback(longId));
+      expect(Array.isArray(result.current.data)).toBe(true);
+    }
+  });
+
+  it('useProposalFeedback handles 30 unicode proposalIds', () => {
+    for (let i = 0; i < 30; i++) {
+      const id = `prop-日本語-${i}`;
+      const { result } = renderHook(() => useProposalFeedback(id));
+      expect(Array.isArray(result.current.data)).toBe(true);
+    }
+  });
 });

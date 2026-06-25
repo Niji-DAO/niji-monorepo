@@ -414,4 +414,44 @@ describe('useNounSeed', () => {
     const { result } = renderHook(() => useNounSeed(0n));
     expect(result.current).toBeUndefined();
   });
+
+  it('useNounSeed handles 50 different nounIds with same seed', () => {
+    hookState.seedsTuple = [1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n, 11n, 12n];
+    for (let i = 0; i < 50; i++) {
+      const { result } = renderHook(() => useNounSeed(BigInt(i)));
+      expect(result.current?.special).toBe(1);
+    }
+  });
+
+  it('useNounSeed handles 50 different seed tuples', () => {
+    for (let i = 0; i < 50; i++) {
+      hookState.seedsTuple = Array.from({ length: 12 }, (_, j) => BigInt(j + i + 1));
+      const { result } = renderHook(() => useNounSeed(0n));
+      expect(result.current?.special).toBe(i + 1);
+    }
+  });
+
+  it('useNounSeed handles 30 undefined seed cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      hookState.seedsTuple = undefined;
+      const { result } = renderHook(() => useNounSeed(BigInt(i)));
+      expect(result.current).toBeUndefined();
+    }
+  });
+
+  it('useNounSeed handles 30 alternating seed presence cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      hookState.seedsTuple =
+        i % 2 === 0 ? Array.from({ length: 12 }, (_, j) => BigInt(j + 1)) : undefined;
+      expect(() => renderHook(() => useNounSeed(BigInt(i)))).not.toThrow();
+    }
+  });
+
+  it('useNounSeed handles 50 large nounIds', () => {
+    hookState.seedsTuple = [1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n, 11n, 12n];
+    for (let i = 0; i < 50; i++) {
+      const { result } = renderHook(() => useNounSeed(BigInt(1_000_000 + i)));
+      expect(result.current?.special).toBe(1);
+    }
+  });
 });
