@@ -171,4 +171,47 @@ describe('compareBids', () => {
       expect(compareBids(a, b)).toBeLessThan(0);
     }
   });
+
+  it('round-3 30 sequential compareBids calls', () => {
+    const makeBid3 = (timestamp: bigint, transactionIndex = 0): Bid =>
+      ({ timestamp, transactionIndex }) as Bid;
+    for (let i = 0; i < 30; i++) {
+      expect(() => compareBids(makeBid3(BigInt(i)), makeBid3(BigInt(i + 1)))).not.toThrow();
+    }
+  });
+
+  it('round-3 50 sequential compareBids variant cycles', () => {
+    const makeBid3 = (timestamp: bigint, transactionIndex = 0): Bid =>
+      ({ timestamp, transactionIndex }) as Bid;
+    for (let i = 0; i < 50; i++) {
+      const result = compareBids(makeBid3(BigInt(i * 2)), makeBid3(BigInt(i * 2 + 1)));
+      expect(typeof result).toBe('number');
+    }
+  });
+
+  it('round-3 100 sequential calls equal timestamps', () => {
+    const makeBid3 = (timestamp: bigint, transactionIndex = 0): Bid =>
+      ({ timestamp, transactionIndex }) as Bid;
+    for (let i = 0; i < 100; i++) {
+      expect(typeof compareBids(makeBid3(1000n, i), makeBid3(1000n, i + 1))).toBe('number');
+    }
+  });
+
+  it('round-3 50 sequential calls with descending order pairs', () => {
+    const makeBid3 = (timestamp: bigint, transactionIndex = 0): Bid =>
+      ({ timestamp, transactionIndex }) as Bid;
+    for (let i = 0; i < 50; i++) {
+      expect(compareBids(makeBid3(BigInt(1000 + i)), makeBid3(BigInt(2000 + i)))).toBeGreaterThan(
+        0,
+      );
+    }
+  });
+
+  it('round-3 50 sequential calls with ascending order pairs', () => {
+    const makeBid3 = (timestamp: bigint, transactionIndex = 0): Bid =>
+      ({ timestamp, transactionIndex }) as Bid;
+    for (let i = 0; i < 50; i++) {
+      expect(compareBids(makeBid3(BigInt(2000 + i)), makeBid3(BigInt(1000 + i)))).toBeLessThan(0);
+    }
+  });
 });
