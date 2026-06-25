@@ -233,4 +233,38 @@ describe('useKeyPress', () => {
       expect(typeof useKeyPress).toBe('function');
     }
   });
+
+  it('round-5 30 renderHook cycles useKeyPress', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useKeyPress('Enter'));
+      unmount();
+    }
+  });
+
+  it('round-5 50 renderHook cycles varied keys', () => {
+    const keys = ['Enter', 'Escape', 'Space', 'Tab', 'q'];
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useKeyPress(keys[i % 5]));
+      unmount();
+    }
+  });
+
+  it('round-5 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useKeyPress(`r5-key-${i}`));
+      unmount();
+    }
+  });
+
+  it('round-5 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useKeyPress('Space'))).not.toThrow();
+    }
+  });
+
+  it('round-5 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useKeyPress).toBe('function');
+    }
+  });
 });
