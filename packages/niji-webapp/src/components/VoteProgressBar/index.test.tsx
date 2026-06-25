@@ -409,4 +409,52 @@ describe('VoteProgressBar', () => {
     const inner = container.querySelectorAll('div')[1];
     expect(inner?.getAttribute('style')).toContain('33.333%');
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+      unmount();
+    }
+  });
+
+  it('renders 300 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <VoteProgressBar key={i} variant={VoteCardVariant.FOR} percentage={i % 100} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different percentage values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(
+        <VoteProgressBar variant={VoteCardVariant.FOR} percentage={i} />,
+      );
+      const inner = container.querySelectorAll('div')[1];
+      expect(inner?.getAttribute('style')).toContain(`${i}%`);
+      unmount();
+    }
+  });
+
+  it('all 3 variants render with 50% percentage', () => {
+    [VoteCardVariant.FOR, VoteCardVariant.AGAINST, VoteCardVariant.ABSTAIN].forEach(v => {
+      const { container, unmount } = render(<VoteProgressBar variant={v} percentage={50} />);
+      expect(container.querySelectorAll('div').length).toBe(2);
+      unmount();
+    });
+  });
+
+  it('rapid rerender 50 times preserves structure', () => {
+    const { container, rerender } = render(
+      <VoteProgressBar variant={VoteCardVariant.FOR} percentage={0} />,
+    );
+    for (let i = 0; i < 50; i++) {
+      rerender(<VoteProgressBar variant={VoteCardVariant.AGAINST} percentage={i} />);
+    }
+    expect(container.querySelectorAll('div').length).toBe(2);
+  });
 });

@@ -363,4 +363,47 @@ describe('ProposalEditor', () => {
     const long = 'a'.repeat(5000);
     expect(() => render(<ProposalEditor {...defaults} body={long} />)).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalEditor {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ProposalEditor key={i} {...defaults} title={`T-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid body input 100 events fires onBodyInput', () => {
+    const onBodyInput = vi.fn();
+    const { container } = render(<ProposalEditor {...defaults} onBodyInput={onBodyInput} />);
+    const ta = container.querySelector('textarea')!;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(ta, { target: { value: `b-${i}` } });
+    }
+    expect(onBodyInput).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles 50 different title values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(<ProposalEditor {...defaults} title={`T-${i}`} />);
+      expect(container.querySelector('input')?.getAttribute('value')).toBe(`T-${i}`);
+      unmount();
+    }
+  });
+
+  it('isCandidate=true keeps input rendered', () => {
+    const { container } = render(<ProposalEditor {...defaults} isCandidate={true} />);
+    expect(container.querySelector('input')).not.toBeNull();
+    expect(container.querySelector('textarea')).not.toBeNull();
+  });
 });
