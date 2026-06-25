@@ -506,4 +506,65 @@ describe('CandidateCard', () => {
       ).not.toThrow();
     }
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <CandidateCard candidate={baseCandidate} nounsRequired={i} />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <CandidateCard
+              key={i}
+              candidate={{ ...baseCandidate, id: `c-${i}` } as never}
+              nounsRequired={i}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different proposer addresses', () => {
+    for (let i = 0; i < 100; i++) {
+      const c = { ...baseCandidate, proposer: '0x' + i.toString(16).padStart(40, '0') } as never;
+      const { unmount } = wrap(<CandidateCard candidate={c} nounsRequired={3} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different proposerVotes values', () => {
+    for (let i = 0; i < 30; i++) {
+      const c = { ...baseCandidate, proposerVotes: i } as never;
+      const { unmount } = wrap(<CandidateCard candidate={c} nounsRequired={3} />);
+      unmount();
+    }
+  });
+
+  it('all 50 instances link to unique candidate id', () => {
+    const { container } = wrap(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <CandidateCard
+            key={i}
+            candidate={{ ...baseCandidate, id: `c-${i}` } as never}
+            nounsRequired={3}
+          />
+        ))}
+      </>,
+    );
+    const links = container.querySelectorAll('a');
+    links.forEach((link, i) => {
+      expect(link.getAttribute('href')).toBe(`/candidates/c-${i}`);
+    });
+  });
 });

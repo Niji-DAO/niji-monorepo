@@ -433,4 +433,62 @@ describe('BrandTextEntry', () => {
     }
     expect(container.querySelector('input')).not.toBeNull();
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<BrandTextEntry onChange={() => {}} value={`v-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <BrandTextEntry key={i} onChange={() => {}} value={`v-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different labels', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <BrandTextEntry onChange={() => {}} label={`L-${i}`} />,
+      );
+      expect(container.querySelector('span')?.textContent).toBe(`L-${i}`);
+      unmount();
+    }
+  });
+
+  it('rapid 100 onChange events fire handler', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandTextEntry onChange={onChange} />);
+    const input = container.querySelector('input')!;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(input, { target: { value: `v-${i}` } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles 30 different types', () => {
+    [
+      'text',
+      'number',
+      'email',
+      'password',
+      'search',
+      'tel',
+      'url',
+      'date',
+      'time',
+      'string',
+    ].forEach(type => {
+      const { container, unmount } = render(<BrandTextEntry onChange={() => {}} type={type} />);
+      expect(container.querySelector('input')?.getAttribute('type')).toBe(type);
+      unmount();
+    });
+  });
 });

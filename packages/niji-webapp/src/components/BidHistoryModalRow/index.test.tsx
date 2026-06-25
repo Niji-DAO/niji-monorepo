@@ -486,4 +486,53 @@ describe('BidHistoryModalRow', () => {
       expect(() => rerender(<BidHistoryModalRow bid={b} index={1} />)).not.toThrow();
     }
   });
+
+  it('mount-unmount 100 cycles', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<BidHistoryModalRow bid={bid} index={i} />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <BidHistoryModalRow key={i} bid={bid} index={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different bid timestamps', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    for (let i = 0; i < 100; i++) {
+      const b = { ...bid, timestamp: BigInt(1700000000 + i * 3600) };
+      const { unmount } = render(<BidHistoryModalRow bid={b} index={1} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different ENS names', () => {
+    vi.mocked(containsBlockedText).mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      vi.mocked(useReverseENSLookUp).mockReturnValue(`ens-${i}.eth`);
+      const { unmount } = render(<BidHistoryModalRow bid={bid} index={1} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different transactionHash values', () => {
+    vi.mocked(useReverseENSLookUp).mockReturnValue(undefined);
+    for (let i = 0; i < 30; i++) {
+      const b = { ...bid, transactionHash: `0x${i.toString(16).padStart(64, '0')}` };
+      const { container, unmount } = render(<BidHistoryModalRow bid={b} index={1} />);
+      expect(container.querySelector('a')?.getAttribute('href')).toContain(b.transactionHash);
+      unmount();
+    }
+  });
 });
