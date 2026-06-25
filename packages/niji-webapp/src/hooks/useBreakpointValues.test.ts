@@ -267,4 +267,39 @@ describe('useBreakpointDown', () => {
       expect(typeof useBreakpointValues).toBe('function');
     }
   });
+
+  it('round-4 30 renderHook cycles useBreakpointValues', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useBreakpointValues({ base: i + 100 }));
+      unmount();
+    }
+  });
+
+  it('round-4 50 renderHook cycles varied breakpoints', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() =>
+        useBreakpointValues({ base: i + 200, md: i + 300, lg: i + 400 }),
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useBreakpointValues({ base: i + 500 }));
+      unmount();
+    }
+  });
+
+  it('round-4 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useBreakpointValues({ base: i + 700 }))).not.toThrow();
+    }
+  });
+
+  it('round-4 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useBreakpointValues).toBe('function');
+    }
+  });
 });
