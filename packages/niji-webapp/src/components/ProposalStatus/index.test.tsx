@@ -393,4 +393,52 @@ describe('ProposalStatus', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <ProposalStatus key={i} status={ProposalState.ACTIVE} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different status cycles', () => {
+    const states = [
+      ProposalState.PENDING,
+      ProposalState.ACTIVE,
+      ProposalState.SUCCEEDED,
+      ProposalState.EXECUTED,
+      ProposalState.DEFEATED,
+    ];
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalStatus status={states[i % 5]} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ProposalStatus status={ProposalState.ACTIVE} />)).not.toThrow();
+    }
+  });
+
+  it('round-4 30 different className values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalStatus status={ProposalState.ACTIVE} className={`r4-cls-${i}`} />,
+      );
+      unmount();
+    }
+  });
 });
