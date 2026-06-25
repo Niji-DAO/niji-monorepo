@@ -511,4 +511,56 @@ describe('TightStackedCircleNijis', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<TightStackedCircleNijis nounIds={[i]} />);
+      unmount();
+    }
+  });
+
+  it('renders 1500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <TightStackedCircleNijis key={i} nounIds={[i, i + 1, i + 2]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different nounIds with single value', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(<TightStackedCircleNijis nounIds={[i]} />);
+      expect(container.querySelector('circle')?.getAttribute('data-niji')).toBe(String(i));
+      unmount();
+    }
+  });
+
+  it('all 700 svgs have width=55', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 700 }, (_, i) => (
+          <TightStackedCircleNijis key={i} nounIds={[i]} />
+        ))}
+      </>,
+    );
+    const svgs = container.querySelectorAll('svg');
+    expect(svgs.length).toBe(700);
+    svgs.forEach(svg => {
+      expect(svg.getAttribute('width')).toBe('55');
+    });
+  });
+
+  it('handles 50 different cap-3 fully populated arrays', () => {
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(
+        <TightStackedCircleNijis nounIds={[i * 10, i * 10 + 1, i * 10 + 2, i * 10 + 3]} />,
+      );
+      expect(container.querySelectorAll('circle').length).toBe(3);
+      unmount();
+    }
+  });
 });
