@@ -537,4 +537,63 @@ describe('Bid', () => {
       ).not.toThrow();
     }
   });
+
+  it('renders 20 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 20 }, (_, i) => (
+            <Bid
+              key={i}
+              auction={makeAuction({ nounId: BigInt(i) }) as never}
+              auctionEnded={false}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rerender 30 times preserves component', () => {
+    const { rerender } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <Bid auction={makeAuction({ nounId: BigInt(i) }) as never} auctionEnded={false} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles MAX_SAFE_INTEGER bigint nounId', () => {
+    expect(() =>
+      render(
+        <Bid
+          auction={makeAuction({ nounId: 9_007_199_254_740_991n }) as never}
+          auctionEnded={false}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles auctionEnded=true variant', () => {
+    expect(() =>
+      render(<Bid auction={makeAuction() as never} auctionEnded={true} />),
+    ).not.toThrow();
+  });
+
+  it('handles all hookState placeBid combinations', () => {
+    const orig = { ...hookState.placeBid };
+    [
+      { isPending: true, isError: false, isSuccess: false },
+      { isPending: false, isError: true, isSuccess: false },
+      { isPending: false, isError: false, isSuccess: true },
+    ].forEach(s => {
+      hookState.placeBid = s;
+      expect(() =>
+        render(<Bid auction={makeAuction() as never} auctionEnded={false} />),
+      ).not.toThrow();
+    });
+    hookState.placeBid = orig;
+  });
 });

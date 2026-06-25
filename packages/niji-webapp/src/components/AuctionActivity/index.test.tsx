@@ -610,4 +610,34 @@ describe('AuctionActivity', () => {
       ),
     ).not.toThrow();
   });
+
+  it('handles isLastAuction=false variant', () => {
+    useAtomValueMock.mockReturnValue(false);
+    expect(() =>
+      wrap(
+        <AuctionActivity {...defaults} isLastAuction={false} auction={makeAuction() as never} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid useAtomValue toggle 30 times', () => {
+    const { rerender } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+    for (let i = 0; i < 30; i++) {
+      useAtomValueMock.mockReturnValue(i % 2 === 0);
+      expect(() =>
+        rerender(
+          <MemoryRouter>
+            <AuctionActivity {...defaults} auction={makeAuction() as never} />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 0n nounId edge case', () => {
+    useAtomValueMock.mockReturnValue(false);
+    expect(() =>
+      wrap(<AuctionActivity {...defaults} auction={makeAuction({ nounId: 0n }) as never} />),
+    ).not.toThrow();
+  });
 });

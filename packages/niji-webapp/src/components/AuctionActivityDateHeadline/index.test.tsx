@@ -408,4 +408,36 @@ describe('AuctionActivityDateHeadline', () => {
       expect(() => rerender(<AuctionActivityDateHeadline startTime={1700000000n} />)).not.toThrow();
     }
   });
+
+  it('handles 1n startTime (very small)', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() => render(<AuctionActivityDateHeadline startTime={1n} />)).not.toThrow();
+  });
+
+  it('renders 200 instances', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <AuctionActivityDateHeadline key={i} startTime={BigInt(1700000000 + i)} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h4').length).toBe(200);
+  });
+
+  it('all 100 instances have warm style when isCool=false', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <AuctionActivityDateHeadline key={i} startTime={BigInt(1700000000 + i)} />
+        ))}
+      </>,
+    );
+    const h4s = container.querySelectorAll('h4');
+    h4s.forEach(h4 => {
+      expect(h4.getAttribute('style')).toContain('warm');
+    });
+  });
 });
