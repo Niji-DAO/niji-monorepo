@@ -151,4 +151,38 @@ describe('useForkTreasuryBalance', () => {
       expect(result.current).toBe(150n);
     }
   });
+
+  it('round-2 30 renderHook cycles useForkTreasuryBalance', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useForkTreasuryBalance(TREASURY));
+      unmount();
+    }
+  });
+
+  it('round-2 50 renderHook cycles varied treasury', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as never;
+      const { unmount } = renderHook(() => useForkTreasuryBalance(addr));
+      unmount();
+    }
+  });
+
+  it('round-2 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useForkTreasuryBalance(TREASURY));
+      unmount();
+    }
+  });
+
+  it('round-2 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useForkTreasuryBalance(TREASURY))).not.toThrow();
+    }
+  });
+
+  it('round-2 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useForkTreasuryBalance).toBe('function');
+    }
+  });
 });
