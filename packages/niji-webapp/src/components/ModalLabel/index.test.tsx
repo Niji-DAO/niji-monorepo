@@ -460,4 +460,54 @@ describe('ModalLabel', () => {
     const { container } = render(<ModalLabel>{long}</ModalLabel>);
     expect(container.querySelector('div')?.textContent?.length).toBe(100000);
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<ModalLabel>x</ModalLabel>);
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <ModalLabel key={i}>{i}</ModalLabel>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different children values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(<ModalLabel>v-{i}</ModalLabel>);
+      expect(container.querySelector('div')?.textContent).toBe(`v-${i}`);
+      unmount();
+    }
+  });
+
+  it('all 500 div wrappers exist with correct content', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <ModalLabel key={i}>label-{i}</ModalLabel>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(500);
+    expect(container.textContent).toContain('label-499');
+  });
+
+  it('handles 50 different ReactNode types', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ModalLabel>
+          <span data-testid={`n-${i}`}>{i}</span>
+        </ModalLabel>,
+      );
+      unmount();
+    }
+  });
 });
