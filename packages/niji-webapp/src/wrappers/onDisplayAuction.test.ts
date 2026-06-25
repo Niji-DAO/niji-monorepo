@@ -311,4 +311,42 @@ describe('useOnDisplayAuction additional cases', () => {
       expect(result.current?.startTime).toBe(BigInt(i * 100));
     }
   });
+
+  it('round-2 30 renderHook cycles useOnDisplayAuction', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useOnDisplayAuction());
+      unmount();
+    }
+  });
+
+  it('round-2 30 renderHook cycles useAuctionBids', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useAuctionBids(BigInt(i)));
+      unmount();
+    }
+  });
+
+  it('round-2 50 useAuctionBids cycles varied nounIds', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useAuctionBids(BigInt(i + 100)));
+      unmount();
+    }
+  });
+
+  it('round-2 hook returns without crash for 30 calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useOnDisplayAuction())).not.toThrow();
+      expect(() => renderHook(() => useAuctionBids(BigInt(i)))).not.toThrow();
+    }
+  });
+
+  it('round-2 100 sequential mixed renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } =
+        i % 2 === 0
+          ? renderHook(() => useOnDisplayAuction())
+          : renderHook(() => useAuctionBids(BigInt(i)));
+      unmount();
+    }
+  });
 });
