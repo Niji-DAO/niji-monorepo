@@ -508,4 +508,52 @@ describe('LegacyNoun — additional edge cases', () => {
       expect(img.getAttribute('src')).toMatch(/loading-skull-noun/i);
     });
   });
+
+  it('LegacyNoun mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<LegacyNoun imgPath="/x.png" alt="x" />);
+      unmount();
+    }
+  });
+
+  it('LegacyNoun renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <LegacyNoun key={i} imgPath={`/x-${i}.png`} alt={`alt-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('LegacyNoun handles 200 different className values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(
+        <LegacyNoun imgPath="/x.png" alt="x" className={`cls-${i}`} />,
+      );
+      expect(container.querySelector('img')?.className).toContain(`cls-${i}`);
+      unmount();
+    }
+  });
+
+  it('LoadingNoun mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<LoadingNoun />);
+      unmount();
+    }
+  });
+
+  it('LoadingNoun renders 1000 instances', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <LoadingNoun key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });
