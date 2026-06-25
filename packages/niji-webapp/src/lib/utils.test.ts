@@ -132,4 +132,38 @@ describe('cn (clsx + tailwind-merge)', () => {
       expect(typeof c).toBe('string');
     }
   });
+
+  it('round-4 30 sequential cn calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => cn(`r4-cls-${i}`)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 sequential cn varied inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = cn(`r4-a-${i}`, `r4-b-${i}`);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-4 100 sequential cn calls', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(cn(`r4-${i}`).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-4 50 deterministic cn for same input', () => {
+    for (let i = 0; i < 50; i++) {
+      const r1 = cn('r4-x', 'r4-y');
+      const r2 = cn('r4-x', 'r4-y');
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-4 100 sequential alternating call patterns', () => {
+    for (let i = 0; i < 100; i++) {
+      const c = i % 2 === 0 ? cn('r4-c') : cn('r4-d');
+      expect(typeof c).toBe('string');
+    }
+  });
 });
