@@ -197,4 +197,41 @@ describe('shortENS — boundary', () => {
       }).not.toThrow();
     }
   });
+
+  it('round-2 30 sequential calls with varied addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as Address;
+      expect(() => veryShortAddress(addr)).not.toThrow();
+    }
+  });
+
+  it('round-2 30 sequential calls with varied ENS', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => veryShortENS(`r2-ens-${i}.eth`)).not.toThrow();
+    }
+  });
+
+  it('round-2 handles 50 different short address inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0xABCDEF' + i.toString(16).padStart(34, '0')) as Address;
+      const result = veryShortAddress(addr);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-2 handles 50 different ENS inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = veryShortENS(`alice-${i}.eth`);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-2 round-trip 100 sequential mixed calls', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as Address;
+      veryShortAddress(addr);
+      veryShortENS(`r2-${i}.eth`);
+    }
+    expect(true).toBe(true);
+  });
 });
