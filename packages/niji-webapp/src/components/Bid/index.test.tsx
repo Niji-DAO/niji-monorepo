@@ -833,4 +833,43 @@ describe('Bid', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 different auctionEnded toggle', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 30 different auction nounIds', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = { ...makeAuction(), nounId: BigInt(i + 100) };
+      const { unmount } = render(<Bid auction={a as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<Bid auction={makeAuction() as never} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-3 30 mount-unmount cycles second', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
 });
