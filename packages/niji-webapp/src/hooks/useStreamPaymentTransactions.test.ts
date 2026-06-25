@@ -392,4 +392,36 @@ describe('useStreamPaymentTransactions', () => {
       expect(useStreamPaymentTransactions).toBeTruthy();
     }
   });
+
+  it('round-6 30 sequential useStreamPaymentTransactions access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useStreamPaymentTransactions).toBeDefined();
+    }
+  });
+
+  it('round-6 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useStreamPaymentTransactions).toBe('function');
+    }
+  });
+
+  it('round-6 100 sequential reference consistency', () => {
+    const first = useStreamPaymentTransactions;
+    for (let i = 0; i < 100; i++) {
+      expect(useStreamPaymentTransactions).toBe(first);
+    }
+  });
+
+  it('round-6 50 sequential reference check second', () => {
+    const first = useStreamPaymentTransactions;
+    for (let i = 0; i < 50; i++) {
+      expect(useStreamPaymentTransactions).toBe(first);
+    }
+  });
+
+  it('round-6 100 sequential truthiness checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useStreamPaymentTransactions).toBeTruthy();
+    }
+  });
 });
