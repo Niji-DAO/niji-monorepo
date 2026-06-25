@@ -807,4 +807,48 @@ describe('EnsOrLongAddress', () => {
       expect(() => rerender(<EnsOrLongAddress address={addr} />)).not.toThrow();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR6' + i.toString(16).padStart(38, '0')) as `0x${string}`;
+      const { unmount } = render(<EnsOrLongAddress address={addr} />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => {
+            const addr = ('0xR6' + i.toString(16).padStart(38, '0')) as `0x${string}`;
+            return <EnsOrLongAddress key={i} address={addr} />;
+          })}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR6' + '0'.padStart(38, '0')) as `0x${string}`;
+      expect(() => render(<EnsOrLongAddress address={addr} />)).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0xR6' + i.toString(16).padStart(38, '0')) as `0x${string}`;
+      const { unmount } = render(<EnsOrLongAddress address={addr} />);
+      unmount();
+    }
+  });
+
+  it('round-6 100 rerender cycles', () => {
+    const { rerender } = render(<EnsOrLongAddress address="0x0" />);
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0xR6' + i.toString(16).padStart(38, '0')) as `0x${string}`;
+      expect(() => rerender(<EnsOrLongAddress address={addr} />)).not.toThrow();
+    }
+  });
 });
