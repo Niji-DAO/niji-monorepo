@@ -77,4 +77,36 @@ describe('getProposalVoteIcon', () => {
     const b = getProposalVoteIcon(makeProposal(ProposalState.EXECUTED), Vote.AGAINST);
     expect(a).toBe(b);
   });
+
+  it('handles 100 cycles of PENDING + undefined', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(getProposalVoteIcon(makeProposal(ProposalState.PENDING), undefined)).toBeTruthy();
+    }
+  });
+
+  it('handles 100 cycles of ACTIVE + Vote.FOR', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(getProposalVoteIcon(makeProposal(ProposalState.ACTIVE), Vote.FOR)).toBeTruthy();
+    }
+  });
+
+  it('handles 50 different state + vote combinations', () => {
+    const states = [ProposalState.ACTIVE, ProposalState.SUCCEEDED, ProposalState.EXECUTED];
+    const votes = [Vote.FOR, Vote.SUPPORT, Vote.ABSTAIN];
+    for (let i = 0; i < 50; i++) {
+      expect(() => getProposalVoteIcon(makeProposal(states[i % 3]), votes[i % 3])).not.toThrow();
+    }
+  });
+
+  it('handles 100 cycles of EXECUTED + Vote.FOR', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(getProposalVoteIcon(makeProposal(ProposalState.EXECUTED), Vote.FOR)).toBeTruthy();
+    }
+  });
+
+  it('rapid 200 invocations', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => getProposalVoteIcon(makeProposal(ProposalState.ACTIVE), Vote.FOR)).not.toThrow();
+    }
+  });
 });

@@ -67,4 +67,35 @@ describe('containsBlockedText', () => {
   it('returns false for clean text with punctuation marks', () => {
     expect(containsBlockedText('Hello, world! How are you?', 'en')).toBe(false);
   });
+
+  it('handles 100 different clean text inputs en', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(containsBlockedText(`hello-${i}`, 'en')).toBe(false);
+    }
+  });
+
+  it('handles 100 different clean text inputs ja', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => containsBlockedText(`text-${i}`, 'ja')).not.toThrow();
+    }
+  });
+
+  it('handles 100 empty string evaluations', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(containsBlockedText('', 'en')).toBe(false);
+    }
+  });
+
+  it('handles 100 long text inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      const long = 'hello '.repeat(i + 10);
+      expect(() => containsBlockedText(long, 'en')).not.toThrow();
+    }
+  });
+
+  it('rapid 200 invocations with clean text', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => containsBlockedText('hello world', 'en')).not.toThrow();
+    }
+  });
 });
