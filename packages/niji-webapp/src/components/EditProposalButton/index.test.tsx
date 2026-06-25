@@ -395,4 +395,58 @@ describe('EditProposalButton', () => {
     const { container } = render(<EditProposalButton {...defaults} isFormInvalid={true} />);
     expect(container.querySelector('button')).not.toBeNull();
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<EditProposalButton {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <EditProposalButton key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles all 4 boolean prop combinations', () => {
+    [true, false].forEach(isLoading => {
+      [true, false].forEach(hasActive => {
+        expect(() =>
+          render(
+            <EditProposalButton
+              {...defaults}
+              isLoading={isLoading}
+              hasActiveOrPendingProposal={hasActive}
+            />,
+          ),
+        ).not.toThrow();
+      });
+    });
+  });
+
+  it('rapid 100 button click events fire handler', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <EditProposalButton {...defaults} handleCreateProposal={handle} />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 100; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles isCandidate toggle 30 rerenders', () => {
+    const { rerender } = render(<EditProposalButton {...defaults} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(<EditProposalButton {...defaults} isCandidate={i % 2 === 0} />),
+      ).not.toThrow();
+    }
+  });
 });

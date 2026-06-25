@@ -357,4 +357,59 @@ describe('ModalTitle', () => {
     const { container } = render(<ModalTitle>{long}</ModalTitle>);
     expect(container.querySelector('h1')?.textContent?.length).toBe(5000);
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ModalTitle>x</ModalTitle>);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <ModalTitle key={i}>title-{i}</ModalTitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles deeply nested children (5 levels)', () => {
+    const { container } = render(
+      <ModalTitle>
+        <span>
+          <strong>
+            <em>
+              <small>
+                <i data-testid="deep5">deep</i>
+              </small>
+            </em>
+          </strong>
+        </span>
+      </ModalTitle>,
+    );
+    expect(container.querySelector('[data-testid="deep5"]')?.textContent).toBe('deep');
+  });
+
+  it('handles 50 different children rerender', () => {
+    const { container, rerender } = render(<ModalTitle>0</ModalTitle>);
+    for (let i = 0; i < 50; i++) {
+      rerender(<ModalTitle>v-{i}</ModalTitle>);
+    }
+    expect(container.querySelector('h1')?.textContent).toContain('49');
+  });
+
+  it('all 200 instances have h1 element', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <ModalTitle key={i}>{i}</ModalTitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(200);
+  });
 });
