@@ -108,4 +108,50 @@ describe('lookupNNSOrENS', () => {
     expect(readContract.mock.calls[0][0].address).toBe(NNS_ADDR);
     expect(readContract.mock.calls[1][0].address).toBe(ENS_ADDR);
   });
+
+  it('handles 50 different addresses with NNS resolved', async () => {
+    for (let i = 0; i < 50; i++) {
+      const readContract = vi.fn().mockResolvedValueOnce(`name-${i}.eth`);
+      const client: Client = { readContract };
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as Address;
+      await expect(lookupNNSOrENS(client, addr)).resolves.toBe(`name-${i}.eth`);
+    }
+  });
+
+  it('handles 50 different addresses with ENS fallback', async () => {
+    for (let i = 0; i < 50; i++) {
+      const readContract = vi.fn().mockResolvedValueOnce('').mockResolvedValueOnce(`fall-${i}.eth`);
+      const client: Client = { readContract };
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as Address;
+      await expect(lookupNNSOrENS(client, addr)).resolves.toBe(`fall-${i}.eth`);
+    }
+  });
+
+  it('handles 30 cycles with NNS throws + ENS resolve', async () => {
+    for (let i = 0; i < 30; i++) {
+      const readContract = vi
+        .fn()
+        .mockRejectedValueOnce(new Error('nns-err'))
+        .mockResolvedValueOnce(`recover-${i}.eth`);
+      const client: Client = { readContract };
+      await expect(lookupNNSOrENS(client, TARGET)).resolves.toBe(`recover-${i}.eth`);
+    }
+  });
+
+  it('handles 30 cycles with both empty', async () => {
+    for (let i = 0; i < 30; i++) {
+      const readContract = vi.fn().mockResolvedValueOnce('').mockResolvedValueOnce('');
+      const client: Client = { readContract };
+      const result = await lookupNNSOrENS(client, TARGET);
+      expect(result === '' || result === undefined || result === null).toBe(true);
+    }
+  });
+
+  it('handles 100 different name resolutions', async () => {
+    for (let i = 0; i < 100; i++) {
+      const readContract = vi.fn().mockResolvedValueOnce(`unique-${i}.⌐◨-◨`);
+      const client: Client = { readContract };
+      await expect(lookupNNSOrENS(client, TARGET)).resolves.toBe(`unique-${i}.⌐◨-◨`);
+    }
+  });
 });
