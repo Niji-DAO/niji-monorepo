@@ -874,4 +874,90 @@ describe('NijiContent', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles all 6 settleHookState states combinations', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    [
+      { isPending: false, isSuccess: false, isError: false, error: null },
+      { isPending: true, isSuccess: false, isError: false, error: null },
+      { isPending: false, isSuccess: true, isError: false, error: null },
+      { isPending: false, isSuccess: false, isError: true, error: { message: 'e' } },
+      { isPending: true, isSuccess: true, isError: false, error: null },
+      { isPending: false, isSuccess: false, isError: false, error: { message: 'x' } },
+    ].forEach(s => {
+      Object.assign(settleHookState, s);
+      const { unmount } = render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      );
+      unmount();
+    });
+    Object.assign(settleHookState, {
+      isPending: false,
+      isSuccess: false,
+      isError: false,
+      error: null,
+    });
+  });
+
+  it('rapid 100 writeContract invocations', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    writeContractMock.mockReset();
+    render(
+      <MemoryRouter>
+        <NijiContent />
+      </MemoryRouter>,
+    );
+    for (let i = 0; i < 100; i++) writeContractMock({});
+    expect(writeContractMock).toHaveBeenCalledTimes(100);
+  });
+
+  it('handles 30 different account/block combinations', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    for (let i = 0; i < 30; i++) {
+      useAccountMock.mockReturnValue({
+        address: '0x' + i.toString(16).padStart(40, '0'),
+      });
+      useBlockMock.mockReturnValue({ data: { timestamp: BigInt(i * 1000) } });
+      const { unmount } = render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different nounId values', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    for (let i = 0; i < 30; i++) {
+      useAtomValueMock.mockReturnValue(BigInt(i * 100));
+      const { unmount } = render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
 });

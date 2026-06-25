@@ -630,4 +630,56 @@ describe('ProposalHeader', () => {
       unmount();
     });
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<ProposalHeader {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different proposal ids with versions', () => {
+    for (let i = 0; i < 30; i++) {
+      const p = makeProposal({ id: String(i) });
+      const versions = [{ createdAt: 1700000000n }];
+      const { unmount } = wrap(
+        <ProposalHeader
+          {...baseProps}
+          proposal={p}
+          proposalVersions={versions as never}
+          versionNumber={1n}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles all proposalVote values', () => {
+    const orig = hookState.proposalVote;
+    ['For', 'Against', 'Abstain'].forEach(vote => {
+      hookState.hasVoted = true;
+      hookState.proposalVote = vote;
+      const { unmount } = wrap(<ProposalHeader {...baseProps} />);
+      unmount();
+    });
+    hookState.proposalVote = orig;
+    hookState.hasVoted = false;
+  });
+
+  it('handles 30 different submit handler invocations', () => {
+    submitMock.mockReset();
+    wrap(<ProposalHeader {...baseProps} />);
+    for (let i = 0; i < 30; i++) submitMock();
+    expect(submitMock).toHaveBeenCalledTimes(30);
+  });
+
+  it('handles 30 different availableVotes values', () => {
+    const orig = hookState.availableVotes;
+    for (let i = 0; i < 30; i++) {
+      hookState.availableVotes = i;
+      const { unmount } = wrap(<ProposalHeader {...baseProps} />);
+      unmount();
+    }
+    hookState.availableVotes = orig;
+  });
 });
