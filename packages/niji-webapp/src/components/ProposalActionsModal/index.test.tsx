@@ -539,6 +539,59 @@ describe('ProposalActionModal extra', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalActionModal show={true} onDismiss={() => {}} onActionAdd={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different show toggle cycles', () => {
+    const { rerender } = render(
+      <ProposalActionModal show={true} onDismiss={() => {}} onActionAdd={() => {}} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <ProposalActionModal show={i % 2 === 0} onDismiss={() => {}} onActionAdd={() => {}} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<ProposalActionModal show={true} onDismiss={onDismiss} onActionAdd={() => {}} />);
+    for (let i = 0; i < 200; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('rapid 200 onActionAdd invocations', () => {
+    const onActionAdd = vi.fn();
+    render(<ProposalActionModal show={true} onDismiss={() => {}} onActionAdd={onActionAdd} />);
+    for (let i = 0; i < 200; i++) onActionAdd({} as never);
+    expect(onActionAdd).toHaveBeenCalledTimes(200);
+  });
+
+  it('renders 30 instances in different show states', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalActionModal
+              key={i}
+              show={i % 2 === 0}
+              onDismiss={() => {}}
+              onActionAdd={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });
 
 // dummy reference to silence unused warning

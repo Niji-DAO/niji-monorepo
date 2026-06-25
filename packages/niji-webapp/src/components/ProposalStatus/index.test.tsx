@@ -243,4 +243,58 @@ describe('ProposalStatus', () => {
     rerender(<ProposalStatus status={ProposalState.EXECUTED} className="custom-cls" />);
     expect(container.querySelector('div')?.className).toContain('custom-cls');
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
+      unmount();
+    }
+  });
+
+  it('renders 1500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <ProposalStatus key={i} status={ProposalState.ACTIVE} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 500 instances render single div', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <ProposalStatus key={i} status={ProposalState.ACTIVE} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(500);
+  });
+
+  it('handles 100 different className values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <ProposalStatus status={ProposalState.ACTIVE} className={`cls-${i}`} />,
+      );
+      expect(container.querySelector('div')?.className).toContain(`cls-${i}`);
+      unmount();
+    }
+  });
+
+  it('rapid 200 status transitions', () => {
+    const states = [
+      ProposalState.ACTIVE,
+      ProposalState.PENDING,
+      ProposalState.SUCCEEDED,
+      ProposalState.QUEUED,
+      ProposalState.EXECUTED,
+    ];
+    const { rerender } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
+    for (let i = 0; i < 200; i++) {
+      expect(() => rerender(<ProposalStatus status={states[i % 5]} />)).not.toThrow();
+    }
+  });
 });
