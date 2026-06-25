@@ -368,4 +368,59 @@ describe('ModalSubtitle', () => {
     const { container } = render(<ModalSubtitle>{long}</ModalSubtitle>);
     expect(container.querySelector('div')?.textContent?.length).toBe(5000);
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ModalSubtitle>x</ModalSubtitle>);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <ModalSubtitle key={i}>sub-{i}</ModalSubtitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles deeply nested children (5 levels)', () => {
+    const { container } = render(
+      <ModalSubtitle>
+        <span>
+          <strong>
+            <em>
+              <small>
+                <i data-testid="deep5">deep</i>
+              </small>
+            </em>
+          </strong>
+        </span>
+      </ModalSubtitle>,
+    );
+    expect(container.querySelector('[data-testid="deep5"]')?.textContent).toBe('deep');
+  });
+
+  it('handles 50 different children rerender', () => {
+    const { container, rerender } = render(<ModalSubtitle>0</ModalSubtitle>);
+    for (let i = 0; i < 50; i++) {
+      rerender(<ModalSubtitle>v-{i}</ModalSubtitle>);
+    }
+    expect(container.querySelector('div')?.textContent).toContain('49');
+  });
+
+  it('all 200 instances have div wrapper', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <ModalSubtitle key={i}>{i}</ModalSubtitle>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBeGreaterThanOrEqual(200);
+  });
 });

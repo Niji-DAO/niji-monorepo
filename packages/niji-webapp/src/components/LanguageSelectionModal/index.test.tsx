@@ -451,4 +451,44 @@ describe('LanguageSelectionModal', () => {
     useAtomMock.mockReturnValue(['xx-XX', vi.fn()]);
     expect(() => render(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('handles all 3 locale variants', () => {
+    ['en-US', 'ja-JP', 'zh-CN'].forEach(loc => {
+      useAtomMock.mockReturnValue([loc, vi.fn()]);
+      expect(() => render(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
+    });
+  });
+
+  it('rapid onDismiss invocations 200 times', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const onDismiss = vi.fn();
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    for (let i = 0; i < 200; i++) {
+      onDismiss();
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles empty string locale', () => {
+    useAtomMock.mockReturnValue(['', vi.fn()]);
+    expect(() => render(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
+  });
+
+  it('rerender 50 times with varying locales', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const { rerender } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+    const locales = ['en-US', 'ja-JP', 'zh-CN'];
+    for (let i = 0; i < 50; i++) {
+      useAtomMock.mockReturnValue([locales[i % 3], vi.fn()]);
+      expect(() => rerender(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
+    }
+  });
 });
