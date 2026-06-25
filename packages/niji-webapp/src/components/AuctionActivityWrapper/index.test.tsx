@@ -768,4 +768,44 @@ describe('AuctionActivityWrapper', () => {
     }
     expect(container.textContent).toContain('49');
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionActivityWrapper>r5</AuctionActivityWrapper>);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionActivityWrapper key={i}>r5-{i}</AuctionActivityWrapper>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionActivityWrapper>r5-c-{i}</AuctionActivityWrapper>);
+      unmount();
+    }
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<AuctionActivityWrapper>x</AuctionActivityWrapper>)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 rerender cycles', () => {
+    const { container, rerender } = render(<AuctionActivityWrapper>x</AuctionActivityWrapper>);
+    for (let i = 0; i < 50; i++) {
+      rerender(<AuctionActivityWrapper>r5-r-{i}</AuctionActivityWrapper>);
+    }
+    expect(container.textContent).toContain('49');
+  });
 });

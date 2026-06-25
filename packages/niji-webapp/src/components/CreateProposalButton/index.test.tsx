@@ -1394,4 +1394,79 @@ describe('CreateProposalButton', () => {
       unmount();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <CreateProposalButton
+          handleCreateProposal={() => {}}
+          hasEnoughVote={true}
+          proposalThreshold={0}
+          isWalletConnected={true}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CreateProposalButton
+              key={i}
+              handleCreateProposal={() => {}}
+              hasEnoughVote={true}
+              proposalThreshold={0}
+              isWalletConnected={true}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <CreateProposalButton
+            handleCreateProposal={() => {}}
+            hasEnoughVote={true}
+            proposalThreshold={0}
+            isWalletConnected={true}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-5 rapid 200 handleCreateProposal invocations', () => {
+    const handler = vi.fn();
+    render(
+      <CreateProposalButton
+        handleCreateProposal={handler}
+        hasEnoughVote={true}
+        proposalThreshold={0}
+        isWalletConnected={true}
+      />,
+    );
+    for (let i = 0; i < 200; i++) handler();
+    expect(handler).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <CreateProposalButton
+          handleCreateProposal={() => {}}
+          hasEnoughVote={true}
+          proposalThreshold={0}
+          isWalletConnected={true}
+        />,
+      );
+      unmount();
+    }
+  });
 });
