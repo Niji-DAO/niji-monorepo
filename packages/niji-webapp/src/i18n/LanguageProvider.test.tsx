@@ -100,4 +100,71 @@ describe('LanguageProvider', () => {
     );
     expect(container.querySelector('[data-testid="niji-i18n-provider"]')).not.toBeNull();
   });
+
+  it('mount-unmount 500 cycles', () => {
+    useActiveLocaleMock.mockReturnValue('en-US');
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <LanguageProvider>
+          <div>x</div>
+        </LanguageProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    useActiveLocaleMock.mockReturnValue('en-US');
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <LanguageProvider key={i}>
+              <div>x-{i}</div>
+            </LanguageProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different locales', () => {
+    for (let i = 0; i < 30; i++) {
+      useActiveLocaleMock.mockReturnValue(`locale-${i}`);
+      const { unmount } = render(
+        <LanguageProvider>
+          <div>x</div>
+        </LanguageProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('all 200 providers render with niji-i18n-provider', () => {
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <LanguageProvider key={i}>
+            <div>x</div>
+          </LanguageProvider>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="niji-i18n-provider"]').length).toBe(200);
+  });
+
+  it('handles 50 different children types', () => {
+    useActiveLocaleMock.mockReturnValue('en-US');
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <LanguageProvider>
+          <div>
+            <span data-testid={`n-${i}`}>{i}</span>
+          </div>
+        </LanguageProvider>,
+      );
+      unmount();
+    }
+  });
 });

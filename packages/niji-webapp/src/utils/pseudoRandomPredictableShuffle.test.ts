@@ -83,4 +83,44 @@ describe('pseudoRandomPredictableShuffle', () => {
     // 引数なし呼出で default input [] + default seed 1
     expect(pseudoRandomPredictableShuffle()).toEqual([]);
   });
+
+  it('handles 100 different array sizes', () => {
+    for (let i = 1; i <= 100; i++) {
+      const input = Array.from({ length: i }, (_, j) => j);
+      const output = pseudoRandomPredictableShuffle(input);
+      expect(output.length).toBe(i);
+    }
+  });
+
+  it('handles 100 different seeds', () => {
+    const input = [1, 2, 3, 4, 5];
+    for (let i = 0; i < 100; i++) {
+      const output = pseudoRandomPredictableShuffle(input, i);
+      expect(output.length).toBe(input.length);
+    }
+  });
+
+  it('same seed produces consistent result 50 times', () => {
+    const input = [1, 2, 3, 4, 5];
+    const expected = pseudoRandomPredictableShuffle(input, 42);
+    for (let i = 0; i < 50; i++) {
+      expect(pseudoRandomPredictableShuffle(input, 42)).toEqual(expected);
+    }
+  });
+
+  it('handles 100 large arrays', () => {
+    for (let i = 0; i < 100; i++) {
+      const input = Array.from({ length: 100 }, (_, j) => j);
+      const output = pseudoRandomPredictableShuffle(input);
+      expect(output.length).toBe(100);
+    }
+  });
+
+  it('handles 100 string element arrays', () => {
+    for (let i = 0; i < 100; i++) {
+      const input = Array.from({ length: 10 }, (_, j) => `item-${j}`);
+      const output = pseudoRandomPredictableShuffle(input);
+      expect(output.length).toBe(10);
+    }
+  });
 });

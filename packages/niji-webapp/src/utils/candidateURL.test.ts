@@ -46,4 +46,38 @@ describe('buildCandidateSlug', () => {
     // proposer + '-' + ('-hello-' = leading hyphen + body + trailing hyphen) = '0xabc--hello-'
     expect(buildCandidateSlug('0xabc', '  hello  ')).toBe('0xabc--hello-');
   });
+
+  it('handles 200 different address inputs', () => {
+    for (let i = 0; i < 200; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      expect(() => buildCandidateSlug(addr, 'slug')).not.toThrow();
+    }
+  });
+
+  it('handles 200 different slug inputs', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => buildCandidateSlug('0xabc', `slug-${i}`)).not.toThrow();
+    }
+  });
+
+  it('handles 100 unicode slug inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => buildCandidateSlug('0xabc', `日本語-${i}`)).not.toThrow();
+    }
+  });
+
+  it('handles 100 long slug inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      const longSlug = 'a'.repeat(i + 100);
+      expect(() => buildCandidateSlug('0xabc', longSlug)).not.toThrow();
+    }
+  });
+
+  it('handles 100 different mixed-case address inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = '0x' + i.toString(16).toUpperCase().padStart(40, '0');
+      const result = buildCandidateSlug(addr, 'slug');
+      expect(result).toBe(addr.toLowerCase() + '-slug');
+    }
+  });
 });
