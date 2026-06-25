@@ -808,4 +808,45 @@ describe('AuctionActivityWrapper', () => {
     }
     expect(container.textContent).toContain('49');
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionActivityWrapper>r6</AuctionActivityWrapper>);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionActivityWrapper key={i}>r6-{i}</AuctionActivityWrapper>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionActivityWrapper>r6-c-{i}</AuctionActivityWrapper>);
+      unmount();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<AuctionActivityWrapper>x</AuctionActivityWrapper>);
+      unmount();
+    }
+  });
+
+  it('round-6 50 rerender cycles', () => {
+    const { container, rerender } = render(<AuctionActivityWrapper>x</AuctionActivityWrapper>);
+    for (let i = 0; i < 50; i++) {
+      rerender(<AuctionActivityWrapper>r6-r-{i}</AuctionActivityWrapper>);
+    }
+    expect(container.textContent).toContain('49');
+  });
 });
