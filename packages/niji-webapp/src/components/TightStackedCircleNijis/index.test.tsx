@@ -608,4 +608,44 @@ describe('TightStackedCircleNijis', () => {
     );
     expect(container.querySelectorAll('svg').length).toBe(200);
   });
+
+  it('round-3 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<TightStackedCircleNijis nounIds={['1']} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <TightStackedCircleNijis key={i} nounIds={[`${i}`]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different nounIds arrays', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<TightStackedCircleNijis nounIds={[`${i + 100}`]} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 different array sizes', () => {
+    for (let i = 1; i <= 30; i++) {
+      const ids = Array.from({ length: i }, (_, j) => `${j}`);
+      const { unmount } = render(<TightStackedCircleNijis nounIds={ids} />);
+      unmount();
+    }
+  });
+
+  it('round-3 100 sequential renders without crash', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => render(<TightStackedCircleNijis nounIds={['1']} />)).not.toThrow();
+    }
+  });
 });
