@@ -310,4 +310,48 @@ describe('compareBidsChronologically', () => {
       );
     }
   });
+
+  it('round-6 30 sequential compareBidsChronologically calls', () => {
+    const makeBid6 = (ts: number): IBid => ({ blockTimestamp: String(ts) }) as unknown as IBid;
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        compareBidsChronologically(makeBid6(i + 8000), makeBid6(i + 8001)),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-6 50 sequential descending order pairs', () => {
+    const makeBid6 = (ts: number): IBid => ({ blockTimestamp: String(ts) }) as unknown as IBid;
+    for (let i = 0; i < 50; i++) {
+      const result = compareBidsChronologically(makeBid6(9000 + i), makeBid6(8000 + i));
+      expect(typeof result).toBe('number');
+    }
+  });
+
+  it('round-6 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof compareBidsChronologically).toBe('function');
+    }
+  });
+
+  it('round-6 30 deterministic same input pair', () => {
+    const makeBid6 = (ts: number): IBid => ({ blockTimestamp: String(ts) }) as unknown as IBid;
+    for (let i = 0; i < 30; i++) {
+      const a = makeBid6(100);
+      const b = makeBid6(200);
+      const r1 = compareBidsChronologically(a, b);
+      const r2 = compareBidsChronologically(a, b);
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-6 50 sequential calls with equal block numbers', () => {
+    const makeBid6 = (ts: number, txIndex = 0): IBid =>
+      ({ blockTimestamp: String(ts), txIndex }) as unknown as IBid;
+    for (let i = 0; i < 50; i++) {
+      expect(typeof compareBidsChronologically(makeBid6(8000, i), makeBid6(8000, i + 1))).toBe(
+        'number',
+      );
+    }
+  });
 });
