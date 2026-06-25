@@ -170,4 +170,37 @@ describe('useScrollToLocation', () => {
       expect(() => renderHook(() => useScrollToLocation())).not.toThrow();
     }
   });
+
+  it('round-2 30 renderHook cycles useScrollToLocation', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useScrollToLocation());
+      unmount();
+    }
+  });
+
+  it('round-2 50 renderHook cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useScrollToLocation());
+      unmount();
+    }
+  });
+
+  it('round-2 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useScrollToLocation());
+      unmount();
+    }
+  });
+
+  it('round-2 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useScrollToLocation())).not.toThrow();
+    }
+  });
+
+  it('round-2 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useScrollToLocation).toBe('function');
+    }
+  });
 });

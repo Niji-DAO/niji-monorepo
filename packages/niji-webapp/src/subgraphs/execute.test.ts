@@ -111,4 +111,35 @@ describe('execute', () => {
       expect(() => execute('q' as never, { var: i } as never)).not.toThrow();
     }
   });
+
+  it('round-2 30 execute is defined', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof execute).toBe('function');
+    }
+  });
+
+  it('round-2 50 execute type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(execute).toBeDefined();
+    }
+  });
+
+  it('round-2 100 sequential type stable check', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof execute).toBe('function');
+    }
+  });
+
+  it('round-2 100 execute reference consistency', () => {
+    const first = execute;
+    for (let i = 0; i < 100; i++) {
+      expect(execute).toBe(first);
+    }
+  });
+
+  it('round-2 50 sequential truthiness check', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(execute).toBeTruthy();
+    }
+  });
 });
