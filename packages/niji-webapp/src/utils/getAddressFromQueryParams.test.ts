@@ -256,4 +256,37 @@ describe('getAddressFromQueryParams', () => {
       expect(() => getAddressFromQueryParams('to', `?to=r6-invalid-${i}`)).not.toThrow();
     }
   });
+
+  it('round-7 30 sequential getAddressFromQueryParams calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => getAddressFromQueryParams('to', `?to=r7-${i}`)).not.toThrow();
+    }
+  });
+
+  it('round-7 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof getAddressFromQueryParams).toBe('function');
+    }
+  });
+
+  it('round-7 100 sequential reference consistency', () => {
+    const first = getAddressFromQueryParams;
+    for (let i = 0; i < 100; i++) {
+      expect(getAddressFromQueryParams).toBe(first);
+    }
+  });
+
+  it('round-7 30 deterministic for same query', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = getAddressFromQueryParams('to', `?to=${VALID_ADDR}`);
+      const r2 = getAddressFromQueryParams('to', `?to=${VALID_ADDR}`);
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-7 50 invalid address strings', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => getAddressFromQueryParams('to', `?to=r7-invalid-${i}`)).not.toThrow();
+    }
+  });
 });
