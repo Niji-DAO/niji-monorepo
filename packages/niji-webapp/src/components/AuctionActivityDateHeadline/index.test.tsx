@@ -837,4 +837,48 @@ describe('AuctionActivityDateHeadline', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionActivityDateHeadline startTime={1700000000n} />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionActivityDateHeadline key={i} startTime={BigInt(1700000000 + i)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 different startTime values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <AuctionActivityDateHeadline startTime={BigInt(1700000000 + i + 9000)} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<AuctionActivityDateHeadline startTime={1700000000n} />);
+      unmount();
+    }
+  });
+
+  it('round-6 100 rerender cycles', () => {
+    const { rerender } = render(<AuctionActivityDateHeadline startTime={1700000000n} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<AuctionActivityDateHeadline startTime={BigInt(4000000000 + i * 60)} />),
+      ).not.toThrow();
+    }
+  });
 });
