@@ -802,4 +802,42 @@ describe('DelegationCandidateVoteCountInfo', () => {
       expect(() => render(<DelegationCandidateVoteCountInfo voteCount={i + 2000} />)).not.toThrow();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<DelegationCandidateVoteCountInfo voteCount={5} />);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DelegationCandidateVoteCountInfo key={i} voteCount={i + 100} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 different voteCount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<DelegationCandidateVoteCountInfo voteCount={i + 5000} />);
+      unmount();
+    }
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<DelegationCandidateVoteCountInfo voteCount={i + 7000} />)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => render(<DelegationCandidateVoteCountInfo voteCount={i + 9000} />)).not.toThrow();
+    }
+  });
 });
