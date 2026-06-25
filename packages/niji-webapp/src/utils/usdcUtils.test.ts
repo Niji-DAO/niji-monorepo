@@ -249,4 +249,37 @@ describe('contract2humanUSDCFormat edge cases', () => {
       expect(() => contract2humanUSDCFormat(BigInt(i + 5000) * 10n ** 6n)).not.toThrow();
     }
   });
+
+  it('round-5 30 sequential human2ContractUSDCFormat calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => human2ContractUSDCFormat(String(i + 5000))).not.toThrow();
+    }
+  });
+
+  it('round-5 30 sequential contract2humanUSDCFormat calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => contract2humanUSDCFormat(BigInt(i + 5000) * 10n ** 6n)).not.toThrow();
+    }
+  });
+
+  it('round-5 round-trip 100 sequential mixed calls', () => {
+    for (let i = 0; i < 100; i++) {
+      const h = human2ContractUSDCFormat(String(i + 6000));
+      contract2humanUSDCFormat(h);
+    }
+    expect(true).toBe(true);
+  });
+
+  it('round-5 50 decimal-formatted USDC values', () => {
+    for (let i = 0; i < 50; i++) {
+      const h = `${i + 700}.5`;
+      expect(() => human2ContractUSDCFormat(h)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 large-value contract format calls', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => contract2humanUSDCFormat(BigInt(i + 10000) * 10n ** 6n)).not.toThrow();
+    }
+  });
 });

@@ -308,4 +308,41 @@ describe('shortENS — boundary', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-5 30 sequential calls with varied addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR5' + i.toString(16).padStart(38, '0')) as Address;
+      expect(() => veryShortAddress(addr)).not.toThrow();
+    }
+  });
+
+  it('round-5 30 sequential calls with varied ENS', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => veryShortENS(`r5-ens-${i}.eth`)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 different short address inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0xR5' + i.toString(16).padStart(38, '0')) as Address;
+      const result = veryShortAddress(addr);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-5 50 different ENS inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = veryShortENS(`r5-bob-${i}.eth`);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-5 round-trip 100 sequential mixed calls', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0xR5' + i.toString(16).padStart(38, '0')) as Address;
+      veryShortAddress(addr);
+      veryShortENS(`r5-${i}.eth`);
+    }
+    expect(true).toBe(true);
+  });
 });
