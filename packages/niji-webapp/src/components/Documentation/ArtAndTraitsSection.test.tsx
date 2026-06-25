@@ -228,4 +228,43 @@ describe('ArtAndTraitsSection', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<ArtAndTraitsSection />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 100 instances variant', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ArtAndTraitsSection key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => wrap(<ArtAndTraitsSection />)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<ArtAndTraitsSection />);
+      unmount();
+    }
+  });
+
+  it('round-4 200 sequential mount cycles third', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = wrap(<ArtAndTraitsSection />);
+      unmount();
+    }
+  });
 });
