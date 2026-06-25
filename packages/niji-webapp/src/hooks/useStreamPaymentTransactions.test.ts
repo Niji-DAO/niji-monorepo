@@ -227,4 +227,45 @@ describe('useStreamPaymentTransactions', () => {
     expect(weth[1].calldata).toBe('0x');
     expect(weth[2].calldata).toMatch(/^0x/);
   });
+
+  it('handles 50 different USDC amounts', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        useStreamPaymentTransactions(i + 1, '0xRECIP', 'USDC' as never, 100, 200, 0n),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 50 different WETH amounts', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        useStreamPaymentTransactions(i + 1, '0xRECIP', 'WETH' as never, 100, 200, 0n),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 50 different recipient addresses', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      expect(() =>
+        useStreamPaymentTransactions(1, addr, 'USDC' as never, 100, 200, 0n),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 30 different startTime values', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        useStreamPaymentTransactions(1, '0xR', 'USDC' as never, 100 + i, 200, 0n),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 30 different endTime values', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        useStreamPaymentTransactions(1, '0xR', 'USDC' as never, 100, 200 + i, 0n),
+      ).not.toThrow();
+    }
+  });
 });

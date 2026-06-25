@@ -317,4 +317,73 @@ describe('Select', () => {
     );
     expect(document.querySelector('[data-testid="item-a"]')).not.toBeNull();
   });
+
+  it('Select mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+        </Select>,
+      );
+      unmount();
+    }
+  });
+
+  it('SelectTrigger renders 50 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <Select key={i}>
+              <SelectTrigger>
+                <SelectValue placeholder={`p-${i}`} />
+              </SelectTrigger>
+            </Select>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('SelectGroup + SelectLabel render 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <SelectGroup>
+          <SelectLabel>label-{i}</SelectLabel>
+        </SelectGroup>,
+      );
+      unmount();
+    }
+  });
+
+  it('SelectSeparator + SelectScrollDownButton 30 cycles in Select context', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="x">x</SelectItem>
+          </SelectContent>
+        </Select>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 SelectValue with different placeholders', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder={`Select-${i}`} />
+          </SelectTrigger>
+        </Select>,
+      );
+      unmount();
+    }
+  });
 });

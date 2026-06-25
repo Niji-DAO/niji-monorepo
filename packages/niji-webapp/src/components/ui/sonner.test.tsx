@@ -139,4 +139,54 @@ describe('Toaster (sonner wrapper)', () => {
     const opts = JSON.parse(t?.getAttribute('data-toast-options') ?? '{}');
     expect(opts.classNames.description).toContain('text-muted-foreground');
   });
+
+  it('mount-unmount 100 cycles with system theme', () => {
+    useThemeMock.mockReturnValue({ theme: 'system' });
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Toaster />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    useThemeMock.mockReturnValue({ theme: 'light' });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <Toaster key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different theme values', () => {
+    const themes = ['light', 'dark', 'system'];
+    for (let i = 0; i < 30; i++) {
+      useThemeMock.mockReturnValue({ theme: themes[i % 3] });
+      const { unmount } = render(<Toaster />);
+      unmount();
+    }
+  });
+
+  it('all 50 Toaster instances render without crash', () => {
+    useThemeMock.mockReturnValue({ theme: 'light' });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <Toaster key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 100 renders without crash', () => {
+    useThemeMock.mockReturnValue({ theme: 'dark' });
+    for (let i = 0; i < 100; i++) {
+      expect(() => render(<Toaster />)).not.toThrow();
+    }
+  });
 });
