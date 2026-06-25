@@ -362,4 +362,43 @@ describe('SponsorsList', () => {
     for (let i = 0; i < 200; i++) onOpen();
     expect(onOpen).toHaveBeenCalledTimes(200);
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<SponsorsList {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 instances rendered together', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SponsorsList key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => wrap(<SponsorsList {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('round-3 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<SponsorsList {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-3 100 sequential mount cycles third', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<SponsorsList {...baseProps} />);
+      unmount();
+    }
+  });
 });

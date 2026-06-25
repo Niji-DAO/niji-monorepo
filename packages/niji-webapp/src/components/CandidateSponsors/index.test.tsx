@@ -733,4 +733,43 @@ describe('CandidateSponsors', () => {
     for (let i = 0; i < 100; i++) setDataFetchPollInterval(0);
     expect(setDataFetchPollInterval).toHaveBeenCalledTimes(100);
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CandidateSponsors key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<CandidateSponsors {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('round-3 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-3 100 mount cycles third', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+  });
 });
