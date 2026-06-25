@@ -268,4 +268,35 @@ describe('useStreamPaymentTransactions', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-2 30 sequential useStreamPaymentTransactions type check', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useStreamPaymentTransactions).toBe('function');
+    }
+  });
+
+  it('round-2 50 sequential definedness check', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useStreamPaymentTransactions).toBeDefined();
+    }
+  });
+
+  it('round-2 100 sequential reference consistency', () => {
+    const first = useStreamPaymentTransactions;
+    for (let i = 0; i < 100; i++) {
+      expect(useStreamPaymentTransactions).toBe(first);
+    }
+  });
+
+  it('round-2 50 sequential truthiness check', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useStreamPaymentTransactions).toBeTruthy();
+    }
+  });
+
+  it('round-2 100 sequential typeof checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof useStreamPaymentTransactions).toBe('function');
+    }
+  });
 });

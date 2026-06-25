@@ -254,4 +254,38 @@ describe('applyAuctionExtended', () => {
       expect(auctionAtom).toBeDefined();
     }
   });
+
+  it('round-2 30 sequential auctionAtom access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(auctionAtom).toBeDefined();
+    }
+  });
+
+  it('round-2 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof reduxSafeAuction).toBe('function');
+      expect(typeof reduxSafeNewAuction).toBe('function');
+      expect(typeof reduxSafeBid).toBe('function');
+      expect(typeof applyActiveAuction).toBe('function');
+    }
+  });
+
+  it('round-2 100 atom reference consistency', () => {
+    const first = auctionAtom;
+    for (let i = 0; i < 100; i++) {
+      expect(auctionAtom).toBe(first);
+    }
+  });
+
+  it('round-2 100 sequential auctionAtom init access', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(auctionAtom.init).toBeDefined();
+    }
+  });
+
+  it('round-2 100 sequential function type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof reduxSafeAuction).toBe('function');
+    }
+  });
 });

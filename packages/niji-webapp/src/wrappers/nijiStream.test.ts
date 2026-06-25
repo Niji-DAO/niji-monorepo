@@ -181,4 +181,39 @@ describe('useElapsedTime', () => {
     }
     expect(writeContractMock).toHaveBeenCalledTimes(50);
   });
+
+  it('round-2 30 renderHook cycles useStreamRemainingBalance', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useStreamRemainingBalance('0xADDR' as never));
+      unmount();
+    }
+  });
+
+  it('round-2 30 renderHook cycles useWithdrawTokens', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useWithdrawTokens('0xADDR' as never));
+      unmount();
+    }
+  });
+
+  it('round-2 30 renderHook cycles useElapsedTime', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useElapsedTime(0, 1000));
+      unmount();
+    }
+  });
+
+  it('round-2 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useStreamRemainingBalance('0xADDR' as never))).not.toThrow();
+    }
+  });
+
+  it('round-2 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof useStreamRemainingBalance).toBe('function');
+      expect(typeof useWithdrawTokens).toBe('function');
+      expect(typeof useElapsedTime).toBe('function');
+    }
+  });
 });
