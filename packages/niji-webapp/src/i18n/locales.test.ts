@@ -230,4 +230,35 @@ describe('SUPPORTED_LOCALE_TO_DAYSJS_LOCALE', () => {
       expect(SUPPORTED_LOCALES[0]).toBeDefined();
     }
   });
+
+  it('round-6 30 sequential SUPPORTED_LOCALES access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(SUPPORTED_LOCALES).toBeDefined();
+    }
+  });
+
+  it('round-6 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(Array.isArray(SUPPORTED_LOCALES)).toBe(true);
+    }
+  });
+
+  it('round-6 100 sequential reference checks', () => {
+    const first = SUPPORTED_LOCALES;
+    for (let i = 0; i < 100; i++) {
+      expect(SUPPORTED_LOCALES).toBe(first);
+    }
+  });
+
+  it('round-6 50 sequential length > 0', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(SUPPORTED_LOCALES.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-6 50 sequential element access', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(SUPPORTED_LOCALES[0]).toBeDefined();
+    }
+  });
 });

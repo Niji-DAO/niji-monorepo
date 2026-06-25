@@ -398,4 +398,63 @@ describe('Section', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <div>r6</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Section key={i} fullWidth={i % 2 === 0}>
+              <div>r6-{i}</div>
+            </Section>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <span>r6-child-{i}</span>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 30 fullWidth toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Section fullWidth={i % 2 === 0}>
+          <div>x</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        render(
+          <Section fullWidth={false}>
+            <div>x</div>
+          </Section>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });

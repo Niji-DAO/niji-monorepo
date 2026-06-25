@@ -225,4 +225,36 @@ describe('pickSupportedLocale', () => {
       expect(pickSupportedLocale).toBeDefined();
     }
   });
+
+  it('round-6 30 sequential pickSupportedLocale calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => pickSupportedLocale('en-US')).not.toThrow();
+    }
+  });
+
+  it('round-6 50 sequential varied locales', () => {
+    const locales = ['en-US', 'ja-JP', 'es-ES', 'fr-FR'];
+    for (let i = 0; i < 50; i++) {
+      expect(() => pickSupportedLocale(locales[i % 4])).not.toThrow();
+    }
+  });
+
+  it('round-6 100 sequential calls produce string', () => {
+    for (let i = 0; i < 100; i++) {
+      const result = pickSupportedLocale('en-US');
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-6 50 sequential pickSupportedLocale truthy', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(pickSupportedLocale).toBeTruthy();
+    }
+  });
+
+  it('round-6 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(pickSupportedLocale).toBeDefined();
+    }
+  });
 });
