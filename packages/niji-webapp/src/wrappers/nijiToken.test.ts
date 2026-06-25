@@ -595,4 +595,38 @@ describe('useNounSeed', () => {
       expect(typeof useNounTokenBalance).toBe('function');
     }
   });
+
+  it('round-6 30 renderHook cycles useNounTokenBalance', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useNounTokenBalance('0xR6' as never));
+      unmount();
+    }
+  });
+
+  it('round-6 50 renderHook cycles varied addresses', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0xR6' + i.toString(16).padStart(38, '0')) as never;
+      const { unmount } = renderHook(() => useNounTokenBalance(addr));
+      unmount();
+    }
+  });
+
+  it('round-6 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useNounTokenBalance('0xR6' as never));
+      unmount();
+    }
+  });
+
+  it('round-6 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useNounTokenBalance('0xR6' as never))).not.toThrow();
+    }
+  });
+
+  it('round-6 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useNounTokenBalance).toBe('function');
+    }
+  });
 });
