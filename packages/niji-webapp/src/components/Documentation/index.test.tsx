@@ -531,4 +531,51 @@ describe('Documentation', () => {
       expect(() => render(<Documentation />)).not.toThrow();
     }
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<Documentation />);
+      unmount();
+    }
+  });
+
+  it('renders 300 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <Documentation key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 200 instances have all 4 sections', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <Documentation key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="about-section"]').length).toBe(200);
+    expect(container.querySelectorAll('[data-testid="art-section"]').length).toBe(200);
+    expect(container.querySelectorAll('[data-testid="gov-section"]').length).toBe(200);
+    expect(container.querySelectorAll('[data-testid="nijiders-section"]').length).toBe(200);
+  });
+
+  it('rapid 300 consecutive renders without crash', () => {
+    for (let i = 0; i < 300; i++) {
+      expect(() => render(<Documentation />)).not.toThrow();
+    }
+  });
+
+  it('rerender 100 times preserves structure', () => {
+    const { container, rerender } = render(<Documentation />);
+    for (let i = 0; i < 100; i++) {
+      rerender(<Documentation />);
+    }
+    expect(container.querySelector('[data-testid="about-section"]')).not.toBeNull();
+  });
 });
