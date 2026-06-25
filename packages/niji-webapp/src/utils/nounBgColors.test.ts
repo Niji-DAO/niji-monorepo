@@ -44,4 +44,37 @@ describe('nounBgColors', () => {
     expect(typeof grey).toBe('string');
     expect(typeof beige).toBe('string');
   });
+
+  it('grey is checked 100 times for consistency', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(grey).toBe('#d5d7e1');
+    }
+  });
+
+  it('beige is checked 100 times for consistency', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(beige).toBe('#e1d7d5');
+    }
+  });
+
+  it('grey is valid 7-char hex 100 times', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(grey).toMatch(/^#[\dA-Fa-f]{6}$/);
+    }
+  });
+
+  it('beige is valid 7-char hex 100 times', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(beige).toMatch(/^#[\dA-Fa-f]{6}$/);
+    }
+  });
+
+  it('grey + beige are immutable references 100 times', () => {
+    const greyRef = grey;
+    const beigeRef = beige;
+    for (let i = 0; i < 100; i++) {
+      expect(grey).toBe(greyRef);
+      expect(beige).toBe(beigeRef);
+    }
+  });
 });

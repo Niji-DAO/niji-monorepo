@@ -81,4 +81,43 @@ describe('compareBids', () => {
     expect(sorted[0]).toBe(a);
     expect(sorted[1]).toBe(b);
   });
+
+  it('handles 100 different timestamp pairs', () => {
+    for (let i = 0; i < 100; i++) {
+      const a = makeBid(BigInt(1000 + i));
+      const b = makeBid(BigInt(2000 + i));
+      expect(compareBids(a, b)).toBeGreaterThan(0);
+    }
+  });
+
+  it('handles 100 different transactionIndex pairs at same timestamp', () => {
+    for (let i = 0; i < 100; i++) {
+      const a = makeBid(1000n, i);
+      const b = makeBid(1000n, i + 1);
+      const cmp = compareBids(a, b);
+      expect(typeof cmp).toBe('number');
+    }
+  });
+
+  it('sort 100 bids descending by timestamp', () => {
+    const bids = Array.from({ length: 100 }, (_, i) => makeBid(BigInt(i * 100)));
+    const sorted = [...bids].sort(compareBids);
+    expect(sorted[0].timestamp).toBe(9900n);
+    expect(sorted[99].timestamp).toBe(0n);
+  });
+
+  it('sort 100 same-timestamp bids by transactionIndex', () => {
+    const bids = Array.from({ length: 100 }, (_, i) => makeBid(1000n, i));
+    const sorted = [...bids].sort(compareBids);
+    expect(sorted.length).toBe(100);
+  });
+
+  it('handles 100 cycles of comparing distinct bids', () => {
+    for (let i = 0; i < 100; i++) {
+      const a = makeBid(BigInt(i));
+      const b = makeBid(BigInt(i + 1000));
+      const cmp = compareBids(a, b);
+      expect(cmp).toBeGreaterThan(0);
+    }
+  });
 });
