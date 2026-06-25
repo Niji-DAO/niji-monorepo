@@ -110,4 +110,36 @@ describe('getGrayBackgroundSVG', () => {
       expect(getGrayBackgroundSVG()).toBe(first);
     }
   });
+
+  it('round-3 30 sequential getGrayBackgroundSVG calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => getGrayBackgroundSVG()).not.toThrow();
+    }
+  });
+
+  it('round-3 50 returns string-typed SVG', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = getGrayBackgroundSVG();
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-3 100 sequential calls produce valid SVG content', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(getGrayBackgroundSVG().length).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-3 50 SVG output contains svg keyword', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(getGrayBackgroundSVG()).toContain('svg');
+    }
+  });
+
+  it('round-3 100 consistent output across calls', () => {
+    const first = getGrayBackgroundSVG();
+    for (let i = 0; i < 100; i++) {
+      expect(getGrayBackgroundSVG()).toBe(first);
+    }
+  });
 });
