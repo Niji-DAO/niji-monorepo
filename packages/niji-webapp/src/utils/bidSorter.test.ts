@@ -218,4 +218,49 @@ describe('compareBidsChronologically', () => {
       );
     }
   });
+
+  it('round-4 30 sequential compareBidsChronologically calls', () => {
+    const makeBid4 = (ts: number, txIndex = 0): IBid =>
+      ({ blockTimestamp: String(ts), txIndex }) as unknown as IBid;
+    for (let i = 0; i < 30; i++) {
+      expect(() => compareBidsChronologically(makeBid4(i), makeBid4(i + 1))).not.toThrow();
+    }
+  });
+
+  it('round-4 50 sequential variant cycles', () => {
+    const makeBid4 = (ts: number, txIndex = 0): IBid =>
+      ({ blockTimestamp: String(ts), txIndex }) as unknown as IBid;
+    for (let i = 0; i < 50; i++) {
+      const result = compareBidsChronologically(makeBid4(i * 3), makeBid4(i * 3 + 1));
+      expect(typeof result).toBe('number');
+    }
+  });
+
+  it('round-4 100 sequential calls', () => {
+    const makeBid4 = (ts: number, txIndex = 0): IBid =>
+      ({ blockTimestamp: String(ts), txIndex }) as unknown as IBid;
+    for (let i = 0; i < 100; i++) {
+      expect(typeof compareBidsChronologically(makeBid4(2000 + i), makeBid4(3000 + i))).toBe(
+        'number',
+      );
+    }
+  });
+
+  it('round-4 50 sequential calls preserve ordering signal', () => {
+    const makeBid4 = (ts: number, txIndex = 0): IBid =>
+      ({ blockTimestamp: String(ts), txIndex }) as unknown as IBid;
+    for (let i = 0; i < 50; i++) {
+      expect(compareBidsChronologically(makeBid4(2000 + i), makeBid4(3000 + i))).not.toBe(0);
+    }
+  });
+
+  it('round-4 50 sequential calls with equal block numbers', () => {
+    const makeBid4 = (ts: number, txIndex = 0): IBid =>
+      ({ blockTimestamp: String(ts), txIndex }) as unknown as IBid;
+    for (let i = 0; i < 50; i++) {
+      expect(typeof compareBidsChronologically(makeBid4(2000, i), makeBid4(2000, i + 1))).toBe(
+        'number',
+      );
+    }
+  });
 });
