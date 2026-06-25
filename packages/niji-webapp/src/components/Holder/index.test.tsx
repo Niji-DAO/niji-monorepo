@@ -771,4 +771,67 @@ describe('Holder', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 200 cycles', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<Holder nounId={BigInt(i)} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('renders 100 instances all with loading state', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <Holder key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different owner addresses with data', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 50; i++) {
+      useSubgraphQueryMock.mockReturnValue({
+        loading: false,
+        error: undefined,
+        data: { noun: { owner: { id: '0x' + i.toString(16).padStart(40, '0') } } },
+      });
+      const { unmount } = render(<Holder nounId={BigInt(i)} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('rapid 100 isNounders toggle rerender', () => {
+    useAtomValueMock.mockReturnValue(true);
+    useSubgraphQueryMock.mockReturnValue({
+      loading: false,
+      error: undefined,
+      data: { noun: { owner: { id: '0xOWNER' } } },
+    });
+    const { rerender } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<Holder nounId={1n} isNounders={i % 2 === 0} />)).not.toThrow();
+    }
+  });
+
+  it('handles 30 different error messages', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 30; i++) {
+      useSubgraphQueryMock.mockReturnValue({
+        loading: false,
+        error: new Error(`err-${i}-${i * 100}`),
+        data: undefined,
+      });
+      const { unmount } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
 });

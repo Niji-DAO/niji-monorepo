@@ -1082,4 +1082,88 @@ describe('CreateProposalButton', () => {
     );
     expect(container.querySelectorAll('button').length).toBe(100);
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <CreateProposalButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          hasEnoughVote={true}
+          isFormInvalid={false}
+          handleCreateProposal={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <CreateProposalButton
+              key={i}
+              isLoading={false}
+              hasActiveOrPendingProposal={false}
+              hasEnoughVote={true}
+              isFormInvalid={false}
+              handleCreateProposal={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 1000 click events fire handler', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateProposalButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        hasEnoughVote={true}
+        isFormInvalid={false}
+        handleCreateProposal={handle}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 1000; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(1000);
+  });
+
+  it('handles 100 different proposalThreshold values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <CreateProposalButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          hasEnoughVote={false}
+          isFormInvalid={false}
+          proposalThreshold={i}
+          handleCreateProposal={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('all 200 instances render button', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <CreateProposalButton
+            key={i}
+            isLoading={false}
+            hasActiveOrPendingProposal={false}
+            hasEnoughVote={true}
+            isFormInvalid={false}
+            handleCreateProposal={() => {}}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(200);
+  });
 });

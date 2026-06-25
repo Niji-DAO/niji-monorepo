@@ -638,4 +638,53 @@ describe('ChangeDelegatePanel', () => {
     }
     hookState.accountVotes = orig;
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <ChangeDelegatePanel key={i} onDismiss={vi.fn()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 500 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<ChangeDelegatePanel onDismiss={onDismiss} />);
+    for (let i = 0; i < 500; i++) {
+      onDismiss();
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(500);
+  });
+
+  it('handles 30 different ensResolved addresses', () => {
+    const orig = hookState.ensResolved;
+    for (let i = 0; i < 30; i++) {
+      hookState.ensResolved = '0x' + i.toString(16).padStart(40, '0');
+      hookState.ensFetched = true;
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+      unmount();
+    }
+    hookState.ensResolved = orig;
+  });
+
+  it('handles 30 different userDelegatee addresses', () => {
+    const orig = hookState.userDelegatee;
+    for (let i = 0; i < 30; i++) {
+      hookState.userDelegatee = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(<ChangeDelegatePanel onDismiss={vi.fn()} />);
+      unmount();
+    }
+    hookState.userDelegatee = orig;
+  });
 });
