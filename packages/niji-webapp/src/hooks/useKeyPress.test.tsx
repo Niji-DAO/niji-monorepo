@@ -267,4 +267,37 @@ describe('useKeyPress', () => {
       expect(typeof useKeyPress).toBe('function');
     }
   });
+
+  it('round-6 30 renderHook cycles useKeyPress', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useKeyPress('Enter'));
+      unmount();
+    }
+  });
+
+  it('round-6 50 renderHook cycles varied keys', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useKeyPress(`r6-${i}`));
+      unmount();
+    }
+  });
+
+  it('round-6 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useKeyPress('Escape'));
+      unmount();
+    }
+  });
+
+  it('round-6 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useKeyPress('Tab'))).not.toThrow();
+    }
+  });
+
+  it('round-6 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useKeyPress).toBe('function');
+    }
+  });
 });

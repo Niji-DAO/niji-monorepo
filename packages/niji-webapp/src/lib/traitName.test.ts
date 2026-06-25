@@ -233,4 +233,36 @@ describe('traitName', () => {
       expect(() => traitName('background', i % 2)).not.toThrow();
     }
   });
+
+  it('round-6 30 sequential traitName calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => traitName('background', 0)).not.toThrow();
+    }
+  });
+
+  it('round-6 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof traitName).toBe('function');
+    }
+  });
+
+  it('round-6 100 sequential calls produce string', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof traitName('background', i % 2)).toBe('string');
+    }
+  });
+
+  it('round-6 30 deterministic for same input', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = traitName('background', 0);
+      const r2 = traitName('background', 0);
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-6 30 various background calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => traitName('background', i % 2)).not.toThrow();
+    }
+  });
 });
