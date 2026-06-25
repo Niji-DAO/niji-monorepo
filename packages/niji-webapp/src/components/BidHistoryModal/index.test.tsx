@@ -508,4 +508,52 @@ describe('BidHistoryModal', () => {
     const a = { ...auction, amount: 1000000000000000000000n };
     expect(() => render(<BidHistoryModal onDismiss={() => {}} auction={a} />)).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BidHistoryModal onDismiss={() => {}} auction={auction} />);
+      unmount();
+    }
+  });
+
+  it('Backdrop rapid 100 clicks invoke onDismiss', () => {
+    const onDismiss = vi.fn();
+    const { container } = render(<Backdrop onDismiss={onDismiss} />);
+    const div = container.querySelector('div')!;
+    for (let i = 0; i < 100; i++) fireEvent.click(div);
+    expect(onDismiss).toHaveBeenCalledTimes(100);
+  });
+
+  it('renders auction with nounId 0n correctly', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const a = { ...auction, nounId: 0n };
+    expect(() => render(<BidHistoryModal onDismiss={() => {}} auction={a} />)).not.toThrow();
+  });
+
+  it('handles 1000 bid entries', () => {
+    const bids = Array.from({ length: 1000 }, (_, i) => ({
+      transactionHash: `0x${i.toString(16).padStart(64, '0')}`,
+      sender: '0xAA',
+      value: BigInt(i),
+      nounId: 42n,
+      extended: false,
+      transactionIndex: i,
+      timestamp: BigInt(1700000000 + i),
+    }));
+    useAuctionBidsMock.mockReturnValue(bids);
+    expect(() => render(<BidHistoryModal onDismiss={() => {}} auction={auction} />)).not.toThrow();
+  });
+
+  it('rerender with auction prop change 30 times', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const { rerender } = render(<BidHistoryModal onDismiss={() => {}} auction={auction} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <BidHistoryModal onDismiss={() => {}} auction={{ ...auction, nounId: BigInt(i) }} />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });

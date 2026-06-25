@@ -452,4 +452,51 @@ describe('BidHistoryItem Component', () => {
     const b = { ...mockBid, extended: true };
     expect(() => render(<BidHistoryItem bid={b} classes={mockClasses} />)).not.toThrow();
   });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <BidHistoryItem key={i} bid={mockBid} classes={mockClasses} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<BidHistoryItem bid={mockBid} classes={mockClasses} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different sender addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const b = {
+        ...mockBid,
+        sender: ('0x' + i.toString(16).padStart(40, '0')) as Address,
+      };
+      expect(() => render(<BidHistoryItem bid={b} classes={mockClasses} />)).not.toThrow();
+    }
+  });
+
+  it('handles 50 different timestamps', () => {
+    for (let i = 0; i < 50; i++) {
+      const b = { ...mockBid, timestamp: BigInt(1700000000 + i * 3600) };
+      expect(() => render(<BidHistoryItem bid={b} classes={mockClasses} />)).not.toThrow();
+    }
+  });
+
+  it('all 50 instances render li elements', () => {
+    const { container } = render(
+      <ul>
+        {Array.from({ length: 50 }, (_, i) => (
+          <BidHistoryItem key={i} bid={mockBid} classes={mockClasses} />
+        ))}
+      </ul>,
+    );
+    expect(container.querySelectorAll('li').length).toBe(50);
+  });
 });
