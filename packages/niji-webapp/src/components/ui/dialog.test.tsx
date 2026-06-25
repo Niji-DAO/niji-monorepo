@@ -214,4 +214,74 @@ describe('Dialog', () => {
     );
     expect(container.querySelector('button')?.textContent).toBe('click');
   });
+
+  it('Dialog mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Dialog>
+          <DialogTrigger>open</DialogTrigger>
+        </Dialog>,
+      );
+      unmount();
+    }
+  });
+
+  it('Dialog renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <Dialog key={i}>
+              <DialogTrigger>btn-{i}</DialogTrigger>
+            </Dialog>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('Dialog with DialogTitle renders 30 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Dialog key={i}>
+              <DialogContent>
+                <DialogTitle>title-{i}</DialogTitle>
+              </DialogContent>
+            </Dialog>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('Dialog with DialogDescription renders 30 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Dialog key={i}>
+              <DialogContent>
+                <DialogTitle>t</DialogTitle>
+                <DialogDescription>desc-{i}</DialogDescription>
+              </DialogContent>
+            </Dialog>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('DialogHeader + DialogFooter mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <>
+          <DialogHeader>header</DialogHeader>
+          <DialogFooter>footer</DialogFooter>
+        </>,
+      );
+      unmount();
+    }
+  });
 });

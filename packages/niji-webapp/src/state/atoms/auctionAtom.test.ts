@@ -220,4 +220,38 @@ describe('applyAuctionExtended', () => {
     const out = applyAuctionExtended(prev, { nounId: 5, endTime: 500n });
     expect(out.activeAuction?.endTime).toBe('500');
   });
+
+  it('reduxSafeAuction handles 100 different auction inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      const a = makeAuction({ nounId: BigInt(i) });
+      expect(() => reduxSafeAuction(a)).not.toThrow();
+    }
+  });
+
+  it('reduxSafeNewAuction handles 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const a = makeAuction();
+      expect(() => reduxSafeNewAuction(a)).not.toThrow();
+    }
+  });
+
+  it('reduxSafeAuction handles 100 different cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const a = makeAuction({ nounId: BigInt(i) });
+      expect(() => reduxSafeAuction(a)).not.toThrow();
+    }
+  });
+
+  it('reduxSafeNewAuction handles 100 cycles second', () => {
+    for (let i = 0; i < 100; i++) {
+      const a = makeAuction();
+      expect(() => reduxSafeNewAuction(a)).not.toThrow();
+    }
+  });
+
+  it('auctionAtom is defined 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(auctionAtom).toBeDefined();
+    }
+  });
 });

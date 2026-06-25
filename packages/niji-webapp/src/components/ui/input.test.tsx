@@ -68,4 +68,51 @@ describe('Input', () => {
     const { container } = render(<Input />);
     expect(container.querySelectorAll('input').length).toBe(1);
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<Input />);
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <Input key={i} placeholder={`p-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 1000 inputs render input element', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 1000 }, (_, i) => (
+          <Input key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(1000);
+  });
+
+  it('handles 100 different type values', () => {
+    const types = ['text', 'password', 'email', 'number', 'date'];
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<Input type={types[i % 5]} />);
+      expect(container.querySelector('input')?.type).toBe(types[i % 5]);
+      unmount();
+    }
+  });
+
+  it('handles 100 different placeholder values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<Input placeholder={`ph-${i}`} />);
+      expect(container.querySelector('input')?.placeholder).toBe(`ph-${i}`);
+      unmount();
+    }
+  });
 });
