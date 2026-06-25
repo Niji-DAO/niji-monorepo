@@ -508,4 +508,43 @@ describe('VoteModal', () => {
       unmount();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteModal {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteModal key={i} {...baseProps} availableVotes={i + 200} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 different availableVotes values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteModal {...baseProps} availableVotes={i + 5000} />);
+      unmount();
+    }
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<VoteModal {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<VoteModal {...baseProps} />);
+      unmount();
+    }
+  });
 });

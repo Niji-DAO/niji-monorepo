@@ -693,4 +693,49 @@ describe('ModalLabel', () => {
     }
     expect(container.querySelector('div')?.textContent).toContain('99');
   });
+
+  it('round-5 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<ModalLabel>r5</ModalLabel>);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 1000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <ModalLabel key={i}>r5-{i}</ModalLabel>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 100 different children values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ModalLabel>r5-v-{i}</ModalLabel>);
+      unmount();
+    }
+  });
+
+  it('round-5 all 200 instances render', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <ModalLabel key={i}>r5-x</ModalLabel>
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(200);
+  });
+
+  it('round-5 100 rerender cycles', () => {
+    const { container, rerender } = render(<ModalLabel>x</ModalLabel>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<ModalLabel>r5-r-{i}</ModalLabel>);
+    }
+    expect(container.querySelector('div')?.textContent).toContain('99');
+  });
 });
