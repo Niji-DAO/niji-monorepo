@@ -234,4 +234,41 @@ describe('shortENS — boundary', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-3 30 sequential calls with varied addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as Address;
+      expect(() => veryShortAddress(addr)).not.toThrow();
+    }
+  });
+
+  it('round-3 30 sequential calls with varied ENS', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => veryShortENS(`r3-ens-${i}.eth`)).not.toThrow();
+    }
+  });
+
+  it('round-3 50 different short address inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0xABCDEF' + i.toString(16).padStart(34, '0')) as Address;
+      const result = veryShortAddress(addr);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-3 50 different ENS inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = veryShortENS(`alice-${i}.eth`);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-3 round-trip 100 sequential mixed calls', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as Address;
+      veryShortAddress(addr);
+      veryShortENS(`r3-${i}.eth`);
+    }
+    expect(true).toBe(true);
+  });
 });

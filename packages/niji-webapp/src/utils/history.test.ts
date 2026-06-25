@@ -99,4 +99,35 @@ describe('nounPath', () => {
       expect(nounPath(String(i)).length).toBeGreaterThan(0);
     }
   });
+
+  it('round-3 30 sequential nounPath calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => nounPath(String(i))).not.toThrow();
+    }
+  });
+
+  it('round-3 50 returns string-typed path for each call', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = nounPath(String(i + 100));
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-3 100 sequential mixed-id calls', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof nounPath(String(i))).toBe('string');
+    }
+  });
+
+  it('round-3 50 path is non-empty', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(nounPath(String(i + 200)).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-3 100 sequential calls produce non-empty results', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(nounPath(String(i)).length).toBeGreaterThan(0);
+    }
+  });
 });
