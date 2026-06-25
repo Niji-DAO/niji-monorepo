@@ -457,4 +457,56 @@ describe('VoteProgressBar', () => {
     }
     expect(container.querySelectorAll('div').length).toBe(2);
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <VoteProgressBar key={i} variant={VoteCardVariant.FOR} percentage={i % 100} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 100 instances with ABSTAIN have abstain class', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <VoteProgressBar key={i} variant={VoteCardVariant.ABSTAIN} percentage={i % 100} />
+        ))}
+      </>,
+    );
+    const allDivs = container.querySelectorAll('div');
+    const abstainDivs = Array.from(allDivs).filter(d => /abstain/i.test(d.className));
+    expect(abstainDivs.length).toBeGreaterThanOrEqual(100);
+  });
+
+  it('handles 100 different percentage values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <VoteProgressBar variant={VoteCardVariant.FOR} percentage={i} />,
+      );
+      expect(container.querySelectorAll('div')[1]?.getAttribute('style')).toContain(`${i}%`);
+      unmount();
+    }
+  });
+
+  it('rapid rerender 100 times with variant changes', () => {
+    const { rerender } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+    const variants = [VoteCardVariant.FOR, VoteCardVariant.AGAINST, VoteCardVariant.ABSTAIN];
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<VoteProgressBar variant={variants[i % 3]} percentage={i % 100} />),
+      ).not.toThrow();
+    }
+  });
 });

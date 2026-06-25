@@ -351,4 +351,43 @@ describe('TruncatedAmount', () => {
     const matches = (container.textContent ?? '').match(/Ξ/g);
     expect(matches?.length).toBe(100);
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<TruncatedAmount amount={parseEther('1')} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <TruncatedAmount key={i} amount={parseEther(`${i + 1}`)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different fractional amounts', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<TruncatedAmount amount={parseEther(`${i + 1}.${i}`)} />);
+      unmount();
+    }
+  });
+
+  it('formats parseEther(0.0099) (boundary rounding)', () => {
+    const { container } = render(<TruncatedAmount amount={parseEther('0.0099')} />);
+    expect(container.textContent).toMatch(/^Ξ \d+\.\d{2}$/);
+  });
+
+  it('rapid rerender 100 times with varying amounts', () => {
+    const { container, rerender } = render(<TruncatedAmount amount={parseEther('1')} />);
+    for (let i = 0; i < 100; i++) {
+      rerender(<TruncatedAmount amount={parseEther(`${i + 1}`)} />);
+    }
+    expect(container.textContent).toMatch(/^Ξ \d+\.\d{2}$/);
+  });
 });
