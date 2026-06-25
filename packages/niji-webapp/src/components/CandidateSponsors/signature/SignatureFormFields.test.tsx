@@ -127,4 +127,51 @@ describe('SignatureFormFields', () => {
     expect(container.querySelector('textarea')?.disabled).toBe(true);
     expect(container.querySelector('input[type="date"]')?.disabled).toBe(true);
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<SignatureFormFields {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <SignatureFormFields key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different reasonText values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<SignatureFormFields {...defaults} reasonText={`r-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('handles 100 different expirationDate values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <SignatureFormFields {...defaults} expirationDate={1700000000 + i * 86400} />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 500 setReasonText events', () => {
+    const setReasonText = vi.fn();
+    const { container } = render(
+      <SignatureFormFields {...defaults} setReasonText={setReasonText} />,
+    );
+    const textarea = container.querySelector('textarea')!;
+    for (let i = 0; i < 500; i++) {
+      fireEvent.change(textarea, { target: { value: `r-${i}` } });
+    }
+    expect(setReasonText).toHaveBeenCalledTimes(500);
+  });
 });

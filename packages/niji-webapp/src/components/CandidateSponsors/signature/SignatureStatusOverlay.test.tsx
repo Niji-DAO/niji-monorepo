@@ -128,4 +128,51 @@ describe('SignatureStatusOverlay', () => {
     const { container } = render(<SignatureStatusOverlay {...defaults} isSignPending={true} />);
     expect(container.querySelector('.spinner-border')).not.toBeNull();
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<SignatureStatusOverlay {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <SignatureStatusOverlay key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different isWaiting/isLoading toggle combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SignatureStatusOverlay {...defaults} isWaiting={i % 2 === 0} isLoading={i % 3 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 isTxSuccessful=true with different tx hashes', () => {
+    for (let i = 0; i < 30; i++) {
+      const txHash = '0x' + i.toString(16).padStart(64, '0');
+      const { unmount } = render(
+        <SignatureStatusOverlay {...defaults} isTxSuccessful={true} transactionHash={txHash} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 isOverlayVisible toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SignatureStatusOverlay {...defaults} isOverlayVisible={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
 });

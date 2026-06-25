@@ -237,4 +237,54 @@ describe('VoteSignals', () => {
     render(<VoteSignals {...baseProps} isCandidate={true} handleRefetch={refetch} />);
     expect(refetch).toHaveBeenCalled();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteSignals {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('renders 30 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteSignals key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles all 6 sendStatus types', () => {
+    const statuses: SendStatus[] = [
+      'None',
+      'PendingSignature',
+      'Mining',
+      'Success',
+      'Fail',
+      'Exception',
+    ];
+    statuses.forEach(s => {
+      feedbackState.sendProposalFeedbackState = { status: s };
+      const { unmount } = render(<VoteSignals {...baseProps} />);
+      unmount();
+    });
+    feedbackState.sendProposalFeedbackState = { status: 'None' };
+  });
+
+  it('handles 30 isCandidate toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteSignals {...baseProps} isCandidate={i % 2 === 0} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different proposalId values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteSignals {...baseProps} proposalId={String(i)} />);
+      unmount();
+    }
+  });
 });
