@@ -452,4 +452,51 @@ describe('NavBarButton', () => {
       expect(getNavBarButtonVariant(style)).toBeTruthy();
     });
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<NavBarButton buttonText="x" />);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <NavBarButton key={i} buttonText={`btn-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 500 onClick events fire handler', () => {
+    const onClick = vi.fn();
+    const { container } = render(<NavBarButton buttonText="x" onClick={onClick} />);
+    const target = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 500; i++) fireEvent.click(target);
+    expect(onClick).toHaveBeenCalledTimes(500);
+  });
+
+  it('handles 100 different buttonStyle variants', () => {
+    for (let i = 0; i < 100; i++) {
+      const style = i % 7;
+      const { unmount } = render(<NavBarButton buttonText={`btn-${i}`} buttonStyle={style} />);
+      unmount();
+    }
+  });
+
+  it('all 300 instances render text content', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 300 }, (_, i) => (
+          <NavBarButton key={i} buttonText={`btn-${i}`} />
+        ))}
+      </>,
+    );
+    const matches = (container.textContent ?? '').match(/btn-/g);
+    expect(matches?.length).toBe(300);
+  });
 });

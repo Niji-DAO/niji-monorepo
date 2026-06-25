@@ -1132,4 +1132,108 @@ describe('VoteCard', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <VoteCard
+          proposal={{ id: '1', forCount: 5n, againstCount: 0n, abstainCount: 0n } as never}
+          percentage={50}
+          nounIds={[]}
+          variant={VoteCardVariant.FOR}
+          delegateGroupedVoteData={[]}
+          isNounsDAOProp={true}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different proposal counts', () => {
+    for (let i = 0; i < 30; i++) {
+      const p = {
+        id: String(i),
+        forCount: BigInt(i),
+        againstCount: BigInt(i * 2),
+        abstainCount: BigInt(i * 3),
+      } as never;
+      const { unmount } = render(
+        <VoteCard
+          proposal={p}
+          percentage={50}
+          nounIds={[]}
+          variant={VoteCardVariant.FOR}
+          delegateGroupedVoteData={[]}
+          isNounsDAOProp={true}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 100 percentage rerender', () => {
+    const { rerender } = render(
+      <VoteCard
+        proposal={{ id: '1', forCount: 0n, againstCount: 0n, abstainCount: 0n } as never}
+        percentage={0}
+        nounIds={[]}
+        variant={VoteCardVariant.FOR}
+        delegateGroupedVoteData={[]}
+        isNounsDAOProp={true}
+      />,
+    );
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(
+          <VoteCard
+            proposal={{ id: '1', forCount: 0n, againstCount: 0n, abstainCount: 0n } as never}
+            percentage={i}
+            nounIds={[]}
+            variant={VoteCardVariant.FOR}
+            delegateGroupedVoteData={[]}
+            isNounsDAOProp={true}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 30 different nounIds arrays', () => {
+    for (let i = 0; i < 30; i++) {
+      const ids = Array.from({ length: i }, (_, j) => j);
+      const { unmount } = render(
+        <VoteCard
+          proposal={{ id: '1', forCount: BigInt(i), againstCount: 0n, abstainCount: 0n } as never}
+          percentage={50}
+          nounIds={ids}
+          variant={VoteCardVariant.FOR}
+          delegateGroupedVoteData={[]}
+          isNounsDAOProp={true}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 instances in single render', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteCard
+              key={i}
+              proposal={
+                { id: String(i), forCount: BigInt(i), againstCount: 0n, abstainCount: 0n } as never
+              }
+              percentage={50}
+              nounIds={[]}
+              variant={VoteCardVariant.FOR}
+              delegateGroupedVoteData={[]}
+              isNounsDAOProp={true}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });

@@ -690,4 +690,62 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
     }
     expect(container.querySelector('[data-testid="current-page"]')?.textContent).toBe('0');
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 50 different vote data array sizes', () => {
+    for (let i = 0; i < 50; i++) {
+      const data = Array.from({ length: i }, (_, j) => makeVote(`0x${j}`, ['1'], 1));
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 30 propId rerender', () => {
+    const { rerender } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <DelegateGroupedNijiImageVoteTable
+            {...baseProps}
+            propId={i}
+            filteredDelegateGroupedVoteData={[]}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 30 different nijiRepresented array sizes', () => {
+    for (let i = 1; i <= 30; i++) {
+      const niji = Array.from({ length: i }, (_, j) => String(j));
+      const data = [makeVote('0xA', niji, 1)];
+      const { container, unmount } = render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+      );
+      expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe(`stack-${i}`);
+      unmount();
+    }
+  });
+
+  it('rapid 50 right arrow clicks then back', () => {
+    const data = Array.from({ length: 60 }, (_, i) => makeVote(`0x${i}`, ['1']));
+    const { container } = render(
+      <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+    );
+    const right = container.querySelector('[data-testid="right"]') as HTMLButtonElement;
+    for (let i = 0; i < 50; i++) fireEvent.click(right);
+    expect(container.querySelector('[data-testid="pager"]')).not.toBeNull();
+  });
 });
