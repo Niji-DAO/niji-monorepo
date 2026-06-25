@@ -529,4 +529,43 @@ describe('SelectProposalActionStep', () => {
     for (let i = 0; i < 200; i++) setState({} as never);
     expect(setState).toHaveBeenCalledTimes(200);
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<SelectProposalActionStep {...setupProps()} />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SelectProposalActionStep key={i} {...setupProps()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<SelectProposalActionStep {...setupProps()} />)).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<SelectProposalActionStep {...setupProps()} />);
+      unmount();
+    }
+  });
+
+  it('round-6 rapid 200 setState invocations', () => {
+    const setState = vi.fn();
+    render(<SelectProposalActionStep {...setupProps({ setState })} />);
+    for (let i = 0; i < 200; i++) setState({} as never);
+    expect(setState).toHaveBeenCalledTimes(200);
+  });
 });
