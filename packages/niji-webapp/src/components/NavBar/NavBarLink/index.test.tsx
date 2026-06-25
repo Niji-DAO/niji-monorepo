@@ -393,4 +393,46 @@ describe('NavBarLink', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<NavBarLink to="/r6">r6</NavBarLink>);
+      unmount();
+    }
+  });
+
+  it('round-6 30 instances rendered together', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NavBarLink key={i} to={`/r6-${i}`}>
+              r6-{i}
+            </NavBarLink>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 different to values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<NavBarLink to={`/r6-${i}`}>r6-c-{i}</NavBarLink>);
+      unmount();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<NavBarLink to="/r6">x</NavBarLink>);
+      unmount();
+    }
+  });
+
+  it('round-6 100 mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<NavBarLink to={`/r6-${i}`}>r6</NavBarLink>);
+      unmount();
+    }
+  });
 });
