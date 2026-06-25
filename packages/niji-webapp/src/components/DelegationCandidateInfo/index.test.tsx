@@ -685,4 +685,66 @@ describe('DelegationCandidateInfo', () => {
       ).not.toThrow();
     });
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegationCandidateInfo address={ADDR} changeModalState={0 as never} votesToAdd={0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 100 instances without crash', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <DelegationCandidateInfo
+              key={i}
+              address={ADDR}
+              changeModalState={0 as never}
+              votesToAdd={i}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles negative votesToAdd', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    expect(() =>
+      render(
+        <DelegationCandidateInfo address={ADDR} changeModalState={1 as never} votesToAdd={-3} />,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles all 4 ChangeDelegateState transition values', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    [0, 1, 2, 3].forEach(s => {
+      expect(() =>
+        render(
+          <DelegationCandidateInfo address={ADDR} changeModalState={s as never} votesToAdd={2} />,
+        ),
+      ).not.toThrow();
+    });
+  });
+
+  it('rapid 50 votesToAdd rerender', () => {
+    useAccountVotesMock.mockReturnValue(5);
+    const { rerender } = render(
+      <DelegationCandidateInfo address={ADDR} changeModalState={1 as never} votesToAdd={0} />,
+    );
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        rerender(
+          <DelegationCandidateInfo address={ADDR} changeModalState={1 as never} votesToAdd={i} />,
+        ),
+      ).not.toThrow();
+    }
+  });
 });

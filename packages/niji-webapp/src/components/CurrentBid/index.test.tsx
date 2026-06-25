@@ -413,4 +413,40 @@ describe('CurrentBid', () => {
       ).not.toThrow();
     }
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('handles 0n currentBid', () => {
+    expect(() => render(<CurrentBid currentBid={0n} auctionEnded={false} />)).not.toThrow();
+  });
+
+  it('handles 1 wei currentBid', () => {
+    expect(() => render(<CurrentBid currentBid={1n} auctionEnded={false} />)).not.toThrow();
+  });
+
+  it('rapid auctionEnded toggle 50 times', () => {
+    const { rerender } = render(<CurrentBid currentBid={parseEther('1')} auctionEnded={false} />);
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        rerender(<CurrentBid currentBid={parseEther('1')} auctionEnded={i % 2 === 0} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('200 instances render', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <CurrentBid key={i} currentBid={parseEther(`${i + 1}`)} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });
