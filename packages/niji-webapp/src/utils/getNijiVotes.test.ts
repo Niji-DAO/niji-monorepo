@@ -268,4 +268,37 @@ describe('getNijiVotes', () => {
       expect(getNijiVotes([], (i % 3) as 0 | 1 | 2)).toEqual([]);
     }
   });
+
+  it('round-7 30 sequential getNijiVotes calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => getNijiVotes([], (i % 3) as 0 | 1 | 2)).not.toThrow();
+    }
+  });
+
+  it('round-7 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof getNijiVotes).toBe('function');
+    }
+  });
+
+  it('round-7 100 sequential reference consistency', () => {
+    const first = getNijiVotes;
+    for (let i = 0; i < 100; i++) {
+      expect(getNijiVotes).toBe(first);
+    }
+  });
+
+  it('round-7 30 deterministic for same input', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = getNijiVotes([], 0);
+      const r2 = getNijiVotes([], 0);
+      expect(r1).toEqual(r2);
+    }
+  });
+
+  it('round-7 100 sequential empty arrays', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(getNijiVotes([], (i % 3) as 0 | 1 | 2)).toEqual([]);
+    }
+  });
 });
