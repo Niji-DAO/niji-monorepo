@@ -162,4 +162,80 @@ describe('HoverCard', () => {
     );
     expect(container.querySelector('span')?.textContent).toBe('');
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={t => <div>{t}</div>} tip="hello" id="x">
+          Trigger
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <HoverCard
+              key={i}
+              hoverCardContent={t => <div>{t}</div>}
+              tip={`tip-${i}`}
+              id={`id-${i}`}
+            >
+              T-{i}
+            </HoverCard>
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different tip values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={t => <div>{t}</div>} tip={`tip-${i}`} id={`id-${i}`}>
+          Trigger
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('handles 100 different id values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={t => <div>{t}</div>} tip="hello" id={`unique-${i}`}>
+          Trigger
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('handles 50 different content render functions', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <HoverCard
+          hoverCardContent={t => (
+            <div data-testid={`content-${i}`}>
+              {t}-{i}
+            </div>
+          )}
+          tip={`tip-${i}`}
+          id={`id-${i}`}
+        >
+          Trigger
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
 });

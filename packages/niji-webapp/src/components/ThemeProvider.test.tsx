@@ -152,4 +152,67 @@ describe('ThemeProvider', () => {
     expect(container.querySelector('[data-testid="a"]')?.textContent).toBe('a');
     expect(container.querySelector('[data-testid="b"]')?.textContent).toBe('b');
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>x</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 1500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <ThemeProvider key={i}>
+              <div>x-{i}</div>
+            </ThemeProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different children values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(
+        <ThemeProvider>
+          <div data-testid={`v-${i}`}>val-{i}</div>
+        </ThemeProvider>,
+      );
+      expect(container.querySelector(`[data-testid="v-${i}"]`)?.textContent).toBe(`val-${i}`);
+      unmount();
+    }
+  });
+
+  it('all 500 instances have next-themes-provider data-testid', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <ThemeProvider key={i}>
+            <div>x</div>
+          </ThemeProvider>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="next-themes-provider"]').length).toBe(500);
+  });
+
+  it('handles 50 different nested children', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>
+            <span>nested-{i}</span>
+          </div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
 });
