@@ -331,4 +331,57 @@ describe('VoteSignal', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <VoteSignal support={1} voteCount={1} reason="r5" address={ADDR} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteSignal
+              key={i}
+              support={(i % 3) as 0 | 1 | 2}
+              voteCount={i + 100}
+              reason={`r5-${i}`}
+              address={ADDR}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 different voteCount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <VoteSignal support={1} voteCount={i + 5000} reason="x" address={ADDR} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<VoteSignal support={1} voteCount={1} reason="x" address={ADDR} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <VoteSignal support={1} voteCount={1} reason="x" address={ADDR} />,
+      );
+      unmount();
+    }
+  });
 });

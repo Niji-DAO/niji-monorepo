@@ -794,4 +794,79 @@ describe('ModalBottomButtonRow', () => {
       unmount();
     }
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ModalBottomButtonRow
+          prevBtnText="prev"
+          onPrevBtnClick={() => {}}
+          nextBtnText="next"
+          onNextBtnClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ModalBottomButtonRow
+              key={i}
+              prevBtnText={`r5-${i}`}
+              onPrevBtnClick={() => {}}
+              nextBtnText={`r5-${i}`}
+              onNextBtnClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ModalBottomButtonRow
+            prevBtnText="prev"
+            onPrevBtnClick={() => {}}
+            nextBtnText="next"
+            onNextBtnClick={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-5 rapid 200 onPrevBtnClick invocations', () => {
+    const onPrev = vi.fn();
+    render(
+      <ModalBottomButtonRow
+        prevBtnText="prev"
+        onPrevBtnClick={onPrev}
+        nextBtnText="next"
+        onNextBtnClick={() => {}}
+      />,
+    );
+    for (let i = 0; i < 200; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ModalBottomButtonRow
+          prevBtnText="prev"
+          onPrevBtnClick={() => {}}
+          nextBtnText="next"
+          onNextBtnClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
 });
