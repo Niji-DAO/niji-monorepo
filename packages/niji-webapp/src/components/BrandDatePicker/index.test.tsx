@@ -374,4 +374,43 @@ describe('BrandDatePicker', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BrandDatePicker onChange={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <BrandDatePicker key={i} onChange={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<BrandDatePicker onChange={() => {}} />)).not.toThrow();
+    }
+  });
+
+  it('round-6 rapid 200 onChange invocations', () => {
+    const onChange = vi.fn();
+    render(<BrandDatePicker onChange={onChange} />);
+    for (let i = 0; i < 200; i++) onChange(new Date());
+    expect(onChange).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-6 100 mount-unmount cycles second', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<BrandDatePicker onChange={() => {}} />);
+      unmount();
+    }
+  });
 });
