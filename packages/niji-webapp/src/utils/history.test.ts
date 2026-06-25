@@ -192,4 +192,37 @@ describe('nounPath', () => {
       expect(nounPath(String(i + 9000)).length).toBeGreaterThan(0);
     }
   });
+
+  it('round-6 30 sequential nounPath calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => nounPath(String(i + 11000))).not.toThrow();
+    }
+  });
+
+  it('round-6 50 sequential string-typed checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof nounPath(String(i + 12000))).toBe('string');
+    }
+  });
+
+  it('round-6 100 sequential calls preserve format', () => {
+    for (let i = 0; i < 100; i++) {
+      const result = nounPath(String(i + 13000));
+      expect(result.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-6 30 deterministic for same nounId', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = nounPath('100');
+      const r2 = nounPath('100');
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-6 100 sequential calls produce non-empty results', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(nounPath(String(i + 15000)).length).toBeGreaterThan(0);
+    }
+  });
 });
