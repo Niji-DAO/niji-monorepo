@@ -145,4 +145,50 @@ describe('VoteSignal', () => {
     );
     expect(container.querySelector('img')).toBeNull();
   });
+
+  it('mount-unmount 200 cycles', () => {
+    useEnsNameMock.mockReturnValue({ data: undefined });
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<VoteSignal voter={ADDR} votes={5} reason="" />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    useEnsNameMock.mockReturnValue({ data: 'alice.eth' });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <VoteSignal key={i} voter={ADDR} votes={i} reason={`r-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different votes values', () => {
+    useEnsNameMock.mockReturnValue({ data: undefined });
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteSignal voter={ADDR} votes={i} reason="" />);
+      unmount();
+    }
+  });
+
+  it('handles 100 different voter addresses', () => {
+    useEnsNameMock.mockReturnValue({ data: undefined });
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      const { unmount } = render(<VoteSignal voter={addr} votes={1} reason="" />);
+      unmount();
+    }
+  });
+
+  it('handles 100 different reason values', () => {
+    useEnsNameMock.mockReturnValue({ data: undefined });
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteSignal voter={ADDR} votes={1} reason={`r-${i}`} />);
+      unmount();
+    }
+  });
 });

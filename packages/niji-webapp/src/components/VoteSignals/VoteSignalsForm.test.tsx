@@ -169,4 +169,47 @@ describe('VoteSignalsForm extra cases', () => {
     });
     expect(setReasonText).toHaveBeenCalledWith('a\nb\nc');
   });
+
+  it('VoteSignalsForm mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<VoteSignalsForm {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <VoteSignalsForm key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different support values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteSignalsForm {...defaults} support={i % 3} />);
+      unmount();
+    }
+  });
+
+  it('rapid 500 setReasonText events', () => {
+    const setReasonText = vi.fn();
+    const { container } = render(<VoteSignalsForm {...defaults} setReasonText={setReasonText} />);
+    const textarea = container.querySelector('textarea')!;
+    for (let i = 0; i < 500; i++) {
+      fireEvent.change(textarea, { target: { value: `r-${i}` } });
+    }
+    expect(setReasonText).toHaveBeenCalledTimes(500);
+  });
+
+  it('VoteSignalsPending mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<VoteSignalsPending />);
+      unmount();
+    }
+  });
 });
