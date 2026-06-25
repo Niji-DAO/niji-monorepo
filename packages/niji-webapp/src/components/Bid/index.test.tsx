@@ -596,4 +596,62 @@ describe('Bid', () => {
     });
     hookState.placeBid = orig;
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different bidder addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = makeAuction({ bidder: `0xBID${i}` });
+      const { unmount } = render(<Bid auction={a as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('handles minBidIncPercentage variations', () => {
+    const orig = hookState.minBidIncPercentage;
+    [2n, 5n, 10n, 20n, 50n].forEach(p => {
+      hookState.minBidIncPercentage = p;
+      expect(() =>
+        render(<Bid auction={makeAuction() as never} auctionEnded={false} />),
+      ).not.toThrow();
+    });
+    hookState.minBidIncPercentage = orig;
+  });
+
+  it('handles all 5 settleAuction status combinations', () => {
+    const orig = { ...hookState.settleAuction };
+    [
+      { isPending: true, isSuccess: false, isError: false, isIdle: false, error: null },
+      { isPending: false, isSuccess: true, isError: false, isIdle: false, error: null },
+      {
+        isPending: false,
+        isSuccess: false,
+        isError: true,
+        isIdle: false,
+        error: { message: 'e' },
+      },
+      { isPending: false, isSuccess: false, isError: false, isIdle: true, error: null },
+      { isPending: true, isSuccess: false, isError: true, isIdle: false, error: null },
+    ].forEach(s => {
+      hookState.settleAuction = s;
+      expect(() =>
+        render(<Bid auction={makeAuction() as never} auctionEnded={true} />),
+      ).not.toThrow();
+    });
+    hookState.settleAuction = orig;
+  });
+
+  it('handles 50 different bid input values', () => {
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    for (let i = 0; i < 50; i++) {
+      fireEvent.change(input, { target: { value: `${i + 1}.00` } });
+    }
+    expect(input).not.toBeNull();
+  });
 });

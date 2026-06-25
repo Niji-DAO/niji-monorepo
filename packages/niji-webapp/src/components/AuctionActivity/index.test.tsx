@@ -640,4 +640,53 @@ describe('AuctionActivity', () => {
       wrap(<AuctionActivity {...defaults} auction={makeAuction({ nounId: 0n }) as never} />),
     ).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<AuctionActivity {...defaults} auction={makeAuction() as never} />);
+      unmount();
+    }
+  });
+
+  it('handles all 4 boolean combinations', () => {
+    useAtomValueMock.mockReturnValue(false);
+    [true, false].forEach(isFirst => {
+      [true, false].forEach(isLast => {
+        expect(() =>
+          wrap(
+            <AuctionActivity
+              {...defaults}
+              isFirstAuction={isFirst}
+              isLastAuction={isLast}
+              auction={makeAuction() as never}
+            />,
+          ),
+        ).not.toThrow();
+      });
+    });
+  });
+
+  it('handles 30 different bidder addresses', () => {
+    useAtomValueMock.mockReturnValue(false);
+    for (let i = 0; i < 30; i++) {
+      const a = makeAuction({ bidder: `0xBIDDER${i}` });
+      expect(() => wrap(<AuctionActivity {...defaults} auction={a as never} />)).not.toThrow();
+    }
+  });
+
+  it('handles ended auction (endTime=1n)', () => {
+    useAtomValueMock.mockReturnValue(false);
+    const ended = makeAuction({ endTime: 1n });
+    expect(() => wrap(<AuctionActivity {...defaults} auction={ended as never} />)).not.toThrow();
+  });
+
+  it('handles 50 different amount values', () => {
+    useAtomValueMock.mockReturnValue(false);
+    for (let i = 0; i < 50; i++) {
+      const a = makeAuction({ amount: BigInt(i * 1000) });
+      const { unmount } = wrap(<AuctionActivity {...defaults} auction={a as never} />);
+      unmount();
+    }
+  });
 });

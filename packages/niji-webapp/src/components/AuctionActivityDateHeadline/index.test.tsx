@@ -440,4 +440,56 @@ describe('AuctionActivityDateHeadline', () => {
       expect(h4.getAttribute('style')).toContain('warm');
     });
   });
+
+  it('mount-unmount 200 cycles', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<AuctionActivityDateHeadline startTime={1735689600n} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <AuctionActivityDateHeadline key={i} startTime={BigInt(1700000000 + i)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 50 different startTime sequentially', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 50; i++) {
+      const { container, unmount } = render(
+        <AuctionActivityDateHeadline startTime={BigInt(1700000000 + i * 86400)} />,
+      );
+      expect(container.querySelector('h4')).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it('all 100 cool instances have brand-cool-light-text', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <AuctionActivityDateHeadline key={i} startTime={1735689600n} />
+        ))}
+      </>,
+    );
+    const h4s = container.querySelectorAll('h4');
+    h4s.forEach(h4 => {
+      expect(h4.getAttribute('style')).toContain('brand-cool-light-text');
+    });
+  });
+
+  it('handles 1n startTime edge case', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() => render(<AuctionActivityDateHeadline startTime={1n} />)).not.toThrow();
+  });
 });
