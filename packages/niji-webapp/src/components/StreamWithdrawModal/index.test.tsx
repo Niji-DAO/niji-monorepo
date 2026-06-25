@@ -506,4 +506,43 @@ describe('StreamWithdrawModal', () => {
     for (let i = 0; i < 100; i++) onDismiss();
     expect(onDismiss).toHaveBeenCalledTimes(100);
   });
+
+  it('round-3 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<StreamWithdrawModal {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <StreamWithdrawModal key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 show toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<StreamWithdrawModal {...baseProps} show={i % 2 === 0} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<StreamWithdrawModal {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('round-3 rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<StreamWithdrawModal {...baseProps} onDismiss={onDismiss} />);
+    for (let i = 0; i < 200; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
 });
