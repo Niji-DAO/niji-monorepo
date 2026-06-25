@@ -645,4 +645,47 @@ describe('CandidateSponsors', () => {
     });
     hookState.account = orig;
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('handles 50 different blockNumber values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<CandidateSponsors {...baseProps} blockNumber={BigInt(i + 10)} />);
+      unmount();
+    }
+  });
+
+  it('renders 50 instances all with empty signatures', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <CandidateSponsors key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different requiredVotes values', () => {
+    for (let i = 0; i < 30; i++) {
+      const c = makeCandidate({ requiredVotes: i });
+      const { unmount } = render(<CandidateSponsors {...baseProps} candidate={c} />);
+      unmount();
+    }
+  });
+
+  it('handles rapid 30 isThresholdMet toggle', () => {
+    for (let i = 0; i < 30; i++) {
+      hookState.isThresholdMet = i % 2 === 0;
+      const { unmount } = render(<CandidateSponsors {...baseProps} />);
+      unmount();
+    }
+    hookState.isThresholdMet = false;
+  });
 });
