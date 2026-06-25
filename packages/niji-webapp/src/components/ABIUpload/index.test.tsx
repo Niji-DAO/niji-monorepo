@@ -868,4 +868,49 @@ describe('ABIUpload Component', () => {
     }
     expect(handleChange).toHaveBeenCalledTimes(100);
   });
+
+  it('round-2 mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<ABIUpload onChange={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <ABIUpload key={i} onChange={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different abiFileName values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ABIUpload onChange={() => {}} abiFileName={`r2-${i}.json`} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 isValid + isInvalid combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ABIUpload onChange={() => {}} isValid={i % 2 === 0} isInvalid={i % 3 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 200 onChange events fire handler', () => {
+    const handleChange = vi.fn();
+    const { container } = render(<ABIUpload onChange={handleChange} />);
+    const input = container.querySelector('input[type="file"]')!;
+    for (let i = 0; i < 200; i++) {
+      fireEvent.change(input);
+    }
+    expect(handleChange).toHaveBeenCalledTimes(200);
+  });
 });

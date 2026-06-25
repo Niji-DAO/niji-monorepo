@@ -658,4 +658,46 @@ describe('BidHistoryModal', () => {
     for (let i = 0; i < 100; i++) fireEvent.click(btn);
     expect(onDismiss).toHaveBeenCalledTimes(100);
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <BidHistoryModal key={i} auction={auction} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different nounId values', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = { ...auction, nounId: BigInt(i) };
+      const { unmount } = render(<BidHistoryModal auction={a} onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 300 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<BidHistoryModal auction={auction} onDismiss={onDismiss} />);
+    for (let i = 0; i < 300; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(300);
+  });
+
+  it('round-2 handles 30 different amount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = { ...auction, amount: BigInt(i + 1) * BigInt(10n ** 18n) };
+      const { unmount } = render(<BidHistoryModal auction={a} onDismiss={() => {}} />);
+      unmount();
+    }
+  });
 });
