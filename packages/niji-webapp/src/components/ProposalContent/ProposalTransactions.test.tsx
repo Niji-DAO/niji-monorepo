@@ -281,4 +281,43 @@ describe('ProposalTransactions', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ProposalTransactions details={[]} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ProposalTransactions key={i} details={[]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ProposalTransactions details={[]} />)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ProposalTransactions details={[]} />);
+      unmount();
+    }
+  });
+
+  it('round-4 100 sequential mount cycles third', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ProposalTransactions details={[]} />);
+      unmount();
+    }
+  });
 });
