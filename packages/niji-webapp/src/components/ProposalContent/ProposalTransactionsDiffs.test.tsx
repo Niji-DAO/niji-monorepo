@@ -588,4 +588,74 @@ describe('ProposalTransactionsDiffs', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalTransactionsDiffs
+          oldTransactions={[]}
+          newTransactions={[]}
+          activeVersionNumber={1}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalTransactionsDiffs
+              key={i}
+              oldTransactions={[]}
+              newTransactions={[]}
+              activeVersionNumber={i + 8000}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ProposalTransactionsDiffs
+            oldTransactions={[]}
+            newTransactions={[]}
+            activeVersionNumber={1}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ProposalTransactionsDiffs
+          oldTransactions={[]}
+          newTransactions={[]}
+          activeVersionNumber={1}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 100 sequential mount cycles third', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <ProposalTransactionsDiffs
+          oldTransactions={[]}
+          newTransactions={[]}
+          activeVersionNumber={1}
+        />,
+      );
+      unmount();
+    }
+  });
 });
