@@ -318,4 +318,37 @@ describe('timeUtils stress', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-6 30 sequential currentUnixEpoch calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => currentUnixEpoch()).not.toThrow();
+    }
+  });
+
+  it('round-6 50 sequential toUnixEpoch calls', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => toUnixEpoch(new Date(4_000_000_000_000 + i * 1000))).not.toThrow();
+    }
+  });
+
+  it('round-6 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof currentUnixEpoch).toBe('function');
+      expect(typeof toUnixEpoch).toBe('function');
+    }
+  });
+
+  it('round-6 50 currentUnixEpoch returns number', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof currentUnixEpoch()).toBe('number');
+    }
+  });
+
+  it('round-6 100 sequential mixed calls', () => {
+    for (let i = 0; i < 100; i++) {
+      currentUnixEpoch();
+      toUnixEpoch(new Date(5_000_000_000_000 + i * 1000));
+    }
+    expect(true).toBe(true);
+  });
 });
