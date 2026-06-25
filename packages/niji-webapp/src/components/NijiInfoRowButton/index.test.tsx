@@ -319,4 +319,69 @@ describe('NijiInfoRowButton', () => {
     );
     expect(container.textContent).toBe('日本語');
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(
+        <NijiInfoRowButton iconImgSource="/x.png" btnText="x" onClickHandler={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 1500 instances without crash', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <NijiInfoRowButton
+              key={i}
+              iconImgSource="/x.png"
+              btnText={`btn-${i}`}
+              onClickHandler={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different btnText values', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(
+        <NijiInfoRowButton iconImgSource="/x.png" btnText={`b-${i}`} onClickHandler={() => {}} />,
+      );
+      expect(container.textContent).toBe(`b-${i}`);
+      unmount();
+    }
+  });
+
+  it('rapid 500 onClick events fire handler', () => {
+    useAtomValueMock.mockReturnValue(true);
+    const handler = vi.fn();
+    const { container } = render(
+      <NijiInfoRowButton iconImgSource="/x.png" btnText="x" onClickHandler={handler} />,
+    );
+    const target = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 500; i++) fireEvent.click(target);
+    expect(handler).toHaveBeenCalledTimes(500);
+  });
+
+  it('handles 30 different iconImgSource values', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 30; i++) {
+      const { container, unmount } = render(
+        <NijiInfoRowButton
+          iconImgSource={`/icon-${i}.png`}
+          btnText="x"
+          onClickHandler={() => {}}
+        />,
+      );
+      expect(container.querySelector('img')?.getAttribute('src')).toBe(`/icon-${i}.png`);
+      unmount();
+    }
+  });
 });
