@@ -509,4 +509,56 @@ describe('VoteProgressBar', () => {
       ).not.toThrow();
     }
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <VoteProgressBar key={i} variant={VoteCardVariant.FOR} percentage={i % 100} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different percentage with FOR', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(
+        <VoteProgressBar variant={VoteCardVariant.FOR} percentage={i} />,
+      );
+      const inner = container.querySelectorAll('div')[1];
+      expect(inner?.className).toMatch(/for/i);
+      unmount();
+    }
+  });
+
+  it('all 300 instances render 2 div elements each', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 300 }, (_, i) => (
+          <VoteProgressBar key={i} variant={VoteCardVariant.FOR} percentage={i % 100} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div').length).toBe(600);
+  });
+
+  it('handles 30 fractional percentages', () => {
+    for (let i = 0; i < 30; i++) {
+      const p = i * 3.33;
+      const { container, unmount } = render(
+        <VoteProgressBar variant={VoteCardVariant.AGAINST} percentage={p} />,
+      );
+      expect(container.querySelectorAll('div').length).toBe(2);
+      unmount();
+    }
+  });
 });

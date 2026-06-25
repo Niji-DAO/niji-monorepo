@@ -390,4 +390,53 @@ describe('TruncatedAmount', () => {
     }
     expect(container.textContent).toMatch(/^Ξ \d+\.\d{2}$/);
   });
+
+  it('mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<TruncatedAmount amount={parseEther('1')} />);
+      unmount();
+    }
+  });
+
+  it('renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <TruncatedAmount key={i} amount={parseEther(`${i + 1}`)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different bigint amounts', () => {
+    for (let i = 0; i < 100; i++) {
+      const amount = BigInt(i + 1) * 1_000_000_000_000_000_000n;
+      const { container, unmount } = render(<TruncatedAmount amount={amount} />);
+      expect(container.textContent).toMatch(/^Ξ \d+\.\d{2}$/);
+      unmount();
+    }
+  });
+
+  it('all 300 instances start with Ξ', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 300 }, (_, i) => (
+          <TruncatedAmount key={i} amount={parseEther(`${i + 1}`)} />
+        ))}
+      </>,
+    );
+    const matches = (container.textContent ?? '').match(/Ξ/g);
+    expect(matches?.length).toBe(300);
+  });
+
+  it('handles 50 different fractional amounts (0.1 incrementing)', () => {
+    for (let i = 0; i < 50; i++) {
+      const v = (i + 1) * 0.1;
+      const { container, unmount } = render(<TruncatedAmount amount={parseEther(`${v}`)} />);
+      expect(container.textContent).toMatch(/^Ξ \d+\.\d{2}$/);
+      unmount();
+    }
+  });
 });

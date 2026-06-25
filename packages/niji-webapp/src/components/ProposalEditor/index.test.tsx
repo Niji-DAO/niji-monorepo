@@ -450,4 +450,46 @@ describe('ProposalEditor', () => {
     const long = 'a'.repeat(10000);
     expect(() => render(<ProposalEditor {...defaults} title={long} />)).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalEditor {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('renders 30 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalEditor key={i} {...defaults} title={`T-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different title + body combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalEditor {...defaults} title={`T-${i}`} body={`# Body ${i}`} />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 50 title + body rerender', () => {
+    const { rerender } = render(<ProposalEditor {...defaults} />);
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        rerender(<ProposalEditor {...defaults} title={`T-${i}`} body={`B-${i}`} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 10000 char body without crash', () => {
+    const long = 'a'.repeat(10000);
+    expect(() => render(<ProposalEditor {...defaults} body={long} />)).not.toThrow();
+  });
 });

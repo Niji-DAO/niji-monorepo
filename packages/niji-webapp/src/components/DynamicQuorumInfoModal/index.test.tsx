@@ -956,4 +956,77 @@ describe('DynamicQuorumInfoModal', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={5}
+          onDismiss={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 100 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <DynamicQuorumInfoModal
+              key={i}
+              proposal={makeProposal()}
+              againstVotesAbsolute={i}
+              onDismiss={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different proposal mocks', () => {
+    for (let i = 0; i < 30; i++) {
+      const p = { ...makeProposal(), id: String(i) } as never;
+      const { unmount } = render(
+        <DynamicQuorumInfoModal proposal={p} againstVotesAbsolute={5} onDismiss={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 100 rerender with varying votes', () => {
+    const { rerender } = render(
+      <DynamicQuorumInfoModal
+        proposal={makeProposal()}
+        againstVotesAbsolute={0}
+        onDismiss={() => {}}
+      />,
+    );
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(
+          <DynamicQuorumInfoModal
+            proposal={makeProposal()}
+            againstVotesAbsolute={i}
+            onDismiss={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles fractional againstVotes', () => {
+    expect(() =>
+      render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={3.14}
+          onDismiss={() => {}}
+        />,
+      ),
+    ).not.toThrow();
+  });
 });
