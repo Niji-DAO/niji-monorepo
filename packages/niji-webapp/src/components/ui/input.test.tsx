@@ -115,4 +115,50 @@ describe('Input', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 1500 cycles', () => {
+    for (let i = 0; i < 1500; i++) {
+      const { unmount } = render(<Input />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 2000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <Input key={i} placeholder={`r2-p-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 all 1000 inputs render input element', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 1000 }, (_, i) => (
+          <Input key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(1000);
+  });
+
+  it('round-2 handles 100 type variants', () => {
+    const types = ['text', 'password', 'email', 'number', 'date'];
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Input type={types[i % 5]} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 100 placeholder variants', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<Input placeholder={`r2-ph-${i}`} />);
+      expect(container.querySelector('input')?.placeholder).toBe(`r2-ph-${i}`);
+      unmount();
+    }
+  });
 });
