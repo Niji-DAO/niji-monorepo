@@ -462,4 +462,46 @@ describe('AuctionTitleAndNavWrapper Component', () => {
     }
     expect(container.textContent).toContain('49');
   });
+
+  it('round-5 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionTitleAndNavWrapper>r5</AuctionTitleAndNavWrapper>);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionTitleAndNavWrapper key={i}>r5-{i}</AuctionTitleAndNavWrapper>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<AuctionTitleAndNavWrapper>x</AuctionTitleAndNavWrapper>)).not.toThrow();
+    }
+  });
+
+  it('round-5 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionTitleAndNavWrapper>r5-c-{i}</AuctionTitleAndNavWrapper>);
+      unmount();
+    }
+  });
+
+  it('round-5 50 rerender cycles', () => {
+    const { container, rerender } = render(
+      <AuctionTitleAndNavWrapper>x</AuctionTitleAndNavWrapper>,
+    );
+    for (let i = 0; i < 50; i++) {
+      rerender(<AuctionTitleAndNavWrapper>r5-r-{i}</AuctionTitleAndNavWrapper>);
+    }
+    expect(container.textContent).toContain('49');
+  });
 });
