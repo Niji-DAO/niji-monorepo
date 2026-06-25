@@ -481,4 +481,43 @@ describe('NavLocaleSwitcher', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NavLocaleSwitcher />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NavLocaleSwitcher key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => render(<NavLocaleSwitcher />)).not.toThrow();
+    }
+  });
+
+  it('round-6 100 rerender cycles', () => {
+    const { rerender } = render(<NavLocaleSwitcher />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<NavLocaleSwitcher />)).not.toThrow();
+    }
+  });
+
+  it('round-6 100 sequential mount cycles second', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<NavLocaleSwitcher />);
+      unmount();
+    }
+  });
 });
