@@ -231,4 +231,70 @@ describe('CustomConnectkitProvider', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 300 cycles', () => {
+    useActiveLocaleMock.mockReturnValue('en-US');
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(
+        <CustomConnectkitProvider>
+          <div>x</div>
+        </CustomConnectkitProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances', () => {
+    useActiveLocaleMock.mockReturnValue('en-US');
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <CustomConnectkitProvider key={i}>
+              <div>x-{i}</div>
+            </CustomConnectkitProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different locales', () => {
+    for (let i = 0; i < 50; i++) {
+      useActiveLocaleMock.mockReturnValue(`loc-${i}`);
+      const { unmount } = render(
+        <CustomConnectkitProvider>
+          <div>x</div>
+        </CustomConnectkitProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 100 instances render ckp testid', () => {
+    useActiveLocaleMock.mockReturnValue('en-US');
+    const { container } = render(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <CustomConnectkitProvider key={i}>
+            <div>x</div>
+          </CustomConnectkitProvider>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="ckp"]').length).toBe(100);
+  });
+
+  it('round-2 rapid 100 renders', () => {
+    useActiveLocaleMock.mockReturnValue('en-US');
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        render(
+          <CustomConnectkitProvider>
+            <div>x</div>
+          </CustomConnectkitProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });

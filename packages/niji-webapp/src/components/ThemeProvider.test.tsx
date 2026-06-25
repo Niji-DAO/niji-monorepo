@@ -215,4 +215,67 @@ describe('ThemeProvider', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>x</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 1000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <ThemeProvider key={i}>
+              <span>x-{i}</span>
+            </ThemeProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 100 different children types', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>
+            <span data-testid={`n-${i}`}>{i}</span>
+          </div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 200 instances render with provider testid', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <ThemeProvider key={i}>
+            <div>x</div>
+          </ThemeProvider>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="next-themes-provider"]').length).toBe(200);
+  });
+
+  it('round-2 rapid 200 renders', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() =>
+        render(
+          <ThemeProvider>
+            <div>x</div>
+          </ThemeProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
