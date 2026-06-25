@@ -177,4 +177,38 @@ describe('getTokenAddressForCurrency — additional', () => {
       expect(() => formatTokenAmount(1.5, SupportedCurrency.USDC)).not.toThrow();
     }
   });
+
+  it('round-2 30 sequential formatTokenAmount calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => formatTokenAmount(i + 1, SupportedCurrency.ETH)).not.toThrow();
+    }
+  });
+
+  it('round-2 50 different currencies', () => {
+    const currencies = [SupportedCurrency.ETH, SupportedCurrency.USDC];
+    for (let i = 0; i < 50; i++) {
+      const result = formatTokenAmount(i + 1, currencies[i % 2]);
+      expect(typeof result).toBe('bigint');
+    }
+  });
+
+  it('round-2 100 sequential getTokenAddressForCurrency calls', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => getTokenAddressForCurrency(SupportedCurrency.ETH)).not.toThrow();
+    }
+  });
+
+  it('round-2 50 USDC variant cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof getTokenAddressForCurrency(SupportedCurrency.USDC)).toBe('string');
+    }
+  });
+
+  it('round-2 100 deterministic for same input', () => {
+    for (let i = 0; i < 100; i++) {
+      const r1 = formatTokenAmount(1, SupportedCurrency.ETH);
+      const r2 = formatTokenAmount(1, SupportedCurrency.ETH);
+      expect(r1).toBe(r2);
+    }
+  });
 });
