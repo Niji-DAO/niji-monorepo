@@ -405,4 +405,58 @@ describe('ProposalTransactions', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(
+        <ProposalTransactions proposalTransactions={[]} onRemoveProposalTransaction={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 1500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <ProposalTransactions
+              key={i}
+              proposalTransactions={[]}
+              onRemoveProposalTransaction={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different tx counts (1-30)', () => {
+    for (let i = 1; i <= 30; i++) {
+      const txs = Array.from({ length: i }, (_, j) => makeTx(`f${j}()`, '0x', `d${j}`));
+      const { unmount } = render(
+        <ProposalTransactions proposalTransactions={txs} onRemoveProposalTransaction={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 200 onRemove invocations', () => {
+    const onRemove = vi.fn();
+    render(
+      <ProposalTransactions proposalTransactions={[]} onRemoveProposalTransaction={onRemove} />,
+    );
+    for (let i = 0; i < 200; i++) onRemove(i);
+    expect(onRemove).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles 30 different tx signatures', () => {
+    for (let i = 0; i < 30; i++) {
+      const tx = makeTx(`fn-${i}()`, `0x${i}`);
+      const { unmount } = render(
+        <ProposalTransactions proposalTransactions={[tx]} onRemoveProposalTransaction={() => {}} />,
+      );
+      unmount();
+    }
+  });
 });

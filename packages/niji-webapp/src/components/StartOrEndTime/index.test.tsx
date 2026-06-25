@@ -301,4 +301,58 @@ describe('StartOrEndTime', () => {
       expect(container.textContent).toContain('starts');
     }
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    const now = Math.floor(Date.now() / 1000);
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<StartOrEndTime startTime={now + 3600} endTime={now + 7200} />);
+      unmount();
+    }
+  });
+
+  it('renders 1500 instances without crash', () => {
+    const now = Math.floor(Date.now() / 1000);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <StartOrEndTime key={i} startTime={now + 3600 + i} endTime={now + 7200 + i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different time pairs', () => {
+    const now = Math.floor(Date.now() / 1000);
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <StartOrEndTime startTime={now + 3600 + i * 100} endTime={now + 7200 + i * 100} />,
+      );
+      unmount();
+    }
+  });
+
+  it('all 500 instances render in starts state', () => {
+    const now = Math.floor(Date.now() / 1000);
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <StartOrEndTime key={i} startTime={now + 3600} endTime={now + 7200} />
+        ))}
+      </>,
+    );
+    const matches = (container.textContent ?? '').match(/starts/g);
+    expect(matches?.length).toBe(500);
+  });
+
+  it('rapid 200 rerender transitions', () => {
+    const now = Math.floor(Date.now() / 1000);
+    const { rerender } = render(<StartOrEndTime startTime={now + 3600} endTime={now + 7200} />);
+    for (let i = 0; i < 200; i++) {
+      expect(() =>
+        rerender(<StartOrEndTime startTime={now + 3600 + i} endTime={now + 7200 + i} />),
+      ).not.toThrow();
+    }
+  });
 });
