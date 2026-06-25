@@ -76,4 +76,37 @@ describe('countDecimals', () => {
   it('handles negative zero (-0) as integer (0 decimals)', () => {
     expect(countDecimals(-0)).toBe(0);
   });
+
+  it('handles 100 integer inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(countDecimals(i)).toBe(0);
+    }
+  });
+
+  it('handles 100 single-decimal inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      const n = i + 0.1;
+      expect(countDecimals(n)).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('handles 100 two-decimal inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      const n = i + 0.25;
+      expect(countDecimals(n)).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('handles 100 negative integer inputs', () => {
+    for (let i = 1; i <= 100; i++) {
+      expect(countDecimals(-i)).toBe(0);
+    }
+  });
+
+  it('handles 100 large integer inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      const n = 1_000_000 + i;
+      expect(countDecimals(n)).toBe(0);
+    }
+  });
 });
