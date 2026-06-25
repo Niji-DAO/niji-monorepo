@@ -661,4 +661,72 @@ describe('Select', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder="r6" />
+          </SelectTrigger>
+        </Select>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Select key={i}>
+              <SelectTrigger>
+                <SelectValue placeholder={`r6-${i}`} />
+              </SelectTrigger>
+            </Select>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 different placeholder values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder={`r6-p-${i}`} />
+          </SelectTrigger>
+        </Select>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder="x" />
+          </SelectTrigger>
+        </Select>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 100 sequential select renders', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder={`r6-${i}`} />
+          </SelectTrigger>
+        </Select>,
+      );
+      unmount();
+    }
+  });
 });
