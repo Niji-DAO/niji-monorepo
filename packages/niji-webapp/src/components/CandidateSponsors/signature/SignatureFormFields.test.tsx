@@ -268,4 +268,48 @@ describe('SignatureFormFields', () => {
     }
     expect(setReasonText).toHaveBeenCalledTimes(300);
   });
+
+  it('round-4 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<SignatureFormFields {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SignatureFormFields key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<SignatureFormFields {...defaults} />)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<SignatureFormFields {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-4 rapid 300 setReasonText invocations', () => {
+    const setReasonText = vi.fn();
+    const { container } = render(
+      <SignatureFormFields {...defaults} setReasonText={setReasonText} />,
+    );
+    const textarea = container.querySelector('textarea')!;
+    for (let i = 0; i < 300; i++) {
+      fireEvent.change(textarea, { target: { value: `r4-r-${i}` } });
+    }
+    expect(setReasonText).toHaveBeenCalledTimes(300);
+  });
 });
