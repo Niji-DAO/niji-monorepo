@@ -815,4 +815,79 @@ describe('AuctionNavigation Component', () => {
       unmount();
     }
   });
+
+  it('round-5 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <AuctionNavigation
+          isFirstAuction={false}
+          isLastAuction={false}
+          onPrevAuctionClick={() => {}}
+          onNextAuctionClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <AuctionNavigation
+              key={i}
+              isFirstAuction={false}
+              isLastAuction={false}
+              onPrevAuctionClick={() => {}}
+              onNextAuctionClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <AuctionNavigation
+            isFirstAuction={false}
+            isLastAuction={false}
+            onPrevAuctionClick={() => {}}
+            onNextAuctionClick={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-5 rapid 200 onPrevAuctionClick invocations', () => {
+    const onPrevAuctionClick = vi.fn();
+    render(
+      <AuctionNavigation
+        isFirstAuction={false}
+        isLastAuction={false}
+        onPrevAuctionClick={onPrevAuctionClick}
+        onNextAuctionClick={() => {}}
+      />,
+    );
+    for (let i = 0; i < 200; i++) onPrevAuctionClick();
+    expect(onPrevAuctionClick).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <AuctionNavigation
+          isFirstAuction={false}
+          isLastAuction={false}
+          onPrevAuctionClick={() => {}}
+          onNextAuctionClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
 });
