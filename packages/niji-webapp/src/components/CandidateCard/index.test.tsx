@@ -626,4 +626,61 @@ describe('CandidateCard', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 instances variant', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <CandidateCard
+              key={i}
+              candidate={{ ...baseCandidate, id: `c-r2-${i}` } as never}
+              nounsRequired={3}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different proposer addresses', () => {
+    for (let i = 0; i < 50; i++) {
+      const c = {
+        ...baseCandidate,
+        proposer: '0x' + i.toString(16).padStart(40, '0'),
+      } as never;
+      const { unmount } = wrap(<CandidateCard candidate={c} nounsRequired={3} />);
+      unmount();
+    }
+  });
+
+  it('round-2 all 100 instances have sponsors element', () => {
+    const { container } = wrap(
+      <>
+        {Array.from({ length: 100 }, (_, i) => (
+          <CandidateCard
+            key={i}
+            candidate={{ ...baseCandidate, id: `c-r2-${i}` } as never}
+            nounsRequired={3}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="sponsors"]').length).toBe(100);
+  });
+
+  it('round-2 handles 30 different candidate.requiredVotes values', () => {
+    for (let i = 0; i < 30; i++) {
+      const c = { ...baseCandidate, requiredVotes: i + 100 } as never;
+      const { unmount } = wrap(<CandidateCard candidate={c} nounsRequired={3} />);
+      unmount();
+    }
+  });
 });
