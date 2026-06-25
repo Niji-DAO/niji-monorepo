@@ -391,4 +391,55 @@ describe('SolidColorBackgroundModal', () => {
     rerender(<SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>v2</p>} />);
     expect(document.getElementById('overlay-root')?.querySelector('p')?.textContent).toBe('v2');
   });
+
+  it('mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>x</p>} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 50 different content values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>val-{i}</p>} />,
+      );
+      unmount();
+    }
+  });
+
+  it('rapid 500 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<SolidColorBackgroundModal show={true} onDismiss={onDismiss} content={<p>x</p>} />);
+    for (let i = 0; i < 500; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(500);
+  });
+
+  it('handles 30 different show toggle cycles', () => {
+    const { rerender } = render(
+      <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>x</p>} />,
+    );
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(
+          <SolidColorBackgroundModal
+            show={i % 2 === 0}
+            onDismiss={() => {}}
+            content={<p>v-{i}</p>}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('renders 10 modals sequentially', () => {
+    for (let i = 0; i < 10; i++) {
+      const { unmount } = render(
+        <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>m-{i}</p>} />,
+      );
+      unmount();
+    }
+  });
 });

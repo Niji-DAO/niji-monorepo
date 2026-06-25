@@ -280,4 +280,43 @@ describe('ProposalContent extra cases', () => {
     expect(typeof transactionLink).toBe('function');
     expect(typeof transactionIconLink).toBe('function');
   });
+
+  it('linkIfAddress handles 100 different addresses', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      expect(() => linkIfAddress(addr)).not.toThrow();
+    }
+  });
+
+  it('transactionLink handles 100 different hashes', () => {
+    for (let i = 0; i < 100; i++) {
+      const hash = '0x' + i.toString(16).padStart(64, '0');
+      expect(() => transactionLink(hash)).not.toThrow();
+    }
+  });
+
+  it('transactionIconLink handles 100 different hashes', () => {
+    for (let i = 0; i < 100; i++) {
+      const hash = '0x' + i.toString(16).padStart(64, '0');
+      expect(() => transactionIconLink(hash)).not.toThrow();
+    }
+  });
+
+  it('linkIfAddress + transactionLink + transactionIconLink for short strings', () => {
+    expect(() => linkIfAddress('0x0')).not.toThrow();
+    expect(() => transactionLink('0x0')).not.toThrow();
+    expect(() => transactionIconLink('0x0')).not.toThrow();
+  });
+
+  it('all 3 utility functions handle 30 sequential calls', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = '0x' + i.toString(16).padStart(40, '0');
+      const h = '0x' + i.toString(16).padStart(64, '0');
+      expect(() => {
+        linkIfAddress(a);
+        transactionLink(h);
+        transactionIconLink(h);
+      }).not.toThrow();
+    }
+  });
 });
