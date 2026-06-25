@@ -288,4 +288,36 @@ describe('applyAuctionExtended', () => {
       expect(typeof reduxSafeAuction).toBe('function');
     }
   });
+
+  it('round-3 30 sequential auctionAtom access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(auctionAtom).toBeDefined();
+    }
+  });
+
+  it('round-3 50 sequential reduxSafeAuction function check', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof reduxSafeAuction).toBe('function');
+    }
+  });
+
+  it('round-3 100 sequential applyActiveAuction type check', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof applyActiveAuction).toBe('function');
+    }
+  });
+
+  it('round-3 50 sequential atom reference consistency', () => {
+    const first = auctionAtom;
+    for (let i = 0; i < 50; i++) {
+      expect(auctionAtom).toBe(first);
+    }
+  });
+
+  it('round-3 100 sequential mixed function checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof applyAppendBid).toBe('function');
+      expect(typeof applyFullAuction).toBe('function');
+    }
+  });
 });
