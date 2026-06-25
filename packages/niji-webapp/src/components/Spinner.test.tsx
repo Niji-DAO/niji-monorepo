@@ -308,4 +308,42 @@ describe('Spinner', () => {
       expect(() => render(<Spinner />)).not.toThrow();
     }
   });
+
+  it('round-6 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<Spinner />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <Spinner key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => render(<Spinner />)).not.toThrow();
+    }
+  });
+
+  it('round-6 100 rerender cycles', () => {
+    const { rerender } = render(<Spinner />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<Spinner />)).not.toThrow();
+    }
+  });
+
+  it('round-6 200 sequential renders second cycle', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => render(<Spinner />)).not.toThrow();
+    }
+  });
 });

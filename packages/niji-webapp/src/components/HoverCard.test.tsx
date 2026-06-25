@@ -505,4 +505,68 @@ describe('HoverCard', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={() => <div />} tip="r6" id="r6">
+          <div>x</div>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <HoverCard key={i} hoverCardContent={() => <div />} tip="r6" id={`r6-${i}`}>
+              <div>x</div>
+            </HoverCard>
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 different tip values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={() => <div />} tip={`r6-tip-${i}`} id="r6">
+          <div>x</div>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <HoverCard hoverCardContent={() => <div />} tip="r6" id="r6">
+            <div>x</div>
+          </HoverCard>,
+          { wrapper: WithProviders },
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={() => <div />} tip="r6-2" id="r6-x">
+          <div>x</div>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
 });
