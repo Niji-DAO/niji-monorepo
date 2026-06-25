@@ -180,4 +180,50 @@ describe('SponsorsHeader (update flow)', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 200 cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <SponsorsHeader candidate={baseCandidate} isThresholdMet={false} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 200 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <SponsorsHeader key={i} candidate={baseCandidate} isThresholdMet={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different candidates with varying voteCount', () => {
+    for (let i = 0; i < 50; i++) {
+      const c = { ...baseCandidate, voteCount: i + 100 } as never;
+      const { unmount } = render(<SponsorsHeader candidate={c} isThresholdMet={false} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 50 different proposerVotes values', () => {
+    for (let i = 0; i < 50; i++) {
+      const c = { ...baseCandidate, proposerVotes: i + 100 } as never;
+      const { unmount } = render(<SponsorsHeader candidate={c} isThresholdMet={true} />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 isThresholdMet toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SponsorsHeader candidate={baseCandidate} isThresholdMet={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
 });

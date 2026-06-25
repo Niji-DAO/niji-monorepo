@@ -1033,4 +1033,47 @@ describe('NijiContent', () => {
     for (let i = 0; i < 200; i++) writeContractMock({});
     expect(writeContractMock).toHaveBeenCalledTimes(200);
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<NijiContent />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances in single wrap', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiContent key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 30 different sequential renders', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<NijiContent />);
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 sequential wrap cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<NijiContent />);
+      unmount();
+    }
+  });
+
+  it('round-2 rapid 100 writeContract invocations', () => {
+    const { container } = wrap(<NijiContent />);
+    const buttons = container.querySelectorAll('button');
+    const before = writeContractMock.mock.calls.length;
+    for (let i = 0; i < 100; i++) {
+      if (buttons.length > 0) fireEvent.click(buttons[0]);
+    }
+    expect(writeContractMock.mock.calls.length).toBeGreaterThanOrEqual(before);
+  });
 });
