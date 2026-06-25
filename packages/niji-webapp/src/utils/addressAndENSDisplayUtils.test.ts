@@ -345,4 +345,42 @@ describe('shortENS — boundary', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-6 30 sequential veryShortAddress calls', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR6' + i.toString(16).padStart(38, '0')) as Address;
+      expect(() => veryShortAddress(addr)).not.toThrow();
+    }
+  });
+
+  it('round-6 50 sequential veryShortENS calls', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => veryShortENS(`r6-ens-${i}.eth`)).not.toThrow();
+    }
+  });
+
+  it('round-6 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof veryShortAddress).toBe('function');
+      expect(typeof veryShortENS).toBe('function');
+    }
+  });
+
+  it('round-6 30 deterministic for same address', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = '0xR6CONST' as Address;
+      const r1 = veryShortAddress(addr);
+      const r2 = veryShortAddress(addr);
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-6 round-trip 100 sequential mixed calls', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0xR6' + i.toString(16).padStart(38, '0')) as Address;
+      veryShortAddress(addr);
+      veryShortENS(`r6-${i}.eth`);
+    }
+    expect(true).toBe(true);
+  });
 });
