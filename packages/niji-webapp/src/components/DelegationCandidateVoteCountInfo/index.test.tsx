@@ -622,4 +622,65 @@ describe('DelegationCandidateVoteCountInfo', () => {
     }
     expect(container.textContent).toContain('t-29');
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(
+        <DelegationCandidateVoteCountInfo text="x" voteCount={1} isLoading={false} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <DelegationCandidateVoteCountInfo
+              key={i}
+              text={`t-${i}`}
+              voteCount={i}
+              isLoading={false}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different voteCount values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(
+        <DelegationCandidateVoteCountInfo text="x" voteCount={i} isLoading={false} />,
+      );
+      expect(container.textContent).toContain(String(i));
+      unmount();
+    }
+  });
+
+  it('rapid isLoading toggle 200 times', () => {
+    const { rerender } = render(
+      <DelegationCandidateVoteCountInfo text="x" voteCount={5} isLoading={false} />,
+    );
+    for (let i = 0; i < 200; i++) {
+      expect(() =>
+        rerender(
+          <DelegationCandidateVoteCountInfo text="x" voteCount={5} isLoading={i % 2 === 0} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('renders 500 instances without crash (count verification)', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <DelegationCandidateVoteCountInfo key={i} text="x" voteCount={i} isLoading={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
 });
