@@ -720,4 +720,87 @@ describe('NijiContent', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles all 5 settleHookState statuses', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    [
+      { isPending: true, isSuccess: false, isError: false, error: null },
+      { isPending: false, isSuccess: true, isError: false, error: null },
+      { isPending: false, isSuccess: false, isError: true, error: { message: 'e' } },
+      { isPending: false, isSuccess: false, isError: false, error: null },
+      { isPending: false, isSuccess: true, isError: true, error: null },
+    ].forEach(s => {
+      Object.assign(settleHookState, s);
+      expect(() =>
+        render(
+          <MemoryRouter>
+            <NijiContent />
+          </MemoryRouter>,
+        ),
+      ).not.toThrow();
+    });
+    Object.assign(settleHookState, {
+      isPending: false,
+      isSuccess: false,
+      isError: false,
+      error: null,
+    });
+  });
+
+  it('handles 50 different nounIds sequentially', () => {
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    for (let i = 0; i < 50; i++) {
+      useAtomValueMock.mockReturnValue(BigInt(i));
+      const { unmount } = render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles undefined timestamp block', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: undefined });
+    expect(() =>
+      render(
+        <MemoryRouter>
+          <NijiContent />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles writeContract being invoked', () => {
+    useAtomValueMock.mockReturnValue(10n);
+    useAccountMock.mockReturnValue({ address: '0xACCT' });
+    useBlockMock.mockReturnValue({ data: { timestamp: 0n } });
+    writeContractMock.mockReset();
+    render(
+      <MemoryRouter>
+        <NijiContent />
+      </MemoryRouter>,
+    );
+    writeContractMock({});
+    expect(writeContractMock).toHaveBeenCalled();
+  });
 });

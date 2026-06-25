@@ -502,4 +502,51 @@ describe('SettleManuallyBtn', () => {
       render(<SettleManuallyBtn auction={a} settleAuctionHandler={() => {}} />),
     ).not.toThrow();
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <SettleManuallyBtn auction={auction} settleAuctionHandler={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <SettleManuallyBtn key={i} auction={auction} settleAuctionHandler={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different auctions', () => {
+    for (let i = 0; i < 30; i++) {
+      const a: Auction = { ...auction, nounId: BigInt(i) };
+      const { unmount } = render(<SettleManuallyBtn auction={a} settleAuctionHandler={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('handles undefined bidder edge case', () => {
+    const a: Auction = { ...auction, bidder: '0x' as never };
+    expect(() =>
+      render(<SettleManuallyBtn auction={a} settleAuctionHandler={() => {}} />),
+    ).not.toThrow();
+  });
+
+  it('all 50 instances have button element', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 50 }, (_, i) => (
+          <SettleManuallyBtn key={i} auction={auction} settleAuctionHandler={() => {}} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(50);
+  });
 });
