@@ -612,4 +612,49 @@ describe('MinBid', () => {
     );
     expect(container.children.length).toBe(200);
   });
+
+  it('round-3 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<MinBid minBid={1n} onClick={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <MinBid key={i} minBid={BigInt(i + 1)} onClick={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 100 different minBid values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<MinBid minBid={BigInt(i + 1)} onClick={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-3 rapid 1000 onClick events', () => {
+    const onClick = vi.fn();
+    const { container } = render(<MinBid minBid={1n} onClick={onClick} />);
+    const target = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 1000; i++) fireEvent.click(target);
+    expect(onClick).toHaveBeenCalledTimes(1000);
+  });
+
+  it('round-3 all 200 instances render div root', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <MinBid key={i} minBid={BigInt(i + 1)} onClick={() => {}} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(200);
+  });
 });
