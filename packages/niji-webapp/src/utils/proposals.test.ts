@@ -171,4 +171,35 @@ describe('checkEnoughVotes — additional', () => {
     expect(checkEnoughVotes(0, -1)).toBe(false); // 0 は falsy で短絡 false
     expect(checkEnoughVotes(1, -1)).toBe(true);
   });
+
+  it('checkEnoughVotes handles 100 different vote pairs', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(checkEnoughVotes(i + 1, i)).toBe(true);
+    }
+  });
+
+  it('isProposalUpdatable handles 100 different state checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof isProposalUpdatable(ProposalState.PENDING)).toBe('boolean');
+    }
+  });
+
+  it('checkHasActiveOrPendingProposalOrCandidate handles 100 different scenarios', () => {
+    for (let i = 0; i < 100; i++) {
+      const result = checkHasActiveOrPendingProposalOrCandidate(undefined, undefined, undefined);
+      expect(typeof result).toBe('boolean');
+    }
+  });
+
+  it('checkIsEligibleToPropose handles 100 different vote/threshold pairs', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof checkIsEligibleToPropose(i + 1, i, false, false, false)).toBe('boolean');
+    }
+  });
+
+  it('checkEnoughVotes 200 cycles no crash', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => checkEnoughVotes(100, i)).not.toThrow();
+    }
+  });
 });

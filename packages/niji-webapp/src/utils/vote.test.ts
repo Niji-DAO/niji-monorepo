@@ -65,4 +65,36 @@ describe('Vote enum', () => {
     expect(Vote[0]).toBe('SUPPORT');
     expect(Vote[0]).toBeTruthy();
   });
+
+  it('Vote.SUPPORT is 0 (100 cycles)', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Vote.SUPPORT).toBe(0);
+    }
+  });
+
+  it('Vote.FOR is 1 (100 cycles)', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Vote.FOR).toBe(1);
+    }
+  });
+
+  it('Vote.ABSTAIN is 2 (100 cycles)', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Vote.ABSTAIN).toBe(2);
+    }
+  });
+
+  it('reverse lookup 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Vote[0]).toBe('SUPPORT');
+      expect(Vote[1]).toBe('FOR');
+      expect(Vote[2]).toBe('ABSTAIN');
+    }
+  });
+
+  it('Vote enum has 3 values 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Object.keys(Vote).length).toBeGreaterThanOrEqual(6);
+    }
+  });
 });

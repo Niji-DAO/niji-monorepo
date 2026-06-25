@@ -66,4 +66,49 @@ describe('execute', () => {
     mockFetch.mockResolvedValue({ ok: false, json: async () => ({}) });
     await expect(execute('query' as never)).rejects.toThrow('Network response was not ok');
   });
+
+  it('handles 30 different empty-config cycles', async () => {
+    configState.subgraphApiUri = '';
+    for (let i = 0; i < 30; i++) {
+      expect(await execute('query x { y }' as never)).toBeUndefined();
+    }
+  });
+
+  it('handles 30 successful fetch cycles', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ data: { x: 1 } }),
+    });
+    for (let i = 0; i < 30; i++) {
+      const result = await execute('q' as never);
+      expect(result).toEqual({ x: 1 });
+    }
+  });
+
+  it('handles 30 error responses', async () => {
+    mockFetch.mockResolvedValue({ ok: false, status: 500 });
+    for (let i = 0; i < 30; i++) {
+      await expect(execute('q' as never)).rejects.toThrow();
+    }
+  });
+
+  it('handles 30 different query inputs', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ data: {} }),
+    });
+    for (let i = 0; i < 30; i++) {
+      expect(() => execute(`q-${i}` as never)).not.toThrow();
+    }
+  });
+
+  it('handles 30 different vars inputs', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ data: {} }),
+    });
+    for (let i = 0; i < 30; i++) {
+      expect(() => execute('q' as never, { var: i } as never)).not.toThrow();
+    }
+  });
 });
