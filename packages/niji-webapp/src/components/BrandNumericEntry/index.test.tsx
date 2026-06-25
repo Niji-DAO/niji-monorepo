@@ -369,4 +369,41 @@ describe('BrandNumericEntry', () => {
     const { container } = render(<BrandNumericEntry value={1_000_000_000_000_000} />);
     expect(container.querySelector('input')?.value).toContain('1,000,000,000,000,000');
   });
+
+  it('renders 200 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <BrandNumericEntry key={i} value={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<BrandNumericEntry value={i} />);
+      unmount();
+    }
+  });
+
+  it('handles 0 value', () => {
+    const { container } = render(<BrandNumericEntry value={0} />);
+    expect(container.querySelector('input')?.value).toBe('0');
+  });
+
+  it('handles decimal value 3.14', () => {
+    const { container } = render(<BrandNumericEntry value={3.14} />);
+    expect(container.querySelector('input')?.value).toContain('3.14');
+  });
+
+  it('rapid rerender 50 times with varying value', () => {
+    const { container, rerender } = render(<BrandNumericEntry value={0} />);
+    for (let i = 0; i < 50; i++) {
+      rerender(<BrandNumericEntry value={i} />);
+    }
+    expect(container.querySelector('input')).not.toBeNull();
+  });
 });
