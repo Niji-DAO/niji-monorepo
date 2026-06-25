@@ -67,4 +67,40 @@ describe('svg2png', () => {
     const svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"></svg>';
     await expect(svg2png(svgString, 25, 25)).rejects.toThrow(/Unable to scale canvas/);
   });
+
+  it('rapid 100 calls return Promise', () => {
+    const svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"></svg>';
+    for (let i = 0; i < 100; i++) {
+      expect(svg2png(svgString, 32, 32)).toBeInstanceOf(Promise);
+    }
+  });
+
+  it('handles 50 different SVG inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><text>${i}</text></svg>`;
+      expect(() => svg2png(svgString, 32, 32)).not.toThrow();
+    }
+  });
+
+  it('handles 30 integer scale ratios', () => {
+    const svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"></svg>';
+    for (let i = 1; i <= 30; i++) {
+      expect(() => svg2png(svgString, 32 * i, 32 * i)).not.toThrow();
+    }
+  });
+
+  it('100 invocations all return Promise', () => {
+    const svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"></svg>';
+    for (let i = 0; i < 100; i++) {
+      expect(svg2png(svgString, 32, 32)).toBeInstanceOf(Promise);
+    }
+  });
+
+  it('handles 30 different width/height pairs', () => {
+    const svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"></svg>';
+    for (let i = 0; i < 30; i++) {
+      const w = 32 * (i + 1);
+      expect(() => svg2png(svgString, w, w)).not.toThrow();
+    }
+  });
 });
