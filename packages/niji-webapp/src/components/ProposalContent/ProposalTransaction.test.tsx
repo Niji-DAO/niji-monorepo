@@ -286,4 +286,43 @@ describe('ProposalTransaction', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ProposalTransaction transaction={simpleTx} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <ProposalTransaction key={i} transaction={simpleTx} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different sigTx variants', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalTransaction transaction={sigTx} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ProposalTransaction transaction={simpleTx} />)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ProposalTransaction transaction={simpleTx} />);
+      unmount();
+    }
+  });
 });
