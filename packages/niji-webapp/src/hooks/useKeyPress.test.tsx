@@ -300,4 +300,35 @@ describe('useKeyPress', () => {
       expect(typeof useKeyPress).toBe('function');
     }
   });
+
+  it('round-7 30 sequential useKeyPress access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useKeyPress).toBeDefined();
+    }
+  });
+
+  it('round-7 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useKeyPress).toBe('function');
+    }
+  });
+
+  it('round-7 100 sequential reference consistency', () => {
+    const first = useKeyPress;
+    for (let i = 0; i < 100; i++) {
+      expect(useKeyPress).toBe(first);
+    }
+  });
+
+  it('round-7 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useKeyPress('Enter'))).not.toThrow();
+    }
+  });
+
+  it('round-7 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useKeyPress).toBe('function');
+    }
+  });
 });
