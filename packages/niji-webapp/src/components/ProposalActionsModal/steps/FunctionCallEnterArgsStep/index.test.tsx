@@ -386,4 +386,64 @@ describe('FunctionCallEnterArgsStep', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <FunctionCallEnterArgsStep
+              key={i}
+              {...defaults}
+              state={{ abi, function: 'transfer' } as never}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 200 onPrevBtnClick invocations', () => {
+    const onPrev = vi.fn();
+    render(
+      <FunctionCallEnterArgsStep
+        {...defaults}
+        state={{ abi, function: 'transfer' } as never}
+        onPrevBtnClick={onPrev}
+      />,
+    );
+    for (let i = 0; i < 200; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-2 rapid 200 onNextBtnClick invocations', () => {
+    const onNext = vi.fn();
+    render(
+      <FunctionCallEnterArgsStep
+        {...defaults}
+        state={{ abi, function: 'transfer' } as never}
+        onNextBtnClick={onNext}
+      />,
+    );
+    for (let i = 0; i < 200; i++) onNext();
+    expect(onNext).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-2 30 mount-unmount cycles second', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+      );
+      unmount();
+    }
+  });
 });

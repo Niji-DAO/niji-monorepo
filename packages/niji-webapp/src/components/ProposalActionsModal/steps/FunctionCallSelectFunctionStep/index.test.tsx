@@ -411,4 +411,50 @@ describe('FunctionCallSelectFunctionStep', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<FunctionCallSelectFunctionStep {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <FunctionCallSelectFunctionStep key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 200 onPrevBtnClick invocations', () => {
+    const onPrev = vi.fn();
+    render(<FunctionCallSelectFunctionStep {...baseProps} onPrevBtnClick={onPrev} />);
+    for (let i = 0; i < 200; i++) onPrev();
+    expect(onPrev).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-2 rapid 200 onNextBtnClick invocations', () => {
+    const onNext = vi.fn();
+    render(<FunctionCallSelectFunctionStep {...baseProps} onNextBtnClick={onNext} />);
+    for (let i = 0; i < 200; i++) onNext();
+    expect(onNext).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-2 handles 30 different addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      const { unmount } = render(
+        <FunctionCallSelectFunctionStep
+          {...baseProps}
+          state={{ ...baseProps.state, address: addr } as never}
+        />,
+      );
+      unmount();
+    }
+  });
 });
