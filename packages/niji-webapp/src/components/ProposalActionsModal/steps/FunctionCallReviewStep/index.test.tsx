@@ -687,4 +687,52 @@ describe('FunctionCallReviewStep', () => {
       unmount();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={baseState as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <FunctionCallReviewStep key={i} {...defaults} state={baseState as never} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<FunctionCallReviewStep {...defaults} state={baseState as never} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={baseState as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 30 different address values', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = '0xR6' + i.toString(16).padStart(38, '0');
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={{ ...baseState, address: addr } as never} />,
+      );
+      unmount();
+    }
+  });
 });
