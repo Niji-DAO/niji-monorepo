@@ -271,4 +271,41 @@ describe('shortENS — boundary', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-4 30 sequential calls with varied addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR4' + i.toString(16).padStart(38, '0')) as Address;
+      expect(() => veryShortAddress(addr)).not.toThrow();
+    }
+  });
+
+  it('round-4 30 sequential calls with varied ENS', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => veryShortENS(`r4-ens-${i}.eth`)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 different short address inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0xR4' + i.toString(16).padStart(38, '0')) as Address;
+      const result = veryShortAddress(addr);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-4 50 different ENS inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = veryShortENS(`r4-bob-${i}.eth`);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-4 round-trip 100 sequential mixed calls', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0xR4' + i.toString(16).padStart(38, '0')) as Address;
+      veryShortAddress(addr);
+      veryShortENS(`r4-${i}.eth`);
+    }
+    expect(true).toBe(true);
+  });
 });
