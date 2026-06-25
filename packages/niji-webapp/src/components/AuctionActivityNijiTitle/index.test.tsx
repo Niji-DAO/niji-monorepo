@@ -499,4 +499,54 @@ describe('AuctionActivityNijiTitle', () => {
     }
     expect(container.querySelector('h1')?.textContent).toContain('Niji');
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<AuctionActivityNijiTitle nounId={1n} />);
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <AuctionActivityNijiTitle key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different nounIds with isCool=false', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(
+        <AuctionActivityNijiTitle nounId={BigInt(i)} isCool={false} />,
+      );
+      expect(container.querySelector('h1')?.textContent).toContain(String(i));
+      unmount();
+    }
+  });
+
+  it('all 500 h1 elements contain Niji prefix', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <AuctionActivityNijiTitle key={i} nounId={BigInt(i)} />
+        ))}
+      </>,
+    );
+    const matches = (container.textContent ?? '').match(/Niji/g);
+    expect(matches?.length).toBe(500);
+  });
+
+  it('handles rapid 100 isCool toggle rerender', () => {
+    const { rerender } = render(<AuctionActivityNijiTitle nounId={1n} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<AuctionActivityNijiTitle nounId={BigInt(i)} isCool={i % 2 === 0} />),
+      ).not.toThrow();
+    }
+  });
 });

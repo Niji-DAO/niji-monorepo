@@ -696,4 +696,53 @@ describe('Bid', () => {
     ).not.toThrow();
     hookState.minBidIncPercentage = orig;
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different bid input event chains', () => {
+    const { container } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    for (let i = 0; i < 30; i++) {
+      fireEvent.change(input, { target: { value: `${i + 1}.0` } });
+      expect(input.value).toBe(`${i + 1}.0`);
+    }
+  });
+
+  it('renders 30 instances all auctionEnded=false', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Bid
+              key={i}
+              auction={makeAuction({ nounId: BigInt(i) }) as never}
+              auctionEnded={false}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different bidder addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = makeAuction({ bidder: `0xBID${i}` });
+      const { unmount } = render(<Bid auction={a as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different auctionEnded toggle cycles', () => {
+    const { rerender } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(<Bid auction={makeAuction() as never} auctionEnded={i % 2 === 0} />),
+      ).not.toThrow();
+    }
+  });
 });
