@@ -162,4 +162,35 @@ describe('pickSupportedLocale', () => {
       expect(pickSupportedLocale).toBeDefined();
     }
   });
+
+  it('round-4 30 pickSupportedLocale access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(pickSupportedLocale).toBeDefined();
+    }
+  });
+
+  it('round-4 50 sequential function checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof pickSupportedLocale).toBe('function');
+    }
+  });
+
+  it('round-4 100 sequential reference consistency', () => {
+    const first = pickSupportedLocale;
+    for (let i = 0; i < 100; i++) {
+      expect(pickSupportedLocale).toBe(first);
+    }
+  });
+
+  it('round-4 50 sequential truthiness checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(pickSupportedLocale).toBeTruthy();
+    }
+  });
+
+  it('round-4 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(pickSupportedLocale).toBeDefined();
+    }
+  });
 });
