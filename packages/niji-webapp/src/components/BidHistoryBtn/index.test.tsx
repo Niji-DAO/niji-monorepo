@@ -437,4 +437,45 @@ describe('BidHistoryBtn Component (isCool=true)', () => {
       expect(() => render(<BidHistoryBtn onClick={vi.fn()} />)).not.toThrow();
     }
   });
+
+  it('mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<BidHistoryBtn onClick={vi.fn()} />);
+      unmount();
+    }
+  });
+
+  it('handles onClick being a no-op vi.fn', () => {
+    const noop = vi.fn();
+    render(<BidHistoryBtn onClick={noop} />);
+    expect(noop).toHaveBeenCalledTimes(0);
+  });
+
+  it('rapid alternating click 100 times invokes 100 times', () => {
+    const onClick = vi.fn();
+    render(<BidHistoryBtn onClick={onClick} />);
+    const btn = screen.getAllByText('View all bids')[0];
+    for (let i = 0; i < 100; i++) {
+      fireEvent.click(btn);
+    }
+    expect(onClick).toHaveBeenCalledTimes(100);
+  });
+
+  it('200 instances all render text', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <BidHistoryBtn key={i} onClick={vi.fn()} />
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(200);
+  });
+
+  it('handles new onClick prop per rerender 30 times', () => {
+    const { rerender } = render(<BidHistoryBtn onClick={vi.fn()} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() => rerender(<BidHistoryBtn onClick={vi.fn()} />)).not.toThrow();
+    }
+  });
 });
