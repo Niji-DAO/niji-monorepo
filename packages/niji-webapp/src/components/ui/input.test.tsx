@@ -251,4 +251,48 @@ describe('Input', () => {
     );
     expect(container.querySelectorAll('input').length).toBe(200);
   });
+
+  it('round-5 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<Input />);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <Input key={i} placeholder={`r5-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 different placeholder values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Input placeholder={`r5-p-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Input />);
+      unmount();
+    }
+  });
+
+  it('round-5 all 200 inputs render', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <Input key={i} placeholder={`r5-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(200);
+  });
 });

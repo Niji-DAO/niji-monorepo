@@ -264,4 +264,44 @@ describe('buttonVariants (cva)', () => {
       unmount();
     }
   });
+
+  it('round-5 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<Button>r5</Button>);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <Button key={i}>r5-{i}</Button>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Button>r5-c-{i}</Button>);
+      unmount();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Button>x</Button>);
+      unmount();
+    }
+  });
+
+  it('round-5 30 disabled toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Button disabled={i % 2 === 0}>x</Button>);
+      unmount();
+    }
+  });
 });
