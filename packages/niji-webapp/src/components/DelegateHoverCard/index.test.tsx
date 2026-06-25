@@ -970,4 +970,84 @@ describe('DelegateHoverCard', () => {
       unmount();
     }
   });
+
+  it('mount-unmount 200 cycles', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(
+        <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 200 instances all in loading state', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 200 }, (_, i) => (
+            <DelegateHoverCard key={i} delegateId={`delegate-0x${i}`} proposalCreationBlock={1n} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 100 different delegateIds', () => {
+    useDelegateNounsAtBlockQueryMock.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+    });
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <DelegateHoverCard delegateId={`delegate-0x${i}`} proposalCreationBlock={1n} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different niji counts', () => {
+    for (let i = 1; i <= 30; i++) {
+      const niji = Array.from({ length: i }, (_, j) => ({ id: String(j) }));
+      useDelegateNounsAtBlockQueryMock.mockReturnValue({
+        data: { delegates: [{ id: '0xA', nijiRepresented: niji }] },
+        loading: false,
+        error: undefined,
+      });
+      const { container, unmount } = render(
+        <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+      );
+      expect(container.querySelector('[data-testid="stacked"]')?.textContent).toBe(`stack-${i}`);
+      unmount();
+    }
+  });
+
+  it('handles all query state transitions', () => {
+    [
+      { loading: true, error: undefined, data: undefined },
+      { loading: false, error: new Error('e'), data: undefined },
+      { loading: false, error: undefined, data: { delegates: [] } },
+      {
+        loading: false,
+        error: undefined,
+        data: { delegates: [{ id: '0xA', nijiRepresented: [{ id: '1' }] }] },
+      },
+    ].forEach(state => {
+      useDelegateNounsAtBlockQueryMock.mockReturnValue(state);
+      const { unmount } = render(
+        <DelegateHoverCard delegateId="delegate-0xA" proposalCreationBlock={1n} />,
+      );
+      unmount();
+    });
+  });
 });
