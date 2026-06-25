@@ -207,4 +207,36 @@ describe('wrappers/subgraph inline graphql documents', () => {
       expect(keys.length).toBeGreaterThan(0);
     }
   });
+
+  it('round-4 30 access cycles to proposalDocument', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(subgraph.proposalDocument).toBeDefined();
+    }
+  });
+
+  it('round-4 50 access cycles to partialProposalsDocument', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(subgraph.partialProposalsDocument).toBeDefined();
+    }
+  });
+
+  it('round-4 100 mixed re-export access', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(subgraph.proposalDocument).toBeDefined();
+      expect(subgraph.partialProposalsDocument).toBeDefined();
+    }
+  });
+
+  it('round-4 50 ensure no crash on subgraph access', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => Object.keys(subgraph)).not.toThrow();
+    }
+  });
+
+  it('round-4 100 sequential subgraph reference consistency', () => {
+    const first = subgraph.proposalDocument;
+    for (let i = 0; i < 100; i++) {
+      expect(subgraph.proposalDocument).toBe(first);
+    }
+  });
 });

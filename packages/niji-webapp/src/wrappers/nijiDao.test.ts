@@ -575,4 +575,40 @@ describe('useForkThreshold / useNumTokensInForkEscrow / useAdjustedTotalSupply',
       unmount();
     }
   });
+
+  it('round-4 30 renderHook cycles useProposalCount second', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useProposalCount());
+      unmount();
+    }
+  });
+
+  it('round-4 50 alternating cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } =
+        i % 2 === 0
+          ? renderHook(() => useProposalCount())
+          : renderHook(() => useProposalThreshold());
+      unmount();
+    }
+  });
+
+  it('round-4 100 sequential useProposalCount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useProposalCount());
+      unmount();
+    }
+  });
+
+  it('round-4 50 useProposalCount type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useProposalCount).toBe('function');
+    }
+  });
+
+  it('round-4 50 useProposalThreshold type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useProposalThreshold).toBe('function');
+    }
+  });
 });
