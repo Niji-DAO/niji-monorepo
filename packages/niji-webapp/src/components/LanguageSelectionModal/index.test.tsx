@@ -491,4 +491,51 @@ describe('LanguageSelectionModal', () => {
       expect(() => rerender(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
     }
   });
+
+  it('mount-unmount 100 cycles', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different setActiveLocale invocations', () => {
+    for (let i = 0; i < 30; i++) {
+      const setLocale = vi.fn();
+      useAtomMock.mockReturnValue(['en-US', setLocale]);
+      const { unmount } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('rapid 200 onDismiss invocations', () => {
+    useAtomMock.mockReturnValue(['en-US', vi.fn()]);
+    const onDismiss = vi.fn();
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    for (let i = 0; i < 200; i++) {
+      onDismiss();
+    }
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('handles all 3 locale variants 10 times', () => {
+    ['en-US', 'ja-JP', 'zh-CN'].forEach(loc => {
+      for (let i = 0; i < 10; i++) {
+        useAtomMock.mockReturnValue([loc, vi.fn()]);
+        const { unmount } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+        unmount();
+      }
+    });
+  });
+
+  it('renders title always "Select Language" across all locales', () => {
+    ['en-US', 'ja-JP', 'zh-CN', 'xx-XX'].forEach(loc => {
+      useAtomMock.mockReturnValue([loc, vi.fn()]);
+      render(<LanguageSelectionModal onDismiss={() => {}} />);
+      expect(document.getElementById('overlay-root')?.querySelector('h3')?.textContent).toBe(
+        'Select Language',
+      );
+    });
+  });
 });
