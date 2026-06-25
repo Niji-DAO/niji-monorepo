@@ -143,4 +143,42 @@ describe('useElapsedTime', () => {
     expect(opts.query.enabled).toBe(true);
     expect(opts.functionName).toBe('elapsedTime');
   });
+
+  it('useStreamRemainingBalance handles 30 different addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      expect(() =>
+        renderHook(() => useStreamRemainingBalance(addr as `0x${string}`)),
+      ).not.toThrow();
+    }
+  });
+
+  it('useElapsedTime handles 30 different addresses', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      expect(() => renderHook(() => useElapsedTime(addr as `0x${string}`))).not.toThrow();
+    }
+  });
+
+  it('useWithdrawTokens handles 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useWithdrawTokens())).not.toThrow();
+    }
+  });
+
+  it('useStreamRemainingBalance returns data for 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      useReadContractMock.mockReturnValue({ data: BigInt(i) });
+      const { result } = renderHook(() => useStreamRemainingBalance('0xX' as `0x${string}`));
+      expect(typeof result.current === 'bigint' || result.current === undefined).toBe(true);
+    }
+  });
+
+  it('useWithdrawTokens fires writeContract 50 times', () => {
+    const { result } = renderHook(() => useWithdrawTokens());
+    for (let i = 0; i < 50; i++) {
+      result.current.withdrawTokens({} as never);
+    }
+    expect(writeContractMock).toHaveBeenCalledTimes(50);
+  });
 });
