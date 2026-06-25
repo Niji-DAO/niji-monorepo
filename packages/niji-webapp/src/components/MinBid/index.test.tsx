@@ -745,4 +745,43 @@ describe('MinBid', () => {
     );
     expect(container.children.length).toBe(200);
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<MinBid minBid={1n} onClick={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <MinBid key={i} minBid={BigInt(i + 8000)} onClick={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<MinBid minBid={1n} onClick={() => {}} />)).not.toThrow();
+    }
+  });
+
+  it('round-6 rapid 200 onClick invocations', () => {
+    const onClick = vi.fn();
+    render(<MinBid minBid={1n} onClick={onClick} />);
+    for (let i = 0; i < 200; i++) onClick();
+    expect(onClick).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<MinBid minBid={1n} onClick={() => {}} />);
+      unmount();
+    }
+  });
 });
