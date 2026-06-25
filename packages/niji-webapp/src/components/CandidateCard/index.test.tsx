@@ -724,4 +724,45 @@ describe('CandidateCard', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 instances rendered together', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CandidateCard key={i} candidate={baseCandidate} nounsRequired={i + 100} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 different nounsRequired values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={i + 500} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<CandidateCard candidate={baseCandidate} nounsRequired={3} />);
+      unmount();
+    }
+  });
 });
