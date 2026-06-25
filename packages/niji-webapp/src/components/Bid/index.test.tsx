@@ -745,4 +745,53 @@ describe('Bid', () => {
       ).not.toThrow();
     }
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('renders 30 instances all auction-ended', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Bid
+              key={i}
+              auction={{ ...makeAuction(), nounId: BigInt(i) } as never}
+              auctionEnded={true}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different nounId values', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = { ...makeAuction(), nounId: BigInt(i) };
+      const { unmount } = render(<Bid auction={a as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different amount values', () => {
+    for (let i = 0; i < 30; i++) {
+      const a = { ...makeAuction(), amount: BigInt((i + 1) * 1000000000000000000) };
+      const { unmount } = render(<Bid auction={a as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different account states', () => {
+    const orig = hookState.account;
+    for (let i = 0; i < 30; i++) {
+      hookState.account = i % 2 === 0 ? `0xACCT${i}` : undefined;
+      const { unmount } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+      unmount();
+    }
+    hookState.account = orig;
+  });
 });
