@@ -556,4 +556,55 @@ describe('BidHistoryModal', () => {
       ).not.toThrow();
     }
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BidHistoryModal onDismiss={() => {}} auction={auction} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different auction nounIds', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    for (let i = 0; i < 30; i++) {
+      const a = { ...auction, nounId: BigInt(i) };
+      const { unmount } = render(<BidHistoryModal onDismiss={() => {}} auction={a} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different bid array lengths', () => {
+    for (let i = 0; i < 30; i++) {
+      const bids = Array.from({ length: i + 1 }, (_, j) => ({
+        transactionHash: `0x${j}`,
+        sender: '0xAA',
+        value: BigInt(j),
+        nounId: 42n,
+        extended: false,
+        transactionIndex: j,
+        timestamp: BigInt(j),
+      }));
+      useAuctionBidsMock.mockReturnValue(bids);
+      const { unmount } = render(<BidHistoryModal onDismiss={() => {}} auction={auction} />);
+      unmount();
+    }
+  });
+
+  it('rapid 100 close button clicks fire onDismiss', () => {
+    useAuctionBidsMock.mockReturnValue([]);
+    const onDismiss = vi.fn();
+    render(<BidHistoryModal onDismiss={onDismiss} auction={auction} />);
+    const btn = document.getElementById('overlay-root')?.querySelector('button') as HTMLElement;
+    for (let i = 0; i < 100; i++) fireEvent.click(btn);
+    expect(onDismiss).toHaveBeenCalledTimes(100);
+  });
+
+  it('Backdrop 500 click events fire onDismiss', () => {
+    const onDismiss = vi.fn();
+    const { container } = render(<Backdrop onDismiss={onDismiss} />);
+    const div = container.querySelector('div')!;
+    for (let i = 0; i < 500; i++) fireEvent.click(div);
+    expect(onDismiss).toHaveBeenCalledTimes(500);
+  });
 });
