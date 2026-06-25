@@ -454,4 +454,40 @@ describe('useNounSeed', () => {
       expect(result.current?.special).toBe(1);
     }
   });
+
+  it('round-2 30 renderHook cycles useNounTokenBalance', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useNounTokenBalance('0xABC' as never));
+      unmount();
+    }
+  });
+
+  it('round-2 50 renderHook cycles useNounTokenBalance varied', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as never;
+      const { unmount } = renderHook(() => useNounTokenBalance(addr));
+      unmount();
+    }
+  });
+
+  it('round-2 30 mount-unmount renderHook second cycle', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useNounTokenBalance('0xR2' as never));
+      unmount();
+    }
+  });
+
+  it('round-2 hook returns without crash for 30 calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useNounTokenBalance('0xR2' as never))).not.toThrow();
+    }
+  });
+
+  it('round-2 100 sequential renderHook cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as never;
+      const { unmount } = renderHook(() => useNounTokenBalance(addr));
+      unmount();
+    }
+  });
 });
