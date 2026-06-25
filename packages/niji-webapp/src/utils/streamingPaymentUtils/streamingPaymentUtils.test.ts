@@ -146,4 +146,35 @@ describe('getTokenAddressForCurrency — additional', () => {
     expect(getTokenAddressForCurrency(SupportedCurrency.WETH, 99999)).toBe(zeroAddress);
     expect(getTokenAddressForCurrency(SupportedCurrency.STETH, 99999)).toBe(zeroAddress);
   });
+
+  it('formatTokenAmount USDC handles 100 different amounts', () => {
+    for (let i = 0; i < 100; i++) {
+      const amount = i + 1;
+      expect(formatTokenAmount(amount, SupportedCurrency.USDC)).toBe(BigInt(amount * 1_000_000));
+    }
+  });
+
+  it('formatTokenAmount WETH handles 100 different amounts', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => formatTokenAmount(i + 1, SupportedCurrency.WETH)).not.toThrow();
+    }
+  });
+
+  it('formatTokenAmount STETH handles 100 different amounts', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => formatTokenAmount(i + 1, SupportedCurrency.STETH)).not.toThrow();
+    }
+  });
+
+  it('getTokenAddressForCurrency handles 30 different chainIds', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => getTokenAddressForCurrency(SupportedCurrency.USDC, i)).not.toThrow();
+    }
+  });
+
+  it('rapid 200 formatTokenAmount invocations', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => formatTokenAmount(1.5, SupportedCurrency.USDC)).not.toThrow();
+    }
+  });
 });

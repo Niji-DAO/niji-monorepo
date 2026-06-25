@@ -109,4 +109,43 @@ describe('useEthNeeded', () => {
     const { result } = renderHook(() => useEthNeeded('0xADDR', 10, true));
     expect(result.current).toBeUndefined();
   });
+
+  it('handles 30 different additionalTokens values', () => {
+    useReadNijiTokenBuyerEthNeededMock.mockReturnValue({ data: 100n });
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        renderHook(() => useEthNeeded('0xADDR' as `0x${string}`, BigInt(i * 100))),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 30 different tokenAddress values', () => {
+    useReadNijiTokenBuyerEthNeededMock.mockReturnValue({ data: 100n });
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as `0x${string}`;
+      expect(() => renderHook(() => useEthNeeded(addr, 100n))).not.toThrow();
+    }
+  });
+
+  it('handles 30 cycles with undefined return', () => {
+    useReadNijiTokenBuyerEthNeededMock.mockReturnValue({ data: undefined });
+    for (let i = 0; i < 30; i++) {
+      const { result } = renderHook(() => useEthNeeded('0xA' as `0x${string}`, 100n));
+      expect(result.current).toBeUndefined();
+    }
+  });
+
+  it('handles 30 cycles with large bigint return without crash', () => {
+    useReadNijiTokenBuyerEthNeededMock.mockReturnValue({ data: 1_000_000_000_000_000_000n });
+    for (let i = 0; i < 30; i++) {
+      expect(() => renderHook(() => useEthNeeded('0xA' as `0x${string}`, 100n))).not.toThrow();
+    }
+  });
+
+  it('rapid 50 invocations', () => {
+    useReadNijiTokenBuyerEthNeededMock.mockReturnValue({ data: 100n });
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useEthNeeded('0xA' as `0x${string}`, 100n))).not.toThrow();
+    }
+  });
 });
