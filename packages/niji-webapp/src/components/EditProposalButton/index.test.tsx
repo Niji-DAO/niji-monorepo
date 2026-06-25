@@ -642,4 +642,50 @@ describe('EditProposalButton', () => {
     );
     expect(container.querySelectorAll('button').length).toBe(200);
   });
+
+  it('round-4 mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(<EditProposalButton {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <EditProposalButton key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 30 isCandidate toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<EditProposalButton {...defaults} isCandidate={i % 2 === 0} />);
+      unmount();
+    }
+  });
+
+  it('round-4 30 hasActiveOrPendingProposal toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <EditProposalButton {...defaults} hasActiveOrPendingProposal={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-4 all 200 instances render button', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <EditProposalButton key={i} {...defaults} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('button').length).toBe(200);
+  });
 });

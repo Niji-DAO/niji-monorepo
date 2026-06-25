@@ -622,4 +622,50 @@ describe('ModalSubtitle', () => {
     }
     expect(container.textContent).toContain('99');
   });
+
+  it('round-4 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<ModalSubtitle>r4</ModalSubtitle>);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 1000 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <ModalSubtitle key={i}>r4-{i}</ModalSubtitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 100 different children values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { container, unmount } = render(<ModalSubtitle>r4-v-{i}</ModalSubtitle>);
+      expect(container.textContent).toBe(`r4-v-${i}`);
+      unmount();
+    }
+  });
+
+  it('round-4 all 200 instances render', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <ModalSubtitle key={i}>r4-x</ModalSubtitle>
+        ))}
+      </>,
+    );
+    expect(container.children.length).toBe(200);
+  });
+
+  it('round-4 100 rerender cycles', () => {
+    const { container, rerender } = render(<ModalSubtitle>x</ModalSubtitle>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<ModalSubtitle>r4-r-{i}</ModalSubtitle>);
+    }
+    expect(container.textContent).toContain('99');
+  });
 });
