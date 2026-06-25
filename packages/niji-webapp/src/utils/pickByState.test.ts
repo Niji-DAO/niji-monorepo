@@ -68,4 +68,42 @@ describe('usePickByState', () => {
     const results = [1, 0];
     expect(usePickByState('b', states, results)).toBe(0);
   });
+
+  /* eslint-disable react-hooks/rules-of-hooks */
+  it('handles 100 different state/result pairs', () => {
+    for (let i = 0; i < 100; i++) {
+      const states = [`s-${i}`, `s-${i + 1}`];
+      const results = [i, i + 1];
+      expect(usePickByState(`s-${i}`, states, results)).toBe(i);
+    }
+  });
+
+  it('handles 100 large states arrays', () => {
+    for (let i = 0; i < 100; i++) {
+      const states = Array.from({ length: i + 1 }, (_, j) => `s-${j}`);
+      const results = Array.from({ length: i + 1 }, (_, j) => j);
+      expect(usePickByState(`s-0`, states, results)).toBe(0);
+    }
+  });
+
+  it('handles 100 not-found state lookups', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(usePickByState(`unknown-${i}`, ['a', 'b'], [1, 2])).toBeUndefined();
+    }
+  });
+
+  it('handles 100 number-type state matches', () => {
+    for (let i = 0; i < 100; i++) {
+      const states = [i, i + 1, i + 2];
+      const results = ['a', 'b', 'c'];
+      expect(usePickByState(i, states, results)).toBe('a');
+    }
+  });
+
+  it('rapid 200 invocations', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => usePickByState('a', ['a', 'b'], [1, 2])).not.toThrow();
+    }
+  });
+  /* eslint-enable react-hooks/rules-of-hooks */
 });

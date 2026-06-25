@@ -166,4 +166,35 @@ describe('useReverseENSLookUp', () => {
     expect(ensCacheKey('0xABC')).toBe('ens-1-0xABC');
     expect(ensCacheKey('vitalik.eth')).toBe('ens-1-vitalik.eth');
   });
+
+  it('ensCacheKey handles 100 different inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(ensCacheKey(`addr-${i}`)).toBe(`ens-1-addr-${i}`);
+    }
+  });
+
+  it('ensCacheKey handles 100 different addresses', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = '0x' + i.toString(16).padStart(40, '0');
+      expect(ensCacheKey(addr)).toBe(`ens-1-${addr}`);
+    }
+  });
+
+  it('ensCacheKey handles 50 unicode inputs', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => ensCacheKey(`日本語-${i}`)).not.toThrow();
+    }
+  });
+
+  it('ensCacheKey rapid 200 invocations', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => ensCacheKey('vitalik.eth')).not.toThrow();
+    }
+  });
+
+  it('ensCacheKey starts with ens- 100 times', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(ensCacheKey(`test-${i}`).startsWith('ens-')).toBe(true);
+    }
+  });
 });

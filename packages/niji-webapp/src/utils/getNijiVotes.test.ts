@@ -67,4 +67,41 @@ describe('getNijiVotes', () => {
       'solo',
     ]);
   });
+
+  it('handles 100 different vote arrays for support=0', () => {
+    for (let i = 0; i < 100; i++) {
+      const v = [{ supportDetailed: 0 as const, nijiRepresented: [`niji-${i}`] }];
+      expect(getNijiVotes(v, 0)).toEqual([`niji-${i}`]);
+    }
+  });
+
+  it('handles 100 different vote arrays for support=1', () => {
+    for (let i = 0; i < 100; i++) {
+      const v = [{ supportDetailed: 1 as const, nijiRepresented: [`niji-${i}`] }];
+      expect(getNijiVotes(v, 1)).toEqual([`niji-${i}`]);
+    }
+  });
+
+  it('handles 100 large vote arrays', () => {
+    for (let i = 1; i <= 100; i++) {
+      const v = Array.from({ length: i }, (_, j) => ({
+        supportDetailed: 1 as const,
+        nijiRepresented: [`n-${j}`],
+      }));
+      expect(getNijiVotes(v, 1).length).toBe(i);
+    }
+  });
+
+  it('handles 100 votes with multiple nijiIds each', () => {
+    for (let i = 0; i < 100; i++) {
+      const v = [{ supportDetailed: 1 as const, nijiRepresented: [`a-${i}`, `b-${i}`, `c-${i}`] }];
+      expect(getNijiVotes(v, 1).length).toBe(3);
+    }
+  });
+
+  it('rapid 200 empty array invocations', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(getNijiVotes([], 1)).toEqual([]);
+    }
+  });
 });
