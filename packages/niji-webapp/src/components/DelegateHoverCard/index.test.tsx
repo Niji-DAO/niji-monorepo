@@ -1189,4 +1189,49 @@ describe('DelegateHoverCard', () => {
       unmount();
     }
   });
+
+  it('round-5 mount-unmount 100 cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<DelegateHoverCard delegateId="0xR5" proposerAddress="0xPROP" />);
+      unmount();
+    }
+  });
+
+  it('round-5 renders 100 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <DelegateHoverCard key={i} delegateId={`0xR5-${i}`} proposerAddress={`0xPROP-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-5 30 different delegateId values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateHoverCard delegateId={`0xR5-d-${i}`} proposerAddress="0xPROP" />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-5 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<DelegateHoverCard delegateId="0xR5" proposerAddress="0xPROP" />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-5 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <DelegateHoverCard delegateId="0xR5-2" proposerAddress="0xPROP" />,
+      );
+      unmount();
+    }
+  });
 });
