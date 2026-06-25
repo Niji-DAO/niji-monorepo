@@ -549,4 +549,49 @@ describe('AuctionActivityNijiTitle', () => {
       ).not.toThrow();
     }
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<AuctionActivityNijiTitle nounId={1n} />);
+      unmount();
+    }
+  });
+
+  it('renders 1500 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1500 }, (_, i) => (
+            <AuctionActivityNijiTitle key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 200 different nounId values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(<AuctionActivityNijiTitle nounId={BigInt(i)} />);
+      expect(container.querySelector('h1')?.textContent).toContain(`${i}`);
+      unmount();
+    }
+  });
+
+  it('all 500 instances render h1', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <AuctionActivityNijiTitle key={i} nounId={BigInt(i)} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('h1').length).toBe(500);
+  });
+
+  it('handles 30 different isCool boolean combinations', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionActivityNijiTitle nounId={1n} isCool={i % 2 === 0} />);
+      unmount();
+    }
+  });
 });

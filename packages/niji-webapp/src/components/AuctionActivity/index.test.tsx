@@ -828,4 +828,109 @@ describe('AuctionActivity', () => {
       ).not.toThrow();
     }
   });
+
+  it('mount-unmount 30 cycles', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <AuctionActivity
+            auction={makeAuction() as never}
+            isFirstAuction={false}
+            isLastAuction={false}
+            onPrevAuctionClick={() => {}}
+            onNextAuctionClick={() => {}}
+            displayGraphDepComps={false}
+          />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different nounId values', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 30; i++) {
+      const a = { ...makeAuction(), nounId: BigInt(i) };
+      const { unmount } = render(
+        <MemoryRouter>
+          <AuctionActivity
+            auction={a as never}
+            isFirstAuction={false}
+            isLastAuction={false}
+            onPrevAuctionClick={() => {}}
+            onNextAuctionClick={() => {}}
+            displayGraphDepComps={false}
+          />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('handles all 4 isFirstAuction/isLastAuction combinations 5 times each', () => {
+    useAtomValueMock.mockReturnValue(true);
+    [
+      { isFirst: true, isLast: true },
+      { isFirst: true, isLast: false },
+      { isFirst: false, isLast: true },
+      { isFirst: false, isLast: false },
+    ].forEach(({ isFirst, isLast }) => {
+      for (let i = 0; i < 5; i++) {
+        const { unmount } = render(
+          <MemoryRouter>
+            <AuctionActivity
+              auction={makeAuction() as never}
+              isFirstAuction={isFirst}
+              isLastAuction={isLast}
+              onPrevAuctionClick={() => {}}
+              onNextAuctionClick={() => {}}
+              displayGraphDepComps={false}
+            />
+          </MemoryRouter>,
+        );
+        unmount();
+      }
+    });
+  });
+
+  it('handles 30 different displayGraphDepComps combinations', () => {
+    useAtomValueMock.mockReturnValue(true);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <AuctionActivity
+            auction={makeAuction() as never}
+            isFirstAuction={false}
+            isLastAuction={false}
+            onPrevAuctionClick={() => {}}
+            onNextAuctionClick={() => {}}
+            displayGraphDepComps={i % 2 === 0}
+          />
+        </MemoryRouter>,
+      );
+      unmount();
+    }
+  });
+
+  it('renders 30 instances all in MemoryRouter', () => {
+    useAtomValueMock.mockReturnValue(true);
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionActivity
+              key={i}
+              auction={{ ...makeAuction(), nounId: BigInt(i) } as never}
+              isFirstAuction={false}
+              isLastAuction={false}
+              onPrevAuctionClick={() => {}}
+              onNextAuctionClick={() => {}}
+              displayGraphDepComps={false}
+            />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
 });
