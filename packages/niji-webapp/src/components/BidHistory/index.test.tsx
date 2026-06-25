@@ -323,4 +323,60 @@ describe('BidHistory Component', () => {
       ),
     ).not.toThrow();
   });
+
+  it('mount-unmount 200 cycles', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<BidHistory auctionId={1n} max={5} classes={mockClasses} />);
+      unmount();
+    }
+  });
+
+  it('renders 500 instances with empty bids', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <BidHistory key={i} auctionId={BigInt(i)} max={5} classes={mockClasses} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different max values (1-30)', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    for (let i = 1; i <= 30; i++) {
+      const { unmount } = render(<BidHistory auctionId={1n} max={i} classes={mockClasses} />);
+      unmount();
+    }
+  });
+
+  it('handles 30 different auctionId values', () => {
+    vi.mocked(useAuctionBids).mockReturnValue([]);
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <BidHistory auctionId={BigInt(i)} max={5} classes={mockClasses} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different bid counts', () => {
+    for (let i = 1; i <= 30; i++) {
+      const bids = Array.from({ length: i }, (_, j) => ({
+        transactionHash: `0x${j}`,
+        sender: '0xAA',
+        value: BigInt(j + 1),
+        nounId: 1n,
+        extended: false,
+        transactionIndex: j,
+        timestamp: BigInt(j),
+      }));
+      vi.mocked(useAuctionBids).mockReturnValue(bids);
+      const { unmount } = render(<BidHistory auctionId={1n} max={30} classes={mockClasses} />);
+      unmount();
+    }
+  });
 });

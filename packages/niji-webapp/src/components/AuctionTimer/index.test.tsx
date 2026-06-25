@@ -254,4 +254,50 @@ describe('AuctionTimer Component', () => {
     const tiny = { ...mockAuction(0), endTime: 1n };
     expect(() => render(<AuctionTimer auction={tiny} auctionEnded={true} />)).not.toThrow();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('renders 30 instances with auctionEnded=false', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionTimer key={i} auction={mockAuction(3600 + i * 100)} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles 30 different endTimeOffset values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <AuctionTimer auction={mockAuction(3600 + i * 60)} auctionEnded={false} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 rerenders with rotating auction', () => {
+    const { rerender } = render(<AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />);
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        rerender(<AuctionTimer auction={mockAuction(3600 + i * 60)} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('handles 30 different auctionEnded toggle', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <AuctionTimer auction={mockAuction(i * 100)} auctionEnded={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
 });
