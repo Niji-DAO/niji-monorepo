@@ -181,4 +181,36 @@ describe('processProposalDescriptionText', () => {
       expect(() => processProposalDescriptionText('', '')).not.toThrow();
     }
   });
+
+  it('round-4 30 sequential processProposalDescriptionText calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => processProposalDescriptionText(`r4-d-${i}`, `r4-t-${i}`)).not.toThrow();
+    }
+  });
+
+  it('round-4 50 different description values', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = processProposalDescriptionText(`r4-desc-${i}`, 't');
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-4 50 different title values', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = processProposalDescriptionText('d', `r4-title-${i}`);
+      expect(typeof result).toBe('string');
+    }
+  });
+
+  it('round-4 100 sequential calls preserve string-typed return', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof processProposalDescriptionText(`r4-d-${i}`, `r4-t-${i}`)).toBe('string');
+    }
+  });
+
+  it('round-4 100 sequential calls with empty inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => processProposalDescriptionText('', '')).not.toThrow();
+    }
+  });
 });
