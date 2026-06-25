@@ -294,4 +294,43 @@ describe('CandidateSponsors', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-3 mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<CandidateSponsors signers={[]} nounsRequired={0} />);
+      unmount();
+    }
+  });
+
+  it('round-3 renders 50 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 50 }, (_, i) => (
+            <CandidateSponsors key={i} signers={[]} nounsRequired={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 30 different nounsRequired values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsors signers={[]} nounsRequired={i + 1} />);
+      unmount();
+    }
+  });
+
+  it('round-3 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<CandidateSponsors signers={[]} nounsRequired={2} />)).not.toThrow();
+    }
+  });
+
+  it('round-3 30 mount-unmount cycles second', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsors signers={[]} nounsRequired={2} />);
+      unmount();
+    }
+  });
 });
