@@ -197,4 +197,51 @@ describe('Footer', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 50 cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<Footer />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 50 instances in single MemoryRouter mount', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 50 }, (_, i) => (
+            <Footer key={i} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 rapid 100 mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<Footer />);
+      unmount();
+    }
+  });
+
+  it('round-2 renders 100 instances in single MemoryRouter', () => {
+    expect(() =>
+      render(
+        <MemoryRouter>
+          {Array.from({ length: 100 }, (_, i) => (
+            <Footer key={i} />
+          ))}
+        </MemoryRouter>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 50 wrap cycles do not throw', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => {
+        const { unmount } = wrap(<Footer />);
+        unmount();
+      }).not.toThrow();
+    }
+  });
 });

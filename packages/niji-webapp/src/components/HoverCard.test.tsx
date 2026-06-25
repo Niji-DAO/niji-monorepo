@@ -238,4 +238,80 @@ describe('HoverCard', () => {
       unmount();
     }
   });
+
+  it('round-2 mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={t => <div>{t}</div>} tip="hello" id="x">
+          Trigger
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <HoverCard
+              key={i}
+              hoverCardContent={t => <div>{t}</div>}
+              tip={`tip-${i}`}
+              id={`id-${i}`}
+            >
+              T-{i}
+            </HoverCard>
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-2 handles 50 different tip values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={t => <div>{t}</div>} tip={`tip-${i}`} id={`id-${i}`}>
+          Trigger
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 50 different id values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={t => <div>{t}</div>} tip="hello" id={`id-r2-${i}`}>
+          Trigger
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-2 handles 30 different content render functions', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <HoverCard
+          hoverCardContent={t => (
+            <div data-testid={`c-r2-${i}`}>
+              {t}-{i}
+            </div>
+          )}
+          tip={`tip-${i}`}
+          id={`id-${i}`}
+        >
+          Trigger
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
 });
