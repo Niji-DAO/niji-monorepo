@@ -326,4 +326,44 @@ describe('NijiInfoRowHolder', () => {
       unmount();
     }
   });
+
+  it('round-4 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-4 30 different nounId values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={BigInt(i + 200)} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('round-4 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders }),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-4 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-4 50 different className values', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={1n} className={`r4-cls-${i}`} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
 });
