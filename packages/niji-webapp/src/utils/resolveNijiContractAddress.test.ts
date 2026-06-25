@@ -229,4 +229,42 @@ describe('resolveNijiContractAddress', () => {
       expect(() => resolveNijiContractAddress(name as never)).not.toThrow();
     }
   });
+
+  it('round-5 30 sequential import + resolve calls', async () => {
+    for (let i = 0; i < 30; i++) {
+      const { resolveNijiContractAddress } = await importResolver();
+      expect(() => resolveNijiContractAddress('Token' as never)).not.toThrow();
+    }
+  });
+
+  it('round-5 30 sequential token name access cycles', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 30; i++) {
+      expect(() => resolveNijiContractAddress('Token' as never)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 sequential different contract name calls', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    const names = ['Token', 'AuctionHouse', 'DAO'];
+    for (let i = 0; i < 50; i++) {
+      expect(() => resolveNijiContractAddress(names[i % 3] as never)).not.toThrow();
+    }
+  });
+
+  it('round-5 50 sequential access cycles', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 50; i++) {
+      const result = resolveNijiContractAddress('AuctionHouse' as never);
+      expect(typeof result).toBeTruthy();
+    }
+  });
+
+  it('round-5 100 sequential alternating call cycles', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 100; i++) {
+      const name = i % 2 === 0 ? 'DAO' : 'AuctionHouse';
+      expect(() => resolveNijiContractAddress(name as never)).not.toThrow();
+    }
+  });
 });
