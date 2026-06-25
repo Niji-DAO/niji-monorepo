@@ -126,4 +126,35 @@ describe('isMobileScreen', () => {
       expect(() => isMobileScreen()).not.toThrow();
     }
   });
+
+  it('round-2 30 sequential isMobileScreen calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => isMobileScreen()).not.toThrow();
+    }
+  });
+
+  it('round-2 50 returns boolean-typed result', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof isMobileScreen()).toBe('boolean');
+    }
+  });
+
+  it('round-2 100 sequential calls', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof isMobileScreen()).toBe('boolean');
+    }
+  });
+
+  it('round-2 50 cycles produce consistent result', () => {
+    const first = isMobileScreen();
+    for (let i = 0; i < 50; i++) {
+      expect(isMobileScreen()).toBe(first);
+    }
+  });
+
+  it('round-2 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof isMobileScreen).toBe('function');
+    }
+  });
 });

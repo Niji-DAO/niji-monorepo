@@ -105,5 +105,41 @@ describe('usePickByState', () => {
       expect(() => usePickByState('a', ['a', 'b'], [1, 2])).not.toThrow();
     }
   });
+
+  /* eslint-disable react-hooks/rules-of-hooks */
+  it('round-2 30 sequential usePickByState calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => usePickByState('a', ['a', 'b'], [1, 2])).not.toThrow();
+    }
+  });
+
+  it('round-2 50 different state lookup cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const states = [`r2-s-${i}`, 'b'];
+      const results = [i, i + 1];
+      expect(usePickByState(`r2-s-${i}`, states, results)).toBe(i);
+    }
+  });
+
+  it('round-2 100 sequential calls preserve return type', () => {
+    for (let i = 0; i < 100; i++) {
+      const result = usePickByState('a', ['a', 'b'], [1, 2]);
+      expect(typeof result).toBe('number');
+    }
+  });
+
+  it('round-2 50 sequential consistency cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const r1 = usePickByState('x', ['x'], [42]);
+      const r2 = usePickByState('x', ['x'], [42]);
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-2 100 sequential undefined cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(usePickByState(`miss-${i}`, ['a'], [1])).toBeUndefined();
+    }
+  });
   /* eslint-enable react-hooks/rules-of-hooks */
 });

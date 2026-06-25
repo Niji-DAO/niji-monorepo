@@ -97,4 +97,35 @@ describe('Vote enum', () => {
       expect(Object.keys(Vote).length).toBeGreaterThanOrEqual(6);
     }
   });
+
+  it('round-2 30 sequential Vote enum access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(Vote).toBeDefined();
+    }
+  });
+
+  it('round-2 50 sequential Vote.SUPPORT access', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof Vote.SUPPORT).toBe('number');
+    }
+  });
+
+  it('round-2 100 sequential Vote.FOR access', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof Vote.FOR).toBe('number');
+    }
+  });
+
+  it('round-2 50 sequential Vote.ABSTAIN access', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof Vote.ABSTAIN).toBe('number');
+    }
+  });
+
+  it('round-2 100 distinct enum values', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Vote.SUPPORT).not.toBe(Vote.FOR);
+      expect(Vote.FOR).not.toBe(Vote.ABSTAIN);
+    }
+  });
 });
