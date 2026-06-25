@@ -1149,4 +1149,74 @@ describe('CreateCandidateButton', () => {
       unmount();
     }
   });
+
+  it('round-3 mount-unmount 300 cycles', () => {
+    for (let i = 0; i < 300; i++) {
+      const { unmount } = render(
+        <CreateCandidateButton
+          handleCreateProposal={() => {}}
+          isFormInvalid={false}
+          isLoading={false}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 renders 300 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 300 }, (_, i) => (
+            <CreateCandidateButton
+              key={i}
+              handleCreateProposal={() => {}}
+              isFormInvalid={false}
+              isLoading={false}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-3 rapid 500 click events', () => {
+    const handle = vi.fn();
+    const { container } = render(
+      <CreateCandidateButton
+        handleCreateProposal={handle}
+        isFormInvalid={false}
+        isLoading={false}
+      />,
+    );
+    const btn = container.querySelector('button')!;
+    for (let i = 0; i < 500; i++) fireEvent.click(btn);
+    expect(handle).toHaveBeenCalledTimes(500);
+  });
+
+  it('round-3 30 isLoading toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <CreateCandidateButton
+          handleCreateProposal={() => {}}
+          isFormInvalid={false}
+          isLoading={i % 2 === 0}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-3 30 isFormInvalid toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <CreateCandidateButton
+          handleCreateProposal={() => {}}
+          isFormInvalid={i % 2 === 0}
+          isLoading={false}
+        />,
+      );
+      unmount();
+    }
+  });
 });
