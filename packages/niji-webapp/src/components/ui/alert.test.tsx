@@ -109,4 +109,59 @@ describe('Alert extra cases', () => {
     const { container } = render(<AlertDescription>{long}</AlertDescription>);
     expect(container.firstChild?.textContent?.length).toBe(200);
   });
+
+  it('Alert mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<Alert />);
+      unmount();
+    }
+  });
+
+  it('Alert renders 1000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 1000 }, (_, i) => (
+            <Alert key={i}>content-{i}</Alert>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('all 500 alerts have role=alert', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <Alert key={i} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('div[role="alert"]').length).toBe(500);
+  });
+
+  it('AlertTitle + AlertDescription render 100 instances', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 100 }, (_, i) => (
+            <Alert key={i}>
+              <AlertTitle>title-{i}</AlertTitle>
+              <AlertDescription>desc-{i}</AlertDescription>
+            </Alert>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('handles all 2 variants 100 times each', () => {
+    const variants = ['default', 'destructive'] as const;
+    variants.forEach(v => {
+      for (let i = 0; i < 100; i++) {
+        const { unmount } = render(<Alert variant={v}>x</Alert>);
+        unmount();
+      }
+    });
+  });
 });
