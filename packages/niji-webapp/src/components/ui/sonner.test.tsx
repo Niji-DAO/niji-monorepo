@@ -353,4 +353,42 @@ describe('Toaster (sonner wrapper)', () => {
       expect(() => render(<Toaster />)).not.toThrow();
     }
   });
+
+  it('round-6 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<Toaster />);
+      unmount();
+    }
+  });
+
+  it('round-6 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <Toaster key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => render(<Toaster />)).not.toThrow();
+    }
+  });
+
+  it('round-6 100 rerender cycles', () => {
+    const { rerender } = render(<Toaster />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<Toaster />)).not.toThrow();
+    }
+  });
+
+  it('round-6 200 sequential renders second cycle', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(() => render(<Toaster />)).not.toThrow();
+    }
+  });
 });

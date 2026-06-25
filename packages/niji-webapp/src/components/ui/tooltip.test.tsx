@@ -499,4 +499,78 @@ describe('Tooltip', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-6 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>r6</TooltipTrigger>
+            <TooltipContent>r6</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <TooltipProvider key={i}>
+              <Tooltip>
+                <TooltipTrigger>r6-{i}</TooltipTrigger>
+                <TooltipContent>r6-{i}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-6 30 different trigger text', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>r6-t-{i}</TooltipTrigger>
+            <TooltipContent>y</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>x</TooltipTrigger>
+            <TooltipContent>y</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-6 100 sequential renders without crash', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        render(
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>x</TooltipTrigger>
+              <TooltipContent>y</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
