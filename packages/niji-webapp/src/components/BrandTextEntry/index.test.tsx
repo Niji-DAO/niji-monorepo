@@ -635,4 +635,51 @@ describe('BrandTextEntry', () => {
     );
     expect(container.querySelectorAll('input').length).toBe(200);
   });
+
+  it('round-4 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<BrandTextEntry value="r4" onChange={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-4 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <BrandTextEntry key={i} value={`r4-${i}`} onChange={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-4 100 different value cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<BrandTextEntry value={`r4-v-${i}`} onChange={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-4 all 200 instances render input', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <BrandTextEntry key={i} value={`r4-${i}`} onChange={() => {}} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('input').length).toBe(200);
+  });
+
+  it('round-4 rapid 200 onChange events', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandTextEntry value="x" onChange={onChange} />);
+    const input = container.querySelector('input')!;
+    for (let i = 0; i < 200; i++) {
+      fireEvent.change(input, { target: { value: `r4-${i}` } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(200);
+  });
 });
