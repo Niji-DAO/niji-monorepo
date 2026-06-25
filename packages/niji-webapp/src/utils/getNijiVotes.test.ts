@@ -137,4 +137,37 @@ describe('getNijiVotes', () => {
       expect(getNijiVotes([], (i % 3) as 0 | 1 | 2)).toEqual([]);
     }
   });
+
+  it('round-3 30 sequential getNijiVotes calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => getNijiVotes(votes, (i % 3) as 0 | 1 | 2)).not.toThrow();
+    }
+  });
+
+  it('round-3 50 returns array-typed result', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = getNijiVotes(votes, (i % 3) as 0 | 1 | 2);
+      expect(Array.isArray(result)).toBe(true);
+    }
+  });
+
+  it('round-3 100 sequential vote support variants', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Array.isArray(getNijiVotes(votes, (i % 3) as 0 | 1 | 2))).toBe(true);
+    }
+  });
+
+  it('round-3 50 deterministic results for same support', () => {
+    for (let i = 0; i < 50; i++) {
+      const r1 = getNijiVotes(votes, 1);
+      const r2 = getNijiVotes(votes, 1);
+      expect(r1).toEqual(r2);
+    }
+  });
+
+  it('round-3 100 sequential empty arrays', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(getNijiVotes([], (i % 3) as 0 | 1 | 2)).toEqual([]);
+    }
+  });
 });
