@@ -499,4 +499,46 @@ describe('NavBarButton', () => {
     const matches = (container.textContent ?? '').match(/btn-/g);
     expect(matches?.length).toBe(300);
   });
+
+  it('mount-unmount 1000 cycles', () => {
+    for (let i = 0; i < 1000; i++) {
+      const { unmount } = render(<NavBarButton buttonText="x" />);
+      unmount();
+    }
+  });
+
+  it('renders 2000 instances without crash', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 2000 }, (_, i) => (
+            <NavBarButton key={i} buttonText={`btn-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('rapid 1000 onClick events fire handler', () => {
+    const onClick = vi.fn();
+    const { container } = render(<NavBarButton buttonText="x" onClick={onClick} />);
+    const target = container.firstElementChild as HTMLElement;
+    for (let i = 0; i < 1000; i++) fireEvent.click(target);
+    expect(onClick).toHaveBeenCalledTimes(1000);
+  });
+
+  it('handles 200 different buttonText values', () => {
+    for (let i = 0; i < 200; i++) {
+      const { container, unmount } = render(<NavBarButton buttonText={`btn-${i}`} />);
+      expect(container.textContent).toContain(`btn-${i}`);
+      unmount();
+    }
+  });
+
+  it('handles 100 rapid buttonStyle rerender', () => {
+    const { rerender } = render(<NavBarButton buttonText="x" />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<NavBarButton buttonText="x" buttonStyle={i % 7} />)).not.toThrow();
+    }
+  });
 });

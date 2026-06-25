@@ -748,4 +748,67 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
     for (let i = 0; i < 50; i++) fireEvent.click(right);
     expect(container.querySelector('[data-testid="pager"]')).not.toBeNull();
   });
+
+  it('mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different propId values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable
+          {...baseProps}
+          propId={i}
+          filteredDelegateGroupedVoteData={[]}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('handles 30 different vote data structures', () => {
+    for (let i = 0; i < 30; i++) {
+      const data = Array.from({ length: i + 1 }, (_, j) =>
+        makeVote(`0xDEL${j}`, [`${j + 1}`], (j % 3) as 0 | 1 | 2),
+      );
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={data} />,
+      );
+      unmount();
+    }
+  });
+
+  it('all 30 instances render pager', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 30 }, (_, i) => (
+          <DelegateGroupedNijiImageVoteTable
+            key={i}
+            {...baseProps}
+            propId={i}
+            filteredDelegateGroupedVoteData={[]}
+          />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('[data-testid="pager"]').length).toBe(30);
+  });
+
+  it('handles 30 different proposalCreationBlock values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable
+          {...baseProps}
+          proposalCreationBlock={BigInt(i * 1000)}
+          filteredDelegateGroupedVoteData={[]}
+        />,
+      );
+      unmount();
+    }
+  });
 });
