@@ -779,4 +779,47 @@ describe('LegacyNoun — additional edge cases', () => {
     );
     expect(container.querySelectorAll('img').length).toBe(500);
   });
+
+  it('round-7 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<LegacyNoun imgPath="/r7.png" alt="r7" />);
+      unmount();
+    }
+  });
+
+  it('round-7 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <LegacyNoun key={i} imgPath="/r7.png" alt={`r7-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<LegacyNoun imgPath="/r7.png" alt="r7" />)).not.toThrow();
+    }
+  });
+
+  it('round-7 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<LegacyNoun imgPath="/r7.png" alt="r7" />);
+      unmount();
+    }
+  });
+
+  it('round-7 500 img instances render', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 500 }, (_, i) => (
+          <LegacyNoun key={i} imgPath="/r7.png" alt={`r7-${i}`} />
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('img').length).toBe(500);
+  });
 });
