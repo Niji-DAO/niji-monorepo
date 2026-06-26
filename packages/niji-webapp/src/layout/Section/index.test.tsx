@@ -516,4 +516,63 @@ describe('Section', () => {
       unmount();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <div>r8</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Section key={i} fullWidth={false}>
+              <div>r8-{i}</div>
+            </Section>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <Section fullWidth={false}>
+            <div>x</div>
+          </Section>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <div>x</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-8 30 fullWidth toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Section fullWidth={i % 2 === 0}>
+          <div>r8-{i}</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
 });
