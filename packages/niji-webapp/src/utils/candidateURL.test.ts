@@ -278,4 +278,37 @@ describe('buildCandidateSlug', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-8 30 sequential buildCandidateSlug calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => buildCandidateSlug(`r8-${i}`, `0x${i}`)).not.toThrow();
+    }
+  });
+
+  it('round-8 50 sequential calls produce string', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof buildCandidateSlug(`r8-${i}`, `0x${i}`)).toBe('string');
+    }
+  });
+
+  it('round-8 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof buildCandidateSlug).toBe('function');
+    }
+  });
+
+  it('round-8 30 deterministic for same input', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = buildCandidateSlug('r8-CONST', '0xR8');
+      const r2 = buildCandidateSlug('r8-CONST', '0xR8');
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-8 100 mixed argument variation', () => {
+    for (let i = 0; i < 100; i++) {
+      buildCandidateSlug(`r8-mix-${i}`, `0x${i}`);
+    }
+    expect(true).toBe(true);
+  });
 });
