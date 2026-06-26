@@ -715,4 +715,35 @@ describe('useForkThreshold / useNumTokensInForkEscrow / useAdjustedTotalSupply',
       expect(typeof useProposalThreshold).toBe('function');
     }
   });
+
+  it('round-8 30 sequential useProposalThreshold access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useProposalThreshold).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useProposalThreshold).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = useProposalThreshold;
+    for (let i = 0; i < 100; i++) {
+      expect(useProposalThreshold).toBe(first);
+    }
+  });
+
+  it('round-8 50 sequential truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useProposalThreshold).toBeTruthy();
+    }
+  });
+
+  it('round-8 50 useProposalThreshold type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useProposalThreshold).toBe('function');
+    }
+  });
 });

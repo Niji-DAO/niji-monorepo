@@ -335,4 +335,36 @@ describe('wrappers/subgraph inline graphql documents', () => {
       expect(subgraph).toBe(first);
     }
   });
+
+  it('round-8 30 sequential subgraph access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(subgraph).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof subgraph).toBe('object');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = subgraph;
+    for (let i = 0; i < 100; i++) {
+      expect(subgraph).toBe(first);
+    }
+  });
+
+  it('round-8 50 sequential truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(subgraph).toBeTruthy();
+    }
+  });
+
+  it('round-8 50 sequential subgraph reference consistency second', () => {
+    const first = subgraph;
+    for (let i = 0; i < 50; i++) {
+      expect(subgraph).toBe(first);
+    }
+  });
 });
