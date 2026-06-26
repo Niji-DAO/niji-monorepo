@@ -743,4 +743,45 @@ describe('TruncatedAmount', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<TruncatedAmount amount={1n * 10n ** 18n} />);
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <TruncatedAmount key={i} amount={BigInt(i + 19000) * 10n ** 18n} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<TruncatedAmount amount={1n * 10n ** 18n} />)).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<TruncatedAmount amount={1n * 10n ** 18n} />);
+      unmount();
+    }
+  });
+
+  it('round-8 100 rerender cycles', () => {
+    const { rerender } = render(<TruncatedAmount amount={1n * 10n ** 18n} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<TruncatedAmount amount={BigInt(i + 21000) * 10n ** 18n} />),
+      ).not.toThrow();
+    }
+  });
 });

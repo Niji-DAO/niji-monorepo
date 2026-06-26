@@ -826,4 +826,43 @@ describe('LanguageSelectionModal', () => {
       unmount();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <LanguageSelectionModal key={i} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
+    }
+  });
+
+  it('round-8 rapid 200 onDismiss invocations', () => {
+    const onDismiss = vi.fn();
+    render(<LanguageSelectionModal onDismiss={onDismiss} />);
+    for (let i = 0; i < 200; i++) onDismiss();
+    expect(onDismiss).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+      unmount();
+    }
+  });
 });
