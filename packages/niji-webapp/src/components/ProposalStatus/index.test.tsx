@@ -535,4 +535,45 @@ describe('ProposalStatus', () => {
       unmount();
     }
   });
+
+  it('round-7 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
+      unmount();
+    }
+  });
+
+  it('round-7 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalStatus key={i} status={ProposalState.ACTIVE} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ProposalStatus status={ProposalState.ACTIVE} />)).not.toThrow();
+    }
+  });
+
+  it('round-7 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ProposalStatus status={ProposalState.ACTIVE} />);
+      unmount();
+    }
+  });
+
+  it('round-7 30 different className values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalStatus status={ProposalState.ACTIVE} className={`r7-cls-${i}`} />,
+      );
+      unmount();
+    }
+  });
 });
