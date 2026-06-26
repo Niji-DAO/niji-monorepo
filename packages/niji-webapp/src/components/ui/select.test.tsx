@@ -798,4 +798,73 @@ describe('Select', () => {
       unmount();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder="r8" />
+          </SelectTrigger>
+        </Select>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Select key={i}>
+              <SelectTrigger>
+                <SelectValue placeholder={`r8-${i}`} />
+              </SelectTrigger>
+            </Select>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <Select>
+            <SelectTrigger>
+              <SelectValue placeholder="x" />
+            </SelectTrigger>
+          </Select>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder="x" />
+          </SelectTrigger>
+        </Select>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-8 30 different placeholder values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder={`r8-p-${i}`} />
+          </SelectTrigger>
+        </Select>,
+      );
+      unmount();
+    }
+  });
 });
