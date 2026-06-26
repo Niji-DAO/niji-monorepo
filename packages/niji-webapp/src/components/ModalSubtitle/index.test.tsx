@@ -750,4 +750,45 @@ describe('ModalSubtitle', () => {
     }
     expect(container.textContent).toContain('99');
   });
+
+  it('round-7 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<ModalSubtitle>r7</ModalSubtitle>);
+      unmount();
+    }
+  });
+
+  it('round-7 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <ModalSubtitle key={i}>r7-{i}</ModalSubtitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ModalSubtitle>r7-c-{i}</ModalSubtitle>);
+      unmount();
+    }
+  });
+
+  it('round-7 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ModalSubtitle>x</ModalSubtitle>);
+      unmount();
+    }
+  });
+
+  it('round-7 100 rerender cycles', () => {
+    const { container, rerender } = render(<ModalSubtitle>x</ModalSubtitle>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<ModalSubtitle>r7-r-{i}</ModalSubtitle>);
+    }
+    expect(container.textContent).toContain('99');
+  });
 });
