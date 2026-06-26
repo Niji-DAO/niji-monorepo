@@ -1544,4 +1544,79 @@ describe('CreateProposalButton', () => {
       unmount();
     }
   });
+
+  it('round-7 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <CreateProposalButton
+          handleCreateProposal={() => {}}
+          hasEnoughVote={true}
+          proposalThreshold={0}
+          isWalletConnected={true}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-7 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CreateProposalButton
+              key={i}
+              handleCreateProposal={() => {}}
+              hasEnoughVote={true}
+              proposalThreshold={i + 8000}
+              isWalletConnected={true}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <CreateProposalButton
+            handleCreateProposal={() => {}}
+            hasEnoughVote={true}
+            proposalThreshold={0}
+            isWalletConnected={true}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-7 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <CreateProposalButton
+          handleCreateProposal={() => {}}
+          hasEnoughVote={true}
+          proposalThreshold={0}
+          isWalletConnected={true}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-7 30 hasEnoughVote toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <CreateProposalButton
+          handleCreateProposal={() => {}}
+          hasEnoughVote={i % 2 === 0}
+          proposalThreshold={0}
+          isWalletConnected={true}
+        />,
+      );
+      unmount();
+    }
+  });
 });
