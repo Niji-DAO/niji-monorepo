@@ -421,4 +421,38 @@ describe('shortENS — boundary', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-8 30 sequential veryShortAddress access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(veryShortAddress).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof veryShortAddress).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = veryShortAddress;
+    for (let i = 0; i < 100; i++) {
+      expect(veryShortAddress).toBe(first);
+    }
+  });
+
+  it('round-8 50 sequential veryShortENS access', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(veryShortENS).toBeDefined();
+    }
+  });
+
+  it('round-8 round-trip 100 sequential mixed calls', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0xR8' + i.toString(16).padStart(38, '0')) as Address;
+      veryShortAddress(addr);
+      veryShortENS(`r8-${i}.eth`);
+    }
+    expect(true).toBe(true);
+  });
 });

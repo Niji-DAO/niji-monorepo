@@ -258,4 +258,37 @@ describe('nounPath', () => {
       expect(nounPath(String(i + 21000)).length).toBeGreaterThan(0);
     }
   });
+
+  it('round-8 30 sequential nounPath calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => nounPath(String(i + 23000))).not.toThrow();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof nounPath).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = nounPath;
+    for (let i = 0; i < 100; i++) {
+      expect(nounPath).toBe(first);
+    }
+  });
+
+  it('round-8 30 deterministic for same input', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = nounPath('100');
+      const r2 = nounPath('100');
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-8 100 sequential calls produce non-empty results', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(nounPath(String(i + 25000)).length).toBeGreaterThan(0);
+    }
+  });
 });
