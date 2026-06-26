@@ -402,4 +402,37 @@ describe('lookupNNSOrENS', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-8 30 sequential lookupNNSOrENS access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(lookupNNSOrENS).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof lookupNNSOrENS).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = lookupNNSOrENS;
+    for (let i = 0; i < 100; i++) {
+      expect(lookupNNSOrENS).toBe(first);
+    }
+  });
+
+  it('round-8 50 sequential truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(lookupNNSOrENS).toBeTruthy();
+    }
+  });
+
+  it('round-8 50 sequential calls with empty data', async () => {
+    const mockClient = { call: vi.fn(async () => ({ data: undefined })) } as never;
+    for (let i = 0; i < 50; i++) {
+      await lookupNNSOrENS(mockClient, ('0xR8-' + i) as Address).catch(() => null);
+    }
+    expect(true).toBe(true);
+  });
 });

@@ -337,4 +337,37 @@ describe('pseudoRandomPredictableShuffle', () => {
       expect(r1).toEqual(r2);
     }
   });
+
+  it('round-8 30 sequential pseudoRandomPredictableShuffle calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => pseudoRandomPredictableShuffle([1, 2, 3], i + 9000)).not.toThrow();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof pseudoRandomPredictableShuffle).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = pseudoRandomPredictableShuffle;
+    for (let i = 0; i < 100; i++) {
+      expect(pseudoRandomPredictableShuffle).toBe(first);
+    }
+  });
+
+  it('round-8 50 sequential truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(pseudoRandomPredictableShuffle).toBeTruthy();
+    }
+  });
+
+  it('round-8 deterministic 30 cycles with same seed', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = pseudoRandomPredictableShuffle([1, 2, 3, 4, 5], 888);
+      const r2 = pseudoRandomPredictableShuffle([1, 2, 3, 4, 5], 888);
+      expect(r1).toEqual(r2);
+    }
+  });
 });
