@@ -461,4 +461,35 @@ describe('useSubgraphQuery', () => {
       expect(typeof useSubgraphQuery).toBe('function');
     }
   });
+
+  it('round-9 30 sequential useSubgraphQuery access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useSubgraphQuery).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useSubgraphQuery).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = useSubgraphQuery;
+    for (let i = 0; i < 100; i++) {
+      expect(useSubgraphQuery).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useSubgraphQuery).toBeTruthy();
+    }
+  });
+
+  it('round-9 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useSubgraphQuery).toBe('function');
+    }
+  });
 });

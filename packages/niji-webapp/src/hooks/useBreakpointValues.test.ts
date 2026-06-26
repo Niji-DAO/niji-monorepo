@@ -432,4 +432,35 @@ describe('useBreakpointDown', () => {
       expect(typeof useBreakpointValues).toBe('function');
     }
   });
+
+  it('round-9 30 sequential useBreakpointValues access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useBreakpointValues).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useBreakpointValues).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = useBreakpointValues;
+    for (let i = 0; i < 100; i++) {
+      expect(useBreakpointValues).toBe(first);
+    }
+  });
+
+  it('round-9 50 useBreakpointDown truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useBreakpointDown).toBeTruthy();
+    }
+  });
+
+  it('round-9 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useBreakpointValues).toBe('function');
+    }
+  });
 });

@@ -334,4 +334,35 @@ describe('useProposalStatus', () => {
       expect(useProposalStatus).toBeTruthy();
     }
   });
+
+  it('round-9 30 sequential useProposalStatus access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useProposalStatus).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useProposalStatus).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = useProposalStatus;
+    for (let i = 0; i < 100; i++) {
+      expect(useProposalStatus).toBe(first);
+    }
+  });
+
+  it('round-9 50 sequential truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useProposalStatus).toBeTruthy();
+    }
+  });
+
+  it('round-9 100 sequential truthiness checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useProposalStatus).toBeTruthy();
+    }
+  });
 });

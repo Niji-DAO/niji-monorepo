@@ -366,4 +366,35 @@ describe('useBlockTimestamp', () => {
       expect(typeof useBlockTimestamp).toBe('function');
     }
   });
+
+  it('round-9 30 sequential useBlockTimestamp access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useBlockTimestamp).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useBlockTimestamp).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = useBlockTimestamp;
+    for (let i = 0; i < 100; i++) {
+      expect(useBlockTimestamp).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useBlockTimestamp).toBeTruthy();
+    }
+  });
+
+  it('round-9 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useBlockTimestamp).toBe('function');
+    }
+  });
 });
