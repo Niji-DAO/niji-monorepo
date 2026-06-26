@@ -439,4 +439,43 @@ describe('Footer', () => {
       unmount();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Footer />);
+      unmount();
+    }
+  });
+
+  it('round-8 30 instances rendered together', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Footer key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => wrap(<Footer />)).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<Footer />);
+      unmount();
+    }
+  });
+
+  it('round-8 100 mount cycles third', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<Footer />);
+      unmount();
+    }
+  });
 });
