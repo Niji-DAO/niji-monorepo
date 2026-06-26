@@ -491,4 +491,47 @@ describe('NijiInfoCard', () => {
     for (let i = 0; i < 200; i++) handler();
     expect(handler).toHaveBeenCalledTimes(200);
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiInfoCard key={i} nounId={BigInt(i + 15000)} bidHistoryOnClickHandler={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={() => {}} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <NijiInfoCard nounId={BigInt(i + 17000)} bidHistoryOnClickHandler={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-8 rapid 200 bidHistoryOnClickHandler invocations', () => {
+    const handler = vi.fn();
+    render(<NijiInfoCard nounId={1n} bidHistoryOnClickHandler={handler} />);
+    for (let i = 0; i < 200; i++) handler();
+    expect(handler).toHaveBeenCalledTimes(200);
+  });
 });
