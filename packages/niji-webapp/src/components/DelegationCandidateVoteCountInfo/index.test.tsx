@@ -880,4 +880,44 @@ describe('DelegationCandidateVoteCountInfo', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-7 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<DelegationCandidateVoteCountInfo voteCount={0} />);
+      unmount();
+    }
+  });
+
+  it('round-7 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DelegationCandidateVoteCountInfo key={i} voteCount={i + 17000} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<DelegationCandidateVoteCountInfo voteCount={0} />)).not.toThrow();
+    }
+  });
+
+  it('round-7 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<DelegationCandidateVoteCountInfo voteCount={0} />);
+      unmount();
+    }
+  });
+
+  it('round-7 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        render(<DelegationCandidateVoteCountInfo voteCount={i + 19000} />),
+      ).not.toThrow();
+    }
+  });
 });
