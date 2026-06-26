@@ -820,4 +820,45 @@ describe('ModalLabel', () => {
     }
     expect(container.querySelector('div')?.textContent).toContain('99');
   });
+
+  it('round-8 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<ModalLabel>r8</ModalLabel>);
+      unmount();
+    }
+  });
+
+  it('round-8 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <ModalLabel key={i}>r8-{i}</ModalLabel>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ModalLabel>r8-c-{i}</ModalLabel>);
+      unmount();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ModalLabel>x</ModalLabel>);
+      unmount();
+    }
+  });
+
+  it('round-8 100 rerender cycles', () => {
+    const { container, rerender } = render(<ModalLabel>x</ModalLabel>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<ModalLabel>r8-r-{i}</ModalLabel>);
+    }
+    expect(container.querySelector('div')?.textContent).toContain('99');
+  });
 });
