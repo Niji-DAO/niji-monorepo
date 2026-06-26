@@ -344,4 +344,43 @@ describe('buttonVariants (cva)', () => {
       unmount();
     }
   });
+
+  it('round-7 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Button>r7</Button>);
+      unmount();
+    }
+  });
+
+  it('round-7 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Button key={i}>r7-{i}</Button>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<Button>x</Button>)).not.toThrow();
+    }
+  });
+
+  it('round-7 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Button>r7-c-{i}</Button>);
+      unmount();
+    }
+  });
+
+  it('round-7 30 disabled toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Button disabled={i % 2 === 0}>x</Button>);
+      unmount();
+    }
+  });
 });
