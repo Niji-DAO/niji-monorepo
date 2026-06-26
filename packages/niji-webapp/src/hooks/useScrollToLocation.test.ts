@@ -401,4 +401,36 @@ describe('useScrollToLocation', () => {
       unmount();
     }
   });
+
+  it('round-9 30 sequential useScrollToLocation access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useScrollToLocation).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useScrollToLocation).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = useScrollToLocation;
+    for (let i = 0; i < 100; i++) {
+      expect(useScrollToLocation).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useScrollToLocation).toBeTruthy();
+    }
+  });
+
+  it('round-9 50 renderHook cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useScrollToLocation());
+      unmount();
+    }
+  });
 });

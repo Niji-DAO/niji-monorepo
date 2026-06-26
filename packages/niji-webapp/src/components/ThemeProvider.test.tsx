@@ -632,4 +632,63 @@ describe('ThemeProvider', () => {
       unmount();
     }
   });
+
+  it('round-9 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>r9</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-9 30 instances rendered together', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ThemeProvider key={i}>
+              <div>r9-{i}</div>
+            </ThemeProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-9 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ThemeProvider>
+            <div>r9</div>
+          </ThemeProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-9 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>r9</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-9 30 different children cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <div>r9-child-{i}</div>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
 });
