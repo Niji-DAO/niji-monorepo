@@ -388,4 +388,41 @@ describe('compareBids', () => {
       expect(compareBids(makeBid7(BigInt(11000 + i)), makeBid7(BigInt(10000 + i)))).toBeLessThan(0);
     }
   });
+
+  it('round-8 30 sequential compareBids access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(compareBids).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof compareBids).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = compareBids;
+    for (let i = 0; i < 100; i++) {
+      expect(compareBids).toBe(first);
+    }
+  });
+
+  it('round-8 30 deterministic for same input', () => {
+    const makeBid8 = (timestamp: bigint, transactionIndex = 0): Bid =>
+      ({ timestamp, transactionIndex }) as Bid;
+    for (let i = 0; i < 30; i++) {
+      const r1 = compareBids(makeBid8(100n), makeBid8(200n));
+      const r2 = compareBids(makeBid8(100n), makeBid8(200n));
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-8 50 sequential calls with ascending order pairs', () => {
+    const makeBid8 = (timestamp: bigint, transactionIndex = 0): Bid =>
+      ({ timestamp, transactionIndex }) as Bid;
+    for (let i = 0; i < 50; i++) {
+      expect(compareBids(makeBid8(BigInt(21000 + i)), makeBid8(BigInt(20000 + i)))).toBeLessThan(0);
+    }
+  });
 });

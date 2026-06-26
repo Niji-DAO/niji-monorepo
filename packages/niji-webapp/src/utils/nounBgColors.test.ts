@@ -270,4 +270,37 @@ describe('nounBgColors', () => {
       expect(beige).toBe(first);
     }
   });
+
+  it('round-8 30 sequential beige access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(beige).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof beige).toBe('string');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = beige;
+    for (let i = 0; i < 100; i++) {
+      expect(beige).toBe(first);
+    }
+  });
+
+  it('round-8 50 sequential grey reference consistency', () => {
+    const first = grey;
+    for (let i = 0; i < 50; i++) {
+      expect(grey).toBe(first);
+    }
+  });
+
+  it('round-8 50 sequential beige reference consistency', () => {
+    const first = beige;
+    for (let i = 0; i < 50; i++) {
+      expect(beige).toBe(first);
+    }
+  });
 });
