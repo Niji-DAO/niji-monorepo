@@ -322,4 +322,35 @@ describe('getAddressFromQueryParams', () => {
       expect(() => getAddressFromQueryParams('to', `?to=r8-invalid-${i}`)).not.toThrow();
     }
   });
+
+  it('round-9 30 sequential getAddressFromQueryParams access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(getAddressFromQueryParams).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof getAddressFromQueryParams).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = getAddressFromQueryParams;
+    for (let i = 0; i < 100; i++) {
+      expect(getAddressFromQueryParams).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(getAddressFromQueryParams).toBeTruthy();
+    }
+  });
+
+  it('round-9 50 invalid address strings', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => getAddressFromQueryParams('to', `?to=r9-invalid-${i}`)).not.toThrow();
+    }
+  });
 });

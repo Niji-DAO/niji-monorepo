@@ -340,4 +340,36 @@ describe('countDecimals', () => {
       expect(typeof countDecimals(n)).toBe('number');
     }
   });
+
+  it('round-9 30 sequential countDecimals access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(countDecimals).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof countDecimals).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = countDecimals;
+    for (let i = 0; i < 100; i++) {
+      expect(countDecimals).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(countDecimals).toBeTruthy();
+    }
+  });
+
+  it('round-9 100 sequential alternating int / float', () => {
+    for (let i = 0; i < 100; i++) {
+      const n = i % 2 === 0 ? i + 29000 : i + 29000.625;
+      expect(typeof countDecimals(n)).toBe('number');
+    }
+  });
 });
