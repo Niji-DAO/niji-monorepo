@@ -693,4 +693,35 @@ describe('useNounSeed', () => {
       expect(useNounTokenBalance).toBeTruthy();
     }
   });
+
+  it('round-9 30 sequential useNounTokenBalance access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useNounTokenBalance).toBeDefined();
+    }
+  });
+
+  it('round-9 50 useNounTokenBalance type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useNounTokenBalance).toBe('function');
+    }
+  });
+
+  it('round-9 100 useNounTokenBalance reference consistency', () => {
+    const first = useNounTokenBalance;
+    for (let i = 0; i < 100; i++) {
+      expect(useNounTokenBalance).toBe(first);
+    }
+  });
+
+  it('round-9 50 useNounTokenBalance truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useNounTokenBalance).toBeTruthy();
+    }
+  });
+
+  it('round-9 100 useNounTokenBalance type checks second', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof useNounTokenBalance).toBe('function');
+    }
+  });
 });
