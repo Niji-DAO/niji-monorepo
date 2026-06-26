@@ -862,6 +862,53 @@ describe('ProposalActionModal extra', () => {
       unmount();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalActionModal show={true} onDismiss={() => {}} onActionAdd={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalActionModal key={i} show={true} onDismiss={() => {}} onActionAdd={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<ProposalActionModal show={true} onDismiss={() => {}} onActionAdd={() => {}} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ProposalActionModal show={true} onDismiss={() => {}} onActionAdd={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-8 30 show toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalActionModal show={i % 2 === 0} onDismiss={() => {}} onActionAdd={() => {}} />,
+      );
+      unmount();
+    }
+  });
 });
 
 // dummy reference to silence unused warning

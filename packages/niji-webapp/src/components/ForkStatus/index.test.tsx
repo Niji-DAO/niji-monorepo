@@ -440,4 +440,43 @@ describe('ForkStatus', () => {
       expect(() => rerender(<ForkStatus />)).not.toThrow();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ForkStatus />);
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ForkStatus key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ForkStatus />)).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ForkStatus />);
+      unmount();
+    }
+  });
+
+  it('round-8 30 rerender cycles', () => {
+    const { rerender } = render(<ForkStatus />);
+    for (let i = 0; i < 30; i++) {
+      expect(() => rerender(<ForkStatus />)).not.toThrow();
+    }
+  });
 });
