@@ -855,4 +855,46 @@ describe('BrandTextEntry', () => {
     }
     expect(onChange).toHaveBeenCalledTimes(200);
   });
+
+  it('round-9 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BrandTextEntry value="x" onChange={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-9 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <BrandTextEntry key={i} value={`r9-${i}`} onChange={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-9 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<BrandTextEntry value="x" onChange={() => {}} />)).not.toThrow();
+    }
+  });
+
+  it('round-9 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<BrandTextEntry value="x" onChange={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-9 rapid 200 onChange events', () => {
+    const onChange = vi.fn();
+    const { container } = render(<BrandTextEntry value="x" onChange={onChange} />);
+    const input = container.querySelector('input')!;
+    for (let i = 0; i < 200; i++) {
+      fireEvent.change(input, { target: { value: `r9-${i}` } });
+    }
+    expect(onChange).toHaveBeenCalledTimes(200);
+  });
 });

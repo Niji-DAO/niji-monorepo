@@ -522,4 +522,43 @@ describe('ProposalCandidateContent', () => {
       unmount();
     }
   });
+
+  it('round-9 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalCandidateContent proposal={baseProposal} />);
+      unmount();
+    }
+  });
+
+  it('round-9 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalCandidateContent key={i} proposal={baseProposal} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-9 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ProposalCandidateContent proposal={baseProposal} />)).not.toThrow();
+    }
+  });
+
+  it('round-9 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ProposalCandidateContent proposal={baseProposal} />);
+      unmount();
+    }
+  });
+
+  it('round-9 100 sequential mount cycles third', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ProposalCandidateContent proposal={baseProposal} />);
+      unmount();
+    }
+  });
 });
