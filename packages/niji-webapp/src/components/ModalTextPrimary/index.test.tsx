@@ -853,4 +853,44 @@ describe('ModalTextPrimary', () => {
       expect(() => rerender(<ModalTextPrimary>r8-r-{i}</ModalTextPrimary>)).not.toThrow();
     }
   });
+
+  it('round-9 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<ModalTextPrimary>r9</ModalTextPrimary>);
+      unmount();
+    }
+  });
+
+  it('round-9 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <ModalTextPrimary key={i}>r9-{i}</ModalTextPrimary>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-9 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ModalTextPrimary>r9-c-{i}</ModalTextPrimary>);
+      unmount();
+    }
+  });
+
+  it('round-9 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+      unmount();
+    }
+  });
+
+  it('round-9 100 rerender cycles', () => {
+    const { rerender } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<ModalTextPrimary>r9-r-{i}</ModalTextPrimary>)).not.toThrow();
+    }
+  });
 });
