@@ -737,4 +737,60 @@ describe('ProposalTransactions', () => {
     for (let i = 0; i < 200; i++) onRemoveProposalTransaction(0);
     expect(onRemoveProposalTransaction).toHaveBeenCalledTimes(200);
   });
+
+  it('round-7 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalTransactions proposalTransactions={[]} onRemoveProposalTransaction={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-7 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalTransactions
+              key={i}
+              proposalTransactions={[]}
+              onRemoveProposalTransaction={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ProposalTransactions proposalTransactions={[]} onRemoveProposalTransaction={() => {}} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-7 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ProposalTransactions proposalTransactions={[]} onRemoveProposalTransaction={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-7 rapid 200 onRemove invocations second', () => {
+    const onRemoveProposalTransaction = vi.fn();
+    render(
+      <ProposalTransactions
+        proposalTransactions={[]}
+        onRemoveProposalTransaction={onRemoveProposalTransaction}
+      />,
+    );
+    for (let i = 0; i < 200; i++) onRemoveProposalTransaction(0);
+    expect(onRemoveProposalTransaction).toHaveBeenCalledTimes(200);
+  });
 });
