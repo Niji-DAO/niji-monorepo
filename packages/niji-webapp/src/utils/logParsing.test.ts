@@ -382,4 +382,37 @@ describe('logParsing round-trip', () => {
       expect(k).toContain(`0xR8-T-${i}`);
     }
   });
+
+  it('round-9 30 sequential filterToKey access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(filterToKey).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof filterToKey).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = filterToKey;
+    for (let i = 0; i < 100; i++) {
+      expect(filterToKey).toBe(first);
+    }
+  });
+
+  it('round-9 50 keyToFilter truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(keyToFilter).toBeTruthy();
+    }
+  });
+
+  it('round-9 50 different topic arrays', () => {
+    for (let i = 0; i < 50; i++) {
+      const topics = [`0xR9-T-${i}`];
+      const k = filterToKey({ address: '0xR9-A', topics });
+      expect(k).toContain(`0xR9-T-${i}`);
+    }
+  });
 });
