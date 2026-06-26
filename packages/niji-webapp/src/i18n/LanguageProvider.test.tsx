@@ -580,4 +580,63 @@ describe('LanguageProvider', () => {
       unmount();
     }
   });
+
+  it('round-9 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <LanguageProvider>
+          <div>r9</div>
+        </LanguageProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-9 30 instances rendered together', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <LanguageProvider key={i}>
+              <div>r9-{i}</div>
+            </LanguageProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-9 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <LanguageProvider>
+            <div>r9</div>
+          </LanguageProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-9 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <LanguageProvider>
+          <div>r9</div>
+        </LanguageProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-9 30 different children cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <LanguageProvider>
+          <div>r9-child-{i}</div>
+        </LanguageProvider>,
+      );
+      unmount();
+    }
+  });
 });
