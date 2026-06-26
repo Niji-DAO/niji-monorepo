@@ -730,4 +730,43 @@ describe('NavBar', () => {
       unmount();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<NavBar />);
+      unmount();
+    }
+  });
+
+  it('round-8 30 instances rendered together', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NavBar key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => wrap(<NavBar />)).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<NavBar />);
+      unmount();
+    }
+  });
+
+  it('round-8 100 sequential mount cycles third', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<NavBar />);
+      unmount();
+    }
+  });
 });
