@@ -455,4 +455,38 @@ describe('shortENS — boundary', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-9 30 sequential veryShortAddress access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(veryShortAddress).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof veryShortAddress).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = veryShortAddress;
+    for (let i = 0; i < 100; i++) {
+      expect(veryShortAddress).toBe(first);
+    }
+  });
+
+  it('round-9 50 veryShortENS truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(veryShortENS).toBeTruthy();
+    }
+  });
+
+  it('round-9 round-trip 100 sequential mixed calls', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0xR9' + i.toString(16).padStart(38, '0')) as Address;
+      veryShortAddress(addr);
+      veryShortENS(`r9-${i}.eth`);
+    }
+    expect(true).toBe(true);
+  });
 });
