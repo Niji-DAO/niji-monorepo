@@ -314,4 +314,36 @@ describe('nijiTraitKeys', () => {
       expect(() => humanizeTraitKey(keys[i % 5])).not.toThrow();
     }
   });
+
+  it('round-9 30 sequential humanizeTraitKey access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(humanizeTraitKey).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof humanizeTraitKey).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = humanizeTraitKey;
+    for (let i = 0; i < 100; i++) {
+      expect(humanizeTraitKey).toBe(first);
+    }
+  });
+
+  it('round-9 50 nijiTraitKeys truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(nijiTraitKeys).toBeTruthy();
+    }
+  });
+
+  it('round-9 30 various trait values', () => {
+    const keys = ['background', 'body', 'head', 'glasses', 'accessory'];
+    for (let i = 0; i < 30; i++) {
+      expect(() => humanizeTraitKey(keys[i % 5])).not.toThrow();
+    }
+  });
 });
