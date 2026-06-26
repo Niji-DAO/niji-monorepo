@@ -754,4 +754,51 @@ describe('ForkingPeriodTimer', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    const end = Math.floor(Date.now() / 1000) + 3600;
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ForkingPeriodTimer endTime={end} isPeriodEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    const end = Math.floor(Date.now() / 1000) + 3600;
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ForkingPeriodTimer key={i} endTime={end + i} isPeriodEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    const end = Math.floor(Date.now() / 1000) + 3600;
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<ForkingPeriodTimer endTime={end} isPeriodEnded={false} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    const end = Math.floor(Date.now() / 1000) + 3600;
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ForkingPeriodTimer endTime={end} isPeriodEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-8 50 sequential renders without crash', () => {
+    const end = Math.floor(Date.now() / 1000) + 3600;
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        render(<ForkingPeriodTimer endTime={end} isPeriodEnded={false} />),
+      ).not.toThrow();
+    }
+  });
 });
