@@ -922,4 +922,47 @@ describe('VoteProgressBar', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-9 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+      unmount();
+    }
+  });
+
+  it('round-9 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteProgressBar key={i} variant={VoteCardVariant.FOR} percentage={i % 100} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-9 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-9 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+      unmount();
+    }
+  });
+
+  it('round-9 200 rerender cycles', () => {
+    const { rerender } = render(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={50} />);
+    for (let i = 0; i < 200; i++) {
+      expect(() =>
+        rerender(<VoteProgressBar variant={VoteCardVariant.FOR} percentage={i % 100} />),
+      ).not.toThrow();
+    }
+  });
 });
