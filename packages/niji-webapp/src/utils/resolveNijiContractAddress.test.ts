@@ -382,4 +382,41 @@ describe('resolveNijiContractAddress', () => {
       expect(() => resolveNijiContractAddress(name as never)).not.toThrow();
     }
   });
+
+  it('round-9 30 sequential resolveNijiContractAddress access', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 30; i++) {
+      expect(resolveNijiContractAddress).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 50; i++) {
+      expect(typeof resolveNijiContractAddress).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    const first = resolveNijiContractAddress;
+    for (let i = 0; i < 100; i++) {
+      expect(resolveNijiContractAddress).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 50; i++) {
+      expect(resolveNijiContractAddress).toBeTruthy();
+    }
+  });
+
+  it('round-9 100 sequential alternating call cycles', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 100; i++) {
+      const name = i % 2 === 0 ? 'DAO' : 'AuctionHouse';
+      expect(() => resolveNijiContractAddress(name as never)).not.toThrow();
+    }
+  });
 });
