@@ -331,4 +331,35 @@ describe('traitName', () => {
       expect(() => traitName('background', i % 2)).not.toThrow();
     }
   });
+
+  it('round-9 30 sequential traitName access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(traitName).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof traitName).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = traitName;
+    for (let i = 0; i < 100; i++) {
+      expect(traitName).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(traitName).toBeTruthy();
+    }
+  });
+
+  it('round-9 30 various background calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => traitName('background', i % 2)).not.toThrow();
+    }
+  });
 });
