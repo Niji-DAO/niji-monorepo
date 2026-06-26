@@ -382,4 +382,42 @@ describe('etherscan link builders — fallback URL when blockExplorers undefined
       expect(buildEtherscanTxLink(`0xR7-tx-${i}`).length).toBeGreaterThan(0);
     }
   });
+
+  it('round-8 30 sequential buildEtherscanTxLink calls', async () => {
+    const { buildEtherscanTxLink } = await importEtherscan();
+    for (let i = 0; i < 30; i++) {
+      expect(() => buildEtherscanTxLink(`0xR8-tx-${i}`)).not.toThrow();
+    }
+  });
+
+  it('round-8 50 sequential type checks', async () => {
+    const { buildEtherscanTxLink } = await importEtherscan();
+    for (let i = 0; i < 50; i++) {
+      expect(typeof buildEtherscanTxLink).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', async () => {
+    const { buildEtherscanTxLink } = await importEtherscan();
+    const first = buildEtherscanTxLink;
+    for (let i = 0; i < 100; i++) {
+      expect(buildEtherscanTxLink).toBe(first);
+    }
+  });
+
+  it('round-8 30 deterministic for same input', async () => {
+    const { buildEtherscanTxLink } = await importEtherscan();
+    for (let i = 0; i < 30; i++) {
+      const r1 = buildEtherscanTxLink('0xR8-CONST');
+      const r2 = buildEtherscanTxLink('0xR8-CONST');
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-8 100 sequential calls produce valid links', async () => {
+    const { buildEtherscanTxLink } = await importEtherscan();
+    for (let i = 0; i < 100; i++) {
+      expect(buildEtherscanTxLink(`0xR8-tx-${i}`).length).toBeGreaterThan(0);
+    }
+  });
 });

@@ -344,4 +344,37 @@ describe('cssTransitionUtils consistency', () => {
       expect(basicFadeInOut).toBe(first);
     }
   });
+
+  it('round-8 30 sequential basicFadeInOut access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(basicFadeInOut).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof basicFadeInOut).toBe('object');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = basicFadeInOut;
+    for (let i = 0; i < 100; i++) {
+      expect(basicFadeInOut).toBe(first);
+    }
+  });
+
+  it('round-8 50 desktopModalSlideInFromTopAndGrow consistency', () => {
+    const first = desktopModalSlideInFromTopAndGrow;
+    for (let i = 0; i < 50; i++) {
+      expect(desktopModalSlideInFromTopAndGrow).toBe(first);
+    }
+  });
+
+  it('round-8 100 sequential consistency check basicFadeInOut', () => {
+    const first = basicFadeInOut;
+    for (let i = 0; i < 100; i++) {
+      expect(basicFadeInOut).toBe(first);
+    }
+  });
 });

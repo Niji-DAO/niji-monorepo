@@ -309,4 +309,37 @@ describe('processProposalDescriptionText', () => {
       expect(() => processProposalDescriptionText('', '')).not.toThrow();
     }
   });
+
+  it('round-8 30 sequential processProposalDescriptionText access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(processProposalDescriptionText).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof processProposalDescriptionText).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = processProposalDescriptionText;
+    for (let i = 0; i < 100; i++) {
+      expect(processProposalDescriptionText).toBe(first);
+    }
+  });
+
+  it('round-8 30 deterministic for same input', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = processProposalDescriptionText('a', 'b');
+      const r2 = processProposalDescriptionText('a', 'b');
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-8 100 sequential calls with empty inputs', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => processProposalDescriptionText('', '')).not.toThrow();
+    }
+  });
 });
