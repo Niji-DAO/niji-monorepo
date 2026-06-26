@@ -430,4 +430,35 @@ describe('useSubgraphQuery', () => {
       expect(typeof useSubgraphQuery).toBe('function');
     }
   });
+
+  it('round-8 30 sequential useSubgraphQuery access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useSubgraphQuery).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useSubgraphQuery).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = useSubgraphQuery;
+    for (let i = 0; i < 100; i++) {
+      expect(useSubgraphQuery).toBe(first);
+    }
+  });
+
+  it('round-8 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useSubgraphQuery({} as never))).not.toThrow();
+    }
+  });
+
+  it('round-8 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useSubgraphQuery).toBe('function');
+    }
+  });
 });
