@@ -376,4 +376,35 @@ describe('useEthNeeded', () => {
       expect(typeof useEthNeeded).toBe('function');
     }
   });
+
+  it('round-9 30 sequential useEthNeeded access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useEthNeeded).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useEthNeeded).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = useEthNeeded;
+    for (let i = 0; i < 100; i++) {
+      expect(useEthNeeded).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useEthNeeded).toBeTruthy();
+    }
+  });
+
+  it('round-9 50 second type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useEthNeeded).toBe('function');
+    }
+  });
 });

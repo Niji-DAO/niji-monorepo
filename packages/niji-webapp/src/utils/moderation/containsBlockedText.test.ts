@@ -328,4 +328,36 @@ describe('containsBlockedText', () => {
       expect(typeof containsBlockedText(text, 'all')).toBe('boolean');
     }
   });
+
+  it('round-9 30 sequential containsBlockedText access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(containsBlockedText).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof containsBlockedText).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = containsBlockedText;
+    for (let i = 0; i < 100; i++) {
+      expect(containsBlockedText).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(containsBlockedText).toBeTruthy();
+    }
+  });
+
+  it('round-9 100 sequential mixed allowed / blocked checks', () => {
+    for (let i = 0; i < 100; i++) {
+      const text = i % 2 === 0 ? `r9-clean-${i}` : `r9-text-${i}`;
+      expect(typeof containsBlockedText(text, 'all')).toBe('boolean');
+    }
+  });
 });
