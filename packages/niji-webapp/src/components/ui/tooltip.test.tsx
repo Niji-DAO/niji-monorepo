@@ -573,4 +573,79 @@ describe('Tooltip', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-7 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>r7</TooltipTrigger>
+            <TooltipContent>r7-c</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-7 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <TooltipProvider>
+          <>
+            {Array.from({ length: 30 }, (_, i) => (
+              <Tooltip key={i}>
+                <TooltipTrigger>r7-{i}</TooltipTrigger>
+                <TooltipContent>r7-c-{i}</TooltipContent>
+              </Tooltip>
+            ))}
+          </>
+        </TooltipProvider>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>x</TooltipTrigger>
+              <TooltipContent>y</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-7 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>x</TooltipTrigger>
+            <TooltipContent>y</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-7 100 sequential render check', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        render(
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>x</TooltipTrigger>
+              <TooltipContent>y</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
