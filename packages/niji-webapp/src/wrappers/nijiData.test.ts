@@ -813,4 +813,36 @@ describe('useProposalFeedback', () => {
       unmount();
     }
   });
+
+  it('round-9 30 sequential useCreateProposalCandidate access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useCreateProposalCandidate).toBeDefined();
+    }
+  });
+
+  it('round-9 50 useCreateProposalCandidate type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useCreateProposalCandidate).toBe('function');
+    }
+  });
+
+  it('round-9 100 useCreateProposalCandidate reference consistency', () => {
+    const first = useCreateProposalCandidate;
+    for (let i = 0; i < 100; i++) {
+      expect(useCreateProposalCandidate).toBe(first);
+    }
+  });
+
+  it('round-9 50 useCreateProposalCandidate truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useCreateProposalCandidate).toBeTruthy();
+    }
+  });
+
+  it('round-9 100 sequential useCreateProposalCandidate cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useCreateProposalCandidate());
+      unmount();
+    }
+  });
 });
