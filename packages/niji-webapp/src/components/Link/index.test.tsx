@@ -398,4 +398,44 @@ describe('Link', () => {
       expect(() => rerender(<Link text={`r${i}`} url={`https://r6-${i}.io`} />)).not.toThrow();
     }
   });
+
+  it('round-7 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<Link text="r7" url="https://r7.io" />);
+      unmount();
+    }
+  });
+
+  it('round-7 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <Link key={i} text={`r7-${i}`} url={`https://r7-${i}.io`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 different text values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Link text={`r7-c-${i}`} url={`https://r7-c-${i}.io`} />);
+      unmount();
+    }
+  });
+
+  it('round-7 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Link text="x" url="https://r7.io" />);
+      unmount();
+    }
+  });
+
+  it('round-7 100 rerender cycles', () => {
+    const { rerender } = render(<Link text="x" url="https://r7.io" />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<Link text={`r${i}`} url={`https://r7-${i}.io`} />)).not.toThrow();
+    }
+  });
 });
