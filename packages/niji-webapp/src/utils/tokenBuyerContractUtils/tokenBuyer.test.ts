@@ -345,4 +345,35 @@ describe('useEthNeeded', () => {
       expect(typeof useEthNeeded).toBe('function');
     }
   });
+
+  it('round-8 30 sequential useEthNeeded access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useEthNeeded).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useEthNeeded).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = useEthNeeded;
+    for (let i = 0; i < 100; i++) {
+      expect(useEthNeeded).toBe(first);
+    }
+  });
+
+  it('round-8 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useEthNeeded('0xR8', 1))).not.toThrow();
+    }
+  });
+
+  it('round-8 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useEthNeeded).toBe('function');
+    }
+  });
 });

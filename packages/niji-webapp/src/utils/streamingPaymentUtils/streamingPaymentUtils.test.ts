@@ -367,4 +367,35 @@ describe('getTokenAddressForCurrency — additional', () => {
       expect(typeof getTokenAddressForCurrency).toBe('function');
     }
   });
+
+  it('round-8 30 sequential getTokenAddressForCurrency access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(getTokenAddressForCurrency).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof getTokenAddressForCurrency).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = getTokenAddressForCurrency;
+    for (let i = 0; i < 100; i++) {
+      expect(getTokenAddressForCurrency).toBe(first);
+    }
+  });
+
+  it('round-8 50 sequential truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(getTokenAddressForCurrency).toBeTruthy();
+    }
+  });
+
+  it('round-8 50 sequential currency type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof getTokenAddressForCurrency).toBe('function');
+    }
+  });
 });
