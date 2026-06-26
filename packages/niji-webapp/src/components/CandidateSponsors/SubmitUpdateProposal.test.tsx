@@ -540,4 +540,43 @@ describe('SubmitUpdateProposal', () => {
       unmount();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<SubmitUpdateProposal {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-8 30 instances rendered together', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SubmitUpdateProposal key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => wrap(<SubmitUpdateProposal {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<SubmitUpdateProposal {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-8 30 isModalOpen toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<SubmitUpdateProposal {...baseProps} isModalOpen={i % 2 === 0} />);
+      unmount();
+    }
+  });
 });
