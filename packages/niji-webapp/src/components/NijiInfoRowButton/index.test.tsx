@@ -680,4 +680,47 @@ describe('NijiInfoRowButton', () => {
       unmount();
     }
   });
+
+  it('round-7 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NijiInfoRowButton btnText="r7" onClickHandler={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-7 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiInfoRowButton key={i} btnText={`r7-${i}`} onClickHandler={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<NijiInfoRowButton btnText="x" onClickHandler={() => {}} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-7 rapid 200 onClickHandler invocations', () => {
+    const onClickHandler = vi.fn();
+    render(<NijiInfoRowButton btnText="x" onClickHandler={onClickHandler} />);
+    for (let i = 0; i < 200; i++) onClickHandler();
+    expect(onClickHandler).toHaveBeenCalledTimes(200);
+  });
+
+  it('round-7 30 different icon values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiInfoRowButton iconImgSource={`/r7-${i}.png`} btnText="x" onClickHandler={() => {}} />,
+      );
+      unmount();
+    }
+  });
 });

@@ -971,4 +971,65 @@ describe('BrandDropdown', () => {
     );
     expect(container.querySelectorAll('select').length).toBe(200);
   });
+
+  it('round-7 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <BrandDropdown onChange={() => {}} value="r7">
+          <option value="r7">R7</option>
+        </BrandDropdown>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-7 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <BrandDropdown key={i} onChange={() => {}} value="a">
+              <option value="a">A-{i}</option>
+            </BrandDropdown>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <BrandDropdown onChange={() => {}} value="x">
+            <option value="x">X</option>
+          </BrandDropdown>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-7 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <BrandDropdown onChange={() => {}} value="x">
+          <option value="x">X</option>
+        </BrandDropdown>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-7 200 sequential select instances', () => {
+    const { container } = render(
+      <>
+        {Array.from({ length: 200 }, (_, i) => (
+          <BrandDropdown key={i} onChange={() => {}} value="a">
+            <option value="a">A-{i}</option>
+          </BrandDropdown>
+        ))}
+      </>,
+    );
+    expect(container.querySelectorAll('select').length).toBe(200);
+  });
 });
