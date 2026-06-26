@@ -744,4 +744,64 @@ describe('NijisTransition', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijisTransition show={true} transitionStyes={styles}>
+          <div>r8</div>
+        </NijisTransition>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijisTransition key={i} show={true} transitionStyes={styles}>
+              <div>r8-{i}</div>
+            </NijisTransition>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <NijisTransition show={true} transitionStyes={styles}>
+            <div>x</div>
+          </NijisTransition>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <NijisTransition show={true} transitionStyes={styles}>
+          <div>x</div>
+        </NijisTransition>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-8 30 sequential show toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <NijisTransition show={i % 2 === 0} transitionStyes={styles}>
+            <div>x</div>
+          </NijisTransition>,
+        ),
+      ).not.toThrow();
+    }
+  });
 });
