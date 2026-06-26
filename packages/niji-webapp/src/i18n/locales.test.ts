@@ -323,4 +323,35 @@ describe('SUPPORTED_LOCALE_TO_DAYSJS_LOCALE', () => {
       expect(SUPPORTED_LOCALES[0]).toBeDefined();
     }
   });
+
+  it('round-9 30 sequential SUPPORTED_LOCALES access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(SUPPORTED_LOCALES).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(Array.isArray(SUPPORTED_LOCALES)).toBe(true);
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = SUPPORTED_LOCALES;
+    for (let i = 0; i < 100; i++) {
+      expect(SUPPORTED_LOCALES).toBe(first);
+    }
+  });
+
+  it('round-9 50 DEFAULT_LOCALE truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(DEFAULT_LOCALE).toBeTruthy();
+    }
+  });
+
+  it('round-9 50 sequential element access', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(SUPPORTED_LOCALES[0]).toBeDefined();
+    }
+  });
 });

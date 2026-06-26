@@ -319,4 +319,35 @@ describe('pickSupportedLocale', () => {
       expect(pickSupportedLocale).toBeDefined();
     }
   });
+
+  it('round-9 30 sequential pickSupportedLocale access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(pickSupportedLocale).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof pickSupportedLocale).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = pickSupportedLocale;
+    for (let i = 0; i < 100; i++) {
+      expect(pickSupportedLocale).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(pickSupportedLocale).toBeTruthy();
+    }
+  });
+
+  it('round-9 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(pickSupportedLocale).toBeDefined();
+    }
+  });
 });

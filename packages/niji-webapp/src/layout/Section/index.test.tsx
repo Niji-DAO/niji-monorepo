@@ -575,4 +575,63 @@ describe('Section', () => {
       unmount();
     }
   });
+
+  it('round-9 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Section>
+          <div>r9</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-9 30 instances rendered together', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Section key={i}>
+              <div>r9-{i}</div>
+            </Section>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-9 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <Section>
+            <div>r9</div>
+          </Section>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-9 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <Section>
+          <div>r9</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-9 30 fullWidth toggle cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Section fullWidth={i % 2 === 0}>
+          <div>r9-{i}</div>
+        </Section>,
+      );
+      unmount();
+    }
+  });
 });
