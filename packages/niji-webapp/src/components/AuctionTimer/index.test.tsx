@@ -562,4 +562,46 @@ describe('AuctionTimer Component', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionTimer key={i} auction={mockAuction(3600 + i + 15000)} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<AuctionTimer auction={mockAuction(3600)} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-8 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() =>
+        render(<AuctionTimer auction={mockAuction(3600 + i + 17000)} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
 });

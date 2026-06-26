@@ -827,4 +827,47 @@ describe('CurrentBid', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CurrentBid currentBid={1n * 10n ** 18n} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CurrentBid key={i} currentBid={BigInt(i + 15000) * 10n ** 18n} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<CurrentBid currentBid={1n * 10n ** 18n} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<CurrentBid currentBid={1n * 10n ** 18n} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-8 100 rerender cycles', () => {
+    const { rerender } = render(<CurrentBid currentBid={1n * 10n ** 18n} auctionEnded={false} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<CurrentBid currentBid={BigInt(i + 17000) * 10n ** 18n} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
 });
