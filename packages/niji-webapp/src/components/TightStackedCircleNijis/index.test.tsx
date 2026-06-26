@@ -808,4 +808,42 @@ describe('TightStackedCircleNijis', () => {
       expect(() => render(<TightStackedCircleNijis nounIds={['1']} />)).not.toThrow();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<TightStackedCircleNijis nounIds={['1']} />);
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <TightStackedCircleNijis key={i} nounIds={[`${i + 10000}`]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<TightStackedCircleNijis nounIds={['1']} />)).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<TightStackedCircleNijis nounIds={['1']} />);
+      unmount();
+    }
+  });
+
+  it('round-8 100 sequential renders without crash', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => render(<TightStackedCircleNijis nounIds={['1']} />)).not.toThrow();
+    }
+  });
 });
