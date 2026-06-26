@@ -1096,4 +1096,46 @@ describe('Holder', () => {
       unmount();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Holder key={i} nounId={BigInt(i + 90000)} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<Holder nounId={1n} />, { wrapper: WithProviders })).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-8 30 large nounId values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Holder nounId={BigInt(100000 + i)} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
 });
