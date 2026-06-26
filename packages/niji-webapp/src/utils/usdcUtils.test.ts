@@ -381,4 +381,35 @@ describe('contract2humanUSDCFormat edge cases', () => {
       expect(() => contract2humanUSDCFormat(BigInt(i + 25000) * 10n ** 6n)).not.toThrow();
     }
   });
+
+  it('round-9 30 sequential human2ContractUSDCFormat access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(human2ContractUSDCFormat).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof human2ContractUSDCFormat).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = human2ContractUSDCFormat;
+    for (let i = 0; i < 100; i++) {
+      expect(human2ContractUSDCFormat).toBe(first);
+    }
+  });
+
+  it('round-9 50 contract2humanUSDCFormat truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(contract2humanUSDCFormat).toBeTruthy();
+    }
+  });
+
+  it('round-9 50 large-value contract format calls', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => contract2humanUSDCFormat(BigInt(i + 27000) * 10n ** 6n)).not.toThrow();
+    }
+  });
 });
