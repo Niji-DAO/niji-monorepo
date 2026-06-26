@@ -791,4 +791,45 @@ describe('ModalSubtitle', () => {
     }
     expect(container.textContent).toContain('99');
   });
+
+  it('round-8 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<ModalSubtitle>r8</ModalSubtitle>);
+      unmount();
+    }
+  });
+
+  it('round-8 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <ModalSubtitle key={i}>r8-{i}</ModalSubtitle>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ModalSubtitle>r8-c-{i}</ModalSubtitle>);
+      unmount();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ModalSubtitle>x</ModalSubtitle>);
+      unmount();
+    }
+  });
+
+  it('round-8 100 rerender cycles', () => {
+    const { container, rerender } = render(<ModalSubtitle>x</ModalSubtitle>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<ModalSubtitle>r8-r-{i}</ModalSubtitle>);
+    }
+    expect(container.textContent).toContain('99');
+  });
 });
