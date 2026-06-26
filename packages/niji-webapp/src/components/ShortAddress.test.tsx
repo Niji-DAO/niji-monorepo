@@ -476,4 +476,43 @@ describe('ShortAddress', () => {
       expect(() => rerender(<ShortAddress address={ADDR} />)).not.toThrow();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ShortAddress address={ADDR} />);
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ShortAddress key={i} address={ADDR} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ShortAddress address={ADDR} />)).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ShortAddress address={ADDR} />);
+      unmount();
+    }
+  });
+
+  it('round-8 100 rerender cycles', () => {
+    const { rerender } = render(<ShortAddress address={ADDR} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<ShortAddress address={ADDR} />)).not.toThrow();
+    }
+  });
 });
