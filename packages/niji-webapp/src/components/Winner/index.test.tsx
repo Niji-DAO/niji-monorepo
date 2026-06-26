@@ -659,4 +659,49 @@ describe('Winner', () => {
       unmount();
     }
   });
+
+  it('round-9 mount-unmount 30 cycles', () => {
+    const addr = '0x5FbDB2315678afecb367f032d93F642f64180aa3' as const;
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Winner winner={addr} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-9 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => {
+            const addr = ('0xR9V' + i.toString(16).padStart(37, '0')) as `0x${string}`;
+            return <Winner key={i} winner={addr} />;
+          })}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-9 30 sequential renders without crash', () => {
+    const addr = '0x5FbDB2315678afecb367f032d93F642f64180aa3' as const;
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<Winner winner={addr} />, { wrapper: WithProviders })).not.toThrow();
+    }
+  });
+
+  it('round-9 50 mount-unmount cycles second', () => {
+    const addr = '0x5FbDB2315678afecb367f032d93F642f64180aa3' as const;
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Winner winner={addr} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-9 30 different winner values', () => {
+    for (let i = 0; i < 30; i++) {
+      const addr = ('0xR9V' + i.toString(16).padStart(37, '0')) as `0x${string}`;
+      const { unmount } = render(<Winner winner={addr} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
 });
