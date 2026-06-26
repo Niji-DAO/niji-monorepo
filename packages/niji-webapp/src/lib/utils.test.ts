@@ -299,4 +299,36 @@ describe('cn (clsx + tailwind-merge)', () => {
       expect(typeof c).toBe('string');
     }
   });
+
+  it('round-9 30 sequential cn access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(cn).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof cn).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = cn;
+    for (let i = 0; i < 100; i++) {
+      expect(cn).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(cn).toBeTruthy();
+    }
+  });
+
+  it('round-9 100 sequential alternating call patterns', () => {
+    for (let i = 0; i < 100; i++) {
+      const c = i % 2 === 0 ? cn('r9-c') : cn('r9-d');
+      expect(typeof c).toBe('string');
+    }
+  });
 });

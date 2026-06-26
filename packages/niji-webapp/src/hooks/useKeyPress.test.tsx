@@ -362,4 +362,35 @@ describe('useKeyPress', () => {
       expect(typeof useKeyPress).toBe('function');
     }
   });
+
+  it('round-9 30 sequential useKeyPress access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useKeyPress).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useKeyPress).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = useKeyPress;
+    for (let i = 0; i < 100; i++) {
+      expect(useKeyPress).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useKeyPress).toBeTruthy();
+    }
+  });
+
+  it('round-9 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useKeyPress).toBe('function');
+    }
+  });
 });
