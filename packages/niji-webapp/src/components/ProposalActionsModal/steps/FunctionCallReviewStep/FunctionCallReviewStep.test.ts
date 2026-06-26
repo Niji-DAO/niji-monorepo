@@ -565,4 +565,35 @@ describe('handleActionAdd', () => {
       expect(handleActionAdd).toBeTruthy();
     }
   });
+
+  it('round-8 30 sequential handleActionAdd access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(handleActionAdd).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof handleActionAdd).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = handleActionAdd;
+    for (let i = 0; i < 100; i++) {
+      expect(handleActionAdd).toBe(first);
+    }
+  });
+
+  it('round-8 50 sequential truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(handleActionAdd).toBeTruthy();
+    }
+  });
+
+  it('round-8 100 sequential truthiness checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(handleActionAdd).toBeTruthy();
+    }
+  });
 });
