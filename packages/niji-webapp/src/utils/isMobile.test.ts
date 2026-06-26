@@ -313,4 +313,35 @@ describe('isMobileScreen', () => {
       expect(typeof isMobileScreen).toBe('function');
     }
   });
+
+  it('round-8 30 sequential isMobileScreen calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => isMobileScreen()).not.toThrow();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof isMobileScreen).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = isMobileScreen;
+    for (let i = 0; i < 100; i++) {
+      expect(isMobileScreen).toBe(first);
+    }
+  });
+
+  it('round-8 50 sequential calls produce boolean', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof isMobileScreen()).toBe('boolean');
+    }
+  });
+
+  it('round-8 100 sequential type checks second', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof isMobileScreen).toBe('function');
+    }
+  });
 });
