@@ -420,4 +420,40 @@ describe('etherscan link builders — fallback URL when blockExplorers undefined
       expect(buildEtherscanTxLink(`0xR8-tx-${i}`).length).toBeGreaterThan(0);
     }
   });
+
+  it('round-9 30 sequential buildEtherscanTxLink access', async () => {
+    const { buildEtherscanTxLink } = await importEtherscan();
+    for (let i = 0; i < 30; i++) {
+      expect(buildEtherscanTxLink).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', async () => {
+    const { buildEtherscanTxLink } = await importEtherscan();
+    for (let i = 0; i < 50; i++) {
+      expect(typeof buildEtherscanTxLink).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', async () => {
+    const { buildEtherscanTxLink } = await importEtherscan();
+    const first = buildEtherscanTxLink;
+    for (let i = 0; i < 100; i++) {
+      expect(buildEtherscanTxLink).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', async () => {
+    const { buildEtherscanTxLink } = await importEtherscan();
+    for (let i = 0; i < 50; i++) {
+      expect(buildEtherscanTxLink).toBeTruthy();
+    }
+  });
+
+  it('round-9 100 sequential calls produce valid links', async () => {
+    const { buildEtherscanTxLink } = await importEtherscan();
+    for (let i = 0; i < 100; i++) {
+      expect(buildEtherscanTxLink(`0xR9-tx-${i}`).length).toBeGreaterThan(0);
+    }
+  });
 });

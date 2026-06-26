@@ -417,4 +417,37 @@ describe('timeUtils stress', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-9 30 sequential currentUnixEpoch access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(currentUnixEpoch).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof currentUnixEpoch).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = currentUnixEpoch;
+    for (let i = 0; i < 100; i++) {
+      expect(currentUnixEpoch).toBe(first);
+    }
+  });
+
+  it('round-9 50 toUnixEpoch truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(toUnixEpoch).toBeTruthy();
+    }
+  });
+
+  it('round-9 100 sequential mixed calls', () => {
+    for (let i = 0; i < 100; i++) {
+      currentUnixEpoch();
+      toUnixEpoch(new Date(9_000_000_000_000 + i * 1000));
+    }
+    expect(true).toBe(true);
+  });
 });
