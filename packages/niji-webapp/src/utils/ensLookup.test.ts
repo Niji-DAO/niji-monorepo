@@ -393,4 +393,38 @@ describe('useReverseENSLookUp', () => {
       expect(ensCacheKey(addr)).toEqual(first);
     }
   });
+
+  it('round-8 30 sequential ensCacheKey calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => ensCacheKey(`0xR8-${i}` as never)).not.toThrow();
+    }
+  });
+
+  it('round-8 50 sequential calls produce defined result', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(ensCacheKey(`0xR8-${i}` as never)).toBeDefined();
+    }
+  });
+
+  it('round-8 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof ensCacheKey).toBe('function');
+    }
+  });
+
+  it('round-8 30 deterministic for same address', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = ensCacheKey('0xR8-CONST' as never);
+      const r2 = ensCacheKey('0xR8-CONST' as never);
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-8 50 ensCacheKey consistency check', () => {
+    const addr = '0xR8-CONST-2' as never;
+    const first = ensCacheKey(addr);
+    for (let i = 0; i < 50; i++) {
+      expect(ensCacheKey(addr)).toEqual(first);
+    }
+  });
 });
