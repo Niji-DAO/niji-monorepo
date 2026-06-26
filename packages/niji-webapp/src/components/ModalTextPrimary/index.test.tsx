@@ -773,4 +773,44 @@ describe('ModalTextPrimary', () => {
       expect(() => rerender(<ModalTextPrimary>r6-r-{i}</ModalTextPrimary>)).not.toThrow();
     }
   });
+
+  it('round-7 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<ModalTextPrimary>r7</ModalTextPrimary>);
+      unmount();
+    }
+  });
+
+  it('round-7 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <ModalTextPrimary key={i}>r7-{i}</ModalTextPrimary>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ModalTextPrimary>r7-c-{i}</ModalTextPrimary>);
+      unmount();
+    }
+  });
+
+  it('round-7 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+      unmount();
+    }
+  });
+
+  it('round-7 100 rerender cycles', () => {
+    const { rerender } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<ModalTextPrimary>r7-r-{i}</ModalTextPrimary>)).not.toThrow();
+    }
+  });
 });
