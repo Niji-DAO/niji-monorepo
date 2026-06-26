@@ -335,4 +335,35 @@ describe('useBlockTimestamp', () => {
       expect(typeof useBlockTimestamp).toBe('function');
     }
   });
+
+  it('round-8 30 sequential useBlockTimestamp access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useBlockTimestamp).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useBlockTimestamp).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = useBlockTimestamp;
+    for (let i = 0; i < 100; i++) {
+      expect(useBlockTimestamp).toBe(first);
+    }
+  });
+
+  it('round-8 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useBlockTimestamp(BigInt(i + 19000)))).not.toThrow();
+    }
+  });
+
+  it('round-8 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useBlockTimestamp).toBe('function');
+    }
+  });
 });

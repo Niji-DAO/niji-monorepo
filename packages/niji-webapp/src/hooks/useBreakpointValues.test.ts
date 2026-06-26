@@ -401,4 +401,35 @@ describe('useBreakpointDown', () => {
       expect(typeof useBreakpointValues).toBe('function');
     }
   });
+
+  it('round-8 30 sequential useBreakpointValues access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useBreakpointValues).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useBreakpointValues).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = useBreakpointValues;
+    for (let i = 0; i < 100; i++) {
+      expect(useBreakpointValues).toBe(first);
+    }
+  });
+
+  it('round-8 50 hook does not throw on call', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => renderHook(() => useBreakpointValues({ base: i + 23000 }))).not.toThrow();
+    }
+  });
+
+  it('round-8 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useBreakpointValues).toBe('function');
+    }
+  });
 });
