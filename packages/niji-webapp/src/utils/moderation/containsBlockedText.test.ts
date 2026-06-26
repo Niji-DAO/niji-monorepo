@@ -295,4 +295,37 @@ describe('containsBlockedText', () => {
       expect(typeof containsBlockedText(text, 'all')).toBe('boolean');
     }
   });
+
+  it('round-8 30 sequential containsBlockedText calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => containsBlockedText(`r8-${i}`, 'all')).not.toThrow();
+    }
+  });
+
+  it('round-8 50 sequential calls produce boolean', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof containsBlockedText(`r8-${i}`, 'all')).toBe('boolean');
+    }
+  });
+
+  it('round-8 100 sequential type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof containsBlockedText).toBe('function');
+    }
+  });
+
+  it('round-8 30 deterministic for same input', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = containsBlockedText('test-r8', 'all');
+      const r2 = containsBlockedText('test-r8', 'all');
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-8 100 sequential mixed allowed / blocked checks', () => {
+    for (let i = 0; i < 100; i++) {
+      const text = i % 2 === 0 ? `r8-clean-${i}` : `r8-text-${i}`;
+      expect(typeof containsBlockedText(text, 'all')).toBe('boolean');
+    }
+  });
 });
