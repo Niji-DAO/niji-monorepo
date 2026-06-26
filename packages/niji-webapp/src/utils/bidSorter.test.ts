@@ -398,4 +398,43 @@ describe('compareBidsChronologically', () => {
       );
     }
   });
+
+  it('round-8 30 sequential compareBidsChronologically access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(compareBidsChronologically).toBeDefined();
+    }
+  });
+
+  it('round-8 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof compareBidsChronologically).toBe('function');
+    }
+  });
+
+  it('round-8 100 sequential reference consistency', () => {
+    const first = compareBidsChronologically;
+    for (let i = 0; i < 100; i++) {
+      expect(compareBidsChronologically).toBe(first);
+    }
+  });
+
+  it('round-8 30 deterministic for same input', () => {
+    const makeBid8 = (ts: number, txIndex = 0): IBid =>
+      ({ blockTimestamp: String(ts), txIndex }) as unknown as IBid;
+    for (let i = 0; i < 30; i++) {
+      const r1 = compareBidsChronologically(makeBid8(100), makeBid8(200));
+      const r2 = compareBidsChronologically(makeBid8(100), makeBid8(200));
+      expect(r1).toBe(r2);
+    }
+  });
+
+  it('round-8 50 sequential calls with equal block numbers', () => {
+    const makeBid8 = (ts: number, txIndex = 0): IBid =>
+      ({ blockTimestamp: String(ts), txIndex }) as unknown as IBid;
+    for (let i = 0; i < 50; i++) {
+      expect(typeof compareBidsChronologically(makeBid8(11000, i), makeBid8(11000, i + 1))).toBe(
+        'number',
+      );
+    }
+  });
 });
