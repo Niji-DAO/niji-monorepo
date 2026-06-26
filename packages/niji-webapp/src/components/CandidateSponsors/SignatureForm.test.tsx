@@ -604,4 +604,43 @@ describe('SignatureForm', () => {
       unmount();
     }
   });
+
+  it('round-8 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<SignatureForm {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-8 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SignatureForm key={i} {...baseProps} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-8 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<SignatureForm {...baseProps} />)).not.toThrow();
+    }
+  });
+
+  it('round-8 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<SignatureForm {...baseProps} />);
+      unmount();
+    }
+  });
+
+  it('round-8 30 different proposalIdToUpdate cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<SignatureForm {...baseProps} proposalIdToUpdate={i + 13000} />);
+      unmount();
+    }
+  });
 });
