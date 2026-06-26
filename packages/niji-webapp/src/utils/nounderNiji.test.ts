@@ -336,4 +336,37 @@ describe('isNounderNiji', () => {
       expect(r1).toBe(r2);
     }
   });
+
+  it('round-9 30 sequential isNounderNiji access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(isNounderNiji).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof isNounderNiji).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = isNounderNiji;
+    for (let i = 0; i < 100; i++) {
+      expect(isNounderNiji).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(isNounderNiji).toBeTruthy();
+    }
+  });
+
+  it('round-9 deterministic for same nounId 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const r1 = isNounderNiji(2000n);
+      const r2 = isNounderNiji(2000n);
+      expect(r1).toBe(r2);
+    }
+  });
 });

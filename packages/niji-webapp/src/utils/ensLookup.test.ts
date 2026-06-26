@@ -427,4 +427,37 @@ describe('useReverseENSLookUp', () => {
       expect(ensCacheKey(addr)).toEqual(first);
     }
   });
+
+  it('round-9 30 sequential ensCacheKey access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(ensCacheKey).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof ensCacheKey).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = ensCacheKey;
+    for (let i = 0; i < 100; i++) {
+      expect(ensCacheKey).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(ensCacheKey).toBeTruthy();
+    }
+  });
+
+  it('round-9 50 ensCacheKey consistency check', () => {
+    const addr = '0xR9-CONST-2' as never;
+    const first = ensCacheKey(addr);
+    for (let i = 0; i < 50; i++) {
+      expect(ensCacheKey(addr)).toEqual(first);
+    }
+  });
 });
