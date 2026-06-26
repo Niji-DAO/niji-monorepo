@@ -807,4 +807,43 @@ describe('BrandSpinner', () => {
       unmount();
     }
   });
+
+  it('round-7 mount-unmount 500 cycles', () => {
+    for (let i = 0; i < 500; i++) {
+      const { unmount } = render(<BrandSpinner />);
+      unmount();
+    }
+  });
+
+  it('round-7 renders 500 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 500 }, (_, i) => (
+            <BrandSpinner key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 50 sequential renders without crash', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => render(<BrandSpinner />)).not.toThrow();
+    }
+  });
+
+  it('round-7 100 rerender cycles', () => {
+    const { rerender } = render(<BrandSpinner />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<BrandSpinner />)).not.toThrow();
+    }
+  });
+
+  it('round-7 200 sequential mount cycles', () => {
+    for (let i = 0; i < 200; i++) {
+      const { unmount } = render(<BrandSpinner />);
+      unmount();
+    }
+  });
 });
