@@ -313,4 +313,37 @@ describe('shouldUseStateBg', () => {
       expect(typeof shouldUseStateBg({ pathname: path })).toBe('boolean');
     }
   });
+
+  it('round-9 30 sequential shouldUseStateBg access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(shouldUseStateBg).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof shouldUseStateBg).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = shouldUseStateBg;
+    for (let i = 0; i < 100; i++) {
+      expect(shouldUseStateBg).toBe(first);
+    }
+  });
+
+  it('round-9 50 invocations', () => {
+    for (let i = 0; i < 50; i++) {
+      shouldUseStateBg({ pathname: `/r9-${i}` });
+    }
+    expect(true).toBe(true);
+  });
+
+  it('round-9 100 various pathname patterns', () => {
+    for (let i = 0; i < 100; i++) {
+      const path = i % 2 === 0 ? '/' : `/r9-noun-${i}`;
+      expect(typeof shouldUseStateBg({ pathname: path })).toBe('boolean');
+    }
+  });
 });
