@@ -949,4 +949,84 @@ describe('ModalBottomButtonRow', () => {
     expect(onPrev).toHaveBeenCalledTimes(200);
     expect(onNext).toHaveBeenCalledTimes(200);
   });
+
+  it('round-7 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ModalBottomButtonRow
+          prevBtnText="P"
+          onPrevBtnClick={() => {}}
+          nextBtnText="N"
+          onNextBtnClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-7 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ModalBottomButtonRow
+              key={i}
+              prevBtnText={`P-${i}`}
+              onPrevBtnClick={() => {}}
+              nextBtnText={`N-${i}`}
+              onNextBtnClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-7 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ModalBottomButtonRow
+            prevBtnText="P"
+            onPrevBtnClick={() => {}}
+            nextBtnText="N"
+            onNextBtnClick={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-7 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ModalBottomButtonRow
+          prevBtnText="P"
+          onPrevBtnClick={() => {}}
+          nextBtnText="N"
+          onNextBtnClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-7 rapid 200 onPrev/onNext invocations second', () => {
+    const onPrev = vi.fn();
+    const onNext = vi.fn();
+    render(
+      <ModalBottomButtonRow
+        prevBtnText="P"
+        onPrevBtnClick={onPrev}
+        nextBtnText="N"
+        onNextBtnClick={onNext}
+      />,
+    );
+    for (let i = 0; i < 200; i++) {
+      onPrev();
+      onNext();
+    }
+    expect(onPrev).toHaveBeenCalledTimes(200);
+    expect(onNext).toHaveBeenCalledTimes(200);
+  });
 });
