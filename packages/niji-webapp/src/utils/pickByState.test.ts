@@ -347,5 +347,36 @@ describe('usePickByState', () => {
       expect(usePickByState(`r8-miss-${i}`, ['a'], [1])).toBeUndefined();
     }
   });
+
+  it('round-9 30 sequential usePickByState access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(usePickByState).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof usePickByState).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = usePickByState;
+    for (let i = 0; i < 100; i++) {
+      expect(usePickByState).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(usePickByState).toBeTruthy();
+    }
+  });
+
+  it('round-9 100 sequential undefined cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(usePickByState(`r9-miss-${i}`, ['a'], [1])).toBeUndefined();
+    }
+  });
   /* eslint-enable react-hooks/rules-of-hooks */
 });
