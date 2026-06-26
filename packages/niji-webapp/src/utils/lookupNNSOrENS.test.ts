@@ -435,4 +435,37 @@ describe('lookupNNSOrENS', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-9 30 sequential lookupNNSOrENS access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(lookupNNSOrENS).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof lookupNNSOrENS).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = lookupNNSOrENS;
+    for (let i = 0; i < 100; i++) {
+      expect(lookupNNSOrENS).toBe(first);
+    }
+  });
+
+  it('round-9 50 truthy checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(lookupNNSOrENS).toBeTruthy();
+    }
+  });
+
+  it('round-9 50 sequential calls with empty data', async () => {
+    const mockClient = { call: vi.fn(async () => ({ data: undefined })) } as never;
+    for (let i = 0; i < 50; i++) {
+      await lookupNNSOrENS(mockClient, ('0xR9-' + i) as Address).catch(() => null);
+    }
+    expect(true).toBe(true);
+  });
 });

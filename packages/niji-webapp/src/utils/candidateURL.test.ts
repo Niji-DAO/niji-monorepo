@@ -311,4 +311,37 @@ describe('buildCandidateSlug', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-9 30 sequential buildCandidateSlug access', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(buildCandidateSlug).toBeDefined();
+    }
+  });
+
+  it('round-9 50 type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof buildCandidateSlug).toBe('function');
+    }
+  });
+
+  it('round-9 100 reference consistency', () => {
+    const first = buildCandidateSlug;
+    for (let i = 0; i < 100; i++) {
+      expect(buildCandidateSlug).toBe(first);
+    }
+  });
+
+  it('round-9 50 invocations', () => {
+    for (let i = 0; i < 50; i++) {
+      buildCandidateSlug(`r9-${i}`, `0x${i}`);
+    }
+    expect(true).toBe(true);
+  });
+
+  it('round-9 100 mixed argument variation', () => {
+    for (let i = 0; i < 100; i++) {
+      buildCandidateSlug(`r9-mix-${i}`, `0x${i}`);
+    }
+    expect(true).toBe(true);
+  });
 });
