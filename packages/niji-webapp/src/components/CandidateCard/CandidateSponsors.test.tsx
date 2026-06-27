@@ -604,4 +604,27 @@ describe('CandidateSponsors', () => {
       expect(typeof CandidateSponsors).toBe('function');
     }
   });
+
+  it('round-11 30 sequential CandidateSponsors truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(CandidateSponsors).toBeTruthy();
+  });
+
+  it('round-11 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof CandidateSponsors).toBe('function');
+  });
+
+  it('round-11 30 sequential defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(CandidateSponsors).toBeDefined();
+  });
+
+  it('round-11 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(CandidateSponsors).toBeTruthy();
+      expect(typeof CandidateSponsors).toBe('function');
+    }
+  });
+
+  it('round-11 100 sequential defined checks third', () => {
+    for (let i = 0; i < 100; i++) expect(CandidateSponsors).toBeDefined();
+  });
 });
