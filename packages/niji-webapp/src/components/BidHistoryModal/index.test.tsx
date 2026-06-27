@@ -1027,4 +1027,44 @@ describe('BidHistoryModal', () => {
       expect(typeof Backdrop).toBe('function');
     }
   });
+
+  it('round-11 30 sequential BidHistoryModal mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <BidHistoryModal key={i} auction={auction} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<BidHistoryModal auction={auction} onDismiss={() => {}} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-11 100 Backdrop type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof Backdrop).toBe('function');
+    }
+  });
 });
