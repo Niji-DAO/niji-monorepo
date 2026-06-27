@@ -365,4 +365,35 @@ describe('useProposalStatus', () => {
       expect(useProposalStatus).toBeTruthy();
     }
   });
+
+  it('round-10 30 sequential useProposalStatus truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useProposalStatus).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useProposalStatus).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useProposalStatus).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential combined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useProposalStatus).toBeTruthy();
+      expect(typeof useProposalStatus).toBe('function');
+    }
+  });
+
+  it('round-10 100 sequential defined checks second', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useProposalStatus).toBeDefined();
+    }
+  });
 });
