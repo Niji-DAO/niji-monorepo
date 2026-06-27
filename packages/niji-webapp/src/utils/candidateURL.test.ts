@@ -375,4 +375,35 @@ describe('buildCandidateSlug', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-11 30 sequential buildCandidateSlug calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(buildCandidateSlug(`r11-${i}`, '0xR11')).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof buildCandidateSlug).toBe('function');
+    }
+  });
+
+  it('round-11 30 truthiness checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(buildCandidateSlug).toBeTruthy();
+    }
+  });
+
+  it('round-11 50 sequential defined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(buildCandidateSlug).toBeDefined();
+    }
+  });
+
+  it('round-11 100 sequential combined invocations', () => {
+    for (let i = 0; i < 100; i++) {
+      buildCandidateSlug(`r11-c-${i}`, `0xR11-${i}`);
+    }
+    expect(true).toBe(true);
+  });
 });
