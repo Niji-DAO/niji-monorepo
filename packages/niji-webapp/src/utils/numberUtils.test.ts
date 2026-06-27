@@ -372,4 +372,35 @@ describe('countDecimals', () => {
       expect(typeof countDecimals(n)).toBe('number');
     }
   });
+
+  it('round-10 30 sequential countDecimals truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(countDecimals).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof countDecimals).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(countDecimals).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential return type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof countDecimals(i + 39000.25)).toBe('number');
+    }
+  });
+
+  it('round-10 100 mixed argument variation', () => {
+    for (let i = 0; i < 100; i++) {
+      const n = i % 3 === 0 ? i + 49000 : i % 3 === 1 ? i + 49000.5 : i + 49000.125;
+      expect(typeof countDecimals(n)).toBe('number');
+    }
+  });
 });

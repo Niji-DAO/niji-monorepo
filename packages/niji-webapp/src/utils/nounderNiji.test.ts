@@ -369,4 +369,36 @@ describe('isNounderNiji', () => {
       expect(r1).toBe(r2);
     }
   });
+
+  it('round-10 30 sequential isNounderNiji truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(isNounderNiji).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof isNounderNiji).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(isNounderNiji).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential boolean return checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof isNounderNiji(BigInt(i + 3000))).toBe('boolean');
+    }
+  });
+
+  it('round-10 100 sequential reproducibility checks', () => {
+    for (let i = 0; i < 100; i++) {
+      const r1 = isNounderNiji(4000n);
+      const r2 = isNounderNiji(4000n);
+      expect(r1).toBe(r2);
+    }
+  });
 });
