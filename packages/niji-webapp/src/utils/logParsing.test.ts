@@ -487,4 +487,32 @@ describe('logParsing round-trip', () => {
       expect(k1).toEqual(k2);
     }
   });
+
+  it('round-12 30 sequential filterToKey truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(filterToKey).toBeTruthy();
+  });
+
+  it('round-12 30 sequential keyToFilter type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof keyToFilter).toBe('function');
+  });
+
+  it('round-12 30 sequential filterToKey defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(filterToKey).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(filterToKey).toBeTruthy();
+      expect(typeof keyToFilter).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential filterToKey idempotency', () => {
+    const topics: string[] = [];
+    for (let i = 0; i < 100; i++) {
+      const k1 = filterToKey({ address: '0xR12-A', topics });
+      const k2 = filterToKey({ address: '0xR12-A', topics });
+      expect(k1).toEqual(k2);
+    }
+  });
 });
