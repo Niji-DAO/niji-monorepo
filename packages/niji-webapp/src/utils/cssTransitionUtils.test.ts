@@ -475,4 +475,30 @@ describe('cssTransitionUtils consistency', () => {
       expect(basicFadeInOut).toBe(first);
     }
   });
+
+  it('round-12 30 sequential basicFadeInOut truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(basicFadeInOut).toBeTruthy();
+  });
+
+  it('round-12 30 sequential basicFadeInOut type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof basicFadeInOut).toBe('object');
+  });
+
+  it('round-12 30 sequential basicFadeInOut defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(basicFadeInOut).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(basicFadeInOut).toBeTruthy();
+      expect(typeof basicFadeInOut).toBe('object');
+    }
+  });
+
+  it('round-12 100 sequential basicFadeInOut reference consistency', () => {
+    const first = basicFadeInOut;
+    for (let i = 0; i < 100; i++) {
+      expect(basicFadeInOut).toBe(first);
+    }
+  });
 });
