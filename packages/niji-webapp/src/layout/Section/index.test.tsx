@@ -693,4 +693,63 @@ describe('Section', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential Section mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <span>r11-{i}</span>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Section key={i} fullWidth={false}>
+              <span>r11-i-{i}</span>
+            </Section>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <Section fullWidth={false}>
+            <span>r11-s-{i}</span>
+          </Section>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <Section fullWidth={true}>
+          <span>r11-m-{i}</span>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <span>r11-c-{i}</span>
+        </Section>,
+      );
+      unmount();
+    }
+  });
 });
