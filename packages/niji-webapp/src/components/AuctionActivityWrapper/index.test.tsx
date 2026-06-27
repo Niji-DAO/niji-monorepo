@@ -1014,4 +1014,46 @@ describe('AuctionActivityWrapper', () => {
     }
     expect(container.textContent).toContain('99');
   });
+
+  it('round-11 30 sequential AuctionActivityWrapper mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionActivityWrapper>r11-m-{i}</AuctionActivityWrapper>);
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionActivityWrapper key={i}>r11-i-{i}</AuctionActivityWrapper>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<AuctionActivityWrapper>r11-s-{i}</AuctionActivityWrapper>),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<AuctionActivityWrapper>r11-m2-{i}</AuctionActivityWrapper>);
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential rerender cycles', () => {
+    const { container, rerender } = render(<AuctionActivityWrapper>x</AuctionActivityWrapper>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<AuctionActivityWrapper>r11-r-{i}</AuctionActivityWrapper>);
+    }
+    expect(container.textContent).toContain('99');
+  });
 });
