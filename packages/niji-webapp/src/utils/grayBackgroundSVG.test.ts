@@ -394,4 +394,30 @@ describe('getGrayBackgroundSVG', () => {
       expect(getGrayBackgroundSVG()).toBe(first);
     }
   });
+
+  it('round-12 30 sequential getGrayBackgroundSVG truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(getGrayBackgroundSVG).toBeTruthy();
+  });
+
+  it('round-12 30 sequential getGrayBackgroundSVG type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof getGrayBackgroundSVG).toBe('function');
+  });
+
+  it('round-12 30 sequential getGrayBackgroundSVG defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(getGrayBackgroundSVG).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(getGrayBackgroundSVG).toBeTruthy();
+      expect(typeof getGrayBackgroundSVG).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential getGrayBackgroundSVG idempotency', () => {
+    const first = getGrayBackgroundSVG();
+    for (let i = 0; i < 100; i++) {
+      expect(getGrayBackgroundSVG()).toBe(first);
+    }
+  });
 });

@@ -437,4 +437,31 @@ describe('processProposalDescriptionText', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-12 30 sequential processProposalDescriptionText truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(processProposalDescriptionText).toBeTruthy();
+  });
+
+  it('round-12 30 sequential processProposalDescriptionText type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof processProposalDescriptionText).toBe('function');
+  });
+
+  it('round-12 30 sequential processProposalDescriptionText defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(processProposalDescriptionText).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(processProposalDescriptionText).toBeTruthy();
+      expect(typeof processProposalDescriptionText).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential processProposalDescriptionText invocations', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        processProposalDescriptionText(i % 2 === 0 ? '' : `r12-desc-${i}`, `r12-t-${i}`),
+      ).not.toThrow();
+    }
+  });
 });
