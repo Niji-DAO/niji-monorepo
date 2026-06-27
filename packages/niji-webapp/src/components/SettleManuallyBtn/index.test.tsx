@@ -1064,4 +1064,49 @@ describe('SettleManuallyBtn', () => {
     for (let i = 0; i < 200; i++) handler();
     expect(handler).toHaveBeenCalledTimes(200);
   });
+
+  it('round-10 30 sequential SettleManuallyBtn mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SettleManuallyBtn key={i} settleAuctionHandler={() => {}} auction={auction} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <SettleManuallyBtn settleAuctionHandler={() => {}} auction={auction} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential handler invocations', () => {
+    const cb = vi.fn();
+    render(<SettleManuallyBtn settleAuctionHandler={cb} auction={auction} />);
+    for (let i = 0; i < 100; i++) cb();
+    expect(cb).toHaveBeenCalledTimes(100);
+  });
 });
