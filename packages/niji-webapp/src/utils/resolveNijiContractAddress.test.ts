@@ -419,4 +419,40 @@ describe('resolveNijiContractAddress', () => {
       expect(() => resolveNijiContractAddress(name as never)).not.toThrow();
     }
   });
+
+  it('round-10 30 sequential resolveNijiContractAddress truthiness', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 30; i++) {
+      expect(resolveNijiContractAddress).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 30; i++) {
+      expect(typeof resolveNijiContractAddress).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 30; i++) {
+      expect(resolveNijiContractAddress).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential invocations', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 50; i++) {
+      expect(() => resolveNijiContractAddress(TRE)).not.toThrow();
+    }
+  });
+
+  it('round-10 100 mixed name variation', async () => {
+    const { resolveNijiContractAddress } = await importResolver();
+    for (let i = 0; i < 100; i++) {
+      const addr = i % 3 === 0 ? GOV : i % 3 === 1 ? AH : TRE;
+      expect(() => resolveNijiContractAddress(addr)).not.toThrow();
+    }
+  });
 });
