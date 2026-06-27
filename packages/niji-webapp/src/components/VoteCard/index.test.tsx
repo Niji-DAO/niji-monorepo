@@ -1819,4 +1819,48 @@ describe('VoteCard', () => {
       expect(typeof VoteCard).toBe('function');
     }
   });
+
+  it('round-10 30 sequential VoteCard mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <VoteCard proposal={makeProposal()} variant={VoteCardVariant.FOR} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteCard key={i} proposal={makeProposal()} variant={VoteCardVariant.FOR} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<VoteCard proposal={makeProposal()} variant={VoteCardVariant.AGAINST} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <VoteCard proposal={makeProposal()} variant={VoteCardVariant.ABSTAIN} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential type checks second', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof VoteCard).toBe('function');
+    }
+  });
 });

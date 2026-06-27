@@ -1345,4 +1345,57 @@ describe('DelegateGroupedNijiImageVoteTable', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential DelegateGroupedNijiImageVoteTable mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DelegateGroupedNijiImageVoteTable
+              key={i}
+              {...baseProps}
+              filteredDelegateGroupedVoteData={[]}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <DelegateGroupedNijiImageVoteTable {...baseProps} filteredDelegateGroupedVoteData={[]} />,
+      );
+      unmount();
+    }
+  });
 });
