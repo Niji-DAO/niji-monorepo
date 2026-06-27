@@ -1265,4 +1265,79 @@ describe('AuctionNavigation Component', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential AuctionNavigation mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <AuctionNavigation
+          isFirstAuction={i % 2 === 0}
+          isLastAuction={i % 2 !== 0}
+          onPrevAuctionClick={() => {}}
+          onNextAuctionClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionNavigation
+              key={i}
+              isFirstAuction={false}
+              isLastAuction={false}
+              onPrevAuctionClick={() => {}}
+              onNextAuctionClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <AuctionNavigation
+            isFirstAuction={false}
+            isLastAuction={true}
+            onPrevAuctionClick={() => {}}
+            onNextAuctionClick={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <AuctionNavigation
+          isFirstAuction={false}
+          isLastAuction={false}
+          onPrevAuctionClick={() => {}}
+          onNextAuctionClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <AuctionNavigation
+          isFirstAuction={true}
+          isLastAuction={true}
+          onPrevAuctionClick={() => {}}
+          onNextAuctionClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
 });

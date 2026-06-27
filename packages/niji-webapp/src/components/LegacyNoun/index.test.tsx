@@ -943,4 +943,44 @@ describe('LegacyNoun — additional edge cases', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential LegacyNoun mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<LegacyNoun imgPath="/r11.png" alt={`r11-m-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <LegacyNoun key={i} imgPath="/r11.png" alt={`r11-i-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential LoadingNoun mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<LoadingNoun />);
+      unmount();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<LegacyNoun imgPath="/r11.png" alt={`r11-m2-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential different alt values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<LegacyNoun imgPath="/r11.png" alt={`r11-c-${i}`} />);
+      unmount();
+    }
+  });
 });
