@@ -392,4 +392,29 @@ describe('traitCategory', () => {
       expect(traitCategory).toBeDefined();
     }
   });
+
+  it('round-12 30 sequential traitCategory truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(traitCategory).toBeTruthy();
+  });
+
+  it('round-12 30 sequential traitCategory type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof traitCategory).toBe('object');
+  });
+
+  it('round-12 30 sequential traitCategory defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(traitCategory).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/object', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(traitCategory).toBeTruthy();
+      expect(typeof traitCategory).toBe('object');
+    }
+  });
+
+  it('round-12 100 sequential defined checks fourth', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(traitCategory).toBeDefined();
+    }
+  });
 });

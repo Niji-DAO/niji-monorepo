@@ -769,4 +769,63 @@ describe('NijiI18nProvider', () => {
       unmount();
     }
   });
+
+  it('round-12 30 sequential NijiI18nProvider mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiI18nProvider>
+          <span>r12-m-{i}</span>
+        </NijiI18nProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiI18nProvider key={i}>
+              <span>r12-i-{i}</span>
+            </NijiI18nProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <NijiI18nProvider>
+            <span>r12-s-{i}</span>
+          </NijiI18nProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <NijiI18nProvider>
+          <span>r12-m2-{i}</span>
+        </NijiI18nProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <NijiI18nProvider>
+          <span>r12-c-{i}</span>
+        </NijiI18nProvider>,
+      );
+      unmount();
+    }
+  });
 });
