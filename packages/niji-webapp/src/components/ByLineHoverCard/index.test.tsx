@@ -1103,4 +1103,43 @@ describe('ByLineHoverCard', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential ByLineHoverCard mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ByLineHoverCard proposerAddress="0xR10" />);
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ByLineHoverCard key={i} proposerAddress={`0xR10-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ByLineHoverCard proposerAddress="0xR10" />)).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ByLineHoverCard proposerAddress={`0xR10-m-${i}`} />);
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential different proposerAddress values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ByLineHoverCard proposerAddress={`0xR10-c-${i}`} />);
+      unmount();
+    }
+  });
 });

@@ -1130,4 +1130,49 @@ describe('Bid', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential Bid mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Bid key={i} auction={makeAuction() as never} auctionEnded={i % 2 === 0} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<Bid auction={makeAuction() as never} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential alternating auctionEnded', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={i % 2 === 0} />,
+      );
+      unmount();
+    }
+  });
 });
