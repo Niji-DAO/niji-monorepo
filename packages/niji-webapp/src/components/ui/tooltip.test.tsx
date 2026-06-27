@@ -794,4 +794,68 @@ describe('Tooltip', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-10 30 sequential TooltipProvider mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>r10-{i}</TooltipTrigger>
+            <TooltipContent>r10-content-{i}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <TooltipProvider key={i}>
+              <Tooltip>
+                <TooltipTrigger>r10-i-{i}</TooltipTrigger>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>r10-s-{i}</TooltipTrigger>
+            </Tooltip>
+          </TooltipProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>r10-m-{i}</TooltipTrigger>
+          </Tooltip>
+        </TooltipProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential type checks combined', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof TooltipProvider).toBe('function');
+      expect(typeof Tooltip).toBe('function');
+    }
+  });
 });
