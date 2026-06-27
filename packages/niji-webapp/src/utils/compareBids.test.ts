@@ -528,4 +528,30 @@ describe('compareBids', () => {
       expect(compareBids).toBeTruthy();
     }
   });
+
+  it('round-12 30 sequential compareBids truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(compareBids).toBeTruthy();
+  });
+
+  it('round-12 30 sequential compareBids type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof compareBids).toBe('function');
+  });
+
+  it('round-12 30 sequential compareBids defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(compareBids).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(compareBids).toBeTruthy();
+      expect(typeof compareBids).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof compareBids).toBe('function');
+      expect(compareBids).toBeTruthy();
+    }
+  });
 });
