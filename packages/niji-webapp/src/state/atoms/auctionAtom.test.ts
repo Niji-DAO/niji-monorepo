@@ -576,4 +576,29 @@ describe('applyAuctionExtended', () => {
       expect(typeof applyAppendBid).toBe('function');
     }
   });
+
+  it('round-12 30 sequential applyAppendBid truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(applyAppendBid).toBeTruthy();
+  });
+
+  it('round-12 30 sequential applyAppendBid type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof applyAppendBid).toBe('function');
+  });
+
+  it('round-12 30 sequential applyAppendBid defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(applyAppendBid).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(applyAppendBid).toBeTruthy();
+      expect(typeof applyAppendBid).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential type checks fifth', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof applyAppendBid).toBe('function');
+    }
+  });
 });

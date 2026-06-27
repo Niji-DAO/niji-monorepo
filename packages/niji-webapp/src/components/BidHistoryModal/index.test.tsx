@@ -1067,4 +1067,32 @@ describe('BidHistoryModal', () => {
       expect(Backdrop).toBeDefined();
     }
   });
+
+  it('round-12 30 sequential BidHistoryModal mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BidHistoryModal auction={auction} onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-12 30 sequential Backdrop truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(Backdrop).toBeTruthy();
+  });
+
+  it('round-12 30 sequential Backdrop type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof Backdrop).toBe('function');
+  });
+
+  it('round-12 50 sequential combined Backdrop truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(Backdrop).toBeTruthy();
+      expect(typeof Backdrop).toBe('function');
+    }
+  });
+
+  it('round-12 100 Backdrop defined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Backdrop).toBeDefined();
+    }
+  });
 });

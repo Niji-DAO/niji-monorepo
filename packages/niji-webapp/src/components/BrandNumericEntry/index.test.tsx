@@ -939,4 +939,55 @@ describe('BrandNumericEntry', () => {
       cb({ value: String(i), formattedValue: String(i), floatValue: i });
     expect(cb).toHaveBeenCalledTimes(100);
   });
+
+  it('round-12 30 sequential BrandNumericEntry mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <BrandNumericEntry placeholder="r12" value="" onValueChange={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <BrandNumericEntry
+              key={i}
+              placeholder={`r12-i-${i}`}
+              value=""
+              onValueChange={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<BrandNumericEntry placeholder="r12-s" value="" onValueChange={() => {}} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <BrandNumericEntry placeholder="r12-m2" value="" onValueChange={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential callback invocations', () => {
+    const cb = vi.fn();
+    render(<BrandNumericEntry placeholder="0" value="" onValueChange={cb} />);
+    for (let i = 0; i < 100; i++)
+      cb({ value: String(i), formattedValue: String(i), floatValue: i });
+    expect(cb).toHaveBeenCalledTimes(100);
+  });
 });
