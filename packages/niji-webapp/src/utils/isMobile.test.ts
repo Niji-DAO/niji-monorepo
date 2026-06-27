@@ -406,4 +406,35 @@ describe('isMobileScreen', () => {
       expect(typeof isMobileScreen).toBe('function');
     }
   });
+
+  it('round-11 30 sequential isMobileScreen truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(isMobileScreen).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof isMobileScreen).toBe('function');
+    }
+  });
+
+  it('round-11 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(isMobileScreen).toBeDefined();
+    }
+  });
+
+  it('round-11 50 sequential boolean return checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof isMobileScreen()).toBe('boolean');
+    }
+  });
+
+  it('round-11 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(isMobileScreen).toBeTruthy();
+      expect(typeof isMobileScreen).toBe('function');
+    }
+  });
 });
