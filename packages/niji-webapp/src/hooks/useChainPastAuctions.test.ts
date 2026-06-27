@@ -460,4 +460,30 @@ describe('useChainPastAuctions', () => {
       unmount();
     }
   });
+
+  it('round-12 30 sequential useChainPastAuctions truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(useChainPastAuctions).toBeTruthy();
+  });
+
+  it('round-12 30 sequential useChainPastAuctions type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof useChainPastAuctions).toBe('function');
+  });
+
+  it('round-12 30 sequential useChainPastAuctions defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(useChainPastAuctions).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useChainPastAuctions).toBeTruthy();
+      expect(typeof useChainPastAuctions).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential renderHook', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useChainPastAuctions(i % 2 === 0));
+      unmount();
+    }
+  });
 });

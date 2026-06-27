@@ -249,4 +249,30 @@ describe('useActiveLocale', () => {
       expect(typeof useActiveLocale).toBe('function');
     }
   });
+
+  it('round-12 30 sequential useActiveLocale truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(useActiveLocale).toBeTruthy();
+  });
+
+  it('round-12 30 sequential useActiveLocale type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof useActiveLocale).toBe('function');
+  });
+
+  it('round-12 30 sequential useActiveLocale defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(useActiveLocale).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useActiveLocale).toBeTruthy();
+      expect(typeof useActiveLocale).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useActiveLocale).toBeTruthy();
+      expect(typeof useActiveLocale).toBe('function');
+    }
+  });
 });

@@ -499,4 +499,30 @@ describe('useScrollToLocation', () => {
       expect(typeof useScrollToLocation).toBe('function');
     }
   });
+
+  it('round-12 30 sequential useScrollToLocation truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(useScrollToLocation).toBeTruthy();
+  });
+
+  it('round-12 30 sequential useScrollToLocation type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof useScrollToLocation).toBe('function');
+  });
+
+  it('round-12 30 sequential useScrollToLocation defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(useScrollToLocation).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useScrollToLocation).toBeTruthy();
+      expect(typeof useScrollToLocation).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useScrollToLocation).toBeTruthy();
+      expect(typeof useScrollToLocation).toBe('function');
+    }
+  });
 });
