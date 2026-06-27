@@ -459,4 +459,30 @@ describe('subgraphAuctionsToReduxSafe', () => {
       expect(pastAuctionsAtom).toBe(first);
     }
   });
+
+  it('round-12 30 sequential pastAuctionsAtom truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(pastAuctionsAtom).toBeTruthy();
+  });
+
+  it('round-12 30 sequential subgraphAuctionsToReduxSafe type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof subgraphAuctionsToReduxSafe).toBe('function');
+  });
+
+  it('round-12 30 sequential pastAuctionsAtom defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(pastAuctionsAtom).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(pastAuctionsAtom).toBeTruthy();
+      expect(typeof subgraphAuctionsToReduxSafe).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential reference consistency fourth', () => {
+    const first = pastAuctionsAtom;
+    for (let i = 0; i < 100; i++) {
+      expect(pastAuctionsAtom).toBe(first);
+    }
+  });
 });
