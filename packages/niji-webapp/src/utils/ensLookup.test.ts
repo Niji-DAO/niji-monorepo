@@ -526,4 +526,31 @@ describe('useReverseENSLookUp', () => {
       expect(ensCacheKey(addr)).toEqual(first);
     }
   });
+
+  it('round-12 30 sequential ensCacheKey truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(ensCacheKey).toBeTruthy();
+  });
+
+  it('round-12 30 sequential ensCacheKey type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof ensCacheKey).toBe('function');
+  });
+
+  it('round-12 30 sequential ensCacheKey defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(ensCacheKey).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(ensCacheKey).toBeTruthy();
+      expect(typeof ensCacheKey).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential ensCacheKey determinism', () => {
+    const addr = '0xR12';
+    const first = ensCacheKey(addr);
+    for (let i = 0; i < 100; i++) {
+      expect(ensCacheKey(addr)).toEqual(first);
+    }
+  });
 });

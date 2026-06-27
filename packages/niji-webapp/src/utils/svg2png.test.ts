@@ -227,4 +227,30 @@ describe('svg2png', () => {
       expect(typeof svg2png).toBe('function');
     }
   });
+
+  it('round-12 30 sequential svg2png truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(svg2png).toBeTruthy();
+  });
+
+  it('round-12 30 sequential svg2png type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof svg2png).toBe('function');
+  });
+
+  it('round-12 30 sequential svg2png defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(svg2png).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(svg2png).toBeTruthy();
+      expect(typeof svg2png).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(svg2png).toBeDefined();
+      expect(typeof svg2png).toBe('function');
+    }
+  });
 });

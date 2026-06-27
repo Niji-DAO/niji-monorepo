@@ -379,4 +379,30 @@ describe('constants', () => {
       expect(reimported.AVERAGE_BLOCK_TIME_IN_SECS).toBe(AVERAGE_BLOCK_TIME_IN_SECS);
     }
   });
+
+  it('round-12 30 sequential AVERAGE_BLOCK_TIME_IN_SECS truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(AVERAGE_BLOCK_TIME_IN_SECS).toBeTruthy();
+  });
+
+  it('round-12 30 sequential AVERAGE_BLOCK_TIME_IN_SECS type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof AVERAGE_BLOCK_TIME_IN_SECS).toBe('number');
+  });
+
+  it('round-12 30 sequential AVERAGE_BLOCK_TIME_IN_SECS defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(AVERAGE_BLOCK_TIME_IN_SECS).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/number', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(AVERAGE_BLOCK_TIME_IN_SECS).toBeTruthy();
+      expect(typeof AVERAGE_BLOCK_TIME_IN_SECS).toBe('number');
+    }
+  });
+
+  it('round-12 100 sequential reimport consistency', async () => {
+    for (let i = 0; i < 100; i++) {
+      const reimported = await import('./constants');
+      expect(reimported.AVERAGE_BLOCK_TIME_IN_SECS).toBe(AVERAGE_BLOCK_TIME_IN_SECS);
+    }
+  });
 });
