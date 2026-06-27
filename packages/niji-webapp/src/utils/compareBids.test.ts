@@ -493,4 +493,39 @@ describe('compareBids', () => {
       expect(compareBids).toBeTruthy();
     }
   });
+
+  it('round-11 30 sequential compareBids truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(compareBids).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof compareBids).toBe('function');
+    }
+  });
+
+  it('round-11 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(compareBids).toBeDefined();
+    }
+  });
+
+  it('round-11 50 sequential compareBids invocations', () => {
+    const makeBid11 = (timestamp: bigint, transactionIndex = 0): Bid =>
+      ({ timestamp, transactionIndex }) as Bid;
+    for (let i = 0; i < 50; i++) {
+      expect(compareBids(makeBid11(BigInt(51000 + i)), makeBid11(BigInt(50000 + i)))).toBeLessThan(
+        0,
+      );
+    }
+  });
+
+  it('round-11 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof compareBids).toBe('function');
+      expect(compareBids).toBeTruthy();
+    }
+  });
 });

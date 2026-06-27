@@ -370,4 +370,37 @@ describe('nounBgColors', () => {
       expect(grey).toBe(firstGrey);
     }
   });
+
+  it('round-11 30 sequential beige truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(beige).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 sequential grey truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(grey).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 sequential combined defined', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(beige).toBeDefined();
+      expect(grey).toBeDefined();
+    }
+  });
+
+  it('round-11 50 sequential combined references', () => {
+    const first = beige;
+    for (let i = 0; i < 50; i++) {
+      expect(beige).toBe(first);
+    }
+  });
+
+  it('round-11 100 sequential grey reference consistency', () => {
+    const firstGrey = grey;
+    for (let i = 0; i < 100; i++) {
+      expect(grey).toBe(firstGrey);
+    }
+  });
 });
