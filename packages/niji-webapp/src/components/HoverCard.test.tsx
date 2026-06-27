@@ -830,4 +830,73 @@ describe('HoverCard', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential HoverCard mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={t => <div>{t}</div>} tip={`r11-${i}`} id={`r11-${i}`}>
+          <span>r11</span>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <HoverCard
+              key={i}
+              hoverCardContent={t => <div>{t}</div>}
+              tip={`r11-i-${i}`}
+              id={`r11-i-${i}`}
+            >
+              <span>r11</span>
+            </HoverCard>
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <HoverCard hoverCardContent={t => <div>{t}</div>} tip={`r11-s-${i}`} id={`r11-s-${i}`}>
+            <span>r11</span>
+          </HoverCard>,
+          { wrapper: WithProviders },
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={t => <div>{t}</div>} tip={`r11-m-${i}`} id={`r11-m-${i}`}>
+          <span>r11</span>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential different id values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={t => <div>{t}</div>} tip={`r11-c-${i}`} id={`r11-c-${i}`}>
+          <span>r11</span>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
 });
