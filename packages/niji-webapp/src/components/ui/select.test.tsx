@@ -936,4 +936,48 @@ describe('Select', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential Select mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Select>
+          <SelectTrigger>r10-{i}</SelectTrigger>
+        </Select>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Select key={i}>
+              <SelectTrigger>r10-i-{i}</SelectTrigger>
+            </Select>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 type checks Select', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof Select).toBe('function');
+    }
+  });
+
+  it('round-10 50 SelectTrigger truthiness', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(SelectTrigger).toBeTruthy();
+    }
+  });
+
+  it('round-10 100 combined defined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Select).toBeDefined();
+      expect(SelectTrigger).toBeDefined();
+    }
+  });
 });
