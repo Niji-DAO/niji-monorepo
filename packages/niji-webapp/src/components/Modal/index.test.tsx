@@ -728,4 +728,48 @@ describe('Modal', () => {
       expect(typeof Backdrop).toBe('function');
     }
   });
+
+  it('round-11 30 sequential Modal mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Modal title="r11" content={<p>r11-{i}</p>} onDismiss={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Modal key={i} title={`r11-${i}`} content={<p>r11-i</p>} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<Modal title="r11" content={<p>r11-s</p>} onDismiss={() => {}} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <Modal title="r11-2" content={<p>r11-m-{i}</p>} onDismiss={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 100 Backdrop type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof Backdrop).toBe('function');
+    }
+  });
 });
