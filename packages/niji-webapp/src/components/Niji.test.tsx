@@ -618,4 +618,43 @@ describe('Niji', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential Niji mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Niji nounId={BigInt(i + 50000)} />);
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Niji key={i} nounId={BigInt(i + 51000)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<Niji nounId={BigInt(i + 52000)} />)).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Niji nounId={BigInt(i + 53000)} />);
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential different nounId values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Niji nounId={BigInt(i + 54000)} />);
+      unmount();
+    }
+  });
 });
