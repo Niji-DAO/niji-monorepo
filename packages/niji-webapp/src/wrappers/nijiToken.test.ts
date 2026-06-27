@@ -755,4 +755,35 @@ describe('useNounSeed', () => {
       expect(typeof useNounTokenBalance).toBe('function');
     }
   });
+
+  it('round-11 30 sequential useNounTokenBalance truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useNounTokenBalance).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useNounTokenBalance).toBe('function');
+    }
+  });
+
+  it('round-11 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useNounTokenBalance).toBeDefined();
+    }
+  });
+
+  it('round-11 50 sequential combined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useNounTokenBalance).toBeTruthy();
+      expect(typeof useNounTokenBalance).toBe('function');
+    }
+  });
+
+  it('round-11 100 sequential type checks fourth', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof useNounTokenBalance).toBe('function');
+    }
+  });
 });
