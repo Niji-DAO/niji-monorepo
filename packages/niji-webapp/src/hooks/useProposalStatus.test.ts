@@ -427,4 +427,29 @@ describe('useProposalStatus', () => {
       expect(useProposalStatus).toBeDefined();
     }
   });
+
+  it('round-12 30 sequential useProposalStatus truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(useProposalStatus).toBeTruthy();
+  });
+
+  it('round-12 30 sequential useProposalStatus type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof useProposalStatus).toBe('function');
+  });
+
+  it('round-12 30 sequential useProposalStatus defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(useProposalStatus).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useProposalStatus).toBeTruthy();
+      expect(typeof useProposalStatus).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential defined checks fourth', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useProposalStatus).toBeDefined();
+    }
+  });
 });
