@@ -718,4 +718,48 @@ describe('AuctionTitleAndNavWrapper Component', () => {
     }
     expect(container.textContent).toContain('99');
   });
+
+  it('round-11 30 sequential AuctionTitleAndNavWrapper mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionTitleAndNavWrapper>r11-{i}</AuctionTitleAndNavWrapper>);
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionTitleAndNavWrapper key={i}>r11-i-{i}</AuctionTitleAndNavWrapper>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<AuctionTitleAndNavWrapper>r11-s-{i}</AuctionTitleAndNavWrapper>),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<AuctionTitleAndNavWrapper>r11-m-{i}</AuctionTitleAndNavWrapper>);
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential rerender cycles second', () => {
+    const { container, rerender } = render(
+      <AuctionTitleAndNavWrapper>x</AuctionTitleAndNavWrapper>,
+    );
+    for (let i = 0; i < 100; i++) {
+      rerender(<AuctionTitleAndNavWrapper>r11-r-{i}</AuctionTitleAndNavWrapper>);
+    }
+    expect(container.textContent).toContain('99');
+  });
 });
