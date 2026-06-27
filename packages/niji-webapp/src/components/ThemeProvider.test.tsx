@@ -809,4 +809,63 @@ describe('ThemeProvider', () => {
       unmount();
     }
   });
+
+  it('round-12 30 sequential ThemeProvider mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <span>r12-m-{i}</span>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ThemeProvider key={i}>
+              <span>r12-i-{i}</span>
+            </ThemeProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ThemeProvider>
+            <span>r12-s-{i}</span>
+          </ThemeProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <span>r12-m2-{i}</span>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <ThemeProvider>
+          <span>r12-c-{i}</span>
+        </ThemeProvider>,
+      );
+      unmount();
+    }
+  });
 });
