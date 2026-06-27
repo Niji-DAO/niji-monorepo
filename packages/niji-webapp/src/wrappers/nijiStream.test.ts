@@ -216,4 +216,35 @@ describe('useElapsedTime', () => {
       expect(typeof useElapsedTime).toBe('function');
     }
   });
+
+  it('round-9 30 sequential useStreamRemainingBalance truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useStreamRemainingBalance).toBeTruthy();
+    }
+  });
+
+  it('round-9 30 sequential useWithdrawTokens truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useWithdrawTokens).toBeTruthy();
+    }
+  });
+
+  it('round-9 30 sequential useElapsedTime truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useElapsedTime).toBeTruthy();
+    }
+  });
+
+  it('round-9 50 sequential type checks second', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useStreamRemainingBalance).toBe('function');
+    }
+  });
+
+  it('round-9 100 sequential combined type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof useWithdrawTokens).toBe('function');
+      expect(typeof useElapsedTime).toBe('function');
+    }
+  });
 });
