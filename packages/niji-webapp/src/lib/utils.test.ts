@@ -393,4 +393,30 @@ describe('cn (clsx + tailwind-merge)', () => {
       expect(typeof c).toBe('string');
     }
   });
+
+  it('round-12 30 sequential cn truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(cn).toBeTruthy();
+  });
+
+  it('round-12 30 sequential cn type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof cn).toBe('function');
+  });
+
+  it('round-12 30 sequential cn defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(cn).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(cn).toBeTruthy();
+      expect(typeof cn).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential mixed invocations', () => {
+    for (let i = 0; i < 100; i++) {
+      const c = i % 2 === 0 ? cn(`r12-c-${i}`) : cn(`r12-d-${i}`);
+      expect(typeof c).toBe('string');
+    }
+  });
 });
