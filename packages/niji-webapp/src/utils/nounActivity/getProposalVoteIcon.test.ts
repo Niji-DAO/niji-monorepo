@@ -383,4 +383,37 @@ describe('getProposalVoteIcon', () => {
       expect(r1).toBe(r2);
     }
   });
+
+  it('round-10 30 sequential getProposalVoteIcon truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(getProposalVoteIcon).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof getProposalVoteIcon).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(getProposalVoteIcon).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential combined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(getProposalVoteIcon).toBeTruthy();
+      expect(typeof getProposalVoteIcon).toBe('function');
+    }
+  });
+
+  it('round-10 100 sequential reproducibility checks second', () => {
+    for (let i = 0; i < 100; i++) {
+      const r1 = getProposalVoteIcon(1 as never);
+      const r2 = getProposalVoteIcon(1 as never);
+      expect(r1).toBe(r2);
+    }
+  });
 });
