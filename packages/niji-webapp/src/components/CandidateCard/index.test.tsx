@@ -1070,4 +1070,51 @@ describe('CandidateCard', () => {
       unmount();
     }
   });
+
+  it('round-12 30 sequential CandidateCard mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(
+        <CandidateCard candidate={baseCandidate} nounsRequired={i + 100000} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CandidateCard key={i} candidate={baseCandidate} nounsRequired={i + 110000} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        wrap(<CandidateCard candidate={baseCandidate} nounsRequired={i + 120000} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(
+        <CandidateCard candidate={baseCandidate} nounsRequired={i + 130000} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential different nounsRequired values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(
+        <CandidateCard candidate={baseCandidate} nounsRequired={i + 140000} />,
+      );
+      unmount();
+    }
+  });
 });
