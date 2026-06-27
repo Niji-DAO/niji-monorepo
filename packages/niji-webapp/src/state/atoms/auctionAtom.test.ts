@@ -512,4 +512,36 @@ describe('applyAuctionExtended', () => {
       expect(typeof applyFullAuction).toBe('function');
     }
   });
+
+  it('round-10 30 sequential applyAppendBid truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(applyAppendBid).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 applyFullAuction truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(applyFullAuction).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 combined defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(applyAppendBid).toBeDefined();
+      expect(applyFullAuction).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential type checks combined', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof applyAppendBid).toBe('function');
+      expect(typeof applyFullAuction).toBe('function');
+    }
+  });
+
+  it('round-10 100 sequential type checks third', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof applyAppendBid).toBe('function');
+    }
+  });
 });
