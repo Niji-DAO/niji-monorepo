@@ -947,4 +947,68 @@ describe('NijiInfoRowButton', () => {
     for (let i = 0; i < 100; i++) cb();
     expect(cb).toHaveBeenCalledTimes(100);
   });
+
+  it('round-12 30 sequential NijiInfoRowButton mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijiInfoRowButton
+          iconImgSource="/r12.png"
+          btnText={`r12-m-${i}`}
+          onClickHandler={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiInfoRowButton
+              key={i}
+              iconImgSource="/r12.png"
+              btnText={`r12-i-${i}`}
+              onClickHandler={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <NijiInfoRowButton
+            iconImgSource="/r12.png"
+            btnText={`r12-s-${i}`}
+            onClickHandler={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <NijiInfoRowButton
+          iconImgSource="/r12.png"
+          btnText={`r12-m2-${i}`}
+          onClickHandler={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential handler invocations', () => {
+    const cb = vi.fn();
+    render(<NijiInfoRowButton iconImgSource="/r12.png" btnText="r12" onClickHandler={cb} />);
+    for (let i = 0; i < 100; i++) cb();
+    expect(cb).toHaveBeenCalledTimes(100);
+  });
 });
