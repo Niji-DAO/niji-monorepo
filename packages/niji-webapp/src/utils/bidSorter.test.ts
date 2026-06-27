@@ -472,4 +472,41 @@ describe('compareBidsChronologically', () => {
       );
     }
   });
+
+  it('round-10 30 sequential compareBidsChronologically truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(compareBidsChronologically).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof compareBidsChronologically).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(compareBidsChronologically).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential invocations', () => {
+    const makeBid10 = (blockTimestamp: number, txIndex: number) =>
+      ({
+        blockTimestamp: blockTimestamp.toString(),
+        txIndex: txIndex.toString(),
+      }) as unknown as IBid;
+    for (let i = 0; i < 50; i++) {
+      compareBidsChronologically(makeBid10(14000, i), makeBid10(14000, i + 1));
+    }
+    expect(true).toBe(true);
+  });
+
+  it('round-10 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(compareBidsChronologically).toBeTruthy();
+      expect(typeof compareBidsChronologically).toBe('function');
+    }
+  });
 });

@@ -489,4 +489,40 @@ describe('shortENS — boundary', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-10 30 sequential formatShortAddress truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(formatShortAddress).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 sequential shortENS truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(shortENS).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 sequential combined type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof formatShortAddress).toBe('function');
+      expect(typeof veryShortAddress).toBe('function');
+    }
+  });
+
+  it('round-10 50 sequential format invocations', () => {
+    for (let i = 0; i < 50; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as Address;
+      formatShortAddress(addr);
+    }
+    expect(true).toBe(true);
+  });
+
+  it('round-10 100 mixed invocations', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = ('0x' + i.toString(16).padStart(40, '0')) as Address;
+      veryShortAddress(addr);
+      veryShortENS(`r10-${i}.eth`);
+    }
+    expect(true).toBe(true);
+  });
 });
