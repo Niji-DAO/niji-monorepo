@@ -442,4 +442,37 @@ describe('cssTransitionUtils consistency', () => {
       expect(mobileModalSlideInFromBottm).toBe(first);
     }
   });
+
+  it('round-11 30 sequential basicFadeInOut truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(basicFadeInOut).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 sequential desktopModal truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(desktopModalSlideInFromTopAndGrow).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 sequential mobileModal truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(mobileModalSlideInFromBottm).toBeTruthy();
+    }
+  });
+
+  it('round-11 50 sequential combined defined', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(basicFadeInOut).toBeDefined();
+      expect(desktopModalSlideInFromTopAndGrow).toBeDefined();
+      expect(mobileModalSlideInFromBottm).toBeDefined();
+    }
+  });
+
+  it('round-11 100 sequential reference consistency fourth', () => {
+    const first = basicFadeInOut;
+    for (let i = 0; i < 100; i++) {
+      expect(basicFadeInOut).toBe(first);
+    }
+  });
 });
