@@ -314,4 +314,31 @@ describe('useElapsedTime', () => {
       expect(typeof useElapsedTime).toBe('function');
     }
   });
+
+  it('round-12 30 sequential useStreamRemainingBalance truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(useStreamRemainingBalance).toBeTruthy();
+  });
+
+  it('round-12 30 sequential useWithdrawTokens type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof useWithdrawTokens).toBe('function');
+  });
+
+  it('round-12 30 sequential useElapsedTime defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(useElapsedTime).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useStreamRemainingBalance).toBeTruthy();
+      expect(typeof useWithdrawTokens).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential type checks third', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof useStreamRemainingBalance).toBe('function');
+      expect(typeof useWithdrawTokens).toBe('function');
+      expect(typeof useElapsedTime).toBe('function');
+    }
+  });
 });

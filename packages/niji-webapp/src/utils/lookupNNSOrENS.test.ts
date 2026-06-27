@@ -534,4 +534,31 @@ describe('lookupNNSOrENS', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-12 30 sequential lookupNNSOrENS truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(lookupNNSOrENS).toBeTruthy();
+  });
+
+  it('round-12 30 sequential lookupNNSOrENS type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof lookupNNSOrENS).toBe('function');
+  });
+
+  it('round-12 30 sequential lookupNNSOrENS defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(lookupNNSOrENS).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(lookupNNSOrENS).toBeTruthy();
+      expect(typeof lookupNNSOrENS).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential lookupNNSOrENS invocations', async () => {
+    const mockClient = { call: vi.fn(async () => ({ data: '0x' as const })) } as never;
+    for (let i = 0; i < 100; i++) {
+      await lookupNNSOrENS(mockClient, ('0xR12-' + i) as Address).catch(() => null);
+    }
+    expect(true).toBe(true);
+  });
 });

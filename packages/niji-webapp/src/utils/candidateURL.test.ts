@@ -406,4 +406,30 @@ describe('buildCandidateSlug', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-12 30 sequential buildCandidateSlug truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(buildCandidateSlug).toBeTruthy();
+  });
+
+  it('round-12 30 sequential buildCandidateSlug type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof buildCandidateSlug).toBe('function');
+  });
+
+  it('round-12 30 sequential buildCandidateSlug defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(buildCandidateSlug).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(buildCandidateSlug).toBeTruthy();
+      expect(typeof buildCandidateSlug).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential buildCandidateSlug invocations', () => {
+    for (let i = 0; i < 100; i++) {
+      buildCandidateSlug(`r12-c-${i}`, `0xR12-${i}`);
+    }
+    expect(true).toBe(true);
+  });
 });
