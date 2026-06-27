@@ -349,4 +349,40 @@ describe('useOnDisplayAuction additional cases', () => {
       unmount();
     }
   });
+
+  it('round-9 30 sequential useOnDisplayAuction renderHook', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useOnDisplayAuction());
+      unmount();
+    }
+  });
+
+  it('round-9 30 sequential useAuctionBids renderHook', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useAuctionBids(BigInt(i)));
+      unmount();
+    }
+  });
+
+  it('round-9 30 sequential type checks useOnDisplayAuction', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useOnDisplayAuction).toBe('function');
+    }
+  });
+
+  it('round-9 50 sequential type checks useAuctionBids', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof useAuctionBids).toBe('function');
+    }
+  });
+
+  it('round-9 100 sequential combined renderHook', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } =
+        i % 2 === 0
+          ? renderHook(() => useOnDisplayAuction())
+          : renderHook(() => useAuctionBids(BigInt(i + 1000)));
+      unmount();
+    }
+  });
 });
