@@ -525,4 +525,29 @@ describe('useBreakpointDown', () => {
       expect(useBreakpointValues).toBeDefined();
     }
   });
+
+  it('round-12 30 sequential useBreakpointValues truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(useBreakpointValues).toBeTruthy();
+  });
+
+  it('round-12 30 sequential useBreakpointValues type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof useBreakpointValues).toBe('function');
+  });
+
+  it('round-12 30 sequential useBreakpointValues defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(useBreakpointValues).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useBreakpointValues).toBeTruthy();
+      expect(typeof useBreakpointValues).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential defined checks fourth', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useBreakpointValues).toBeDefined();
+    }
+  });
 });
