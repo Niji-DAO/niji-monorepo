@@ -437,4 +437,30 @@ describe('isMobileScreen', () => {
       expect(typeof isMobileScreen).toBe('function');
     }
   });
+
+  it('round-12 30 sequential isMobileScreen truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(isMobileScreen).toBeTruthy();
+  });
+
+  it('round-12 30 sequential isMobileScreen type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof isMobileScreen).toBe('function');
+  });
+
+  it('round-12 30 sequential isMobileScreen defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(isMobileScreen).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(isMobileScreen).toBeTruthy();
+      expect(typeof isMobileScreen).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(isMobileScreen).toBeTruthy();
+      expect(typeof isMobileScreen).toBe('function');
+    }
+  });
 });
