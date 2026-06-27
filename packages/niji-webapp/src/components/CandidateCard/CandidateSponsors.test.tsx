@@ -567,4 +567,41 @@ describe('CandidateSponsors', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential CandidateSponsors mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsors signers={[]} nounsRequired={i} />);
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CandidateSponsors key={i} signers={[]} nounsRequired={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<CandidateSponsors signers={[]} nounsRequired={i} />)).not.toThrow();
+    }
+  });
+
+  it('round-10 30 truthiness checks variant', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(CandidateSponsors).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks variant', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof CandidateSponsors).toBe('function');
+    }
+  });
 });

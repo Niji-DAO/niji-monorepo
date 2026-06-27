@@ -455,4 +455,43 @@ describe('CandidateSponsorImage', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential CandidateSponsorImage mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CandidateSponsorImage nounId={BigInt(i)} />);
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CandidateSponsorImage key={i} nounId={BigInt(i + 1)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<CandidateSponsorImage nounId={BigInt(i + 100)} />)).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<CandidateSponsorImage nounId={BigInt(i + 35000)} />);
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential different nounId values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<CandidateSponsorImage nounId={BigInt(i + 45000)} />);
+      unmount();
+    }
+  });
 });
