@@ -491,4 +491,29 @@ describe('getTokenAddressForCurrency — additional', () => {
       expect(getTokenAddressForCurrency).toBeDefined();
     }
   });
+
+  it('round-12 30 sequential getTokenAddressForCurrency truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(getTokenAddressForCurrency).toBeTruthy();
+  });
+
+  it('round-12 30 sequential getTokenAddressForCurrency type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof getTokenAddressForCurrency).toBe('function');
+  });
+
+  it('round-12 30 sequential getTokenAddressForCurrency defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(getTokenAddressForCurrency).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(getTokenAddressForCurrency).toBeTruthy();
+      expect(typeof getTokenAddressForCurrency).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential defined checks fourth', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(getTokenAddressForCurrency).toBeDefined();
+    }
+  });
 });

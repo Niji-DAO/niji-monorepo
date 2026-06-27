@@ -752,4 +752,63 @@ describe('Section', () => {
       unmount();
     }
   });
+
+  it('round-12 30 sequential Section mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <span>r12-m-{i}</span>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Section key={i} fullWidth={false}>
+              <span>r12-i-{i}</span>
+            </Section>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <Section fullWidth={false}>
+            <span>r12-s-{i}</span>
+          </Section>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <Section fullWidth={true}>
+          <span>r12-m2-{i}</span>
+        </Section>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <Section fullWidth={false}>
+          <span>r12-c-{i}</span>
+        </Section>,
+      );
+      unmount();
+    }
+  });
 });

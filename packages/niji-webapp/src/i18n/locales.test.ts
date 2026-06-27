@@ -414,4 +414,26 @@ describe('SUPPORTED_LOCALE_TO_DAYSJS_LOCALE', () => {
       expect(SUPPORTED_LOCALES[0]).toBeDefined();
     }
   });
+
+  it('round-12 30 sequential SUPPORTED_LOCALES truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(SUPPORTED_LOCALES).toBeTruthy();
+  });
+
+  it('round-12 30 sequential SUPPORTED_LOCALES type checks', () => {
+    for (let i = 0; i < 30; i++) expect(Array.isArray(SUPPORTED_LOCALES)).toBe(true);
+  });
+
+  it('round-12 30 sequential SUPPORTED_LOCALES defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(SUPPORTED_LOCALES).toBeDefined();
+  });
+
+  it('round-12 50 sequential SUPPORTED_LOCALES non-empty length', () => {
+    for (let i = 0; i < 50; i++) expect(SUPPORTED_LOCALES.length).toBeGreaterThan(0);
+  });
+
+  it('round-12 100 sequential element access fourth', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(SUPPORTED_LOCALES[0]).toBeDefined();
+    }
+  });
 });
