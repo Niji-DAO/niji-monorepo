@@ -547,4 +547,50 @@ describe('Trait', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential Trait mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Trait type="hat" seed={i + 1000} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Trait key={i} type="hat" seed={i + 1100} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<Trait type="hat" seed={i + 1200} />, { wrapper: WithProviders }),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Trait type="hat" seed={i + 1300} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Trait type="hat" seed={i + 1400} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
 });
