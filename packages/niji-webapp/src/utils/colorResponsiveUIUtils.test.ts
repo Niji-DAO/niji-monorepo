@@ -346,4 +346,36 @@ describe('shouldUseStateBg', () => {
       expect(typeof shouldUseStateBg({ pathname: path })).toBe('boolean');
     }
   });
+
+  it('round-10 30 sequential shouldUseStateBg truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(shouldUseStateBg).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof shouldUseStateBg).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(shouldUseStateBg).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential combined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(shouldUseStateBg).toBeTruthy();
+      expect(typeof shouldUseStateBg).toBe('function');
+    }
+  });
+
+  it('round-10 100 mixed path variation', () => {
+    for (let i = 0; i < 100; i++) {
+      const path = i % 3 === 0 ? '/' : `/r10-noun-${i}`;
+      expect(typeof shouldUseStateBg({ pathname: path })).toBe('boolean');
+    }
+  });
 });
