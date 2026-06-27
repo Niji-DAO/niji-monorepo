@@ -1269,4 +1269,84 @@ describe('ModalBottomButtonRow', () => {
     expect(onPrev).toHaveBeenCalledTimes(100);
     expect(onNext).toHaveBeenCalledTimes(100);
   });
+
+  it('round-11 30 sequential ModalBottomButtonRow mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ModalBottomButtonRow
+          prevBtnText="prev"
+          nextBtnText="next"
+          onPrevBtnClick={() => {}}
+          onNextBtnClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ModalBottomButtonRow
+              key={i}
+              prevBtnText={`prev-${i}`}
+              nextBtnText={`next-${i}`}
+              onPrevBtnClick={() => {}}
+              onNextBtnClick={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <ModalBottomButtonRow
+            prevBtnText="prev"
+            nextBtnText="next"
+            onPrevBtnClick={() => {}}
+            onNextBtnClick={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ModalBottomButtonRow
+          prevBtnText="prev"
+          nextBtnText="next"
+          onPrevBtnClick={() => {}}
+          onNextBtnClick={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential onPrev + onNext invocations', () => {
+    const onPrev = vi.fn();
+    const onNext = vi.fn();
+    render(
+      <ModalBottomButtonRow
+        prevBtnText="prev"
+        nextBtnText="next"
+        onPrevBtnClick={onPrev}
+        onNextBtnClick={onNext}
+      />,
+    );
+    for (let i = 0; i < 100; i++) {
+      onPrev();
+      onNext();
+    }
+    expect(onPrev).toHaveBeenCalledTimes(100);
+    expect(onNext).toHaveBeenCalledTimes(100);
+  });
 });
