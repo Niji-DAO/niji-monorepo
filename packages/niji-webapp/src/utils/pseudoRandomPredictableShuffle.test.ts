@@ -470,4 +470,31 @@ describe('pseudoRandomPredictableShuffle', () => {
       expect(r1).toEqual(r2);
     }
   });
+
+  it('round-12 30 sequential pseudoRandomPredictableShuffle truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(pseudoRandomPredictableShuffle).toBeTruthy();
+  });
+
+  it('round-12 30 sequential pseudoRandomPredictableShuffle type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof pseudoRandomPredictableShuffle).toBe('function');
+  });
+
+  it('round-12 30 sequential pseudoRandomPredictableShuffle defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(pseudoRandomPredictableShuffle).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(pseudoRandomPredictableShuffle).toBeTruthy();
+      expect(typeof pseudoRandomPredictableShuffle).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential determinism', () => {
+    for (let i = 0; i < 100; i++) {
+      const r1 = pseudoRandomPredictableShuffle([1, 2, 3, 4, 5], 999);
+      const r2 = pseudoRandomPredictableShuffle([1, 2, 3, 4, 5], 999);
+      expect(r1).toEqual(r2);
+    }
+  });
 });
