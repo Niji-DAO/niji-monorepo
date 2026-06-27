@@ -761,4 +761,73 @@ describe('HoverCard', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential HoverCard mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={t => <div>{t}</div>} tip={`r10-${i}`} id={`r10-${i}`}>
+          <span>child</span>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <HoverCard
+              key={i}
+              hoverCardContent={t => <div>{t}</div>}
+              tip={`r10-i-${i}`}
+              id={`r10-i-${i}`}
+            >
+              <span>child</span>
+            </HoverCard>
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <HoverCard hoverCardContent={t => <div>{t}</div>} tip={`r10-s-${i}`} id={`r10-s-${i}`}>
+            <span>child</span>
+          </HoverCard>,
+          { wrapper: WithProviders },
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={t => <div>{t}</div>} tip={`r10-m-${i}`} id={`r10-m-${i}`}>
+          <span>child</span>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential different id values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <HoverCard hoverCardContent={t => <div>{t}</div>} tip={`r10-id-${i}`} id={`r10-id-${i}`}>
+          <span>child</span>
+        </HoverCard>,
+        { wrapper: WithProviders },
+      );
+      unmount();
+    }
+  });
 });
