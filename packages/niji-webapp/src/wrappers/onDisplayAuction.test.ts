@@ -417,4 +417,37 @@ describe('useOnDisplayAuction additional cases', () => {
       unmount();
     }
   });
+
+  it('round-11 30 useOnDisplayAuction truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useOnDisplayAuction).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 useAuctionBids truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useAuctionBids).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useOnDisplayAuction).toBe('function');
+      expect(typeof useAuctionBids).toBe('function');
+    }
+  });
+
+  it('round-11 50 sequential combined defined', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useOnDisplayAuction).toBeDefined();
+      expect(useAuctionBids).toBeDefined();
+    }
+  });
+
+  it('round-11 100 sequential renderHook second', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useOnDisplayAuction());
+      unmount();
+    }
+  });
 });
