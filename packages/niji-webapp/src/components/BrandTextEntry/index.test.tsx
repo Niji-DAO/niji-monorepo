@@ -941,4 +941,50 @@ describe('BrandTextEntry', () => {
     }
     expect(cb).toHaveBeenCalledTimes(100);
   });
+
+  it('round-11 30 sequential BrandTextEntry mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<BrandTextEntry placeholder={`r11-m-${i}`} onChange={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <BrandTextEntry key={i} placeholder={`r11-i-${i}`} onChange={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<BrandTextEntry placeholder={`r11-s-${i}`} onChange={() => {}} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <BrandTextEntry placeholder={`r11-m2-${i}`} onChange={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential onChange invocations', () => {
+    const cb = vi.fn();
+    const { container } = render(<BrandTextEntry placeholder="r11-c" onChange={cb} />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    for (let i = 0; i < 100; i++) {
+      fireEvent.change(input, { target: { value: `r11-${i}` } });
+    }
+    expect(cb).toHaveBeenCalledTimes(100);
+  });
 });
