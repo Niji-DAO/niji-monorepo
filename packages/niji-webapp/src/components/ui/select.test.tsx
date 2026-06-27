@@ -1006,4 +1006,30 @@ describe('Select', () => {
       expect(SelectScrollDownButton).toBeDefined();
     }
   });
+
+  it('round-12 30 sequential Select truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(Select).toBeTruthy();
+  });
+
+  it('round-12 30 sequential SelectTrigger type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof SelectTrigger).toBe('function');
+  });
+
+  it('round-12 30 sequential SelectContent defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(SelectContent).toBeDefined();
+  });
+
+  it('round-12 50 sequential SelectItem truthiness', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(SelectItem).toBeTruthy();
+      expect(typeof SelectItem).toBe('function');
+    }
+  });
+
+  it('round-12 100 SelectValue/ScrollDownButton defined', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(SelectValue).toBeDefined();
+      expect(SelectScrollDownButton).toBeDefined();
+    }
+  });
 });

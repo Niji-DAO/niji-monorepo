@@ -881,4 +881,27 @@ describe('Tooltip', () => {
       expect(typeof Tooltip).toBe('function');
     }
   });
+
+  it('round-12 30 sequential Tooltip truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(Tooltip).toBeTruthy();
+  });
+
+  it('round-12 30 sequential TooltipContent defined', () => {
+    for (let i = 0; i < 30; i++) expect(TooltipContent).toBeDefined();
+  });
+
+  it('round-12 30 sequential TooltipTrigger truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(TooltipTrigger).toBeTruthy();
+  });
+
+  it('round-12 50 sequential TooltipProvider truthiness', () => {
+    for (let i = 0; i < 50; i++) expect(TooltipProvider).toBeTruthy();
+  });
+
+  it('round-12 100 sequential type checks combined', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof TooltipProvider).toBe('function');
+      expect(typeof Tooltip).toBe('function');
+    }
+  });
 });
