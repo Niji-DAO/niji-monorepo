@@ -992,4 +992,63 @@ describe('NijisTransition', () => {
       unmount();
     }
   });
+
+  it('round-12 30 sequential NijisTransition mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NijisTransition show={true} transitionStyes={styles}>
+          <span>r12-m-{i}</span>
+        </NijisTransition>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijisTransition key={i} show={true} transitionStyes={styles}>
+              <span>r12-i-{i}</span>
+            </NijisTransition>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <NijisTransition show={true} transitionStyes={styles}>
+            <span>r12-s-{i}</span>
+          </NijisTransition>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <NijisTransition show={false} transitionStyes={styles}>
+          <span>r12-m2-{i}</span>
+        </NijisTransition>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <NijisTransition show={true} transitionStyes={styles}>
+          <span>r12-c-{i}</span>
+        </NijisTransition>,
+      );
+      unmount();
+    }
+  });
 });
