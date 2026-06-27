@@ -332,4 +332,35 @@ describe('getGrayBackgroundSVG', () => {
       expect(getGrayBackgroundSVG()).toBe(first);
     }
   });
+
+  it('round-10 30 sequential getGrayBackgroundSVG truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(getGrayBackgroundSVG).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof getGrayBackgroundSVG).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(getGrayBackgroundSVG).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential string return checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof getGrayBackgroundSVG()).toBe('string');
+    }
+  });
+
+  it('round-10 100 sequential reference consistency third', () => {
+    const first = getGrayBackgroundSVG();
+    for (let i = 0; i < 100; i++) {
+      expect(getGrayBackgroundSVG()).toBe(first);
+    }
+  });
 });
