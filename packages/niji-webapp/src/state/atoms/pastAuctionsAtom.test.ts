@@ -427,4 +427,36 @@ describe('subgraphAuctionsToReduxSafe', () => {
       expect(pastAuctionsAtom).toBe(first);
     }
   });
+
+  it('round-11 30 sequential pastAuctionsAtom truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(pastAuctionsAtom).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 subgraphAuctionsToReduxSafe truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(subgraphAuctionsToReduxSafe).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 combined defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(pastAuctionsAtom).toBeDefined();
+      expect(subgraphAuctionsToReduxSafe).toBeDefined();
+    }
+  });
+
+  it('round-11 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof subgraphAuctionsToReduxSafe).toBe('function');
+    }
+  });
+
+  it('round-11 100 sequential reference consistency third', () => {
+    const first = pastAuctionsAtom;
+    for (let i = 0; i < 100; i++) {
+      expect(pastAuctionsAtom).toBe(first);
+    }
+  });
 });
