@@ -485,4 +485,39 @@ describe('timeUtils stress', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-11 30 sequential currentUnixEpoch truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(currentUnixEpoch).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 sequential toUnixEpoch truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(toUnixEpoch).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 sequential combined type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof currentUnixEpoch).toBe('function');
+      expect(typeof toUnixEpoch).toBe('function');
+      expect(typeof relativeTimestamp).toBe('function');
+    }
+  });
+
+  it('round-11 50 sequential currentUnixEpoch invocations', () => {
+    for (let i = 0; i < 50; i++) {
+      currentUnixEpoch();
+    }
+    expect(true).toBe(true);
+  });
+
+  it('round-11 100 sequential mixed invocations third', () => {
+    for (let i = 0; i < 100; i++) {
+      currentUnixEpoch();
+      toUnixEpoch(new Date(11_000_000_000_000 + i * 1000));
+    }
+    expect(true).toBe(true);
+  });
 });
