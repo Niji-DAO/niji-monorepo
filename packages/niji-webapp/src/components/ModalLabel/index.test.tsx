@@ -942,4 +942,44 @@ describe('ModalLabel', () => {
     }
     expect(container.querySelector('div')?.textContent).toContain('99');
   });
+
+  it('round-11 30 sequential ModalLabel mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ModalLabel>r11-m-{i}</ModalLabel>);
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ModalLabel key={i}>r11-i-{i}</ModalLabel>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ModalLabel>r11-s-{i}</ModalLabel>)).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ModalLabel>r11-m2-{i}</ModalLabel>);
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential rerender cycles', () => {
+    const { container, rerender } = render(<ModalLabel>x</ModalLabel>);
+    for (let i = 0; i < 100; i++) {
+      rerender(<ModalLabel>r11-r-{i}</ModalLabel>);
+    }
+    expect(container.querySelector('div')?.textContent).toContain('99');
+  });
 });
