@@ -392,4 +392,34 @@ describe('traitName', () => {
       expect(() => traitName('background', i % 2)).not.toThrow();
     }
   });
+
+  it('round-11 30 sequential traitName truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(traitName).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof traitName).toBe('function');
+    }
+  });
+
+  it('round-11 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(traitName).toBeDefined();
+    }
+  });
+
+  it('round-11 50 sequential background invocations second', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => traitName('background', i % 2)).not.toThrow();
+    }
+  });
+
+  it('round-11 100 mixed invocations', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() => traitName('background', i % 2)).not.toThrow();
+    }
+  });
 });

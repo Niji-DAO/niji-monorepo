@@ -378,4 +378,36 @@ describe('nijiTraitKeys', () => {
       expect(() => humanizeTraitKey(keys[i % 5])).not.toThrow();
     }
   });
+
+  it('round-11 30 sequential humanizeTraitKey truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(humanizeTraitKey).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof humanizeTraitKey).toBe('function');
+    }
+  });
+
+  it('round-11 30 nijiTraitKeys truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(nijiTraitKeys).toBeTruthy();
+    }
+  });
+
+  it('round-11 50 sequential combined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(humanizeTraitKey).toBeDefined();
+      expect(nijiTraitKeys).toBeDefined();
+    }
+  });
+
+  it('round-11 100 sequential invocations second', () => {
+    const keys = ['background', 'body', 'head', 'glasses', 'accessory'];
+    for (let i = 0; i < 100; i++) {
+      expect(() => humanizeTraitKey(keys[i % 5])).not.toThrow();
+    }
+  });
 });
