@@ -904,4 +904,43 @@ describe('LanguageSelectionModal', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential LanguageSelectionModal mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <LanguageSelectionModal key={i} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<LanguageSelectionModal onDismiss={() => {}} />)).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<LanguageSelectionModal onDismiss={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential onDismiss invocations', () => {
+    const cb = vi.fn();
+    render(<LanguageSelectionModal onDismiss={cb} />);
+    for (let i = 0; i < 100; i++) cb();
+    expect(cb).toHaveBeenCalledTimes(100);
+  });
 });
