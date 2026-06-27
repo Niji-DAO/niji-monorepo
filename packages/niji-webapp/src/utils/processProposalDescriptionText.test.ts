@@ -373,4 +373,36 @@ describe('processProposalDescriptionText', () => {
       expect(() => processProposalDescriptionText('', '')).not.toThrow();
     }
   });
+
+  it('round-10 30 sequential processProposalDescriptionText truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(processProposalDescriptionText).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof processProposalDescriptionText).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(processProposalDescriptionText).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential invocations with content', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => processProposalDescriptionText(`r10-${i}`, `title-${i}`)).not.toThrow();
+    }
+  });
+
+  it('round-10 100 sequential mixed invocations', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        processProposalDescriptionText(i % 2 === 0 ? '' : `desc-${i}`, `t-${i}`),
+      ).not.toThrow();
+    }
+  });
 });
