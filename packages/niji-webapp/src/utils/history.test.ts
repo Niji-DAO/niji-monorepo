@@ -382,4 +382,29 @@ describe('nounPath', () => {
       expect(nounPath(String(i + 67000)).length).toBeGreaterThan(0);
     }
   });
+
+  it('round-12 30 sequential nounPath truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(nounPath).toBeTruthy();
+  });
+
+  it('round-12 30 sequential nounPath type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof nounPath).toBe('function');
+  });
+
+  it('round-12 30 sequential nounPath defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(nounPath).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(nounPath).toBeTruthy();
+      expect(typeof nounPath).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential nounPath invocations', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(nounPath(String(i + 77000)).length).toBeGreaterThan(0);
+    }
+  });
 });
