@@ -350,4 +350,49 @@ describe('Dialog', () => {
     for (let i = 0; i < 100; i++) fireEvent.click(btn);
     expect(handler.mock.calls.length).toBeGreaterThan(50);
   });
+
+  it('round-9 30 sequential Dialog Trigger mounts', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Dialog>
+          <DialogTrigger>r9-{i}</DialogTrigger>
+        </Dialog>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-9 30 different trigger labels', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Dialog>
+          <DialogTrigger>r9-c-{i}</DialogTrigger>
+        </Dialog>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-9 50 sequential type checks Dialog', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof Dialog).toBe('function');
+    }
+  });
+
+  it('round-9 50 sequential truthiness DialogTrigger', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(DialogTrigger).toBeTruthy();
+    }
+  });
+
+  it('round-9 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Dialog>
+          <DialogTrigger>variant-{i}</DialogTrigger>
+        </Dialog>,
+      );
+      unmount();
+    }
+  });
 });

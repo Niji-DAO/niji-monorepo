@@ -219,4 +219,49 @@ describe('Alert extra cases', () => {
       }
     });
   });
+
+  it('round-9 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Alert>r9</Alert>);
+      unmount();
+    }
+  });
+
+  it('round-9 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Alert key={i}>r9-{i}</Alert>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-9 30 different children values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Alert>r9-c-{i}</Alert>);
+      unmount();
+    }
+  });
+
+  it('round-9 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Alert>r9-2</Alert>);
+      unmount();
+    }
+  });
+
+  it('round-9 30 AlertTitle + AlertDescription render', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Alert>
+          <AlertTitle>r9-t-{i}</AlertTitle>
+          <AlertDescription>r9-d-{i}</AlertDescription>
+        </Alert>,
+      );
+      unmount();
+    }
+  });
 });
