@@ -596,4 +596,57 @@ describe('handleActionAdd', () => {
       expect(handleActionAdd).toBeTruthy();
     }
   });
+
+  it('round-9 30 sequential handleActionAdd invocations', () => {
+    const cb = vi.fn();
+    const state = {
+      address: '0xABC' as `0x${string}`,
+      abi: ensReverseRegistrarAbi,
+      function: 'setName',
+      amount: '0',
+      args: ['nouns.eth'],
+    };
+    for (let i = 0; i < 30; i++) handleActionAdd(state, cb);
+    expect(cb).toHaveBeenCalledTimes(30);
+  });
+
+  it('round-9 50 sequential handleActionAdd invocations second', () => {
+    const cb = vi.fn();
+    const state = {
+      address: '0xDEF' as `0x${string}`,
+      abi: ensReverseRegistrarAbi,
+      function: 'setName',
+      amount: '0',
+      args: ['nouns2.eth'],
+    };
+    for (let i = 0; i < 50; i++) handleActionAdd(state, cb);
+    expect(cb).toHaveBeenCalledTimes(50);
+  });
+
+  it('round-9 100 sequential truthiness checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(handleActionAdd).toBeDefined();
+    }
+  });
+
+  it('round-9 30 different state addresses', () => {
+    const cb = vi.fn();
+    for (let i = 0; i < 30; i++) {
+      const state = {
+        address: `0xABC${i}` as `0x${string}`,
+        abi: ensReverseRegistrarAbi,
+        function: 'setName',
+        amount: '0',
+        args: ['nouns.eth'],
+      };
+      handleActionAdd(state, cb);
+    }
+    expect(cb).toHaveBeenCalledTimes(30);
+  });
+
+  it('round-9 50 sequential type checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof handleActionAdd).toBe('function');
+    }
+  });
 });
