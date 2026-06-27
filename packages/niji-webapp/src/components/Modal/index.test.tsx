@@ -684,4 +684,48 @@ describe('Modal', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential Modal mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Modal title="r10" content={<p>r10-{i}</p>} onDismiss={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Modal key={i} title={`r10-${i}`} content={<p>r10-i</p>} onDismiss={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<Modal title="r10" content={<p>r10-s</p>} onDismiss={() => {}} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <Modal title="r10-2" content={<p>r10-m-{i}</p>} onDismiss={() => {}} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 Backdrop type checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof Backdrop).toBe('function');
+    }
+  });
 });
