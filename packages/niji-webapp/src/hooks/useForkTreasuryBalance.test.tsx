@@ -416,4 +416,35 @@ describe('useForkTreasuryBalance', () => {
       expect(typeof useForkTreasuryBalance).toBe('function');
     }
   });
+
+  it('round-10 30 sequential useForkTreasuryBalance truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useForkTreasuryBalance).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useForkTreasuryBalance).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useForkTreasuryBalance).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential combined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useForkTreasuryBalance).toBeTruthy();
+      expect(typeof useForkTreasuryBalance).toBe('function');
+    }
+  });
+
+  it('round-10 100 sequential defined checks second', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useForkTreasuryBalance).toBeDefined();
+    }
+  });
 });

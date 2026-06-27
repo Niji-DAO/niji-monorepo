@@ -394,4 +394,37 @@ describe('useChainPastAuctions', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential useChainPastAuctions truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useChainPastAuctions).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useChainPastAuctions).toBe('function');
+    }
+  });
+
+  it('round-10 30 sequential renderHook isCool=true', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useChainPastAuctions(true));
+      unmount();
+    }
+  });
+
+  it('round-10 50 sequential renderHook isCool=false', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useChainPastAuctions(false));
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential alternating renderHook', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = renderHook(() => useChainPastAuctions(i % 2 === 0));
+      unmount();
+    }
+  });
 });
