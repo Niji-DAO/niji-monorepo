@@ -317,4 +317,35 @@ describe('constants', () => {
       expect(reimported.AVERAGE_BLOCK_TIME_IN_SECS).toBe(AVERAGE_BLOCK_TIME_IN_SECS);
     }
   });
+
+  it('round-10 30 sequential AVERAGE_BLOCK_TIME_IN_SECS truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(AVERAGE_BLOCK_TIME_IN_SECS).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof AVERAGE_BLOCK_TIME_IN_SECS).toBe('number');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(AVERAGE_BLOCK_TIME_IN_SECS).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential greater than zero checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(AVERAGE_BLOCK_TIME_IN_SECS).toBeGreaterThan(0);
+    }
+  });
+
+  it('round-10 100 sequential reimport reference consistency', async () => {
+    for (let i = 0; i < 100; i++) {
+      const reimported = await import('./constants');
+      expect(reimported.AVERAGE_BLOCK_TIME_IN_SECS).toBe(AVERAGE_BLOCK_TIME_IN_SECS);
+    }
+  });
 });
