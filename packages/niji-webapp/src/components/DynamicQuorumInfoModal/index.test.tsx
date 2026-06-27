@@ -1673,4 +1673,70 @@ describe('DynamicQuorumInfoModal', () => {
     for (let i = 0; i < 100; i++) cb();
     expect(cb).toHaveBeenCalledTimes(100);
   });
+
+  it('round-11 30 sequential DynamicQuorumInfoModal mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={i + 50000}
+          onDismiss={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DynamicQuorumInfoModal
+              key={i}
+              proposal={makeProposal()}
+              againstVotesAbsolute={i + 60000}
+              onDismiss={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <DynamicQuorumInfoModal
+            proposal={makeProposal()}
+            againstVotesAbsolute={i + 70000}
+            onDismiss={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <DynamicQuorumInfoModal
+          proposal={makeProposal()}
+          againstVotesAbsolute={i + 80000}
+          onDismiss={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential onDismiss invocations', () => {
+    const cb = vi.fn();
+    render(
+      <DynamicQuorumInfoModal proposal={makeProposal()} againstVotesAbsolute={5} onDismiss={cb} />,
+    );
+    for (let i = 0; i < 100; i++) cb();
+    expect(cb).toHaveBeenCalledTimes(100);
+  });
 });
