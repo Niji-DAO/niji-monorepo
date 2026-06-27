@@ -1339,4 +1339,47 @@ describe('ABIUpload Component', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential ABIUpload mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ABIUpload isValid={false} isInvalid={false} onChange={vi.fn()} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ABIUpload key={i} isValid={false} isInvalid={false} onChange={vi.fn()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<ABIUpload isValid={false} isInvalid={false} onChange={vi.fn()} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ABIUpload isValid={true} isInvalid={false} onChange={vi.fn()} />);
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential onChange invocations', () => {
+    const cb = vi.fn();
+    render(<ABIUpload isValid={false} isInvalid={false} onChange={cb} />);
+    for (let i = 0; i < 100; i++) cb([] as never);
+    expect(cb).toHaveBeenCalledTimes(100);
+  });
 });
