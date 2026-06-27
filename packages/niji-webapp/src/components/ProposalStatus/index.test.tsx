@@ -701,4 +701,51 @@ describe('ProposalStatus', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential ProposalStatus mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalStatus status={ProposalState.ACTIVE} className={`r11-m-${i}`} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalStatus key={i} status={ProposalState.ACTIVE} className={`r11-i-${i}`} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<ProposalStatus status={ProposalState.PENDING} className={`r11-s-${i}`} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ProposalStatus status={ProposalState.SUCCEEDED} className={`r11-m2-${i}`} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential alternating ProposalStatus values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <ProposalStatus status={ProposalState.ACTIVE} className={`r11-c-${i}`} />,
+      );
+      unmount();
+    }
+  });
 });

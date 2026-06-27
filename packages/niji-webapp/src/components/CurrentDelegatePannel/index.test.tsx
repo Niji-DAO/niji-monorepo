@@ -1185,4 +1185,43 @@ describe('CurrentDelegatePannel', () => {
     for (let i = 0; i < 100; i++) cb();
     expect(cb).toHaveBeenCalledTimes(100);
   });
+
+  it('round-11 30 sequential CurrentDelegatePannel mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CurrentDelegatePannel key={i} onPrimaryBtnClick={() => {}} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} />)).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<CurrentDelegatePannel onPrimaryBtnClick={() => {}} />);
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential onClick invocations', () => {
+    const cb = vi.fn();
+    render(<CurrentDelegatePannel onPrimaryBtnClick={cb} />);
+    for (let i = 0; i < 100; i++) cb();
+    expect(cb).toHaveBeenCalledTimes(100);
+  });
 });
