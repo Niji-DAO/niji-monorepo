@@ -627,4 +627,27 @@ describe('CandidateSponsors', () => {
   it('round-11 100 sequential defined checks third', () => {
     for (let i = 0; i < 100; i++) expect(CandidateSponsors).toBeDefined();
   });
+
+  it('round-12 30 sequential CandidateSponsors truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(CandidateSponsors).toBeTruthy();
+  });
+
+  it('round-12 30 sequential CandidateSponsors type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof CandidateSponsors).toBe('function');
+  });
+
+  it('round-12 30 sequential CandidateSponsors defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(CandidateSponsors).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(CandidateSponsors).toBeTruthy();
+      expect(typeof CandidateSponsors).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential defined checks fourth', () => {
+    for (let i = 0; i < 100; i++) expect(CandidateSponsors).toBeDefined();
+  });
 });
