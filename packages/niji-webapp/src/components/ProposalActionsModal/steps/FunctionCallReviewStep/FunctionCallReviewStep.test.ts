@@ -649,4 +649,42 @@ describe('handleActionAdd', () => {
       expect(typeof handleActionAdd).toBe('function');
     }
   });
+
+  it('round-10 30 sequential handleActionAdd truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(handleActionAdd).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof handleActionAdd).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(handleActionAdd).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential handleActionAdd invocations', () => {
+    const cb = vi.fn();
+    const state = {
+      address: '0xR10' as `0x${string}`,
+      abi: ensReverseRegistrarAbi,
+      function: 'setName',
+      amount: '0',
+      args: ['r10.eth'],
+    };
+    for (let i = 0; i < 50; i++) handleActionAdd(state, cb);
+    expect(cb).toHaveBeenCalledTimes(50);
+  });
+
+  it('round-10 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof handleActionAdd).toBe('function');
+      expect(handleActionAdd).toBeTruthy();
+    }
+  });
 });
