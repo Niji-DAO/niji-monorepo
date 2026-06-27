@@ -819,4 +819,43 @@ describe('Proposals', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential Proposals mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<Proposals proposals={[]} nounsRequired={i} />);
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Proposals key={i} proposals={[]} nounsRequired={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => wrap(<Proposals proposals={[]} nounsRequired={i} />)).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<Proposals proposals={[]} nounsRequired={i + 30000} />);
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential different nounsRequired values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<Proposals proposals={[]} nounsRequired={i + 40000} />);
+      unmount();
+    }
+  });
 });
