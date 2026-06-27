@@ -893,4 +893,43 @@ describe('ModalTextPrimary', () => {
       expect(() => rerender(<ModalTextPrimary>r9-r-{i}</ModalTextPrimary>)).not.toThrow();
     }
   });
+
+  it('round-10 30 sequential ModalTextPrimary mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ModalTextPrimary>r10-{i}</ModalTextPrimary>);
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ModalTextPrimary key={i}>r10-i-{i}</ModalTextPrimary>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ModalTextPrimary>r10-s-{i}</ModalTextPrimary>)).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ModalTextPrimary>r10-m-{i}</ModalTextPrimary>);
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential rerender cycles second', () => {
+    const { rerender } = render(<ModalTextPrimary>x</ModalTextPrimary>);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<ModalTextPrimary>r10-r-{i}</ModalTextPrimary>)).not.toThrow();
+    }
+  });
 });
