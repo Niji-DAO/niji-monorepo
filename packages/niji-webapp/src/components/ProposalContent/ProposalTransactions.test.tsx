@@ -593,4 +593,43 @@ describe('ProposalTransactions', () => {
       unmount();
     }
   });
+
+  it('round-12 30 sequential ProposalTransactions mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ProposalTransactions details={[]} />);
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalTransactions key={i} details={[]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<ProposalTransactions details={[]} />)).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ProposalTransactions details={[]} />);
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ProposalTransactions details={[]} />);
+      unmount();
+    }
+  });
 });
