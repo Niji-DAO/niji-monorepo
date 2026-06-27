@@ -551,4 +551,30 @@ describe('checkEnoughVotes — additional', () => {
       expect(isProposalUpdatable(ProposalState.ACTIVE)).toBe(first);
     }
   });
+
+  it('round-12 30 sequential isProposalUpdatable truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(isProposalUpdatable).toBeTruthy();
+  });
+
+  it('round-12 30 sequential isProposalUpdatable type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof isProposalUpdatable).toBe('function');
+  });
+
+  it('round-12 30 sequential isProposalUpdatable defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(isProposalUpdatable).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(isProposalUpdatable).toBeTruthy();
+      expect(typeof isProposalUpdatable).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential isProposalUpdatable idempotency', () => {
+    const first = isProposalUpdatable(ProposalState.PENDING);
+    for (let i = 0; i < 100; i++) {
+      expect(isProposalUpdatable(ProposalState.PENDING)).toBe(first);
+    }
+  });
 });

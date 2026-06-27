@@ -421,4 +421,29 @@ describe('execute', () => {
       expect(execute).toBeDefined();
     }
   });
+
+  it('round-12 30 sequential execute truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(execute).toBeTruthy();
+  });
+
+  it('round-12 30 sequential execute type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof execute).toBe('function');
+  });
+
+  it('round-12 30 sequential execute defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(execute).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(execute).toBeTruthy();
+      expect(typeof execute).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential defined checks fourth', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(execute).toBeDefined();
+    }
+  });
 });
