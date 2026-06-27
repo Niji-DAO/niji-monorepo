@@ -898,4 +898,60 @@ describe('FunctionCallEnterArgsStep', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential FunctionCallEnterArgsStep mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <FunctionCallEnterArgsStep
+              key={i}
+              {...defaults}
+              state={{ abi, function: 'transfer' } as never}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <FunctionCallEnterArgsStep
+            {...defaults}
+            state={{ abi, function: 'transfer' } as never}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+      );
+      unmount();
+    }
+  });
 });
