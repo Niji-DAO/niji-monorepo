@@ -1455,4 +1455,51 @@ describe('DelegateHoverCard', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential DelegateHoverCard mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegateHoverCard delegateId={`0xR11-m-${i}`} proposerAddress="0xPROP" />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DelegateHoverCard key={i} delegateId={`0xR11-i-${i}`} proposerAddress="0xPROP" />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<DelegateHoverCard delegateId={`0xR11-s-${i}`} proposerAddress="0xPROP" />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <DelegateHoverCard delegateId={`0xR11-m2-${i}`} proposerAddress="0xPROP" />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential different delegateId values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <DelegateHoverCard delegateId={`0xR11-c-${i}`} proposerAddress="0xPROP" />,
+      );
+      unmount();
+    }
+  });
 });
