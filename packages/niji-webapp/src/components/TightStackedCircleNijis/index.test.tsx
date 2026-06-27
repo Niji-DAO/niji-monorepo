@@ -962,4 +962,45 @@ describe('TightStackedCircleNijis', () => {
       unmount();
     }
   });
+
+  it('round-12 30 sequential TightStackedCircleNijis mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<TightStackedCircleNijis nounIds={[String(i + 100000)]} />);
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <TightStackedCircleNijis key={i} nounIds={[String(i + 110000)]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<TightStackedCircleNijis nounIds={[String(i + 120000)]} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<TightStackedCircleNijis nounIds={[String(i + 130000)]} />);
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential different nounIds values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<TightStackedCircleNijis nounIds={[String(i + 140000)]} />);
+      unmount();
+    }
+  });
 });
