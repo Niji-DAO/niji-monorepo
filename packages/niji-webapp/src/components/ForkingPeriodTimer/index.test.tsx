@@ -848,4 +848,45 @@ describe('ForkingPeriodTimer', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-10 30 sequential ForkingPeriodTimer mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<ForkingPeriodTimer endTime={3600} isPeriodEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ForkingPeriodTimer key={i} endTime={3600 + i} isPeriodEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<ForkingPeriodTimer endTime={3600 + i} isPeriodEnded={false} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<ForkingPeriodTimer endTime={7200} isPeriodEnded={true} />);
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential different endTime values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<ForkingPeriodTimer endTime={3600 + i} isPeriodEnded={false} />);
+      unmount();
+    }
+  });
 });
