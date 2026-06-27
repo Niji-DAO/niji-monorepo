@@ -539,4 +539,42 @@ describe('buttonVariants (cva)', () => {
       expect(typeof buttonVariants).toBe('function');
     }
   });
+
+  it('round-12 30 sequential Button mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Button>r12-m-{i}</Button>);
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Button key={i}>r12-i-{i}</Button>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<Button>r12-s-{i}</Button>)).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Button>r12-m2-{i}</Button>);
+      unmount();
+    }
+  });
+
+  it('round-12 100 buttonVariants defined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(buttonVariants).toBeDefined();
+    }
+  });
 });
