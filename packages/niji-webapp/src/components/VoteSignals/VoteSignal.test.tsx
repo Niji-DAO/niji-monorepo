@@ -578,4 +578,51 @@ describe('VoteSignal', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential VoteSignal mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <VoteSignal support={1} voteCount={i} reason="r10" address={ADDR} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteSignal key={i} support={1} voteCount={i} reason="r10" address={ADDR} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<VoteSignal support={1} voteCount={i} reason="r10" address={ADDR} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <VoteSignal support={1} voteCount={i + 30000} reason="r10-2" address={ADDR} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential different voteCount values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <VoteSignal support={1} voteCount={i + 40000} reason="r10" address={ADDR} />,
+      );
+      unmount();
+    }
+  });
 });
