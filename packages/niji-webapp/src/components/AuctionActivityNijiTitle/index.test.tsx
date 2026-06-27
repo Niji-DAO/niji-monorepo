@@ -949,4 +949,43 @@ describe('AuctionActivityNijiTitle', () => {
       expect(() => rerender(<AuctionActivityNijiTitle nounId={BigInt(i + 40000)} />)).not.toThrow();
     }
   });
+
+  it('round-11 30 sequential AuctionActivityNijiTitle mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionActivityNijiTitle nounId={BigInt(i + 50000)} />);
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionActivityNijiTitle key={i} nounId={BigInt(i + 60000)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<AuctionActivityNijiTitle nounId={BigInt(i + 70000)} />)).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<AuctionActivityNijiTitle nounId={BigInt(i + 80000)} />);
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential rerender cycles', () => {
+    const { rerender } = render(<AuctionActivityNijiTitle nounId={1n} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() => rerender(<AuctionActivityNijiTitle nounId={BigInt(i + 90000)} />)).not.toThrow();
+    }
+  });
 });
