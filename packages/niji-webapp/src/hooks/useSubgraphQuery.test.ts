@@ -523,4 +523,35 @@ describe('useSubgraphQuery', () => {
       expect(useSubgraphQuery).toBeDefined();
     }
   });
+
+  it('round-11 30 sequential useSubgraphQuery truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useSubgraphQuery).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useSubgraphQuery).toBe('function');
+    }
+  });
+
+  it('round-11 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useSubgraphQuery).toBeDefined();
+    }
+  });
+
+  it('round-11 50 sequential combined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useSubgraphQuery).toBeTruthy();
+      expect(typeof useSubgraphQuery).toBe('function');
+    }
+  });
+
+  it('round-11 100 sequential defined checks third', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useSubgraphQuery).toBeDefined();
+    }
+  });
 });

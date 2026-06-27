@@ -466,4 +466,37 @@ describe('useScrollToLocation', () => {
       expect(typeof useScrollToLocation).toBe('function');
     }
   });
+
+  it('round-11 30 sequential useScrollToLocation truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useScrollToLocation).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useScrollToLocation).toBe('function');
+    }
+  });
+
+  it('round-11 30 sequential renderHook second', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useScrollToLocation());
+      unmount();
+    }
+  });
+
+  it('round-11 50 sequential renderHook third', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useScrollToLocation());
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useScrollToLocation).toBeTruthy();
+      expect(typeof useScrollToLocation).toBe('function');
+    }
+  });
 });

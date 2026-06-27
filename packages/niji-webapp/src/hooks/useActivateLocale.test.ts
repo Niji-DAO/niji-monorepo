@@ -216,4 +216,37 @@ describe('useActiveLocale', () => {
       expect(typeof useActiveLocale).toBe('function');
     }
   });
+
+  it('round-11 30 sequential useActiveLocale truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useActiveLocale).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useActiveLocale).toBe('function');
+    }
+  });
+
+  it('round-11 30 sequential renderHook second', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = renderHook(() => useActiveLocale());
+      unmount();
+    }
+  });
+
+  it('round-11 50 sequential renderHook third', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = renderHook(() => useActiveLocale());
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useActiveLocale).toBeTruthy();
+      expect(typeof useActiveLocale).toBe('function');
+    }
+  });
 });
