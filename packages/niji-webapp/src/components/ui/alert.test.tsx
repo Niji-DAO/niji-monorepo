@@ -308,4 +308,43 @@ describe('Alert extra cases', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential Alert mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Alert>r11-m-{i}</Alert>);
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Alert key={i}>r11-i-{i}</Alert>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<Alert>r11-s-{i}</Alert>)).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential AlertTitle mount-unmount cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<AlertTitle>r11-t-{i}</AlertTitle>);
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential AlertDescription render cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<AlertDescription>r11-d-{i}</AlertDescription>);
+      unmount();
+    }
+  });
 });
