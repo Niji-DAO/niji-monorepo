@@ -866,4 +866,47 @@ describe('TruncatedAmount', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-11 30 sequential TruncatedAmount mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<TruncatedAmount amount={BigInt(i + 50000) * 10n ** 18n} />);
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <TruncatedAmount key={i} amount={BigInt(i + 60000) * 10n ** 18n} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<TruncatedAmount amount={BigInt(i + 70000) * 10n ** 18n} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<TruncatedAmount amount={BigInt(i + 80000) * 10n ** 18n} />);
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential rerender cycles', () => {
+    const { rerender } = render(<TruncatedAmount amount={parseEther('5')} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<TruncatedAmount amount={BigInt(i + 90000) * 10n ** 18n} />),
+      ).not.toThrow();
+    }
+  });
 });

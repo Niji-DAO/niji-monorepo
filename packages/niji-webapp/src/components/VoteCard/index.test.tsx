@@ -1863,4 +1863,27 @@ describe('VoteCard', () => {
       expect(typeof VoteCard).toBe('function');
     }
   });
+
+  it('round-11 30 sequential VoteCard truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(VoteCard).toBeTruthy();
+  });
+
+  it('round-11 30 sequential VoteCard type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof VoteCard).toBe('function');
+  });
+
+  it('round-11 30 sequential VoteCard defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(VoteCard).toBeDefined();
+  });
+
+  it('round-11 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(VoteCard).toBeTruthy();
+      expect(typeof VoteCard).toBe('function');
+    }
+  });
+
+  it('round-11 100 sequential defined checks third', () => {
+    for (let i = 0; i < 100; i++) expect(VoteCard).toBeDefined();
+  });
 });

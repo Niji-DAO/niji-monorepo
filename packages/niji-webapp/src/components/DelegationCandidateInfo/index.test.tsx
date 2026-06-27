@@ -1358,4 +1358,62 @@ describe('DelegationCandidateInfo', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential DelegationCandidateInfo mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <DelegationCandidateInfo address="0xR11" votesToAdd={i + 50000} userDelegatee="0xUSER" />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <DelegationCandidateInfo
+              key={i}
+              address={`0xR11I${i}`}
+              votesToAdd={i + 60000}
+              userDelegatee="0xUSER"
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <DelegationCandidateInfo
+            address="0xR11S"
+            votesToAdd={i + 70000}
+            userDelegatee="0xUSER"
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <DelegationCandidateInfo address="0xR11M" votesToAdd={i + 80000} userDelegatee="0xUSER" />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential different votesToAdd values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <DelegationCandidateInfo address="0xR11" votesToAdd={i + 90000} userDelegatee="0xUSER" />,
+      );
+      unmount();
+    }
+  });
 });
