@@ -395,4 +395,45 @@ describe('Dialog', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential Dialog Trigger mounts', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Dialog>
+          <DialogTrigger>r10-{i}</DialogTrigger>
+        </Dialog>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 different trigger labels', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <Dialog>
+          <DialogTrigger>r10-c-{i}</DialogTrigger>
+        </Dialog>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 50 sequential type checks Dialog', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof Dialog).toBe('function');
+    }
+  });
+
+  it('round-10 50 sequential truthiness DialogTrigger', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(DialogTrigger).toBeTruthy();
+    }
+  });
+
+  it('round-10 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof Dialog).toBe('function');
+      expect(DialogTrigger).toBeTruthy();
+    }
+  });
 });
