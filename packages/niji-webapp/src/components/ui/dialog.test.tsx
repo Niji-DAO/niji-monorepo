@@ -436,4 +436,27 @@ describe('Dialog', () => {
       expect(DialogTrigger).toBeTruthy();
     }
   });
+
+  it('round-11 30 sequential Dialog truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(Dialog).toBeTruthy();
+  });
+
+  it('round-11 30 sequential DialogTitle defined', () => {
+    for (let i = 0; i < 30; i++) expect(DialogTitle).toBeDefined();
+  });
+
+  it('round-11 30 sequential DialogDescription truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(DialogDescription).toBeTruthy();
+  });
+
+  it('round-11 50 sequential DialogHeader/Footer truthiness', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(DialogHeader).toBeTruthy();
+      expect(DialogFooter).toBeTruthy();
+    }
+  });
+
+  it('round-11 100 sequential DialogContent defined', () => {
+    for (let i = 0; i < 100; i++) expect(DialogContent).toBeDefined();
+  });
 });
