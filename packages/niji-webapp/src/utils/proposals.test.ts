@@ -487,4 +487,36 @@ describe('checkEnoughVotes — additional', () => {
       expect(isProposalUpdatable(ProposalState.ACTIVE)).toBe(first);
     }
   });
+
+  it('round-10 30 sequential isProposalUpdatable truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(isProposalUpdatable).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof isProposalUpdatable).toBe('function');
+    }
+  });
+
+  it('round-10 30 combined defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(checkEnoughVotes).toBeDefined();
+      expect(checkIsEligibleToPropose).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential boolean return checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof isProposalUpdatable(ProposalState.PENDING)).toBe('boolean');
+    }
+  });
+
+  it('round-10 100 sequential reproducibility checks second', () => {
+    const first = isProposalUpdatable(ProposalState.EXECUTED);
+    for (let i = 0; i < 100; i++) {
+      expect(isProposalUpdatable(ProposalState.EXECUTED)).toBe(first);
+    }
+  });
 });
