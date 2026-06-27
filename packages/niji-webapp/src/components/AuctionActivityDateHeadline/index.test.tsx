@@ -1004,4 +1004,49 @@ describe('AuctionActivityDateHeadline', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-10 30 sequential AuctionActivityDateHeadline mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<AuctionActivityDateHeadline startTime={1700000000n} />);
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <AuctionActivityDateHeadline key={i} startTime={BigInt(1700000000 + i)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<AuctionActivityDateHeadline startTime={BigInt(1700000000 + i)} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <AuctionActivityDateHeadline startTime={BigInt(1700000000 + i)} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential rerender cycles second', () => {
+    const { rerender } = render(<AuctionActivityDateHeadline startTime={1700000000n} />);
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<AuctionActivityDateHeadline startTime={BigInt(1700000000 + i * 60)} />),
+      ).not.toThrow();
+    }
+  });
 });
