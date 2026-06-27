@@ -675,4 +675,51 @@ describe('ProposalContent extra cases', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential ProposalContent mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalContent description="r10" title={`r10-${i}`} details={[]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalContent key={i} description="r10" title={`r10-i-${i}`} details={[]} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<ProposalContent description="r10" title={`r10-s-${i}`} details={[]} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ProposalContent description="r10" title={`r10-m-${i}`} details={[]} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential different title values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <ProposalContent description="r10" title={`r10-c-${i}`} details={[]} />,
+      );
+      unmount();
+    }
+  });
 });
