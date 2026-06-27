@@ -695,4 +695,74 @@ describe('OriginalSignature', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential OriginalSignature mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <OriginalSignature
+          voteCount={i + 50000}
+          signer={SIGNER}
+          isParentProposalUpdatable={true}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <OriginalSignature
+              key={i}
+              voteCount={i + 60000}
+              signer={SIGNER}
+              isParentProposalUpdatable={true}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <OriginalSignature
+            voteCount={i + 70000}
+            signer={SIGNER}
+            isParentProposalUpdatable={false}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <OriginalSignature
+          voteCount={i + 80000}
+          signer={SIGNER}
+          isParentProposalUpdatable={true}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential different voteCount values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <OriginalSignature
+          voteCount={i + 90000}
+          signer={SIGNER}
+          isParentProposalUpdatable={true}
+        />,
+      );
+      unmount();
+    }
+  });
 });
