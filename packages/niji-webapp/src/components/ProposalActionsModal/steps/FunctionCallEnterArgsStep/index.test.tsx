@@ -786,4 +786,60 @@ describe('FunctionCallEnterArgsStep', () => {
       unmount();
     }
   });
+
+  it('round-9 mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-9 renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <FunctionCallEnterArgsStep
+              key={i}
+              {...defaults}
+              state={{ abi, function: 'transfer' } as never}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-9 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <FunctionCallEnterArgsStep
+            {...defaults}
+            state={{ abi, function: 'transfer' } as never}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-9 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-9 100 sequential mount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <FunctionCallEnterArgsStep {...defaults} state={{ abi, function: 'transfer' } as never} />,
+      );
+      unmount();
+    }
+  });
 });
