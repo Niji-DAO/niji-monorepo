@@ -522,4 +522,43 @@ describe('NavBarItem', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential NavBarItem mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NavBarItem>r10-{i}</NavBarItem>);
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NavBarItem key={i}>r10-i-{i}</NavBarItem>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<NavBarItem>r10-s-{i}</NavBarItem>)).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<NavBarItem>r10-m-{i}</NavBarItem>);
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential different children values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<NavBarItem>r10-c-{i}</NavBarItem>);
+      unmount();
+    }
+  });
 });
