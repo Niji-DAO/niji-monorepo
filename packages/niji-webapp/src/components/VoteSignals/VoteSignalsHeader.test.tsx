@@ -235,4 +235,43 @@ describe('VoteSignalsHeader — additional', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential VoteSignalsHeader mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteSignalsHeader />);
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteSignalsHeader key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<VoteSignalsHeader />)).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<VoteSignalsHeader isCandidate={true} />);
+      unmount();
+    }
+  });
+
+  it('round-10 100 VoteSignalsFootnote mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteSignalsFootnote />);
+      unmount();
+    }
+  });
 });
