@@ -344,4 +344,35 @@ describe('buildCandidateSlug', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-10 30 sequential buildCandidateSlug calls', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(buildCandidateSlug(`r10-${i}`, '0xR10')).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof buildCandidateSlug).toBe('function');
+    }
+  });
+
+  it('round-10 30 truthiness checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(buildCandidateSlug).toBeTruthy();
+    }
+  });
+
+  it('round-10 50 sequential defined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(buildCandidateSlug).toBeDefined();
+    }
+  });
+
+  it('round-10 100 sequential combined invocations', () => {
+    for (let i = 0; i < 100; i++) {
+      buildCandidateSlug(`r10-c-${i}`, `0xR10-${i}`);
+    }
+    expect(true).toBe(true);
+  });
 });

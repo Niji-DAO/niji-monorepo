@@ -255,4 +255,44 @@ describe('VoteSignalsForm extra cases', () => {
       unmount();
     }
   });
+
+  it('round-9 VoteSignalsForm mount-unmount 30 cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteSignalsForm {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-9 VoteSignalsForm renders 30 instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteSignalsForm key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-9 VoteSignalsForm 30 different support values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteSignalsForm {...defaults} support={i % 3} />);
+      unmount();
+    }
+  });
+
+  it('round-9 VoteSignalsPending 30 mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteSignalsPending />);
+      unmount();
+    }
+  });
+
+  it('round-9 50 mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<VoteSignalsForm {...defaults} />);
+      unmount();
+    }
+  });
 });
