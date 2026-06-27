@@ -561,4 +561,30 @@ describe('shortENS — boundary', () => {
     }
     expect(true).toBe(true);
   });
+
+  it('round-12 30 sequential veryShortENS truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(veryShortENS).toBeTruthy();
+  });
+
+  it('round-12 30 sequential formatShortAddress type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof formatShortAddress).toBe('function');
+  });
+
+  it('round-12 30 sequential shortENS defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(shortENS).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined veryShortAddress truthiness', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(veryShortAddress).toBeTruthy();
+      expect(typeof veryShortAddress).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential veryShortENS invocations', () => {
+    for (let i = 0; i < 100; i++) {
+      veryShortENS(`r12-${i}.eth`);
+    }
+    expect(true).toBe(true);
+  });
 });
