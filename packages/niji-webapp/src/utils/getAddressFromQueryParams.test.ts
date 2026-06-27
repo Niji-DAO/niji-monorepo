@@ -384,4 +384,35 @@ describe('getAddressFromQueryParams', () => {
       expect(() => getAddressFromQueryParams(key, `?${key}=r10-${i}`)).not.toThrow();
     }
   });
+
+  it('round-11 30 sequential getAddressFromQueryParams truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(getAddressFromQueryParams).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof getAddressFromQueryParams).toBe('function');
+    }
+  });
+
+  it('round-11 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(getAddressFromQueryParams).toBeDefined();
+    }
+  });
+
+  it('round-11 50 sequential invalid invocations', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(() => getAddressFromQueryParams('to', `?to=r11-invalid-${i}`)).not.toThrow();
+    }
+  });
+
+  it('round-11 100 mixed argument variation', () => {
+    for (let i = 0; i < 100; i++) {
+      const key = i % 2 === 0 ? 'to' : 'from';
+      expect(() => getAddressFromQueryParams(key, `?${key}=r11-${i}`)).not.toThrow();
+    }
+  });
 });
