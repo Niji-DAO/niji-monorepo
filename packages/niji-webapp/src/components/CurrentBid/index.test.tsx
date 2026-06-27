@@ -913,4 +913,49 @@ describe('CurrentBid', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential CurrentBid mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<CurrentBid currentBid={1n * 10n ** 18n} auctionEnded={false} />);
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CurrentBid key={i} currentBid={BigInt(i + 1) * 10n ** 18n} auctionEnded={false} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<CurrentBid currentBid={1n * 10n ** 18n} auctionEnded={false} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <CurrentBid currentBid={BigInt(i + 30000) * 10n ** 18n} auctionEnded={false} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <CurrentBid currentBid={BigInt(i + 40000) * 10n ** 18n} auctionEnded={true} />,
+      );
+      unmount();
+    }
+  });
 });
