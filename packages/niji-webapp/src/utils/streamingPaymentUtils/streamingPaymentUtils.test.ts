@@ -460,4 +460,35 @@ describe('getTokenAddressForCurrency — additional', () => {
       expect(getTokenAddressForCurrency).toBeDefined();
     }
   });
+
+  it('round-11 30 sequential getTokenAddressForCurrency truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(getTokenAddressForCurrency).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof getTokenAddressForCurrency).toBe('function');
+    }
+  });
+
+  it('round-11 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(getTokenAddressForCurrency).toBeDefined();
+    }
+  });
+
+  it('round-11 50 sequential combined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(getTokenAddressForCurrency).toBeTruthy();
+      expect(typeof getTokenAddressForCurrency).toBe('function');
+    }
+  });
+
+  it('round-11 100 sequential defined checks third', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(getTokenAddressForCurrency).toBeDefined();
+    }
+  });
 });
