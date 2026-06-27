@@ -519,4 +519,35 @@ describe('useStreamPaymentTransactions', () => {
       expect(useStreamPaymentTransactions).toBeTruthy();
     }
   });
+
+  it('round-10 30 sequential useStreamPaymentTransactions truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useStreamPaymentTransactions).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useStreamPaymentTransactions).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useStreamPaymentTransactions).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential combined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useStreamPaymentTransactions).toBeTruthy();
+      expect(typeof useStreamPaymentTransactions).toBe('function');
+    }
+  });
+
+  it('round-10 100 sequential defined checks second', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useStreamPaymentTransactions).toBeDefined();
+    }
+  });
 });

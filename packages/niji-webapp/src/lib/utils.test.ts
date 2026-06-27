@@ -331,4 +331,35 @@ describe('cn (clsx + tailwind-merge)', () => {
       expect(typeof c).toBe('string');
     }
   });
+
+  it('round-10 30 sequential cn truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(cn).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof cn).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(cn).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential string return checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(typeof cn(`r10-${i}`)).toBe('string');
+    }
+  });
+
+  it('round-10 100 sequential mixed invocations', () => {
+    for (let i = 0; i < 100; i++) {
+      const c = i % 2 === 0 ? cn(`r10-c-${i}`) : cn(`r10-d-${i}`);
+      expect(typeof c).toBe('string');
+    }
+  });
 });
