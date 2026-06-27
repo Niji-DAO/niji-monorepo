@@ -408,4 +408,29 @@ describe('Vote enum', () => {
       expect(Vote.FOR).not.toBe(Vote.SUPPORT);
     }
   });
+
+  it('round-12 30 sequential Vote truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(Vote).toBeTruthy();
+  });
+
+  it('round-12 30 sequential Vote type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof Vote).toBe('object');
+  });
+
+  it('round-12 30 sequential Vote defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(Vote).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/object', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(Vote).toBeTruthy();
+      expect(typeof Vote).toBe('object');
+    }
+  });
+
+  it('round-12 100 distinct enum values fourth', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Vote.FOR).not.toBe(Vote.ABSTAIN);
+    }
+  });
 });
