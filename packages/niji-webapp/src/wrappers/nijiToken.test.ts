@@ -786,4 +786,27 @@ describe('useNounSeed', () => {
       expect(typeof useNounTokenBalance).toBe('function');
     }
   });
+
+  it('round-12 30 sequential useNounTokenBalance truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(useNounTokenBalance).toBeTruthy();
+  });
+
+  it('round-12 30 sequential useNounTokenBalance type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof useNounTokenBalance).toBe('function');
+  });
+
+  it('round-12 30 sequential useNounTokenBalance defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(useNounTokenBalance).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useNounTokenBalance).toBeTruthy();
+      expect(typeof useNounTokenBalance).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential defined checks third', () => {
+    for (let i = 0; i < 100; i++) expect(useNounTokenBalance).toBeDefined();
+  });
 });

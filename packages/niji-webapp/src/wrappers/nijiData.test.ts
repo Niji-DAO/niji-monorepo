@@ -908,4 +908,27 @@ describe('useProposalFeedback', () => {
       expect(typeof useCreateProposalCandidate).toBe('function');
     }
   });
+
+  it('round-12 30 sequential useCreateProposalCandidate truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(useCreateProposalCandidate).toBeTruthy();
+  });
+
+  it('round-12 30 sequential useCreateProposalCandidate type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof useCreateProposalCandidate).toBe('function');
+  });
+
+  it('round-12 30 sequential useCreateProposalCandidate defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(useCreateProposalCandidate).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useCreateProposalCandidate).toBeTruthy();
+      expect(typeof useCreateProposalCandidate).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential defined checks third', () => {
+    for (let i = 0; i < 100; i++) expect(useCreateProposalCandidate).toBeDefined();
+  });
 });
