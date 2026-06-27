@@ -710,4 +710,63 @@ describe('CustomConnectkitProvider', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential CustomConnectkitProvider mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <CustomConnectkitProvider>
+          <span>r10-{i}</span>
+        </CustomConnectkitProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CustomConnectkitProvider key={i}>
+              <span>r10-i-{i}</span>
+            </CustomConnectkitProvider>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <CustomConnectkitProvider>
+            <span>r10-s-{i}</span>
+          </CustomConnectkitProvider>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <CustomConnectkitProvider>
+          <span>r10-m-{i}</span>
+        </CustomConnectkitProvider>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <CustomConnectkitProvider>
+          <span>r10-c-{i}</span>
+        </CustomConnectkitProvider>,
+      );
+      unmount();
+    }
+  });
 });
