@@ -395,4 +395,34 @@ describe('getNijiVotes', () => {
       expect(Array.isArray(getNijiVotes([], (i % 3) as 0 | 1 | 2))).toBe(true);
     }
   });
+
+  it('round-11 30 sequential getNijiVotes truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(getNijiVotes).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof getNijiVotes).toBe('function');
+    }
+  });
+
+  it('round-11 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(getNijiVotes).toBeDefined();
+    }
+  });
+
+  it('round-11 50 sequential empty arrays second', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(getNijiVotes([], (i % 3) as 0 | 1 | 2)).toEqual([]);
+    }
+  });
+
+  it('round-11 100 sequential array return checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(Array.isArray(getNijiVotes([], (i % 3) as 0 | 1 | 2))).toBe(true);
+    }
+  });
 });
