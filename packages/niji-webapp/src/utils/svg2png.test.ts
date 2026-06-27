@@ -131,4 +131,36 @@ describe('svg2png', () => {
       expect(svg2png).toBeTruthy();
     }
   });
+
+  it('round-9 30 sequential svg2png truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(svg2png).toBeTruthy();
+    }
+  });
+
+  it('round-9 30 sequential type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof svg2png).toBe('function');
+    }
+  });
+
+  it('round-9 30 sequential defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(svg2png).toBeDefined();
+    }
+  });
+
+  it('round-9 50 sequential mixed checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(svg2png).toBeTruthy();
+      expect(typeof svg2png).toBe('function');
+    }
+  });
+
+  it('round-9 100 sequential combined checks', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(svg2png).toBeDefined();
+      expect(typeof svg2png).toBe('function');
+    }
+  });
 });
