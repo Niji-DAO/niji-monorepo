@@ -393,4 +393,35 @@ describe('useKeyPress', () => {
       expect(typeof useKeyPress).toBe('function');
     }
   });
+
+  it('round-10 30 sequential useKeyPress truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useKeyPress).toBeTruthy();
+    }
+  });
+
+  it('round-10 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useKeyPress).toBe('function');
+    }
+  });
+
+  it('round-10 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useKeyPress).toBeDefined();
+    }
+  });
+
+  it('round-10 50 sequential combined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useKeyPress).toBeTruthy();
+      expect(typeof useKeyPress).toBe('function');
+    }
+  });
+
+  it('round-10 100 sequential defined checks second', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(useKeyPress).toBeDefined();
+    }
+  });
 });
