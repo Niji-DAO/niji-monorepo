@@ -1180,4 +1180,48 @@ describe('Holder', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential Holder mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<Holder nounId={BigInt(i)} />, { wrapper: WithProviders });
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <Holder key={i} nounId={BigInt(i)} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<Holder nounId={BigInt(i)} />, { wrapper: WithProviders })).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<Holder nounId={BigInt(i + 30000)} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential different nounId values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<Holder nounId={BigInt(i + 40000)} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
 });
