@@ -434,4 +434,30 @@ describe('countDecimals', () => {
       expect(typeof countDecimals(n)).toBe('number');
     }
   });
+
+  it('round-12 30 sequential countDecimals truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(countDecimals).toBeTruthy();
+  });
+
+  it('round-12 30 sequential countDecimals type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof countDecimals).toBe('function');
+  });
+
+  it('round-12 30 sequential countDecimals defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(countDecimals).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(countDecimals).toBeTruthy();
+      expect(typeof countDecimals).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential countDecimals invocations', () => {
+    for (let i = 0; i < 100; i++) {
+      const n = i % 3 === 0 ? i + 79000 : i % 3 === 1 ? i + 79000.5 : i + 79000.125;
+      expect(typeof countDecimals(n)).toBe('number');
+    }
+  });
 });

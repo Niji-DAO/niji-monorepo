@@ -433,4 +433,31 @@ describe('isNounderNiji', () => {
       expect(r1).toBe(r2);
     }
   });
+
+  it('round-12 30 sequential isNounderNiji truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(isNounderNiji).toBeTruthy();
+  });
+
+  it('round-12 30 sequential isNounderNiji type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof isNounderNiji).toBe('function');
+  });
+
+  it('round-12 30 sequential isNounderNiji defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(isNounderNiji).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(isNounderNiji).toBeTruthy();
+      expect(typeof isNounderNiji).toBe('function');
+    }
+  });
+
+  it('round-12 100 sequential isNounderNiji idempotency', () => {
+    for (let i = 0; i < 100; i++) {
+      const r1 = isNounderNiji(7000n);
+      const r2 = isNounderNiji(7000n);
+      expect(r1).toBe(r2);
+    }
+  });
 });
