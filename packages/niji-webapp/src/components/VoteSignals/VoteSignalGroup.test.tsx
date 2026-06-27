@@ -521,4 +521,49 @@ describe('VoteSignalGroup', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential VoteSignalGroup mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <VoteSignalGroup voteSignals={[]} support={(i % 3) as 0 | 1 | 2} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteSignalGroup key={i} voteSignals={[]} support={(i % 3) as 0 | 1 | 2} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<VoteSignalGroup voteSignals={[]} support={(i % 3) as 0 | 1 | 2} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<VoteSignalGroup voteSignals={[]} support={1} />);
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential alternating support values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <VoteSignalGroup voteSignals={[]} support={(i % 3) as 0 | 1 | 2} />,
+      );
+      unmount();
+    }
+  });
 });
