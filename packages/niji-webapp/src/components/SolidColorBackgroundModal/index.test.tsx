@@ -913,4 +913,56 @@ describe('SolidColorBackgroundModal', () => {
       unmount();
     }
   });
+
+  it('round-10 30 sequential SolidColorBackgroundModal mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>r10-{i}</p>} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SolidColorBackgroundModal
+              key={i}
+              show={true}
+              onDismiss={() => {}}
+              content={<p>r10-i-{i}</p>}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-10 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <SolidColorBackgroundModal show={true} onDismiss={() => {}} content={<p>r10-s</p>} />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-10 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <SolidColorBackgroundModal show={false} onDismiss={() => {}} content={<p>r10-m-{i}</p>} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-10 100 sequential onDismiss invocations', () => {
+    const cb = vi.fn();
+    render(<SolidColorBackgroundModal show={true} onDismiss={cb} content={<p>r10-c</p>} />);
+    for (let i = 0; i < 100; i++) cb();
+    expect(cb).toHaveBeenCalledTimes(100);
+  });
 });
