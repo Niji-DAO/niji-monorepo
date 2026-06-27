@@ -639,4 +639,53 @@ describe('NijiInfoRowHolder', () => {
       unmount();
     }
   });
+
+  it('round-11 30 sequential NijiInfoRowHolder mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={BigInt(i)} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('round-11 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiInfoRowHolder key={i} nounId={BigInt(i + 1)} />
+          ))}
+        </>,
+        { wrapper: WithProviders },
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-11 30 different nounId values', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={BigInt(i + 5000)} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('round-11 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={BigInt(i + 6000)} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
+
+  it('round-11 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<NijiInfoRowHolder nounId={BigInt(i + 7000)} />, {
+        wrapper: WithProviders,
+      });
+      unmount();
+    }
+  });
 });
