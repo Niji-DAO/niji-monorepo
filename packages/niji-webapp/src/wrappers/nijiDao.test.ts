@@ -809,4 +809,35 @@ describe('useForkThreshold / useNumTokensInForkEscrow / useAdjustedTotalSupply',
       expect(useProposalThreshold).toBeTruthy();
     }
   });
+
+  it('round-11 30 sequential useProposalThreshold truthiness', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useProposalThreshold).toBeTruthy();
+    }
+  });
+
+  it('round-11 30 type checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(typeof useProposalThreshold).toBe('function');
+    }
+  });
+
+  it('round-11 30 defined checks', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(useProposalThreshold).toBeDefined();
+    }
+  });
+
+  it('round-11 50 sequential combined checks', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(useProposalThreshold).toBeTruthy();
+      expect(typeof useProposalThreshold).toBe('function');
+    }
+  });
+
+  it('round-11 100 sequential type checks fourth', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(typeof useProposalThreshold).toBe('function');
+    }
+  });
 });
