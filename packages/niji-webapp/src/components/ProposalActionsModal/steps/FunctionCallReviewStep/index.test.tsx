@@ -4327,4 +4327,100 @@ describe('FunctionCallReviewStep', () => {
       unmount();
     }
   });
+
+  it('round-82 30 sequential FunctionCallReviewStep mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={{ ...baseState } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-82 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <FunctionCallReviewStep key={i} {...defaults} state={{ ...baseState } as never} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-82 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<FunctionCallReviewStep {...defaults} state={{ ...baseState } as never} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-82 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={{ ...baseState } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-82 100 sequential different address values', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = '0xR82' + i.toString(16).padStart(38, '0');
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={{ ...baseState, address: addr } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-83 30 sequential FunctionCallReviewStep mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={{ ...baseState } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-83 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <FunctionCallReviewStep key={i} {...defaults} state={{ ...baseState } as never} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-83 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<FunctionCallReviewStep {...defaults} state={{ ...baseState } as never} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-83 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={{ ...baseState } as never} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-83 100 sequential different address values', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = '0xR83' + i.toString(16).padStart(38, '0');
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={{ ...baseState, address: addr } as never} />,
+      );
+      unmount();
+    }
+  });
 });
