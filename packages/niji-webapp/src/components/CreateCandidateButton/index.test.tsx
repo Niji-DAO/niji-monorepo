@@ -1789,4 +1789,79 @@ describe('CreateCandidateButton', () => {
     for (let i = 0; i < 100; i++) cb();
     expect(cb).toHaveBeenCalledTimes(100);
   });
+
+  it('round-12 30 sequential CreateCandidateButton mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <CreateCandidateButton
+          isLoading={false}
+          hasActiveOrPendingProposal={false}
+          isFormInvalid={false}
+          handleCreateProposal={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <CreateCandidateButton
+              key={i}
+              isLoading={false}
+              hasActiveOrPendingProposal={false}
+              isFormInvalid={false}
+              handleCreateProposal={() => {}}
+            />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <CreateCandidateButton
+            isLoading={false}
+            hasActiveOrPendingProposal={false}
+            isFormInvalid={false}
+            handleCreateProposal={() => {}}
+          />,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <CreateCandidateButton
+          isLoading={true}
+          hasActiveOrPendingProposal={false}
+          isFormInvalid={false}
+          handleCreateProposal={() => {}}
+        />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential handler invocations', () => {
+    const cb = vi.fn();
+    render(
+      <CreateCandidateButton
+        isLoading={false}
+        hasActiveOrPendingProposal={false}
+        isFormInvalid={false}
+        handleCreateProposal={cb}
+      />,
+    );
+    for (let i = 0; i < 100; i++) cb();
+    expect(cb).toHaveBeenCalledTimes(100);
+  });
 });

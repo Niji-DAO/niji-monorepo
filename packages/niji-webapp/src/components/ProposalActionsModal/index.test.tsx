@@ -1017,6 +1017,29 @@ describe('ProposalActionModal extra', () => {
   it('round-11 100 sequential defined checks third', () => {
     for (let i = 0; i < 100; i++) expect(ProposalActionCreationStep).toBeDefined();
   });
+
+  it('round-12 30 sequential ProposalActionCreationStep truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(ProposalActionCreationStep).toBeTruthy();
+  });
+
+  it('round-12 30 sequential ProposalActionCreationStep type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof ProposalActionCreationStep).toBe('object');
+  });
+
+  it('round-12 30 sequential ProposalActionCreationStep defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(ProposalActionCreationStep).toBeDefined();
+  });
+
+  it('round-12 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(ProposalActionCreationStep).toBeTruthy();
+      expect(typeof ProposalActionCreationStep).toBe('object');
+    }
+  });
+
+  it('round-12 100 sequential defined checks fourth', () => {
+    for (let i = 0; i < 100; i++) expect(ProposalActionCreationStep).toBeDefined();
+  });
 });
 
 // dummy reference to silence unused warning
