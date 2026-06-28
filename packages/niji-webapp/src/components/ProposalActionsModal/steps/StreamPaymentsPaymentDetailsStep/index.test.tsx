@@ -1010,4 +1010,43 @@ describe('StreamPaymentsPaymentDetailsStep', () => {
       unmount();
     }
   });
+
+  it('round-17 30 sequential StreamPaymentsPaymentDetailsStep mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-17 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <StreamPaymentsPaymentDetailsStep key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-17 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<StreamPaymentsPaymentDetailsStep {...defaults} />)).not.toThrow();
+    }
+  });
+
+  it('round-17 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+      unmount();
+    }
+  });
+
+  it('round-17 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<StreamPaymentsPaymentDetailsStep {...defaults} />);
+      unmount();
+    }
+  });
 });
