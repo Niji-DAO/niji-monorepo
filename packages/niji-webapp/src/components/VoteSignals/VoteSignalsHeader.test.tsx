@@ -313,4 +313,43 @@ describe('VoteSignalsHeader — additional', () => {
       unmount();
     }
   });
+
+  it('round-12 30 sequential VoteSignalsHeader mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<VoteSignalsHeader />);
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <VoteSignalsHeader key={i} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential VoteSignalsFootnote renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<VoteSignalsFootnote />)).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential isCandidate=true mount-unmount cycles', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<VoteSignalsHeader isCandidate={true} />);
+      unmount();
+    }
+  });
+
+  it('round-12 100 VoteSignalsFootnote mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<VoteSignalsFootnote />);
+      unmount();
+    }
+  });
 });
