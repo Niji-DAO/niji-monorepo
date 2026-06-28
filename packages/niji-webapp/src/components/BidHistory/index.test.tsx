@@ -856,4 +856,51 @@ describe('BidHistory Component', () => {
       unmount();
     }
   });
+
+  it('round-12 30 sequential BidHistory mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <BidHistory auctionId={`${i + 100000}`} max={3} classes={mockClasses} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <BidHistory key={i} auctionId={`${i + 110000}`} max={3} classes={mockClasses} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<BidHistory auctionId={`${i + 120000}`} max={3} classes={mockClasses} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <BidHistory auctionId={`${i + 130000}`} max={3} classes={mockClasses} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential different auctionId values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <BidHistory auctionId={`${i + 140000}`} max={3} classes={mockClasses} />,
+      );
+      unmount();
+    }
+  });
 });
