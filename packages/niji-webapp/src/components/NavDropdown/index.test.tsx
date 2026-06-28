@@ -1380,4 +1380,63 @@ describe('NavDropDown', () => {
       unmount();
     }
   });
+
+  it('round-12 30 sequential NavDropDown mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <NavDropDown buttonText={`r12-m-${i}`}>
+          <span>x</span>
+        </NavDropDown>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NavDropDown key={i} buttonText={`r12-i-${i}`}>
+              <span>x</span>
+            </NavDropDown>
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(
+          <NavDropDown buttonText={`r12-s-${i}`}>
+            <span>x</span>
+          </NavDropDown>,
+        ),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <NavDropDown buttonText={`r12-m2-${i}`}>
+          <span>x</span>
+        </NavDropDown>,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential different children values', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(
+        <NavDropDown buttonText="r12-c">
+          <span>r12-c-{i}</span>
+        </NavDropDown>,
+      );
+      unmount();
+    }
+  });
 });
