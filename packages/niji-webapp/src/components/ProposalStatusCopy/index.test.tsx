@@ -750,4 +750,53 @@ describe('ProposalStatusCopy', () => {
       ).not.toThrow();
     }
   });
+
+  it('round-12 30 sequential ProposalStatusCopy mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.ACTIVE)} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <ProposalStatusCopy key={i} proposal={makeProposal(ProposalState.PENDING)} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it('round-12 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<ProposalStatusCopy proposal={makeProposal(ProposalState.ACTIVE)} />),
+      ).not.toThrow();
+    }
+  });
+
+  it('round-12 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <ProposalStatusCopy proposal={makeProposal(ProposalState.SUCCEEDED)} />,
+      );
+      unmount();
+    }
+  });
+
+  it('round-12 100 sequential rerender cycles', () => {
+    const { rerender } = render(
+      <ProposalStatusCopy proposal={makeProposal(ProposalState.ACTIVE)} />,
+    );
+    for (let i = 0; i < 100; i++) {
+      expect(() =>
+        rerender(<ProposalStatusCopy proposal={makeProposal(ProposalState.EXECUTED)} />),
+      ).not.toThrow();
+    }
+  });
 });
