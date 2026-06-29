@@ -7004,4 +7004,39 @@ describe('NijiContent', () => {
       unmount();
     }
   });
+
+  it('round-159 30 sequential NijiContent mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = wrap(<NijiContent {...defaults} />);
+      unmount();
+    }
+  });
+  it('round-159 30 renders instances variant', () => {
+    expect(() =>
+      wrap(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <NijiContent key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+  it('round-159 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => wrap(<NijiContent {...defaults} />)).not.toThrow();
+    }
+  });
+  it('round-159 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = wrap(<NijiContent {...defaults} />);
+      unmount();
+    }
+  });
+  it('round-159 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = wrap(<NijiContent {...defaults} />);
+      unmount();
+    }
+  });
 });
