@@ -6842,4 +6842,38 @@ describe('TransferFundsReviewStep', () => {
       unmount();
     }
   });
+  it('round-172 30 sequential TransferFundsReviewStep mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<TransferFundsReviewStep {...defaults} />);
+      unmount();
+    }
+  });
+  it('round-172 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <TransferFundsReviewStep key={i} {...defaults} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+  it('round-172 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<TransferFundsReviewStep {...defaults} />)).not.toThrow();
+    }
+  });
+  it('round-172 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<TransferFundsReviewStep {...defaults} />);
+      unmount();
+    }
+  });
+  it('round-172 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<TransferFundsReviewStep {...defaults} />);
+      unmount();
+    }
+  });
 });
