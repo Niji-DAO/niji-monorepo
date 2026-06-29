@@ -6886,4 +6886,38 @@ describe('SelectProposalActionStep', () => {
       unmount();
     }
   });
+  it('round-173 30 sequential SelectProposalActionStep mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(<SelectProposalActionStep {...setupProps()} />);
+      unmount();
+    }
+  });
+  it('round-173 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <SelectProposalActionStep key={i} {...setupProps()} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+  it('round-173 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() => render(<SelectProposalActionStep {...setupProps()} />)).not.toThrow();
+    }
+  });
+  it('round-173 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(<SelectProposalActionStep {...setupProps()} />);
+      unmount();
+    }
+  });
+  it('round-173 100 sequential mount-unmount cycles', () => {
+    for (let i = 0; i < 100; i++) {
+      const { unmount } = render(<SelectProposalActionStep {...setupProps()} />);
+      unmount();
+    }
+  });
 });
