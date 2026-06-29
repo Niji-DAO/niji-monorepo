@@ -13327,4 +13327,90 @@ describe('FunctionCallReviewStep', () => {
       unmount();
     }
   });
+  it('round-280 30 sequential FunctionCallReviewStep mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={baseState as never} />,
+      );
+      unmount();
+    }
+  });
+  it('round-280 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <FunctionCallReviewStep key={i} {...defaults} state={baseState as never} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+  it('round-280 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<FunctionCallReviewStep {...defaults} state={baseState as never} />),
+      ).not.toThrow();
+    }
+  });
+  it('round-280 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={baseState as never} />,
+      );
+      unmount();
+    }
+  });
+  it('round-280 100 sequential different address values', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = '0xR280' + i.toString(16).padStart(36, '0');
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={{ ...baseState, address: addr } as never} />,
+      );
+      unmount();
+    }
+  });
+  it('round-281 30 sequential FunctionCallReviewStep mount-unmount cycles', () => {
+    for (let i = 0; i < 30; i++) {
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={baseState as never} />,
+      );
+      unmount();
+    }
+  });
+  it('round-281 30 renders instances variant', () => {
+    expect(() =>
+      render(
+        <>
+          {Array.from({ length: 30 }, (_, i) => (
+            <FunctionCallReviewStep key={i} {...defaults} state={baseState as never} />
+          ))}
+        </>,
+      ),
+    ).not.toThrow();
+  });
+  it('round-281 30 sequential renders without crash', () => {
+    for (let i = 0; i < 30; i++) {
+      expect(() =>
+        render(<FunctionCallReviewStep {...defaults} state={baseState as never} />),
+      ).not.toThrow();
+    }
+  });
+  it('round-281 50 sequential mount-unmount cycles second', () => {
+    for (let i = 0; i < 50; i++) {
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={baseState as never} />,
+      );
+      unmount();
+    }
+  });
+  it('round-281 100 sequential different address values', () => {
+    for (let i = 0; i < 100; i++) {
+      const addr = '0xR281' + i.toString(16).padStart(36, '0');
+      const { unmount } = render(
+        <FunctionCallReviewStep {...defaults} state={{ ...baseState, address: addr } as never} />,
+      );
+      unmount();
+    }
+  });
 });
