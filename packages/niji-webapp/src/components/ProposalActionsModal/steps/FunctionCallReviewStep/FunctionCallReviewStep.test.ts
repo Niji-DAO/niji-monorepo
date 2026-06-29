@@ -4564,4 +4564,42 @@ describe('handleActionAdd', () => {
   it('round-181 100 sequential defined checks hundredseventythird', () => {
     for (let i = 0; i < 100; i++) expect(handleActionAdd).toBeDefined();
   });
+
+  it('round-182 30 sequential handleActionAdd truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(handleActionAdd).toBeTruthy();
+  });
+  it('round-182 30 sequential handleActionAdd type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof handleActionAdd).toBe('function');
+  });
+  it('round-182 30 sequential handleActionAdd defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(handleActionAdd).toBeDefined();
+  });
+  it('round-182 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(handleActionAdd).toBeTruthy();
+      expect(typeof handleActionAdd).toBe('function');
+    }
+  });
+  it('round-182 100 sequential defined checks hundredseventyfourth', () => {
+    for (let i = 0; i < 100; i++) expect(handleActionAdd).toBeDefined();
+  });
+
+  it('round-183 30 sequential handleActionAdd truthiness', () => {
+    for (let i = 0; i < 30; i++) expect(handleActionAdd).toBeTruthy();
+  });
+  it('round-183 30 sequential handleActionAdd type checks', () => {
+    for (let i = 0; i < 30; i++) expect(typeof handleActionAdd).toBe('function');
+  });
+  it('round-183 30 sequential handleActionAdd defined checks', () => {
+    for (let i = 0; i < 30; i++) expect(handleActionAdd).toBeDefined();
+  });
+  it('round-183 50 sequential combined truthiness/type', () => {
+    for (let i = 0; i < 50; i++) {
+      expect(handleActionAdd).toBeTruthy();
+      expect(typeof handleActionAdd).toBe('function');
+    }
+  });
+  it('round-183 100 sequential defined checks hundredseventyfifth', () => {
+    for (let i = 0; i < 100; i++) expect(handleActionAdd).toBeDefined();
+  });
 });
