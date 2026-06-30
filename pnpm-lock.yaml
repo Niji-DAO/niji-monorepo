@@ -435,7 +435,7 @@ importers:
         version: 2.3.1(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)
       '@wagmi/core':
         specifier: 'catalog:'
-        version: 2.18.0(@tanstack/query-core@5.85.3)(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(typescript@5.9.2)(use-sync-external-store@1.5.0(react@19.1.0))(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
+        version: 2.18.0(@tanstack/query-core@5.85.3)(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(typescript@5.9.2)(use-sync-external-store@1.4.0(react@19.1.0))(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
       dotenv:
         specifier: 'catalog:'
         version: 16.5.0
@@ -481,6 +481,9 @@ importers:
       '@graphprotocol/graph-ts':
         specifier: 0.38.1
         version: 0.38.1
+      '@niji/contracts':
+        specifier: workspace:*
+        version: link:../niji-contracts
       assemblyscript:
         specifier: ^0.19.23
         version: 0.19.23
@@ -546,7 +549,7 @@ importers:
         version: 6.6.3
       '@wagmi/core':
         specifier: 'catalog:'
-        version: 2.18.0(@tanstack/query-core@5.85.3)(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(typescript@5.9.2)(use-sync-external-store@1.4.0(react@19.1.0))(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
+        version: 2.18.0(@tanstack/query-core@5.85.3)(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(typescript@5.9.2)(use-sync-external-store@1.5.0(react@19.1.0))(viem@2.33.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.7)(zod@3.25.76))
       bad-words:
         specifier: ^3.0.4
         version: 3.0.4
