@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Niji DUNA is a legally recognized Decentralized Unincorporated Nonprofit Association established in Wyoming via <0/> designed to provide a robust legal framework that aligns with the decentralized nature of Niji DAO. This structure allows Niji DAO to operate with limited liability protection and legal clarity without compromising its decentralized governance ethos."
 msgstr ""
 
@@ -49,8 +49,8 @@ msgstr ""
 msgid "Update proposal"
 msgstr ""
 
-#: src/components/VoteSignals/VoteSignals.tsx
-#: src/components/VoteSignals/VoteSignals.tsx
+#: src/components/VoteSignals/VoteSignalsHeader.tsx
+#: src/components/VoteSignals/VoteSignalsHeader.tsx
 msgid "Nijis voters can cast voting signals to give proposers of pending proposals an idea of how they intend to vote and helpful guidance on proposal changes to change their vote."
 msgstr ""
 
@@ -99,7 +99,7 @@ msgstr ""
 msgid "You've already delegated to this address"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Daily Auctions"
 msgstr ""
 
@@ -160,7 +160,7 @@ msgstr ""
 msgid "Winner"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Nijis are an experimental attempt to improve the formation of on-chain avatar communities. While projects such as {cryptopunksLink} have attempted to bootstrap digital community and identity, Nijis attempt to bootstrap identity, community, governance, and a treasury that can be used by the community."
 msgstr ""
 
@@ -196,7 +196,7 @@ msgstr ""
 msgid "Compound Governance"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/GovernanceSection.tsx
 msgid "attempt to alter Niji auction cadence for the purpose of maintaining or acquiring a voting majority"
 msgstr ""
 
@@ -204,7 +204,7 @@ msgstr ""
 msgid "Delegate {availableVotes} Votes"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Learn more about the DUNA"
 msgstr ""
 
@@ -213,8 +213,8 @@ msgid "Streamed so far"
 msgstr ""
 
 #: src/components/Footer.tsx
-msgid "Map"
-msgstr ""
+#~ msgid "Map"
+#~ msgstr ""
 
 #: src/components/CandidateSponsors/OriginalSignature.tsx
 msgid "Awaiting signature"
@@ -259,7 +259,7 @@ msgstr ""
 msgid "3.5 artists, 6.5 technologists"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/GovernanceSection.tsx
 msgid "bribe voters to facilitate withdraws of the treasury for personal gain"
 msgstr ""
 
@@ -277,14 +277,14 @@ msgid "Download All"
 msgstr ""
 
 #: src/components/Banner/index.tsx
-msgid "FOREVER."
-msgstr ""
+#~ msgid "FOREVER."
+#~ msgstr ""
 
 #: src/pages/Forks/index.tsx
 msgid "There are no active forks."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/GovernanceSection.tsx
 msgid "Consequently, the Niji Foundation anticipates being the steward of the veto power until Niji DAO is ready to implement an alternative, and therefore wishes to clarify the conditions under which it would exercise this power."
 msgstr ""
 
@@ -312,7 +312,7 @@ msgstr ""
 #~ msgid "Nouns Protocol"
 #~ msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Niji artwork is in the {publicDomainLink}."
 msgstr ""
 
@@ -351,11 +351,15 @@ msgstr ""
 msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nijis voters, it can be promoted to a proposal. "
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/pages/CrystalBall/index.tsx
+msgid "現在オークション中"
+msgstr ""
+
+#: src/components/Documentation/AboutSection.tsx
 msgid "By adopting the DUNA model, Niji DAO sets a pioneering example for DAOs seeking to balance decentralized autonomy with legal certainty, further solidifying its position at the forefront of decentralized governance innovation."
 msgstr ""
 
-#: src/components/VoteSignals/VoteSignals.tsx
+#: src/components/VoteSignals/VoteSignalsForm.tsx
 msgid "Add your feedback"
 msgstr ""
 
@@ -379,7 +383,7 @@ msgstr ""
 msgid "You <0>MUST</0> maintain enough voting power to meet the proposal threshold until your proposal is executed. If you fail to do so, anyone can cancel your proposal."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/GovernanceSection.tsx
 msgid "There are unfortunately no algorithmic solutions for making these determinations in advance (if there were, the veto would not be required), and proposals must be considered on a case by case basis."
 msgstr ""
 
@@ -395,7 +399,7 @@ msgstr ""
 msgid "Settle manually"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Artwork is generative and stored directly on-chain (not IPFS)."
 msgstr ""
 
@@ -427,7 +431,7 @@ msgstr ""
 msgid "Available to withdraw"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "You can experiment with off-chain Niji generation at the {playgroundLink}."
 msgstr ""
 
@@ -470,8 +474,8 @@ msgid "You can settle manually in {0} minutes"
 msgstr ""
 
 #: src/components/NijisIntroSection/index.tsx
-msgid "Nijispot"
-msgstr ""
+#~ msgid "Nijispot"
+#~ msgstr ""
 
 #: src/pages/Candidate/index.tsx
 msgid "<0>Note: </0>This proposal candidate has been proposed onchain."
@@ -486,7 +490,7 @@ msgstr ""
 msgid "Update Delegate"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Settlement of one auction kicks off the next."
 msgstr ""
 
@@ -521,8 +525,8 @@ msgid "Delegate Update Failed"
 msgstr ""
 
 #: src/components/NijisIntroSection/index.tsx
-msgid "There's a way for everyone to get involved with Niji. From whimsical endeavors like naming a frog, to ambitious projects like constructing a giant float for the Rose Parade, or even crypto infrastructure like Prop House. Niji funds projects of all sizes and domains."
-msgstr ""
+#~ msgid "There's a way for everyone to get involved with Niji. From whimsical endeavors like naming a frog, to ambitious projects like constructing a giant float for the Rose Parade, or even crypto infrastructure like Prop House. Niji funds projects of all sizes and domains."
+#~ msgstr ""
 
 #: src/components/Footer.tsx
 #: src/pages/Forks/index.tsx
@@ -534,11 +538,11 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: src/components/CandidateSponsors/index.tsx
+#: src/components/CandidateSponsors/SponsorsList.tsx
 msgid "Sponsoring a proposal requires at least one Niji vote"
 msgstr ""
 
-#: src/components/CandidateSponsors/SignatureForm.tsx
+#: src/components/CandidateSponsors/signature/SignatureStatusOverlay.tsx
 msgid "Signature request"
 msgstr ""
 
@@ -550,7 +554,7 @@ msgstr ""
 #~ msgid "Proposal candidates can be created by anyone. If a candidate receives enough signatures by Nouns voters, it can be promoted to a proposal."
 #~ msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "The Niji Auction Contract will act as a self-sufficient Niji generation and distribution mechanism, auctioning one Niji every 24 hours, forever. 100% of auction proceeds (ETH) are automatically deposited in the Niji DAO treasury, where they are governed by Niji owners."
 msgstr ""
 
@@ -562,11 +566,11 @@ msgstr ""
 msgid "Address"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/GovernanceSection.tsx
 msgid "Governance ‘Slow Start’"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Summary"
 msgstr ""
 
@@ -592,7 +596,7 @@ msgstr ""
 msgid "Only Nijis you owned or were delegated to you before {0} are eligible to vote."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/NijidersRewardSection.tsx
 msgid "Nijider distributions don't interfere with the cadence of 24 hour auctions. Nijis are sent directly to the Nijider's Multisig, and auctions continue on schedule with the next available Niji ID."
 msgstr ""
 
@@ -649,7 +653,7 @@ msgstr ""
 msgid "Review Action Details"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Each time an auction is settled, the settlement transaction will also cause a new Niji to be minted and a new 24 hour auction to begin. "
 msgstr ""
 
@@ -657,13 +661,13 @@ msgstr ""
 msgid "Candidate Created!"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 #: src/components/NijiContent/index.tsx
 #: src/pages/Governance/index.tsx
 msgid "Niji DAO"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/NijidersRewardSection.tsx
 msgid "Nijider's Reward"
 msgstr ""
 
@@ -680,7 +684,7 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Niji DAO uses a fork of {compoundGovLink}."
 msgstr ""
 
@@ -746,7 +750,7 @@ msgstr ""
 msgid "Please try again."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "No explicit rules exist for attribute scarcity; all Nijis are equally rare."
 msgstr ""
 
@@ -779,9 +783,9 @@ msgstr ""
 msgid "Already has"
 msgstr ""
 
-#. placeholder {0}: userVoteSupport && supportText[userVoteSupport.supportDetailed].toLowerCase()
-#. placeholder {1}: userVoteSupport?.createdTimestamp && dayjs(userVoteSupport?.createdTimestamp * 1000).fromNow()
-#: src/components/VoteSignals/VoteSignals.tsx
+#. placeholder {0}: userVoteSupport && SUPPORT_TEXT[userVoteSupport.supportDetailed].toLowerCase()
+#. placeholder {1}: userVoteSupport?.createdTimestamp && dayjs(userVoteSupport.createdTimestamp * 1000).fromNow()
+#: src/components/VoteSignals/VoteSignalsUserFeedback.tsx
 msgid "You provided <0>{0}</0> feedback {1}"
 msgstr ""
 
@@ -791,7 +795,7 @@ msgstr ""
 
 #: src/components/VoteCard/index.tsx
 #: src/components/VoteModal/index.tsx
-#: src/components/VoteSignals/VoteSignals.tsx
+#: src/components/VoteSignals/VoteSignalsForm.tsx
 msgid "Against"
 msgstr ""
 
@@ -833,7 +837,7 @@ msgstr ""
 msgid "Failed to fetch"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/GovernanceSection.tsx
 msgid "unequally withdraw the treasury for personal gain"
 msgstr ""
 
@@ -850,8 +854,8 @@ msgid "Candidates submitted by community members will appear here."
 msgstr ""
 
 #: src/components/Banner/index.tsx
-msgid "ONE NOUN,"
-msgstr ""
+#~ msgid "ONE NOUN,"
+#~ msgstr ""
 
 #: src/components/ProposalActionsModal/steps/SelectProposalActionStep/index.tsx
 msgid "<0/><1>Guidelines</1><2/>• Do <3>NOT</3> request ETH to trade into USDC. Instead, request USDC directly.<4/>• Do <5>NOT</5> transfer funds externally to create an ETH or USDC stream. Instead, use the \"Stream Funds\" action.<6/><7>Supported Action Types</7><8/><9>• Transfer Funds: </9>Send USDC, ETH, or stETH.<10/><11>• Stream Funds: </11>Stream USDC or WETH over time.<12/><13>• Function Call: </13>Call a contract function."
@@ -875,7 +879,7 @@ msgstr ""
 msgid "Stream"
 msgstr ""
 
-#: src/components/VoteSignals/VoteSignals.tsx
+#: src/components/VoteSignals/VoteSignalsForm.tsx
 msgid "Submit"
 msgstr ""
 
@@ -883,7 +887,7 @@ msgstr ""
 msgid "Auction"
 msgstr ""
 
-#: src/components/CandidateSponsors/index.tsx
+#: src/components/CandidateSponsors/SponsorsHeader.tsx
 msgid "Update proposal candidates must be re-signed by the original signers."
 msgstr ""
 
@@ -915,6 +919,10 @@ msgstr ""
 #. placeholder {0}: nijisRequired !== undefined ? ( <> {nijisRequired} {threshold === 0 ? nijiSingular : nijiPlural} </> ) : ( '...' )
 #: src/pages/Governance/index.tsx
 msgid "Nijis govern <0>Niji DAO</0>. Nijis can vote on proposals or delegate their vote to a third party. A minimum of <1>{0}</1> is required to submit proposals."
+msgstr ""
+
+#: src/pages/CrystalBall/index.tsx
+msgid "※ Niji Seeder の seed 生成は keccak256(blockhash + tokenId + timestamp + prevrandao) をシードに使うため、 実際に mint される block の hash で seed が確定します。 ここでの予測は現時点 (latest block) で chain に問い合わせた view 結果なので、 実際の auction 開始 block と異なれば絵柄も変わります。"
 msgstr ""
 
 #: src/components/ByLineHoverCard/index.tsx
@@ -1000,7 +1008,7 @@ msgstr ""
 msgid "Deploy Fork"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/GovernanceSection.tsx
 msgid "The Niji Foundation considers the veto an emergency power that should not be exercised in the normal course of business. The Niji Foundation will veto proposals that introduce non-trivial legal or existential risks to the Niji DAO or the Niji Foundation, including (but not necessarily limited to) proposals that:"
 msgstr ""
 
@@ -1008,7 +1016,7 @@ msgstr ""
 msgid "View the candidate"
 msgstr ""
 
-#: src/components/CandidateSponsors/index.tsx
+#: src/components/CandidateSponsors/SponsorsHeader.tsx
 msgid "No sponsored votes needed"
 msgstr ""
 
@@ -1042,7 +1050,7 @@ msgstr ""
 msgid "<0>Delegated Niji: </0>"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "All Nijis are members of Niji DAO."
 msgstr ""
 
@@ -1051,14 +1059,14 @@ msgid "Now has"
 msgstr ""
 
 #: src/components/NijisIntroSection/index.tsx
-msgid "Build With Niji. Get Funded."
-msgstr ""
+#~ msgid "Build With Niji. Get Funded."
+#~ msgstr ""
 
 #: src/components/Winner/index.tsx
 msgid "You"
 msgstr ""
 
-#: src/components/VoteSignals/VoteSignals.tsx
+#: src/components/VoteSignals/VoteSignalsHeader.tsx
 msgid "Pre-proposal feedback"
 msgstr ""
 
@@ -1085,7 +1093,7 @@ msgstr ""
 msgid "Auction ended"
 msgstr ""
 
-#: src/components/CandidateSponsors/index.tsx
+#: src/components/CandidateSponsors/SponsorsHeader.tsx
 msgid "Proposal candidates must meet the required Nijis vote threshold."
 msgstr ""
 
@@ -1103,11 +1111,11 @@ msgstr ""
 msgid "Submit Vote"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "Niji Traits"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "Nijis are generated randomly based Ethereum block hashes. There are no 'if' statements or other rules governing Niji trait scarcity, which makes all Nijis equally rare. As of this writing, Nijis are made up of:"
 msgstr ""
 
@@ -1119,7 +1127,7 @@ msgstr ""
 #~ msgid "Nounspot"
 #~ msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/GovernanceSection.tsx
 msgid "The Niji community has undertaken a preliminary exploration of proposal veto alternatives (‘rage quit’ etc.), but it is now clear that this is a difficult problem that will require significantly more research, development and testing before a satisfactory solution can be implemented."
 msgstr ""
 
@@ -1136,7 +1144,7 @@ msgstr ""
 msgid "This proposal can be edited for "
 msgstr ""
 
-#: src/components/VoteSignals/VoteSignals.tsx
+#: src/components/VoteSignals/VoteSignalsForm.tsx
 msgid "Adding your feedback"
 msgstr ""
 
@@ -1146,8 +1154,8 @@ msgid "Any token holder can signal to fork (exit) in response to a governance pr
 msgstr ""
 
 #: src/components/NijisIntroSection/index.tsx
-msgid "From a school in Uganda to a coffee shop in LA, from a crypto hub in São Paulo to a deli in Melbourne, Niji lives wherever creative people bring ideas to life. Explore nounish people, places, and things with <0/>."
-msgstr ""
+#~ msgid "From a school in Uganda to a coffee shop in LA, from a crypto hub in São Paulo to a deli in Melbourne, Niji lives wherever creative people bring ideas to life. Explore nounish people, places, and things with <0/>."
+#~ msgstr ""
 
 #: src/components/LanguageSelectionModal/index.tsx
 msgid "Select Language"
@@ -1160,6 +1168,11 @@ msgstr ""
 
 #: src/pages/Fork/DeployForkButton.tsx
 msgid "Deploying Niji fork and beginning the forking period"
+msgstr ""
+
+#: src/components/Footer.tsx
+#: src/components/NavBar/index.tsx
+msgid "Crystal Ball"
 msgstr ""
 
 #: src/components/NavBar/index.tsx
@@ -1178,7 +1191,7 @@ msgstr ""
 msgid "Proposed Transactions"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Under Wyoming's DUNA Act, Niji DAO can hold assets, enter into contracts, and participate in legal actions in its own name. Governance remains fully decentralized, with decisions controlled exclusively by Niji holders via on-chain voting. This enables Niji DAO to sustainably fund projects, manage its treasury, and interact confidently within both the digital and physical worlds."
 msgstr ""
 
@@ -1186,7 +1199,7 @@ msgstr ""
 msgid "Review Function Call Action"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "The Niji Seeder contract is used to determine Niji traits during the minting process. The seeder contract can be replaced to allow for future trait generation algorithm upgrades. Additionally, it can be locked by the Niji DAO to prevent any future updates. Currently, Niji traits are determined using pseudo-random number generation:"
 msgstr ""
 
@@ -1208,7 +1221,7 @@ msgstr ""
 msgid "Vote on Prop {0}"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "Nijis are stored directly on Ethereum and do not utilize pointers to other networks such as IPFS. This is possible because Niji parts are compressed and stored on-chain using a custom run-length encoding (RLE), which is a form of lossless compression."
 msgstr ""
 
@@ -1216,7 +1229,7 @@ msgstr ""
 msgid "Bids"
 msgstr ""
 
-#: src/components/CandidateSponsors/SignatureForm.tsx
+#: src/components/CandidateSponsors/signature/SignatureStatusOverlay.tsx
 msgid "Submit signature"
 msgstr ""
 
@@ -1231,7 +1244,7 @@ msgstr ""
 msgid "Description"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Niji DAO utilizes a fork of {compoundGovLink} and is the main governing body of the Niji ecosystem. The Niji DAO treasury receives 100% of ETH proceeds from daily Niji auctions. Each Niji is an irrevocable member of Niji DAO and entitled to one vote in all governance matters. Niji votes are non-transferable (if you sell your Niji the vote goes with it) but delegatable, which means you can assign your vote to someone else as long as you own your Niji."
 msgstr ""
 
@@ -1239,7 +1252,7 @@ msgstr ""
 msgid "Change"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "The compressed parts are efficiently converted into a single base64 encoded SVG image on-chain. To accomplish this, each part is decoded into an intermediate format before being converted into a series of SVG rects using batched, on-chain string concatenation. Once the entire SVG has been generated, it is base64 encoded."
 msgstr ""
 
@@ -1296,7 +1309,7 @@ msgstr ""
 msgid "All traits are <0>CC0</0> (Creative Commons Zero), meaning they are in the public domain and free to use for any purpose without restriction."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Learn more below, or start creating Nijis off-chain using the {playgroundLink}."
 msgstr ""
 
@@ -1314,6 +1327,7 @@ msgstr ""
 #~ msgid "This candidate has met the required threshold, but Nouns voters can still add support until it’s put onchain."
 #~ msgstr ""
 
+#: src/components/Footer.tsx
 #: src/components/NavBar/index.tsx
 #: src/components/NavBar/index.tsx
 msgid "LP"
@@ -1324,7 +1338,9 @@ msgstr ""
 msgid "Niji DAO Fork{0}"
 msgstr ""
 
-#. placeholder {0}: isV2Prop ? i18n.number(Number(currentQuorum ?? 0)) : proposal.quorumVotes
+#. placeholder {0}: i18n.number(Number(currentQuorum ?? 0))
+#. placeholder {0}: proposal.quorumVotes
+#: src/pages/Vote/index.tsx
 #: src/pages/Vote/index.tsx
 msgid "{0} votes"
 msgstr ""
@@ -1333,11 +1349,11 @@ msgstr ""
 msgid "Withdraw from Stream <0/>"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "WTF?"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Nijiders receive rewards in the form of Nijis (10% of supply for first 5 years)."
 msgstr ""
 
@@ -1377,6 +1393,10 @@ msgstr ""
 msgid "Voted with<0>{numVotesForProp}</0>Nijis"
 msgstr ""
 
+#: src/pages/CrystalBall/index.tsx
+msgid "次に登場する Niji をブロックチェーン上の seed 生成ロジックで先取り。 現在オークション中の Niji の次から 5 体先までを予測表示します。"
+msgstr ""
+
 #: src/components/Documentation/index.tsx
 #~ msgid "Nounder distributions don't interfere with the cadence of 24 hour auctions. Nijis are sent directly to the Nounder's Multisig, and auctions continue on schedule with the next available Niji ID."
 #~ msgstr ""
@@ -1393,7 +1413,7 @@ msgstr ""
 msgid "Voted with<0>{numVotesForProp}</0>Niji"
 msgstr ""
 
-#: src/components/VoteSignals/VoteSignals.tsx
+#: src/components/VoteSignals/VoteSignalsHeader.tsx
 msgid "Pre-voting feedback"
 msgstr ""
 
@@ -1402,7 +1422,7 @@ msgstr ""
 msgid "Starts {0}"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/GovernanceSection.tsx
 msgid "The proposal veto right was initially envisioned as a temporary solution to the problem of ‘51% attacks’ on the Niji DAO treasury. While Nijiders initially believed that a healthy distribution of Nijis would be sufficient protection for the DAO, a more complete understanding of the incentives and risks has led to general consensus within the Nijiders, the Niji Foundation, and the wider community that a more robust game-theoretic solution should be implemented before the right is removed."
 msgstr ""
 
@@ -1424,7 +1444,7 @@ msgstr ""
 msgid "You've generated {0} years worth of Nijis"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/NijidersRewardSection.tsx
 msgid "Because 100% of Niji auction proceeds are sent to Niji DAO, Nijiders have chosen to compensate themselves with Nijis. Every 10th Niji for the first 5 years of the project (Niji ids #0, #10, #20, #30 and so on) will be automatically sent to the Nijider's multisig to be vested and shared among the founding members of the project."
 msgstr ""
 
@@ -1486,7 +1506,7 @@ msgstr ""
 
 #: src/components/VoteCard/index.tsx
 #: src/components/VoteModal/index.tsx
-#: src/components/VoteSignals/VoteSignals.tsx
+#: src/components/VoteSignals/VoteSignalsForm.tsx
 msgid "Abstain"
 msgstr ""
 
@@ -1517,13 +1537,13 @@ msgstr ""
 msgid "Colored Noggles"
 msgstr ""
 
-#. placeholder {0}: props.candidate.proposerVotes
-#. placeholder {1}: props.candidate.proposerVotes > 1 ? 's' : ''
-#: src/components/CandidateSponsors/index.tsx
+#. placeholder {0}: candidate.proposerVotes
+#. placeholder {1}: candidate.proposerVotes > 1 ? 's' : ''
+#: src/components/CandidateSponsors/SponsorsHeader.tsx
 msgid "Proposer has {0} vote{1}"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "On-Chain Artwork"
 msgstr ""
 
@@ -1540,10 +1560,10 @@ msgstr ""
 #~ msgstr ""
 
 #: src/components/NijisIntroSection/index.tsx
-msgid "Niji is a global community."
-msgstr ""
+#~ msgid "Niji is a global community."
+#~ msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "While settlement is most heavily incentivized for the winning bidder, it can be triggered by anyone, allowing the system to trustlessly auction Nijis as long as Ethereum is operational and there are interested bidders."
 msgstr ""
 
@@ -1572,6 +1592,10 @@ msgstr ""
 msgid "Forking"
 msgstr ""
 
+#: src/pages/CrystalBall/index.tsx
+msgid "計算中…"
+msgstr ""
+
 #: src/components/ProposalActionsModal/steps/StreamPaymentsPaymentDetailsStep/index.tsx
 msgid "Add Stream Date Details"
 msgstr ""
@@ -1592,7 +1616,7 @@ msgstr ""
 msgid "Explore traits"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/NijidersRewardSection.tsx
 msgid "'Nijiders' are the group of ten builders that initiated Niji. Here are the Nijiders:"
 msgstr ""
 
@@ -1612,11 +1636,11 @@ msgstr ""
 msgid "Token"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "The treasury is controlled exclusively by Nijis via governance."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "One Niji is trustlessly auctioned every 24 hours, forever."
 msgstr ""
 
@@ -1671,7 +1695,7 @@ msgstr ""
 msgid "Submissions are free for Nijis voters. Non-voters can submit for a {0} ETH fee."
 msgstr ""
 
-#: src/components/CandidateSponsors/index.tsx
+#: src/components/CandidateSponsors/SponsorsHeader.tsx
 msgid "This candidate has met the required threshold, but Nijis voters can still add support until it’s put onchain."
 msgstr ""
 
@@ -1707,7 +1731,7 @@ msgstr ""
 msgid "Review and Add"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "100% of Niji auction proceeds are trustlessly sent to the treasury."
 msgstr ""
 
@@ -1717,6 +1741,10 @@ msgstr ""
 
 #: src/components/NavLocaleSwitcher/index.tsx
 msgid "Language"
+msgstr ""
+
+#: src/pages/CrystalBall/index.tsx
+msgid "Niji Crystal Ball"
 msgstr ""
 
 #: src/pages/Vote/index.tsx
@@ -1775,7 +1803,7 @@ msgstr ""
 msgid "Delegate"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "Niji DUNA"
 msgstr ""
 
@@ -1796,7 +1824,7 @@ msgstr ""
 msgid "Nijiders' Reward"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/AboutSection.tsx
 msgid "One Niji is equal to one vote."
 msgstr ""
 
@@ -1804,7 +1832,7 @@ msgstr ""
 msgid "Proposal Candidate"
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/GovernanceSection.tsx
 msgid "make upgrades to critical smart contracts without undergoing an audit"
 msgstr ""
 
@@ -1816,7 +1844,7 @@ msgstr ""
 msgid "You have no Votes."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "Trait generation is not truly random. Traits can be predicted when minting a Niji on the pending block."
 msgstr ""
 
@@ -1824,13 +1852,13 @@ msgstr ""
 msgid "There was an error withdrawing to your wallet."
 msgstr ""
 
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "Niji Seeder Contract"
 msgstr ""
 
 #: src/components/VoteCard/index.tsx
 #: src/components/VoteModal/index.tsx
-#: src/components/VoteSignals/VoteSignals.tsx
+#: src/components/VoteSignals/VoteSignalsForm.tsx
 msgid "For"
 msgstr ""
 
@@ -1839,8 +1867,8 @@ msgid "Help mint the next Niji"
 msgstr ""
 
 #: src/components/NijisIntroSection/index.tsx
-msgid "One Niji, Every Day, Forever."
-msgstr ""
+#~ msgid "One Niji, Every Day, Forever."
+#~ msgstr ""
 
 #: src/components/ProposalActionsModal/steps/FunctionCallReviewStep/index.tsx
 msgid "Function"
@@ -1856,7 +1884,7 @@ msgstr ""
 
 #. placeholder {0}: humanizeTraitKey(traitKey)
 #. placeholder {1}: NijiImageData.images[traitKey].length
-#: src/components/Documentation/index.tsx
+#: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "{0} ({1})"
 msgstr ""
 
@@ -1905,12 +1933,12 @@ msgid "Proposer functions"
 msgstr ""
 
 #: src/components/NijisIntroSection/index.tsx
-msgid "Behold, an infinite work of art! Niji is a community-owned brand that makes a positive impact by funding ideas and fostering collaboration. From collectors and technologists, to non-profits and brands, Niji is for everyone."
-msgstr ""
+#~ msgid "Behold, an infinite work of art! Niji is a community-owned brand that makes a positive impact by funding ideas and fostering collaboration. From collectors and technologists, to non-profits and brands, Niji is for everyone."
+#~ msgstr ""
 
 #: src/components/Banner/index.tsx
-msgid "EVERY DAY,"
-msgstr ""
+#~ msgid "EVERY DAY,"
+#~ msgstr ""
 
 #: src/components/NijiContent/index.tsx
 msgid "Learn more"
