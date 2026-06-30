@@ -22,9 +22,14 @@ LOG_DIR := $(ROOT)/.context/dev
 ANVIL_LOG := $(LOG_DIR)/anvil.log
 WEBAPP_LOG := $(LOG_DIR)/webapp.log
 DEPLOY_LOG := $(LOG_DIR)/deploy.log
+SETTLER_LOG := $(LOG_DIR)/auto-settler.log
 ANVIL_PID := $(LOG_DIR)/anvil.pid
 WEBAPP_PID := $(LOG_DIR)/webapp.pid
+SETTLER_PID := $(LOG_DIR)/auto-settler.pid
 ANVIL_STATE := $(LOG_DIR)/anvil-state.json
+
+# anvil account #0 の private key (deterministic、 全 dev 共通)
+ANVIL_DEPLOYER_PK := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
 WEBAPP_ENV := $(ROOT)/packages/niji-webapp/.env
 WEBAPP_ENV_EXAMPLE := $(ROOT)/packages/niji-webapp/.env.example.local
@@ -32,18 +37,18 @@ WEBAPP_ENV_EXAMPLE := $(ROOT)/packages/niji-webapp/.env.example.local
 ANVIL_PORT := 8547
 WEBAPP_PORT := 2424
 
-.PHONY: help dev dev-reset dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg deploy-if-needed
+.PHONY: help dev dev-reset dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg deploy-if-needed auto-settler-bg
 
 help:
 	@echo "Niji DAO — local dev commands"
 	@echo ""
-	@echo "  make dev           anvil (--state load) + (初回のみ deploy) + webapp 並列起動 (Recommended)"
+	@echo "  make dev           anvil + (初回のみ deploy) + auto-settler + webapp 並列起動 (Recommended)"
 	@echo "  make dev-reset     anvil state を削除して fresh chain で再 deploy"
 	@echo "  make dev-sepolia   webapp のみ sepolia mode で background 起動 (anvil 不要)"
 	@echo "  make dev-fg        anvil + webapp を foreground で並列起動 (Ctrl+C で停止)"
-	@echo "  make dev-stop      background で起動した anvil + webapp を停止"
+	@echo "  make dev-stop      background で起動した anvil + auto-settler + webapp を停止"
 	@echo "  make dev-status    起動状況を確認 (PID / port listen / HTTP 応答 / state 有無)"
-	@echo "  make dev-logs      anvil / deploy / webapp log を tail -f で表示"
+	@echo "  make dev-logs      anvil / deploy / auto-settler / webapp log を tail -f で表示"
 	@echo "  make setup         pnpm install + sdk/contracts build + .env 作成"
 	@echo "  make help          このヘルプを表示"
 	@echo ""
@@ -113,6 +118,22 @@ deploy-if-needed: anvil-bg
 		echo "✅ anvil state already exists, skipping deploy (load from $(ANVIL_STATE))"; \
 	fi
 
+# anvil-auto-settler を background 起動 (5 秒 polling で auction を自動 settle)。
+# Nouns contract は自動 progress 機構を持たず、 dev では誰も settle tx を打たないため
+# auction の endTime が来ても次 auction が始まらない。 本 script で off-chain ループ補完。
+auto-settler-bg: | $(LOG_DIR)
+	@if [ -f "$(SETTLER_PID)" ] && kill -0 $$(cat $(SETTLER_PID)) 2>/dev/null; then \
+		echo "🟢 auto-settler already running (PID $$(cat $(SETTLER_PID)))"; \
+	else \
+		echo "🚀 starting auto-settler (5s poll, auto-settle auction on endTime)..."; \
+		cd $(ROOT) && DEPLOYER_PK=$(ANVIL_DEPLOYER_PK) ANVIL_RPC=http://127.0.0.1:$(ANVIL_PORT) \
+			nohup pnpm -w exec tsx packages/niji-contracts/scripts/anvil-auto-settler.ts \
+			> "$(SETTLER_LOG)" 2>&1 & \
+		echo $$! > "$(SETTLER_PID)"; \
+		sleep 1; \
+		echo "🟢 auto-settler started (PID $$(cat $(SETTLER_PID)))"; \
+	fi
+
 # webapp を background 起動。 既存プロセスがあれば再利用。
 webapp-bg: | $(LOG_DIR)
 	@if [ -f "$(WEBAPP_PID)" ] && kill -0 $$(cat $(WEBAPP_PID)) 2>/dev/null; then \
@@ -126,19 +147,20 @@ webapp-bg: | $(LOG_DIR)
 		echo "🟢 webapp started (PID $$(cat $(WEBAPP_PID)))"; \
 	fi
 
-dev: setup-env anvil-bg deploy-if-needed webapp-bg
+dev: setup-env anvil-bg deploy-if-needed auto-settler-bg webapp-bg
 	@echo ""
 	@echo "✅ dev environment ready."
 	@echo ""
-	@echo "  webapp  http://localhost:$(WEBAPP_PORT)"
-	@echo "  anvil   http://127.0.0.1:$(ANVIL_PORT) (chain 31337)"
+	@echo "  webapp        http://localhost:$(WEBAPP_PORT)"
+	@echo "  anvil         http://127.0.0.1:$(ANVIL_PORT) (chain 31337)"
+	@echo "  auto-settler  🤖 5s polling, next auction starts automatically on endTime"
 	@if [ -f "$(ANVIL_STATE)" ]; then \
-		echo "  state   $(ANVIL_STATE) ($$(du -h $(ANVIL_STATE) | cut -f1))"; \
+		echo "  state         $(ANVIL_STATE) ($$(du -h $(ANVIL_STATE) | cut -f1))"; \
 	fi
 	@echo ""
 	@echo "  make dev-logs    to tail logs"
 	@echo "  make dev-status  to check health"
-	@echo "  make dev-stop    to stop both"
+	@echo "  make dev-stop    to stop all"
 
 # state file を削除して fresh chain で再 deploy。
 # anvil + webapp を 1 度停止 → state 削除 → make dev で initial deploy 再実行。
@@ -171,6 +193,15 @@ dev-stop:
 			echo "  ⛔ webapp stopped (PID $$PID)"; \
 		fi; \
 		rm -f "$(WEBAPP_PID)"; \
+	fi
+	@if [ -f "$(SETTLER_PID)" ]; then \
+		PID=$$(cat "$(SETTLER_PID)"); \
+		if kill -0 $$PID 2>/dev/null; then \
+			pkill -P $$PID 2>/dev/null || true; \
+			kill $$PID 2>/dev/null || true; \
+			echo "  ⛔ auto-settler stopped (PID $$PID)"; \
+		fi; \
+		rm -f "$(SETTLER_PID)"; \
 	fi
 	@if [ -f "$(ANVIL_PID)" ]; then \
 		PID=$$(cat "$(ANVIL_PID)"); \
@@ -206,21 +237,26 @@ dev-status:
 		echo "  anvil   ⚪ stopped"; \
 	fi
 	@if [ -f "$(WEBAPP_PID)" ] && kill -0 $$(cat $(WEBAPP_PID)) 2>/dev/null; then \
-		echo "  webapp  🟢 running (PID $$(cat $(WEBAPP_PID)), port $(WEBAPP_PORT))"; \
-		curl -s -o /dev/null -w "          HTTP          %{http_code}\n" \
-			http://localhost:$(WEBAPP_PORT) || echo "          HTTP          no response"; \
+		echo "  webapp        🟢 running (PID $$(cat $(WEBAPP_PID)), port $(WEBAPP_PORT))"; \
+		curl -s -o /dev/null -w "                HTTP          %{http_code}\n" \
+			http://localhost:$(WEBAPP_PORT) || echo "                HTTP          no response"; \
 	else \
-		echo "  webapp  ⚪ stopped"; \
+		echo "  webapp        ⚪ stopped"; \
+	fi
+	@if [ -f "$(SETTLER_PID)" ] && kill -0 $$(cat $(SETTLER_PID)) 2>/dev/null; then \
+		echo "  auto-settler  🤖 running (PID $$(cat $(SETTLER_PID)), 5s poll)"; \
+	else \
+		echo "  auto-settler  ⚪ stopped (auction は手動 settle が必要)"; \
 	fi
 	@if [ -f "$(ANVIL_STATE)" ]; then \
-		echo "  state   📦 exists ($$(du -h $(ANVIL_STATE) | cut -f1), contracts deployed)"; \
+		echo "  state         📦 exists ($$(du -h $(ANVIL_STATE) | cut -f1), contracts deployed)"; \
 	else \
-		echo "  state   ⚪ none (next 'make dev' will deploy contracts)"; \
+		echo "  state         ⚪ none (next 'make dev' will deploy contracts)"; \
 	fi
 	@echo ""
 	@echo "  log dir  $(LOG_DIR)"
 
 dev-logs:
-	@echo "📜 tailing anvil + deploy + webapp logs (Ctrl+C to exit)..."
-	@touch "$(ANVIL_LOG)" "$(DEPLOY_LOG)" "$(WEBAPP_LOG)"
-	@tail -f "$(ANVIL_LOG)" "$(DEPLOY_LOG)" "$(WEBAPP_LOG)"
+	@echo "📜 tailing anvil + deploy + auto-settler + webapp logs (Ctrl+C to exit)..."
+	@touch "$(ANVIL_LOG)" "$(DEPLOY_LOG)" "$(SETTLER_LOG)" "$(WEBAPP_LOG)"
+	@tail -f "$(ANVIL_LOG)" "$(DEPLOY_LOG)" "$(SETTLER_LOG)" "$(WEBAPP_LOG)"
