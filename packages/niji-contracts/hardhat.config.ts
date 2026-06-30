@@ -87,6 +87,7 @@ const config: HardhatUserConfig = {
   abiExporter: {
     path: './abi',
     clear: true,
+    runOnCompile: true,
   },
   typechain: {
     outDir: './typechain',
