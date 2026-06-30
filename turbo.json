@@ -21,6 +21,10 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", "build/**", ".next/**", "!.next/cache/**"]
     },
+    "@niji/contracts#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "abi/**", "artifacts/**", "typechain/**", "cache/**"]
+    },
     "test": {
       "dependsOn": ["build"],
       "outputs": [],
