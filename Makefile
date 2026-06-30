@@ -1,10 +1,13 @@
 # Niji DAO monorepo — local dev orchestration
 #
-# 1 つの make コマンドで anvil + webapp を並列起動する。
+# 1 つの make コマンドで anvil + contract deploy + webapp を並列起動する。
+# anvil --state で chain state を .context/dev/anvil-state.json に dump/load し、
+# 2 回目以降の make dev は deploy/populate を skip して state load で一瞬復元 (~1 秒)。
 # log は .context/dev/ 配下、 PID 管理で停止 / restart も 1 コマンド。
 #
 # Quickstart:
-#   make dev           # anvil + webapp を bg 並列起動 (chain 31337、 推奨)
+#   make dev           # anvil --state load + (初回のみ deploy) + webapp 並列起動 (Recommended)
+#   make dev-reset     # state file 削除 + 再 deploy で fresh chain 再構築
 #   make dev-sepolia   # webapp のみ sepolia mode で bg 起動 (anvil 不要)
 #   make dev-fg        # anvil + webapp を foreground 並列起動 (Ctrl+C で同時停止)
 #   make dev-stop      # bg で起動した anvil + webapp を停止
@@ -18,8 +21,10 @@ ROOT := $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 LOG_DIR := $(ROOT)/.context/dev
 ANVIL_LOG := $(LOG_DIR)/anvil.log
 WEBAPP_LOG := $(LOG_DIR)/webapp.log
+DEPLOY_LOG := $(LOG_DIR)/deploy.log
 ANVIL_PID := $(LOG_DIR)/anvil.pid
 WEBAPP_PID := $(LOG_DIR)/webapp.pid
+ANVIL_STATE := $(LOG_DIR)/anvil-state.json
 
 WEBAPP_ENV := $(ROOT)/packages/niji-webapp/.env
 WEBAPP_ENV_EXAMPLE := $(ROOT)/packages/niji-webapp/.env.example.local
@@ -27,23 +32,28 @@ WEBAPP_ENV_EXAMPLE := $(ROOT)/packages/niji-webapp/.env.example.local
 ANVIL_PORT := 8547
 WEBAPP_PORT := 2424
 
-.PHONY: help dev dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg
+.PHONY: help dev dev-reset dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg deploy-if-needed
 
 help:
 	@echo "Niji DAO — local dev commands"
 	@echo ""
-	@echo "  make dev           anvil + webapp を background で並列起動 (chain 31337)"
+	@echo "  make dev           anvil (--state load) + (初回のみ deploy) + webapp 並列起動 (Recommended)"
+	@echo "  make dev-reset     anvil state を削除して fresh chain で再 deploy"
 	@echo "  make dev-sepolia   webapp のみ sepolia mode で background 起動 (anvil 不要)"
 	@echo "  make dev-fg        anvil + webapp を foreground で並列起動 (Ctrl+C で停止)"
 	@echo "  make dev-stop      background で起動した anvil + webapp を停止"
-	@echo "  make dev-status    起動状況を確認 (PID / port listen / HTTP 応答)"
-	@echo "  make dev-logs      anvil / webapp log を tail -f で表示"
+	@echo "  make dev-status    起動状況を確認 (PID / port listen / HTTP 応答 / state 有無)"
+	@echo "  make dev-logs      anvil / deploy / webapp log を tail -f で表示"
 	@echo "  make setup         pnpm install + sdk/contracts build + .env 作成"
 	@echo "  make help          このヘルプを表示"
 	@echo ""
 	@echo "URL:"
 	@echo "  webapp  http://localhost:$(WEBAPP_PORT)"
 	@echo "  anvil   http://127.0.0.1:$(ANVIL_PORT) (chain id 31337)"
+	@echo ""
+	@echo "State:"
+	@echo "  state file  $(ANVIL_STATE)"
+	@echo "  初回起動時に deploy-niji-full が走り、 以降は anvil --state で 1 秒復元"
 
 setup: install build setup-env
 	@echo "✅ setup complete. run 'make dev' to start."
@@ -69,16 +79,38 @@ $(LOG_DIR):
 	@mkdir -p $(LOG_DIR)
 
 # anvil を background 起動。 既存プロセスがあれば再利用。
+# --state で chain state を $(ANVIL_STATE) に dump/load (load + 終了時 dump + 5 秒間隔の定期 dump)。
+# state file が存在すれば deploy 済 contract をそのまま load、 不存在なら fresh chain で起動。
 anvil-bg: | $(LOG_DIR)
 	@if [ -f "$(ANVIL_PID)" ] && kill -0 $$(cat $(ANVIL_PID)) 2>/dev/null; then \
 		echo "🟢 anvil already running (PID $$(cat $(ANVIL_PID)))"; \
 	else \
-		echo "🚀 starting anvil on :$(ANVIL_PORT) (chain 31337)..."; \
+		if [ -f "$(ANVIL_STATE)" ]; then \
+			echo "🚀 starting anvil on :$(ANVIL_PORT) (chain 31337, state load from $(ANVIL_STATE))..."; \
+		else \
+			echo "🚀 starting anvil on :$(ANVIL_PORT) (chain 31337, fresh state)..."; \
+		fi; \
 		nohup anvil --port $(ANVIL_PORT) --chain-id 31337 --host 127.0.0.1 \
+			--state "$(ANVIL_STATE)" --state-interval 5 \
 			> "$(ANVIL_LOG)" 2>&1 & \
 		echo $$! > "$(ANVIL_PID)"; \
 		sleep 1; \
 		echo "🟢 anvil started (PID $$(cat $(ANVIL_PID)))"; \
+	fi
+
+# state file が無ければ deploy-niji-full を実行して contract を deploy + populate。
+# state file 存在時は skip (= 既に deploy 済の chain を load しているため)。
+deploy-if-needed: anvil-bg
+	@if [ ! -f "$(ANVIL_STATE)" ] || [ ! -s "$(ANVIL_STATE)" ]; then \
+		echo "🔨 first run — deploying contracts (deploy-niji-full + populate + ownership)..."; \
+		echo "⏳ this takes ~30-60s, subsequent 'make dev' will load from state in ~1s"; \
+		cd $(ROOT)/packages/niji-contracts && pnpm hardhat deploy-niji-full --network localhost \
+			> "$(DEPLOY_LOG)" 2>&1 && echo "✅ contracts deployed (log: $(DEPLOY_LOG))" \
+			|| (echo "❌ deploy failed, see $(DEPLOY_LOG)"; exit 1); \
+		echo "⏳ waiting 6s for anvil state dump (state-interval=5)..."; \
+		sleep 6; \
+	else \
+		echo "✅ anvil state already exists, skipping deploy (load from $(ANVIL_STATE))"; \
 	fi
 
 # webapp を background 起動。 既存プロセスがあれば再利用。
@@ -94,16 +126,26 @@ webapp-bg: | $(LOG_DIR)
 		echo "🟢 webapp started (PID $$(cat $(WEBAPP_PID)))"; \
 	fi
 
-dev: setup-env anvil-bg webapp-bg
+dev: setup-env anvil-bg deploy-if-needed webapp-bg
 	@echo ""
 	@echo "✅ dev environment ready."
 	@echo ""
 	@echo "  webapp  http://localhost:$(WEBAPP_PORT)"
 	@echo "  anvil   http://127.0.0.1:$(ANVIL_PORT) (chain 31337)"
+	@if [ -f "$(ANVIL_STATE)" ]; then \
+		echo "  state   $(ANVIL_STATE) ($$(du -h $(ANVIL_STATE) | cut -f1))"; \
+	fi
 	@echo ""
 	@echo "  make dev-logs    to tail logs"
 	@echo "  make dev-status  to check health"
 	@echo "  make dev-stop    to stop both"
+
+# state file を削除して fresh chain で再 deploy。
+# anvil + webapp を 1 度停止 → state 削除 → make dev で initial deploy 再実行。
+dev-reset: dev-stop
+	@echo "🗑️  removing anvil state ($(ANVIL_STATE))..."
+	@rm -f "$(ANVIL_STATE)"
+	@echo "✅ state removed. run 'make dev' to re-deploy from fresh chain."
 
 dev-sepolia: setup-env webapp-bg
 	@echo ""
@@ -170,10 +212,15 @@ dev-status:
 	else \
 		echo "  webapp  ⚪ stopped"; \
 	fi
+	@if [ -f "$(ANVIL_STATE)" ]; then \
+		echo "  state   📦 exists ($$(du -h $(ANVIL_STATE) | cut -f1), contracts deployed)"; \
+	else \
+		echo "  state   ⚪ none (next 'make dev' will deploy contracts)"; \
+	fi
 	@echo ""
 	@echo "  log dir  $(LOG_DIR)"
 
 dev-logs:
-	@echo "📜 tailing anvil + webapp logs (Ctrl+C to exit)..."
-	@touch "$(ANVIL_LOG)" "$(WEBAPP_LOG)"
-	@tail -f "$(ANVIL_LOG)" "$(WEBAPP_LOG)"
+	@echo "📜 tailing anvil + deploy + webapp logs (Ctrl+C to exit)..."
+	@touch "$(ANVIL_LOG)" "$(DEPLOY_LOG)" "$(WEBAPP_LOG)"
+	@tail -f "$(ANVIL_LOG)" "$(DEPLOY_LOG)" "$(WEBAPP_LOG)"
