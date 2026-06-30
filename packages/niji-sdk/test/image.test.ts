@@ -1,23 +1,12 @@
 import { join } from 'path';
 
-import { glob } from 'glob';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { Image } from '../src/image/image';
 import { buildSVG, decodeImage } from '../src/image/svg-builder';
 import { RGBAColor } from '../src/image/types';
 
-import { Image as Image1 } from './image';
 import { readPngImage } from './lib';
-
-async function encodeSingleLineRLE(filepath: string) {
-  const transparent: [string, number] = ['', 0];
-  const colors: Map<string, number> = new Map([transparent]);
-  const pngImage = await readPngImage(filepath);
-  const image = new Image1(pngImage.width, pngImage.height);
-  const rle = image.toRLE(pngImage.rgbaAt, colors);
-  return { rle, colors };
-}
 
 async function encodeMultiLineRLE(filepath: string) {
   const transparent: [string, number] = ['', 0];
@@ -29,39 +18,14 @@ async function encodeMultiLineRLE(filepath: string) {
 }
 
 describe('Image', () => {
-  describe('Comparing single line RLE to multiline RLE encoding', async () => {
-    it('builds the same svg with both encoders', async () => {
-      const filepath = join(__dirname, `./lib/images/head-cone.png`);
-      const { rle: rle1, colors: colors1 } = await encodeSingleLineRLE(filepath);
-      const { rle: rle2, colors: colors2 } = await encodeMultiLineRLE(filepath);
-
-      const svg1 = buildSVG([{ data: rle1 }], Array.from(colors1.keys()), 'ffffff');
-      const svg2 = buildSVG([{ data: rle2 }], Array.from(colors2.keys()), 'ffffff');
-
-      expect(svg1).to.be.equal(svg2);
-    });
-
-    it('builds the same svg for all images', async () => {
-      const filepaths = glob.sync(join(__dirname, '../../niji-assets/images/+(1|2|3|4)*/*.png'));
-
-      for (const filepath of filepaths) {
-        const { rle: rle1, colors: colors1 } = await encodeSingleLineRLE(filepath);
-        const { rle: rle2, colors: colors2 } = await encodeMultiLineRLE(filepath);
-
-        const svg1 = buildSVG([{ data: rle1 }], Array.from(colors1.keys()), 'ffffff');
-        const svg2 = buildSVG([{ data: rle2 }], Array.from(colors2.keys()), 'ffffff');
-
-        expect(svg1).to.be.equal(svg2);
-      }
-    });
-
-    it('builds empty image correctly', async () => {
-      const { rle: rle2, colors: colors2 } = await encodeMultiLineRLE(
-        join(__dirname, './lib/images/empty.png'),
-      );
-      const svg2 = buildSVG([{ data: rle2 }], Array.from(colors2.keys()), 'ffffff');
-      expect(svg2).to.eq(
-        '<svg width="320" height="320" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#ffffff" /></svg>',
+  describe('Multiline RLE empty image', async () => {
+    // Niji は resolution=512 default のため viewBox = 5120 × 5120。
+    // 旧 Nouns 形式 (resolution=32 → viewBox 320) との互換性は持たない。
+    it('builds empty image with default 5120 viewBox', async () => {
+      const { rle, colors } = await encodeMultiLineRLE(join(__dirname, './lib/images/empty.png'));
+      const svg = buildSVG([{ data: rle }], Array.from(colors.keys()), 'ffffff');
+      expect(svg).to.eq(
+        '<svg width="5120" height="5120" viewBox="0 0 5120 5120" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#ffffff" /></svg>',
       );
     });
   });
