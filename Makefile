@@ -85,18 +85,21 @@ $(LOG_DIR):
 
 # anvil を background 起動。 既存プロセスがあれば再利用。
 # --state で chain state を $(ANVIL_STATE) に dump/load (load + 終了時 dump + 5 秒間隔の定期 dump)。
+# --block-time 1 で 1 秒間隔の自動 block mining を有効化 (auto-settler が endTime 経過検知 →
+# settle tx 送信 → 次 auction 開始 chain が回るために必須、 default の on-demand mining では
+# block timestamp が進まず auction endTime に永遠到達しないため)。
 # state file が存在すれば deploy 済 contract をそのまま load、 不存在なら fresh chain で起動。
 anvil-bg: | $(LOG_DIR)
 	@if [ -f "$(ANVIL_PID)" ] && kill -0 $$(cat $(ANVIL_PID)) 2>/dev/null; then \
 		echo "🟢 anvil already running (PID $$(cat $(ANVIL_PID)))"; \
 	else \
 		if [ -f "$(ANVIL_STATE)" ]; then \
-			echo "🚀 starting anvil on :$(ANVIL_PORT) (chain 31337, state load from $(ANVIL_STATE))..."; \
+			echo "🚀 starting anvil on :$(ANVIL_PORT) (chain 31337, state load from $(ANVIL_STATE), block-time 1s)..."; \
 		else \
-			echo "🚀 starting anvil on :$(ANVIL_PORT) (chain 31337, fresh state)..."; \
+			echo "🚀 starting anvil on :$(ANVIL_PORT) (chain 31337, fresh state, block-time 1s)..."; \
 		fi; \
 		nohup anvil --port $(ANVIL_PORT) --chain-id 31337 --host 127.0.0.1 \
-			--state "$(ANVIL_STATE)" --state-interval 5 \
+			--state "$(ANVIL_STATE)" --state-interval 5 --block-time 1 \
 			> "$(ANVIL_LOG)" 2>&1 & \
 		echo $$! > "$(ANVIL_PID)"; \
 		sleep 1; \
