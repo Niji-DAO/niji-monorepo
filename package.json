@@ -11,7 +11,7 @@
     "format": "NODE_OPTIONS=--max_old_space_size=16384 prettier --write 'packages/**/*.{ts(x)?,sol,md,css,json}' '!**/typechain/**'",
     "lint": "eslint --cache --cache-location .cache/.eslintcache",
     "prepare": "husky",
-    "test": "turbo run test"
+    "test": "turbo run test --concurrency=1"
   },
   "devDependencies": {
     "@eslint-react/eslint-plugin": "^2.13.0",
@@ -66,13 +66,13 @@
       "unix-dgram"
     ],
     "overrides": {
-      "@typescript-eslint/utils": ">=8.56.0",
       "@babel/traverse": ">=7.23.2",
       "@openzeppelin/contracts": "4.4.0",
       "@openzeppelin/contracts-upgradeable": "4.4.0",
       "@openzeppelin/hardhat-upgrades": ">=3.9.1",
       "@openzeppelin/upgrades-core": ">=1.42.0",
       "@types/node": "catalog:",
+      "@typescript-eslint/utils": ">=8.56.0",
       "async": ">=2.6.4",
       "axios": ">=0.30.0",
       "braces": ">=3.0.3",
