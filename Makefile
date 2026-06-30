@@ -18,8 +18,10 @@ ROOT := $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 LOG_DIR := $(ROOT)/.context/dev
 ANVIL_LOG := $(LOG_DIR)/anvil.log
 WEBAPP_LOG := $(LOG_DIR)/webapp.log
+HARDHAT_LOG := $(LOG_DIR)/hardhat.log
 ANVIL_PID := $(LOG_DIR)/anvil.pid
 WEBAPP_PID := $(LOG_DIR)/webapp.pid
+HARDHAT_PID := $(LOG_DIR)/hardhat.pid
 
 WEBAPP_ENV := $(ROOT)/packages/niji-webapp/.env
 WEBAPP_ENV_EXAMPLE := $(ROOT)/packages/niji-webapp/.env.example.local
@@ -27,23 +29,25 @@ WEBAPP_ENV_EXAMPLE := $(ROOT)/packages/niji-webapp/.env.example.local
 ANVIL_PORT := 8547
 WEBAPP_PORT := 2424
 
-.PHONY: help dev dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg
+.PHONY: help dev dev-full dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg hardhat-bg
 
 help:
 	@echo "Niji DAO — local dev commands"
 	@echo ""
-	@echo "  make dev           anvil + webapp を background で並列起動 (chain 31337)"
+	@echo "  make dev-full      hardhat node + contract deploy/populate + webapp を 1 cmd 起動 (Recommended)"
+	@echo "  make dev           anvil + webapp を background で並列起動 (chain 31337、 contract 未 deploy)"
 	@echo "  make dev-sepolia   webapp のみ sepolia mode で background 起動 (anvil 不要)"
 	@echo "  make dev-fg        anvil + webapp を foreground で並列起動 (Ctrl+C で停止)"
-	@echo "  make dev-stop      background で起動した anvil + webapp を停止"
+	@echo "  make dev-stop      background で起動した anvil / hardhat node / webapp を停止"
 	@echo "  make dev-status    起動状況を確認 (PID / port listen / HTTP 応答)"
-	@echo "  make dev-logs      anvil / webapp log を tail -f で表示"
+	@echo "  make dev-logs      anvil / hardhat / webapp log を tail -f で表示"
 	@echo "  make setup         pnpm install + sdk/contracts build + .env 作成"
 	@echo "  make help          このヘルプを表示"
 	@echo ""
 	@echo "URL:"
-	@echo "  webapp  http://localhost:$(WEBAPP_PORT)"
-	@echo "  anvil   http://127.0.0.1:$(ANVIL_PORT) (chain id 31337)"
+	@echo "  webapp        http://localhost:$(WEBAPP_PORT)"
+	@echo "  anvil         http://127.0.0.1:$(ANVIL_PORT) (chain id 31337、 make dev 経路)"
+	@echo "  hardhat node  http://127.0.0.1:8545 (chain id 31337、 make dev-full 経路)"
 
 setup: install build setup-env
 	@echo "✅ setup complete. run 'make dev' to start."
@@ -105,6 +109,32 @@ dev: setup-env anvil-bg webapp-bg
 	@echo "  make dev-status  to check health"
 	@echo "  make dev-stop    to stop both"
 
+# hardhat node + contract 完全初期化 + webapp を 1 cmd で起動。
+# pnpm task:run-local が hardhat node を内包して deploy + populate + ownership transfer を全自動実行する。
+hardhat-bg: | $(LOG_DIR)
+	@if [ -f "$(HARDHAT_PID)" ] && kill -0 $$(cat $(HARDHAT_PID)) 2>/dev/null; then \
+		echo "🟢 hardhat node (run-local) already running (PID $$(cat $(HARDHAT_PID)))"; \
+	else \
+		echo "🚀 starting hardhat node + deploy + populate (chain 31337, port 8545)..."; \
+		cd $(ROOT) && nohup pnpm --filter @niji/contracts task:run-local \
+			> "$(HARDHAT_LOG)" 2>&1 & \
+		echo $$! > "$(HARDHAT_PID)"; \
+		echo "⏳ waiting for hardhat node + contract deploy/populate (~30-60s)..."; \
+		sleep 30; \
+		echo "🟢 hardhat node started (PID $$(cat $(HARDHAT_PID)))"; \
+	fi
+
+dev-full: setup-env hardhat-bg webapp-bg
+	@echo ""
+	@echo "✅ full dev environment ready (hardhat node + contracts deployed + webapp)."
+	@echo ""
+	@echo "  webapp        http://localhost:$(WEBAPP_PORT)"
+	@echo "  hardhat node  http://127.0.0.1:8545 (chain 31337)"
+	@echo ""
+	@echo "  make dev-logs    to tail logs (hardhat + webapp)"
+	@echo "  make dev-status  to check health"
+	@echo "  make dev-stop    to stop all"
+
 dev-sepolia: setup-env webapp-bg
 	@echo ""
 	@echo "✅ webapp running in sepolia mode."
@@ -130,6 +160,15 @@ dev-stop:
 		fi; \
 		rm -f "$(WEBAPP_PID)"; \
 	fi
+	@if [ -f "$(HARDHAT_PID)" ]; then \
+		PID=$$(cat "$(HARDHAT_PID)"); \
+		if kill -0 $$PID 2>/dev/null; then \
+			pkill -P $$PID 2>/dev/null || true; \
+			kill $$PID 2>/dev/null || true; \
+			echo "  ⛔ hardhat node stopped (PID $$PID)"; \
+		fi; \
+		rm -f "$(HARDHAT_PID)"; \
+	fi
 	@if [ -f "$(ANVIL_PID)" ]; then \
 		PID=$$(cat "$(ANVIL_PID)"); \
 		if kill -0 $$PID 2>/dev/null; then \
@@ -149,31 +188,45 @@ dev-stop:
 		echo "$$ANVIL_PIDS" | xargs kill 2>/dev/null || true; \
 		echo "  ⛔ killed lingering anvil listeners on :$(ANVIL_PORT)"; \
 	fi
+	@HARDHAT_PIDS=$$(lsof -nP -iTCP:8545 -sTCP:LISTEN -t 2>/dev/null); \
+	if [ -n "$$HARDHAT_PIDS" ]; then \
+		echo "$$HARDHAT_PIDS" | xargs kill 2>/dev/null || true; \
+		echo "  ⛔ killed lingering hardhat node listeners on :8545"; \
+	fi
 	@echo "✅ stopped."
 
 dev-status:
 	@echo "🔍 dev status:"
 	@echo ""
 	@if [ -f "$(ANVIL_PID)" ] && kill -0 $$(cat $(ANVIL_PID)) 2>/dev/null; then \
-		echo "  anvil   🟢 running (PID $$(cat $(ANVIL_PID)), port $(ANVIL_PORT))"; \
-		curl -s -o /dev/null -w "          eth_chainId   %{http_code}\n" \
+		echo "  anvil         🟢 running (PID $$(cat $(ANVIL_PID)), port $(ANVIL_PORT))"; \
+		curl -s -o /dev/null -w "                eth_chainId   %{http_code}\n" \
 			-X POST -H "Content-Type: application/json" \
 			--data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' \
-			http://127.0.0.1:$(ANVIL_PORT) || echo "          eth_chainId   no response"; \
+			http://127.0.0.1:$(ANVIL_PORT) || echo "                eth_chainId   no response"; \
 	else \
-		echo "  anvil   ⚪ stopped"; \
+		echo "  anvil         ⚪ stopped"; \
+	fi
+	@if [ -f "$(HARDHAT_PID)" ] && kill -0 $$(cat $(HARDHAT_PID)) 2>/dev/null; then \
+		echo "  hardhat node  🟢 running (PID $$(cat $(HARDHAT_PID)), port 8545)"; \
+		curl -s -o /dev/null -w "                eth_chainId   %{http_code}\n" \
+			-X POST -H "Content-Type: application/json" \
+			--data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' \
+			http://127.0.0.1:8545 || echo "                eth_chainId   no response"; \
+	else \
+		echo "  hardhat node  ⚪ stopped"; \
 	fi
 	@if [ -f "$(WEBAPP_PID)" ] && kill -0 $$(cat $(WEBAPP_PID)) 2>/dev/null; then \
-		echo "  webapp  🟢 running (PID $$(cat $(WEBAPP_PID)), port $(WEBAPP_PORT))"; \
-		curl -s -o /dev/null -w "          HTTP          %{http_code}\n" \
-			http://localhost:$(WEBAPP_PORT) || echo "          HTTP          no response"; \
+		echo "  webapp        🟢 running (PID $$(cat $(WEBAPP_PID)), port $(WEBAPP_PORT))"; \
+		curl -s -o /dev/null -w "                HTTP          %{http_code}\n" \
+			http://localhost:$(WEBAPP_PORT) || echo "                HTTP          no response"; \
 	else \
-		echo "  webapp  ⚪ stopped"; \
+		echo "  webapp        ⚪ stopped"; \
 	fi
 	@echo ""
 	@echo "  log dir  $(LOG_DIR)"
 
 dev-logs:
-	@echo "📜 tailing anvil + webapp logs (Ctrl+C to exit)..."
-	@touch "$(ANVIL_LOG)" "$(WEBAPP_LOG)"
-	@tail -f "$(ANVIL_LOG)" "$(WEBAPP_LOG)"
+	@echo "📜 tailing anvil + hardhat + webapp logs (Ctrl+C to exit)..."
+	@touch "$(ANVIL_LOG)" "$(HARDHAT_LOG)" "$(WEBAPP_LOG)"
+	@tail -f "$(ANVIL_LOG)" "$(HARDHAT_LOG)" "$(WEBAPP_LOG)"
