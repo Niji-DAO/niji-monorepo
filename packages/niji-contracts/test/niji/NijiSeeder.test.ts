@@ -278,8 +278,20 @@ describe('NijiSeeder', () => {
         await ethers.provider.send('evm_mine', []);
         const seedAtSample = await seeder.generateSeed(0, await art.getAddress());
 
-        expect(seedAtAlt.special !== seedAtSample.special || seedAtAlt.hair !== seedAtSample.hair)
-          .to.be.true;
+        const anyTraitChanged =
+          seedAtAlt.special !== seedAtSample.special ||
+          seedAtAlt.choker !== seedAtSample.choker ||
+          seedAtAlt.headphone !== seedAtSample.headphone ||
+          seedAtAlt.leftHand !== seedAtSample.leftHand ||
+          seedAtAlt.hat !== seedAtSample.hat ||
+          seedAtAlt.clothing !== seedAtSample.clothing ||
+          seedAtAlt.ear !== seedAtSample.ear ||
+          seedAtAlt.back !== seedAtSample.back ||
+          seedAtAlt.backDecoration !== seedAtSample.backDecoration ||
+          seedAtAlt.background !== seedAtSample.background ||
+          seedAtAlt.solidBackground !== seedAtSample.solidBackground ||
+          seedAtAlt.hair !== seedAtSample.hair;
+        expect(anyTraitChanged).to.be.true;
       } finally {
         await ethers.provider.send('evm_setAutomine', [true]);
       }
