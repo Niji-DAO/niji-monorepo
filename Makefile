@@ -6,15 +6,16 @@
 # log は .context/dev/ 配下、 PID 管理で停止 / restart も 1 コマンド。
 #
 # Quickstart:
-#   make dev           # anvil --state load + (初回のみ deploy) + webapp 並列起動 (Recommended)
-#   make dev-fresh     # dev-stop + state 削除 + fresh chain で make dev = 一から見たい時
-#   make dev-reset     # state 削除のみ (次 make dev で fresh chain)
+#   make dev           # anvil (fresh chain) + deploy + auto-settler + webapp を並列起動 (Recommended)
+#   make dev-stop      # anvil + auto-settler + webapp を graceful shutdown + state 削除
 #   make dev-sepolia   # webapp のみ sepolia mode で bg 起動 (anvil 不要)
 #   make dev-fg        # anvil + webapp を foreground 並列起動 (Ctrl+C で同時停止)
-#   make dev-stop      # bg で起動した anvil + webapp を graceful shutdown
 #   make dev-status    # 起動状況を確認
 #   make dev-logs      # log を tail -f で表示
 #   make help          # コマンド一覧表示
+#
+# make dev-stop && make dev = 常に fresh chain (dev-stop で state 削除するため)。
+# 起動中 anvil を残したまま再起動したい場合は make dev-stop を挟まず直接 make dev を実行 (state 残る)。
 
 SHELL := /bin/bash
 ROOT := $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
@@ -38,21 +39,21 @@ WEBAPP_ENV_EXAMPLE := $(ROOT)/packages/niji-webapp/.env.example.local
 ANVIL_PORT := 8547
 WEBAPP_PORT := 2424
 
-.PHONY: help dev dev-fresh dev-reset dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg deploy-if-needed auto-settler-bg
+.PHONY: help dev dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg deploy-if-needed auto-settler-bg
 
 help:
 	@echo "Niji DAO — local dev commands"
 	@echo ""
-	@echo "  make dev           anvil + (初回のみ deploy) + auto-settler + webapp 並列起動 (Recommended)"
-	@echo "  make dev-fresh     dev-stop + state 削除 + fresh chain で make dev (= 一から見たい時)"
-	@echo "  make dev-reset     anvil state を削除して fresh chain で再 deploy (次 make dev 待ち)"
+	@echo "  make dev           anvil + deploy + auto-settler + webapp 並列起動 (Recommended)"
+	@echo "  make dev-stop      anvil + auto-settler + webapp を graceful shutdown + state 削除"
 	@echo "  make dev-sepolia   webapp のみ sepolia mode で background 起動 (anvil 不要)"
 	@echo "  make dev-fg        anvil + webapp を foreground で並列起動 (Ctrl+C で停止)"
-	@echo "  make dev-stop      background で起動した anvil + auto-settler + webapp を graceful shutdown"
 	@echo "  make dev-status    起動状況を確認 (PID / port listen / HTTP 応答 / state 有無)"
 	@echo "  make dev-logs      anvil / deploy / auto-settler / webapp log を tail -f で表示"
 	@echo "  make setup         pnpm install + sdk/contracts build + .env 作成"
 	@echo "  make help          このヘルプを表示"
+	@echo ""
+	@echo "  make dev-stop && make dev = 常に fresh chain (dev-stop で state 削除するため)"
 	@echo ""
 	@echo "URL:"
 	@echo "  webapp  http://localhost:$(WEBAPP_PORT)"
@@ -60,7 +61,8 @@ help:
 	@echo ""
 	@echo "State:"
 	@echo "  state file  $(ANVIL_STATE)"
-	@echo "  初回起動時に deploy-niji-full が走り、 以降は anvil --state で 1 秒復元"
+	@echo "  make dev で deploy-niji-full が走る (~30-60s、 auction / trait 550 image 全 upload)"
+	@echo "  make dev-stop で state 削除 = 次 make dev は fresh chain deploy"
 
 setup: install build setup-env
 	@echo "✅ setup complete. run 'make dev' to start."
@@ -176,20 +178,6 @@ dev: setup-env anvil-bg deploy-if-needed auto-settler-bg webapp-bg
 	@echo "  make dev-status  to check health"
 	@echo "  make dev-stop    to stop all"
 
-# state file を削除して fresh chain で再 deploy。
-# anvil + webapp を 1 度停止 → state 削除 → make dev で initial deploy 再実行。
-dev-reset: dev-stop
-	@echo "🗑️  removing anvil state ($(ANVIL_STATE))..."
-	@rm -f "$(ANVIL_STATE)"
-	@echo "✅ state removed. run 'make dev' to re-deploy from fresh chain."
-
-# 1 コマンドで fresh chain 再起動。 dev-reset (dev-stop + state 削除) → dev (deploy + all bg 起動)
-# を chain。 user が「一から見たい」 時の SSOT、 dev-reset 単体は state 削除のみで
-# make dev を明示的に打つ必要がある 2 段経路の 1 cmd shortcut。
-dev-fresh: dev-reset dev
-	@echo ""
-	@echo "✅ fresh dev environment ready (state 削除 + fresh deploy 完了)."
-
 dev-sepolia: setup-env webapp-bg
 	@echo ""
 	@echo "✅ webapp running in sepolia mode."
@@ -256,6 +244,12 @@ dev-stop:
 	if [ -n "$$ANVIL_PIDS" ]; then \
 		echo "$$ANVIL_PIDS" | xargs kill 2>/dev/null || true; \
 		echo "  ⛔ killed lingering anvil listeners on :$(ANVIL_PORT)"; \
+	fi
+	@# state file 削除 = user 直感 (make dev-stop で「一旦全部止める」 = 次 make dev は fresh chain) を SSOT 化。
+	@# 高速再起動が欲しい場面は無く、 途中状態が残ることによる混乱を優先排除。
+	@if [ -f "$(ANVIL_STATE)" ]; then \
+		rm -f "$(ANVIL_STATE)"; \
+		echo "  🗑️  removed anvil state (next make dev = fresh chain deploy)"; \
 	fi
 	@echo "✅ stopped."
 
