@@ -96,22 +96,21 @@ $(LOG_DIR):
 	@mkdir -p $(LOG_DIR)
 
 # anvil を background 起動。 既存プロセスがあれば再利用。
-# --state で chain state を $(ANVIL_STATE) に dump/load (load + 終了時 dump + 5 秒間隔の定期 dump)。
-# --block-time 1 で 1 秒間隔の自動 block mining を有効化 (auto-settler が endTime 経過検知 →
-# settle tx 送信 → 次 auction 開始 chain が回るために必須、 default の on-demand mining では
-# block timestamp が進まず auction endTime に永遠到達しないため)。
-# state file が存在すれば deploy 済 contract をそのまま load、 不存在なら fresh chain で起動。
+# メモリ軽量化設定 (旧 720MB → 想定 250-350MB)。
+# --block-time 2 秒 = 60 秒 auction に対し十分な mining 頻度、 block 蓄積が半減。
+# --state-interval 30 秒 = crash 時保険のみ、 dev-stop で最終 dump 保証。
+# --prune-history = 歴史 block state 破棄でメモリ削減、 dev で past block query 不要。
 anvil-bg: | $(LOG_DIR)
 	@if [ -f "$(ANVIL_PID)" ] && kill -0 $$(cat $(ANVIL_PID)) 2>/dev/null; then \
 		echo "🟢 anvil already running (PID $$(cat $(ANVIL_PID)))"; \
 	else \
 		if [ -f "$(ANVIL_STATE)" ]; then \
-			echo "🚀 starting anvil on :$(ANVIL_PORT) (chain 31337, state load from $(ANVIL_STATE), block-time 1s)..."; \
+			echo "🚀 starting anvil on :$(ANVIL_PORT) (chain 31337, state load, block-time 2s, prune-history)..."; \
 		else \
-			echo "🚀 starting anvil on :$(ANVIL_PORT) (chain 31337, fresh state, block-time 1s)..."; \
+			echo "🚀 starting anvil on :$(ANVIL_PORT) (chain 31337, fresh state, block-time 2s, prune-history)..."; \
 		fi; \
 		nohup anvil --port $(ANVIL_PORT) --chain-id 31337 --host 127.0.0.1 \
-			--state "$(ANVIL_STATE)" --state-interval 5 --block-time 1 \
+			--state "$(ANVIL_STATE)" --state-interval 30 --block-time 2 --prune-history \
 			> "$(ANVIL_LOG)" 2>&1 & \
 		echo $$! > "$(ANVIL_PID)"; \
 		sleep 1; \
@@ -141,7 +140,7 @@ auto-settler-bg: | $(LOG_DIR)
 		echo "🟢 auto-settler already running (PID $$(cat $(SETTLER_PID)))"; \
 	else \
 		echo "🚀 starting auto-settler (5s poll, auto-settle auction on endTime)..."; \
-		cd $(ROOT) && DEPLOYER_PK=$(ANVIL_DEPLOYER_PK) ANVIL_RPC=http://127.0.0.1:$(ANVIL_PORT) \
+		cd $(ROOT) && DEPLOYER_PK=$(ANVIL_DEPLOYER_PK) ANVIL_RPC=http://127.0.0.1:$(ANVIL_PORT) POLL_MS=10000 \
 			nohup pnpm -w exec tsx packages/niji-contracts/scripts/anvil-auto-settler.ts \
 			> "$(SETTLER_LOG)" 2>&1 & \
 		echo $$! > "$(SETTLER_PID)"; \
@@ -262,6 +261,9 @@ dev-stop:
 		fi; \
 		rm -f "$(SETTLER_PID)"; \
 	fi
+	@# tsx + pnpm の 4 段 process tree で pkill -P が届かない子孫を確実に掃除。
+	@# script 名 pattern で残骸を一括 kill する fallback。
+	@pkill -9 -f "anvil-auto-settler" 2>/dev/null || true
 	@# anvil は SIGTERM で --state dump 完了を待つ (最大 10 秒)。 dump 中に SIGKILL すると
 	@# JSON が途中で切れ、 次の make dev で "failed to parse json file: EOF" で起動失敗する。
 	@# graceful shutdown 経路 = SIGTERM 送信 → 1 秒間隔で process 死亡 poll (最大 10 秒) → 未死亡なら SIGKILL fallback。
