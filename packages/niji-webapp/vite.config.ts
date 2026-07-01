@@ -68,6 +68,17 @@ export default defineConfig({
       overlay: true,
     },
   },
+  // build 時のみ 30MB niji-data-rle.json を JSON.parse で lazy 展開 (dev では逆効果のため無効)。
+  json: {
+    stringify: process.env.NODE_ENV === 'production',
+  },
+  optimizeDeps: {
+    // 30MB niji-data-rle.json を含む @niji/assets の事前 bundle を無効化、
+    // dev server 起動時の一括 transform を避けメモリ消費を抑制。
+    exclude: ['@niji/assets', '@niji/sdk'],
+    // dev server 起動時に scan する dependency 範囲を制限。
+    entries: ['src/index.tsx'],
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -75,10 +86,21 @@ export default defineConfig({
     dedupe: ['@tanstack/react-query', '@wagmi/core', 'viem', 'wagmi'],
   },
   build: {
+    // 30MB niji-data-rle.json を独立 chunk 化して main bundle から切り離す。
+    // 旧 33MB 単一 chunk → main ~3MB + niji-data 30MB (別 request、 lazy parse) に分割。
+    chunkSizeWarningLimit: 5000,
     rollupOptions: {
       external: ['fs'],
       output: {
         format: 'esm',
+        manualChunks: id => {
+          if (id.includes('niji-data-rle.json')) return 'niji-data';
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/'))
+            return 'react-vendor';
+          if (id.includes('node_modules/wagmi/') || id.includes('node_modules/viem/'))
+            return 'wagmi-vendor';
+          if (id.includes('node_modules/@tanstack/')) return 'tanstack-vendor';
+        },
       },
     },
     minify: 'terser',
