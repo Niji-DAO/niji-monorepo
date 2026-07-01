@@ -66,24 +66,25 @@ export const NIJI_TRAITS: NijiTraitDef[] = [
 /**
  * COMPOSITE_ORDER (下 → 上) matches NijiDescriptor.sol's SVG <image> emission order.
  *
- * 完璧仕様 = 12 trait 全てを user が視認できる z-order。
- * 旧仕様は hat(4) が hair(11) より上に描画され hair 全体を隠す設計欠陥があった。
+ * 完璧仕様 = 12 trait 全てを user が視認できる + variation 豊富な trait を前面配置。
+ * special(0) は 2 個しかなく最前面配置すると「常に同じ overlay」 と見え変化を隠す、
+ * back(7)/choker(1)/ear(6) も 2-4 個で少数、 これらを後方に置く。
  *
- * 描画順序 (下 layer → 上 layer)。
- *   1. solidBackground(10) ... 背景単色 (最背面)
- *   2. background(9)       ... 背景 pattern
- *   3. backDecoration(8)   ... 背中装飾 (羽等)
- *   4. back(7)             ... 背中 (胴体後面)
- *   5. clothing(5)         ... 服 (胴体前面)
- *   6. choker(1)           ... チョーカー (首元、 clothing より上)
- *   7. ear(6)              ... 耳 (顔サイド)
- *   8. hat(4)              ... 帽子 (頭上部、 hair より下 = ブランド部分は hair が透過しない部分で見える)
- *   9. hair(11)            ... 髪 (hat 上、 頭部前面まで来る)
- *   10. headphone(2)        ... ヘッドホン (hair 上、 耳部品として自然)
- *   11. leftHand(3)         ... 左手 / 武器 (キャラ前面、 手前に構える)
- *   12. special(0)          ... エフェクト overlay (最前面)
+ * 描画順序 (下 layer → 上 layer、 少数 → 多数 の順で variation impact 最大化)。
+ *   1. solidBackground(10) ... 42 通り、 背景単色 (最背面)
+ *   2. background(9)       ... 25 通り、 背景 pattern
+ *   3. backDecoration(8)   ... 12 通り、 背中装飾
+ *   4. back(7)             ... 2 通り (少)、 胴体後面
+ *   5. special(0)          ... 2 通り (少)、 エフェクト背景
+ *   6. clothing(5)         ... 166 通り、 服 (胴体前面)
+ *   7. choker(1)           ... 4 通り (少)、 首元
+ *   8. ear(6)              ... 3 通り (少)、 顔サイド
+ *   9. hat(4)              ... 32 通り、 帽子 (頭上部)
+ *   10. hair(11)           ... 235 通り、 髪 (hat 上、 最も variation 豊富)
+ *   11. headphone(2)       ... 14 通り、 ヘッドホン (hair 上)
+ *   12. leftHand(3)        ... 13 通り、 左手 / 武器 (最前面)
  */
-export const NIJI_COMPOSITE_ORDER = [10, 9, 8, 7, 5, 1, 6, 4, 11, 2, 3, 0];
+export const NIJI_COMPOSITE_ORDER = [10, 9, 8, 7, 0, 5, 1, 6, 4, 11, 2, 3];
 
 export interface ColorInfo {
   r: number;
