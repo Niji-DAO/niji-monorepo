@@ -108,19 +108,28 @@ anvil-bg: | $(LOG_DIR)
 		echo "🟢 anvil started (PID $$(cat $(ANVIL_PID)))"; \
 	fi
 
-# state file が無ければ deploy-niji-full を実行して contract を deploy + populate。
-# state file 存在時は skip (= 既に deploy 済の chain を load しているため)。
+# state file が無い or 空 or 妥当性検査失敗 (contract 実在チェック) 時に deploy-niji-full を実行。
+# state file 存在チェックだけでは不十分 = SIGKILL による dump 破損時に file 残るが chain 空、
+# もしくは fresh anvil の空 chain dump (~1MB) を「deploy 済」 と誤判定して deploy skip する事故が発生する。
+# chain 上に NijiAuctionHouseProxy が deploy 済か eth_getCode で確認して判定する。
 deploy-if-needed: anvil-bg
-	@if [ ! -f "$(ANVIL_STATE)" ] || [ ! -s "$(ANVIL_STATE)" ]; then \
-		echo "🔨 first run — deploying contracts (deploy-niji-full + populate + ownership)..."; \
-		echo "⏳ this takes ~30-60s, subsequent 'make dev' will load from state in ~1s"; \
+	@AUCTION_HOUSE=$$(ls -t $(ROOT)/packages/niji-contracts/deploy/localhost-*-full.json 2>/dev/null | head -1 \
+		| xargs -I {} sh -c 'jq -r ".contracts.NijiAuctionHouseProxy // empty" {} 2>/dev/null'); \
+	CODE_SIZE=0; \
+	if [ -n "$$AUCTION_HOUSE" ]; then \
+		CODE=$$(cast code $$AUCTION_HOUSE --rpc-url http://127.0.0.1:$(ANVIL_PORT) 2>/dev/null || echo "0x"); \
+		CODE_SIZE=$${#CODE}; \
+	fi; \
+	if [ "$$CODE_SIZE" -lt 10 ]; then \
+		echo "🔨 no deployed contracts on chain (AuctionHouse code size=$$CODE_SIZE) — running deploy-niji-full..."; \
+		echo "⏳ this takes ~30-60s"; \
 		cd $(ROOT)/packages/niji-contracts && pnpm hardhat deploy-niji-full --network localhost \
 			> "$(DEPLOY_LOG)" 2>&1 && echo "✅ contracts deployed (log: $(DEPLOY_LOG))" \
 			|| (echo "❌ deploy failed, see $(DEPLOY_LOG)"; exit 1); \
 		echo "⏳ waiting 6s for anvil state dump (state-interval=5)..."; \
 		sleep 6; \
 	else \
-		echo "✅ anvil state already exists, skipping deploy (load from $(ANVIL_STATE))"; \
+		echo "✅ contracts already deployed on chain (AuctionHouse=$$AUCTION_HOUSE), skipping deploy"; \
 	fi
 
 # anvil-auto-settler を background 起動 (5 秒 polling で auction を自動 settle)。
