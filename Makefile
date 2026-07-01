@@ -29,6 +29,10 @@ ANVIL_PID := $(LOG_DIR)/anvil.pid
 WEBAPP_PID := $(LOG_DIR)/webapp.pid
 SETTLER_PID := $(LOG_DIR)/auto-settler.pid
 ANVIL_STATE := $(LOG_DIR)/anvil-state.json
+# fresh chain snapshot ... make dev-init で 1 回 deploy 済 anvil state を保存、
+# make dev-stop && make dev で snapshot を copy して load = 毎回 fresh chain を ~1s で起動する。
+# source code (contract / deploy script) 変更後は make dev-refresh で snapshot 再生成が必要。
+ANVIL_SNAPSHOT := $(LOG_DIR)/anvil-fresh-snapshot.json
 
 # anvil account #0 の private key (deterministic、 全 dev 共通)
 ANVIL_DEPLOYER_PK := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
@@ -39,30 +43,34 @@ WEBAPP_ENV_EXAMPLE := $(ROOT)/packages/niji-webapp/.env.example.local
 ANVIL_PORT := 8547
 WEBAPP_PORT := 2424
 
-.PHONY: help dev dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg deploy-if-needed auto-settler-bg
+.PHONY: help dev dev-init dev-refresh dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg snapshot-if-needed auto-settler-bg
 
 help:
 	@echo "Niji DAO — local dev commands"
 	@echo ""
-	@echo "  make dev           anvil + deploy + auto-settler + webapp 並列起動 (Recommended)"
-	@echo "  make dev-stop      anvil + auto-settler + webapp を graceful shutdown + state 削除"
+	@echo "  make dev           anvil + snapshot load (~1s) + auto-settler + webapp 並列起動 (Recommended)"
+	@echo "  make dev-init      1 回 fresh chain deploy して snapshot 保存 (初回 or 手動再生成用)"
+	@echo "  make dev-refresh   snapshot 削除 + dev-init で snapshot 再生成 (contract 変更後)"
+	@echo "  make dev-stop      anvil + auto-settler + webapp を graceful shutdown + live state 削除"
 	@echo "  make dev-sepolia   webapp のみ sepolia mode で background 起動 (anvil 不要)"
 	@echo "  make dev-fg        anvil + webapp を foreground で並列起動 (Ctrl+C で停止)"
-	@echo "  make dev-status    起動状況を確認 (PID / port listen / HTTP 応答 / state 有無)"
+	@echo "  make dev-status    起動状況を確認 (PID / port listen / HTTP 応答 / state / snapshot 有無)"
 	@echo "  make dev-logs      anvil / deploy / auto-settler / webapp log を tail -f で表示"
 	@echo "  make setup         pnpm install + sdk/contracts build + .env 作成"
 	@echo "  make help          このヘルプを表示"
 	@echo ""
-	@echo "  make dev-stop && make dev = 常に fresh chain (dev-stop で state 削除するため)"
+	@echo "  make dev-stop && make dev = 常に fresh chain (snapshot copy で ~1s 起動)"
+	@echo "  snapshot 不在時は make dev が自動的に dev-init を呼ぶ"
 	@echo ""
 	@echo "URL:"
 	@echo "  webapp  http://localhost:$(WEBAPP_PORT)"
 	@echo "  anvil   http://127.0.0.1:$(ANVIL_PORT) (chain id 31337)"
 	@echo ""
 	@echo "State:"
-	@echo "  state file  $(ANVIL_STATE)"
-	@echo "  make dev で deploy-niji-full が走る (~30-60s、 auction / trait 550 image 全 upload)"
-	@echo "  make dev-stop で state 削除 = 次 make dev は fresh chain deploy"
+	@echo "  live state  $(ANVIL_STATE) (make dev-stop で削除)"
+	@echo "  snapshot    $(ANVIL_SNAPSHOT) (make dev-init で生成、 make dev で copy して load)"
+	@echo "  make dev-init で 1 回 deploy-niji-full 実行 (~30-60s、 550 image 全 upload)"
+	@echo "  以降 make dev = snapshot copy + anvil load で ~1s 起動 (常に fresh chain)"
 
 setup: install build setup-env
 	@echo "✅ setup complete. run 'make dev' to start."
@@ -110,28 +118,19 @@ anvil-bg: | $(LOG_DIR)
 		echo "🟢 anvil started (PID $$(cat $(ANVIL_PID)))"; \
 	fi
 
-# state file が無い or 空 or 妥当性検査失敗 (contract 実在チェック) 時に deploy-niji-full を実行。
-# state file 存在チェックだけでは不十分 = SIGKILL による dump 破損時に file 残るが chain 空、
-# もしくは fresh anvil の空 chain dump (~1MB) を「deploy 済」 と誤判定して deploy skip する事故が発生する。
-# chain 上に NijiAuctionHouseProxy が deploy 済か eth_getCode で確認して判定する。
-deploy-if-needed: anvil-bg
-	@AUCTION_HOUSE=$$(ls -t $(ROOT)/packages/niji-contracts/deploy/localhost-*-full.json 2>/dev/null | head -1 \
-		| xargs -I {} sh -c 'jq -r ".contracts.NijiAuctionHouseProxy // empty" {} 2>/dev/null'); \
-	CODE_SIZE=0; \
-	if [ -n "$$AUCTION_HOUSE" ]; then \
-		CODE=$$(cast code $$AUCTION_HOUSE --rpc-url http://127.0.0.1:$(ANVIL_PORT) 2>/dev/null || echo "0x"); \
-		CODE_SIZE=$${#CODE}; \
-	fi; \
-	if [ "$$CODE_SIZE" -lt 10 ]; then \
-		echo "🔨 no deployed contracts on chain (AuctionHouse code size=$$CODE_SIZE) — running deploy-niji-full..."; \
-		echo "⏳ this takes ~30-60s"; \
-		cd $(ROOT)/packages/niji-contracts && pnpm hardhat deploy-niji-full --network localhost \
-			> "$(DEPLOY_LOG)" 2>&1 && echo "✅ contracts deployed (log: $(DEPLOY_LOG))" \
-			|| (echo "❌ deploy failed, see $(DEPLOY_LOG)"; exit 1); \
-		echo "⏳ waiting 6s for anvil state dump (state-interval=5)..."; \
-		sleep 6; \
+# snapshot が無ければ dev-init を chain して生成、 有れば live state に copy して load 起動を有効化。
+# make dev から呼ばれ、 snapshot copy は 1 file cp なので ~100ms、 以降の anvil --state load は ~1s。
+snapshot-if-needed:
+	@if [ ! -f "$(ANVIL_SNAPSHOT)" ] || [ ! -s "$(ANVIL_SNAPSHOT)" ]; then \
+		echo "📦 snapshot 未生成、 make dev-init を実行して初回 deploy + snapshot 保存 (~30-60s)..."; \
+		$(MAKE) --no-print-directory dev-init; \
+	fi
+	@if [ ! -f "$(ANVIL_STATE)" ] || [ ! -s "$(ANVIL_STATE)" ]; then \
+		cp "$(ANVIL_SNAPSHOT)" "$(ANVIL_STATE)"; \
+		SNAP_SIZE=$$(du -h "$(ANVIL_SNAPSHOT)" | cut -f1); \
+		echo "📦 snapshot copied to live state ($$SNAP_SIZE) → anvil load 準備完了"; \
 	else \
-		echo "✅ contracts already deployed on chain (AuctionHouse=$$AUCTION_HOUSE), skipping deploy"; \
+		echo "✅ live state already exists, skipping snapshot copy"; \
 	fi
 
 # anvil-auto-settler を background 起動 (5 秒 polling で auction を自動 settle)。
@@ -163,20 +162,71 @@ webapp-bg: | $(LOG_DIR)
 		echo "🟢 webapp started (PID $$(cat $(WEBAPP_PID)))"; \
 	fi
 
-dev: setup-env anvil-bg deploy-if-needed auto-settler-bg webapp-bg
+# make dev = snapshot copy (~100ms) + anvil load (~1s) + auto-settler + webapp。
+# snapshot は事前に make dev-init で 1 回作成、 以降 make dev-stop && make dev で常に fresh chain を ~1s で復元。
+dev: setup-env snapshot-if-needed anvil-bg auto-settler-bg webapp-bg
 	@echo ""
-	@echo "✅ dev environment ready."
+	@echo "✅ dev environment ready (snapshot load、 常に fresh chain)."
 	@echo ""
 	@echo "  webapp        http://localhost:$(WEBAPP_PORT)"
 	@echo "  anvil         http://127.0.0.1:$(ANVIL_PORT) (chain 31337)"
 	@echo "  auto-settler  🤖 5s polling, next auction starts automatically on endTime"
 	@if [ -f "$(ANVIL_STATE)" ]; then \
-		echo "  state         $(ANVIL_STATE) ($$(du -h $(ANVIL_STATE) | cut -f1))"; \
+		echo "  live state    $(ANVIL_STATE) ($$(du -h $(ANVIL_STATE) | cut -f1))"; \
+	fi
+	@if [ -f "$(ANVIL_SNAPSHOT)" ]; then \
+		echo "  snapshot      $(ANVIL_SNAPSHOT) ($$(du -h $(ANVIL_SNAPSHOT) | cut -f1))"; \
 	fi
 	@echo ""
 	@echo "  make dev-logs    to tail logs"
 	@echo "  make dev-status  to check health"
 	@echo "  make dev-stop    to stop all"
+
+# 1 回だけ fresh chain で deploy-niji-full を実行して anvil state を snapshot として保存。
+# make dev で自動的に snapshot が呼ばれるので通常 user は明示実行不要、 contract 変更後の
+# 再生成 (= dev-refresh) と 初回 setup 用のエントリポイント。
+# 手順 ... (1) live state 削除 (2) anvil 起動 (fresh chain) (3) deploy-niji-full 実行
+#        (4) anvil に snapshot dump signal (SIGTERM graceful) (5) live state を snapshot に move
+dev-init: setup-env
+	@echo "🎬 make dev-init — initial deploy + snapshot 保存 (~30-60s、 1 回だけ)"
+	@if [ -f "$(ANVIL_PID)" ] && kill -0 $$(cat $(ANVIL_PID)) 2>/dev/null; then \
+		echo "⛔ stopping existing anvil first..."; \
+		$(MAKE) --no-print-directory dev-stop; \
+	fi
+	@rm -f "$(ANVIL_STATE)"
+	@mkdir -p $(LOG_DIR)
+	@echo "🚀 starting anvil (fresh chain) for snapshot generation..."
+	@nohup anvil --port $(ANVIL_PORT) --chain-id 31337 --host 127.0.0.1 \
+		--state "$(ANVIL_STATE)" --state-interval 5 --block-time 1 \
+		> "$(ANVIL_LOG)" 2>&1 & \
+		echo $$! > "$(ANVIL_PID)"
+	@sleep 1
+	@echo "🔨 running deploy-niji-full on fresh chain..."
+	@cd $(ROOT)/packages/niji-contracts && pnpm hardhat deploy-niji-full --network localhost \
+		> "$(DEPLOY_LOG)" 2>&1 && echo "✅ contracts deployed (log: $(DEPLOY_LOG))" \
+		|| (echo "❌ deploy failed, see $(DEPLOY_LOG)"; kill $$(cat $(ANVIL_PID)); rm -f $(ANVIL_PID); exit 1)
+	@echo "⏳ waiting 8s for anvil state dump (state-interval=5)..."
+	@sleep 8
+	@echo "⛔ stopping anvil gracefully to flush state..."
+	@PID=$$(cat "$(ANVIL_PID)"); kill -TERM $$PID 2>/dev/null || true; \
+		for i in 1 2 3 4 5 6 7 8 9 10; do \
+			sleep 1; \
+			if ! kill -0 $$PID 2>/dev/null; then break; fi; \
+			if [ $$i -eq 10 ]; then kill -KILL $$PID 2>/dev/null || true; fi; \
+		done
+	@rm -f "$(ANVIL_PID)"
+	@if [ ! -f "$(ANVIL_STATE)" ] || [ ! -s "$(ANVIL_STATE)" ]; then \
+		echo "❌ anvil state dump failed (empty or missing)"; exit 1; \
+	fi
+	@mv "$(ANVIL_STATE)" "$(ANVIL_SNAPSHOT)"
+	@echo "✅ snapshot 保存完了 → $(ANVIL_SNAPSHOT) ($$(du -h $(ANVIL_SNAPSHOT) | cut -f1))"
+	@echo "   以降 make dev = snapshot copy + anvil load で ~1s 起動"
+
+# snapshot 再生成 = contract source 変更後に呼ぶ。 snapshot 削除 + dev-init 再実行。
+dev-refresh:
+	@echo "🔄 removing snapshot for regeneration..."
+	@rm -f "$(ANVIL_SNAPSHOT)"
+	@$(MAKE) --no-print-directory dev-init
 
 dev-sepolia: setup-env webapp-bg
 	@echo ""
@@ -278,9 +328,14 @@ dev-status:
 		echo "  auto-settler  ⚪ stopped (auction は手動 settle が必要)"; \
 	fi
 	@if [ -f "$(ANVIL_STATE)" ]; then \
-		echo "  state         📦 exists ($$(du -h $(ANVIL_STATE) | cut -f1), contracts deployed)"; \
+		echo "  live state    📦 exists ($$(du -h $(ANVIL_STATE) | cut -f1), anvil load 中)"; \
 	else \
-		echo "  state         ⚪ none (next 'make dev' will deploy contracts)"; \
+		echo "  live state    ⚪ none (make dev で snapshot copy 予定)"; \
+	fi
+	@if [ -f "$(ANVIL_SNAPSHOT)" ]; then \
+		echo "  snapshot      📦 exists ($$(du -h $(ANVIL_SNAPSHOT) | cut -f1), fresh chain 準備完了)"; \
+	else \
+		echo "  snapshot      ⚪ none (make dev-init が必要、 make dev は自動 fallback)"; \
 	fi
 	@echo ""
 	@echo "  log dir  $(LOG_DIR)"
