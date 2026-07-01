@@ -61,24 +61,44 @@ export const buildSVG = (
       let currentX = bounds.left;
       let currentY = bounds.top;
 
+      // 1 line (currentY) 内で同色連続 run を merge して 1 rect emit。
+      // 旧実装は RLE 1 byte 上限 (255) で切れた run を record 単位で emit するため、
+      // 512 pixel 幅の単色 line が 3 rect (255+255+2) に分割され横縞状に見える bug があった。
+      let pendingColorIndex = -1;
+      let pendingStartX = 0;
+      let pendingLength = 0;
+
+      const flushPending = () => {
+        if (pendingLength > 0 && pendingColorIndex > 0) {
+          const hex = paletteColors[pendingColorIndex];
+          svgRects.push(
+            `<rect width="${pendingLength * 10}" height="10" x="${pendingStartX * 10}" y="${
+              currentY * 10
+            }" fill="#${hex}" />`,
+          );
+        }
+        pendingColorIndex = -1;
+        pendingLength = 0;
+      };
+
       rects.forEach(draw => {
         let drawLength = draw[0];
         const colorIndex = draw[1];
-        const hexColor = paletteColors[colorIndex];
 
         let length = getRectLength(currentX, drawLength, bounds.right);
         while (length > 0) {
-          // Do not push rect if transparent
-          if (colorIndex !== 0) {
-            svgRects.push(
-              `<rect width="${length * 10}" height="10" x="${currentX * 10}" y="${
-                currentY * 10
-              }" fill="#${hexColor}" />`,
-            );
+          if (colorIndex === pendingColorIndex) {
+            pendingLength += length;
+          } else {
+            flushPending();
+            pendingColorIndex = colorIndex;
+            pendingStartX = currentX;
+            pendingLength = length;
           }
 
           currentX += length;
           if (currentX === bounds.right) {
+            flushPending();
             currentX = bounds.left;
             currentY++;
           }
@@ -87,6 +107,7 @@ export const buildSVG = (
           length = getRectLength(currentX, drawLength, bounds.right);
         }
       });
+      flushPending();
       result += svgRects.join('');
       return result;
     },
