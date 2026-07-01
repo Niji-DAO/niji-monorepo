@@ -1,0 +1,19 @@
+{
+  "network": "base-sepolia",
+  "nijiToken": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 0
+  },
+  "nijiAuctionHouse": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 0
+  },
+  "nijiDAO": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 0
+  },
+  "nijiDAOData": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 0
+  }
+}
