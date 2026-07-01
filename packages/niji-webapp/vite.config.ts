@@ -89,6 +89,22 @@ export default defineConfig({
     // 30MB niji-data-rle.json を独立 chunk 化して main bundle から切り離す。
     // 旧 33MB 単一 chunk → main ~3MB + niji-data 30MB (別 request、 lazy parse) に分割。
     chunkSizeWarningLimit: 5000,
+    // 巨大 vendor chunk (wallet-vendor 2.4MB / motion-vendor 220KB 等) を initial preload
+    // から除外、 実際に import される時にのみ DL する経路に切替。 index.html の initial
+    // preload は critical path (main + react + wagmi) のみに絞り込む。
+    modulePreload: {
+      resolveDependencies: (_filename, deps) => {
+        return deps.filter(dep => {
+          if (dep.includes('wallet-vendor')) return false;
+          if (dep.includes('markdown-vendor')) return false;
+          if (dep.includes('chart-vendor')) return false;
+          if (dep.includes('motion-vendor')) return false;
+          if (dep.includes('bootstrap-vendor')) return false;
+          if (dep.includes('ethers-vendor')) return false;
+          return true;
+        });
+      },
+    },
     rollupOptions: {
       external: ['fs'],
       output: {
@@ -97,9 +113,53 @@ export default defineConfig({
           if (id.includes('niji-data-rle.json')) return 'niji-data';
           if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/'))
             return 'react-vendor';
-          if (id.includes('node_modules/wagmi/') || id.includes('node_modules/viem/'))
+          if (
+            id.includes('node_modules/wagmi/') ||
+            id.includes('node_modules/viem/') ||
+            id.includes('node_modules/@wagmi/')
+          )
             return 'wagmi-vendor';
           if (id.includes('node_modules/@tanstack/')) return 'tanstack-vendor';
+          // 大物 wallet UI (walletconnect / web3modal / reown / coinbase wallet SDK) を独立 chunk 化。
+          // wallet 接続 modal 表示時のみ必要、 initial page load では critical path 外。
+          if (
+            id.includes('node_modules/@walletconnect/') ||
+            id.includes('node_modules/@web3modal/') ||
+            id.includes('node_modules/@reown/') ||
+            id.includes('node_modules/@coinbase/')
+          )
+            return 'wallet-vendor';
+          // ConnectKit + wallet button 系 UI
+          if (id.includes('node_modules/connectkit/')) return 'wallet-vendor';
+          // ethers (legacy path、 wagmi 経路と分離)
+          if (id.includes('node_modules/ethers/')) return 'ethers-vendor';
+          // syntax highlighter / markdown 系は governance page でのみ使用、 lazy chunk へ
+          if (
+            id.includes('node_modules/react-syntax-highlighter/') ||
+            id.includes('node_modules/refractor/') ||
+            id.includes('node_modules/prismjs/') ||
+            id.includes('node_modules/react-markdown/') ||
+            id.includes('node_modules/remark-') ||
+            id.includes('node_modules/rehype-')
+          )
+            return 'markdown-vendor';
+          // chart / date picker 系 (governance / analytics 用)
+          if (
+            id.includes('node_modules/recharts/') ||
+            id.includes('node_modules/d3-') ||
+            id.includes('node_modules/react-datepicker/')
+          )
+            return 'chart-vendor';
+          // bootstrap / react-bootstrap は legacy、 徐々に廃止予定だが現状 main bundle に残る
+          if (id.includes('node_modules/react-bootstrap/') || id.includes('node_modules/bootstrap/'))
+            return 'bootstrap-vendor';
+          // motion / animation 系
+          if (id.includes('node_modules/framer-motion/') || id.includes('node_modules/motion/'))
+            return 'motion-vendor';
+          // Radix UI (shadcn/ui 依存) は多数の小 package で構成、 まとめて 1 chunk
+          if (id.includes('node_modules/@radix-ui/')) return 'radix-vendor';
+          // lingui i18n runtime
+          if (id.includes('node_modules/@lingui/')) return 'lingui-vendor';
         },
       },
     },
