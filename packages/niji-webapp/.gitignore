@@ -25,7 +25,10 @@ yarn-error.log*
 .env
 .vercel
 
-# i18n 
+# i18n
 /src/locales/**/*.js
 /src/locales/**/en-US.po
 /src/locales/**/pseudo.po
+
+# 30MB niji-data-rle.json は niji-assets から build script でコピー、 リポには含めない
+/public/niji-data-rle.json

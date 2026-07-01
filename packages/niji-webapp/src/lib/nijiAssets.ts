@@ -1,4 +1,18 @@
-import imageData from '../../../niji-assets/src/niji-data-rle.json';
+// 30MB niji-data-rle.json は main bundle から切り離し、 起動時 fetch で lazy 展開。
+// public/niji-data-rle.json は predev / prebuild で niji-assets からコピー (package.json)。
+// top-level await + ES2022 target により NijiImageData は同期 API のまま維持。
+interface NijiImageDataShape {
+  palette: string[];
+  images: Record<string, { filename: string; data: string }[]>;
+}
+
+async function loadNijiData(): Promise<NijiImageDataShape> {
+  const res = await fetch('/niji-data-rle.json');
+  if (!res.ok) throw new Error(`niji-data-rle.json fetch failed: ${res.status}`);
+  return res.json();
+}
+
+const imageData: NijiImageDataShape = await loadNijiData();
 
 export interface NijiSeed {
   special: number;
