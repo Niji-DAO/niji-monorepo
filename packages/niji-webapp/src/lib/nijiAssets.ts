@@ -7,7 +7,12 @@ interface NijiImageDataShape {
 }
 
 async function loadNijiData(): Promise<NijiImageDataShape> {
-  const res = await fetch('/niji-data-rle.json');
+  // 31337 local dev では常に fresh fetch (fresh chain で compositeOrder が変わった時
+  // browser disk cache の stale JSON を掴まないよう cache-control no-cache 強制)。
+  const isLocalDev = import.meta.env.VITE_CHAIN_ID === '31337';
+  const res = await fetch('/niji-data-rle.json', {
+    cache: isLocalDev ? 'no-store' : 'default',
+  });
   if (!res.ok) throw new Error(`niji-data-rle.json fetch failed: ${res.status}`);
   return res.json();
 }
