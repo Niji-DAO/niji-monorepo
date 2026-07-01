@@ -7,10 +7,11 @@
 #
 # Quickstart:
 #   make dev           # anvil --state load + (初回のみ deploy) + webapp 並列起動 (Recommended)
-#   make dev-reset     # state file 削除 + 再 deploy で fresh chain 再構築
+#   make dev-fresh     # dev-stop + state 削除 + fresh chain で make dev = 一から見たい時
+#   make dev-reset     # state 削除のみ (次 make dev で fresh chain)
 #   make dev-sepolia   # webapp のみ sepolia mode で bg 起動 (anvil 不要)
 #   make dev-fg        # anvil + webapp を foreground 並列起動 (Ctrl+C で同時停止)
-#   make dev-stop      # bg で起動した anvil + webapp を停止
+#   make dev-stop      # bg で起動した anvil + webapp を graceful shutdown
 #   make dev-status    # 起動状況を確認
 #   make dev-logs      # log を tail -f で表示
 #   make help          # コマンド一覧表示
@@ -37,16 +38,17 @@ WEBAPP_ENV_EXAMPLE := $(ROOT)/packages/niji-webapp/.env.example.local
 ANVIL_PORT := 8547
 WEBAPP_PORT := 2424
 
-.PHONY: help dev dev-reset dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg deploy-if-needed auto-settler-bg
+.PHONY: help dev dev-fresh dev-reset dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg deploy-if-needed auto-settler-bg
 
 help:
 	@echo "Niji DAO — local dev commands"
 	@echo ""
 	@echo "  make dev           anvil + (初回のみ deploy) + auto-settler + webapp 並列起動 (Recommended)"
-	@echo "  make dev-reset     anvil state を削除して fresh chain で再 deploy"
+	@echo "  make dev-fresh     dev-stop + state 削除 + fresh chain で make dev (= 一から見たい時)"
+	@echo "  make dev-reset     anvil state を削除して fresh chain で再 deploy (次 make dev 待ち)"
 	@echo "  make dev-sepolia   webapp のみ sepolia mode で background 起動 (anvil 不要)"
 	@echo "  make dev-fg        anvil + webapp を foreground で並列起動 (Ctrl+C で停止)"
-	@echo "  make dev-stop      background で起動した anvil + auto-settler + webapp を停止"
+	@echo "  make dev-stop      background で起動した anvil + auto-settler + webapp を graceful shutdown"
 	@echo "  make dev-status    起動状況を確認 (PID / port listen / HTTP 応答 / state 有無)"
 	@echo "  make dev-logs      anvil / deploy / auto-settler / webapp log を tail -f で表示"
 	@echo "  make setup         pnpm install + sdk/contracts build + .env 作成"
@@ -172,6 +174,13 @@ dev-reset: dev-stop
 	@rm -f "$(ANVIL_STATE)"
 	@echo "✅ state removed. run 'make dev' to re-deploy from fresh chain."
 
+# 1 コマンドで fresh chain 再起動。 dev-reset (dev-stop + state 削除) → dev (deploy + all bg 起動)
+# を chain。 user が「一から見たい」 時の SSOT、 dev-reset 単体は state 削除のみで
+# make dev を明示的に打つ必要がある 2 段経路の 1 cmd shortcut。
+dev-fresh: dev-reset dev
+	@echo ""
+	@echo "✅ fresh dev environment ready (state 削除 + fresh deploy 完了)."
+
 dev-sepolia: setup-env webapp-bg
 	@echo ""
 	@echo "✅ webapp running in sepolia mode."
@@ -187,7 +196,7 @@ dev-fg: setup-env
 	wait
 
 dev-stop:
-	@echo "⛔ stopping dev processes..."
+	@echo "⛔ stopping dev processes (graceful shutdown)..."
 	@if [ -f "$(WEBAPP_PID)" ]; then \
 		PID=$$(cat "$(WEBAPP_PID)"); \
 		if kill -0 $$PID 2>/dev/null; then \
@@ -206,11 +215,25 @@ dev-stop:
 		fi; \
 		rm -f "$(SETTLER_PID)"; \
 	fi
+	@# anvil は SIGTERM で --state dump 完了を待つ (最大 10 秒)。 dump 中に SIGKILL すると
+	@# JSON が途中で切れ、 次の make dev で "failed to parse json file: EOF" で起動失敗する。
+	@# graceful shutdown 経路 = SIGTERM 送信 → 1 秒間隔で process 死亡 poll (最大 10 秒) → 未死亡なら SIGKILL fallback。
 	@if [ -f "$(ANVIL_PID)" ]; then \
 		PID=$$(cat "$(ANVIL_PID)"); \
 		if kill -0 $$PID 2>/dev/null; then \
-			kill $$PID 2>/dev/null || true; \
-			echo "  ⛔ anvil stopped (PID $$PID)"; \
+			echo "  ⏳ sending SIGTERM to anvil (PID $$PID), waiting up to 10s for state dump..."; \
+			kill -TERM $$PID 2>/dev/null || true; \
+			for i in 1 2 3 4 5 6 7 8 9 10; do \
+				sleep 1; \
+				if ! kill -0 $$PID 2>/dev/null; then \
+					echo "  ⛔ anvil stopped gracefully after $${i}s (PID $$PID, state dumped safely)"; \
+					break; \
+				fi; \
+				if [ $$i -eq 10 ]; then \
+					echo "  ⚠️  anvil did not exit within 10s, sending SIGKILL (state may be corrupted)"; \
+					kill -KILL $$PID 2>/dev/null || true; \
+				fi; \
+			done; \
 		fi; \
 		rm -f "$(ANVIL_PID)"; \
 	fi
