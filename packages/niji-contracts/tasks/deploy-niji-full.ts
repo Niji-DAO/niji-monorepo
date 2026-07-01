@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 
+import { NIJI_COMPOSITE_ORDER } from '../scripts/niji-encoder';
+
 const BASE_DIR = path.join(__dirname, '../../niji-assets/images_niji');
 const TRAIT_DIRS = [
   { dir: '01_スペシャル', name: 'special', id: 0 },
@@ -19,8 +21,8 @@ const TRAIT_DIRS = [
   { dir: '12_髪の毛', name: 'hair', id: 11 },
 ];
 
-// 重ね順（下から上）: solidBackground → background → backDecoration → special → leftHand → back → clothing → choker → ear → hair → hat → headphone
-const COMPOSITE_ORDER = [10, 9, 8, 0, 3, 7, 5, 1, 6, 11, 4, 2];
+// 重ね順 SSOT = scripts/niji-encoder.ts の NIJI_COMPOSITE_ORDER (hair を hat 上に配置し hair 隠蔽解消)。
+const COMPOSITE_ORDER = NIJI_COMPOSITE_ORDER;
 
 interface ColorInfo {
   r: number;

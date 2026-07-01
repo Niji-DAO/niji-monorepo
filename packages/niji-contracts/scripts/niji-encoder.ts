@@ -65,11 +65,25 @@ export const NIJI_TRAITS: NijiTraitDef[] = [
 
 /**
  * COMPOSITE_ORDER (下 → 上) matches NijiDescriptor.sol's SVG <image> emission order.
- * solidBackground(10) → background(9) → backDecoration(8) → special(0)
- *  → leftHand(3) → back(7) → clothing(5) → choker(1)
- *  → ear(6) → hair(11) → hat(4) → headphone(2)
+ *
+ * 完璧仕様 = 12 trait 全てを user が視認できる z-order。
+ * 旧仕様は hat(4) が hair(11) より上に描画され hair 全体を隠す設計欠陥があった。
+ *
+ * 描画順序 (下 layer → 上 layer)。
+ *   1. solidBackground(10) ... 背景単色 (最背面)
+ *   2. background(9)       ... 背景 pattern
+ *   3. backDecoration(8)   ... 背中装飾 (羽等)
+ *   4. back(7)             ... 背中 (胴体後面)
+ *   5. clothing(5)         ... 服 (胴体前面)
+ *   6. choker(1)           ... チョーカー (首元、 clothing より上)
+ *   7. ear(6)              ... 耳 (顔サイド)
+ *   8. hat(4)              ... 帽子 (頭上部、 hair より下 = ブランド部分は hair が透過しない部分で見える)
+ *   9. hair(11)            ... 髪 (hat 上、 頭部前面まで来る)
+ *   10. headphone(2)        ... ヘッドホン (hair 上、 耳部品として自然)
+ *   11. leftHand(3)         ... 左手 / 武器 (キャラ前面、 手前に構える)
+ *   12. special(0)          ... エフェクト overlay (最前面)
  */
-export const NIJI_COMPOSITE_ORDER = [10, 9, 8, 0, 3, 7, 5, 1, 6, 11, 4, 2];
+export const NIJI_COMPOSITE_ORDER = [10, 9, 8, 7, 5, 1, 6, 4, 11, 2, 3, 0];
 
 export interface ColorInfo {
   r: number;
