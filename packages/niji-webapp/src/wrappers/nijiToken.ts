@@ -68,23 +68,41 @@ const toSeedObject = (seed: Seed | ContractSeedTuple | INounSeed): INounSeed => 
     return seed as INounSeed;
   }
 
+  // viem/wagmi の named multi-output abi returns は tuple (Array) で来る場合と
+  // named object で来る場合の 2 態。 tuple の場合 named access は undefined、
+  // object の場合 numeric index access は undefined になるため両経路 fallback 必須。
+  // Array 判定して優先経路を切替、 default 0 を最終 fallback。
   const tupleSeed = seed as Partial<Record<keyof INounSeed, bigint | number>> & {
     [index: number]: bigint | number | undefined;
   };
+  const isArrayLike =
+    Array.isArray(seed) ||
+    (typeof (seed as { length?: number }).length === 'number' && !('special' in seed));
+  const pick = (name: keyof INounSeed, idx: number): number => {
+    // Array-like 経路優先 (viem tuple return)
+    const arrVal = (seed as Record<number, unknown>)[idx];
+    if (typeof arrVal === 'bigint' || typeof arrVal === 'number') return Number(arrVal);
+    // named object 経路 (viem named return)
+    const namedVal = tupleSeed[name];
+    if (typeof namedVal === 'bigint' || typeof namedVal === 'number') return Number(namedVal);
+    // 最終 default (どちらも undefined)
+    if (isArrayLike && Number(arrVal) === 0) return 0;
+    return 0;
+  };
 
   return {
-    special: Number(tupleSeed.special ?? tupleSeed[0] ?? 0),
-    choker: Number(tupleSeed.choker ?? tupleSeed[1] ?? 0),
-    headphone: Number(tupleSeed.headphone ?? tupleSeed[2] ?? 0),
-    leftHand: Number(tupleSeed.leftHand ?? tupleSeed[3] ?? 0),
-    hat: Number(tupleSeed.hat ?? tupleSeed[4] ?? 0),
-    clothing: Number(tupleSeed.clothing ?? tupleSeed[5] ?? 0),
-    ear: Number(tupleSeed.ear ?? tupleSeed[6] ?? 0),
-    back: Number(tupleSeed.back ?? tupleSeed[7] ?? 0),
-    backDecoration: Number(tupleSeed.backDecoration ?? tupleSeed[8] ?? 0),
-    background: Number(tupleSeed.background ?? tupleSeed[9] ?? 0),
-    solidBackground: Number(tupleSeed.solidBackground ?? tupleSeed[10] ?? 0),
-    hair: Number(tupleSeed.hair ?? tupleSeed[11] ?? 0),
+    special: pick('special', 0),
+    choker: pick('choker', 1),
+    headphone: pick('headphone', 2),
+    leftHand: pick('leftHand', 3),
+    hat: pick('hat', 4),
+    clothing: pick('clothing', 5),
+    ear: pick('ear', 6),
+    back: pick('back', 7),
+    backDecoration: pick('backDecoration', 8),
+    background: pick('background', 9),
+    solidBackground: pick('solidBackground', 10),
+    hair: pick('hair', 11),
   };
 };
 
@@ -133,14 +151,26 @@ export const useNounSeed = (nounId: bigint): INounSeed | undefined => {
   const seed = isLocalDev ? undefined : seeds?.[Number(nounId)];
 
   // wallet 未接続でも default chain で seed を取得できるよう chainId を明示する。
+  // 31337 local dev では anvil を fresh chain で再起動しても contract address が
+  // 決定論的で同じなので wagmi 内部 cache が stale seed を返し続ける事故が発生。
+  // staleTime=0 + gcTime=0 で常に fresh fetch を強制、 auction 進行に追従する。
   const { data: response } = useReadNijiTokenSeeds({
     chainId: defaultChain.id,
     args: [nounId],
-    query: { enabled: !seed },
+    query: {
+      enabled: !seed,
+      ...(isLocalDev ? { staleTime: 0, gcTime: 0 } : {}),
+    },
   });
 
   if (response) {
+    if (isLocalDev) {
+      console.log(`[useNounSeed] nounId=${nounId} raw response =`, response);
+    }
     const seedData = toSeedObject(response as unknown as ContractSeedTuple);
+    if (isLocalDev) {
+      console.log(`[useNounSeed] nounId=${nounId} parsed =`, seedData);
+    }
     if (!isLocalDev) {
       const seedCache = localStorage.getItem(seedCacheKey);
       if (seedCache && isSeedValid(seedData)) {
