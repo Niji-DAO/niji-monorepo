@@ -121,9 +121,16 @@ const useNounSeeds = () => {
   return cachedSeeds;
 };
 
+// 31337 (anvil local) 環境では anvil を fresh chain で再起動しても contract address が
+// 決定論的 CREATE で同一になり、 localStorage の seedCache key (`seed-31337-<address>`) が
+// 変わらない。 結果 make dev-fresh 後も前 chain の古い seed が返り続け、 auction 更新しても
+// webapp 上で trait が変わって見えない。 local dev では常に chain read を primary にして
+// localStorage cache を bypass する。
+const isLocalDev = CHAIN_ID === 31337;
+
 export const useNounSeed = (nounId: bigint): INounSeed | undefined => {
   const seeds = useNounSeeds();
-  const seed = seeds?.[Number(nounId)];
+  const seed = isLocalDev ? undefined : seeds?.[Number(nounId)];
 
   // wallet 未接続でも default chain で seed を取得できるよう chainId を明示する。
   const { data: response } = useReadNijiTokenSeeds({
@@ -134,13 +141,15 @@ export const useNounSeed = (nounId: bigint): INounSeed | undefined => {
 
   if (response) {
     const seedData = toSeedObject(response as unknown as ContractSeedTuple);
-    const seedCache = localStorage.getItem(seedCacheKey);
-    if (seedCache && isSeedValid(seedData)) {
-      const updatedSeedCache = JSON.stringify({
-        ...JSON.parse(seedCache),
-        [nounId.toString()]: seedData,
-      });
-      localStorage.setItem(seedCacheKey, updatedSeedCache);
+    if (!isLocalDev) {
+      const seedCache = localStorage.getItem(seedCacheKey);
+      if (seedCache && isSeedValid(seedData)) {
+        const updatedSeedCache = JSON.stringify({
+          ...JSON.parse(seedCache),
+          [nounId.toString()]: seedData,
+        });
+        localStorage.setItem(seedCacheKey, updatedSeedCache);
+      }
     }
     return seedData;
   }
