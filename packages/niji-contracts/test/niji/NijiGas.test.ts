@@ -29,6 +29,23 @@ import { NijiArt, NijiDescriptor } from '../../typechain';
 import crypto from 'crypto';
 import { TRAIT_NAMES, TRAIT_COUNT, RESOLUTION, COMPOSITE_ORDER } from './helpers';
 
+/**
+ * CI 環境判定 (GitHub Actions runner の 7GB memory 上限で 20KB PNG x 12 layers
+ * が OOM kill される問題への対策)。
+ *
+ * - `process.env.CI = 'true'` (GH Actions / 一般的な CI で自動設定) 検出時のみ
+ *   20KB size を skip し、 local (未設定) では従来通り 20KB まで実行して
+ *   production sizing 用の gas benchmark を保持する。
+ * - 判定を module 定数として export し、 behavior test から検証可能にする。
+ */
+export const IS_CI = process.env.CI === 'true';
+
+/**
+ * CI 環境で skip する PNG size bytes (20KB のみ)。 5/10/15KB + P6 profiles +
+ * sub-operations は継続実行する (memory 上限を超えない)。
+ */
+export const CI_SKIP_SIZE_BYTES = 20_480;
+
 describe('NijiGas – production-size PNG gas benchmarks', function () {
   this.timeout(180_000); // 3 minutes — large images need longer setup
 
@@ -127,7 +144,9 @@ describe('NijiGas – production-size PNG gas benchmarks', function () {
     ];
 
     for (const { label, bytes } of sizes) {
-      it(`${label.trim()} PNG x 12 layers`, async () => {
+      // CI 環境では 20KB を skip (GH Actions 7GB memory 上限で OOM kill 対策、 GH #3012)
+      const testFn = IS_CI && bytes === CI_SKIP_SIZE_BYTES ? it.skip : it;
+      testFn(`${label.trim()} PNG x 12 layers`, async () => {
         const png = generateSyntheticPng(bytes);
         const { descriptor, traitIndices } = await deployWithImages(png, TRAIT_COUNT);
 
@@ -171,7 +190,9 @@ describe('NijiGas – production-size PNG gas benchmarks', function () {
     ];
 
     for (const { label, bytes } of sizes) {
-      it(`addTraitImage – ${label.trim()}`, async () => {
+      // CI 環境では 20KB を skip (GH Actions 7GB memory 上限で OOM kill 対策、 GH #3012)
+      const testFn = IS_CI && bytes === CI_SKIP_SIZE_BYTES ? it.skip : it;
+      testFn(`addTraitImage – ${label.trim()}`, async () => {
         const png = generateSyntheticPng(bytes);
         const tx = await art.addTraitImage(0, png);
         const receipt = await tx.wait();
