@@ -5,582 +5,2209 @@ import {
   createUseWatchContractEvent,
 } from 'wagmi/codegen';
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // NijiToken
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const nijiTokenAbi = [
   {
-    type: 'constructor',
     inputs: [
-      { name: '_noundersDAO', internalType: 'address', type: 'address' },
-      { name: '_minter', internalType: 'address', type: 'address' },
-      { name: '_descriptor', internalType: 'contract INijiDescriptor', type: 'address' },
-      { name: '_seeder', internalType: 'contract INijiSeeder', type: 'address' },
-      { name: '_proxyRegistry', internalType: 'contract IProxyRegistry', type: 'address' },
+      {
+        internalType: 'string',
+        name: '_name',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: '_symbol',
+        type: 'string',
+      },
+      {
+        internalType: 'address',
+        name: '_descriptor',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_seeder',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: '_maxSupply',
+        type: 'uint256',
+      },
     ],
     stateMutability: 'nonpayable',
+    type: 'constructor',
   },
   {
-    type: 'event',
-    anonymous: false,
+    inputs: [],
+    name: 'BaseURIIsLocked',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'CheckpointUnorderedInsertion',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'ContractsAreLocked',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'DescriptorNotSet',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'ECDSAInvalidSignature',
+    type: 'error',
+  },
+  {
     inputs: [
-      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'approved', internalType: 'address', type: 'address', indexed: true },
-      { name: 'tokenId', internalType: 'uint256', type: 'uint256', indexed: true },
+      {
+        internalType: 'uint256',
+        name: 'length',
+        type: 'uint256',
+      },
     ],
-    name: 'Approval',
+    name: 'ECDSAInvalidSignatureLength',
+    type: 'error',
   },
   {
-    type: 'event',
-    anonymous: false,
     inputs: [
-      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'operator', internalType: 'address', type: 'address', indexed: true },
-      { name: 'approved', internalType: 'bool', type: 'bool', indexed: false },
+      {
+        internalType: 'bytes32',
+        name: 's',
+        type: 'bytes32',
+      },
     ],
-    name: 'ApprovalForAll',
+    name: 'ECDSAInvalidSignatureS',
+    type: 'error',
   },
   {
-    type: 'event',
-    anonymous: false,
     inputs: [
-      { name: 'delegator', internalType: 'address', type: 'address', indexed: true },
-      { name: 'fromDelegate', internalType: 'address', type: 'address', indexed: true },
-      { name: 'toDelegate', internalType: 'address', type: 'address', indexed: true },
+      {
+        internalType: 'uint256',
+        name: 'timepoint',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint48',
+        name: 'clock',
+        type: 'uint48',
+      },
     ],
-    name: 'DelegateChanged',
+    name: 'ERC5805FutureLookup',
+    type: 'error',
   },
   {
-    type: 'event',
-    anonymous: false,
+    inputs: [],
+    name: 'ERC6372InconsistentClock',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'ERC721EnumerableForbiddenBatchMint',
+    type: 'error',
+  },
+  {
     inputs: [
-      { name: 'delegate', internalType: 'address', type: 'address', indexed: true },
-      { name: 'previousBalance', internalType: 'uint256', type: 'uint256', indexed: false },
-      { name: 'newBalance', internalType: 'uint256', type: 'uint256', indexed: false },
+      {
+        internalType: 'address',
+        name: 'sender',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
     ],
-    name: 'DelegateVotesChanged',
+    name: 'ERC721IncorrectOwner',
+    type: 'error',
   },
-  { type: 'event', anonymous: false, inputs: [], name: 'DescriptorLocked' },
   {
-    type: 'event',
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'operator',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'ERC721InsufficientApproval',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'approver',
+        type: 'address',
+      },
+    ],
+    name: 'ERC721InvalidApprover',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'operator',
+        type: 'address',
+      },
+    ],
+    name: 'ERC721InvalidOperator',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    name: 'ERC721InvalidOwner',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'receiver',
+        type: 'address',
+      },
+    ],
+    name: 'ERC721InvalidReceiver',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'sender',
+        type: 'address',
+      },
+    ],
+    name: 'ERC721InvalidSender',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'ERC721NonexistentToken',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'index',
+        type: 'uint256',
+      },
+    ],
+    name: 'ERC721OutOfBoundsIndex',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'EmptyAddress',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'EmptyPlaceholderURI',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'EnforcedPause',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'ExpectedPause',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'currentNonce',
+        type: 'uint256',
+      },
+    ],
+    name: 'InvalidAccountNonce',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'InvalidShortString',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'MaxSupplyReached',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'requested',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'limit',
+        type: 'uint256',
+      },
+    ],
+    name: 'MintBatchQuantityExceedsLimit',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'MintingNotActive',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'OnlyMinter',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    name: 'OwnableInvalidOwner',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'OwnableUnauthorizedAccount',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'PlaceholderURINotSet',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'ProvenanceHashLocked',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'ReentrancyGuardReentrantCall',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'RenounceOwnershipDisabled',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'RevealAlreadyDone',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint8',
+        name: 'bits',
+        type: 'uint8',
+      },
+      {
+        internalType: 'uint256',
+        name: 'value',
+        type: 'uint256',
+      },
+    ],
+    name: 'SafeCastOverflowedUintDowncast',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'SeederNotSet',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'str',
+        type: 'string',
+      },
+    ],
+    name: 'StringTooLong',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'TokenDoesNotExist',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'expiry',
+        type: 'uint256',
+      },
+    ],
+    name: 'VotesExpiredSignature',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'WithdrawAmountExceedsBalance',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes',
+        name: 'reason',
+        type: 'bytes',
+      },
+    ],
+    name: 'WithdrawFailed',
+    type: 'error',
+  },
+  {
     anonymous: false,
     inputs: [
       {
-        name: 'descriptor',
-        internalType: 'contract INijiDescriptor',
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
         type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'approved',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'Approval',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'operator',
+        type: 'address',
+      },
+      {
         indexed: false,
+        internalType: 'bool',
+        name: 'approved',
+        type: 'bool',
+      },
+    ],
+    name: 'ApprovalForAll',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [],
+    name: 'BaseURILocked',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'newBaseURI',
+        type: 'string',
+      },
+    ],
+    name: 'BaseURIUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_fromTokenId',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_toTokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'BatchMetadataUpdate',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'newContractURIHash',
+        type: 'string',
+      },
+    ],
+    name: 'ContractURIHashUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [],
+    name: 'ContractsLocked',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'delegator',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'fromDelegate',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'toDelegate',
+        type: 'address',
+      },
+    ],
+    name: 'DelegateChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'delegate',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'previousVotes',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'newVotes',
+        type: 'uint256',
+      },
+    ],
+    name: 'DelegateVotesChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'oldDescriptor',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'newDescriptor',
+        type: 'address',
       },
     ],
     name: 'DescriptorUpdated',
-  },
-  { type: 'event', anonymous: false, inputs: [], name: 'MinterLocked' },
-  {
     type: 'event',
+  },
+  {
     anonymous: false,
-    inputs: [{ name: 'minter', internalType: 'address', type: 'address', indexed: false }],
-    name: 'MinterUpdated',
+    inputs: [],
+    name: 'EIP712DomainChanged',
+    type: 'event',
   },
   {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256', indexed: true }],
-    name: 'NounBurned',
-  },
-  {
-    type: 'event',
     anonymous: false,
     inputs: [
-      { name: 'tokenId', internalType: 'uint256', type: 'uint256', indexed: true },
       {
-        name: 'seed',
-        internalType: 'struct INijiSeeder.Seed',
-        type: 'tuple',
-        components: [
-          { name: 'background', internalType: 'uint48', type: 'uint48' },
-          { name: 'body', internalType: 'uint48', type: 'uint48' },
-          { name: 'accessory', internalType: 'uint48', type: 'uint48' },
-          { name: 'head', internalType: 'uint48', type: 'uint48' },
-          { name: 'glasses', internalType: 'uint48', type: 'uint48' },
-        ],
         indexed: false,
+        internalType: 'uint256',
+        name: '_tokenId',
+        type: 'uint256',
       },
     ],
-    name: 'NounCreated',
+    name: 'MetadataUpdate',
+    type: 'event',
   },
   {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'noundersDAO', internalType: 'address', type: 'address', indexed: false }],
-    name: 'NoundersDAOUpdated',
-  },
-  {
-    type: 'event',
     anonymous: false,
     inputs: [
-      { name: 'previousOwner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'newOwner', internalType: 'address', type: 'address', indexed: true },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'oldMinter',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'newMinter',
+        type: 'address',
+      },
+    ],
+    name: 'MinterUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'bool',
+        name: 'isActive',
+        type: 'bool',
+      },
+    ],
+    name: 'MintingToggled',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        components: [
+          {
+            internalType: 'uint48',
+            name: 'special',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'choker',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'headphone',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'leftHand',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'hat',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'clothing',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'ear',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'back',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'backDecoration',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'background',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'solidBackground',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'hair',
+            type: 'uint48',
+          },
+        ],
+        indexed: false,
+        internalType: 'struct INijiSeeder.Seed',
+        name: 'seed',
+        type: 'tuple',
+      },
+    ],
+    name: 'NijiMinted',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'previousOwner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'OwnershipTransferStarted',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'previousOwner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
     ],
     name: 'OwnershipTransferred',
-  },
-  { type: 'event', anonymous: false, inputs: [], name: 'SeederLocked' },
-  {
     type: 'event',
+  },
+  {
     anonymous: false,
     inputs: [
-      { name: 'seeder', internalType: 'contract INijiSeeder', type: 'address', indexed: false },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'Paused',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'newPlaceholderURI',
+        type: 'string',
+      },
+    ],
+    name: 'PlaceholderURIUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'provenanceHash',
+        type: 'string',
+      },
+    ],
+    name: 'ProvenanceHashSet',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [],
+    name: 'Revealed',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'oldSeeder',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'newSeeder',
+        type: 'address',
+      },
     ],
     name: 'SeederUpdated',
+    type: 'event',
   },
   {
-    type: 'event',
     anonymous: false,
     inputs: [
-      { name: 'from', internalType: 'address', type: 'address', indexed: true },
-      { name: 'to', internalType: 'address', type: 'address', indexed: true },
-      { name: 'tokenId', internalType: 'uint256', type: 'uint256', indexed: true },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'from',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
     ],
     name: 'Transfer',
+    type: 'event',
   },
   {
-    type: 'function',
-    inputs: [],
-    name: 'DELEGATION_TYPEHASH',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'DOMAIN_TYPEHASH',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
+    anonymous: false,
     inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'Unpaused',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'Withdrawn',
+    type: 'event',
+  },
+  {
+    inputs: [],
+    name: 'CLOCK_MODE',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'MAX_MINT_BATCH_SIZE',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'acceptOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
     ],
     name: 'approve',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
     name: 'balanceOf',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
+    inputs: [],
+    name: 'baseURI',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
-    inputs: [{ name: 'nounId', internalType: 'uint256', type: 'uint256' }],
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
     name: 'burn',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [
-      { name: '', internalType: 'address', type: 'address' },
-      { name: '', internalType: 'uint32', type: 'uint32' },
-    ],
-    name: 'checkpoints',
+    inputs: [],
+    name: 'clock',
     outputs: [
-      { name: 'fromBlock', internalType: 'uint32', type: 'uint32' },
-      { name: 'votes', internalType: 'uint96', type: 'uint96' },
+      {
+        internalType: 'uint48',
+        name: '',
+        type: 'uint48',
+      },
     ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [],
     name: 'contractURI',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
-    name: 'dataURI',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
     inputs: [],
-    name: 'decimals',
-    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    name: 'currentTokenId',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: 'delegatee', internalType: 'address', type: 'address' }],
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'delegatee',
+        type: 'address',
+      },
+    ],
     name: 'delegate',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [
-      { name: 'delegatee', internalType: 'address', type: 'address' },
-      { name: 'nonce', internalType: 'uint256', type: 'uint256' },
-      { name: 'expiry', internalType: 'uint256', type: 'uint256' },
-      { name: 'v', internalType: 'uint8', type: 'uint8' },
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 's', internalType: 'bytes32', type: 'bytes32' },
+      {
+        internalType: 'address',
+        name: 'delegatee',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'nonce',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'expiry',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint8',
+        name: 'v',
+        type: 'uint8',
+      },
+      {
+        internalType: 'bytes32',
+        name: 'r',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'bytes32',
+        name: 's',
+        type: 'bytes32',
+      },
     ],
     name: 'delegateBySig',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: 'delegator', internalType: 'address', type: 'address' }],
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
     name: 'delegates',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [],
     name: 'descriptor',
-    outputs: [{ name: '', internalType: 'contract INijiDescriptor', type: 'address' }],
+    outputs: [
+      {
+        internalType: 'contract NijiDescriptor',
+        name: '',
+        type: 'address',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
-    name: 'getApproved',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    inputs: [],
+    name: 'eip712Domain',
+    outputs: [
+      {
+        internalType: 'bytes1',
+        name: 'fields',
+        type: 'bytes1',
+      },
+      {
+        internalType: 'string',
+        name: 'name',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'version',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'chainId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'verifyingContract',
+        type: 'address',
+      },
+      {
+        internalType: 'bytes32',
+        name: 'salt',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'uint256[]',
+        name: 'extensions',
+        type: 'uint256[]',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'getCurrentVotes',
-    outputs: [{ name: '', internalType: 'uint96', type: 'uint96' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
     inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'blockNumber', internalType: 'uint256', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'exists',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'getApproved',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'getCurrentVotes',
+    outputs: [
+      {
+        internalType: 'uint96',
+        name: '',
+        type: 'uint96',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'timepoint',
+        type: 'uint256',
+      },
+    ],
+    name: 'getPastTotalSupply',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'timepoint',
+        type: 'uint256',
+      },
+    ],
+    name: 'getPastVotes',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'blockNumber',
+        type: 'uint256',
+      },
     ],
     name: 'getPriorVotes',
-    outputs: [{ name: '', internalType: 'uint96', type: 'uint96' }],
+    outputs: [
+      {
+        internalType: 'uint96',
+        name: '',
+        type: 'uint96',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [
-      { name: 'owner', internalType: 'address', type: 'address' },
-      { name: 'operator', internalType: 'address', type: 'address' },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'getSeed',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'uint48',
+            name: 'special',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'choker',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'headphone',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'leftHand',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'hat',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'clothing',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'ear',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'back',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'backDecoration',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'background',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'solidBackground',
+            type: 'uint48',
+          },
+          {
+            internalType: 'uint48',
+            name: 'hair',
+            type: 'uint48',
+          },
+        ],
+        internalType: 'struct INijiSeeder.Seed',
+        name: '',
+        type: 'tuple',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'getTraitIndices',
+    outputs: [
+      {
+        internalType: 'uint256[]',
+        name: '',
+        type: 'uint256[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'getVotes',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'operator',
+        type: 'address',
+      },
     ],
     name: 'isApprovedForAll',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [],
-    name: 'isDescriptorLocked',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    name: 'isBaseURILocked',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [],
-    name: 'isMinterLocked',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    name: 'isContractsLocked',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [],
-    name: 'isSeederLocked',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    name: 'isMintingActive',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [],
-    name: 'lockDescriptor',
+    name: 'isProvenanceHashLocked',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'isRevealed',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'lockBaseURI',
     outputs: [],
     stateMutability: 'nonpayable',
-  },
-  { type: 'function', inputs: [], name: 'lockMinter', outputs: [], stateMutability: 'nonpayable' },
-  { type: 'function', inputs: [], name: 'lockSeeder', outputs: [], stateMutability: 'nonpayable' },
-  {
     type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'lockContracts',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'lockProvenanceHash',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'maxSupply',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'mint',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+    ],
+    name: 'mint',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'nonpayable',
     type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'quantity',
+        type: 'uint256',
+      },
+    ],
+    name: 'mintBatch',
+    outputs: [
+      {
+        internalType: 'uint256[]',
+        name: '',
+        type: 'uint256[]',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'minter',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [],
     name: 'name',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
     name: 'nonces',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [],
-    name: 'noundersDAO',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
-    name: 'numCheckpoints',
-    outputs: [{ name: '', internalType: 'uint32', type: 'uint32' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
     inputs: [],
     name: 'owner',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
     name: 'ownerOf',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [],
-    name: 'proxyRegistry',
-    outputs: [{ name: '', internalType: 'contract IProxyRegistry', type: 'address' }],
-    stateMutability: 'view',
+    name: 'pause',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
+    inputs: [],
+    name: 'paused',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'pendingOwner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'placeholderURI',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'provenanceHash',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'remainingSupply',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
+    type: 'function',
   },
   {
+    inputs: [],
+    name: 'reveal',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
+  },
+  {
     inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
+      {
+        internalType: 'address',
+        name: 'from',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
     ],
     name: 'safeTransferFrom',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
-      { name: '_data', internalType: 'bytes', type: 'bytes' },
+      {
+        internalType: 'address',
+        name: 'from',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
     ],
     name: 'safeTransferFrom',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [],
     name: 'seeder',
-    outputs: [{ name: '', internalType: 'contract INijiSeeder', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    name: 'seeds',
     outputs: [
-      { name: 'special', internalType: 'uint48', type: 'uint48' },
-      { name: 'choker', internalType: 'uint48', type: 'uint48' },
-      { name: 'headphone', internalType: 'uint48', type: 'uint48' },
-      { name: 'leftHand', internalType: 'uint48', type: 'uint48' },
-      { name: 'hat', internalType: 'uint48', type: 'uint48' },
-      { name: 'clothing', internalType: 'uint48', type: 'uint48' },
-      { name: 'ear', internalType: 'uint48', type: 'uint48' },
-      { name: 'back', internalType: 'uint48', type: 'uint48' },
-      { name: 'backDecoration', internalType: 'uint48', type: 'uint48' },
-      { name: 'background', internalType: 'uint48', type: 'uint48' },
-      { name: 'solidBackground', internalType: 'uint48', type: 'uint48' },
-      { name: 'hair', internalType: 'uint48', type: 'uint48' },
+      {
+        internalType: 'contract INijiSeeder',
+        name: '',
+        type: 'address',
+      },
     ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [
-      { name: 'operator', internalType: 'address', type: 'address' },
-      { name: 'approved', internalType: 'bool', type: 'bool' },
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'seeds',
+    outputs: [
+      {
+        internalType: 'uint48',
+        name: 'special',
+        type: 'uint48',
+      },
+      {
+        internalType: 'uint48',
+        name: 'choker',
+        type: 'uint48',
+      },
+      {
+        internalType: 'uint48',
+        name: 'headphone',
+        type: 'uint48',
+      },
+      {
+        internalType: 'uint48',
+        name: 'leftHand',
+        type: 'uint48',
+      },
+      {
+        internalType: 'uint48',
+        name: 'hat',
+        type: 'uint48',
+      },
+      {
+        internalType: 'uint48',
+        name: 'clothing',
+        type: 'uint48',
+      },
+      {
+        internalType: 'uint48',
+        name: 'ear',
+        type: 'uint48',
+      },
+      {
+        internalType: 'uint48',
+        name: 'back',
+        type: 'uint48',
+      },
+      {
+        internalType: 'uint48',
+        name: 'backDecoration',
+        type: 'uint48',
+      },
+      {
+        internalType: 'uint48',
+        name: 'background',
+        type: 'uint48',
+      },
+      {
+        internalType: 'uint48',
+        name: 'solidBackground',
+        type: 'uint48',
+      },
+      {
+        internalType: 'uint48',
+        name: 'hair',
+        type: 'uint48',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'operator',
+        type: 'address',
+      },
+      {
+        internalType: 'bool',
+        name: 'approved',
+        type: 'bool',
+      },
     ],
     name: 'setApprovalForAll',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'newBaseURI',
+        type: 'string',
+      },
+    ],
+    name: 'setBaseURI',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
-    inputs: [{ name: 'newContractURIHash', internalType: 'string', type: 'string' }],
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'newContractURIHash',
+        type: 'string',
+      },
+    ],
     name: 'setContractURIHash',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: '_descriptor', internalType: 'contract INijiDescriptor', type: 'address' }],
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_descriptor',
+        type: 'address',
+      },
+    ],
     name: 'setDescriptor',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: '_minter', internalType: 'address', type: 'address' }],
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_minter',
+        type: 'address',
+      },
+    ],
     name: 'setMinter',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: '_noundersDAO', internalType: 'address', type: 'address' }],
-    name: 'setNoundersDAO',
+    inputs: [
+      {
+        internalType: 'bool',
+        name: '_isActive',
+        type: 'bool',
+      },
+    ],
+    name: 'setMintingActive',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'newPlaceholderURI',
+        type: 'string',
+      },
+    ],
+    name: 'setPlaceholderURI',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
-    inputs: [{ name: '_seeder', internalType: 'contract INijiSeeder', type: 'address' }],
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: '_provenanceHash',
+        type: 'string',
+      },
+    ],
+    name: 'setProvenanceHash',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_seeder',
+        type: 'address',
+      },
+    ],
     name: 'setSeeder',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    inputs: [
+      {
+        internalType: 'bytes4',
+        name: 'interfaceId',
+        type: 'bytes4',
+      },
+    ],
     name: 'supportsInterface',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [],
     name: 'symbol',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
+    inputs: [],
+    name: 'toggleMinting',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
-    inputs: [{ name: 'index', internalType: 'uint256', type: 'uint256' }],
-    name: 'tokenByIndex',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
   },
   {
-    type: 'function',
     inputs: [
-      { name: 'owner', internalType: 'address', type: 'address' },
-      { name: 'index', internalType: 'uint256', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'index',
+        type: 'uint256',
+      },
+    ],
+    name: 'tokenByIndex',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'index',
+        type: 'uint256',
+      },
     ],
     name: 'tokenOfOwnerByIndex',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
     name: 'tokenURI',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [],
     name: 'totalSupply',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
     inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
+      {
+        internalType: 'address',
+        name: 'from',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
     ],
     name: 'transferFrom',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'function',
-    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
     name: 'transferOwnership',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
+    inputs: [],
+    name: 'unpause',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
-    inputs: [{ name: 'delegator', internalType: 'address', type: 'address' }],
-    name: 'votesToDelegate',
-    outputs: [{ name: '', internalType: 'uint96', type: 'uint96' }],
-    stateMutability: 'view',
+  },
+  {
+    inputs: [],
+    name: 'withdraw',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'withdrawAmount',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    stateMutability: 'payable',
+    type: 'receive',
   },
 ] as const;
 
 /**
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const nijiTokenAddress = {
   1: '0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03',
-  11155111: '0x4C4674bb72a096855496a7204962297bd7e12b85',
   31337: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
   84532: '0x0000000000000000000000000000000000000000',
+  11155111: '0x4C4674bb72a096855496a7204962297bd7e12b85',
 } as const;
 
 /**
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const nijiTokenConfig = { address: nijiTokenAddress, abi: nijiTokenAbi } as const;
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiToken = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -588,34 +2215,34 @@ export const useReadNijiToken = /*#__PURE__*/ createUseReadContract({
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"DELEGATION_TYPEHASH"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"CLOCK_MODE"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useReadNijiTokenDelegationTypehash = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiTokenCLOCKMODE = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'DELEGATION_TYPEHASH',
+  functionName: 'CLOCK_MODE',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"DOMAIN_TYPEHASH"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"MAX_MINT_BATCH_SIZE"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useReadNijiTokenDomainTypehash = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiTokenMAXMINTBATCHSIZE = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'DOMAIN_TYPEHASH',
+  functionName: 'MAX_MINT_BATCH_SIZE',
 });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"balanceOf"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenBalanceOf = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -624,58 +2251,58 @@ export const useReadNijiTokenBalanceOf = /*#__PURE__*/ createUseReadContract({
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"checkpoints"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"baseURI"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useReadNijiTokenCheckpoints = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiTokenBaseURI = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'checkpoints',
+  functionName: 'baseURI',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"clock"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenClock = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'clock',
 });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"contractURI"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useReadNijiTokenContractUri = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiTokenContractURI = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
   functionName: 'contractURI',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"dataURI"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"currentTokenId"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useReadNijiTokenDataUri = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiTokenCurrentTokenId = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'dataURI',
-});
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"decimals"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
- */
-export const useReadNijiTokenDecimals = /*#__PURE__*/ createUseReadContract({
-  abi: nijiTokenAbi,
-  address: nijiTokenAddress,
-  functionName: 'decimals',
+  functionName: 'currentTokenId',
 });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"delegates"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenDelegates = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -686,8 +2313,8 @@ export const useReadNijiTokenDelegates = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"descriptor"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenDescriptor = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -696,10 +2323,34 @@ export const useReadNijiTokenDescriptor = /*#__PURE__*/ createUseReadContract({
 });
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"eip712Domain"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenEip712Domain = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'eip712Domain',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"exists"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenExists = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'exists',
+});
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"getApproved"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenGetApproved = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -710,8 +2361,8 @@ export const useReadNijiTokenGetApproved = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"getCurrentVotes"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenGetCurrentVotes = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -720,10 +2371,34 @@ export const useReadNijiTokenGetCurrentVotes = /*#__PURE__*/ createUseReadContra
 });
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"getPastTotalSupply"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenGetPastTotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'getPastTotalSupply',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"getPastVotes"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenGetPastVotes = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'getPastVotes',
+});
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"getPriorVotes"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenGetPriorVotes = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -732,10 +2407,46 @@ export const useReadNijiTokenGetPriorVotes = /*#__PURE__*/ createUseReadContract
 });
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"getSeed"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenGetSeed = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'getSeed',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"getTraitIndices"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenGetTraitIndices = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'getTraitIndices',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"getVotes"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenGetVotes = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'getVotes',
+});
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"isApprovedForAll"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenIsApprovedForAll = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -744,46 +2455,82 @@ export const useReadNijiTokenIsApprovedForAll = /*#__PURE__*/ createUseReadContr
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"isDescriptorLocked"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"isBaseURILocked"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useReadNijiTokenIsDescriptorLocked = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiTokenIsBaseURILocked = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'isDescriptorLocked',
+  functionName: 'isBaseURILocked',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"isMinterLocked"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"isContractsLocked"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useReadNijiTokenIsMinterLocked = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiTokenIsContractsLocked = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'isMinterLocked',
+  functionName: 'isContractsLocked',
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"isSeederLocked"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"isMintingActive"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useReadNijiTokenIsSeederLocked = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiTokenIsMintingActive = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'isSeederLocked',
+  functionName: 'isMintingActive',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"isProvenanceHashLocked"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenIsProvenanceHashLocked = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'isProvenanceHashLocked',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"isRevealed"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenIsRevealed = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'isRevealed',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"maxSupply"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenMaxSupply = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'maxSupply',
 });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"minter"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenMinter = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -794,8 +2541,8 @@ export const useReadNijiTokenMinter = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"name"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenName = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -806,8 +2553,8 @@ export const useReadNijiTokenName = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"nonces"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenNonces = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -816,34 +2563,10 @@ export const useReadNijiTokenNonces = /*#__PURE__*/ createUseReadContract({
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"noundersDAO"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
- */
-export const useReadNijiTokenNoundersDao = /*#__PURE__*/ createUseReadContract({
-  abi: nijiTokenAbi,
-  address: nijiTokenAddress,
-  functionName: 'noundersDAO',
-});
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"numCheckpoints"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
- */
-export const useReadNijiTokenNumCheckpoints = /*#__PURE__*/ createUseReadContract({
-  abi: nijiTokenAbi,
-  address: nijiTokenAddress,
-  functionName: 'numCheckpoints',
-});
-
-/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"owner"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenOwner = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -854,8 +2577,8 @@ export const useReadNijiTokenOwner = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"ownerOf"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenOwnerOf = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -864,22 +2587,82 @@ export const useReadNijiTokenOwnerOf = /*#__PURE__*/ createUseReadContract({
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"proxyRegistry"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"paused"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useReadNijiTokenProxyRegistry = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiTokenPaused = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'proxyRegistry',
+  functionName: 'paused',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"pendingOwner"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenPendingOwner = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'pendingOwner',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"placeholderURI"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenPlaceholderURI = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'placeholderURI',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"provenanceHash"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenProvenanceHash = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'provenanceHash',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"remainingSupply"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenRemainingSupply = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'remainingSupply',
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useReadNijiTokenRenounceOwnership = /*#__PURE__*/ createUseReadContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'renounceOwnership',
 });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"seeder"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenSeeder = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -890,8 +2673,8 @@ export const useReadNijiTokenSeeder = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"seeds"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenSeeds = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -902,8 +2685,8 @@ export const useReadNijiTokenSeeds = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"supportsInterface"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenSupportsInterface = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -914,8 +2697,8 @@ export const useReadNijiTokenSupportsInterface = /*#__PURE__*/ createUseReadCont
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"symbol"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenSymbol = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -926,8 +2709,8 @@ export const useReadNijiTokenSymbol = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"tokenByIndex"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenTokenByIndex = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -938,8 +2721,8 @@ export const useReadNijiTokenTokenByIndex = /*#__PURE__*/ createUseReadContract(
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"tokenOfOwnerByIndex"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenTokenOfOwnerByIndex = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -950,10 +2733,10 @@ export const useReadNijiTokenTokenOfOwnerByIndex = /*#__PURE__*/ createUseReadCo
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"tokenURI"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useReadNijiTokenTokenUri = /*#__PURE__*/ createUseReadContract({
+export const useReadNijiTokenTokenURI = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
   functionName: 'tokenURI',
@@ -962,8 +2745,8 @@ export const useReadNijiTokenTokenUri = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"totalSupply"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useReadNijiTokenTotalSupply = /*#__PURE__*/ createUseReadContract({
   abi: nijiTokenAbi,
@@ -972,22 +2755,10 @@ export const useReadNijiTokenTotalSupply = /*#__PURE__*/ createUseReadContract({
 });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"votesToDelegate"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
- */
-export const useReadNijiTokenVotesToDelegate = /*#__PURE__*/ createUseReadContract({
-  abi: nijiTokenAbi,
-  address: nijiTokenAddress,
-  functionName: 'votesToDelegate',
-});
-
-/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiToken = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -995,10 +2766,22 @@ export const useWriteNijiToken = /*#__PURE__*/ createUseWriteContract({
 });
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"acceptOwnership"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWriteNijiTokenAcceptOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'acceptOwnership',
+});
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"approve"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiTokenApprove = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -1009,8 +2792,8 @@ export const useWriteNijiTokenApprove = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"burn"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiTokenBurn = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -1021,8 +2804,8 @@ export const useWriteNijiTokenBurn = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"delegate"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiTokenDelegate = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -1033,8 +2816,8 @@ export const useWriteNijiTokenDelegate = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"delegateBySig"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiTokenDelegateBySig = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -1043,46 +2826,46 @@ export const useWriteNijiTokenDelegateBySig = /*#__PURE__*/ createUseWriteContra
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"lockDescriptor"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"lockBaseURI"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useWriteNijiTokenLockDescriptor = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiTokenLockBaseURI = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'lockDescriptor',
+  functionName: 'lockBaseURI',
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"lockMinter"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"lockContracts"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useWriteNijiTokenLockMinter = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiTokenLockContracts = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'lockMinter',
+  functionName: 'lockContracts',
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"lockSeeder"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"lockProvenanceHash"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useWriteNijiTokenLockSeeder = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiTokenLockProvenanceHash = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'lockSeeder',
+  functionName: 'lockProvenanceHash',
 });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"mint"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiTokenMint = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -1091,22 +2874,46 @@ export const useWriteNijiTokenMint = /*#__PURE__*/ createUseWriteContract({
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"renounceOwnership"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"mintBatch"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useWriteNijiTokenRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiTokenMintBatch = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'renounceOwnership',
+  functionName: 'mintBatch',
+});
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"pause"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWriteNijiTokenPause = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'pause',
+});
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"reveal"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWriteNijiTokenReveal = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'reveal',
 });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"safeTransferFrom"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiTokenSafeTransferFrom = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -1117,8 +2924,8 @@ export const useWriteNijiTokenSafeTransferFrom = /*#__PURE__*/ createUseWriteCon
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setApprovalForAll"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiTokenSetApprovalForAll = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -1127,12 +2934,24 @@ export const useWriteNijiTokenSetApprovalForAll = /*#__PURE__*/ createUseWriteCo
 });
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setBaseURI"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWriteNijiTokenSetBaseURI = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'setBaseURI',
+});
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setContractURIHash"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useWriteNijiTokenSetContractUriHash = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiTokenSetContractURIHash = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
   functionName: 'setContractURIHash',
@@ -1141,8 +2960,8 @@ export const useWriteNijiTokenSetContractUriHash = /*#__PURE__*/ createUseWriteC
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setDescriptor"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiTokenSetDescriptor = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -1153,8 +2972,8 @@ export const useWriteNijiTokenSetDescriptor = /*#__PURE__*/ createUseWriteContra
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setMinter"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiTokenSetMinter = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -1163,22 +2982,46 @@ export const useWriteNijiTokenSetMinter = /*#__PURE__*/ createUseWriteContract({
 });
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setNoundersDAO"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setMintingActive"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useWriteNijiTokenSetNoundersDao = /*#__PURE__*/ createUseWriteContract({
+export const useWriteNijiTokenSetMintingActive = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'setNoundersDAO',
+  functionName: 'setMintingActive',
+});
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setPlaceholderURI"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWriteNijiTokenSetPlaceholderURI = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'setPlaceholderURI',
+});
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setProvenanceHash"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWriteNijiTokenSetProvenanceHash = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'setProvenanceHash',
 });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setSeeder"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiTokenSetSeeder = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -1187,10 +3030,22 @@ export const useWriteNijiTokenSetSeeder = /*#__PURE__*/ createUseWriteContract({
 });
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"toggleMinting"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWriteNijiTokenToggleMinting = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'toggleMinting',
+});
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"transferFrom"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiTokenTransferFrom = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -1201,8 +3056,8 @@ export const useWriteNijiTokenTransferFrom = /*#__PURE__*/ createUseWriteContrac
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"transferOwnership"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWriteNijiTokenTransferOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: nijiTokenAbi,
@@ -1211,10 +3066,46 @@ export const useWriteNijiTokenTransferOwnership = /*#__PURE__*/ createUseWriteCo
 });
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"unpause"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWriteNijiTokenUnpause = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'unpause',
+});
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"withdraw"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWriteNijiTokenWithdraw = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'withdraw',
+});
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"withdrawAmount"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWriteNijiTokenWithdrawAmount = /*#__PURE__*/ createUseWriteContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'withdrawAmount',
+});
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiToken = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1222,10 +3113,22 @@ export const useSimulateNijiToken = /*#__PURE__*/ createUseSimulateContract({
 });
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"acceptOwnership"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useSimulateNijiTokenAcceptOwnership = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'acceptOwnership',
+});
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"approve"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiTokenApprove = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1236,8 +3139,8 @@ export const useSimulateNijiTokenApprove = /*#__PURE__*/ createUseSimulateContra
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"burn"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiTokenBurn = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1248,8 +3151,8 @@ export const useSimulateNijiTokenBurn = /*#__PURE__*/ createUseSimulateContract(
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"delegate"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiTokenDelegate = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1260,8 +3163,8 @@ export const useSimulateNijiTokenDelegate = /*#__PURE__*/ createUseSimulateContr
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"delegateBySig"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiTokenDelegateBySig = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1270,46 +3173,46 @@ export const useSimulateNijiTokenDelegateBySig = /*#__PURE__*/ createUseSimulate
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"lockDescriptor"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"lockBaseURI"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useSimulateNijiTokenLockDescriptor = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiTokenLockBaseURI = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'lockDescriptor',
+  functionName: 'lockBaseURI',
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"lockMinter"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"lockContracts"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useSimulateNijiTokenLockMinter = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiTokenLockContracts = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'lockMinter',
+  functionName: 'lockContracts',
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"lockSeeder"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"lockProvenanceHash"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useSimulateNijiTokenLockSeeder = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiTokenLockProvenanceHash = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'lockSeeder',
+  functionName: 'lockProvenanceHash',
 });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"mint"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiTokenMint = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1318,22 +3221,46 @@ export const useSimulateNijiTokenMint = /*#__PURE__*/ createUseSimulateContract(
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"renounceOwnership"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"mintBatch"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useSimulateNijiTokenRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiTokenMintBatch = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'renounceOwnership',
+  functionName: 'mintBatch',
+});
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"pause"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useSimulateNijiTokenPause = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'pause',
+});
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"reveal"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useSimulateNijiTokenReveal = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'reveal',
 });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"safeTransferFrom"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiTokenSafeTransferFrom = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1344,8 +3271,8 @@ export const useSimulateNijiTokenSafeTransferFrom = /*#__PURE__*/ createUseSimul
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setApprovalForAll"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiTokenSetApprovalForAll = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1354,12 +3281,24 @@ export const useSimulateNijiTokenSetApprovalForAll = /*#__PURE__*/ createUseSimu
 });
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setBaseURI"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useSimulateNijiTokenSetBaseURI = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'setBaseURI',
+});
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setContractURIHash"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useSimulateNijiTokenSetContractUriHash = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiTokenSetContractURIHash = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
   functionName: 'setContractURIHash',
@@ -1368,8 +3307,8 @@ export const useSimulateNijiTokenSetContractUriHash = /*#__PURE__*/ createUseSim
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setDescriptor"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiTokenSetDescriptor = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1380,8 +3319,8 @@ export const useSimulateNijiTokenSetDescriptor = /*#__PURE__*/ createUseSimulate
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setMinter"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiTokenSetMinter = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1390,22 +3329,46 @@ export const useSimulateNijiTokenSetMinter = /*#__PURE__*/ createUseSimulateCont
 });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setNoundersDAO"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setMintingActive"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useSimulateNijiTokenSetNoundersDao = /*#__PURE__*/ createUseSimulateContract({
+export const useSimulateNijiTokenSetMintingActive = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  functionName: 'setNoundersDAO',
+  functionName: 'setMintingActive',
+});
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setPlaceholderURI"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useSimulateNijiTokenSetPlaceholderURI = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'setPlaceholderURI',
+});
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setProvenanceHash"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useSimulateNijiTokenSetProvenanceHash = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'setProvenanceHash',
 });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"setSeeder"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiTokenSetSeeder = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1414,10 +3377,22 @@ export const useSimulateNijiTokenSetSeeder = /*#__PURE__*/ createUseSimulateCont
 });
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"toggleMinting"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useSimulateNijiTokenToggleMinting = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'toggleMinting',
+});
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"transferFrom"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiTokenTransferFrom = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1428,8 +3403,8 @@ export const useSimulateNijiTokenTransferFrom = /*#__PURE__*/ createUseSimulateC
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"transferOwnership"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useSimulateNijiTokenTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
   abi: nijiTokenAbi,
@@ -1438,10 +3413,46 @@ export const useSimulateNijiTokenTransferOwnership = /*#__PURE__*/ createUseSimu
 });
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"unpause"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useSimulateNijiTokenUnpause = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'unpause',
+});
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"withdraw"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useSimulateNijiTokenWithdraw = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'withdraw',
+});
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"withdrawAmount"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useSimulateNijiTokenWithdrawAmount = /*#__PURE__*/ createUseSimulateContract({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  functionName: 'withdrawAmount',
+});
+
+/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWatchNijiTokenEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiTokenAbi,
@@ -1449,10 +3460,10 @@ export const useWatchNijiTokenEvent = /*#__PURE__*/ createUseWatchContractEvent(
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"Approval"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"Approval"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWatchNijiTokenApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiTokenAbi,
@@ -1461,10 +3472,10 @@ export const useWatchNijiTokenApprovalEvent = /*#__PURE__*/ createUseWatchContra
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"ApprovalForAll"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"ApprovalForAll"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWatchNijiTokenApprovalForAllEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiTokenAbi,
@@ -1473,10 +3484,71 @@ export const useWatchNijiTokenApprovalForAllEvent = /*#__PURE__*/ createUseWatch
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"DelegateChanged"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"BaseURILocked"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWatchNijiTokenBaseURILockedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  eventName: 'BaseURILocked',
+});
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"BaseURIUpdated"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWatchNijiTokenBaseURIUpdatedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  eventName: 'BaseURIUpdated',
+});
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"BatchMetadataUpdate"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWatchNijiTokenBatchMetadataUpdateEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  eventName: 'BatchMetadataUpdate',
+});
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"ContractURIHashUpdated"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWatchNijiTokenContractURIHashUpdatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: nijiTokenAbi,
+    address: nijiTokenAddress,
+    eventName: 'ContractURIHashUpdated',
+  });
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"ContractsLocked"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWatchNijiTokenContractsLockedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  eventName: 'ContractsLocked',
+});
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"DelegateChanged"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWatchNijiTokenDelegateChangedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiTokenAbi,
@@ -1485,35 +3557,24 @@ export const useWatchNijiTokenDelegateChangedEvent = /*#__PURE__*/ createUseWatc
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"DelegateVotesChanged"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"DelegateVotesChanged"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useWatchNijiTokenDelegateVotesChangedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiTokenDelegateVotesChangedEvent = /*#__PURE__*/ createUseWatchContractEvent(
+  {
     abi: nijiTokenAbi,
     address: nijiTokenAddress,
     eventName: 'DelegateVotesChanged',
-  });
+  },
+);
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"DescriptorLocked"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"DescriptorUpdated"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
- */
-export const useWatchNijiTokenDescriptorLockedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: nijiTokenAbi,
-  address: nijiTokenAddress,
-  eventName: 'DescriptorLocked',
-});
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"DescriptorUpdated"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWatchNijiTokenDescriptorUpdatedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiTokenAbi,
@@ -1522,22 +3583,34 @@ export const useWatchNijiTokenDescriptorUpdatedEvent = /*#__PURE__*/ createUseWa
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"MinterLocked"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"EIP712DomainChanged"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useWatchNijiTokenMinterLockedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiTokenEIP712DomainChangedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  eventName: 'MinterLocked',
+  eventName: 'EIP712DomainChanged',
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"MinterUpdated"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"MetadataUpdate"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWatchNijiTokenMetadataUpdateEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  eventName: 'MetadataUpdate',
+});
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"MinterUpdated"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWatchNijiTokenMinterUpdatedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiTokenAbi,
@@ -1546,71 +3619,110 @@ export const useWatchNijiTokenMinterUpdatedEvent = /*#__PURE__*/ createUseWatchC
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"NounBurned"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"MintingToggled"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useWatchNijiTokenNounBurnedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiTokenMintingToggledEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  eventName: 'NounBurned',
+  eventName: 'MintingToggled',
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"NounCreated"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"NijiMinted"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useWatchNijiTokenNounCreatedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiTokenNijiMintedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  eventName: 'NounCreated',
+  eventName: 'NijiMinted',
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"NoundersDAOUpdated"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"OwnershipTransferStarted"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useWatchNijiTokenNoundersDaoUpdatedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: nijiTokenAbi,
-  address: nijiTokenAddress,
-  eventName: 'NoundersDAOUpdated',
-});
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"OwnershipTransferred"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
- */
-export const useWatchNijiTokenOwnershipTransferredEvent =
+export const useWatchNijiTokenOwnershipTransferStartedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: nijiTokenAbi,
     address: nijiTokenAddress,
-    eventName: 'OwnershipTransferred',
+    eventName: 'OwnershipTransferStarted',
   });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"SeederLocked"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"OwnershipTransferred"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
-export const useWatchNijiTokenSeederLockedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchNijiTokenOwnershipTransferredEvent = /*#__PURE__*/ createUseWatchContractEvent(
+  {
+    abi: nijiTokenAbi,
+    address: nijiTokenAddress,
+    eventName: 'OwnershipTransferred',
+  },
+);
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"Paused"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWatchNijiTokenPausedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
-  eventName: 'SeederLocked',
+  eventName: 'Paused',
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"SeederUpdated"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"PlaceholderURIUpdated"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWatchNijiTokenPlaceholderURIUpdatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: nijiTokenAbi,
+    address: nijiTokenAddress,
+    eventName: 'PlaceholderURIUpdated',
+  });
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"ProvenanceHashSet"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWatchNijiTokenProvenanceHashSetEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  eventName: 'ProvenanceHashSet',
+});
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"Revealed"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWatchNijiTokenRevealedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  eventName: 'Revealed',
+});
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"SeederUpdated"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWatchNijiTokenSeederUpdatedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiTokenAbi,
@@ -1619,13 +3731,37 @@ export const useWatchNijiTokenSeederUpdatedEvent = /*#__PURE__*/ createUseWatchC
 });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `eventName` set to `"Transfer"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"Transfer"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4c4674bb72a096855496a7204962297bd7e12b85)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
  */
 export const useWatchNijiTokenTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: nijiTokenAbi,
   address: nijiTokenAddress,
   eventName: 'Transfer',
+});
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"Unpaused"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWatchNijiTokenUnpausedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  eventName: 'Unpaused',
+});
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link nijiTokenAbi}__ and `functionName` set to `"Withdrawn"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x4C4674bb72a096855496a7204962297bd7e12b85)
+ */
+export const useWatchNijiTokenWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: nijiTokenAbi,
+  address: nijiTokenAddress,
+  eventName: 'Withdrawn',
 });

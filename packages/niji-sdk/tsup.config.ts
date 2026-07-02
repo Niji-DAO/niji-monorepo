@@ -17,6 +17,8 @@ export default defineConfig({
     'react/treasury': 'src/react/treasury/index.ts',
     'actions/legacy-treasury': 'src/actions/legacy-treasury.gen.ts',
     'react/legacy-treasury': 'src/react/legacy-treasury.gen.ts',
+    'actions/seeder': 'src/actions/seeder.gen.ts',
+    'react/seeder': 'src/react/seeder.gen.ts',
     'actions/stream-factory': 'src/actions/stream-factory.gen.ts',
     'react/stream-factory': 'src/react/stream-factory.gen.ts',
     'actions/stream': 'src/actions/stream.gen.ts',

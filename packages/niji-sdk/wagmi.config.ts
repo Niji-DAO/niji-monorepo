@@ -3,7 +3,14 @@ import { actions, etherscan, react } from '@wagmi/cli/plugins';
 import 'dotenv/config';
 import { mainnet, sepolia } from '@wagmi/core/chains';
 import { streamAbi } from './src/abis/StreamAbi';
+import { nijiTokenAbi } from './src/abis/NijiTokenAbi';
+import { nijiDescriptorAbi } from './src/abis/NijiDescriptorAbi';
+import { nijiAuctionHouseAbi } from './src/abis/NijiAuctionHouseAbi';
+import { nijiSeederAbi } from './src/abis/NijiSeederAbi';
 
+// Niji で fork 大幅修正した contract は etherscan 経由 (mainnet 旧 Nouns address から
+// fetch) だと Nouns 旧 abi を掴んでしまうため、 local abi (packages/niji-contracts/abi/) を
+// SSOT にする。 詳細は GH Issue #3003 (wagmi.config を local abi 経路に統一)。
 const etherscanContractConfigs = [
   {
     name: 'NijiGovernor',
@@ -38,30 +45,6 @@ const etherscanContractConfigs = [
     },
   },
   {
-    name: 'NijiToken',
-    fileName: 'token',
-    address: {
-      [mainnet.id]: '0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03',
-      [sepolia.id]: '0x4c4674bb72a096855496a7204962297bd7e12b85',
-    },
-  },
-  {
-    name: 'NijiAuctionHouse',
-    fileName: 'auction-house',
-    address: {
-      [mainnet.id]: '0x830bd73e4184cef73443c15111a1df14e495c706',
-      [sepolia.id]: '0x488609b7113fcf3b761a05956300d605e8f6bcaf',
-    },
-  },
-  {
-    name: 'NijiDescriptor',
-    fileName: 'descriptor',
-    address: {
-      [mainnet.id]: '0x33a9c445fb4fb21f2c030a6b2d3e2f12d017bfac',
-      [sepolia.id]: '0x79e04ebcdf1ac2661697b23844149b43acc002d5',
-    },
-  },
-  {
     name: 'NijiStreamFactory',
     fileName: 'stream-factory',
     address: {
@@ -87,11 +70,54 @@ const etherscanContractConfigs = [
   },
 ];
 
+// Niji fork で abi 変更した 4 contract は local abi 経路で SSOT 化。
+// etherscan 経由だと Nouns 旧 address (0x9c8ff314... 等) から Nouns 旧関数
+// (accessories / bodies / backgrounds 5 outputs seeds 等) が fetch され、
+// runtime で「見た目変わらない」 系の regression を招く。
+const localAbiContractConfigs = [
+  {
+    name: 'NijiToken',
+    fileName: 'token',
+    abi: nijiTokenAbi,
+    address: {
+      [mainnet.id]: '0x9c8ff314c9bc7f6e59a9d9225fb22946427edc03',
+      [sepolia.id]: '0x4c4674bb72a096855496a7204962297bd7e12b85',
+    },
+  },
+  {
+    name: 'NijiAuctionHouse',
+    fileName: 'auction-house',
+    abi: nijiAuctionHouseAbi,
+    address: {
+      [mainnet.id]: '0x830bd73e4184cef73443c15111a1df14e495c706',
+      [sepolia.id]: '0x488609b7113fcf3b761a05956300d605e8f6bcaf',
+    },
+  },
+  {
+    name: 'NijiDescriptor',
+    fileName: 'descriptor',
+    abi: nijiDescriptorAbi,
+    address: {
+      [mainnet.id]: '0x33a9c445fb4fb21f2c030a6b2d3e2f12d017bfac',
+      [sepolia.id]: '0x79e04ebcdf1ac2661697b23844149b43acc002d5',
+    },
+  },
+];
+
+// NijiSeeder は runtime で NijiToken.seeder() から address 解決するため、
+// abi のみ export (streamAbi と同じ address-less pattern)。
+// 詳細 = packages/niji-webapp/src/pages/CrystalBall/index.tsx 内 SEEDER_ABI 手書きを
+// 本 gen file 経由の readNijiSeeder / useReadNijiSeeder に統一する経路。
 const staticContractConfigs = [
   {
     name: 'NijiStream',
     fileName: 'stream',
     abi: streamAbi,
+  },
+  {
+    name: 'NijiSeeder',
+    fileName: 'seeder',
+    abi: nijiSeederAbi,
   },
 ];
 
@@ -239,6 +265,30 @@ export default defineConfig(() => [
         }),
         react(),
       ],
+    },
+  ]),
+  ...localAbiContractConfigs.flatMap(({ name, fileName, abi, address }) => [
+    {
+      out: `src/actions/${fileName}.gen.ts`,
+      contracts: [
+        {
+          abi,
+          name,
+          address: address as Record<1, `0x${string}`> & Partial<Record<number, `0x${string}`>>,
+        },
+      ],
+      plugins: [actions({ overridePackageName: '@wagmi/core' })],
+    },
+    {
+      out: `src/react/${fileName}.gen.ts`,
+      contracts: [
+        {
+          abi,
+          name,
+          address: address as Record<1, `0x${string}`> & Partial<Record<number, `0x${string}`>>,
+        },
+      ],
+      plugins: [react()],
     },
   ]),
   ...staticContractConfigs.flatMap(({ name, fileName, abi }) => [

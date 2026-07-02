@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import {
+  nijiSeederAbi,
   useReadNijiAuctionHouseAuctionStorage,
   useReadNijiTokenDescriptor,
   useReadNijiTokenSeeder,
@@ -12,37 +13,8 @@ import { useReadContracts } from 'wagmi';
 
 import { NijiWithSeed } from '@/components/Niji';
 
-const SEEDER_ABI = [
-  {
-    type: 'function',
-    name: 'generateSeed',
-    stateMutability: 'view',
-    inputs: [
-      { name: 'tokenId', type: 'uint256' },
-      { name: 'descriptor', type: 'address' },
-    ],
-    outputs: [
-      {
-        type: 'tuple',
-        components: [
-          { name: 'special', type: 'uint48' },
-          { name: 'choker', type: 'uint48' },
-          { name: 'headphone', type: 'uint48' },
-          { name: 'leftHand', type: 'uint48' },
-          { name: 'hat', type: 'uint48' },
-          { name: 'clothing', type: 'uint48' },
-          { name: 'ear', type: 'uint48' },
-          { name: 'back', type: 'uint48' },
-          { name: 'backDecoration', type: 'uint48' },
-          { name: 'background', type: 'uint48' },
-          { name: 'solidBackground', type: 'uint48' },
-          { name: 'hair', type: 'uint48' },
-        ],
-      },
-    ],
-  },
-] as const;
-
+// seeder address は runtime で NijiToken.seeder() から解決するため、 abi のみ
+// @niji/sdk 経由で参照する。 GH #3003 で local abi 経路に統一済。
 const PREVIEW_COUNT = 5;
 
 interface SeedTuple {
@@ -98,7 +70,7 @@ function CrystalBallPage() {
     contracts: ready
       ? nextNounIds.map(nounId => ({
           address: seederAddr,
-          abi: SEEDER_ABI,
+          abi: nijiSeederAbi,
           functionName: 'generateSeed' as const,
           args: [nounId, descriptorAddr] as const,
         }))
