@@ -1,3 +1,4 @@
+import { nijiAuctionHouseAddress } from '@niji/sdk/actions';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { graphql } from 'ponder';
@@ -9,7 +10,13 @@ import {
   type ThreeDsCallbackStore,
 } from '../handlers/fiat-bid/3ds-callback.js';
 import { createAuthorizeApp, type FiatBidStore } from '../handlers/fiat-bid/authorize.js';
+import { createPlaceBidApp, type PlaceBidStore } from '../handlers/fiat-bid/place-bid.js';
 import { createSpotRateApp } from '../handlers/spot-rate.js';
+import {
+  BidRelay,
+  createBaseSepoliaPublicClient,
+  createEnvSigner,
+} from '../services/bidRelay/index.js';
 import { GmoClient } from '../services/gmo/client.js';
 import { SpotRateFetcher } from '../services/spotRate/index.js';
 
@@ -117,5 +124,90 @@ const threeDsCallbackStore: ThreeDsCallbackStore = {
   },
 };
 app.route('/api/v1/fiat-bid', createThreeDsCallbackApp({ gmoClient, store: threeDsCallbackStore }));
+
+/**
+ * Issue #3008 — POST /api/v1/fiat-bid/place-bid (運営 EOA 代理 bid tx 発火)
+ *
+ * fiat_bid.status = "3ds-verified" record を lookup → NijiAuctionHouseV3.createBid tx broadcast →
+ * fiat_bid.status = "bid-placed" UPDATE + txHash 返却。
+ *
+ * revert (BidTooLow / AuctionEnded / gas 高騰 / RPC 障害) 時は GMO alterTran cancel + fiat_bid.status = "cancelled"。
+ *
+ * 秘密鍵管理 = Phase 1 は env OPERATOR_EOA_PRIVATE_KEY 直、 SignerProvider interface で抽象化 (Phase 3 KMS 移行想定)。
+ *
+ * NijiAuctionHouseV3 address = Base Sepolia (chainId=84532) は sdk 側 nijiAuctionHouseAddress で 0x0 placeholder、
+ * 実 deploy 後は env NIJI_AUCTION_HOUSE_ADDRESS で override 可能。
+ */
+const operatorPrivateKeyRaw = process.env['OPERATOR_EOA_PRIVATE_KEY'] ?? '';
+const baseSepoliaRpcUrl =
+  process.env['BASE_SEPOLIA_RPC_URL'] ??
+  process.env['PONDER_RPC_URL_84532'] ??
+  'https://sepolia.base.org';
+const nijiAuctionHouseAddressOverride = process.env['NIJI_AUCTION_HOUSE_ADDRESS'];
+const auctionHouseAddress = (nijiAuctionHouseAddressOverride ??
+  nijiAuctionHouseAddress[84532]) as `0x${string}`;
+
+/**
+ * BidRelay singleton は operatorPrivateKey が env に設定されている時のみ生成する。
+ * env 未設定時は place-bid endpoint は 500 応答するが、 module load 時 crash を避ける
+ * (test / codegen / typecheck 時に env 不要の設計)。
+ */
+let placeBidStore: PlaceBidStore | null = null;
+let bidRelay: BidRelay | null = null;
+const isValidOperatorKey =
+  operatorPrivateKeyRaw.length === 66 && operatorPrivateKeyRaw.startsWith('0x');
+if (
+  isValidOperatorKey &&
+  (auctionHouseAddress as string) !== '0x0000000000000000000000000000000000000000'
+) {
+  const operatorPrivateKey = operatorPrivateKeyRaw as `0x${string}`;
+  const signer = createEnvSigner({
+    privateKey: operatorPrivateKey,
+    rpcUrl: baseSepoliaRpcUrl,
+  });
+  const publicClient = createBaseSepoliaPublicClient(baseSepoliaRpcUrl);
+  bidRelay = new BidRelay({
+    signer,
+    publicClient,
+    auctionHouseAddress,
+  });
+
+  placeBidStore = {
+    findVerified: async authId => {
+      const rows = await (db
+        .select()
+        .from(schema.fiatBid)
+        .where(eq(schema.fiatBid.authId, authId)) as unknown as Promise<
+        Array<{
+          authId: string;
+          status: string;
+          ethAmount: bigint;
+        }>
+      >);
+      const row = rows[0];
+      if (!row) return null;
+      // Phase 1 mock 環境の accessPass 派生 (3ds-callback と同一 logic、 実 GMO 切替時に schema field 追加で置換)
+      const accessPass = authId.startsWith('mock-access-')
+        ? `mock-pass-${(Number(authId.replace('mock-access-', '')) + 1).toString().padStart(8, '0')}`
+        : `${authId}-pass`;
+      return {
+        authId: row.authId,
+        status: row.status,
+        ethAmount: row.ethAmount,
+        accessPass,
+      };
+    },
+    updateStatus: async input => {
+      const update: Record<string, unknown> = { status: input.status };
+      // txHash 保存 field は Phase 1 schema に無い、 Phase 2 で fiat_bid.bidTxHash 追加時に配線
+      // (現状は log / operational trace のみで管理)
+      await writableDb
+        .update(schema.fiatBid)
+        .set(update)
+        .where(eq(schema.fiatBid.authId, input.authId));
+    },
+  };
+  app.route('/api/v1/fiat-bid', createPlaceBidApp({ bidRelay, gmoClient, store: placeBidStore }));
+}
 
 export default app;
