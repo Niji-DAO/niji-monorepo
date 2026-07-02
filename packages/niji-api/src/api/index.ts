@@ -1,4 +1,4 @@
-import { nijiAuctionHouseAddress } from '@niji/sdk/actions';
+import { nijiAuctionHouseAddress, nijiTokenAddress } from '@niji/sdk/actions';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { graphql } from 'ponder';
@@ -10,7 +10,9 @@ import {
   type ThreeDsCallbackStore,
 } from '../handlers/fiat-bid/3ds-callback.js';
 import { createAuthorizeApp, type FiatBidStore } from '../handlers/fiat-bid/authorize.js';
+import { createCaptureApp, type CaptureStore } from '../handlers/fiat-bid/capture.js';
 import { createPlaceBidApp, type PlaceBidStore } from '../handlers/fiat-bid/place-bid.js';
+import { createTransferNftApp, type TransferNftStore } from '../handlers/fiat-bid/transfer-nft.js';
 import { createSpotRateApp } from '../handlers/spot-rate.js';
 import {
   BidRelay,
@@ -18,6 +20,11 @@ import {
   createEnvSigner,
 } from '../services/bidRelay/index.js';
 import { GmoClient } from '../services/gmo/client.js';
+import {
+  TransferRelay,
+  createTransferEnvSigner,
+  createTransferPublicClient,
+} from '../services/settlement/index.js';
 import { SpotRateFetcher } from '../services/spotRate/index.js';
 
 /**
@@ -208,6 +215,112 @@ if (
     },
   };
   app.route('/api/v1/fiat-bid', createPlaceBidApp({ bidRelay, gmoClient, store: placeBidStore }));
+}
+
+/**
+ * Issue #3010 — POST /api/v1/fiat-bid/capture + /transfer (落札後 capture + transferFrom)
+ *
+ * capture — fiat_bid.status = "bid-placed" record を GMO alterTran(SALES) で実売上確定、
+ *           status = "captured" + capturedAt UPDATE。 fail 時は運営 alert + status = "cancelled"。
+ * transfer — fiat_bid.status = "captured" record に対し 運営 EOA から user wallet に
+ *            NijiToken.transferFrom を viem で発火、 status = "transferred" + transferredAt UPDATE。
+ *
+ * NijiToken address = Base Sepolia は sdk 側 nijiTokenAddress で 0x0 placeholder、
+ * 実 deploy 後は env NIJI_TOKEN_ADDRESS で override 可能。
+ */
+const captureStore: CaptureStore = {
+  findBidPlaced: async authId => {
+    const rows = await (db
+      .select()
+      .from(schema.fiatBid)
+      .where(eq(schema.fiatBid.authId, authId)) as unknown as Promise<
+      Array<{
+        authId: string;
+        status: string;
+        jpyAmount: number;
+      }>
+    >);
+    const row = rows[0];
+    if (!row) return null;
+    const accessPass = authId.startsWith('mock-access-')
+      ? `mock-pass-${(Number(authId.replace('mock-access-', '')) + 1).toString().padStart(8, '0')}`
+      : `${authId}-pass`;
+    return {
+      authId: row.authId,
+      status: row.status,
+      accessPass,
+      jpyAmount: row.jpyAmount,
+    };
+  },
+  updateCaptureStatus: async input => {
+    const update: Record<string, unknown> = { status: input.status };
+    if (input.capturedAt !== undefined) {
+      update['capturedAt'] = input.capturedAt;
+    }
+    await writableDb
+      .update(schema.fiatBid)
+      .set(update)
+      .where(eq(schema.fiatBid.authId, input.authId));
+  },
+};
+app.route('/api/v1/fiat-bid', createCaptureApp({ gmoClient, store: captureStore }));
+
+/**
+ * transfer endpoint は operatorPrivateKey + NIJI_TOKEN address が揃っている場合のみ register
+ * env 未設定時は module load 時 crash を避け、 endpoint 呼出時に 404 相当となる
+ */
+const nijiTokenAddressOverride = process.env['NIJI_TOKEN_ADDRESS'];
+const tokenAddress = (nijiTokenAddressOverride ?? nijiTokenAddress[84532]) as `0x${string}`;
+if (
+  isValidOperatorKey &&
+  (tokenAddress as string) !== '0x0000000000000000000000000000000000000000'
+) {
+  const operatorPrivateKey = operatorPrivateKeyRaw as `0x${string}`;
+  const transferSigner = createTransferEnvSigner({
+    privateKey: operatorPrivateKey,
+    rpcUrl: baseSepoliaRpcUrl,
+  });
+  const transferPublicClient = createTransferPublicClient(baseSepoliaRpcUrl);
+  const transferRelay = new TransferRelay({
+    signer: transferSigner,
+    publicClient: transferPublicClient,
+    nijiTokenAddress: tokenAddress,
+  });
+
+  const transferStore: TransferNftStore = {
+    findCaptured: async authId => {
+      const rows = await (db
+        .select()
+        .from(schema.fiatBid)
+        .where(eq(schema.fiatBid.authId, authId)) as unknown as Promise<
+        Array<{
+          authId: string;
+          status: string;
+          bidderWallet: `0x${string}`;
+          auctionId: bigint;
+        }>
+      >);
+      const row = rows[0];
+      if (!row) return null;
+      return {
+        authId: row.authId,
+        status: row.status,
+        bidderWallet: row.bidderWallet,
+        auctionId: row.auctionId,
+      };
+    },
+    updateTransferStatus: async input => {
+      // txHash は Phase 1 schema に無い、 Phase 2 で fiat_bid.transferTxHash 追加時に配線
+      await writableDb
+        .update(schema.fiatBid)
+        .set({
+          status: input.status,
+          transferredAt: input.transferredAt,
+        })
+        .where(eq(schema.fiatBid.authId, input.authId));
+    },
+  };
+  app.route('/api/v1/fiat-bid', createTransferNftApp({ transferRelay, store: transferStore }));
 }
 
 export default app;
