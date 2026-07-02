@@ -26,7 +26,8 @@ const AuctionPage: React.FC<AuctionPageProps> = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!lastAuctionNounId) return;
+    // lastAuctionNounId が 0 (Niji #0 のみ mint 済) は合法値。 未初期化 (null/undefined) のみ skip。
+    if (lastAuctionNounId == null) return;
     if (auctionId === undefined) {
       if (onDisplayAuctionNounId === Number(lastAuctionNounId)) return;
       setOnDisplayAuctionNounId(Number(lastAuctionNounId));

@@ -78,7 +78,13 @@ export const Niji: FC<NijiProps> = ({
   const seed = providedSeed ?? (nounId !== undefined ? fetchedSeed : undefined);
 
   const { data: svg } = useQuery({
-    queryKey: ['niji-svg', seed] as const,
+    // seed object を JSON stringify で primitive 化 (deep compare を強制)、
+    // nounId も明示 append で「別 Niji の同 seed 偶発一致」 でも別 cache 化する。
+    queryKey: [
+      'niji-svg',
+      nounId?.toString() ?? 'no-id',
+      seed ? JSON.stringify(seed) : 'no-seed',
+    ] as const,
     queryFn: () => {
       const { parts, background } = getNijiData(seed!);
       return buildSVG(parts, NijiImageData.palette, background);

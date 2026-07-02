@@ -1,3 +1,5 @@
+import { lazy, Suspense } from 'react';
+
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
@@ -11,28 +13,35 @@ import NavBar from '@/components/NavBar';
 import NetworkAlert from '@/components/NetworkAlert';
 import { Toaster } from '@/components/ui/sonner';
 import { CHAIN_ID } from '@/config';
+// AuctionPage は default route (/ と /niji/:id) で FCP に必須なので eager import 維持。
+// 他 21 pages は React.lazy で code splitting、 main bundle から切り離し。
 import AuctionPage from '@/pages/Auction';
-import { BrandAssetsPage } from '@/pages/BrandAssets/BrandAssetsPage';
-import { CalendarPage } from '@/pages/CalendarPage';
-import CandidatePage from '@/pages/Candidate';
-import CandidateHistoryPage from '@/pages/CandidateHistoryPage';
-import CreateCandidatePage from '@/pages/CreateCandidate';
-import CreateProposalPage from '@/pages/CreateProposal';
-import CrystalBallPage from '@/pages/CrystalBall';
-import DelegatePage from '@/pages/DelegatePage';
-import EditCandidatePage from '@/pages/EditCandidate';
-import EditProposalPage from '@/pages/EditProposal';
-import FaucetPage from '@/pages/Faucet';
-import ForkPage from '@/pages/Fork';
-import ForksPage from '@/pages/Forks';
-import GovernancePage from '@/pages/Governance';
-import NijisPage from '@/pages/NijisPage';
-import NotFoundPage from '@/pages/NotFound';
-import NoundersPage from '@/pages/Nounders';
-import Playground from '@/pages/Playground';
-import ProposalHistory from '@/pages/ProposalHistory';
-import TraitsPage from '@/pages/TraitsPage';
-import VotePage from '@/pages/Vote';
+
+const BrandAssetsPage = lazy(() =>
+  import('@/pages/BrandAssets/BrandAssetsPage').then(m => ({ default: m.BrandAssetsPage })),
+);
+const CalendarPage = lazy(() =>
+  import('@/pages/CalendarPage').then(m => ({ default: m.CalendarPage })),
+);
+const CandidatePage = lazy(() => import('@/pages/Candidate'));
+const CandidateHistoryPage = lazy(() => import('@/pages/CandidateHistoryPage'));
+const CreateCandidatePage = lazy(() => import('@/pages/CreateCandidate'));
+const CreateProposalPage = lazy(() => import('@/pages/CreateProposal'));
+const CrystalBallPage = lazy(() => import('@/pages/CrystalBall'));
+const DelegatePage = lazy(() => import('@/pages/DelegatePage'));
+const EditCandidatePage = lazy(() => import('@/pages/EditCandidate'));
+const EditProposalPage = lazy(() => import('@/pages/EditProposal'));
+const FaucetPage = lazy(() => import('@/pages/Faucet'));
+const ForkPage = lazy(() => import('@/pages/Fork'));
+const ForksPage = lazy(() => import('@/pages/Forks'));
+const GovernancePage = lazy(() => import('@/pages/Governance'));
+const NijisPage = lazy(() => import('@/pages/NijisPage'));
+const NotFoundPage = lazy(() => import('@/pages/NotFound'));
+const NoundersPage = lazy(() => import('@/pages/Nounders'));
+const Playground = lazy(() => import('@/pages/Playground'));
+const ProposalHistory = lazy(() => import('@/pages/ProposalHistory'));
+const TraitsPage = lazy(() => import('@/pages/TraitsPage'));
+const VotePage = lazy(() => import('@/pages/Vote'));
 
 import classes from './App.module.css';
 
@@ -46,40 +55,45 @@ function App() {
       {chainId !== undefined && Number(CHAIN_ID) !== chainId && <NetworkAlert />}
       <BrowserRouter>
         <NavBar />
-        <Routes>
-          <Route path="/" element={<AuctionPage />} />
-          <Route path="/niji/:id" element={<AuctionPage />} />
-          <Route path="/nounders" element={<NoundersPage />} />
-          <Route path="/create-proposal" element={<CreateProposalPage />} />
-          <Route path="/create-candidate" element={<CreateCandidatePage />} />
-          <Route path="/vote" element={<GovernancePage />} />
-          <Route path="/vote/:id" element={<VotePage />} />
-          <Route path="/vote/:id/history" element={<ProposalHistory />} />
-          <Route path="/vote/:id/history/:versionNumber" element={<ProposalHistory />} />
-          <Route
-            path="/vote/:id/edit"
-            element={<EditProposalPage match={{ params: { id: ':id' } }} />}
-          />
-          <Route path="/candidates/:id" element={<CandidatePage />} />
-          <Route
-            path="/candidates/:id/edit"
-            element={<EditCandidatePage match={{ params: { id: ':id' } }} />}
-          />
-          <Route path="/candidates/:id/history" element={<CandidateHistoryPage />} />
-          <Route path="/candidates/:id/history/:versionNumber" element={<CandidateHistoryPage />} />
-          <Route path="/playground" element={<Playground />} />
-          <Route path="/delegate" element={<DelegatePage />} />
-          <Route path="/traits" element={<TraitsPage />} />
-          <Route path="/explore" element={<Navigate to="/nijis" replace />} />
-          <Route path="/nijis" element={<NijisPage />} />
-          <Route path="/fork/:id" element={<ForkPage />} />
-          <Route path="/fork" element={<ForksPage />} />
-          <Route path="/brand" element={<BrandAssetsPage />} />
-          <Route path="/calendar" element={<CalendarPage />} />
-          <Route path="/crystal-ball" element={<CrystalBallPage />} />
-          {Number(CHAIN_ID) === 31337 && <Route path="/faucet" element={<FaucetPage />} />}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route path="/" element={<AuctionPage />} />
+            <Route path="/niji/:id" element={<AuctionPage />} />
+            <Route path="/nounders" element={<NoundersPage />} />
+            <Route path="/create-proposal" element={<CreateProposalPage />} />
+            <Route path="/create-candidate" element={<CreateCandidatePage />} />
+            <Route path="/vote" element={<GovernancePage />} />
+            <Route path="/vote/:id" element={<VotePage />} />
+            <Route path="/vote/:id/history" element={<ProposalHistory />} />
+            <Route path="/vote/:id/history/:versionNumber" element={<ProposalHistory />} />
+            <Route
+              path="/vote/:id/edit"
+              element={<EditProposalPage match={{ params: { id: ':id' } }} />}
+            />
+            <Route path="/candidates/:id" element={<CandidatePage />} />
+            <Route
+              path="/candidates/:id/edit"
+              element={<EditCandidatePage match={{ params: { id: ':id' } }} />}
+            />
+            <Route path="/candidates/:id/history" element={<CandidateHistoryPage />} />
+            <Route
+              path="/candidates/:id/history/:versionNumber"
+              element={<CandidateHistoryPage />}
+            />
+            <Route path="/playground" element={<Playground />} />
+            <Route path="/delegate" element={<DelegatePage />} />
+            <Route path="/traits" element={<TraitsPage />} />
+            <Route path="/explore" element={<Navigate to="/nijis" replace />} />
+            <Route path="/nijis" element={<NijisPage />} />
+            <Route path="/fork/:id" element={<ForkPage />} />
+            <Route path="/fork" element={<ForksPage />} />
+            <Route path="/brand" element={<BrandAssetsPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/crystal-ball" element={<CrystalBallPage />} />
+            {Number(CHAIN_ID) === 31337 && <Route path="/faucet" element={<FaucetPage />} />}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
         <Footer />
         <Toaster
           expand
