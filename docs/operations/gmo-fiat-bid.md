@@ -114,14 +114,135 @@ capture / transfer / chargeback の 3 経路で発生する異常状態に対す
 - Railway (or 本番相当環境) の log console で `[capture-failed]` / `[transfer-failed]` を毎日目視確認する運営 routine
 - Phase 4 で PagerDuty / Slack Webhook / 監視 dashboard に自動配線
 
-## 今後の追記項目 (Issue 3 以降)
+## 運営 EOA 鍵管理 (Issue #3011 Phase D、 Phase 移行 SSOT)
 
-Issue 3 (authorize endpoint) 完了時に本 doc に追記する項目 —
+fiat bid 経路で運営 EOA が bid tx / transferFrom を broadcast する秘密鍵の管理経路。 Phase 別に階段的に強化する SSOT。
 
-- 運営 EOA 鍵管理経路 (env 直書き / KMS / 1Password / hardware wallet の選定)
-- GMO 契約情報 (加盟店 ID / サイト ID / 3DS 契約プラン)
-- e2e test 起動手順 (Playwright + mock server 経由 golden path)
-- 監視 / alert 経路 (Phase 4 で自動化、 Phase 1 は log 手動確認)
+### Phase 1 (現状 = Base Sepolia MVP)
+
+- 保管形式 — `packages/niji-api/.env` 内 `OPERATOR_PRIVATE_KEY=0x...` env 変数直書き (32 byte hex)
+- 対象 chain — Base Sepolia (chainId 84532)、 gas は Base Sepolia faucet で調達
+- 責務者 — 開発担当者 (`.env` は `.gitignore` 対象、 commit 禁止)
+- 事故対応 — 秘密鍵漏洩検知時は即時 `env` 更新 + Base Sepolia 側 EOA 廃棄、 testnet 資産のみで実 JPY 影響なし
+- faucet 復旧手順 — Base Sepolia faucet (Alchemy / Coinbase 公式) で 0.05 ETH 未満は自動、 それ以上は運営が手動 request
+
+### Phase 3 (本番 = Base Mainnet 切替)
+
+- 保管形式 — AWS KMS (asymmetric CMK) 経由の envelope encryption、 `packages/niji-api` は KMS API 経由で per-tx 署名
+- 対象 chain — Base Mainnet (chainId 8453)、 gas は運営 treasury から補充
+- 責務者 — 運営 + 開発リーダー 2 名の IAM 権限、 `kms:Sign` は audit log で追跡
+- 事故対応 — KMS key rotate 手順を GMO 決済停止 → EOA 移行 → GMO 決済再開の 3 stage で実施
+- 移行手順 — Phase 3 移行 PR で `env` 直読 signer から KMS signer に切替、 fallback として env signer を残す (feature flag `USE_KMS_SIGNER`)
+
+### KMS 選定理由 (Phase 3)
+
+- 対案 1Password + agent — セキュリティ低い、 CI からの直接 signing 経路が不透明
+- 対案 hardware wallet (Ledger) — 24/7 broadcast 経路と非互換 (人手介入必須)
+- KMS 採用 — AWS 実運用の tx signing 実績あり、 IAM で細粒度権限、 CloudTrail で audit log
+
+## GMO 契約情報 (Issue #3011 Phase D)
+
+GMO ペイメントゲートウェイ (PG) 契約情報の保管先と切替手順。 Phase 別 SSOT。
+
+### 契約情報項目
+
+| 項目 | 内容 | 保管先 (Phase 1) | 保管先 (Phase 3) |
+|---|---|---|---|
+| 加盟店 ID (merchant ID、 13 桁) | GMO 契約書に記載 | `env GMO_MERCHANT_ID` | 1Password 加盟店 vault |
+| サイト ID (site ID、 13 桁) | GMO 契約書に記載 | `env GMO_SITE_ID` | 1Password 加盟店 vault |
+| ショップパスワード (可変 8-20 文字) | GMO 管理画面で生成 | `env GMO_SHOP_PASS` | AWS Secrets Manager |
+| 3DS 契約プラン | GMO 契約書 (Phase 1 は demo、 Phase 3 で 3DS 2.0 本契約) | 契約書 PDF (1Password) | 契約書 PDF (1Password) |
+| GMO 側連絡先 | 技術問合せ email + 電話番号 | 契約書 PDF | 契約書 PDF |
+
+### 事故対応連絡先
+
+- GMO PG 技術サポート — GMO 契約書記載 (Phase 3 契約時に確定)
+- Niji DAO 運営問合せ email — `support@niji-dao.example` (Phase 3 で確定 email に置換)
+- 緊急時 chargeback 対応 — GMO 管理画面の dispute section から手動対応
+
+## mock 環境切替手順 (Issue #3011 Phase D、 詳細版)
+
+Phase 1 開発 / test 期間中は GMO デモ環境期限切れのため MSW mock server で e2e 検証する。 切替 procedure と rollback を SSOT 化。
+
+### mock → 本番 切替 procedure (Phase 3 移行時)
+
+1. GMO 本番契約書を取得 (加盟店 ID / サイト ID / ショップパスワード)
+2. 1Password 「加盟店 vault」 に契約情報を保管
+3. AWS Secrets Manager に `GMO_SHOP_PASS` を registration
+4. `packages/niji-api/.env.production` を作成、 `USE_GMO_MOCK=false` + `GMO_ENDPOINT=https://p01.mul-pay.jp` に設定
+5. `packages/niji-api` を deploy、 smoke test で GMO PG API `/entryTran` 疎通確認
+6. webapp env `VITE_ENABLE_FIAT_BID=true` に切替、 release 後 24 時間監視 (log 経路 = Railway / Datadog 予定)
+
+### rollback (本番 → mock、 事故時)
+
+1. `packages/niji-api/.env.production` の `USE_GMO_MOCK=true` に即時切替 + redeploy
+2. webapp env `VITE_ENABLE_FIAT_BID=false` に切替、 fiat bid UI 非表示化 (ETH bid 経路のみ稼働)
+3. GMO 側の与信枠は最大 60 日で自動 revoke、 rollback 前後の bid record を audit
+4. 事故原因の post-mortem を `decisions/personal/{date}-gmo-mock-rollback-{reason}.md` に記録
+
+## Phase 移行手順 (Issue #3011 Phase D、 Phase 1 → 2 → 3 → 4 SSOT)
+
+Phase 1 MVP から Phase 4 自動化までの段階的移行手順。 各 Phase の gate 条件と実装項目を明確化する。
+
+### Phase 1 → 2 (fiat bid 増額 UX 実装)
+
+- gate 条件 — Phase 1 の 3 marker (test-passed + verify-passed + review-passed) 全 active、 Base Sepolia golden path 1 spec pass
+- 実装項目 —
+  - fiat bid 増額 (現在の fiat bid 額 + n 円 で再 bid) UI 実装
+  - 既存 fiat_bid record の `status = re-bid` 遷移 + GMO 与信枠 revoke + 新 authId 生成の atomic 処理
+  - 増額履歴 audit log
+- 期間見積 — 2-3 週間 (grilling P9 で確定した Phase 2 スコープ)
+
+### Phase 2 → 3 (Base Mainnet + GMO 本番切替)
+
+- gate 条件 — Phase 2 完了 + AWS KMS 配線完了 + GMO 本番契約締結
+- 実装項目 —
+  - Base Sepolia → Base Mainnet 切替 (chainId + RPC + contract 再 deploy)
+  - GMO デモ → 本番 endpoint 切替 (`USE_GMO_MOCK=false` + `GMO_ENDPOINT=https://p01.mul-pay.jp`)
+  - env 直読 signer → KMS signer 切替 (`USE_KMS_SIGNER=true` feature flag)
+  - 3DS 2.0 本契約 activation + fraud alert 経路配線
+- 期間見積 — 3-4 週間 (契約締結 + KMS 配線 + smoke test の総和)
+
+### Phase 3 → 4 (retry queue + monitoring 自動化)
+
+- gate 条件 — Phase 3 で本番稼働 3 ヶ月経過 + 事故 recovery 手動対応の実績蓄積
+- 実装項目 —
+  - transfer 失敗の retry queue (SQS + Lambda worker、 3 回 exponential backoff)
+  - capture 失敗の GMO 管理画面 API 経由 auto retry
+  - PagerDuty / Slack Webhook / 監視 dashboard 統合
+  - chargeback 検出の GMO webhook 受信経路 (現在は手動確認)
+- 期間見積 — 4-6 週間 (queue 実装 + monitoring 統合 + on-call 体制構築)
+
+## Phase 1 完了確認 (Issue #3011 Phase E、 3 marker 発行前提)
+
+Phase 1 全 8 Issue merge 後、 以下を確認して 3 marker (test-passed + verify-passed + review-passed) を発行する。
+
+### Phase 1 完了 Issue 一覧 (8 件)
+
+| Issue | title | 主担当 file | 完了 status |
+|---|---|---|---|
+| #3004 | GMO SDK 依存追加 + MSW mock server 設定 | `packages/niji-api/src/mocks/gmo-server.ts` | merged |
+| #3005 | fiat_bid schema + Ponder table 定義 | `packages/niji-api/ponder.schema.ts` | merged |
+| #3006 | 与信枠 authorize endpoint (entryTran + execTran) | `packages/niji-api/src/handlers/fiat-bid/authorize.ts` | merged |
+| #3007 | 3DS 2.0 full redirect + callback endpoint | `packages/niji-webapp/src/pages/FiatBid/ThreeDSRedirect.tsx` | merged |
+| #3008 | 運営 EOA 代理 bid tx 発火 endpoint | `packages/niji-api/src/services/bidRelay/index.ts` | merged |
+| #3009 | FiatBidModal + 4 段 stepper UI | `packages/niji-webapp/src/components/FiatBidModal/` | merged |
+| #3010 | 落札後 FiatSettlementModal + capture + transferFrom | `packages/niji-api/src/services/settlement/index.ts` | merged |
+| #3011 | Terms + 特商法 page + Playwright e2e + operations runbook | `packages/niji-webapp/src/pages/Legal/Tokushoho.tsx` | 本 Issue |
+
+### 3 marker 発行手順 (Phase 1 全 Issue merged 後)
+
+`rules/quality.md` § test-passed marker 発行前提 の 3 条件を確認してから marker を発行する。
+
+1. **test-passed** — 各 PR で behavior test 追加が完了しており、 `pnpm test` が全 pass。 marker file = `<repo>/.context/markers/test-passed-{repo-slug}-phase-1-gmo-fiat-bid.md`、 内容に「Phase 1 全 8 Issue の behavior test 状況表 + 実行 log 抜粋」 を記載
+2. **verify-passed** — `/verify` skill で lint + typecheck + test + build が全 pass。 marker file = `verify-passed-{repo-slug}-phase-1-gmo-fiat-bid.md`
+3. **review-passed** — `/code-review-router` で 4 pass review 完了、 blocking issue ゼロ。 marker file = `review-passed-{repo-slug}-phase-1-gmo-fiat-bid.md`
+
+### Phase 1 完了判定後の次 action
+
+- Phase 1 完了 marker 3 件 active で Phase 1 → 2 移行判定に進む
+- Phase 2 の spec (現在は `tests/spec/gmo-fiat-bid/Phase1-*.md` のみ) を新規策定、 `tests/spec/gmo-fiat-bid/Phase2-01-master-spec.md` として grilling 経路で確定
+- Phase 2 の Issue 分割案を `Phase2-02-issue-breakdown.md` に落し込み、 dev-flow chain で順次実装
 
 ## 関連 SSOT
 

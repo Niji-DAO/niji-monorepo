@@ -221,6 +221,11 @@ msgstr "提出提案需要 {threshold} 票"
 msgid "Add as many or as few of your Nijis as you’d like. Additional Nijis can be added during the escrow and forking periods."
 msgstr "根据您的喜好添加任意数量的 Nijis。在托管和分叉期间可以添加更多的 Nijis。"
 
+#: src/components/Bid/index.tsx
+#: src/components/Bid/index.tsx
+msgid "クレカで bid (JPY)"
+msgstr "用信用卡竞标 (日元)"
+
 #: src/components/ProposalActionsModal/steps/SelectProposalActionStep/index.tsx
 msgid "Add Proposal Action"
 msgstr "添加提案操作"
@@ -378,6 +383,10 @@ msgstr "设置批准"
 #: src/components/Holder/index.tsx
 msgid "Failed to fetch Niji info"
 msgstr "获取 Niji 信息失败"
+
+#: src/components/Footer.tsx
+msgid "特定商取引法に基づく表記"
+msgstr "基于特定商业交易法的表述"
 
 #: src/components/AuctionTimer/index.tsx
 msgid "s"

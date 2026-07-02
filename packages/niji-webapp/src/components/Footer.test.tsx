@@ -149,6 +149,15 @@ describe('Footer', () => {
     expect(container.querySelector('a[href*="0xGOV"]')).not.toBeNull();
   });
 
+  // Issue #3011 Phase A = 特商法 page link を Legal category に追加
+  it('Legal category includes 特定商取引法に基づく表記 link to /legal/tokushoho', () => {
+    const { container } = wrap(<Footer />);
+    expect(container.textContent).toContain('Legal');
+    const legalLink = container.querySelector('a[href="/legal/tokushoho"]');
+    expect(legalLink).not.toBeNull();
+    expect(legalLink?.textContent).toContain('特定商取引法に基づく表記');
+  });
+
   it('renders for empty MemoryRouter without crash', () => {
     expect(() => wrap(<Footer />)).not.toThrow();
   });

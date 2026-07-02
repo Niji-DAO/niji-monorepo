@@ -58,6 +58,11 @@ export const Footer = () => {
         },
       ],
     },
+    {
+      // Issue #3011 = GMO 加盟店契約要件 (grilling P5 SSOT)、 特定商取引法に基づく表記を常時参照可能に置く
+      category: 'Legal',
+      items: [{ label: t`特定商取引法に基づく表記`, url: '/legal/tokushoho' }],
+    },
   ];
 
   const socialItems: { alt: string; url: string; icon: React.ReactNode }[] = [
