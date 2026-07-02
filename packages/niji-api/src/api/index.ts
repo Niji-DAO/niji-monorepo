@@ -1,5 +1,5 @@
 import { nijiAuctionHouseAddress, nijiTokenAddress } from '@niji/sdk/actions';
-import { eq } from 'drizzle-orm';
+import { and, eq, inArray, lte } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { graphql } from 'ponder';
 import { db } from 'ponder:api';
@@ -22,6 +22,12 @@ import {
   createEnvSigner,
 } from '../services/bidRelay/index.js';
 import { GmoClient } from '../services/gmo/client.js';
+import {
+  ReauthorizationWorker,
+  type FiatBidRecordForReauth,
+  type ReauthorizationExecutor,
+  type ReauthorizationStore,
+} from '../services/reauthorization/index.js';
 import {
   TransferRelay,
   createTransferEnvSigner,
@@ -408,6 +414,105 @@ if (
     },
   };
   app.route('/api/v1/fiat-bid', createTransferNftApp({ transferRelay, store: transferStore }));
+}
+
+/**
+ * Issue #3024 — 45 日超 fallback ReauthorizationWorker
+ *
+ * 1h 周期 (env `REAUTHORIZATION_INTERVAL_HOURS` で override 可能) で fiat_bid table を scan、
+ * createdAt > 45 日 & status ∈ {pending, 3ds-verified, bid-placed} record を検出 → GMO 再 authorize 発火。
+ * 成功時 reauthorizationCount++ + lastReauthorizedAt UPDATE、 失敗時 status=cancelled + 運営 alert + user 通知。
+ *
+ * env `REAUTHORIZATION_WORKER_ENABLED` truthy 判定 —
+ * dev / test / codegen 時に不要な interval 起動を避けるため opt-in 制御。 production では true 必須。
+ * mock 完結前提 (USE_GMO_MOCK=true) では cardToken は mock server が受入れる placeholder を使用。
+ */
+const reauthEnabledRaw = process.env['REAUTHORIZATION_WORKER_ENABLED'] ?? 'false';
+const reauthEnabled = ['true', '1', 'yes'].includes(reauthEnabledRaw.trim().toLowerCase());
+
+if (reauthEnabled) {
+  const reauthStore: ReauthorizationStore = {
+    findEligibleRecords: async input => {
+      const rows = await (db
+        .select()
+        .from(schema.fiatBid)
+        .where(
+          and(
+            lte(schema.fiatBid.createdAt, input.cutoffDate),
+            inArray(schema.fiatBid.status, ['pending', '3ds-verified', 'bid-placed']),
+          ),
+        ) as unknown as Promise<
+        Array<{
+          authId: string;
+          bidderWallet: `0x${string}`;
+          bidderEmail: string | null;
+          auctionId: bigint;
+          jpyAmount: number;
+          ethAmount: bigint;
+          status: string;
+          createdAt: Date;
+          reauthorizationCount: number;
+        }>
+      >);
+      return rows.map((row): FiatBidRecordForReauth => {
+        // Phase 1/2 mock 環境の accessPass 派生 (authorize / place-bid / topup と同一 logic)
+        const accessPass = row.authId.startsWith('mock-access-')
+          ? `mock-pass-${(Number(row.authId.replace('mock-access-', '')) + 1).toString().padStart(8, '0')}`
+          : `${row.authId}-pass`;
+        return {
+          authId: row.authId,
+          accessPass,
+          bidderWallet: row.bidderWallet,
+          bidderEmail: row.bidderEmail,
+          auctionId: row.auctionId,
+          jpyAmount: row.jpyAmount,
+          ethAmount: row.ethAmount,
+          createdAt: row.createdAt,
+          status: row.status,
+          reauthorizationCount: row.reauthorizationCount,
+        };
+      });
+    },
+    updateAfterReauthSuccess: async input => {
+      // primary key (authId) を旧→新 で置換 + reauthorizationCount + lastReauthorizedAt
+      await writableDb
+        .update(schema.fiatBid)
+        .set({
+          authId: input.newAuthId,
+          reauthorizationCount: input.newReauthorizationCount,
+          lastReauthorizedAt: input.lastReauthorizedAt,
+        })
+        .where(eq(schema.fiatBid.authId, input.oldAuthId));
+    },
+    updateStatusCancelled: async input => {
+      await writableDb
+        .update(schema.fiatBid)
+        .set({ status: 'cancelled' })
+        .where(eq(schema.fiatBid.authId, input.authId));
+    },
+  };
+
+  const reauthExecutor: ReauthorizationExecutor = {
+    reauthorize: async input => {
+      // mock 環境ではどの cardToken でも通る、 実 GMO では PG Token を bidder 経由で再取得する必要がある
+      // (Phase 4 で bidder 再認証 UI 追加時に PG Token 再取得経路を配線)。
+      const cardToken = process.env['GMO_REAUTH_PLACEHOLDER_TOKEN'] ?? 'mock-card-token-reauth';
+      const result = await gmoClient.reauthorize({
+        oldAccessId: input.oldAuthId,
+        oldAccessPass: input.oldAccessPass,
+        newOrderId: input.newOrderId,
+        jpyAmount: input.jpyAmount,
+        cardToken,
+      });
+      return { authId: result.authId, accessPass: result.accessPass };
+    },
+  };
+
+  const reauthWorker = new ReauthorizationWorker({
+    store: reauthStore,
+    executor: reauthExecutor,
+  });
+  reauthWorker.start();
 }
 
 export default app;

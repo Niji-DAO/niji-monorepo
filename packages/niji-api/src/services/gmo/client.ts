@@ -366,6 +366,63 @@ export class GmoClient {
     });
   }
 
+  /**
+   * 与信枠 再 authorize (Issue #3024 = 45 日超 fallback で ReauthorizationWorker が発火)
+   *
+   * 処理順 —
+   * (1) 旧 authorization を alterTran(JobCd=VOID) で cancel (60 日 hold 期限リセット + 二重 hold 防止)
+   * (2) entryTran で新 accessId / accessPass 発行 (JobCd=AUTH、 jpyAmount 再指定)
+   * (3) execTran で 3DS 2.0 認証 URL 発行 (cardToken は redirect 不要 = server side 再 authorize、
+   *     mock server は CardNo 経由で state.transactions に record)
+   *
+   * 3DS 2.0 認証は 45 日超 fallback では skip し、 サーバ間 auth のみで再 hold を確立する。
+   * 実 GMO では issuer によって Frictionless で通過 / Challenge 要求のケースがあり、
+   * Challenge 要求時は本 flow では未対応 (Phase 4 で bidder 再認証経路検討、
+   * 現状は Frictionless 前提 + fail 側で cancel + 通知経路にまわす)。
+   *
+   * SSOT — tests/spec/gmo-fiat-bid/Phase2-01-master-spec.md § 45 日超 fallback、
+   *        Phase2-02-issue-breakdown.md § Issue P2-3
+   */
+  async reauthorize(input: {
+    oldAccessId: string;
+    oldAccessPass: string;
+    newOrderId: string;
+    jpyAmount: number;
+    cardToken: string;
+  }): Promise<AuthorizationResult> {
+    // Step 1 = 旧 auth を VOID cancel、 fail 時はそのまま throw (worker が cancel + alert 処理)
+    await this.cancelAuthorization({
+      accessId: input.oldAccessId,
+      accessPass: input.oldAccessPass,
+    });
+
+    // Step 2 = 新 entryTran で新 accessId / accessPass 発行
+    const entry = await this.entryTran({
+      shopId: this.shopId,
+      shopPass: this.shopPass,
+      orderId: input.newOrderId,
+      jobCd: 'AUTH',
+      amount: input.jpyAmount,
+    });
+
+    // Step 3 = 新 execTran で 3DS URL 発行 (Frictionless 想定で auth 確立、 tds2RetUrl 省略)
+    const exec = await this.execTran({
+      accessId: entry.accessId,
+      accessPass: entry.accessPass,
+      orderId: input.newOrderId,
+      cardToken: input.cardToken,
+    });
+
+    return {
+      authId: entry.accessId,
+      accessPass: entry.accessPass,
+      tds2Url: exec.acsUrl,
+      orderId: exec.orderId,
+      approve: exec.approve,
+      tranId: exec.tranId,
+    };
+  }
+
   private async post(path: string, body: string): Promise<Record<string, string>> {
     const url = `${this.endpoint.replace(/\/$/, '')}${path}`;
     let response: Response;
