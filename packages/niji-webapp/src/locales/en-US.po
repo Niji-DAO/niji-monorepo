@@ -221,6 +221,11 @@ msgstr "Making a proposal requires {threshold} votes"
 msgid "Add as many or as few of your Nijis as you’d like. Additional Nijis can be added during the escrow and forking periods."
 msgstr "Add as many or as few of your Nijis as you’d like. Additional Nijis can be added during the escrow and forking periods."
 
+#: src/components/Bid/index.tsx
+#: src/components/Bid/index.tsx
+msgid "クレカで bid (JPY)"
+msgstr "クレカで bid (JPY)"
+
 #: src/components/ProposalActionsModal/steps/SelectProposalActionStep/index.tsx
 msgid "Add Proposal Action"
 msgstr "Add Proposal Action"
@@ -378,6 +383,10 @@ msgstr "Set approval"
 #: src/components/Holder/index.tsx
 msgid "Failed to fetch Niji info"
 msgstr "Failed to fetch Niji info"
+
+#: src/components/Footer.tsx
+msgid "特定商取引法に基づく表記"
+msgstr "特定商取引法に基づく表記"
 
 #: src/components/AuctionTimer/index.tsx
 msgid "s"
