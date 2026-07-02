@@ -11,17 +11,22 @@
     "ponder:push-snapshot": "tar -czf snapshot.tgz .ponder && gh release upload snapshot snapshot.tgz --clobber",
     "ponder:restore-snapshot": "rm -rf .ponder && curl -sL https://github.com/nounsDAO/nouns-monorepo/releases/download/snapshot/snapshot.tgz | tar -xzf -",
     "start": "ponder start",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc"
   },
   "dependencies": {
     "@niji/sdk": "workspace:*",
     "hono": "^4.5.0",
     "ponder": "^0.12.0",
+    "undici": "^7.28.0",
     "viem": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "dotenv": "catalog:"
+    "dotenv": "catalog:",
+    "msw": "^2.14.0",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=18.14"
