@@ -11,7 +11,10 @@ import { toast } from 'sonner';
 import { formatEther, parseEther } from 'viem';
 import { useAccount } from 'wagmi';
 
+import FiatBidModal from '@/components/FiatBidModal';
 import SettleManuallyBtn from '@/components/SettleManuallyBtn';
+import { Button as ShadcnButton } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useActiveLocale } from '@/hooks/useActivateLocale';
 import { Auction } from '@/wrappers/nijiAuction';
 
@@ -64,6 +67,7 @@ const Bid: React.FC<BidProps> = props => {
   const bidInputRef = useRef<HTMLInputElement>(null);
 
   const [bidInput, setBidInput] = useState('');
+  const [isFiatBidModalOpen, setIsFiatBidModalOpen] = useState(false);
 
   const { t } = useLingui();
 
@@ -211,13 +215,48 @@ const Bid: React.FC<BidProps> = props => {
           </>
         )}
         {!auctionEnded ? (
-          <Button
-            className={auctionEnded ? classes.bidBtnAuctionEnded : classes.bidBtn}
-            onClick={auctionEnded ? settleAuctionHandler : placeBidHandler}
-            disabled={isDisabled}
-          >
-            {isPlacingBid ? <Spinner animation="border" /> : <Trans>Bid</Trans>}
-          </Button>
+          <>
+            <Button
+              className={auctionEnded ? classes.bidBtnAuctionEnded : classes.bidBtn}
+              onClick={auctionEnded ? settleAuctionHandler : placeBidHandler}
+              disabled={isDisabled}
+            >
+              {isPlacingBid ? <Spinner animation="border" /> : <Trans>Bid</Trans>}
+            </Button>
+            <Col lg={12} className="mt-2">
+              {isWalletConnected ? (
+                <ShadcnButton
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsFiatBidModalOpen(true)}
+                  disabled={isPlacingBid || isSettlingAuction}
+                  data-testid="fiat-bid-open-button"
+                >
+                  <Trans>クレカで bid (JPY)</Trans>
+                </ShadcnButton>
+              ) : (
+                // Bid 単体で TooltipProvider を wrap (root 側 Provider が無い test 環境でも動作)。
+                // radix は nested Provider を許容するため、 App root Provider と共存しても副作用なし。
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span data-testid="fiat-bid-open-button-wrapper">
+                        <ShadcnButton
+                          type="button"
+                          variant="outline"
+                          disabled
+                          data-testid="fiat-bid-open-button"
+                        >
+                          <Trans>クレカで bid (JPY)</Trans>
+                        </ShadcnButton>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>wallet 接続が必要です</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </Col>
+          </>
         ) : (
           <>
             <Col lg={12} className={classes.voteForNextNounBtnWrapper}>
@@ -234,6 +273,14 @@ const Bid: React.FC<BidProps> = props => {
           </>
         )}
       </InputGroup>
+      {isWalletConnected && (
+        <FiatBidModal
+          open={isFiatBidModalOpen}
+          onClose={() => setIsFiatBidModalOpen(false)}
+          auctionId={auction.nounId.toString()}
+          bidderWallet={activeAccount ?? ''}
+        />
+      )}
     </>
   );
 };
