@@ -127,3 +127,50 @@ export const streamRelations = relations(stream, ({ one }) => ({
     references: [proposal.id],
   }),
 }));
+
+/**
+ * fiat_bid status enum (Issue #3006、 GMO 与信枠 hold → capture → transferFrom flow の進行状態)
+ * - pending        ... authorize 成功、 3DS 認証待ち
+ * - 3ds-verified   ... 3DS 認証完了、 bid tx 発火待ち (Issue #3007 で更新)
+ * - bid-placed     ... bid tx broadcast 成功 (Issue #3008 で更新)
+ * - captured       ... GMO SALES capture 成功 (Issue #3010 で更新)
+ * - transferred    ... NFT transferFrom 完了 (Issue #3010 で更新)
+ * - cancelled      ... 敗札 / user cancel / capture fail 等で cancel
+ */
+const fiatBidStatusValues = [
+  'pending',
+  '3ds-verified',
+  'bid-placed',
+  'captured',
+  'transferred',
+  'cancelled',
+] as const;
+export type FiatBidStatus = (typeof fiatBidStatusValues)[number];
+export const fiatBidStatus = onchainEnum('fiatBidStatus', fiatBidStatusValues);
+
+export const fiatBid = onchainTable('fiat_bid', t => ({
+  /** GMO auth ID (accessId、 client.authorize が返す authId と一致) */
+  authId: t.text().primaryKey(),
+  /** bidder wallet address (代理 bid 発火時の代理先) */
+  bidderWallet: t.hex().notNull(),
+  /** bidder email (nullable、 落札通知送信用、 Issue #3013 で使う) */
+  bidderEmail: t.text(),
+  /** 対象 auction (Noun ID) */
+  auctionId: t.bigint().notNull(),
+  /** authorize 時の JPY 額 (円単位) */
+  jpyAmount: t.integer().notNull(),
+  /** JPY → ETH 換算後の ETH 額 (wei 単位、 bigint) */
+  ethAmount: t.bigint().notNull(),
+  /** 換算に使った spot rate (JPY per 1 ETH、 記録用) */
+  spotRate: t.integer().notNull(),
+  /** spot rate の取得元 (gmo-coin / coingecko) */
+  spotRateSource: t.text().notNull(),
+  /** 進行状態 */
+  status: fiatBidStatus().notNull(),
+  /** authorize 成功時刻 */
+  createdAt: t.timestamp().notNull(),
+  /** GMO capture 成功時刻 (nullable、 Issue #3010 で埋める) */
+  capturedAt: t.timestamp(),
+  /** NFT transferFrom 成功時刻 (nullable、 Issue #3010 で埋める) */
+  transferredAt: t.timestamp(),
+}));

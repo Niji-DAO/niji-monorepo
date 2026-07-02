@@ -1,0 +1,72 @@
+/**
+ * GMO PGマルチペイメント API request/response 型定義 (Issue #3006 Phase A)
+ *
+ * GMO 公式仕様 (form-encoded KEY=VALUE&KEY=VALUE) の shape を TypeScript 型として集約する。
+ * client.ts はここで定義した型を parse / build する責務のみを持つ。
+ *
+ * SSOT — tests/spec/gmo-fiat-bid/Phase1-01-master-spec.md § P2, P6、
+ *        Phase1-02-issue-breakdown.md § Issue 3、
+ *        packages/niji-api/src/mocks/gmo-server.ts (mock 側 response shape との整合)
+ */
+
+/** entryTran (取引登録) request param */
+export type EntryTranRequest = {
+  /** 加盟店 ID */
+  shopId: string;
+  /** 加盟店 password */
+  shopPass: string;
+  /** 加盟店側 order ID (auth ID PK に一致させて後段 handler で lookup 可能に) */
+  orderId: string;
+  /** JobCd = AUTH (与信枠取得のみ、 Phase 1 は SALES 即時決済を使わない) */
+  jobCd: 'AUTH' | 'SALES';
+  /** 与信枠額 (円単位、 GMO 仕様) */
+  amount: number;
+};
+
+/** entryTran 成功応答 (form-encoded parse 済) */
+export type EntryTranSuccess = {
+  accessId: string;
+  accessPass: string;
+};
+
+/** entryTran / execTran / alterTran 共通の error 応答 shape */
+export type GmoErrorResponse = {
+  errCode: string;
+  errInfo: string;
+};
+
+/** execTran (決済実行 + 3DS URL 発行) request param */
+export type ExecTranRequest = {
+  accessId: string;
+  accessPass: string;
+  orderId: string;
+  /** GMO PG Token 方式で受渡す card token (webapp が GMO に直接 POST して受領) */
+  cardToken: string;
+  /** 3DS 2.0 認証後の webapp 側 return URL (mock は default で使わない) */
+  tds2RetUrl?: string;
+};
+
+/** execTran 成功応答 */
+export type ExecTranSuccess = {
+  /** ACS = '1' の場合 3DS 認証必要 */
+  acs: string;
+  /** 3DS 認証 redirect URL (mock は dummy URL) */
+  acsUrl: string;
+  orderId: string;
+  accessId: string;
+  approve: string;
+  tranId: string;
+  tranDate: string;
+};
+
+/** entryTran + execTran を順次呼出した後の返却型 (authorize handler が使う) */
+export type AuthorizationResult = {
+  /** GMO auth ID (実装上 accessId を採用、 fiat_bid.authId PK に一致) */
+  authId: string;
+  accessPass: string;
+  /** 3DS 認証 redirect URL */
+  tds2Url: string;
+  orderId: string;
+  approve: string;
+  tranId: string;
+};
