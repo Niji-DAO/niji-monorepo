@@ -38,6 +38,8 @@ const ThreeDSRedirectPage = lazy(() => import('@/pages/FiatBid/ThreeDSRedirect')
 const ThreeDSReturnPage = lazy(() => import('@/pages/FiatBid/ThreeDSReturn'));
 const ForksPage = lazy(() => import('@/pages/Forks'));
 const GovernancePage = lazy(() => import('@/pages/Governance'));
+// Issue #3011 = 特商法 static page (Phase 1 = webapp footer 経由で常時参照可能に置く)
+const TokushohoPage = lazy(() => import('@/pages/Legal/Tokushoho'));
 const NijisPage = lazy(() => import('@/pages/NijisPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFound'));
 const NoundersPage = lazy(() => import('@/pages/Nounders'));
@@ -96,6 +98,8 @@ function App() {
             {/* Issue #3007 = fiat bid 3DS 2.0 full redirect + return page (Phase 1 MVP) */}
             <Route path="/fiat-bid/3ds-redirect" element={<ThreeDSRedirectPage />} />
             <Route path="/fiat-bid/3ds-return" element={<ThreeDSReturnPage />} />
+            {/* Issue #3011 = 特定商取引法に基づく表記 (GMO 加盟店契約要件、 grilling P5 SSOT) */}
+            <Route path="/legal/tokushoho" element={<TokushohoPage />} />
             {Number(CHAIN_ID) === 31337 && <Route path="/faucet" element={<FaucetPage />} />}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
