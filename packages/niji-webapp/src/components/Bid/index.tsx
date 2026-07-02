@@ -1,56 +1,29 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+/**
+ * Bid — auction ページの bid button + settle button (Issue #3033 で UI 統合)
+ *
+ * Issue #3033 以降 —
+ * (1) 従来の「Bid」 (ETH inline) + 「クレカで bid (JPY)」 の 2 button を単一「bid」 button に統合
+ * (2) 「bid」 button click で BidModal を open、 modal 内 Tabs で ETH / クレカ 切替
+ * (3) wallet 未接続時は button disable + tooltip「wallet 接続が必要です」 (Phase 1 stance 維持)
+ * (4) auction 終了時は「Pick the next Niji」 + SettleManuallyBtn の従来 UI 維持 (bid button なし)
+ *
+ * SSOT — GH Issue #3033、 Linear CAR-324。
+ */
+import React from 'react';
 
-import { Trans, useLingui } from '@lingui/react/macro';
-import {
-  useReadNijiAuctionHouseMinBidIncrementPercentage,
-  useWriteNijiAuctionHouseCreateBid,
-  useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction,
-} from '@niji/sdk/react';
-import { Button, Col, FormControl, InputGroup, Spinner } from 'react-bootstrap';
+import { Trans } from '@lingui/react/macro';
+import { useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction } from '@niji/sdk/react';
+import { Button, Col, InputGroup } from 'react-bootstrap';
 import { toast } from 'sonner';
-import { formatEther, parseEther } from 'viem';
 import { useAccount } from 'wagmi';
 
-import FiatBidModal from '@/components/FiatBidModal';
+import BidModal from '@/components/BidModal';
 import SettleManuallyBtn from '@/components/SettleManuallyBtn';
 import { Button as ShadcnButton } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useActiveLocale } from '@/hooks/useActivateLocale';
 import { Auction } from '@/wrappers/nijiAuction';
 
 import classes from './Bid.module.css';
-
-import responsiveUiUtilsClasses from '@/utils/ResponsiveUIUtils.module.css';
-
-const computeMinimumNextBid = (
-  currentBid: bigint,
-  minBidIncPercentage: bigint | undefined,
-): bigint => {
-  if (minBidIncPercentage === undefined) {
-    return 0n;
-  }
-  // Calculate minBidIncPercentage/100 + 1 with bigint
-  // Since bigint division truncates, we multiply first then divide to maintain precision
-  return (currentBid * (minBidIncPercentage + 100n)) / 100n;
-};
-
-const minBidEth = (minBid: bigint): string => {
-  if (minBid === 0n) {
-    return '0.01';
-  }
-
-  const eth = formatEther(minBid);
-  // We need to round up to 2 decimal places
-  const ethNum = parseFloat(eth);
-  return (Math.ceil(ethNum * 100) / 100).toFixed(2);
-};
-
-const currentBid = (bidInputRef: React.RefObject<HTMLInputElement | null>) => {
-  if (!bidInputRef.current || !bidInputRef.current.value) {
-    return 0n;
-  }
-  return parseEther(bidInputRef.current.value);
-};
 
 interface BidProps {
   auction: Auction;
@@ -60,29 +33,8 @@ interface BidProps {
 const Bid: React.FC<BidProps> = props => {
   const { address: activeAccount } = useAccount();
   const { auction, auctionEnded } = props;
-  const activeLocale = useActiveLocale();
 
-  const account = activeAccount;
-
-  const bidInputRef = useRef<HTMLInputElement>(null);
-
-  const [bidInput, setBidInput] = useState('');
-  const [isFiatBidModalOpen, setIsFiatBidModalOpen] = useState(false);
-
-  const { t } = useLingui();
-
-  const { data: minBidIncPercentage } = useReadNijiAuctionHouseMinBidIncrementPercentage();
-  const minBid = computeMinimumNextBid(
-    auction.amount !== undefined ? BigInt(auction.amount.toString()) : 0n,
-    minBidIncPercentage !== undefined ? BigInt(minBidIncPercentage.toString()) : undefined,
-  );
-
-  const {
-    writeContract: placeBid,
-    isPending: isPlacingBid,
-    isError: didPlaceBidFail,
-    isSuccess: placeBidSucceeded,
-  } = useWriteNijiAuctionHouseCreateBid();
+  const [isBidModalOpen, setIsBidModalOpen] = React.useState(false);
 
   const {
     writeContract: settleAuction,
@@ -93,74 +45,17 @@ const Bid: React.FC<BidProps> = props => {
     error: settleAuctionError,
   } = useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction();
 
-  const bidInputHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    const input = event.target.value;
-
-    // disable more than 2 digits after the decimal point
-    if (input.includes('.') && event.target.value.split('.')[1].length > 2) {
-      return;
-    }
-
-    setBidInput(event.target.value);
-  };
-
-  useEffect(() => {
-    if (didPlaceBidFail) toast.error(t`Please try again.`);
-  }, [didPlaceBidFail, t]);
-  useEffect(() => {
-    if (placeBidSucceeded) toast.success(t`Bid placed.`);
-  }, [placeBidSucceeded, t]);
-
-  const placeBidHandler = async () => {
-    if (auction == undefined || !bidInputRef.current || !bidInputRef.current.value) {
-      return;
-    }
-
-    if (currentBid(bidInputRef) < minBid) {
-      toast.error(
-        t`Please place a bid higher than or equal to the minimum bid amount of ${minBidEth(minBid)} ETH`,
-      );
-      setBidInput(minBidEth(minBid));
-      return;
-    }
-
-    const value = parseEther(bidInputRef.current.value);
-    placeBid({
-      args: [BigInt(auction.nounId)],
-      value,
-    });
-  };
-
   const settleAuctionHandler = () => {
     settleAuction({});
   };
 
-  const clearBidInput = () => {
-    if (bidInputRef.current) {
-      bidInputRef.current.value = '';
-    }
-  };
-
-  // successful bid using redux store state
-  useEffect(() => {
-    if (!account) return;
-
-    // tx state is mining
-    const isMiningUserTx = isPlacingBid;
-    // allows user to rebid against themselves so long as it is different tx
-    const isCorrectTx = currentBid(bidInputRef) === BigInt(auction.amount?.toString() ?? '0');
-    if (isMiningUserTx && auction.bidder === account && isCorrectTx) {
-      toast.success(t`Bid was placed successfully!`);
-      clearBidInput();
-    }
-  }, [auction, account, t, isPlacingBid]);
   // settle auction transaction state hook
-  useEffect(() => {
+  React.useEffect(() => {
     if (auctionEnded && didSettleAuction) {
-      toast.success(t`Settled auction successfully!`);
+      toast.success('Settled auction successfully!');
     }
     if (auctionEnded && didSettleFail) {
-      toast.error(settleAuctionError?.message || t`Please try again.`);
+      toast.error(settleAuctionError?.message || 'Please try again.');
     }
   }, [
     auctionEnded,
@@ -169,94 +64,55 @@ const Bid: React.FC<BidProps> = props => {
     didSettleAuction,
     didSettleFail,
     settleAuctionError?.message,
-    t,
   ]);
 
   if (auction == undefined) return null;
 
-  const isDisabled = isPlacingBid || isSettlingAuction || !activeAccount;
+  const isWalletConnected = activeAccount !== undefined;
+  const isBidButtonDisabled = isSettlingAuction || !isWalletConnected;
 
   const crytalBallBtnOnClickHandler = () => {
     // Niji 自前の Crystal Ball page (/crystal-ball) を新タブで開く
     window.open('/crystal-ball', '_blank', 'noopener,noreferrer')?.focus();
   };
 
-  const isWalletConnected = activeAccount !== undefined;
-
   return (
     <>
       <InputGroup>
-        {!auctionEnded && (
-          <>
-            <span className={classes.customPlaceholderBidAmt}>
-              {!auctionEnded && !bidInput ? (
-                <>
-                  Ξ {minBidEth(minBid)}{' '}
-                  <span
-                    className={
-                      activeLocale === 'ja-JP' ? responsiveUiUtilsClasses.disableSmallScreens : ''
-                    }
-                  >
-                    <Trans>or more</Trans>
-                  </span>
-                </>
-              ) : (
-                ''
-              )}
-            </span>
-            <FormControl
-              className={classes.bidInput}
-              type="number"
-              min="0"
-              onChange={bidInputHandler}
-              ref={bidInputRef}
-              value={bidInput}
-            />
-          </>
-        )}
         {!auctionEnded ? (
-          <>
-            <Button
-              className={auctionEnded ? classes.bidBtnAuctionEnded : classes.bidBtn}
-              onClick={auctionEnded ? settleAuctionHandler : placeBidHandler}
-              disabled={isDisabled}
-            >
-              {isPlacingBid ? <Spinner animation="border" /> : <Trans>Bid</Trans>}
-            </Button>
-            <Col lg={12} className="mt-2">
-              {isWalletConnected ? (
-                <ShadcnButton
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsFiatBidModalOpen(true)}
-                  disabled={isPlacingBid || isSettlingAuction}
-                  data-testid="fiat-bid-open-button"
-                >
-                  <Trans>クレカで bid (JPY)</Trans>
-                </ShadcnButton>
-              ) : (
-                // Bid 単体で TooltipProvider を wrap (root 側 Provider が無い test 環境でも動作)。
-                // radix は nested Provider を許容するため、 App root Provider と共存しても副作用なし。
-                <TooltipProvider delayDuration={0}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span data-testid="fiat-bid-open-button-wrapper">
-                        <ShadcnButton
-                          type="button"
-                          variant="outline"
-                          disabled
-                          data-testid="fiat-bid-open-button"
-                        >
-                          <Trans>クレカで bid (JPY)</Trans>
-                        </ShadcnButton>
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>wallet 接続が必要です</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </Col>
-          </>
+          <Col lg={12} className="mt-2">
+            {isWalletConnected ? (
+              <ShadcnButton
+                type="button"
+                onClick={() => setIsBidModalOpen(true)}
+                disabled={isBidButtonDisabled}
+                className={classes.bidBtn}
+                data-testid="bid-open-button"
+              >
+                <Trans>Bid</Trans>
+              </ShadcnButton>
+            ) : (
+              // Bid 単体で TooltipProvider を wrap (root 側 Provider が無い test 環境でも動作)。
+              // radix は nested Provider を許容するため、 App root Provider と共存しても副作用なし。
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span data-testid="bid-open-button-wrapper">
+                      <ShadcnButton
+                        type="button"
+                        disabled
+                        className={classes.bidBtn}
+                        data-testid="bid-open-button"
+                      >
+                        <Trans>Bid</Trans>
+                      </ShadcnButton>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>wallet 接続が必要です</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </Col>
         ) : (
           <>
             <Col lg={12} className={classes.voteForNextNounBtnWrapper}>
@@ -274,10 +130,10 @@ const Bid: React.FC<BidProps> = props => {
         )}
       </InputGroup>
       {isWalletConnected && (
-        <FiatBidModal
-          open={isFiatBidModalOpen}
-          onClose={() => setIsFiatBidModalOpen(false)}
-          auctionId={auction.nounId.toString()}
+        <BidModal
+          open={isBidModalOpen}
+          onClose={() => setIsBidModalOpen(false)}
+          auction={auction}
           bidderWallet={activeAccount ?? ''}
         />
       )}

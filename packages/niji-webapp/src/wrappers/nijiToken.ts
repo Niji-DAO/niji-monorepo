@@ -154,13 +154,19 @@ export const useNounSeed = (nounId: bigint): INounSeed | undefined => {
   // 31337 local dev では anvil を fresh chain で再起動しても contract address が
   // 決定論的で同じなので wagmi 内部 cache が stale seed を返し続ける事故が発生。
   // staleTime=0 + gcTime=0 で常に fresh fetch を強制、 auction 進行に追従する。
+  //
+  // Issue #3033 TS2589 fix — query options + args tuple を const 抽出 + `satisfies` で型固定して
+  // wagmi CodeGen hook の type inference tree を浅くし、 「Type instantiation excessively deep」 を回避。
+  // 既知 workaround (wagmi/viem generated hook で args tuple を inline すると TS2589 発生する pattern)。
+  const seedArgs = [nounId] as const satisfies readonly [bigint];
+  const seedQuery = {
+    enabled: !seed,
+    ...(isLocalDev ? { staleTime: 0, gcTime: 0 } : {}),
+  } as const;
   const { data: response } = useReadNijiTokenSeeds({
     chainId: defaultChain.id,
-    args: [nounId],
-    query: {
-      enabled: !seed,
-      ...(isLocalDev ? { staleTime: 0, gcTime: 0 } : {}),
-    },
+    args: seedArgs,
+    query: seedQuery,
   });
 
   if (response) {
