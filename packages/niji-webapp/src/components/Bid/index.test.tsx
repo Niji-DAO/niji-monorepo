@@ -82,6 +82,13 @@ vi.mock('@/components/SettleManuallyBtn', () => ({
   default: () => <button data-testid="settle-btn" />,
 }));
 
+// FiatBidModal は QueryClientProvider 依存 + Dialog Portal で jsdom 描画重いため、
+// Bid 側 test では stub に差替 (FiatBidModal 自体は別 test file で個別検証)
+vi.mock('@/components/FiatBidModal', () => ({
+  default: ({ open }: { open: boolean }) =>
+    open ? <div data-testid="fiat-bid-modal-stub" /> : null,
+}));
+
 import Bid from './index';
 
 const makeAuction = (overrides: Record<string, unknown> = {}) => ({
@@ -194,6 +201,46 @@ describe('Bid', () => {
       b.textContent?.includes('Bid'),
     );
     expect(bidBtn?.disabled).toBe(true);
+  });
+
+  it('renders fiat bid button when wallet connected (auction ongoing)', () => {
+    hookState.account = '0xUSER';
+    const { getAllByTestId } = render(
+      <Bid auction={makeAuction() as never} auctionEnded={false} />,
+    );
+    const fiatBtns = getAllByTestId('fiat-bid-open-button');
+    // 少なくとも 1 つ enabled で描画される (wallet 接続時、 未接続時は tooltip wrapper 経由)
+    expect(fiatBtns.some(b => (b as HTMLButtonElement).disabled === false)).toBe(true);
+  });
+
+  it('disables fiat bid button + wraps in tooltip when wallet disconnected', () => {
+    hookState.account = undefined;
+    const { getAllByTestId, container } = render(
+      <Bid auction={makeAuction() as never} auctionEnded={false} />,
+    );
+    // wallet 未接続時は fiat button は disabled、 tooltip wrapper span で包まれる
+    const fiatBtns = getAllByTestId('fiat-bid-open-button');
+    expect(fiatBtns.length).toBeGreaterThan(0);
+    fiatBtns.forEach(b => {
+      expect((b as HTMLButtonElement).disabled).toBe(true);
+    });
+    // tooltip trigger wrapper span 存在
+    expect(container.querySelector('[data-testid="fiat-bid-open-button-wrapper"]')).not.toBeNull();
+  });
+
+  it('opens fiat bid modal on fiat button click (wallet connected)', () => {
+    hookState.account = '0xUSER';
+    const { getAllByTestId, queryByTestId } = render(
+      <Bid auction={makeAuction() as never} auctionEnded={false} />,
+    );
+    // modal は初期 closed
+    expect(queryByTestId('fiat-bid-modal-stub')).toBeNull();
+    // button click で modal open
+    const fiatBtn = getAllByTestId('fiat-bid-open-button').find(
+      b => (b as HTMLButtonElement).disabled === false,
+    );
+    fireEvent.click(fiatBtn!);
+    expect(queryByTestId('fiat-bid-modal-stub')).not.toBeNull();
   });
 
   it('toast.error on placeBid failure (didPlaceBidFail effect)', () => {
