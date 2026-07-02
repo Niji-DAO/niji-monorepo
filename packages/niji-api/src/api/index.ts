@@ -12,8 +12,10 @@ import {
 import { createAuthorizeApp, type FiatBidStore } from '../handlers/fiat-bid/authorize.js';
 import { createCaptureApp, type CaptureStore } from '../handlers/fiat-bid/capture.js';
 import { createPlaceBidApp, type PlaceBidStore } from '../handlers/fiat-bid/place-bid.js';
+import { createTopupApp, type TopupStore } from '../handlers/fiat-bid/topup.js';
 import { createTransferNftApp, type TransferNftStore } from '../handlers/fiat-bid/transfer-nft.js';
 import { createSpotRateApp } from '../handlers/spot-rate.js';
+import { AuthCleanupQueue } from '../services/authCleanup/index.js';
 import {
   BidRelay,
   createBaseSepoliaPublicClient,
@@ -215,6 +217,91 @@ if (
     },
   };
   app.route('/api/v1/fiat-bid', createPlaceBidApp({ bidRelay, gmoClient, store: placeBidStore }));
+
+  /**
+   * Issue #3023 — POST /api/v1/fiat-bid/topup (bid 増額 5 phase sequential)
+   *
+   * fiat_bid.status = "bid-placed" record を lookup → 新 GMO authorize + BidRelay.placeBid →
+   * 旧 authId を AuthCleanupQueue に enqueue → 新 authId で fiat_bid record UPDATE。
+   *
+   * revert (BidTooLow / AuctionEnded 等) 時は新 auth を GMO alterTran(VOID) cancel、 旧 auth は保持
+   * (増額前状態のまま bid-placed で継続、 store は変更しない)。
+   *
+   * cleanup 経路 = AuthCleanupQueue (5 秒 delay + 1 req/sec rate limit + 3 回 retry、 Issue #3022 経由)。
+   * BidRelay / GmoClient / SpotRateFetcher は Issue #3005 / #3006 / #3008 の service を再利用。
+   */
+  const authCleanupQueue = new AuthCleanupQueue({
+    executor: {
+      cancelAuthorization: async (authId: string) => {
+        // Phase 1 mock 環境の accessPass 派生 (authorize / place-bid と同一 logic、 実 GMO 切替時 schema field で置換)
+        const accessPass = authId.startsWith('mock-access-')
+          ? `mock-pass-${(Number(authId.replace('mock-access-', '')) + 1).toString().padStart(8, '0')}`
+          : `${authId}-pass`;
+        await gmoClient.cancelAuthorization({ accessId: authId, accessPass });
+      },
+    },
+  });
+
+  const topupStore: TopupStore = {
+    findBidPlaced: async authId => {
+      const rows = await (db
+        .select()
+        .from(schema.fiatBid)
+        .where(eq(schema.fiatBid.authId, authId)) as unknown as Promise<
+        Array<{
+          authId: string;
+          status: string;
+          jpyAmount: number;
+          ethAmount: bigint;
+          bidderWallet: `0x${string}`;
+          bidderEmail: string | null;
+          auctionId: bigint;
+          createdAt: Date;
+        }>
+      >);
+      const row = rows[0];
+      if (!row) return null;
+      const accessPass = authId.startsWith('mock-access-')
+        ? `mock-pass-${(Number(authId.replace('mock-access-', '')) + 1).toString().padStart(8, '0')}`
+        : `${authId}-pass`;
+      return {
+        authId: row.authId,
+        status: row.status,
+        jpyAmount: row.jpyAmount,
+        ethAmount: row.ethAmount,
+        bidderWallet: row.bidderWallet,
+        bidderEmail: row.bidderEmail,
+        auctionId: row.auctionId,
+        accessPass,
+        createdAt: row.createdAt,
+      };
+    },
+    updateToNewAuth: async input => {
+      // 旧 authId (PK) を新 authId に置換 + jpyAmount / ethAmount / spotRate 更新
+      // Phase 2 mvp = SQL UPDATE で PK 変更 (Postgres は PK 変更を許容、 参照整合性は fiat_bid 単一 table 内で完結)
+      await writableDb
+        .update(schema.fiatBid)
+        .set({
+          authId: input.newAuthId,
+          jpyAmount: input.newJpyAmount,
+          ethAmount: input.newEthAmount,
+          spotRate: input.spotRate,
+          spotRateSource: input.spotRateSource,
+        })
+        .where(eq(schema.fiatBid.authId, input.oldAuthId));
+    },
+  };
+
+  app.route(
+    '/api/v1/fiat-bid',
+    createTopupApp({
+      bidRelay,
+      gmoClient,
+      spotRateFetcher,
+      cleanupQueue: authCleanupQueue,
+      store: topupStore,
+    }),
+  );
 }
 
 /**
