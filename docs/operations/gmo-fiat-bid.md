@@ -73,13 +73,53 @@ Node v24 の built-in `fetch` は内部的に undici (bundled) を使う。 undi
 
 Phase 1 では標準 `fetch` で十分だが、 Issue 3 以降の GMO client 実装で undici の `request` API を採用する余地を残す。
 
+## 異常系対応 runbook (Phase 1 手動、 Phase 4 で自動化)
+
+capture / transfer / chargeback の 3 経路で発生する異常状態に対する運営 policy と手動対応手順 SSOT。
+
+### capture 失敗 (Phase D 経路)
+
+- 検出 — `[capture-failed]` prefix log が `packages/niji-api` に出力される (Phase 1)、 authId + jpyAmount + errCode + errInfo を含む
+- 状態 — `fiat_bid.status = "cancelled"` に自動遷移、 GMO 与信枠は revoke されて 60 日以内に card 会社側で解放
+- 運営対応 —
+  1. log から authId を取り出し、 GMO 管理画面で決済 status を確認 (card 期限切れ / 与信不足 / fraud 判定 等)
+  2. bidder に email で「別 card 登録 or 銀行振込での支払をお願いします」 と個別連絡
+  3. 銀行振込を受領した場合、 運営が JPY 補填 (fiat_bid.status は cancelled のまま、 別 offchain 記録で管理)
+  4. NFT は予定通り transferFrom 実行 (bidder との個別合意で auction 落札額分の JPY 補填が確約されたことが根拠)
+- policy — capture 失敗による運営赤字は許容、 事後 recovery の SSOT (grilling P6 A 案)
+
+### transfer 失敗 (Phase E 経路)
+
+- 検出 — `[transfer-failed]` prefix log、 authId + bidderWallet + reason を含む
+- 状態 — `fiat_bid.status = "captured"` のまま (transferred に遷移せず)
+- 運営対応 —
+  1. reason 別対応 — `RpcError` は RPC 再選定後 1h 待って手動 retry (`viem` から transferFrom 再発火)、 `NotOwner` は運営 EOA が NFT を保有していない状態 = 別途 auction settle 状態確認、 `InvalidRecipient` は bidder wallet address を再確認
+  2. 手動 retry 3 回まで実行 (1h 間隔)、 各回 log 確認
+  3. 3 回失敗で bidder に email で「別 wallet address 指定を依頼」、 別 address request modal (webapp) から更新受付
+  4. 別 address が有効なら transferFrom 再発火、 それも fail なら operations 側で NFT を運営 EOA 保有のまま cold-hold + bidder 個別調整
+- Phase 4 で自動化 — retry queue + 監視 dashboard + PagerDuty alert 連携
+
+### chargeback 発生 (Phase 3 以降で発生想定)
+
+- 発生条件 — Phase 1 は GMO mock なので発生不可、 Phase 3 実 GMO 本番切替後に card 会社経由の chargeback 通知で判明
+- 運営対応 —
+  1. GMO 管理画面で chargeback status 確認、 fiat_bid.status に手動で `chargeback` (schema 追加要) 反映
+  2. 運営 JPY を card 会社に返金 (GMO 経由の逆送金 flow)
+  3. NFT は on-chain 実装上剥奪不可 = 運営全損吸収 (grilling P6 A 案 SSOT)
+  4. chargeback 発生率が閾値超なら事前 defense (与信枠 pre-flight / 3DS 強制 / bid 上限) 再設計
+
+### 運営 alert log 出力先 (Phase 1)
+
+- backend `packages/niji-api` の console.error stream
+- Railway (or 本番相当環境) の log console で `[capture-failed]` / `[transfer-failed]` を毎日目視確認する運営 routine
+- Phase 4 で PagerDuty / Slack Webhook / 監視 dashboard に自動配線
+
 ## 今後の追記項目 (Issue 3 以降)
 
 Issue 3 (authorize endpoint) 完了時に本 doc に追記する項目 —
 
 - 運営 EOA 鍵管理経路 (env 直書き / KMS / 1Password / hardware wallet の選定)
 - GMO 契約情報 (加盟店 ID / サイト ID / 3DS 契約プラン)
-- 異常系対応 runbook (capture 失敗時の JPY 補填手順、 transferFrom 失敗時の retry 3 回、 chargeback 発生時の運営全損吸収 policy)
 - e2e test 起動手順 (Playwright + mock server 経由 golden path)
 - 監視 / alert 経路 (Phase 4 で自動化、 Phase 1 は log 手動確認)
 
