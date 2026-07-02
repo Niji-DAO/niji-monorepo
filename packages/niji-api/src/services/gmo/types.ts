@@ -70,3 +70,48 @@ export type AuthorizationResult = {
   approve: string;
   tranId: string;
 };
+
+/**
+ * secureTran2 (3DS 2.0 認証結果 verify) request param (Issue #3007)
+ * GMO は 3DS 認証完了後の callback で /secureTran2 endpoint で認証状態を verify する
+ */
+export type SecureTran2Request = {
+  accessId: string;
+  accessPass: string;
+  /** GMO 側 transactionId (3DS 認証 flow の一意識別子) */
+  transactionId: string;
+};
+
+/**
+ * secureTran2 成功応答 (3DS 認証成功 = TranResult=0 が返る)
+ * mock / 実 GMO 共通で ACS 認証状態 + tranResult を返す
+ */
+export type SecureTran2Success = {
+  orderId: string;
+  accessId: string;
+  /** 3DS 認証結果 (成功なら "0"、 fail なら error) */
+  tranResult: string;
+};
+
+/**
+ * alterTran (決済取消 / cancel / refund) request param (Issue #3007 の cancel 用途 + Issue #3010 の capture 用途で共用)
+ * JobCd = VOID (取消) / SALES (売上確定 / capture) / RETURN (返金)
+ * Phase 1 で 3ds fail の cancel 用途は JobCd=VOID 経路のみ使う
+ */
+export type AlterTranRequest = {
+  shopId: string;
+  shopPass: string;
+  accessId: string;
+  accessPass: string;
+  jobCd: 'VOID' | 'SALES' | 'RETURN';
+  /** VOID / SALES 時に必須、 amount 単位 = 円 */
+  amount?: number;
+};
+
+/** alterTran 成功応答 (form-encoded parse 済) */
+export type AlterTranSuccess = {
+  accessId: string;
+  accessPass: string;
+  /** 取引後 status (SALES / VOID / AUTH / RETURN) */
+  status: string;
+};

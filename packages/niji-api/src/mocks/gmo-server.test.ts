@@ -14,9 +14,11 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from
 
 import {
   buildGmoFormResponse,
+  buildMock3dsHtml,
   gmoMockBaseUrl,
   gmoMockServer,
   resetGmoMockState,
+  seedGmoMockTds2Result,
 } from './gmo-server.js';
 
 /** GMO 応答の form-encoded 文字列を Record にパースする helper */
@@ -136,7 +138,9 @@ describe('POST /entryTran (取引登録) mock', () => {
     const secondParsed = parseGmoFormResponse(await second.text());
 
     expect(firstParsed['AccessID']).toBe('mock-access-00000001');
-    expect(secondParsed['AccessID']).toBe('mock-access-00000003');
+    // Issue #3007 = entryTran は access + pass + tds2-tran の 3 counter を消費、
+    // 次の呼出の AccessID = 4 番目 (旧 test は 2 counter 前提だった、 3DS state pre-populate 分の差)
+    expect(secondParsed['AccessID']).toBe('mock-access-00000004');
   });
 });
 
@@ -158,8 +162,13 @@ describe('POST /execTran (決済実行) mock', () => {
     expect(response.status).toBe(200);
     const parsed = parseGmoFormResponse(await response.text());
     expect(parsed['ACS']).toBe('1');
-    expect(parsed['ACSUrl']).toContain('/mock-3ds-callback');
+    // Issue #3007 = 3DS full redirect URL は /mock-3ds に変更、 orderId / accessId / transactionId / returnUrl を含む
+    expect(parsed['ACSUrl']).toContain('/mock-3ds');
     expect(parsed['ACSUrl']).toContain('orderId=order-001');
+    // accessId は request の AccessID (mock-access-00000001) が query 側に付く
+    expect(parsed['ACSUrl']).toContain('accessId=mock-access-00000001');
+    expect(parsed['ACSUrl']).toContain('transactionId=');
+    expect(parsed['ACSUrl']).toContain('returnUrl=');
     expect(parsed['OrderID']).toBe('order-001');
     expect(parsed['Approve']).toMatch(/^mock-approve-\d{8}$/);
     expect(parsed['TranID']).toMatch(/^mock-tran-\d{8}$/);
@@ -228,6 +237,105 @@ describe('POST /alterTran (決済変更) mock', () => {
     expect(response.status).toBe(200);
     const parsed = parseGmoFormResponse(await response.text());
     expect(parsed['Status']).toBe('VOID');
+  });
+});
+
+describe('buildMock3dsHtml (Issue #3007)', () => {
+  it('orderId / accessId / transactionId を含む HTML と success/fail link を返す', () => {
+    const html = buildMock3dsHtml({
+      orderId: 'order-9',
+      accessId: 'acc-9',
+      transactionId: 'tds2-tran-9',
+      returnUrl: 'http://127.0.0.1:2424/fiat-bid/3ds-return',
+    });
+    expect(html).toContain('order-9');
+    expect(html).toContain('tds2-tran-9');
+    expect(html).toContain('id="mock-3ds-success"');
+    expect(html).toContain('id="mock-3ds-fail"');
+    expect(html).toContain('result=success');
+    expect(html).toContain('result=fail');
+    expect(html).toContain('/fiat-bid/3ds-return');
+  });
+});
+
+describe('GET /mock-3ds (Issue #3007)', () => {
+  it('query 経由で orderId / accessId / transactionId を受け text/html 応答を返す', async () => {
+    const url = new URL(`${gmoMockBaseUrl()}/mock-3ds`);
+    url.searchParams.set('orderId', 'order-42');
+    url.searchParams.set('accessId', 'acc-42');
+    url.searchParams.set('transactionId', 'tds2-tran-42');
+    url.searchParams.set('returnUrl', 'http://127.0.0.1:2424/fiat-bid/3ds-return');
+    const response = await fetch(url.toString());
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toContain('text/html');
+    const html = await response.text();
+    expect(html).toContain('order-42');
+    expect(html).toContain('tds2-tran-42');
+    expect(html).toContain('id="mock-3ds-success"');
+    expect(html).toContain('id="mock-3ds-fail"');
+  });
+});
+
+describe('POST /secureTran2 (Issue #3007)', () => {
+  it('tds2Result=success で seed した state を verify、 TranResult=0 応答を返す', async () => {
+    seedGmoMockTds2Result({
+      orderId: 'order-99',
+      accessId: 'acc-99',
+      accessPass: 'pass-99',
+      transactionId: 'tds2-tran-99',
+      tds2Result: 'success',
+    });
+    const response = await fetch(`${gmoMockBaseUrl()}/secureTran2`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        AccessID: 'acc-99',
+        AccessPass: 'pass-99',
+        TransactionId: 'tds2-tran-99',
+      }).toString(),
+    });
+    expect(response.status).toBe(200);
+    const parsed = parseGmoFormResponse(await response.text());
+    expect(parsed['TranResult']).toBe('0');
+    expect(parsed['OrderID']).toBe('order-99');
+    expect(parsed['AccessID']).toBe('acc-99');
+  });
+
+  it('tds2Result=fail で seed した state を verify、 ErrCode=T01 応答を返す', async () => {
+    seedGmoMockTds2Result({
+      orderId: 'order-100',
+      accessId: 'acc-100',
+      accessPass: 'pass-100',
+      transactionId: 'tds2-tran-100',
+      tds2Result: 'fail',
+    });
+    const response = await fetch(`${gmoMockBaseUrl()}/secureTran2`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        AccessID: 'acc-100',
+        AccessPass: 'pass-100',
+        TransactionId: 'tds2-tran-100',
+      }).toString(),
+    });
+    expect(response.status).toBe(200);
+    const parsed = parseGmoFormResponse(await response.text());
+    expect(parsed['ErrCode']).toBe('T01');
+  });
+
+  it('該当 record 無しで ErrCode=G03 応答を返す', async () => {
+    const response = await fetch(`${gmoMockBaseUrl()}/secureTran2`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        AccessID: 'nonexistent',
+        AccessPass: 'nonexistent',
+        TransactionId: 'nonexistent',
+      }).toString(),
+    });
+    expect(response.status).toBe(200);
+    const parsed = parseGmoFormResponse(await response.text());
+    expect(parsed['ErrCode']).toBe('G03');
   });
 });
 

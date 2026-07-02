@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@niji/sdk": "workspace:*",
+    "drizzle-orm": "0.41.0",
     "hono": "^4.5.0",
     "ponder": "^0.12.0",
     "undici": "^7.28.0",

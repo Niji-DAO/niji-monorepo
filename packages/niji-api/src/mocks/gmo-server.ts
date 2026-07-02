@@ -21,10 +21,18 @@ import { setupServer } from 'msw/node';
  * key=value を & で連結、 空値は key= の形式
  */
 export const buildGmoFormResponse = (params: Record<string, string>): string => {
+  // GMO 応答は URL-encode 済 value を返す (form-encoded 標準)、 value 内の &/=/? は client 側 URLSearchParams で parse 可能に
   return Object.entries(params)
-    .map(([key, value]) => `${key}=${value}`)
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
     .join('&');
 };
+
+/**
+ * mock 3DS 認証結果 flag (Issue #3007)
+ * mock 3DS 画面での success / fail button 押下を state.transactions.tds2Result に記録。
+ * secureTran2 handler が本 flag を verify して TranResult を組立てる。
+ */
+type Tds2Result = 'success' | 'fail' | 'pending';
 
 /**
  * GMO 決済 mock state (テスト間で共有される in-memory store)
@@ -34,7 +42,15 @@ export const buildGmoFormResponse = (params: Record<string, string>): string => 
 type MockGmoState = {
   transactions: Map<
     string,
-    { accessId: string; accessPass: string; status: 'authenticated' | 'captured' | 'canceled' }
+    {
+      accessId: string;
+      accessPass: string;
+      status: 'authenticated' | 'captured' | 'canceled';
+      /** Issue #3007 = 3DS mock 画面 button 選択結果、 secureTran2 handler で verify */
+      tds2Result: Tds2Result;
+      /** Issue #3007 = mock 3DS flow で採用する transactionId */
+      transactionId: string;
+    }
   >;
 };
 
@@ -64,8 +80,41 @@ export const gmoMockBaseUrl = (): string => {
 };
 
 /**
- * MSW handler 3 本 (entryTran / execTran / alterTran)
+ * mock 3DS 画面 HTML template (Issue #3007)
+ * 実 GMO は card issuer 提供 iframe / redirect ページを返すが、
+ * mock では success / fail button (link) を持つ static HTML を返す。
+ * link click で webapp の return page (/fiat-bid/3ds-return) に URL query 付き遷移し、
+ * return page が backend の /api/v1/fiat-bid/3ds-callback を叩いて完了する。
+ */
+export const buildMock3dsHtml = (params: {
+  orderId: string;
+  accessId: string;
+  returnUrl: string;
+  transactionId: string;
+}): string => {
+  const { orderId, accessId, returnUrl, transactionId } = params;
+  const successHref = `${returnUrl}?transactionId=${encodeURIComponent(transactionId)}&result=success&accessId=${encodeURIComponent(accessId)}&orderId=${encodeURIComponent(orderId)}`;
+  const failHref = `${returnUrl}?transactionId=${encodeURIComponent(transactionId)}&result=fail&accessId=${encodeURIComponent(accessId)}&orderId=${encodeURIComponent(orderId)}`;
+  return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<title>Mock 3DS 2.0 Challenge</title>
+</head>
+<body>
+<h1>Mock 3D セキュア 2.0 認証</h1>
+<p>orderId ${orderId}</p>
+<p>transactionId ${transactionId}</p>
+<p><a id="mock-3ds-success" href="${successHref}">認証成功 (mock)</a></p>
+<p><a id="mock-3ds-fail" href="${failHref}">認証失敗 (mock)</a></p>
+</body>
+</html>`;
+};
+
+/**
+ * MSW handler 5 本 (entryTran / execTran / secureTran2 / alterTran / mock-3ds 画面 GET)
  * 各 handler は form-encoded body を parse、 mock state を update、 form-encoded response を返す。
+ * mock-3ds 画面のみ HTML 応答 (webapp からの full redirect 先)。
  */
 export const gmoHandlers = [
   /**
@@ -96,7 +145,16 @@ export const gmoHandlers = [
 
     const accessId = nextMockId('mock-access-');
     const accessPass = nextMockId('mock-pass-');
-    state.transactions.set(orderId, { accessId, accessPass, status: 'authenticated' });
+    // Issue #3007 = tds2Result:pending + transactionId を pre-populate、
+    // secureTran2 handler が本 record を lookup して verify する
+    const transactionId = nextMockId('mock-tds2-tran-');
+    state.transactions.set(orderId, {
+      accessId,
+      accessPass,
+      status: 'authenticated',
+      tds2Result: 'pending',
+      transactionId,
+    });
 
     return new HttpResponse(
       buildGmoFormResponse({
@@ -135,10 +193,29 @@ export const gmoHandlers = [
       );
     }
 
+    // Issue #3007 = mock 3DS 画面に webapp return URL を含めた query 付き URL を提供、
+    // full redirect した webapp が mock 画面 → success/fail link → webapp return page で受け取る flow
+    const orderId = params.get('OrderID') ?? '';
+    const accessPass = params.get('AccessPass') ?? '';
+    // execTran が entryTran 経由で state entry を持たない test 場合、 accessId で lookup + fall back で新規 entry
+    const existing = state.transactions.get(orderId);
+    const transactionId = existing?.transactionId ?? nextMockId('mock-tds2-tran-');
+    // 3DS state を record、 secureTran2 が accessId + transactionId で lookup 可能に
+    state.transactions.set(orderId, {
+      accessId,
+      accessPass,
+      status: existing?.status ?? 'authenticated',
+      tds2Result: existing?.tds2Result ?? 'pending',
+      transactionId,
+    });
+    // webapp 側 return URL (webapp が config で持つ base URL からの相対、 default は request Origin 使う想定)
+    // mock では default localhost webapp を assume、 実 GMO 場合は execTran の Tds2RetUrl param 経由
+    const tds2RetUrl = params.get('Tds2RetUrl') ?? 'http://127.0.0.1:2424/fiat-bid/3ds-return';
+    const acsUrl = `${gmoMockBaseUrl()}/mock-3ds?orderId=${encodeURIComponent(orderId)}&accessId=${encodeURIComponent(accessId)}&transactionId=${encodeURIComponent(transactionId)}&returnUrl=${encodeURIComponent(tds2RetUrl)}`;
     return new HttpResponse(
       buildGmoFormResponse({
         ACS: '1', // 3DS 必要
-        OrderID: params.get('OrderID') ?? '',
+        OrderID: orderId,
         AccessID: accessId,
         Forward: 'mock-forward-code',
         Method: '1',
@@ -153,8 +230,91 @@ export const gmoHandlers = [
         ClientField1: '',
         ClientField2: '',
         ClientField3: '',
-        // 3DS 2.0 full redirect URL (mock = webapp 側 callback を叩く dummy URL)
-        ACSUrl: `${gmoMockBaseUrl()}/mock-3ds-callback?orderId=${params.get('OrderID') ?? ''}`,
+        // 3DS 2.0 full redirect URL (mock 3DS 画面 URL、 success/fail button を含む HTML を返す)
+        ACSUrl: acsUrl,
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      },
+    );
+  }),
+
+  /**
+   * GET /mock-3ds — mock 3DS 認証画面 (Issue #3007)
+   * webapp から full redirect 先として叩かれる、 success/fail link を持つ HTML を返す。
+   * query param = orderId / accessId / transactionId / returnUrl (webapp 側 return page URL)
+   * link click で webapp return page (/fiat-bid/3ds-return) に遷移、
+   * return page が backend の 3ds-callback endpoint を叩いて完了する。
+   */
+  http.get(`${gmoMockBaseUrl()}/mock-3ds`, ({ request }) => {
+    const url = new URL(request.url);
+    const orderId = url.searchParams.get('orderId') ?? '';
+    const accessId = url.searchParams.get('accessId') ?? '';
+    const transactionId = url.searchParams.get('transactionId') ?? '';
+    const returnUrl =
+      url.searchParams.get('returnUrl') ?? 'http://127.0.0.1:2424/fiat-bid/3ds-return';
+    const html = buildMock3dsHtml({ orderId, accessId, returnUrl, transactionId });
+    return new HttpResponse(html, {
+      status: 200,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    });
+  }),
+
+  /**
+   * POST /secureTran2 — 3DS 2.0 認証結果 verify (Issue #3007)
+   * backend の 3ds-callback handler が webapp からの callback を受けて呼出す。
+   * 実 GMO は 3DS 認証結果 (成功 / fail) を TranResult field で返す (成功 = "0")。
+   * mock 実装 = state.transactions[orderId].tds2Result を verify、
+   * tds2Result === 'success' で TranResult=0、 それ以外は TranResult ErrCode。
+   *
+   * webapp mock flow で state.tds2Result は URL query の result=success で更新される必要があるが、
+   * 本 mock は callback handler が直接 result を param に含めるので state 経由 verify なしで
+   * 応答を組立てる (test では state.tds2Result を直接 seed する経路も提供)。
+   *
+   * request body = AccessID / AccessPass / TransactionId
+   * 応答 body    = OrderID / AccessID / TranResult ("0" = success)、 fail 時は ErrCode/ErrInfo
+   */
+  http.post(`${gmoMockBaseUrl()}/secureTran2`, async ({ request }) => {
+    const body = await request.text();
+    const params = new URLSearchParams(body);
+    const accessId = params.get('AccessID') ?? '';
+    const transactionId = params.get('TransactionId') ?? '';
+
+    // state から accessId で record を lookup (transactionId 一致まで verify)
+    const record = Array.from(state.transactions.entries()).find(
+      ([, r]) => r.accessId === accessId && r.transactionId === transactionId,
+    );
+    if (record === undefined) {
+      return new HttpResponse(
+        buildGmoFormResponse({
+          ErrCode: 'G03',
+          ErrInfo: 'G03180001', // 該当 auth ID 無し
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        },
+      );
+    }
+    const [orderId, tx] = record;
+    if (tx.tds2Result === 'fail') {
+      return new HttpResponse(
+        buildGmoFormResponse({
+          ErrCode: 'T01',
+          ErrInfo: 'T01180001', // 3DS 認証 fail
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        },
+      );
+    }
+    return new HttpResponse(
+      buildGmoFormResponse({
+        OrderID: orderId,
+        AccessID: accessId,
+        TranResult: '0', // 認証成功
       }),
       {
         status: 200,
@@ -230,4 +390,25 @@ export const gmoMockServer = setupServer(...gmoHandlers);
 export const resetGmoMockState = (): void => {
   state.transactions.clear();
   idCounter = 0;
+};
+
+/**
+ * test 用に mock state に 3DS 結果を seed する helper (Issue #3007)
+ * secureTran2 handler の tds2Result 分岐を verify したい場合に
+ * beforeEach で success / fail を明示的に seed する。
+ */
+export const seedGmoMockTds2Result = (params: {
+  orderId: string;
+  accessId: string;
+  accessPass: string;
+  transactionId: string;
+  tds2Result: 'success' | 'fail' | 'pending';
+}): void => {
+  state.transactions.set(params.orderId, {
+    accessId: params.accessId,
+    accessPass: params.accessPass,
+    status: 'authenticated',
+    tds2Result: params.tds2Result,
+    transactionId: params.transactionId,
+  });
 };

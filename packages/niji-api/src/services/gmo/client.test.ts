@@ -233,3 +233,143 @@ describe('GmoClient.authorize (entryTran + execTran 統合)', () => {
     expect(fetchStub).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('GmoClient.verifyTds2 (Issue #3007)', () => {
+  it('成功応答から OrderID / AccessID / TranResult を parse して返す', async () => {
+    const client = new GmoClient({
+      endpoint: 'http://test-gmo',
+      fetch: makeFetchStub({
+        '/secureTran2': {
+          body: 'OrderID=order-777&AccessID=acc-1&TranResult=0',
+        },
+      }),
+    });
+
+    const result = await client.verifyTds2({
+      accessId: 'acc-1',
+      accessPass: 'pass-1',
+      transactionId: 'tds2-tran-1',
+    });
+
+    expect(result.orderId).toBe('order-777');
+    expect(result.accessId).toBe('acc-1');
+    expect(result.tranResult).toBe('0');
+  });
+
+  it('ErrCode=T01 応答時 GmoAuthorizationError を throw (3DS 認証 fail)', async () => {
+    const client = new GmoClient({
+      endpoint: 'http://test-gmo',
+      fetch: makeFetchStub({
+        '/secureTran2': { body: 'ErrCode=T01&ErrInfo=T01180001' },
+      }),
+    });
+
+    await expect(
+      client.verifyTds2({
+        accessId: 'acc-1',
+        accessPass: 'pass-1',
+        transactionId: 'tds2-tran-1',
+      }),
+    ).rejects.toMatchObject({ errCode: 'T01' });
+  });
+
+  it('TranResult 欠損時 error を throw', async () => {
+    const client = new GmoClient({
+      endpoint: 'http://test-gmo',
+      fetch: makeFetchStub({
+        '/secureTran2': { body: 'OrderID=order-777&AccessID=acc-1' },
+      }),
+    });
+
+    await expect(
+      client.verifyTds2({
+        accessId: 'acc-1',
+        accessPass: 'pass-1',
+        transactionId: 'tds2-tran-1',
+      }),
+    ).rejects.toBeInstanceOf(GmoAuthorizationError);
+  });
+});
+
+describe('GmoClient.alterTran + cancelAuthorization (Issue #3007)', () => {
+  it('alterTran(JobCd=VOID) 成功で Status="VOID" を返す', async () => {
+    const client = new GmoClient({
+      endpoint: 'http://test-gmo',
+      fetch: makeFetchStub({
+        '/alterTran': {
+          body: 'AccessID=acc-1&AccessPass=pass-1&Status=VOID',
+        },
+      }),
+    });
+
+    const result = await client.alterTran({
+      shopId: 'shop',
+      shopPass: 'pass',
+      accessId: 'acc-1',
+      accessPass: 'pass-1',
+      jobCd: 'VOID',
+    });
+    expect(result.status).toBe('VOID');
+    expect(result.accessId).toBe('acc-1');
+  });
+
+  it('alterTran ErrCode=G05 で GmoAuthorizationError を throw', async () => {
+    const client = new GmoClient({
+      endpoint: 'http://test-gmo',
+      fetch: makeFetchStub({
+        '/alterTran': { body: 'ErrCode=G05&ErrInfo=G05180001' },
+      }),
+    });
+
+    await expect(
+      client.alterTran({
+        shopId: 'shop',
+        shopPass: 'pass',
+        accessId: 'acc-1',
+        accessPass: 'pass-1',
+        jobCd: 'VOID',
+      }),
+    ).rejects.toMatchObject({ errCode: 'G05' });
+  });
+
+  it('cancelAuthorization は alterTran(JobCd=VOID) を暗黙呼出、 shopId/shopPass を config から注入', async () => {
+    const fetchStub = vi.fn(
+      async (...args: [input: string | URL | Request, init?: RequestInit]) => {
+        const [input] = args;
+        const url = resolveUrl(input);
+        if (url.endsWith('/alterTran')) {
+          return new Response('AccessID=acc-1&AccessPass=pass-1&Status=VOID', {
+            status: 200,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          });
+        }
+        throw new Error(`unexpected URL ${url}`);
+      },
+    );
+    const client = new GmoClient({
+      endpoint: 'http://test-gmo',
+      shopId: 'test-shop',
+      shopPass: 'test-shop-pass',
+      fetch: fetchStub,
+    });
+
+    const result = await client.cancelAuthorization({
+      accessId: 'acc-1',
+      accessPass: 'pass-1',
+    });
+    expect(result.status).toBe('VOID');
+
+    // fetch call の body に ShopID / ShopPass / JobCd=VOID が含まれていることを verify
+    const callArg = fetchStub.mock.calls[0]?.[1];
+    expect(callArg).toBeDefined();
+    const requestBody =
+      callArg && typeof callArg === 'object' && 'body' in callArg
+        ? String((callArg as { body: unknown }).body)
+        : '';
+    expect(requestBody).toContain('ShopID=test-shop');
+    expect(requestBody).toContain('ShopPass=test-shop-pass');
+    expect(requestBody).toContain('JobCd=VOID');
+    expect(requestBody).toContain('AccessID=acc-1');
+    expect(requestBody).toContain('AccessPass=pass-1');
+  });
+});
