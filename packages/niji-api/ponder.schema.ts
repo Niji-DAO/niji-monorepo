@@ -173,4 +173,14 @@ export const fiatBid = onchainTable('fiat_bid', t => ({
   capturedAt: t.timestamp(),
   /** NFT transferFrom 成功時刻 (nullable、 Issue #3010 で埋める) */
   transferredAt: t.timestamp(),
+  /**
+   * 45 日超 fallback の再 authorization 回数 (Issue #3022 Phase 2 base infra)
+   * default 0、 Issue #3024 の ReauthorizationWorker が 45 日経過を検出するごとに +1 する
+   */
+  reauthorizationCount: t.integer().notNull().default(0),
+  /**
+   * 直近の再 authorization 実行時刻 (Issue #3022 Phase 2 base infra、 nullable)
+   * ReauthorizationWorker が再 authorization 成功時に UPDATE、 次回 45 日 window 計算の起点
+   */
+  lastReauthorizedAt: t.timestamp(),
 }));
