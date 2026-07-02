@@ -57,6 +57,11 @@
       "import": "./dist/react/legacy-treasury.js",
       "default": "./dist/react/legacy-treasury.js"
     },
+    "./react/seeder": {
+      "types": "./dist/react/seeder.d.ts",
+      "import": "./dist/react/seeder.js",
+      "default": "./dist/react/seeder.js"
+    },
     "./react/stream-factory": {
       "types": "./dist/react/stream-factory.d.ts",
       "import": "./dist/react/stream-factory.js",
@@ -111,6 +116,11 @@
       "types": "./dist/actions/legacy-treasury.d.ts",
       "import": "./dist/actions/legacy-treasury.js",
       "default": "./dist/actions/legacy-treasury.js"
+    },
+    "./seeder": {
+      "types": "./dist/actions/seeder.d.ts",
+      "import": "./dist/actions/seeder.js",
+      "default": "./dist/actions/seeder.js"
     },
     "./stream-factory": {
       "types": "./dist/actions/stream-factory.d.ts",
@@ -167,6 +177,9 @@
       "react/legacy-treasury": [
         "./dist/react/legacy-treasury.d.ts"
       ],
+      "react/seeder": [
+        "./dist/react/seeder.d.ts"
+      ],
       "react/stream-factory": [
         "./dist/react/stream-factory.d.ts"
       ],
@@ -199,6 +212,9 @@
       ],
       "legacy-treasury": [
         "./dist/actions/legacy-treasury.d.ts"
+      ],
+      "seeder": [
+        "./dist/actions/seeder.d.ts"
       ],
       "stream-factory": [
         "./dist/actions/stream-factory.d.ts"

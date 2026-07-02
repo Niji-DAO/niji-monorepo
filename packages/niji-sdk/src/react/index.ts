@@ -3,6 +3,7 @@ export * from './data.gen';
 export * from './descriptor.gen';
 export * from './governor.gen';
 export * from './legacy-treasury.gen';
+export * from './seeder.gen';
 export * from './stream-factory.gen';
 export * from './token.gen';
 export * from './treasury/index';
@@ -17,11 +18,9 @@ export * from './treasury-assets/wsteth.gen';
 export * from './usdc-payer.gen';
 export * from './usdc-token-buyer.gen';
 
-export {
-  nounsAuctionHouseAbi as nijiAuctionHouseAbi,
-  nounsAuctionHouseAddress as nijiAuctionHouseAddress,
-  nounsAuctionHouseConfig as nijiAuctionHouseConfig,
-} from './auction-house.gen';
+// NijiAuctionHouse は local abi 経路で nijiAuctionHouseAbi / nijiAuctionHouseAddress を
+// 直接 export するため、 Nouns 旧名からの alias 経路 (GH #3003 以前の nounsAuctionHouse
+// as nijiAuctionHouse) は不要になった。
 
 export {
   nounsGovernorAbi as nijiGovernorAbi,
