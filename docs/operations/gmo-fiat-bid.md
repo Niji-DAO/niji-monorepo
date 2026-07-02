@@ -1,6 +1,7 @@
-# GMO fiat bid 運用ドキュメント (Phase 1 MVP)
+# GMO fiat bid 運用ドキュメント (Phase 1 MVP + Phase 2 拡張)
 
 Phase 1 MVP (`tests/spec/gmo-fiat-bid/Phase1-01-master-spec.md` SSOT) の base infra 運用ドキュメント。
+Phase 2 (`tests/spec/gmo-fiat-bid/Phase2-01-master-spec.md` SSOT) で bid 増額 5 phase sequential 経路 + 45 日超 fallback cron worker 経路を追記した。
 Issue 1 段階では env 変数一覧 + mock server 切替手順のみ記載、 endpoint 実装 (Issue 3 以降) 完了時に本 doc は runbook 章 (異常系対応 / 運営 EOA 鍵管理 / GMO 契約情報) を追記する。
 
 ## Phase 1 スコープと現状
@@ -244,10 +245,131 @@ Phase 1 全 8 Issue merge 後、 以下を確認して 3 marker (test-passed + v
 - Phase 2 の spec (現在は `tests/spec/gmo-fiat-bid/Phase1-*.md` のみ) を新規策定、 `tests/spec/gmo-fiat-bid/Phase2-01-master-spec.md` として grilling 経路で確定
 - Phase 2 の Issue 分割案を `Phase2-02-issue-breakdown.md` に落し込み、 dev-flow chain で順次実装
 
+## Phase 2 bid 増額 flow (5 phase sequential、 Issue #3026)
+
+Phase 2 で追加した fiat bid 増額 (topup) 経路の運用手順 SSOT。 grilling P3-b A 案 (5 phase sequential + 非同期 cleanup) を実装した Phase 2 Issue P2-2 / P2-4 の運用面 SSOT を本 section に集約する。
+
+### 5 phase sequential 経路の概要
+
+fiat bidder が同 auction 内で 2 回目以降の bid (増額) を実行する時、 backend topup handler (`packages/niji-api/src/handlers/fiat-bid/topup.ts`) が 5 phase を sequential に完走する。
+
+| phase | 動作 | 失敗時 rollback |
+|---|---|---|
+| Phase A validation | request 検証 (status=bid-placed + 増額のみ + 100 万円上限) | 400 応答返却、 fiat_bid 変更なし |
+| Phase B GMO 新 auth | SpotRateFetcher で ETH/JPY 換算 + entryTran + execTran で新 authId 発行 | Phase B fail は GMO 側で auth 未発生、 400 応答返却 |
+| Phase C chain bid tx | BidRelay.placeBid で運営 EOA から chain bid tx broadcast | tx revert 時は Phase B 新 auth のみ alterTran VOID、 旧 auth 保持で bid-placed 維持 |
+| Phase D 旧 auth cleanup enqueue | AuthCleanupQueue.enqueue(oldAuthId、 delayMs=5000) で 5 秒後 VOID | queue enqueue fail 時は Phase E に進まず 500 応答、 手動 cleanup |
+| Phase E fiat_bid record 更新 | PK を新 authId に置換、 jpyAmount / ethAmount / spotRate 更新 | Phase E fail (DB 通信 fail 等) は Phase C 完了済で on-chain state と DB 不整合、 手動修復必要 |
+
+### bid 増額 flow 運用手順
+
+日常運用として観測すべき log と対応手順。
+
+1. bid 増額を fiat bidder が実行した時、 backend log に以下 5 log が sequential 出力される (grep `[topup]`)
+   - `[topup] Phase A: validation pass` (100 万円上限 / 増額のみ)
+   - `[topup] Phase B: new auth issued` (新 authId + jpyAmount + ethAmount + spotRate)
+   - `[topup] Phase C: bid tx broadcast` (txHash + fiat bidder wallet + auction contract)
+   - `[topup] Phase D: cleanup enqueued` (旧 authId + delayMs=5000)
+   - `[topup] Phase E: fiat_bid updated` (新 PK + 旧 PK)
+2. Phase C revert 時は log `[topup] Phase C rollback: bid tx reverted, new auth voided` を確認、 fiat_bid.status=bid-placed 維持 + 200 応答 `{ status: "cancelled" }` を返却する経路
+3. Phase E fail (grep `[topup] Phase E failed`) は on-chain state と DB 不整合状態、 運営 EOA で Base Sepolia の Bid event を index して手動 fiat_bid 復旧が必要
+4. 増額 bid 頻度が急増 (1 auction あたり 3 回超) の場合は monitoring 対象、 GMO 与信枠消費が増えるため
+
+### 旧 auth cleanup queue の運用観測
+
+AuthCleanupQueue (`packages/niji-api/src/services/authCleanup/index.ts`) は 5 秒 delay + 1 req/sec rate limit + 3 回 retry で GMO alterTran VOID を実行する。
+
+- 正常時 log は `[auth-cleanup] enqueue authId=xxx delayMs=5000` → `[auth-cleanup] dequeue authId=xxx` → `[auth-cleanup] VOID success authId=xxx` の 3 段
+- retry 発火時 log は `[auth-cleanup] retry authId=xxx attempt=N` (最大 attempt=3)
+- 3 回 fail 後の log は `[auth-cleanup] max retries exceeded authId=xxx`、 GMO 管理画面で該当 authId の与信枠を手動 VOID 実施 (60 日で自動失効するため緊急度低)
+- queue が backend crash で消えた場合の orphan auth 検出は Phase 4 で追加、 Phase 2 では手動 audit で対応 (GMO 管理画面 vs fiat_bid table の差分検出)
+
+## Phase 2 45 日超 fallback 運用 (Issue #3026)
+
+45 日超 fallback は auction 期間が anti-sniping soft close で異常に延びた場合の safety net。 GMO 与信枠が 60 日で自動 revoke されるため、 45 日で先手を打って再 authorization を発火する。
+
+### cron worker 動作確認手順
+
+`packages/niji-api/src/services/reauthorization/index.ts` の `ReauthorizationWorker` が 1h 周期 (env `REAUTHORIZATION_INTERVAL_HOURS` で調整可能、 default 1) で fiat_bid table を scan する。
+
+1. env `REAUTHORIZATION_WORKER_ENABLED=true` で cron worker が起動する opt-in 制御、 dev / test / codegen 時は false で起動抑制
+2. env `REAUTHORIZATION_INTERVAL_HOURS` で scan 周期を上書き可能、 test 環境で頻度上げる時は 0.01 (36 秒) 等に短縮
+3. worker 起動 log は `[reauth] worker started intervalHours=N`、 停止 log は `[reauth] worker stopped`
+4. 各 scan 実行 log は `[reauth] scan cutoff=<45 日前 ISO 日時> eligible=N`、 N は 45 日超 record 件数
+5. 各 record 処理 log は `[reauth] processing authId=xxx createdAt=<ISO>` → 成功時 `[reauth] success authId=xxx newAuthId=yyy` / 失敗時 `[reauth] failed authId=xxx reason=<GMO error>`
+6. cron 動作確認は Railway (or 本番相当環境) の log console で 1h ごとに `[reauth] scan` log が出ることを確認、 出ない場合は worker 停止 (env or crash) 判定
+
+### 再 authorization 失敗時対応
+
+GMO 再 authorization (alterTran VOID + entryTran + execTran の 3 step) が fail した場合、 fiat_bid record 単位で以下 4 経路が発火する。
+
+1. `fiat_bid.status = cancelled` に自動遷移 (Phase 1 の capture 失敗と同じ terminal state)
+2. `onAlert(authId, reason)` callback で運営 alert log 出力 (`packages/niji-api` console.error stream に `[reauth] ALERT` 出力)
+3. `onNotifyUser(fiatBid.userEmail, cancelReason)` callback で user 通知 email 送信 (Phase 1 の email template 再利用)
+4. AuthCleanupQueue と経路分離 = reauth は 1 回 fail で cancel 確定、 AuthCleanup は 3 回 retry (棲み分けは Issue #3024 PR body SSOT)
+
+失敗理由別の手動対応 policy。
+
+- reason=`card 期限切れ` → user email で「card 期限が切れました、 別 card で再入札お願いします」 案内、 fiat_bid record は cancelled のまま
+- reason=`与信不足` → user email で「card 与信枠が不足しています」 案内、 fiat_bid record は cancelled のまま
+- reason=`GMO API 通信 fail` → 1h 待って手動 retry (Railway 管理画面で worker restart、 or 直接 `ReauthorizationWorker.runOnce()` を invoke)
+- reason=`fraud 判定` → user email で「不正利用の疑いで decline されました、 GMO と card 会社にお問合わせください」 案内
+
+### 45 日超 fallback の scope 境界
+
+- Phase 2 では 45 日超 fallback を 1 回のみ実行する経路、 再 authorization 後さらに 45 日経過した場合の N 回目 fallback は Phase 4 で対応 (現状では実運用で 90 日超えは想定不可)
+- 再 authorization で新 authId が発行された場合、 元 authId の cleanup は cron worker 内で完結 (AuthCleanupQueue とは経路分離、 alterTran VOID を 1 回のみ試行)
+- auction settle 済 (fiat_bid.status = 3ds-verified / bid-placed 以外) の record は scan 対象外、 settle 経路が優先
+
+## Phase 2 完了確認 (Issue #3026 Phase C、 3 marker 発行前提)
+
+Phase 2 全 5 Issue merge 後、 以下を確認して 3 marker (test-passed + verify-passed + review-passed) を発行する。 Phase 1 完了確認 section と同じ経路。
+
+### Phase 2 完了 Issue 一覧 (5 件)
+
+| Issue | title | 主担当 file | 完了 status |
+|---|---|---|---|
+| #3022 | Ponder schema 拡張 + AuthCleanupQueue base infra | `packages/niji-api/src/services/authCleanup/index.ts` | merged |
+| #3023 | bid 増額 topup endpoint | `packages/niji-api/src/handlers/fiat-bid/topup.ts` | merged |
+| #3024 | 45 日超 auction fallback cron worker | `packages/niji-api/src/services/reauthorization/index.ts` | merged |
+| #3025 | FiatBidModal 増額 bid branch + 5 phase stepper | `packages/niji-webapp/src/components/FiatBidModal/index.tsx` | merged |
+| #3026 | Playwright e2e golden path + operations runbook | `packages/niji-webapp/tests/e2e/fiat-bid-topup.spec.ts` | 本 Issue |
+
+### 3 marker 発行手順 (Phase 2 全 Issue merged 後)
+
+`rules/quality.md` § test-passed marker 発行前提 の 3 条件を確認してから marker を発行する。
+
+1. **test-passed** — 各 PR で behavior test 追加が完了しており、 `pnpm test` が全 pass。 marker file = `<repo>/.context/markers/test-passed-{repo-slug}-phase-2-gmo-fiat-bid.md`、 内容に「Phase 2 全 5 Issue の behavior test 状況表 + 実行 log 抜粋」 を記載
+2. **verify-passed** — `/verify` skill で lint + typecheck + test + build が全 pass。 marker file = `verify-passed-{repo-slug}-phase-2-gmo-fiat-bid.md`
+3. **review-passed** — `/code-review-router` で 4 pass review 完了、 blocking issue ゼロ。 marker file = `review-passed-{repo-slug}-phase-2-gmo-fiat-bid.md`
+
+### Phase 2 → 3 移行 prerequisite
+
+Phase 2 完了 marker 3 件 active で Phase 3 移行判定に進む。 Phase 3 は本番切替のため、 Phase 2 完了時点で以下 prerequisite を満たしていること。
+
+- **GMO デモ環境再取得** — Phase 1 開始時に期限切れした GMO デモ環境の再契約 (Phase 3 実装前に GMO 側と契約更新)
+- **GMO 本番契約締結** — 加盟店 ID / サイト ID / ショップパスワードの本番 credentials 取得、 1Password 加盟店 vault 保管
+- **PCI DSS 監査** — card 決済経路の PCI DSS 準拠監査 (Phase 3 本番 release 前の gate 条件、 3DS 2.0 契約とセット)
+- **AWS KMS 配線** — 運営 EOA 秘密鍵の env 直読 → KMS signer 切替 (`USE_KMS_SIGNER=true` feature flag)
+- **Base Mainnet 移行** — chainId + RPC + contract 再 deploy、 subgraph endpoint 切替
+- **3DS 2.0 本契約 activation** — GMO 3DS 2.0 の本番認証 activation (Phase 1 は demo 経路のみ)
+
+### Phase 2 完了判定後の次 action
+
+- Phase 2 完了 marker 3 件 active で Phase 3 移行判定に進む
+- Phase 3 の spec 策定 (`tests/spec/gmo-fiat-bid/Phase3-*.md`) は本 Issue の scope 外、 別 session で grilling 経由確定する
+- Phase 3 Issue 分割案 (`Phase3-02-issue-breakdown.md`) は Phase 2 → 3 移行 prerequisite 完了後に着手
+
 ## 関連 SSOT
 
 - `tests/spec/gmo-fiat-bid/Phase1-01-master-spec.md` — Phase 1 master spec
 - `tests/spec/gmo-fiat-bid/Phase1-02-issue-breakdown.md` — 8 Issue 分割案
 - `tests/spec/gmo-fiat-bid/Phase1-05-impact-analysis.md` — 影響範囲分析
+- `tests/spec/gmo-fiat-bid/Phase2-01-master-spec.md` — Phase 2 master spec (bid 増額 + 45 日超 fallback)
+- `tests/spec/gmo-fiat-bid/Phase2-02-issue-breakdown.md` — Phase 2 5 Issue 分割案
 - `packages/niji-api/src/mocks/gmo-server.ts` — MSW handler 実装 SSOT
 - `packages/niji-api/src/mocks/index.ts` — conditional 起動 helper SSOT
+- `packages/niji-api/src/handlers/fiat-bid/topup.ts` — Phase 2 topup 5 phase sequential handler SSOT
+- `packages/niji-api/src/services/authCleanup/index.ts` — Phase 2 async cleanup queue SSOT
+- `packages/niji-api/src/services/reauthorization/index.ts` — Phase 2 45 日超 fallback cron worker SSOT
+- `packages/niji-webapp/tests/e2e/fiat-bid-topup.spec.ts` — Phase 2 topup golden path e2e (Phase 3 activate)
