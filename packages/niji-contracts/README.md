@@ -71,6 +71,9 @@ forge test -vvv
 - **Edge Case Tests**: Boundary conditions and error paths (`*.edge.test.ts`)
 - **Integration Tests**: Cross-contract interactions and full workflows (`NijiIntegration.test.ts`)
 - **Gas Benchmarks**: Production-size PNG operation measurements (`NijiGas.test.ts`)
+  - Local (`pnpm test`) では 5/10/15/20KB PNG × 12 layers + P6 actual profiles を全て測定する production sizing 用 benchmark。
+  - CI (`process.env.CI = 'true'`) では 20KB PNG × 12 layers のみ skip される (GH Actions runner 7GB memory 上限で OOM kill 対策、 GH #3012)。
+  - 20KB size の gas 数値を local 環境で継続確認するには `pnpm test test/niji/NijiGas.test.ts` を CI env なしで実行する。
 
 #### Foundry Tests (`test/foundry/`)
 
