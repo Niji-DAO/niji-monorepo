@@ -33,6 +33,9 @@ const EditCandidatePage = lazy(() => import('@/pages/EditCandidate'));
 const EditProposalPage = lazy(() => import('@/pages/EditProposal'));
 const FaucetPage = lazy(() => import('@/pages/Faucet'));
 const ForkPage = lazy(() => import('@/pages/Fork'));
+// Issue #3007 = 3DS 2.0 full redirect / return pages (bundle 影響を抑えるため lazy import)
+const ThreeDSRedirectPage = lazy(() => import('@/pages/FiatBid/ThreeDSRedirect'));
+const ThreeDSReturnPage = lazy(() => import('@/pages/FiatBid/ThreeDSReturn'));
 const ForksPage = lazy(() => import('@/pages/Forks'));
 const GovernancePage = lazy(() => import('@/pages/Governance'));
 const NijisPage = lazy(() => import('@/pages/NijisPage'));
@@ -90,6 +93,9 @@ function App() {
             <Route path="/brand" element={<BrandAssetsPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/crystal-ball" element={<CrystalBallPage />} />
+            {/* Issue #3007 = fiat bid 3DS 2.0 full redirect + return page (Phase 1 MVP) */}
+            <Route path="/fiat-bid/3ds-redirect" element={<ThreeDSRedirectPage />} />
+            <Route path="/fiat-bid/3ds-return" element={<ThreeDSReturnPage />} />
             {Number(CHAIN_ID) === 31337 && <Route path="/faucet" element={<FaucetPage />} />}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

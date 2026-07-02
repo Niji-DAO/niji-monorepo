@@ -15,12 +15,16 @@
  */
 
 import type {
+  AlterTranRequest,
+  AlterTranSuccess,
   AuthorizationResult,
   EntryTranRequest,
   EntryTranSuccess,
   ExecTranRequest,
   ExecTranSuccess,
   GmoErrorResponse,
+  SecureTran2Request,
+  SecureTran2Success,
 } from './types.js';
 
 /** DI 用の fetch signature (test で mock 差替可能) */
@@ -277,6 +281,89 @@ export class GmoClient {
       approve: exec.approve,
       tranId: exec.tranId,
     };
+  }
+
+  /**
+   * POST /secureTran2 — 3DS 2.0 認証結果 verify (Issue #3007)
+   * 3DS 認証完了後の callback で GMO 側 authorization 状態を verify する。
+   * TranResult=0 が返れば認証成功、 それ以外は fail (chargeback 対策 SSOT)。
+   * mock server は callback endpoint 経由で state.transactions を verify する。
+   */
+  async verifyTds2(req: SecureTran2Request): Promise<SecureTran2Success> {
+    const body = new URLSearchParams({
+      AccessID: req.accessId,
+      AccessPass: req.accessPass,
+      TransactionId: req.transactionId,
+    }).toString();
+
+    const parsed = await this.post('/secureTran2', body);
+    const err = asGmoError(parsed);
+    if (err !== undefined) {
+      throw new GmoAuthorizationError(`GMO secureTran2 failed (${err.errCode})`, {
+        errCode: err.errCode,
+        errInfo: err.errInfo,
+      });
+    }
+    const orderId = parsed['OrderID'];
+    const accessId = parsed['AccessID'];
+    const tranResult = parsed['TranResult'];
+    if (orderId === undefined || accessId === undefined || tranResult === undefined) {
+      throw new GmoAuthorizationError('GMO secureTran2 missing required fields');
+    }
+    return { orderId, accessId, tranResult };
+  }
+
+  /**
+   * POST /alterTran — 決済変更 (Issue #3007 = VOID cancel、 Issue #3010 = SALES capture で共用)
+   * 3DS 認証 fail 時に与信枠 (authorization hold) を解除する必要がある (加盟店契約要件、 chargeback 予防)。
+   * JobCd = VOID で amount 不要、 GMO 仕様上 amount 送信可能だが cancel は amount 依存しない。
+   */
+  async alterTran(req: AlterTranRequest): Promise<AlterTranSuccess> {
+    const params: Record<string, string> = {
+      ShopID: req.shopId,
+      ShopPass: req.shopPass,
+      AccessID: req.accessId,
+      AccessPass: req.accessPass,
+      JobCd: req.jobCd,
+    };
+    if (req.amount !== undefined) {
+      params['Amount'] = String(req.amount);
+    }
+    const body = new URLSearchParams(params).toString();
+
+    const parsed = await this.post('/alterTran', body);
+    const err = asGmoError(parsed);
+    if (err !== undefined) {
+      throw new GmoAuthorizationError(`GMO alterTran failed (${err.errCode})`, {
+        errCode: err.errCode,
+        errInfo: err.errInfo,
+      });
+    }
+    const accessId = parsed['AccessID'];
+    const accessPass = parsed['AccessPass'];
+    const status = parsed['Status'];
+    if (accessId === undefined || accessPass === undefined || status === undefined) {
+      throw new GmoAuthorizationError('GMO alterTran missing required fields');
+    }
+    return { accessId, accessPass, status };
+  }
+
+  /**
+   * 与信枠 cancel の統合 method (3DS fail / timeout 時に呼出)
+   * alterTran(JobCd=VOID) 呼出 + shopId/shopPass 自動注入
+   * handler 層は本 method を呼ぶだけで cancel 完了、 amount 引数不要
+   */
+  async cancelAuthorization(input: {
+    accessId: string;
+    accessPass: string;
+  }): Promise<AlterTranSuccess> {
+    return this.alterTran({
+      shopId: this.shopId,
+      shopPass: this.shopPass,
+      accessId: input.accessId,
+      accessPass: input.accessPass,
+      jobCd: 'VOID',
+    });
   }
 
   private async post(path: string, body: string): Promise<Record<string, string>> {
