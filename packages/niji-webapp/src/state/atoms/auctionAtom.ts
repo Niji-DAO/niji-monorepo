@@ -20,6 +20,84 @@ const initialState: AuctionState = {
 };
 
 /**
+ * 増額 bid の 5 phase state 識別子 (Issue #3025 Phase 2 grilling P7 A' 案)
+ *
+ * webapp UI が topup endpoint 応答に応じて stepper 遷移する際の SSOT。
+ * useFiatBid hook 側の FiatTopupPhase と同 shape、 hook 内 state と atom 間で
+ * 直接 share せず, 起動元 (Bid component) が hook state を atom へ反映する契約。
+ */
+export type TopupStatePhase =
+  | 'idle'
+  | 'pending'
+  | 'auth-taken'
+  | 'tx-broadcast'
+  | 'tx-confirmed'
+  | 'cleanup-queued'
+  | 'failure';
+
+/**
+ * 旧 authorization の async cleanup phase 識別子 (endpoint 応答後の非同期経路)
+ *
+ * queued  = topup endpoint 応答時点 (cleanup queue に enqueue 済、 実行 5 秒 delay 待機中)
+ * running = cleanup worker が GMO alterTran VOID を発火中 (webapp から観測不能、 backend log のみ)
+ * done    = cleanup 完了 (旧 authorization VOID 成功、 webapp から観測不能)
+ *
+ * 観測不能 phase のため webapp 表示は queued 固定 + 「別 tab で作業続行可」 disclaimer で説明する。
+ */
+export type CleanupPhase = 'idle' | 'queued' | 'running' | 'done';
+
+/**
+ * 増額 bid 中の transient state (auction 落札状態と分離)。
+ *
+ * Phase 2 mvp は modal ローカル state で完結、 atom へ晒すのは
+ * (a) 他 component から「増額 bid 中」 を参照したい場合の hook 経路
+ * (b) chain event 経由で bid 増額を検知したときの表示更新の 2 用途に閉じる。
+ */
+export interface TopupState {
+  /** 増額 bid の現 phase (5 phase stepper 表示用) */
+  phase: TopupStatePhase;
+  /** 旧 authorization の cleanup phase (async 完了は観測不能) */
+  cleanupPhase: CleanupPhase;
+  /** 増額 bid 対象の旧 authId (topup endpoint request の authId) */
+  oldAuthId?: string;
+  /** 増額 bid 完了後の新 authId (endpoint 応答の authId) */
+  newAuthId?: string;
+}
+
+const initialTopupState: TopupState = {
+  phase: 'idle',
+  cleanupPhase: 'idle',
+};
+
+/**
+ * 増額 bid の 5 phase + async cleanup state atom (Issue #3025)
+ *
+ * FiatBidModal 内の useFiatBid hook state を setter 経由で反映する契約、
+ * atom 側は presentation state のみ管理 (network call は hook が担当、 SoC 保持)。
+ */
+export const topupStateAtom = atom<TopupState>(initialTopupState);
+
+export const applyTopupPhase = (
+  state: TopupState,
+  payload: { phase: TopupStatePhase; oldAuthId?: string; newAuthId?: string },
+): TopupState => ({
+  ...state,
+  phase: payload.phase,
+  oldAuthId: payload.oldAuthId ?? state.oldAuthId,
+  newAuthId: payload.newAuthId ?? state.newAuthId,
+});
+
+export const applyCleanupPhase = (
+  state: TopupState,
+  payload: { cleanupPhase: CleanupPhase },
+): TopupState => ({
+  ...state,
+  cleanupPhase: payload.cleanupPhase,
+});
+
+export const resetTopupState = (): TopupState => initialTopupState;
+
+/**
  * Current auction の view state (websocket / wagmi watch event 経由で更新)。
  *
  * 旧 Redux slice (state/slices/auction.ts) を Jotai atom に 1:1 移行したもの (Issue #215、

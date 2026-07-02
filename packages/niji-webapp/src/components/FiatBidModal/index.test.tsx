@@ -1,14 +1,19 @@
 /**
- * FiatBidModal behavior test (Issue #3009 Phase D、 spec T13-T15)
+ * FiatBidModal behavior test (Issue #3009 Phase D、 spec T13-T15 + Issue #3025 Phase 2 増額 branch)
  *
- * spec で要求される 3 挙動 —
+ * Phase 1 (新規 bid mode) の 3 挙動 —
  * (1) modal 開閉 + stepper 遷移 (T13)
  * (2) bid 上限 100 万円超過で validation エラー + submit disable (T14)
  * (3) Terms checkbox 未 check で submit disable (追加、 spec 完了条件 6 番)
  * (4) modal 内 submit で authorize 呼出 → step="three-ds" 遷移
+ *
+ * Phase 2 (増額 bid mode、 Issue #3025) の 3 挙動 —
+ * (T1) existingFiatBid prop 存在時に「増額 bid」 modal 表示 (title / submit label / existing bid summary)
+ * (T2) validateTopupJpyAmount 経由の validation error (newJpy <= oldJpy) 表示 + submit disable
+ * (T3) submit で topup endpoint 呼出 + 5 phase stepper 表示 + cleanup disclaimer 表示
  */
 
-import type { AuthorizeResponse, PlaceBidResponse } from '@/hooks/useFiatBid';
+import type { AuthorizeResponse, PlaceBidResponse, TopupResponse } from '@/hooks/useFiatBid';
 import type { SpotRate } from '@/hooks/useSpotRate';
 
 import * as React from 'react';
@@ -19,7 +24,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 
-import { BID_LIMIT_JPY, FiatBidModal, validateJpyAmount } from './index';
+import { BID_LIMIT_JPY, FiatBidModal, validateJpyAmount, validateTopupJpyAmount } from './index';
 
 // Radix Tooltip Portal を jsdom で render するため Provider を wrap
 
@@ -60,6 +65,18 @@ const placeBidResponse: PlaceBidResponse = {
   status: 'bid-placed',
   txHash: '0xTXHASH',
   message: 'bid tx を broadcast しました。',
+};
+
+const topupResponse: TopupResponse = {
+  authId: 'auth-2-new',
+  oldAuthId: 'auth-1',
+  status: 'bid-placed',
+  txHash: '0xTXHASH2',
+  jpyAmount: 80_000,
+  ethAmount: '160000000000000000',
+  spotRate: 500_000,
+  spotRateSource: 'gmo',
+  message: '増額 bid tx を broadcast しました。',
 };
 
 describe('validateJpyAmount', () => {
@@ -228,5 +245,224 @@ describe('modal close', () => {
 
     fireEvent.click(screen.getByTestId('fiat-bid-cancel'));
     expect(onClose).toHaveBeenCalled();
+  });
+});
+
+// ====================================================================
+// Phase 2 増額 bid mode (Issue #3025 T10-T11)
+// ====================================================================
+
+describe('validateTopupJpyAmount (Phase 2、 増額 bid mode)', () => {
+  it('旧 jpyAmount 以下で ng (増額のみ受付)', () => {
+    const r = validateTopupJpyAmount('50000', 50_000);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.message).toContain('増額のみ受付可能');
+  });
+
+  it('旧 jpyAmount 未満で ng', () => {
+    const r = validateTopupJpyAmount('30000', 50_000);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.message).toContain('増額のみ受付可能');
+  });
+
+  it('BID_LIMIT_JPY 超過で ng', () => {
+    const r = validateTopupJpyAmount(`${BID_LIMIT_JPY + 1}`, 50_000);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.message).toContain('bid 上限');
+  });
+
+  it('旧 jpyAmount より大 + BID_LIMIT_JPY 以下で ok', () => {
+    const r = validateTopupJpyAmount('80000', 50_000);
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.value).toBe(80_000);
+  });
+
+  it('空文字で ng', () => {
+    const r = validateTopupJpyAmount('', 50_000);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.message).toContain('JPY 額');
+  });
+});
+
+describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
+  it('existingFiatBid 存在時に「増額 bid」 modal 表示 (title / summary / submit label)', async () => {
+    const spotFetcher = vi.fn().mockResolvedValue(successRate);
+
+    render(
+      <FiatBidModal
+        open
+        onClose={() => {}}
+        auctionId="42"
+        bidderWallet="0xUSER"
+        existingFiatBid={{ authId: 'auth-1', jpyAmount: 50_000 }}
+        fetchersOverride={{
+          fetchers: { authorize: vi.fn(), placeBid: vi.fn(), topup: vi.fn() },
+          saveState: vi.fn(),
+          redirect: vi.fn(),
+        }}
+        spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
+      />,
+      { wrapper: buildWrapper() },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
+    });
+
+    // modal data-mode="topup" に切替済
+    const modal = screen.getByTestId('fiat-bid-modal');
+    expect(modal.getAttribute('data-mode')).toBe('topup');
+
+    // 既存 bid summary 表示
+    const summary = screen.getByTestId('fiat-topup-existing-bid-summary');
+    expect(summary.textContent).toContain('50,000');
+    expect(summary.textContent).toContain('auth-1');
+
+    // submit button の label が「増額 bid を実行」 に切替
+    const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
+    expect(submit.textContent).toContain('増額 bid を実行');
+
+    // 通知 email 欄は増額 mode では非表示
+    expect(screen.queryByTestId('fiat-bid-email-input')).toBeNull();
+  });
+
+  it('増額額 <= 旧 jpyAmount 入力で validation エラー + submit disable', async () => {
+    const topup = vi.fn();
+    const spotFetcher = vi.fn().mockResolvedValue(successRate);
+
+    render(
+      <FiatBidModal
+        open
+        onClose={() => {}}
+        auctionId="42"
+        bidderWallet="0xUSER"
+        existingFiatBid={{ authId: 'auth-1', jpyAmount: 50_000 }}
+        fetchersOverride={{
+          fetchers: { authorize: vi.fn(), placeBid: vi.fn(), topup },
+          saveState: vi.fn(),
+          redirect: vi.fn(),
+        }}
+        spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
+      />,
+      { wrapper: buildWrapper() },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
+    });
+
+    // 旧 jpyAmount と同額入力 (増額のみ受付なので ng)
+    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
+    fireEvent.change(jpyInput, { target: { value: '50000' } });
+
+    await waitFor(() => {
+      const err = screen.getByTestId('fiat-bid-jpy-error');
+      expect(err.textContent).toContain('増額のみ受付可能');
+    });
+
+    fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
+    const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
+    expect(submit.disabled).toBe(true);
+    expect(topup).not.toHaveBeenCalled();
+  });
+
+  it('合計 > BID_LIMIT_JPY で validation エラー + submit disable', async () => {
+    const topup = vi.fn();
+    const spotFetcher = vi.fn().mockResolvedValue(successRate);
+
+    render(
+      <FiatBidModal
+        open
+        onClose={() => {}}
+        auctionId="42"
+        bidderWallet="0xUSER"
+        existingFiatBid={{ authId: 'auth-1', jpyAmount: 500_000 }}
+        fetchersOverride={{
+          fetchers: { authorize: vi.fn(), placeBid: vi.fn(), topup },
+          saveState: vi.fn(),
+          redirect: vi.fn(),
+        }}
+        spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
+      />,
+      { wrapper: buildWrapper() },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
+    });
+
+    // 100 万円 + 1 で BID_LIMIT_JPY 超過
+    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
+    fireEvent.change(jpyInput, { target: { value: `${BID_LIMIT_JPY + 1}` } });
+
+    await waitFor(() => {
+      const err = screen.getByTestId('fiat-bid-jpy-error');
+      expect(err.textContent).toContain('bid 上限');
+    });
+
+    fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
+    const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
+    expect(submit.disabled).toBe(true);
+    expect(topup).not.toHaveBeenCalled();
+  });
+
+  it('submit で topup endpoint 呼出 + 5 phase stepper 表示 + cleanup disclaimer', async () => {
+    const topup = vi.fn().mockResolvedValue(topupResponse);
+    const spotFetcher = vi.fn().mockResolvedValue(successRate);
+
+    render(
+      <FiatBidModal
+        open
+        onClose={() => {}}
+        auctionId="42"
+        bidderWallet="0xUSER"
+        existingFiatBid={{ authId: 'auth-1', jpyAmount: 50_000 }}
+        fetchersOverride={{
+          fetchers: { authorize: vi.fn(), placeBid: vi.fn(), topup },
+          saveState: vi.fn(),
+          redirect: vi.fn(),
+        }}
+        spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
+        generateCardToken={() => 'mock-tok-topup-fixed'}
+      />,
+      { wrapper: buildWrapper() },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-rate-summary').textContent).toContain('500,000');
+    });
+
+    // 増額額 80,000 円入力 (旧 50,000 円より大)
+    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
+    fireEvent.change(jpyInput, { target: { value: '80000' } });
+
+    // Terms check
+    fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
+
+    const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
+    expect(submit.disabled).toBe(false);
+
+    // submit → topup endpoint 呼出
+    fireEvent.click(submit);
+
+    await waitFor(() => {
+      expect(topup).toHaveBeenCalledWith({
+        authId: 'auth-1',
+        newJpyAmount: 80_000,
+        cardToken: 'mock-tok-topup-fixed',
+      });
+    });
+
+    // topup 応答後 stepper が「cleanup-queued」 phase に遷移 (endpoint 完了時点で 4 phase 完了扱い)
+    await waitFor(() => {
+      const stepper = screen.getByTestId('fiat-topup-stepper');
+      expect(stepper.getAttribute('data-step')).toBe('cleanup-queued');
+      expect(stepper.textContent).toContain('cleanup 中');
+    });
+
+    // cleanup disclaimer 表示
+    const disclaimer = screen.getByTestId('fiat-topup-cleanup-disclaimer');
+    expect(disclaimer.textContent).toContain('非同期');
+    expect(disclaimer.textContent).toContain('別 tab');
   });
 });
