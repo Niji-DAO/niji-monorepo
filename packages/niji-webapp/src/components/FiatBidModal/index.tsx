@@ -71,6 +71,7 @@ export const FiatBidModal = ({
   fetchersOverride,
   spotRateOverride,
   generateCardToken,
+  isDev,
 }: FiatBidModalProps): React.JSX.Element => {
   const isTopupMode = existingFiatBid !== undefined;
   const modalTitle = isTopupMode ? '増額 bid (JPY)' : 'クレカで bid (JPY)';
@@ -106,6 +107,7 @@ export const FiatBidModal = ({
           fetchersOverride={fetchersOverride}
           spotRateOverride={spotRateOverride}
           generateCardToken={generateCardToken}
+          isDev={isDev}
         />
       </DialogContent>
     </Dialog>

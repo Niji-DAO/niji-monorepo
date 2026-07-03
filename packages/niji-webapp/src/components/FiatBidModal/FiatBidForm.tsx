@@ -20,6 +20,7 @@
  *        Issue #3033 (bid button 統合 + Tabs 化)、 Issue #3039 (palette 統合)。
  */
 
+import type { CardData } from './CardInput';
 import type { FiatBidStep, FiatTopupPhase } from '@/hooks/useFiatBid';
 
 import * as React from 'react';
@@ -30,7 +31,9 @@ import { Input } from '@/components/ui/input';
 import { useFiatBid } from '@/hooks/useFiatBid';
 import { formatEthFromWei, jpyToEthWei, useSpotRate } from '@/hooks/useSpotRate';
 
+import { CardInput } from './CardInput';
 import classes from './FiatBidForm.module.css';
+import { DEFAULT_TEST_CARD } from './testCards';
 
 /** bid 上限 (spec P4、 100 万円 client-side + backend validation の 2 層) */
 export const BID_LIMIT_JPY = 1_000_000;
@@ -87,14 +90,23 @@ export const validateTopupJpyAmount = (
 };
 
 /**
- * card Token 生成 (Phase 1 mock 経路)
+ * card Token 生成 (Phase 1 mock 経路、 Issue #3047 で cardData 対応拡張)
  *
  * 実 GMO 統合時は window.Multipayment.getToken 経由で GMO 公開鍵ベースの Token 化を行うが、
  * Phase 1 では mock server で simulate する契約なので client-side でも同 shape で mock 生成する。
- * mock cardToken = `mock-tok-${timestamp}` 形式、 backend の mock GmoClient が受理する。
+ *
+ * cardData 指定時 = `mock-tok-{brand}-{last4}-{timestamp}` 形式で brand + last4 を埋込み、
+ * mock server 側で testCard 種別 (3DS Fail 等) を判定できるようにする。
+ * cardData 未指定時 (既存 test 互換) = `mock-tok-{timestamp}-{random}` 形式。
  */
-export const generateMockCardToken = (): string => {
-  return `mock-tok-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+export const generateMockCardToken = (cardData?: CardData): string => {
+  const timestamp = Date.now().toString(36);
+  if (cardData !== undefined && cardData.number.length >= 4) {
+    const last4 = cardData.number.slice(-4);
+    return `mock-tok-${cardData.brand}-${last4}-${timestamp}`;
+  }
+  const random = Math.random().toString(36).slice(2, 8);
+  return `mock-tok-${timestamp}-${random}`;
 };
 
 /** JPY 入力の client-side validation */
@@ -151,7 +163,12 @@ export type FiatBidFormProps = {
   /** test 用 injectable — useSpotRate の option 差替経路 */
   spotRateOverride?: Parameters<typeof useSpotRate>[0];
   /** test 用 injectable — cardToken 生成関数 (default = generateMockCardToken) */
-  generateCardToken?: () => string;
+  generateCardToken?: (cardData?: CardData) => string;
+  /**
+   * dev 環境判定 (Issue #3047、 CardInput の default プリフィル + テストカード dropdown 制御)
+   * default = import.meta.env.DEV、 test で override 可能。
+   */
+  isDev?: boolean;
 };
 
 /**
@@ -168,11 +185,33 @@ export const FiatBidForm = ({
   fetchersOverride,
   spotRateOverride,
   generateCardToken = generateMockCardToken,
+  isDev = import.meta.env.DEV,
 }: FiatBidFormProps): React.JSX.Element => {
   const [jpyRaw, setJpyRaw] = useState<string>('');
   const [termsChecked, setTermsChecked] = useState<boolean>(false);
   const [emailRaw, setEmailRaw] = useState<string>('');
   const [localError, setLocalError] = useState<string | undefined>(undefined);
+
+  /**
+   * cardData 内部 state (Issue #3047 で追加)
+   *
+   * CardInput の onChange callback で更新、 dev 環境 default で DEFAULT_TEST_CARD をプリフィル、
+   * 本番環境 default で空欄 (isCardValid = false → submit disable)。
+   * DEFAULT_TEST_CARD は label field を含むので、 CardData shape の 5 field のみ抽出する。
+   */
+  const [cardData, setCardData] = useState<CardData>(() => {
+    if (!isDev) {
+      return { number: '', expiry: '', cvv: '', holder: '', brand: 'unknown' };
+    }
+    const { number, expiry, cvv, holder, brand } = DEFAULT_TEST_CARD;
+    return { number, expiry, cvv, holder, brand };
+  });
+  const [isCardValid, setIsCardValid] = useState<boolean>(isDev);
+
+  const handleCardChange = useCallback((data: CardData, valid: boolean) => {
+    setCardData(data);
+    setIsCardValid(valid);
+  }, []);
 
   const spotRate = useSpotRate(spotRateOverride);
   const fiatBid = useFiatBid(fetchersOverride);
@@ -198,6 +237,7 @@ export const FiatBidForm = ({
   const submitDisabled =
     !jpyValidation.ok ||
     !termsChecked ||
+    !isCardValid ||
     spotRate.rate === undefined ||
     fiatBid.step === 'authorizing' ||
     fiatBid.step === 'three-ds' ||
@@ -217,8 +257,12 @@ export const FiatBidForm = ({
         setLocalError('特商法および利用規約への同意が必要です');
         return;
       }
+      if (!isCardValid) {
+        setLocalError('card 情報を正しく入力してください');
+        return;
+      }
 
-      const cardToken = generateCardToken();
+      const cardToken = generateCardToken(cardData);
 
       if (isTopupMode && existingFiatBid !== undefined) {
         await fiatBid.topup({
@@ -240,7 +284,9 @@ export const FiatBidForm = ({
     [
       jpyValidation,
       termsChecked,
+      isCardValid,
       generateCardToken,
+      cardData,
       fiatBid,
       auctionId,
       bidderWallet,
@@ -350,10 +396,11 @@ export const FiatBidForm = ({
         )}
 
         <div>
-          <label htmlFor="fiat-bid-card-token-hint" className={`mb-1 block ${classes.formLabel}`}>
+          <label htmlFor="card-input-number" className={`mb-1 block ${classes.formLabel}`}>
             card 情報 (GMO Token 方式)
           </label>
-          <p id="fiat-bid-card-token-hint" className={classes.formHint}>
+          <CardInput onChange={handleCardChange} palette={palette} isDev={isDev} />
+          <p className={`mt-2 ${classes.formHint}`}>
             card 情報は GMO 公開鍵で Token 化され、 webapp / niji サーバーには保存されません。
             (Phase 1 は mock Token を simulate)
           </p>
