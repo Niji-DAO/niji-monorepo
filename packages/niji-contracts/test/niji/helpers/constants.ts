@@ -24,8 +24,12 @@ export const TRAIT_COUNT = TRAIT_NAMES.length;
 /** Default SVG resolution (px) */
 export const RESOLUTION = 320;
 
-/** Default composite order — determines layer stacking in SVG */
-export const COMPOSITE_ORDER = [10, 9, 8, 0, 3, 7, 5, 1, 6, 11, 4, 2];
+/**
+ * Default composite order — determines layer stacking in SVG.
+ * SSOT alignment = packages/niji-contracts/scripts/niji-encoder.ts の NIJI_COMPOSITE_ORDER と同順。
+ * user 指定 (Issue #3063) = leftHand を clothing の背面側 (6 位) に配置し 服が手を隠す 整合を実現する。
+ */
+export const COMPOSITE_ORDER = [10, 9, 8, 7, 0, 3, 5, 1, 6, 4, 11, 2];
 
 /** Minimal valid PNG: 1x1 transparent pixel (67 bytes) */
 export const SAMPLE_PNG = Buffer.from([

@@ -70,21 +70,24 @@ export const NIJI_TRAITS: NijiTraitDef[] = [
  * special(0) は 2 個しかなく最前面配置すると「常に同じ overlay」 と見え変化を隠す、
  * back(7)/choker(1)/ear(6) も 2-4 個で少数、 これらを後方に置く。
  *
+ * user 指定 (Issue #3063) = leftHand(3) を clothing(5) の背面側 (6 位) に配置、
+ * 服が手を隠す整合を実現する (旧配置では leftHand が最前面 = 手が服の上に描画されて不自然)。
+ *
  * 描画順序 (下 layer → 上 layer、 少数 → 多数 の順で variation impact 最大化)。
  *   1. solidBackground(10) ... 42 通り、 背景単色 (最背面)
  *   2. background(9)       ... 25 通り、 背景 pattern
  *   3. backDecoration(8)   ... 12 通り、 背中装飾
  *   4. back(7)             ... 2 通り (少)、 胴体後面
  *   5. special(0)          ... 2 通り (少)、 エフェクト背景
- *   6. clothing(5)         ... 166 通り、 服 (胴体前面)
- *   7. choker(1)           ... 4 通り (少)、 首元
- *   8. ear(6)              ... 3 通り (少)、 顔サイド
- *   9. hat(4)              ... 32 通り、 帽子 (頭上部)
- *   10. hair(11)           ... 235 通り、 髪 (hat 上、 最も variation 豊富)
- *   11. headphone(2)       ... 14 通り、 ヘッドホン (hair 上)
- *   12. leftHand(3)        ... 13 通り、 左手 / 武器 (最前面)
+ *   6. leftHand(3)         ... 13 通り、 左手 / 武器 (clothing 背面に配置し 服が手を隠す 整合実現)
+ *   7. clothing(5)         ... 166 通り、 服 (胴体前面 + 手を隠す)
+ *   8. choker(1)           ... 4 通り (少)、 首元
+ *   9. ear(6)              ... 3 通り (少)、 顔サイド
+ *   10. hat(4)             ... 32 通り、 帽子 (頭上部)
+ *   11. hair(11)           ... 235 通り、 髪 (hat 上、 最も variation 豊富)
+ *   12. headphone(2)       ... 14 通り、 ヘッドホン (最前面)
  */
-export const NIJI_COMPOSITE_ORDER = [10, 9, 8, 7, 0, 5, 1, 6, 4, 11, 2, 3];
+export const NIJI_COMPOSITE_ORDER = [10, 9, 8, 7, 0, 3, 5, 1, 6, 4, 11, 2];
 
 export interface ColorInfo {
   r: number;
