@@ -12,7 +12,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { formatEthFromWei, jpyToEthWei, useSpotRate, type SpotRate } from './useSpotRate';
+import {
+  ethToJpy,
+  ethToWei,
+  formatEthFromWei,
+  jpyToEthWei,
+  useSpotRate,
+  type SpotRate,
+} from './useSpotRate';
 
 const buildWrapper = () => {
   const client = new QueryClient({
@@ -92,6 +99,60 @@ describe('jpyToEthWei', () => {
     expect(jpyToEthWei(1_000_000, 0)).toBe(0n);
     expect(jpyToEthWei(-1, 500_000)).toBe(0n);
     expect(jpyToEthWei(Number.NaN, 500_000)).toBe(0n);
+  });
+});
+
+describe('ethToJpy (Issue #3051、 ETH 入力軸)', () => {
+  it('0.1 ETH * 500,000 rate = 50,000 JPY', () => {
+    expect(ethToJpy(0.1, 500_000)).toBe(50_000);
+  });
+
+  it('1 ETH * 500,000 rate = 500,000 JPY', () => {
+    expect(ethToJpy(1, 500_000)).toBe(500_000);
+  });
+
+  it('小数点丸め (0.001 ETH * 500,001 rate = 500)', () => {
+    expect(ethToJpy(0.001, 500_001)).toBe(500);
+  });
+
+  it('invalid input (0 or negative) で 0 を返す', () => {
+    expect(ethToJpy(0, 500_000)).toBe(0);
+    expect(ethToJpy(1, 0)).toBe(0);
+    expect(ethToJpy(-1, 500_000)).toBe(0);
+    expect(ethToJpy(Number.NaN, 500_000)).toBe(0);
+  });
+});
+
+describe('ethToWei (Issue #3051、 ETH 入力軸、 float 誤差回避のため string 経路 SSOT)', () => {
+  it('1 ETH = 1e18 wei (string)', () => {
+    expect(ethToWei('1')).toBe(1_000_000_000_000_000_000n);
+  });
+
+  it('0.1 ETH = 1e17 wei (float 誤差回避、 string 経由で正確)', () => {
+    expect(ethToWei('0.1')).toBe(100_000_000_000_000_000n);
+  });
+
+  it('0.01 ETH = 1e16 wei (string)', () => {
+    expect(ethToWei('0.01')).toBe(10_000_000_000_000_000n);
+  });
+
+  it('0.05 ETH = 5e16 wei (string)', () => {
+    expect(ethToWei('0.05')).toBe(50_000_000_000_000_000n);
+  });
+
+  it('0.16 ETH = 1.6e17 wei (増額 test の基準値)', () => {
+    expect(ethToWei('0.16')).toBe(160_000_000_000_000_000n);
+  });
+
+  it('number 引数でも動作 (後方互換、 ただし float 誤差の可能性ありなので string 推奨)', () => {
+    expect(ethToWei(1)).toBe(1_000_000_000_000_000_000n);
+  });
+
+  it('invalid input (空文字 / 負数 / e 表記 / NaN) で 0n を返す', () => {
+    expect(ethToWei('')).toBe(0n);
+    expect(ethToWei('-1')).toBe(0n);
+    expect(ethToWei('1e2')).toBe(0n);
+    expect(ethToWei('abc')).toBe(0n);
   });
 });
 

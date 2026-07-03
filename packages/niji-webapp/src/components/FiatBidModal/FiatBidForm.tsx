@@ -1,23 +1,28 @@
 /**
- * FiatBidForm — クレカ (JPY) bid の form 部分 (Issue #3033 で FiatBidModal から抽出)
+ * FiatBidForm — クレカ (JPY 決済) bid の form 部分 (Issue #3033 で FiatBidModal から抽出)
  *
  * 役割 — modal の Dialog wrapper を持たず、 form body のみを export する。
  * BidModal (Tabs 経由) から Tab content として組込む用途 + 既存 FiatBidModal から本 form を
  * Dialog で wrap する用途の 2 経路で reuse する。
  *
- * 保持する挙動 (Issue #3009 Phase C + Issue #3025 Phase 2) —
- * (1) JPY 入力 + 現在 spot rate 表示 + ETH 換算表示 (useSpotRate hook 経由)
+ * 保持する挙動 (Issue #3009 Phase C + Issue #3025 Phase 2 + Issue #3051 で入力軸反転) —
+ * (1) ETH 入力 + 現在 spot rate 表示 + JPY 換算表示 (useSpotRate hook 経由)
+ *     — Issue #3051 で JPY 入力 → ETH 入力軸に反転、 ETH tab と同じ入力体系に統一
  * (2) card 情報 (Phase 1 は GMO Token 方式を simulate、 mock で cardToken 生成)
  * (3) 特商法 link + Terms checkbox 強制 (未 check で submit disable)
  * (4) bid 上限 100 万円 client-side validation + backend validation の 2 層
+ *     — Issue #3051 以降は ETH * spot rate = JPY 換算値 ≤ 100 万円 で判定
  * (5) 4 段 stepper (Phase 1 新規) / 5 phase stepper (Phase 2 増額 branch)
  * (6) 送信 button click で useFiatBid.authorize (Phase 1) or useFiatBid.topup (Phase 2) を呼出
+ *     — Issue #3051 以降は { ethAmount, spotRate, jpyAmount } を primary 契約軸で送信
  *
  * Issue #3039 以降 — site design (cool/warm palette + PT Root UI) に統合。
  * FiatBidForm.module.css で shadcn/ui default class を override、 palette=cool|warm で 2 色系切替。
  *
- * SSOT — tests/spec/gmo-fiat-bid/Phase1-01-master-spec.md § P7、 Phase2-01-master-spec.md § P7、
- *        Issue #3033 (bid button 統合 + Tabs 化)、 Issue #3039 (palette 統合)。
+ * SSOT — tests/spec/gmo-fiat-bid/Phase1-01-master-spec.md § P4 (ETH 固定 SSOT、 Issue #3051 で JPY→ETH に撤廃)、
+ *        Phase2-01-master-spec.md § P7、
+ *        Issue #3033 (bid button 統合 + Tabs 化)、 Issue #3039 (palette 統合)、
+ *        Issue #3051 (JPY→ETH 入力軸反転)。
  */
 
 import type { CardData } from './CardInput';
@@ -29,7 +34,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useFiatBid } from '@/hooks/useFiatBid';
-import { formatEthFromWei, jpyToEthWei, useSpotRate } from '@/hooks/useSpotRate';
+import { ethToJpy, ethToWei, useSpotRate } from '@/hooks/useSpotRate';
 
 import { CardInput } from './CardInput';
 import classes from './FiatBidForm.module.css';
@@ -60,33 +65,82 @@ const TOPUP_PHASE_LABELS: Record<FiatTopupPhase, string> = {
 };
 
 /**
- * 増額 bid 用 JPY validation。 旧 jpyAmount より大きく、 100 万円上限に収まる整数のみ ok。
+ * ETH 額入力 validation 結果 (Issue #3051)。
  *
- * Phase 1 の validateJpyAmount は「1 以上 + 100 万円以下」 のみ、 増額 branch では
- * 旧 jpyAmount 超過の追加 check を強制する (backend validation と 2 層で重畳)。
+ * ok=true 時は ETH 額 (float、 例 0.05) + JPY 換算値 (ethAmount × spotRate 丸め) を返し、
+ * form 側でそのまま useFiatBid.authorize / topup へ渡す ethAmount / jpyAmount とする。
  */
-export const validateTopupJpyAmount = (
+export type EthValidationResult =
+  | { ok: true; value: number; jpyEquivalent: number }
+  | { ok: false; message: string };
+
+/**
+ * ETH 額入力 validation (Issue #3051、 JPY→ETH 入力軸反転)。
+ *
+ * 判定順 (fail 時に最初に該当する 1 条件を返す) —
+ * (1) 空文字 → 「ETH 額を入力してください」
+ * (2) 非有限 or 非正の float → 「ETH 額は正の数で入力してください」
+ * (3) spot rate 未取得 → 「spot rate 取得中です、 しばらくお待ちください」
+ * (4) minBidEth 未満 → 「minimum bid X ETH 以上を入力してください」
+ * (5) JPY 換算 > 100 万円上限 → 「bid 上限 100 万円を超えています (JPY 換算 = 約 X 円)」
+ *
+ * spot rate は必須 (換算値なしで JPY 上限判定不可)、 undefined は fail branch に落とす。
+ * minBidEth は auction contract の min-bid 増分から親 (BidModal) が計算して渡す。
+ */
+export const validateEthAmount = (
   raw: string,
-  oldJpyAmount: number,
-): { ok: true; value: number } | { ok: false; message: string } => {
+  minBidEth: number | undefined,
+  spotRate: number | undefined,
+): EthValidationResult => {
   const trimmed = raw.trim();
   if (trimmed === '') {
-    return { ok: false, message: 'JPY 額を入力してください' };
+    return { ok: false, message: 'ETH 額を入力してください' };
   }
-  const parsed = Number.parseInt(trimmed, 10);
+  const parsed = Number.parseFloat(trimmed);
   if (!Number.isFinite(parsed) || parsed <= 0) {
-    return { ok: false, message: 'JPY 額は正の整数で入力してください' };
+    return { ok: false, message: 'ETH 額は正の数で入力してください' };
   }
-  if (parsed > BID_LIMIT_JPY) {
-    return { ok: false, message: `bid 上限 ${BID_LIMIT_JPY.toLocaleString()} 円を超えています` };
+  if (spotRate === undefined || !Number.isFinite(spotRate) || spotRate <= 0) {
+    return { ok: false, message: 'spot rate 取得中です、 しばらくお待ちください' };
   }
-  if (parsed <= oldJpyAmount) {
+  if (minBidEth !== undefined && parsed < minBidEth) {
     return {
       ok: false,
-      message: `増額のみ受付可能です (現 bid 額 ${oldJpyAmount.toLocaleString()} 円より大きい額を入力してください)`,
+      message: `minimum bid ${minBidEth} ETH 以上を入力してください`,
     };
   }
-  return { ok: true, value: parsed };
+  const jpyEquivalent = ethToJpy(parsed, spotRate);
+  if (jpyEquivalent > BID_LIMIT_JPY) {
+    return {
+      ok: false,
+      message: `bid 上限 ${BID_LIMIT_JPY.toLocaleString()} 円を超えています (JPY 換算 = 約 ${jpyEquivalent.toLocaleString()} 円)`,
+    };
+  }
+  return { ok: true, value: parsed, jpyEquivalent };
+};
+
+/**
+ * 増額 bid 用 ETH validation (Issue #3051、 JPY→ETH 入力軸反転)。
+ *
+ * validateEthAmount と同 5 条件 + 「新 ETH 額 > 旧 ETH 額」 の追加 check を強制する。
+ * 旧 ETH 額は existingFiatBid.ethAmount (bigint wei) から親が float 換算して渡す。
+ * backend の topup endpoint も同 check を強制する (2 層で重畳、 dev-flow の quality.md 準拠)。
+ */
+export const validateTopupEthAmount = (
+  raw: string,
+  minBidEth: number | undefined,
+  spotRate: number | undefined,
+  oldEthAmount: number,
+): EthValidationResult => {
+  const base = validateEthAmount(raw, minBidEth, spotRate);
+  if (!base.ok) return base;
+  if (base.value <= oldEthAmount) {
+    return {
+      ok: false,
+      message: `増額のみ受付可能です (現 bid 額 ${oldEthAmount} ETH より大きい額を入力してください)`,
+    };
+  }
+  return base;
 };
 
 /**
@@ -109,34 +163,20 @@ export const generateMockCardToken = (cardData?: CardData): string => {
   return `mock-tok-${timestamp}-${random}`;
 };
 
-/** JPY 入力の client-side validation */
-export const validateJpyAmount = (
-  raw: string,
-): { ok: true; value: number } | { ok: false; message: string } => {
-  const trimmed = raw.trim();
-  if (trimmed === '') {
-    return { ok: false, message: 'JPY 額を入力してください' };
-  }
-  const parsed = Number.parseInt(trimmed, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return { ok: false, message: 'JPY 額は正の整数で入力してください' };
-  }
-  if (parsed > BID_LIMIT_JPY) {
-    return { ok: false, message: `bid 上限 ${BID_LIMIT_JPY.toLocaleString()} 円を超えています` };
-  }
-  return { ok: true, value: parsed };
-};
-
 /**
  * 既存 fiat_bid record 情報 (親から渡す、 Phase 2 増額 branch trigger)
  *
  * 存在する場合 = user が同 auction で既に fiat bid 成立済 → 「増額 bid」 mode 表示
  * undefined 時 = Phase 1 の新規 bid mode (default)
+ *
+ * Issue #3051 で入力軸 ETH 反転に伴い ethAmount 追加、 jpyAmount は summary 表示 + 後方互換用に残置。
  */
 export type ExistingFiatBid = {
   /** 既存 fiat_bid の authId (topup endpoint request の authId) */
   authId: string;
-  /** 既存 fiat_bid の jpyAmount (増額 validation の下限、 backend と 2 層で強制) */
+  /** 既存 fiat_bid の ETH 額 (float、 増額 validation の下限、 Issue #3051 で追加) */
+  ethAmount: number;
+  /** 既存 fiat_bid の JPY 額 (summary 表示 + audit 用に残置) */
   jpyAmount: number;
 };
 
@@ -154,6 +194,12 @@ export type FiatBidFormProps = {
   auctionId: string;
   /** bidder wallet address (親から wagmi useAccount 経由で渡す) */
   bidderWallet: string;
+  /**
+   * minimum bid ETH 額 (auction contract の 現在 bid + minBidIncPercentage から親が計算)
+   * Issue #3051 で入力軸 ETH 反転に伴い追加、 ETH tab と共通 min-bid logic。
+   * undefined 時 = 未取得扱いで validation は spot rate check のみ、 minimum bid check は skip。
+   */
+  minBidEth?: number;
   /** 既存 fiat_bid record (存在すれば「増額 bid」 branch に切替、 Phase 2 Issue #3025) */
   existingFiatBid?: ExistingFiatBid;
   /** palette 種別 (Issue #3039、 default = "cool" で後方互換) */
@@ -180,6 +226,7 @@ export const FiatBidForm = ({
   onClose,
   auctionId,
   bidderWallet,
+  minBidEth,
   existingFiatBid,
   palette = 'cool',
   fetchersOverride,
@@ -187,7 +234,7 @@ export const FiatBidForm = ({
   generateCardToken = generateMockCardToken,
   isDev = import.meta.env.DEV,
 }: FiatBidFormProps): React.JSX.Element => {
-  const [jpyRaw, setJpyRaw] = useState<string>('');
+  const [ethRaw, setEthRaw] = useState<string>('');
   const [termsChecked, setTermsChecked] = useState<boolean>(false);
   const [emailRaw, setEmailRaw] = useState<string>('');
   const [localError, setLocalError] = useState<string | undefined>(undefined);
@@ -218,24 +265,27 @@ export const FiatBidForm = ({
 
   const isTopupMode = existingFiatBid !== undefined;
 
-  const newBidValidation = useMemo(() => validateJpyAmount(jpyRaw), [jpyRaw]);
+  const newBidValidation = useMemo(
+    () => validateEthAmount(ethRaw, minBidEth, spotRate.rate),
+    [ethRaw, minBidEth, spotRate.rate],
+  );
   const topupValidation = useMemo(
     () =>
       existingFiatBid !== undefined
-        ? validateTopupJpyAmount(jpyRaw, existingFiatBid.jpyAmount)
+        ? validateTopupEthAmount(ethRaw, minBidEth, spotRate.rate, existingFiatBid.ethAmount)
         : undefined,
-    [jpyRaw, existingFiatBid],
+    [ethRaw, minBidEth, spotRate.rate, existingFiatBid],
   );
 
-  const jpyValidation = isTopupMode ? topupValidation! : newBidValidation;
+  const ethValidation = isTopupMode ? topupValidation! : newBidValidation;
 
-  const ethWei = useMemo(() => {
-    if (!jpyValidation.ok || spotRate.rate === undefined) return 0n;
-    return jpyToEthWei(jpyValidation.value, spotRate.rate);
-  }, [jpyValidation, spotRate.rate]);
+  const jpyDisplay = useMemo(() => {
+    if (!ethValidation.ok || spotRate.rate === undefined) return '—';
+    return `約 ${ethValidation.jpyEquivalent.toLocaleString()} 円`;
+  }, [ethValidation, spotRate.rate]);
 
   const submitDisabled =
-    !jpyValidation.ok ||
+    !ethValidation.ok ||
     !termsChecked ||
     !isCardValid ||
     spotRate.rate === undefined ||
@@ -249,8 +299,8 @@ export const FiatBidForm = ({
       event.preventDefault();
       setLocalError(undefined);
 
-      if (!jpyValidation.ok) {
-        setLocalError(jpyValidation.message);
+      if (!ethValidation.ok) {
+        setLocalError(ethValidation.message);
         return;
       }
       if (!termsChecked) {
@@ -261,13 +311,21 @@ export const FiatBidForm = ({
         setLocalError('card 情報を正しく入力してください');
         return;
       }
+      if (spotRate.rate === undefined) {
+        setLocalError('spot rate 取得中です、 しばらくお待ちください');
+        return;
+      }
 
       const cardToken = generateCardToken(cardData);
+      // ethRaw から直接 wei 化 (float 中間変換を経由しないため 0.1 → 1e17 wei の精度確保、 viem parseEther 相当)
+      const ethAmountWei = ethToWei(ethRaw.trim()).toString();
 
       if (isTopupMode && existingFiatBid !== undefined) {
         await fiatBid.topup({
           authId: existingFiatBid.authId,
-          newJpyAmount: jpyValidation.value,
+          newEthAmount: ethAmountWei,
+          newSpotRate: spotRate.rate,
+          newJpyAmount: ethValidation.jpyEquivalent,
           cardToken,
         });
         return;
@@ -277,12 +335,15 @@ export const FiatBidForm = ({
         auctionId,
         bidderWallet,
         bidderEmail: emailRaw.trim() === '' ? undefined : emailRaw.trim(),
-        jpyAmount: jpyValidation.value,
+        ethAmount: ethAmountWei,
+        spotRate: spotRate.rate,
+        jpyAmount: ethValidation.jpyEquivalent,
         cardToken,
       });
     },
     [
-      jpyValidation,
+      ethRaw,
+      ethValidation,
       termsChecked,
       isCardValid,
       generateCardToken,
@@ -293,6 +354,7 @@ export const FiatBidForm = ({
       emailRaw,
       isTopupMode,
       existingFiatBid,
+      spotRate.rate,
     ],
   );
 
@@ -306,7 +368,7 @@ export const FiatBidForm = ({
       return;
     }
     fiatBid.reset();
-    setJpyRaw('');
+    setEthRaw('');
     setTermsChecked(false);
     setEmailRaw('');
     setLocalError(undefined);
@@ -335,34 +397,42 @@ export const FiatBidForm = ({
           <div className={classes.existingBidSummary} data-testid="fiat-topup-existing-bid-summary">
             <div className={classes.existingBidLabel}>現 bid 額</div>
             <div>
-              {existingFiatBid.jpyAmount.toLocaleString()} 円 (auth ID = {existingFiatBid.authId})
+              {existingFiatBid.ethAmount} ETH (JPY 換算 ={' '}
+              {existingFiatBid.jpyAmount.toLocaleString()} 円、 auth ID = {existingFiatBid.authId})
             </div>
           </div>
         )}
 
         <div>
-          <label htmlFor="fiat-bid-jpy-amount" className={`mb-1 block ${classes.formLabel}`}>
-            {isTopupMode ? '新 bid 額 (JPY、 現額より大きい額)' : 'bid 額 (JPY)'}
+          <label htmlFor="fiat-bid-eth-amount" className={`mb-1 block ${classes.formLabel}`}>
+            {isTopupMode ? '新 bid 額 (ETH、 現額より大きい額)' : 'bid 額 (ETH)'}
           </label>
           <Input
-            id="fiat-bid-jpy-amount"
+            id="fiat-bid-eth-amount"
             type="number"
-            min={1}
-            max={BID_LIMIT_JPY}
-            value={jpyRaw}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setJpyRaw(e.target.value)}
+            min={0}
+            step="0.01"
+            value={ethRaw}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEthRaw(e.target.value)}
             placeholder={
               isTopupMode && existingFiatBid !== undefined
-                ? `例) ${(existingFiatBid.jpyAmount + 10_000).toLocaleString()}`
-                : '例) 50000'
+                ? `Ξ ${(existingFiatBid.ethAmount + 0.01).toFixed(2)}`
+                : minBidEth !== undefined
+                  ? `Ξ ${minBidEth}`
+                  : 'Ξ 0.05'
             }
-            data-testid="fiat-bid-jpy-input"
+            data-testid="fiat-bid-eth-input"
             required
-            className={classes.jpyInput}
+            className={classes.ethInput}
           />
-          {!jpyValidation.ok && jpyRaw !== '' && (
-            <p className={classes.errorInline} data-testid="fiat-bid-jpy-error">
-              {jpyValidation.message}
+          {!ethValidation.ok && ethRaw !== '' && (
+            <p className={classes.errorInline} data-testid="fiat-bid-eth-error">
+              {ethValidation.message}
+            </p>
+          )}
+          {minBidEth !== undefined && (
+            <p className={classes.formHint} data-testid="fiat-bid-min-bid-copy">
+              minimum bid — Ξ {minBidEth} or more
             </p>
           )}
         </div>
@@ -375,7 +445,7 @@ export const FiatBidForm = ({
               <span className={classes.rateSource}>(source: {spotRate.source})</span>
             )}
           </div>
-          <div>ETH 換算 = {ethWei === 0n ? '—' : `${formatEthFromWei(ethWei)} ETH`}</div>
+          <div data-testid="fiat-bid-jpy-display">JPY 換算 = {jpyDisplay}</div>
         </div>
 
         {!isTopupMode && (

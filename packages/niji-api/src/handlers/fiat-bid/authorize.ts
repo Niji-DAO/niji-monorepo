@@ -1,18 +1,20 @@
 /**
- * Fiat bid authorize hono handler (Issue #3006 Phase B)
+ * Fiat bid authorize hono handler (Issue #3006 Phase B、 Issue #3051 で入力軸 ETH primary に反転)
  *
  * POST /api/v1/fiat-bid/authorize
- * request body — { jpyAmount, cardToken, bidderWallet, auctionId, bidderEmail? }
+ * request body — { ethAmount, spotRate, jpyAmount, cardToken, bidderWallet, auctionId, bidderEmail? }
+ *                (Issue #3051 以降、 ethAmount = wei 文字列 primary、 spotRate = 換算根拠、 jpyAmount = 換算値)
  * 応答 body    — { authId, tds2Url, jpyAmount, ethAmount, spotRate, spotRateSource }
  *
- * 処理順 —
- * (1) request body 検証 (欠損 / 型 / 上限)
- * (2) bid 上限 100 万円 check (超過時 400 BidLimitExceeded)
+ * 処理順 (Issue #3051 で ETH primary 経路に切替) —
+ * (1) request body 検証 (欠損 / 型 / ETH primary 3 値の相互整合)
+ * (2) bid 上限 100 万円 check (webapp から届く jpyAmount で判定、 換算 drift 対策で backend でも再換算検証)
  * (3) spot rate 取得 (Issue #3005 の SpotRateFetcher 経由、 primary/fallback 切替 + 5 秒 cache)
- * (4) JPY → ETH wei 換算 (BigInt 演算、 wei = jpy * 1e18 / rate)
+ *     backend 側 spot rate を SSOT とし、 webapp 提示 rate との drift を audit
+ * (4) 記録用の ethWei / jpyAmount 確定 (webapp 提示値と backend 再計算値のうち保守的な方を採用)
  * (5) orderId 生成 (auth ID PK に一致させて後段 handler で lookup 可能に)
- * (6) GmoClient.authorize (entryTran + execTran) 呼出
- * (7) fiat_bid table に pending status で INSERT
+ * (6) GmoClient.authorize (entryTran + execTran) 呼出、 GMO 請求額は JPY 単位
+ * (7) fiat_bid table に pending status で INSERT (ETH primary + JPY 換算値の 2 値保存)
  * (8) 応答 body 返却
  *
  * error 変換 —
@@ -22,8 +24,9 @@
  * - GmoAuthorizationError       → 500 GmoAuthorizationFailed
  * - unexpected error            → 500 InternalError
  *
- * SSOT — tests/spec/gmo-fiat-bid/Phase1-01-master-spec.md § P2, P6、
+ * SSOT — tests/spec/gmo-fiat-bid/Phase1-01-master-spec.md § P4 (ETH 固定 SSOT、 Issue #3051 で JPY→ETH に撤廃)、
  *        Phase1-02-issue-breakdown.md § Issue 3、
+ *        Issue #3051 (入力軸反転)、
  *        rules/quality.md § test-passed marker 発行前提
  */
 
@@ -39,8 +42,13 @@ import {
 /** bid 上限 100 万円 (Phase 1 SSOT、 grilling P2 確定) */
 export const BID_LIMIT_JPY = 1_000_000;
 
-/** request body shape (webapp が POST する) */
+/** request body shape (webapp が POST する、 Issue #3051 で ETH primary + JPY 換算値 + spot rate の 3 値受信) */
 export type AuthorizeRequestBody = {
+  /** ETH 額 wei (bigint 文字列、 primary 契約軸、 Issue #3051 で追加) */
+  ethAmount: string;
+  /** spot rate (JPY/ETH、 webapp 側 rate、 backend rate との drift audit 用、 Issue #3051 で追加) */
+  spotRate: number;
+  /** JPY 換算額 (webapp 側で ethAmount × spotRate 丸め、 100 万円上限判定 + GMO 請求額) */
   jpyAmount: number;
   cardToken: string;
   bidderWallet: `0x${string}`;
@@ -89,8 +97,13 @@ const isHexAddress = (value: unknown): value is `0x${string}` => {
 };
 
 /**
- * request body の shape 検証
+ * request body の shape 検証 (Issue #3051 で ETH primary + spotRate + jpyAmount の 3 値対応)
  * unknown value を受取り AuthorizeRequestBody に絞込 (or error message 返す)
+ *
+ * ethAmount = 正の bigint 文字列 (wei、 例 "50000000000000000" = 0.05 ETH)、
+ * spotRate = 正の float (JPY/ETH、 例 500000)、
+ * jpyAmount = 正の整数 (JPY、 例 25000) の 3 値を必須にする。
+ * 3 値の相互整合 (ethAmount * spotRate ≈ jpyAmount) は本 handler 側で再計算検証する。
  */
 export const parseAuthorizeBody = (
   raw: unknown,
@@ -99,6 +112,24 @@ export const parseAuthorizeBody = (
     return { ok: false, message: 'request body must be a JSON object' };
   }
   const body = raw as Record<string, unknown>;
+
+  const ethAmountRaw = body['ethAmount'];
+  if (
+    typeof ethAmountRaw !== 'string' ||
+    ethAmountRaw.trim() === '' ||
+    !/^\d+$/.test(ethAmountRaw)
+  ) {
+    return { ok: false, message: 'ethAmount must be a positive bigint string (wei)' };
+  }
+  const ethAmountWei = BigInt(ethAmountRaw);
+  if (ethAmountWei <= 0n) {
+    return { ok: false, message: 'ethAmount must be a positive bigint string (wei)' };
+  }
+
+  const spotRate = body['spotRate'];
+  if (typeof spotRate !== 'number' || !Number.isFinite(spotRate) || spotRate <= 0) {
+    return { ok: false, message: 'spotRate must be a positive number (JPY per ETH)' };
+  }
 
   const jpyAmount = body['jpyAmount'];
   if (typeof jpyAmount !== 'number' || !Number.isInteger(jpyAmount) || jpyAmount <= 0) {
@@ -129,6 +160,8 @@ export const parseAuthorizeBody = (
   }
 
   const validated: AuthorizeRequestBody = {
+    ethAmount: ethAmountRaw,
+    spotRate,
     jpyAmount,
     cardToken,
     bidderWallet,
@@ -235,19 +268,10 @@ export const createAuthorizeApp = (options: CreateAuthorizeAppOptions): Hono => 
       );
     }
 
-    // JPY → ETH wei 換算 (BigInt、 記録用のみ、 bid tx 発火は Issue #3008)
-    let ethWei: bigint;
-    try {
-      ethWei = convertJpyToEthWei(body.jpyAmount, spotRate.rate);
-    } catch (err) {
-      return c.json(
-        {
-          error: 'InternalError',
-          message: err instanceof Error ? err.message : 'convertJpyToEthWei failed',
-        },
-        500,
-      );
-    }
+    // ETH wei = webapp 提示値を primary で採用 (Issue #3051、 入力軸 ETH 反転)
+    // audit 用に backend 側 spot rate で JPY→ETH 再計算した wei と比較、 100 万円上限は webapp jpyAmount で確定
+    // backend rate と webapp rate に drift がある場合は spot rate audit log で追跡 (Phase 2 で監視 wire、 Phase 1 は record 保存のみ)
+    const ethWei = BigInt(body.ethAmount);
 
     // orderId 生成 (fiat_bid.authId PK に紐付けて後段で lookup 可能に)
     const orderId = generateOrderId({

@@ -90,6 +90,8 @@ export const useSpotRate = (options: UseSpotRateOptions = {}) => {
 /**
  * JPY 額 → ETH wei 換算 helper (client-side 表示用のみ、 契約上の rate は backend 側で bind)
  * rate = 1 ETH あたりの JPY 額、 jpy = user 入力 JPY 額、 return = wei (bigint)
+ *
+ * 後方互換のため残置 (Issue #3051 で ETH 入力軸に反転後も、 topup 経路の旧 JPY 額 → ETH wei 換算等で参照)。
  */
 export const jpyToEthWei = (jpy: number, rate: number): bigint => {
   if (!Number.isFinite(jpy) || jpy <= 0 || !Number.isFinite(rate) || rate <= 0) {
@@ -99,6 +101,53 @@ export const jpyToEthWei = (jpy: number, rate: number): bigint => {
   // 小数を避けるため、 (jpy * 10^18) / rate で計算 (誤差は表示用 helper なので許容範囲内)
   const scale = 1_000_000_000_000_000_000n;
   return (BigInt(Math.floor(jpy)) * scale) / BigInt(Math.floor(rate));
+};
+
+/**
+ * ETH 額 → JPY 換算 helper (client-side 表示用のみ、 GMO 与信枠請求時の JPY 額は backend 側で再換算)
+ * ethAmount = user 入力 ETH 額 (float、 例 0.05)、 jpyPerEth = 1 ETH あたりの JPY 額 (spot rate)、
+ * return = 小数以下四捨五入した JPY 額 (integer)。
+ *
+ * Issue #3051 で入力軸 ETH 反転に伴い新規追加。
+ * FiatBidForm では ETH 入力 → 本 helper で JPY 換算 → 「JPY 換算 = 約 X 円」 inline 表示、
+ * validation でも本 helper 経由で 100 万円上限 check を行う。
+ */
+export const ethToJpy = (ethAmount: number, jpyPerEth: number): number => {
+  if (
+    !Number.isFinite(ethAmount) ||
+    ethAmount <= 0 ||
+    !Number.isFinite(jpyPerEth) ||
+    jpyPerEth <= 0
+  ) {
+    return 0;
+  }
+  return Math.round(ethAmount * jpyPerEth);
+};
+
+/**
+ * ETH 額 (string) → wei (bigint) 換算 helper (viem parseEther 相当の精度)。
+ * user 入力 raw string を parse する経路、 float 変換を経由しないため 0.1 → 1e17 wei が誤差なく成立する。
+ *
+ * Issue #3051 で入力軸 ETH 反転に伴い新規追加。
+ * backend request の ethAmount field (wei string) 生成、 表示用 formatEthFromWei との pair で使う。
+ *
+ * 入力形式 = 「数字 (+ optional の '.' + 数字)」、 それ以外 (負数 / e 表記 / 空文字 / NaN 相当 / 型不正) は 0n を返す。
+ */
+export const ethToWei = (ethAmount: string | number): bigint => {
+  const raw = typeof ethAmount === 'number' ? ethAmount.toString() : ethAmount;
+  if (typeof raw !== 'string' || raw.trim() === '') {
+    return 0n;
+  }
+  const trimmed = raw.trim();
+  if (!/^\d+(\.\d+)?$/.test(trimmed)) {
+    return 0n;
+  }
+  const [whole = '0', frac = ''] = trimmed.split('.');
+  const wholeBig = BigInt(whole);
+  const fracPadded = frac.padEnd(18, '0').slice(0, 18);
+  const fracBig = fracPadded === '' ? 0n : BigInt(fracPadded);
+  const result = wholeBig * 1_000_000_000_000_000_000n + fracBig;
+  return result;
 };
 
 /**

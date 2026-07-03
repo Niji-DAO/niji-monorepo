@@ -65,11 +65,21 @@ export type PlaceBidResponse = {
   message: string;
 };
 
-/** authorize request body (webapp が backend に送出) */
+/** authorize request body (webapp が backend に送出)
+ *
+ * Issue #3051 で入力軸を ETH primary に反転。
+ * webapp は ETH 額 (wei 文字列) + spot rate + JPY 換算値 (audit 用) の 3 値を送信する。
+ * backend の GMO 与信枠請求は JPY 単位 (GMO API 仕様) なので、 backend 側で jpyAmount を使う。
+ */
 export type AuthorizeRequest = {
   auctionId: string;
   bidderWallet: string;
   bidderEmail?: string;
+  /** ETH 額 wei (bigint 文字列、 primary 契約軸、 Issue #3051 で追加) */
+  ethAmount: string;
+  /** spot rate (JPY/ETH、 換算根拠、 audit 用、 Issue #3051 で追加) */
+  spotRate: number;
+  /** JPY 換算額 (client-side で ethAmount × spotRate 丸め、 100 万円上限判定 + backend GMO 請求額、 Issue #3051 で追加) */
   jpyAmount: number;
   /** GMO Token 方式で client-side tokenize 済の card token */
   cardToken: string;
@@ -97,9 +107,18 @@ export type TopupResponse = {
   message: string;
 };
 
-/** topup request body (webapp が backend に送出) */
+/** topup request body (webapp が backend に送出)
+ *
+ * Issue #3051 で入力軸を ETH primary に反転、 authorize と同 shape に統一。
+ * newEthAmount = 新 ETH 額 wei string、 newSpotRate = 換算根拠、 newJpyAmount = 増額後 JPY 総額。
+ */
 export type TopupRequest = {
   authId: string;
+  /** 新 ETH 額 wei (bigint 文字列、 primary 契約軸、 Issue #3051 で追加) */
+  newEthAmount: string;
+  /** 新 spot rate (JPY/ETH、 換算根拠、 audit 用、 Issue #3051 で追加) */
+  newSpotRate: number;
+  /** 新 JPY 額 (client-side で newEthAmount × newSpotRate 丸め、 100 万円上限判定 + backend GMO 請求額、 Issue #3051 で追加) */
   newJpyAmount: number;
   cardToken: string;
 };

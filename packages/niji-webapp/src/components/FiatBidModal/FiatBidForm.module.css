@@ -44,8 +44,8 @@
   color: var(--brand-warm-light-text);
 }
 
-/* ==================== JPY Input ==================== */
-.jpyInput {
+/* ==================== ETH Input (Issue #3051 で JPY → ETH に反転) ==================== */
+.ethInput {
   box-sizing: border-box;
   width: 100%;
   height: 54px;
@@ -62,39 +62,39 @@
   padding: 0 12px;
 }
 
-.jpyInput:focus,
-.jpyInput:focus-visible {
+.ethInput:focus,
+.ethInput:focus-visible {
   outline: none !important;
   box-shadow: inset 0px 0px 0px 1px var(--brand-cool-dark-text) !important;
 }
 
-.form[data-palette='warm'] .jpyInput:focus,
-.form[data-palette='warm'] .jpyInput:focus-visible {
+.form[data-palette='warm'] .ethInput:focus,
+.form[data-palette='warm'] .ethInput:focus-visible {
   box-shadow: inset 0px 0px 0px 1px var(--brand-warm-dark-text) !important;
 }
 
-.jpyInput::-webkit-outer-spin-button,
-.jpyInput::-webkit-inner-spin-button {
+.ethInput::-webkit-outer-spin-button,
+.ethInput::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.jpyInput[type='number'] {
+.ethInput[type='number'] {
   -moz-appearance: textfield;
 }
 
-.jpyInput::placeholder {
+.ethInput::placeholder {
   color: var(--brand-cool-light-text);
   font-family: 'PT Root UI', sans-serif;
   font-weight: bold;
   opacity: 0.6;
 }
 
-.form[data-palette='warm'] .jpyInput::placeholder {
+.form[data-palette='warm'] .ethInput::placeholder {
   color: var(--brand-warm-light-text);
 }
 
-/* ==================== email input (通常サイズ、 JPY input より小さめ) ==================== */
+/* ==================== email input (通常サイズ、 ETH input より小さめ) ==================== */
 .emailInput {
   box-sizing: border-box;
   width: 100%;

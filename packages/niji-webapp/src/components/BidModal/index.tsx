@@ -253,6 +253,7 @@ export const BidModal = ({
               onClose={onClose}
               auctionId={auction.nounId.toString()}
               bidderWallet={bidderWallet}
+              minBidEth={parseFloat(minBidEth(minBid))}
               palette={palette}
               fetchersOverride={fiatFetchersOverride}
               spotRateOverride={fiatSpotRateOverride}

@@ -64,10 +64,21 @@ vi.mock('sonner', () => ({
 }));
 
 // FiatBidForm は useFiatBid + useSpotRate 内部依存で jsdom 重い、 stub 差替 (FiatBidForm 自体は
-// FiatBidModal test で個別検証)
+// FiatBidModal test で個別検証)、 Issue #3051 で minBidEth prop 伝搬確認のため props を data attr で expose
+type StubProps = { minBidEth?: number } & Record<string, unknown>;
 vi.mock('@/components/FiatBidModal/FiatBidForm', () => ({
-  default: () => <div data-testid="fiat-bid-form-stub" />,
-  FiatBidForm: () => <div data-testid="fiat-bid-form-stub" />,
+  default: (props: StubProps) => (
+    <div
+      data-testid="fiat-bid-form-stub"
+      data-min-bid-eth={props.minBidEth !== undefined ? String(props.minBidEth) : ''}
+    />
+  ),
+  FiatBidForm: (props: StubProps) => (
+    <div
+      data-testid="fiat-bid-form-stub"
+      data-min-bid-eth={props.minBidEth !== undefined ? String(props.minBidEth) : ''}
+    />
+  ),
 }));
 
 import BidModal from './index';
@@ -401,6 +412,25 @@ describe('BidModal (Issue #3033)', () => {
     // ここでは modal root の data-palette=warm を確認 (代替)
     const modal = getByTestId('bid-modal');
     expect(modal.getAttribute('data-palette')).toBe('warm');
+  });
+
+  it('Issue #3051 — FiatBidForm に minBidEth prop が伝搬 (auction.amount + minBidIncPercentage から計算した値)', () => {
+    // auction.amount = 1 ETH (1e18 wei)、 minBidIncPercentage=5n → minBid = 1.05 ETH → minBidEth 文字列は "1.05"
+    hookState.minBidIncPercentage = 5n;
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction()}
+          bidderWallet="0xUSER"
+          defaultTab="fiat"
+        />
+      </Wrapper>,
+    );
+    const stub = getByTestId('fiat-bid-form-stub');
+    expect(stub.getAttribute('data-min-bid-eth')).toBe('1.05');
   });
 
   it('Tabs list / trigger に BidModal CSS module class (tabsList / tabsTrigger) 付与', () => {

@@ -1,7 +1,7 @@
 /**
- * useFiatBid hook behavior test (Issue #3009 Phase D)
+ * useFiatBid hook behavior test (Issue #3009 Phase D、 Issue #3051 で ETH primary に変更)
  *
- * (1) authorize 成功で step = "three-ds"、 saveState + redirect 呼出
+ * (1) authorize 成功で step = "three-ds"、 saveState + redirect 呼出 (ethAmount / spotRate / jpyAmount 送信)
  * (2) authorize 失敗で step = "failure" + errorMessage 設定
  * (3) placeBid 成功で step = "success"、 placeBid.status = "cancelled" で step = "failure"
  */
@@ -39,6 +39,8 @@ describe('useFiatBid.authorize', () => {
       await result.current.authorize({
         auctionId: '42',
         bidderWallet: '0xUSER',
+        ethAmount: '100000000000000000', // 0.1 ETH = 1e17 wei
+        spotRate: 500_000,
         jpyAmount: 50_000,
         cardToken: 'mock-tok-123',
       });
@@ -75,7 +77,9 @@ describe('useFiatBid.authorize', () => {
       await result.current.authorize({
         auctionId: '42',
         bidderWallet: '0xUSER',
-        jpyAmount: 2_000_000,
+        ethAmount: '5000000000000000000', // 5 ETH (2.5M JPY 換算相当)
+        spotRate: 500_000,
+        jpyAmount: 2_500_000,
         cardToken: 'mock-tok-123',
       });
     });
@@ -177,6 +181,8 @@ describe('useFiatBid.reset', () => {
       await result.current.authorize({
         auctionId: '42',
         bidderWallet: '0xUSER',
+        ethAmount: '100000000000000000',
+        spotRate: 500_000,
         jpyAmount: 50_000,
         cardToken: 'mock-tok',
       });

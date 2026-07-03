@@ -10,7 +10,7 @@ Base Sepolia + GMO mock server 環境で fiat bid 1 発 → winner capture → �
 - 販売形態 — 既存 NijiAuctionHouseV3 の auction 経路を維持、 fiat bidder 参加 option を追加、 contract 完全無改修
 - 決済モデル — bid 時に GMO authorization hold + winner のみ capture の与信枠モデル
 - fund flow — 運営 EOA が JPY→ETH spot rate 換算して代理 ETH bid tx 発火、 auction settle で ETH treasury 送金、 gas + ETH 送金は運営 JPY 対価受領を根拠に負担
-- spot rate — GMO コイン API primary + CoinGecko fallback + bid tx 発火直前 fetch (5 秒 cache) + 2% 許容幅 + JPY 固定 SSOT (auction contract は ETH 記録の 2 層構造)
+- spot rate — GMO コイン API primary + CoinGecko fallback + bid tx 発火直前 fetch (5 秒 cache) + 2% 許容幅 + ETH 固定 SSOT (Issue #3051 で JPY 固定 SSOT を撤廃、 user 意思表示 = ETH 額 / GMO 与信枠請求 = JPY 換算値 / auction contract 記録 = ETH 額の 3 層構造、 ETH tab と fiat tab の入力軸を一致)
 - 加盟店 — GMO PGマルチペイメント デジタルコンテンツ category 契約、 3D セキュア 2.0、 settle 即時 mint で資金決済法 63 条の 22 の 4 前受金分離管理義務閾値回避
 - 異常系 SSOT — auction contract on-chain settle が絶対、 事前 defense (与信枠 pre-flight + 3DS 強制 + bid 上限 100 万円) + 事後 recovery (capture fail は運営 JPY 補填 / transfer fail は retry 3 回 / chargeback は運営全損吸収)
 - UI stance — wallet 接続必須、 auction ページ 2 boxes 並置 (「ETH で bid」 既存 / 「クレカで bid (JPY)」 新規 fiat modal)、 3DS full redirect、 4 段 stepper
@@ -18,11 +18,11 @@ Base Sepolia + GMO mock server 環境で fiat bid 1 発 → winner capture → �
 
 ## 受入条件 (AC、 YES/NO 検証可能)
 
-- AC 1 — Base Sepolia 上で fiat bidder が webapp `/` で「クレカで bid (JPY)」 ボタン → JPY 額入力 → 現在 spot rate 表示 → ETH 換算表示 → Terms checkbox → bid 実行、 GMO mock で与信枠 authorization 成功 → 運営 EOA が代理 ETH bid tx 発火 → NijiAuctionHouseV3 に BidPlaced event が emit される
+- AC 1 — Base Sepolia 上で fiat bidder が webapp `/` で「クレカで bid」 ボタン → ETH 額入力 → 現在 spot rate 表示 → JPY 換算表示 → Terms checkbox → bid 実行、 GMO mock で与信枠 authorization 成功 (backend で JPY 換算値請求) → 運営 EOA が代理 ETH bid tx 発火 → NijiAuctionHouseV3 に BidPlaced event が emit される (Issue #3051 で JPY→ETH 入力軸に反転)
 - AC 2 — auction 終了時に fiat winner が確定した場合、 webapp modal「クレカ決済を確定します」 + 3DS 追加認証 (mock) → GMO capture 成功 → 運営 EOA から user connected wallet address に NijiToken.transferFrom が実行される
 - AC 3 — GMO 与信枠取得失敗 (mock で fail 応答) 時、 bid tx は発火せず user に「決済確保失敗、 再試行」 通知が表示される
-- AC 4 — fiat bidder の JPY 入力額が現在 spot rate で ETH 換算した値と 2% 超乖離した場合、 user 再確認 modal (「新 rate {X} JPY/ETH で bid 額 {Y} JPY 相当になります、 続行 or cancel」) が表示される
-- AC 5 — bid 上限 100 万円 / bid を webapp + backend の 2 層で強制、 100 万円超入力時に modal 表示 + bid 不可
+- AC 4 — fiat bidder の ETH 入力額 × spot rate による JPY 換算値が backend 側 spot rate で 2% 超乖離した場合、 user 再確認 modal (「新 rate {X} JPY/ETH で bid 額 {Y} JPY 相当になります、 続行 or cancel」) が表示される (Issue #3051 で ETH 入力軸に反転)
+- AC 5 — bid 上限 100 万円 / bid を webapp + backend の 2 層で強制、 100 万円超入力時に modal 表示 + bid 不可 (Issue #3051 以降は ETH × spot rate = JPY 換算値で判定)
 - AC 6 — webapp footer に「特定商取引法に基づく表記」 link + `/legal/tokushoho` 静的 page が表示され、 販売者名 / 住所 / 電話 / 代表者 / 販売価格 / 支払方法 / 商品引渡時期 / 返品ポリシー NFT 特性上不可 の全項目を記載
 - AC 7 — GMO capture 失敗時、 backend log + 運営通知経路で失敗検知 + `docs/operations/gmo-fiat-bid.md` の runbook に基づく手動 JPY 補填手順が実行可能な状態にある
 - AC 8 — Playwright e2e test で「fiat bidder が bid → 落札 → capture → transferFrom」 の golden path が Base Sepolia + GMO mock 環境で 1 spec で pass
