@@ -81,19 +81,23 @@ abstract contract DeployUtils is Test {
         traitNames[11] = 'hair';
     }
 
+    /// SSOT alignment = packages/niji-contracts/scripts/niji-encoder.ts の NIJI_COMPOSITE_ORDER と同順。
+    /// user 指定 (Issue #3066) = special / choker を 8 / 9 位に配置、
+    /// leftHand / clothing / ear を前詰め (5-7 位) にして 前面 3 trait (hat / hair / headphone) を邪魔しない。
+    /// = [10, 9, 8, 7, 3, 5, 6, 0, 1, 4, 11, 2]
     function _compositeOrder() internal pure returns (uint256[] memory order) {
         order = new uint256[](12);
         order[0] = 10;
         order[1] = 9;
         order[2] = 8;
-        order[3] = 0;
+        order[3] = 7;
         order[4] = 3;
-        order[5] = 7;
-        order[6] = 5;
-        order[7] = 1;
-        order[8] = 6;
-        order[9] = 11;
-        order[10] = 4;
+        order[5] = 5;
+        order[6] = 6;
+        order[7] = 0;
+        order[8] = 1;
+        order[9] = 4;
+        order[10] = 11;
         order[11] = 2;
     }
 
