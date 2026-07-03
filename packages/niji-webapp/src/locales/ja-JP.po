@@ -288,6 +288,7 @@ msgid "Consequently, the Niji Foundation anticipates being the steward of the ve
 msgstr "その結果、Niji Foundation は Niji DAO が代替案を実装する準備が整うまで、拒否権の管理者となることを想定しており、したがってこの権限を行使する条件を明確にしたいと考えています。"
 
 #: src/components/NijiInfoRowHolder.tsx
+#: src/components/Winner/index.tsx
 msgid "Waiting for bid"
 msgstr "入札待ち"
 

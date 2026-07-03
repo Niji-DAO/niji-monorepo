@@ -3,6 +3,7 @@ import type { Address } from '@/utils/types';
 import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { nijiAuctionHouseAddress } from '@niji/sdk/react';
 import clsx from 'clsx';
 import { useAtomValue } from 'jotai/react';
 import { Col, Row } from 'react-bootstrap';
@@ -13,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useActiveLocale } from '@/hooks/useActivateLocale';
 import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 import { buildEtherscanAddressLink } from '@/utils/etherscan';
+import { defaultChain } from '@/wagmi';
 
 import classes from './Winner.module.css';
 
@@ -29,6 +31,14 @@ const Winner: React.FC<WinnerProps> = props => {
 
   const isWinnerYou =
     activeAccount !== undefined && activeAccount.toLocaleLowerCase() === winner.toLocaleLowerCase();
+
+  // Issue #3055: auction 開始直後 or settle 済で winner が Niji Auction House contract
+  // address のまま流入すると avatar 表示が misleading になる (同 Issue #3049 と同 pattern)。
+  // 空 avatar でなく「入札待ち」 テキスト表示に切替える。
+  const auctionHouseAddressForChain = nijiAuctionHouseAddress[defaultChain.id];
+  const isAuctionHouse =
+    auctionHouseAddressForChain !== undefined &&
+    winner.toLocaleLowerCase() === auctionHouseAddressForChain.toLocaleLowerCase();
 
   const activeLocale = useActiveLocale();
 
@@ -65,6 +75,19 @@ const Winner: React.FC<WinnerProps> = props => {
     </a>
   );
 
+  const auctionHouseContent = (
+    <span className={classes.emptyState}>
+      <Trans>Waiting for bid</Trans>
+    </span>
+  );
+
+  const winnerContent =
+    isNounders === true
+      ? nounderNounContent
+      : isAuctionHouse
+        ? auctionHouseContent
+        : nonNounderNounContent;
+
   return (
     <>
       <Row className={clsx(classes.wrapper, classes.section)}>
@@ -85,7 +108,7 @@ const Winner: React.FC<WinnerProps> = props => {
               color: isCool ? 'var(--brand-cool-dark-text)' : 'var(--brand-warm-dark-text)',
             }}
           >
-            {isNounders ? nounderNounContent : nonNounderNounContent}
+            {winnerContent}
           </h2>
         </Col>
       </Row>
