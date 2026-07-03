@@ -143,6 +143,7 @@ const Bid: React.FC<BidProps> = props => {
           onClose={() => setIsBidModalOpen(false)}
           auction={auction}
           bidderWallet={activeAccount ?? ''}
+          palette={palette}
         />
       )}
     </>

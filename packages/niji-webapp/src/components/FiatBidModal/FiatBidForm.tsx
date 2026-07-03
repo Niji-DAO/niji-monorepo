@@ -13,8 +13,11 @@
  * (5) 4 段 stepper (Phase 1 新規) / 5 phase stepper (Phase 2 増額 branch)
  * (6) 送信 button click で useFiatBid.authorize (Phase 1) or useFiatBid.topup (Phase 2) を呼出
  *
+ * Issue #3039 以降 — site design (cool/warm palette + PT Root UI) に統合。
+ * FiatBidForm.module.css で shadcn/ui default class を override、 palette=cool|warm で 2 色系切替。
+ *
  * SSOT — tests/spec/gmo-fiat-bid/Phase1-01-master-spec.md § P7、 Phase2-01-master-spec.md § P7、
- *        Issue #3033 (bid button 統合 + Tabs 化)。
+ *        Issue #3033 (bid button 統合 + Tabs 化)、 Issue #3039 (palette 統合)。
  */
 
 import type { FiatBidStep, FiatTopupPhase } from '@/hooks/useFiatBid';
@@ -26,6 +29,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useFiatBid } from '@/hooks/useFiatBid';
 import { formatEthFromWei, jpyToEthWei, useSpotRate } from '@/hooks/useSpotRate';
+
+import classes from './FiatBidForm.module.css';
 
 /** bid 上限 (spec P4、 100 万円 client-side + backend validation の 2 層) */
 export const BID_LIMIT_JPY = 1_000_000;
@@ -123,6 +128,12 @@ export type ExistingFiatBid = {
   jpyAmount: number;
 };
 
+/**
+ * FiatBidForm palette 種別 (Issue #3039、 BidModal と同 SSOT)
+ * cool = grey background (デフォルト)、 warm = beige background。
+ */
+export type FiatBidFormPalette = 'cool' | 'warm';
+
 /** form Props (BidModal Tab 経路 + 単独 FiatBidModal 経路の両方で受渡し) */
 export type FiatBidFormProps = {
   /** modal close callback (form 内 cancel button + 完了時に親から close 経路を呼ぶ) */
@@ -133,6 +144,8 @@ export type FiatBidFormProps = {
   bidderWallet: string;
   /** 既存 fiat_bid record (存在すれば「増額 bid」 branch に切替、 Phase 2 Issue #3025) */
   existingFiatBid?: ExistingFiatBid;
+  /** palette 種別 (Issue #3039、 default = "cool" で後方互換) */
+  palette?: FiatBidFormPalette;
   /** test 用 injectable — useFiatBid の fetchers 差替経路 */
   fetchersOverride?: Parameters<typeof useFiatBid>[0];
   /** test 用 injectable — useSpotRate の option 差替経路 */
@@ -151,6 +164,7 @@ export const FiatBidForm = ({
   auctionId,
   bidderWallet,
   existingFiatBid,
+  palette = 'cool',
   fetchersOverride,
   spotRateOverride,
   generateCardToken = generateMockCardToken,
@@ -263,14 +277,17 @@ export const FiatBidForm = ({
   const submitButtonLabel = isTopupMode ? '増額 bid を実行' : 'bid を実行';
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      className={classes.form}
+      data-palette={palette}
+      data-testid="fiat-bid-form"
+    >
       <div className="space-y-4">
         {isTopupMode && existingFiatBid !== undefined && (
-          <div
-            className="rounded-md bg-blue-50 p-3 text-sm"
-            data-testid="fiat-topup-existing-bid-summary"
-          >
-            <div className="font-medium">現 bid 額</div>
+          <div className={classes.existingBidSummary} data-testid="fiat-topup-existing-bid-summary">
+            <div className={classes.existingBidLabel}>現 bid 額</div>
             <div>
               {existingFiatBid.jpyAmount.toLocaleString()} 円 (auth ID = {existingFiatBid.authId})
             </div>
@@ -278,7 +295,7 @@ export const FiatBidForm = ({
         )}
 
         <div>
-          <label htmlFor="fiat-bid-jpy-amount" className="mb-1 block text-sm font-medium">
+          <label htmlFor="fiat-bid-jpy-amount" className={`mb-1 block ${classes.formLabel}`}>
             {isTopupMode ? '新 bid 額 (JPY、 現額より大きい額)' : 'bid 額 (JPY)'}
           </label>
           <Input
@@ -295,20 +312,21 @@ export const FiatBidForm = ({
             }
             data-testid="fiat-bid-jpy-input"
             required
+            className={classes.jpyInput}
           />
           {!jpyValidation.ok && jpyRaw !== '' && (
-            <p className="mt-1 text-sm text-red-600" data-testid="fiat-bid-jpy-error">
+            <p className={classes.errorInline} data-testid="fiat-bid-jpy-error">
               {jpyValidation.message}
             </p>
           )}
         </div>
 
-        <div className="rounded-md bg-gray-50 p-3 text-sm" data-testid="fiat-bid-rate-summary">
+        <div className={classes.rateSummary} data-testid="fiat-bid-rate-summary">
           <div>
             現在 spot rate ={' '}
             {spotRate.rate !== undefined ? `${spotRate.rate.toLocaleString()} JPY / ETH` : '取得中'}
             {spotRate.source !== undefined && (
-              <span className="ml-2 text-xs text-gray-500">(source: {spotRate.source})</span>
+              <span className={classes.rateSource}>(source: {spotRate.source})</span>
             )}
           </div>
           <div>ETH 換算 = {ethWei === 0n ? '—' : `${formatEthFromWei(ethWei)} ETH`}</div>
@@ -316,7 +334,7 @@ export const FiatBidForm = ({
 
         {!isTopupMode && (
           <div>
-            <label htmlFor="fiat-bid-email" className="mb-1 block text-sm font-medium">
+            <label htmlFor="fiat-bid-email" className={`mb-1 block ${classes.formLabel}`}>
               通知 email (任意)
             </label>
             <Input
@@ -326,15 +344,16 @@ export const FiatBidForm = ({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmailRaw(e.target.value)}
               placeholder="you@example.com"
               data-testid="fiat-bid-email-input"
+              className={classes.emailInput}
             />
           </div>
         )}
 
         <div>
-          <label htmlFor="fiat-bid-card-token-hint" className="mb-1 block text-sm font-medium">
+          <label htmlFor="fiat-bid-card-token-hint" className={`mb-1 block ${classes.formLabel}`}>
             card 情報 (GMO Token 方式)
           </label>
-          <p id="fiat-bid-card-token-hint" className="text-xs text-gray-500">
+          <p id="fiat-bid-card-token-hint" className={classes.formHint}>
             card 情報は GMO 公開鍵で Token 化され、 webapp / niji サーバーには保存されません。
             (Phase 1 は mock Token を simulate)
           </p>
@@ -349,12 +368,12 @@ export const FiatBidForm = ({
             className="mt-1"
             data-testid="fiat-bid-terms-checkbox"
           />
-          <label htmlFor="fiat-bid-terms" className="text-sm">
+          <label htmlFor="fiat-bid-terms" className={classes.termsLabel}>
             <a
               href="/legal/tokushoho"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline"
+              className={classes.termsLink}
             >
               特商法に関する表記
             </a>{' '}
@@ -363,27 +382,20 @@ export const FiatBidForm = ({
         </div>
 
         {currentStepLabel !== '' && (
-          <div
-            className="rounded-md border p-3 text-sm"
-            data-testid={stepperTestId}
-            data-step={currentStepValue}
-          >
+          <div className={classes.stepper} data-testid={stepperTestId} data-step={currentStepValue}>
             {currentStepLabel}
           </div>
         )}
 
         {isTopupMode && fiatBid.topupPhase === 'cleanup-queued' && (
-          <div
-            className="rounded-md bg-yellow-50 p-3 text-xs"
-            data-testid="fiat-topup-cleanup-disclaimer"
-          >
+          <div className={classes.cleanupDisclaimer} data-testid="fiat-topup-cleanup-disclaimer">
             旧 authorization の cleanup 処理は非同期で進行しています。 modal を閉じたり、 別 tab
             で他の操作を続けても問題ありません。
           </div>
         )}
 
         {errorMessage !== undefined && (
-          <div className="text-sm text-red-600" data-testid="fiat-bid-error-message">
+          <div className={classes.errorMessage} data-testid="fiat-bid-error-message">
             {errorMessage}
           </div>
         )}
@@ -395,10 +407,16 @@ export const FiatBidForm = ({
           variant="outline"
           onClick={handleCancel}
           data-testid="fiat-bid-cancel"
+          className={classes.cancelBtn}
         >
           キャンセル
         </Button>
-        <Button type="submit" disabled={submitDisabled} data-testid="fiat-bid-submit">
+        <Button
+          type="submit"
+          disabled={submitDisabled}
+          data-testid="fiat-bid-submit"
+          className={classes.submitBtn}
+        >
           {submitButtonLabel}
         </Button>
       </div>

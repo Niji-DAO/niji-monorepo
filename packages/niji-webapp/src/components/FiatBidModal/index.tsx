@@ -5,11 +5,15 @@
  * BidModal (Tabs 経路、 Issue #3033) と単独 FiatBidModal (fiat 専用経路、 既存 test 互換) の 2 経路で
  * FiatBidForm を reuse する構造。
  *
+ * Issue #3039 以降 — site design (cool/warm palette + PT Root UI) に統合。
+ * BidModal.module.css を共有して DialogContent 側に palette 適用、 内部 form は FiatBidForm 側で処理。
+ *
  * SSOT — tests/spec/gmo-fiat-bid/Phase1-01-master-spec.md § P7、
  *        Phase1-02-issue-breakdown.md § Issue 6、
  *        Phase2-01-master-spec.md § P7、
  *        Phase2-02-issue-breakdown.md § Issue P2-4、
- *        Issue #3033 (form 抽出 + BidModal Tabs 統合)。
+ *        Issue #3033 (form 抽出 + BidModal Tabs 統合)、
+ *        Issue #3039 (palette 統合)。
  */
 
 import * as React from 'react';
@@ -23,6 +27,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
+import bidModalClasses from '@/components/BidModal/BidModal.module.css';
+
 // re-export for backward compat (既存 import 経路を壊さない)
 export {
   BID_LIMIT_JPY,
@@ -32,7 +38,11 @@ export {
 } from '@/components/FiatBidModal/FiatBidForm';
 export type { ExistingFiatBid } from '@/components/FiatBidModal/FiatBidForm';
 
-import type { ExistingFiatBid, FiatBidFormProps } from '@/components/FiatBidModal/FiatBidForm';
+import type {
+  ExistingFiatBid,
+  FiatBidFormPalette,
+  FiatBidFormProps,
+} from '@/components/FiatBidModal/FiatBidForm';
 
 const BID_LIMIT_JPY_DISPLAY = 1_000_000;
 
@@ -40,6 +50,8 @@ const BID_LIMIT_JPY_DISPLAY = 1_000_000;
 export type FiatBidModalProps = {
   /** modal open state (親から制御) */
   open: boolean;
+  /** palette 種別 (Issue #3039、 default = "cool") */
+  palette?: FiatBidFormPalette;
 } & FiatBidFormProps;
 
 /**
@@ -55,6 +67,7 @@ export const FiatBidModal = ({
   auctionId,
   bidderWallet,
   existingFiatBid,
+  palette = 'cool',
   fetchersOverride,
   spotRateOverride,
   generateCardToken,
@@ -72,16 +85,24 @@ export const FiatBidModal = ({
         if (!next) onClose();
       }}
     >
-      <DialogContent data-testid="fiat-bid-modal" data-mode={isTopupMode ? 'topup' : 'new-bid'}>
+      <DialogContent
+        data-testid="fiat-bid-modal"
+        data-mode={isTopupMode ? 'topup' : 'new-bid'}
+        data-palette={palette}
+        className={bidModalClasses.dialogContent}
+      >
         <DialogHeader>
-          <DialogTitle>{modalTitle}</DialogTitle>
-          <DialogDescription>{modalDescription}</DialogDescription>
+          <DialogTitle className={bidModalClasses.dialogTitle}>{modalTitle}</DialogTitle>
+          <DialogDescription className={bidModalClasses.dialogDescription}>
+            {modalDescription}
+          </DialogDescription>
         </DialogHeader>
         <FiatBidForm
           onClose={onClose}
           auctionId={auctionId}
           bidderWallet={bidderWallet}
           existingFiatBid={existingFiatBid}
+          palette={palette}
           fetchersOverride={fetchersOverride}
           spotRateOverride={spotRateOverride}
           generateCardToken={generateCardToken}

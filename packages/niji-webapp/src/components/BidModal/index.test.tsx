@@ -310,4 +310,106 @@ describe('BidModal (Issue #3033)', () => {
     fireEvent.click(getByTestId('eth-bid-submit'));
     expect(placeBidMock).toHaveBeenCalled();
   });
+
+  // ==================== Issue #3039 palette 統合 ====================
+
+  it('palette prop 未指定 → data-palette="cool" が modal root に付与 (default)', () => {
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal open onClose={() => {}} auction={makeAuction()} bidderWallet="0xUSER" />
+      </Wrapper>,
+    );
+    const modal = getByTestId('bid-modal');
+    expect(modal.getAttribute('data-palette')).toBe('cool');
+  });
+
+  it('palette="warm" で data-palette="warm" が modal root に付与', () => {
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction()}
+          bidderWallet="0xUSER"
+          palette="warm"
+        />
+      </Wrapper>,
+    );
+    const modal = getByTestId('bid-modal');
+    expect(modal.getAttribute('data-palette')).toBe('warm');
+  });
+
+  it('palette="cool" で ETH input に BidModal CSS module class (bidInput) 付与', () => {
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction()}
+          bidderWallet="0xUSER"
+          palette="cool"
+        />
+      </Wrapper>,
+    );
+    const input = getByTestId('eth-bid-input');
+    // CSS module 経由で hashed class name が付く、 substring "bidInput" を含むかで判定
+    // (vitest 環境で CSS module は identity-obj-proxy 相当で class 名がそのまま出る想定)
+    expect(input.className).toMatch(/bidInput/);
+  });
+
+  it('palette="warm" で ETH submit button に BidModal CSS module class (bidBtn) 付与', () => {
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction()}
+          bidderWallet="0xUSER"
+          palette="warm"
+        />
+      </Wrapper>,
+    );
+    const submit = getByTestId('eth-bid-submit');
+    expect(submit.className).toMatch(/bidBtn/);
+    const cancel = getByTestId('eth-bid-cancel');
+    expect(cancel.className).toMatch(/cancelBtn/);
+  });
+
+  it('palette は FiatBidForm にも伝播 (fiat tab 切替で form data-palette 検証)', () => {
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction()}
+          bidderWallet="0xUSER"
+          palette="warm"
+          defaultTab="fiat"
+        />
+      </Wrapper>,
+    );
+    // FiatBidForm は test で stub 化しているので data-palette が付かない、
+    // stub は data-testid="fiat-bid-form-stub" のみ、 palette prop 伝搬は FiatBidModal test 側で検証。
+    // ここでは modal root の data-palette=warm を確認 (代替)
+    const modal = getByTestId('bid-modal');
+    expect(modal.getAttribute('data-palette')).toBe('warm');
+  });
+
+  it('Tabs list / trigger に BidModal CSS module class (tabsList / tabsTrigger) 付与', () => {
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal open onClose={() => {}} auction={makeAuction()} bidderWallet="0xUSER" />
+      </Wrapper>,
+    );
+    const ethTab = getByTestId('bid-tab-eth');
+    const fiatTab = getByTestId('bid-tab-fiat');
+    expect(ethTab.className).toMatch(/tabsTrigger/);
+    expect(fiatTab.className).toMatch(/tabsTrigger/);
+  });
 });
