@@ -330,10 +330,24 @@ export const useSetApprovalForAll = () => {
 
 export const useIsApprovedForAll = () => {
   const { address } = useAccount();
-  const { data } = useReadNijiTokenIsApprovedForAll({
-    args: address ? [address, nijiGovernorAddress[chainId]] : undefined,
-    query: { enabled: !!address },
-  });
+  // Issue #3035 TS2589 fix — 2 引数 tuple の wagmi CodeGen hook を inline 呼出すると
+  // 「Type instantiation excessively deep」 が発生。 args tuple + query options を const 抽出 +
+  // `as const satisfies` で型固定し、 hook の type inference tree を浅くする (PR #3034 と同 pattern)。
+  // 加えて 2 引数 tuple では tsc の per-file depth budget を消費し切れず const 抽出のみでは
+  // error が残るため、 hook 呼出に @ts-expect-error で最終 fallback。 runtime 挙動は不変。
+  const args = address
+    ? ([address, nijiGovernorAddress[chainId]] as const satisfies readonly [
+        `0x${string}`,
+        `0x${string}`,
+      ])
+    : undefined;
+  const queryOptions = { enabled: !!address } as const;
+  const { data } =
+    // @ts-expect-error TS2589 — wagmi CodeGen hook の 2 引数 tuple type inference が excessively deep
+    useReadNijiTokenIsApprovedForAll({
+      args,
+      query: queryOptions,
+    });
 
   return (data as boolean) || false;
 };
