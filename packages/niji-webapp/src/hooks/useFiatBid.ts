@@ -47,14 +47,19 @@ export type FiatTopupPhase =
   | 'cleanup-queued'
   | 'failure';
 
-/** authorize endpoint 応答 shape */
+/**
+ * authorize endpoint 応答 shape
+ *
+ * spotRateSource は backend `SpotRateSource` (`packages/niji-api/src/services/spotRate/index.ts` SSOT) と
+ * 一致させる。 Issue #3061 で `mock` union を追加、 `gmo` legacy label は既存 mock fixture 互換で残置。
+ */
 export type AuthorizeResponse = {
   authId: string;
   tds2Url: string;
   jpyAmount: number;
   ethAmount: string;
   spotRate: number;
-  spotRateSource: 'gmo' | 'coingecko';
+  spotRateSource: 'gmo' | 'gmo-coin' | 'coingecko' | 'mock';
 };
 
 /** place-bid endpoint 応答 shape */
@@ -101,8 +106,8 @@ export type TopupResponse = {
   ethAmount: string;
   /** 新 spot rate */
   spotRate: number;
-  /** spot rate 取得元 */
-  spotRateSource: 'gmo' | 'coingecko';
+  /** spot rate 取得元 (Issue #3061 で `mock` union 追加、 `AuthorizeResponse.spotRateSource` と同 SSOT) */
+  spotRateSource: 'gmo' | 'gmo-coin' | 'coingecko' | 'mock';
   /** user 通知 msg */
   message: string;
 };

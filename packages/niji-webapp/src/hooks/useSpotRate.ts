@@ -18,8 +18,13 @@ import { useQuery } from '@tanstack/react-query';
 export type SpotRate = {
   /** ETH 1 単位 = jpy 何円か (整数 or 小数の JPY 額) */
   rate: number;
-  /** 取得元 (primary = GMO コイン API、 fallback = CoinGecko) */
-  source: 'gmo' | 'coingecko';
+  /**
+   * 取得元 —
+   * primary = GMO コイン API (backend では `gmo-coin`、 webapp 側は既存互換で `gmo` も accept)、
+   * fallback = CoinGecko、
+   * mock = Issue #3061、 USE_SPOT_RATE_MOCK=true 時の dev 固定 rate 応答 (badge 表示 trigger)
+   */
+  source: 'gmo' | 'gmo-coin' | 'coingecko' | 'mock';
   /** cache 生成時刻 (ISO string) */
   cachedAt: string;
   /** cache 失効時刻 (ISO string) */

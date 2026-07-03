@@ -159,3 +159,92 @@ describe('FiatBidForm loading spinner (Issue #3053 Phase B、 Issue #3059 で JP
     expect(jpyLoading.textContent).toContain('取得中');
   });
 });
+
+/**
+ * Issue #3061 — source='mock' 時の「dev mock」 badge 表示検証
+ *
+ * (1) source='mock' → 「dev mock」 badge が表示され、 「source: XXX」 の inline 表示は出ない
+ * (2) source='gmo-coin' → badge 非表示、 「source: gmo-coin」 の inline 表示が出る (regression 確認)
+ * (3) source='gmo' (旧互換) → badge 非表示、 「source: gmo」 の inline 表示が出る (regression 確認)
+ * (4) source='coingecko' → badge 非表示、 「source: coingecko」 の inline 表示が出る (regression 確認)
+ */
+describe('FiatBidForm mock badge (Issue #3061)', () => {
+  const buildMockRate = (source: SpotRate['source']): SpotRate => ({
+    rate: 500_000,
+    source,
+    cachedAt: '2026-07-03T00:00:00.000Z',
+    expiresAt: '2026-07-03T00:00:05.000Z',
+  });
+
+  const renderWithSource = (source: SpotRate['source']) => {
+    const fetcher = vi.fn().mockResolvedValue(buildMockRate(source));
+    render(
+      <FiatBidForm
+        onClose={() => {}}
+        auctionId="42"
+        bidderWallet="0xUSER"
+        fetchersOverride={{
+          fetchers: { authorize: vi.fn(), placeBid: vi.fn() },
+          saveState: vi.fn(),
+          redirect: vi.fn(),
+        }}
+        spotRateOverride={{ fetcher, refetchInterval: 0 }}
+        isDev={true}
+      />,
+      { wrapper: buildWrapper() },
+    );
+  };
+
+  it('source=mock 時に「dev mock」 badge が表示される', async () => {
+    renderWithSource('mock');
+
+    // spot rate 取得完了まで待機
+    await waitFor(() => {
+      expect(screen.queryByTestId('fiat-bid-rate-summary-loading')).toBeNull();
+    });
+
+    const badge = screen.getByTestId('fiat-bid-rate-summary-mock-badge');
+    expect(badge).toBeInTheDocument();
+    expect(badge.textContent).toBe('dev mock');
+
+    // 「source: mock」 の inline 表示は出ない (badge と重複しない)
+    const rateSummary = screen.getByTestId('fiat-bid-rate-summary');
+    expect(rateSummary.textContent).not.toContain('source: mock');
+  });
+
+  it('source=gmo-coin 時は badge 非表示 + 「source: gmo-coin」 inline 表示', async () => {
+    renderWithSource('gmo-coin');
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('fiat-bid-rate-summary-loading')).toBeNull();
+    });
+
+    expect(screen.queryByTestId('fiat-bid-rate-summary-mock-badge')).toBeNull();
+    const rateSummary = screen.getByTestId('fiat-bid-rate-summary');
+    expect(rateSummary.textContent).toContain('source: gmo-coin');
+  });
+
+  it('source=gmo (旧互換) 時は badge 非表示 + 「source: gmo」 inline 表示 (regression)', async () => {
+    renderWithSource('gmo');
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('fiat-bid-rate-summary-loading')).toBeNull();
+    });
+
+    expect(screen.queryByTestId('fiat-bid-rate-summary-mock-badge')).toBeNull();
+    const rateSummary = screen.getByTestId('fiat-bid-rate-summary');
+    expect(rateSummary.textContent).toContain('source: gmo');
+  });
+
+  it('source=coingecko 時は badge 非表示 + 「source: coingecko」 inline 表示 (regression)', async () => {
+    renderWithSource('coingecko');
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('fiat-bid-rate-summary-loading')).toBeNull();
+    });
+
+    expect(screen.queryByTestId('fiat-bid-rate-summary-mock-badge')).toBeNull();
+    const rateSummary = screen.getByTestId('fiat-bid-rate-summary');
+    expect(rateSummary.textContent).toContain('source: coingecko');
+  });
+});
