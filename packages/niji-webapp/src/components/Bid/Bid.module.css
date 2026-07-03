@@ -7,33 +7,33 @@
 }
 
 /*
- * bid button — auction cool/warm palette と同調 (Issue #3037)
- *   - background-color は data-palette=cool|warm で切替、 default (data-palette 未指定) は cool
- *   - border-radius 12 → 8 で modern 化
- *   - hover は filter: brightness(1.1) で palette 色を保ったまま明度上げ
- *   - disabled 時は gray 維持 (Nouns 原型踏襲)
- *   - text 色は palette 濃色 (dark-text) を採用し、 淡色 accent 背景でも可読性を確保
+ * bid button — primary CTA として存在感を強化 (Issue #3041)
+ *   - background-color = palette dark-text (cool #151c3b / warm #221b1a)、 auction 背景 (light) と明確に対比
+ *   - color = white で高 contrast (WCAG AA 準拠、 dark bg × white text)
+ *   - width 100% で auction container 全幅、 margin 0 で inline 位置ズレなし
+ *   - padding 12px 24px + font-size 20px + letter-spacing 0.02em で存在感 up
+ *   - hover は brightness(0.85) で濃色を維持したまま暗く (accent 用の 0.95 とは方向逆)
+ *   - disabled 時は gray + white text 維持 (Nouns 原型踏襲、 filter none で hover と非干渉)
  */
 .bidBtn {
   font-family: 'PT Root UI';
   border-radius: 8px !important;
-  margin-left: 0.6rem !important;
-  margin-top: 3px;
-  width: auto;
-  padding: 10px 16px;
+  width: 100%;
+  margin: 0 !important;
+  padding: 12px 24px;
   height: 3rem;
-  color: var(--brand-cool-dark-text);
+  color: white;
   border: transparent;
-  background-color: var(--brand-cool-accent);
+  background-color: var(--brand-cool-dark-text);
   font-weight: bold;
-  letter-spacing: normal;
-  font-size: 19px;
+  letter-spacing: 0.02em;
+  font-size: 20px;
   transition: all 0.2s ease-in-out;
 }
 
 .bidBtn[data-palette='warm'] {
-  color: var(--brand-warm-dark-text);
-  background-color: var(--brand-warm-accent);
+  color: white;
+  background-color: var(--brand-warm-dark-text);
 }
 
 .bidBtn:disabled {
@@ -45,7 +45,7 @@
 .bidBtn:focus {
   outline: none !important;
   box-shadow: none !important;
-  filter: brightness(0.95);
+  filter: brightness(0.85);
 }
 
 .bidBtn:disabled {
