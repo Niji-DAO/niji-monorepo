@@ -40,18 +40,20 @@ contract NijiFuzz is Test {
         traitNames[11] = 'hair';
 
         // Composite order (bottom to top)
+        // SSOT alignment = packages/niji-contracts/scripts/niji-encoder.ts の NIJI_COMPOSITE_ORDER と同順。
+        // user 指定 (Issue #3066) = [10, 9, 8, 7, 3, 5, 6, 0, 1, 4, 11, 2]
         uint256[] memory compositeOrder = new uint256[](TRAIT_COUNT);
         compositeOrder[0] = 10;
         compositeOrder[1] = 9;
         compositeOrder[2] = 8;
-        compositeOrder[3] = 0;
+        compositeOrder[3] = 7;
         compositeOrder[4] = 3;
-        compositeOrder[5] = 7;
-        compositeOrder[6] = 5;
-        compositeOrder[7] = 1;
-        compositeOrder[8] = 6;
-        compositeOrder[9] = 11;
-        compositeOrder[10] = 4;
+        compositeOrder[5] = 5;
+        compositeOrder[6] = 6;
+        compositeOrder[7] = 0;
+        compositeOrder[8] = 1;
+        compositeOrder[9] = 4;
+        compositeOrder[10] = 11;
         compositeOrder[11] = 2;
 
         // Deploy contracts

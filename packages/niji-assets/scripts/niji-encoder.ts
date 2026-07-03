@@ -67,13 +67,15 @@ export const NIJI_TRAITS: NijiTraitDef[] = [
  * COMPOSITE_ORDER (下 → 上) matches NijiDescriptor.sol's SVG <image> emission order.
  *
  * SSOT alignment = packages/niji-contracts/scripts/niji-encoder.ts の NIJI_COMPOSITE_ORDER と同順。
- * user 指定 (Issue #3063) = leftHand を clothing の背面側 (6 位) に配置し 服が手を隠す 整合を実現する。
+ * user 指定 (Issue #3066) = special / choker を 8 / 9 位に配置し、
+ * leftHand / clothing / ear を前詰め (5-7 位) にして 前面 3 trait (hat / hair / headphone) を邪魔しない。
  *
- * solidBackground(10) → background(9) → backDecoration(8) → back(7) → special(0)
- *  → leftHand(3) → clothing(5) → choker(1) → ear(6)
+ * solidBackground(10) → background(9) → backDecoration(8) → back(7)
+ *  → leftHand(3) → clothing(5) → ear(6)
+ *  → special(0) → choker(1)
  *  → hat(4) → hair(11) → headphone(2)
  */
-export const NIJI_COMPOSITE_ORDER = [10, 9, 8, 7, 0, 3, 5, 1, 6, 4, 11, 2];
+export const NIJI_COMPOSITE_ORDER = [10, 9, 8, 7, 3, 5, 6, 0, 1, 4, 11, 2];
 
 export interface ColorInfo {
   r: number;
