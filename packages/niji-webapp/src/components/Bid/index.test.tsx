@@ -274,6 +274,39 @@ describe('Bid (Issue #3033 単一 button + BidModal 経路)', () => {
       expect((bidBtn as HTMLButtonElement).disabled).toBe(true);
     });
 
+    // Issue #3043 Niji pink 統一 (CSS 分岐撤廃、 data-palette 属性は tsx 側で維持)
+    // 本 test は「data-palette 属性は cool/warm 両方で維持されるが、
+    // 適用される class は単一 bidBtn のみで palette 別の追加 class が付かない」 ことを確認する。
+    it('applies same single bidBtn class on cool + warm palette (Issue #3043 単一 pink CTA)', () => {
+      hookState.account = '0xUSER';
+
+      // cool palette 時の class
+      hookState.isCoolAuction = true;
+      const { getAllByTestId: getCool, unmount: unmountCool } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={false} />,
+      );
+      const bidBtnCool = getCool('bid-open-button')[0];
+      const clsCool = bidBtnCool.getAttribute('class') || '';
+      const paletteCool = bidBtnCool.getAttribute('data-palette');
+      unmountCool();
+
+      // warm palette 時の class
+      hookState.isCoolAuction = false;
+      const { getAllByTestId: getWarm } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={false} />,
+      );
+      const bidBtnWarm = getWarm('bid-open-button')[0];
+      const clsWarm = bidBtnWarm.getAttribute('class') || '';
+      const paletteWarm = bidBtnWarm.getAttribute('data-palette');
+
+      // data-palette 属性は分岐維持 (tsx 側、 test regression 回避 + BidModal 伝搬経路維持)
+      expect(paletteCool).toBe('cool');
+      expect(paletteWarm).toBe('warm');
+      // class は cool / warm で完全一致 (CSS 側の palette 分岐撤廃、 単一 pink CTA)
+      expect(clsCool).toBe(clsWarm);
+      expect(clsCool).toMatch(/bidBtn/);
+    });
+
     // Issue #3039 palette 伝搬 (Bid → BidModal)
     it('BidModal に palette="cool" が伝搬 (isCoolAuction=true でモーダル open 時)', () => {
       hookState.account = '0xUSER';

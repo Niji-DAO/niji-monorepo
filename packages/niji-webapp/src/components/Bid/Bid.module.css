@@ -7,13 +7,15 @@
 }
 
 /*
- * bid button — primary CTA として存在感を強化 (Issue #3041)
- *   - background-color = palette dark-text (cool #151c3b / warm #221b1a)、 auction 背景 (light) と明確に対比
- *   - color = white で高 contrast (WCAG AA 準拠、 dark bg × white text)
+ * bid button — primary CTA として Niji pink 単一色に統一 (Issue #3043)
+ *   - background-color = --brand-niji-pink (#EC4A7A、 logo #E9265C から明度 up した軽めトーン)
+ *   - color = white で高 contrast (WCAG AA 準拠、 pink bg × white text)
  *   - width 100% で auction container 全幅、 margin 0 で inline 位置ズレなし
- *   - padding 12px 24px + font-size 20px + letter-spacing 0.02em で存在感 up
- *   - hover は brightness(0.85) で濃色を維持したまま暗く (accent 用の 0.95 とは方向逆)
- *   - disabled 時は gray + white text 維持 (Nouns 原型踏襲、 filter none で hover と非干渉)
+ *   - padding 12px 24px + font-size 20px + letter-spacing 0.02em (Issue #3041 維持)
+ *   - hover = --brand-niji-pink-hover (#E9265C、 logo pink 直) で存在感 up (filter brightness 撤廃)
+ *   - disabled 時は gray + white text 維持 (Nouns 原型踏襲)
+ *   - data-palette 属性は tsx 側で維持 (test regression 回避 + BidModal 内部 palette 伝搬経路維持)、
+ *     CSS 側の cool/warm 分岐のみ撤廃 (auction 背景 cool/warm 両方で同じ pink 表示)
  */
 .bidBtn {
   font-family: 'PT Root UI';
@@ -24,20 +26,11 @@
   height: 3rem;
   color: white;
   border: transparent;
-  background-color: var(--brand-cool-dark-text);
+  background-color: var(--brand-niji-pink);
   font-weight: bold;
   letter-spacing: 0.02em;
   font-size: 20px;
   transition: all 0.2s ease-in-out;
-}
-
-.bidBtn[data-palette='warm'] {
-  color: white;
-  background-color: var(--brand-warm-dark-text);
-}
-
-.bidBtn:disabled {
-  cursor: not-allowed;
 }
 
 .bidBtn:hover,
@@ -45,13 +38,13 @@
 .bidBtn:focus {
   outline: none !important;
   box-shadow: none !important;
-  filter: brightness(0.85);
+  background-color: var(--brand-niji-pink-hover);
 }
 
 .bidBtn:disabled {
   background-color: gray !important;
   color: white;
-  filter: none;
+  cursor: not-allowed;
 }
 
 .minBidCopy {
