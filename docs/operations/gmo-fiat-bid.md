@@ -25,6 +25,8 @@ Issue 1 段階では env 変数一覧 + mock server 切替手順のみ記載、 
 | `GMO_SITE_ID` | サイト ID (13 桁) | `tsite00000001` | GMO 契約書 |
 | `GMO_SHOP_PASS` | ショップパスワード (可変長 8-20 文字) | `changeme_shop_password` | GMO 管理画面 (要 KMS 保管) |
 | `USE_GMO_MOCK` | mock server 切替 (`true` / `false`) | `true` | 本番 = `false` |
+| `USE_SPOT_RATE_MOCK` | spot rate mock 切替 (Issue #3061、 `true` / `false`) | `true` | 本番 = `false` |
+| `MOCK_SPOT_RATE_JPY_PER_ETH` | spot rate mock 固定値 (JPY / 1 ETH、 mock 時のみ有効) | `500000` | (mock=false で無視) |
 
 ### packages/niji-webapp
 
@@ -363,6 +365,7 @@ Phase 2 完了 marker 3 件 active で Phase 3 移行判定に進む。 Phase 3 
 - **AWS KMS 配線** — 運営 EOA 秘密鍵の env 直読 → KMS signer 切替 (`USE_KMS_SIGNER=true` feature flag)
 - **Base Mainnet 移行** — chainId + RPC + contract 再 deploy、 subgraph endpoint 切替
 - **3DS 2.0 本契約 activation** — GMO 3DS 2.0 の本番認証 activation (Phase 1 は demo 経路のみ)
+- **spot rate mock 切替** (Issue #3061) — `USE_SPOT_RATE_MOCK=false` に切替、 実 GMO コイン API + CoinGecko fallback 経路を有効化する。 dev default は `true` で外部通信 0 の offline 動作、 本番 deploy 時は必ず `false` を確認する (誤 mock で実際の rate と乖離した bid が成立するリスク回避、 webapp 側の「dev mock」 badge 非表示化も同時確認)。 `MOCK_SPOT_RATE_JPY_PER_ETH` env は本番では無視されるが、 unset にしておく方が安全
 
 ### Phase 2 完了判定後の次 action
 

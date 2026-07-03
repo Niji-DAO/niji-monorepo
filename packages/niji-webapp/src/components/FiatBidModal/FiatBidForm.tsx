@@ -461,8 +461,22 @@ export const FiatBidForm = ({
                 <div className={classes.rateSummaryValue}>
                   {spotRate.rate.toLocaleString()} JPY / ETH
                 </div>
-                {spotRate.source !== undefined && (
-                  <div className={classes.rateSummarySource}>source: {spotRate.source}</div>
+                {/*
+                  Issue #3061 — source='mock' 時は「dev mock」 badge を表示、
+                  それ以外 (gmo / gmo-coin / coingecko) は従来通り「source: XXX」 の inline 表示。
+                  mock badge は本番で誤って USE_SPOT_RATE_MOCK=true が設定された場合の視覚 signal。
+                */}
+                {spotRate.source === 'mock' ? (
+                  <span
+                    className={classes.mockBadge}
+                    data-testid="fiat-bid-rate-summary-mock-badge"
+                  >
+                    dev mock
+                  </span>
+                ) : (
+                  spotRate.source !== undefined && (
+                    <div className={classes.rateSummarySource}>source: {spotRate.source}</div>
+                  )
                 )}
               </>
             ) : (

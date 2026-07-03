@@ -19,7 +19,13 @@
  * SSOT — tests/spec/gmo-fiat-bid/Phase1-01-master-spec.md § P4、 Phase1-02-issue-breakdown.md § Issue 2
  */
 
-export type SpotRateSource = 'gmo-coin' | 'coingecko';
+/**
+ * spot rate 取得元 —
+ * - 'gmo-coin' = GMO コイン Public API primary
+ * - 'coingecko' = CoinGecko simple/price fallback
+ * - 'mock' = Issue #3061、 USE_SPOT_RATE_MOCK=true 時の固定 rate mock 経路 (Phase 1 dev)
+ */
+export type SpotRateSource = 'gmo-coin' | 'coingecko' | 'mock';
 
 export type SpotRate = {
   /** JPY per 1 ETH の rate、 単位 = 円 */
@@ -65,6 +71,17 @@ export type SpotRateFetcherOptions = {
   fetch?: FetchLike;
   /** 時刻 source (test で決定的 cache 検証、 default = Date.now) */
   now?: () => number;
+  /**
+   * mock mode 切替 (Issue #3061、 Phase 1 dev mock 完結)
+   * true = 固定 rate mock 経路、 外部 API 通信 skip
+   * default = env `USE_SPOT_RATE_MOCK === 'true'`、 未設定 or 'false' で false 扱い (安全側)
+   */
+  useMock?: boolean;
+  /**
+   * mock mode 時の固定 rate (Issue #3061、 単位 = JPY / 1 ETH)
+   * default = env `MOCK_SPOT_RATE_JPY_PER_ETH` の Number parse、 parse fail 時は 500000 fallback
+   */
+  mockRate?: number;
 };
 
 /**
@@ -198,6 +215,18 @@ const fetchCoinGeckoRate = async (
   return rate;
 };
 
+/** mock 固定 rate の default (JPY / 1 ETH、 Issue #3061) */
+const DEFAULT_MOCK_RATE = 500000;
+
+/**
+ * env / options から mock mode 切替を判定
+ * options 明示 > env `USE_SPOT_RATE_MOCK === 'true'` > false (安全側、 誤 mock 有効化を防ぐ)
+ */
+const readUseMock = (optionValue: boolean | undefined): boolean => {
+  if (typeof optionValue === 'boolean') return optionValue;
+  return process.env['USE_SPOT_RATE_MOCK'] === 'true';
+};
+
 /**
  * SpotRateFetcher — primary / fallback 切替 + 5 秒 cache を担う service
  *
@@ -206,6 +235,10 @@ const fetchCoinGeckoRate = async (
  *   const rate = await fetcher.getEthJpyRate();
  *
  * 呼出側 (hono handler、 Phase B) は本 class を singleton 化して DI する。
+ *
+ * Issue #3061 で mock branch 追加 —
+ * USE_SPOT_RATE_MOCK=true (env or option) 時は cache / fetch 全 skip、
+ * MOCK_SPOT_RATE_JPY_PER_ETH 固定値 (default 500000) を即返却する dev mode を持つ。
  */
 export class SpotRateFetcher {
   private readonly gmoCoinEndpoint: string;
@@ -215,6 +248,8 @@ export class SpotRateFetcher {
   private readonly cacheTtlMs: number;
   private readonly fetchImpl: FetchLike;
   private readonly now: () => number;
+  private readonly useMock: boolean;
+  private readonly mockRate: number;
 
   private cache: SpotRate | undefined;
 
@@ -240,14 +275,49 @@ export class SpotRateFetcher {
     this.cacheTtlMs = readNumberConfig(options.cacheTtlMs, 'SPOT_RATE_CACHE_TTL_MS', 5000);
     this.fetchImpl = options.fetch ?? globalThis.fetch;
     this.now = options.now ?? Date.now;
+    this.useMock = readUseMock(options.useMock);
+    // mock rate は readNumberConfig と同じ 3 段優先 (options > env > default) で読取
+    this.mockRate = readNumberConfig(
+      options.mockRate,
+      'MOCK_SPOT_RATE_JPY_PER_ETH',
+      DEFAULT_MOCK_RATE,
+    );
+
+    // Issue #3061 — 本番で mock 誤有効化を検出したら warn log
+    // 起動時に 1 回のみ出力 (constructor 呼出、 singleton 前提で 1 度きり)、 実 rate と乖離した bid 事故を防ぐ signal
+    if (this.useMock && process.env['NODE_ENV'] === 'production') {
+      console.warn(
+        '[spot-rate] WARNING: USE_SPOT_RATE_MOCK=true is active in production. Real GMO coin / CoinGecko API are skipped, mock rate ' +
+          this.mockRate +
+          ' JPY/ETH will be used. Set USE_SPOT_RATE_MOCK=false to disable.',
+      );
+    }
   }
 
   /**
    * ETH/JPY spot rate を返す
-   * cache 有効なら cache を返す、 失効時は primary → fallback の順で fetch
-   * primary / fallback 双方失敗時は SpotRateFetchError throw
+   *
+   * mock mode (Issue #3061、 USE_SPOT_RATE_MOCK=true) —
+   * cache / fetch 経路を全 skip、 毎回 fresh な mock rate を即返却する。
+   * 都度 fresh 応答にする理由 = 外部通信 0 のため cache 経路の意味がなく、
+   * dev 時に mock rate を env で切替えた場合の即時反映 UX を優先する。
+   *
+   * 通常 mode —
+   * cache 有効なら cache を返す、 失効時は primary → fallback の順で fetch。
+   * primary / fallback 双方失敗時は SpotRateFetchError throw。
    */
   async getEthJpyRate(): Promise<SpotRate> {
+    // Issue #3061 — mock mode 分岐、 外部通信 skip + cache skip で即返却
+    if (this.useMock) {
+      const cachedAt = this.now();
+      return {
+        rate: this.mockRate,
+        source: 'mock',
+        cachedAt,
+        expiresAt: cachedAt + this.cacheTtlMs,
+      };
+    }
+
     const now = this.now();
     if (this.cache !== undefined && this.cache.expiresAt > now) {
       return this.cache;

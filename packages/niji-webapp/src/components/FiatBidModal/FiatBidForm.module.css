@@ -181,6 +181,25 @@
   color: var(--brand-warm-light-text);
 }
 
+/*
+ * Issue #3061 — mock badge (source === 'mock' 時に表示、 dev 環境識別 signal)
+ * warning color 系 (red 系 pill) で「本番挙動ではない」 ことを目視できるようにする。
+ * palette (cool / warm) 共通で同 style を適用 (dev 判定 badge は palette と独立)。
+ */
+.mockBadge {
+  display: inline-block;
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: var(--brand-color-red);
+  color: white;
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+  text-transform: lowercase;
+}
+
 .rateSummaryLoading {
   display: inline-flex;
   align-items: center;

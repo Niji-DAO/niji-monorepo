@@ -199,6 +199,197 @@ describe('SpotRateFetcher.getEthJpyRate', () => {
   });
 });
 
+/**
+ * Issue #3061 — USE_SPOT_RATE_MOCK=true 時の mock branch 動作検証
+ *
+ * (1) useMock=true option で固定 rate 500000 (default) を即返却、 source='mock'
+ * (2) useMock=true option + 外部 API endpoint 指定なしでも fetch 発生しない (offline dev 相当)
+ * (3) mockRate option 指定で任意値を返せる
+ * (4) useMock=false option で従来の実 API 経路が動作 (regression 0 確認)
+ * (5) env USE_SPOT_RATE_MOCK='true' 経由で mock mode 有効化
+ * (6) env MOCK_SPOT_RATE_JPY_PER_ETH 経由で mock rate 上書き
+ * (7) env MOCK_SPOT_RATE_JPY_PER_ETH parse fail 時は default 500000 fallback
+ */
+describe('SpotRateFetcher mock branch (Issue #3061)', () => {
+  let originalUseMock: string | undefined;
+  let originalMockRate: string | undefined;
+
+  beforeEach(() => {
+    originalUseMock = process.env['USE_SPOT_RATE_MOCK'];
+    originalMockRate = process.env['MOCK_SPOT_RATE_JPY_PER_ETH'];
+    // test 独立性確保 = env clear、 各 test で必要な env のみ設定
+    delete process.env['USE_SPOT_RATE_MOCK'];
+    delete process.env['MOCK_SPOT_RATE_JPY_PER_ETH'];
+  });
+
+  afterEach(() => {
+    if (originalUseMock === undefined) {
+      delete process.env['USE_SPOT_RATE_MOCK'];
+    } else {
+      process.env['USE_SPOT_RATE_MOCK'] = originalUseMock;
+    }
+    if (originalMockRate === undefined) {
+      delete process.env['MOCK_SPOT_RATE_JPY_PER_ETH'];
+    } else {
+      process.env['MOCK_SPOT_RATE_JPY_PER_ETH'] = originalMockRate;
+    }
+  });
+
+  it('mock=true 時に固定 rate 500000 (default) を即返却、 source=mock', async () => {
+    const fetcher = new SpotRateFetcher({
+      useMock: true,
+      now: () => 100_000,
+      cacheTtlMs: 5000,
+    });
+
+    const result = await fetcher.getEthJpyRate();
+
+    expect(result.rate).toBe(500_000);
+    expect(result.source).toBe('mock');
+    expect(result.cachedAt).toBe(100_000);
+    expect(result.expiresAt).toBe(105_000);
+  });
+
+  it('mock=true 時に外部 API endpoint 未設定でも fetch 発生しない (offline dev 相当)', async () => {
+    // MSW server は listen 済で onUnhandledRequest='error' のため、
+    // 外部 fetch 発生時は test が fail する = fetch 呼出 0 の証明
+    const fetcher = new SpotRateFetcher({
+      useMock: true,
+      // gmoCoinEndpoint / coingeckoEndpoint を指定しない = default env / hardcoded URL に fallback
+      // それでも fetch は発生しない前提
+    });
+
+    const result = await fetcher.getEthJpyRate();
+    expect(result.source).toBe('mock');
+    expect(result.rate).toBe(500_000);
+  });
+
+  it('mockRate option で任意 rate を返せる', async () => {
+    const fetcher = new SpotRateFetcher({
+      useMock: true,
+      mockRate: 480_000,
+      now: () => 200_000,
+    });
+
+    const result = await fetcher.getEthJpyRate();
+    expect(result.rate).toBe(480_000);
+    expect(result.source).toBe('mock');
+  });
+
+  it('mock=false option で従来の実 API 経路が動作 (regression 0 確認)', async () => {
+    server.use(gmoCoinOkHandler);
+    const fetcher = new SpotRateFetcher({
+      gmoCoinEndpoint: GMO_COIN_ENDPOINT,
+      coingeckoEndpoint: COINGECKO_ENDPOINT,
+      useMock: false,
+      now: () => 300_000,
+    });
+
+    const result = await fetcher.getEthJpyRate();
+    expect(result.source).toBe('gmo-coin');
+    expect(result.rate).toBe(500_000);
+  });
+
+  it('env USE_SPOT_RATE_MOCK=true 経由で mock mode 有効化', async () => {
+    process.env['USE_SPOT_RATE_MOCK'] = 'true';
+    const fetcher = new SpotRateFetcher({ now: () => 400_000 });
+
+    const result = await fetcher.getEthJpyRate();
+    expect(result.source).toBe('mock');
+    expect(result.rate).toBe(500_000);
+  });
+
+  it('env USE_SPOT_RATE_MOCK 未設定 (default) では実 API 経路 (安全側)', async () => {
+    // USE_SPOT_RATE_MOCK env なし + gmoCoin ok handler で primary 経路が発火することで
+    // mock mode に落ちていないことを確認 (default = false safe side)
+    server.use(gmoCoinOkHandler);
+    const fetcher = new SpotRateFetcher({
+      gmoCoinEndpoint: GMO_COIN_ENDPOINT,
+      coingeckoEndpoint: COINGECKO_ENDPOINT,
+      now: () => 500_000,
+    });
+
+    const result = await fetcher.getEthJpyRate();
+    expect(result.source).toBe('gmo-coin');
+  });
+
+  it('env USE_SPOT_RATE_MOCK=false でも実 API 経路 (明示 false 確認)', async () => {
+    process.env['USE_SPOT_RATE_MOCK'] = 'false';
+    server.use(gmoCoinOkHandler);
+    const fetcher = new SpotRateFetcher({
+      gmoCoinEndpoint: GMO_COIN_ENDPOINT,
+      coingeckoEndpoint: COINGECKO_ENDPOINT,
+    });
+
+    const result = await fetcher.getEthJpyRate();
+    expect(result.source).toBe('gmo-coin');
+  });
+
+  it('env MOCK_SPOT_RATE_JPY_PER_ETH 経由で mock rate 上書き', async () => {
+    process.env['USE_SPOT_RATE_MOCK'] = 'true';
+    process.env['MOCK_SPOT_RATE_JPY_PER_ETH'] = '450000';
+    const fetcher = new SpotRateFetcher();
+
+    const result = await fetcher.getEthJpyRate();
+    expect(result.rate).toBe(450_000);
+    expect(result.source).toBe('mock');
+  });
+
+  it('env MOCK_SPOT_RATE_JPY_PER_ETH parse fail 時は default 500000 fallback', async () => {
+    process.env['USE_SPOT_RATE_MOCK'] = 'true';
+    process.env['MOCK_SPOT_RATE_JPY_PER_ETH'] = 'not-a-number';
+    const fetcher = new SpotRateFetcher();
+
+    const result = await fetcher.getEthJpyRate();
+    expect(result.rate).toBe(500_000);
+  });
+
+  it('env MOCK_SPOT_RATE_JPY_PER_ETH=0 (無効値) は default 500000 fallback', async () => {
+    process.env['USE_SPOT_RATE_MOCK'] = 'true';
+    process.env['MOCK_SPOT_RATE_JPY_PER_ETH'] = '0';
+    const fetcher = new SpotRateFetcher();
+
+    const result = await fetcher.getEthJpyRate();
+    expect(result.rate).toBe(500_000);
+  });
+
+  it('mock mode では cache 経路 skip で毎回 fresh 応答 (cachedAt が call ごとに更新)', async () => {
+    let currentTime = 600_000;
+    const fetcher = new SpotRateFetcher({
+      useMock: true,
+      now: () => currentTime,
+    });
+
+    const first = await fetcher.getEthJpyRate();
+    expect(first.cachedAt).toBe(600_000);
+
+    // 100 ms 後、 cache TTL 内でも新規 mock rate が返る (cache skip の証明)
+    currentTime = 600_100;
+    const second = await fetcher.getEthJpyRate();
+    expect(second.cachedAt).toBe(600_100);
+  });
+
+  it('mock mode で cacheTtlMs=0 edge case (expiresAt === cachedAt でも動作、 都度 fresh)', async () => {
+    // cacheTtlMs=0 は readNumberConfig の > 0 guard で default 5000 に fallback するが、
+    // env 未設定 + option 未指定でも mock branch は expiresAt = cachedAt + 0 or default に耐える設計であることの確認。
+    // 実際は default 5000 に落ちて動作、 stale-check 経路の regression を防ぐ safety net。
+    let currentTime = 700_000;
+    const fetcher = new SpotRateFetcher({
+      useMock: true,
+      now: () => currentTime,
+    });
+
+    const result = await fetcher.getEthJpyRate();
+    // cache skip の証明 = expiresAt が cachedAt と等しくても直後の再 fetch は成功する
+    expect(result.rate).toBe(500_000);
+
+    currentTime = 700_001; // 1 ms 後 = 通常 cache なら stale 判定される時刻
+    const second = await fetcher.getEthJpyRate();
+    expect(second.rate).toBe(500_000);
+    expect(second.cachedAt).toBe(700_001); // 新規 fetch された証拠
+  });
+});
+
 describe('compareRateDeviation (完了条件 4)', () => {
   let originalTolerance: string | undefined;
 

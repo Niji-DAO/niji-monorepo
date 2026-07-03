@@ -32,7 +32,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { BidRelay, BidRelayError, type SignerProvider } from '../../services/bidRelay/index.js';
 import { GmoAuthorizationError, GmoClient } from '../../services/gmo/client.js';
-import { SpotRateFetcher, SpotRateFetchError } from '../../services/spotRate/index.js';
+import {
+  SpotRateFetcher,
+  SpotRateFetchError,
+  type SpotRateSource,
+} from '../../services/spotRate/index.js';
 
 import {
   createTopupApp,
@@ -112,7 +116,7 @@ class StubBidRelay extends BidRelay {
 class StubSpotRateFetcher extends SpotRateFetcher {
   constructor(
     private readonly behavior:
-      | { kind: 'success'; rate: number; source: 'gmo-coin' | 'coingecko' }
+      | { kind: 'success'; rate: number; source: SpotRateSource }
       | { kind: 'error'; error: Error },
   ) {
     super();
@@ -163,7 +167,7 @@ const makeStore = (
     newJpyAmount: number;
     newEthAmount: bigint;
     spotRate: number;
-    spotRateSource: 'gmo-coin' | 'coingecko';
+    spotRateSource: SpotRateSource;
   }>;
   lookups: string[];
 } => {
@@ -173,7 +177,7 @@ const makeStore = (
     newJpyAmount: number;
     newEthAmount: bigint;
     spotRate: number;
-    spotRateSource: 'gmo-coin' | 'coingecko';
+    spotRateSource: SpotRateSource;
   }> = [];
   const lookups: string[] = [];
   const records = new Map<string, StubRecord>();
