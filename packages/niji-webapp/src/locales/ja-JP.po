@@ -615,7 +615,7 @@ msgstr "象徴的なノグルズを含む Niji DAO 公式ブランドアセッ�
 
 #: src/components/Holder/index.tsx
 msgid "Held by"
-msgstr "主催者"
+msgstr "保有者"
 
 #: src/pages/Nounders/index.tsx
 msgid "The Nijiders"
