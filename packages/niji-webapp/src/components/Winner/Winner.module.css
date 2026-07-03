@@ -41,6 +41,13 @@
   font-weight: bold;
 }
 
+.emptyState {
+  font-family: 'PT Root UI';
+  font-weight: normal;
+  font-style: italic;
+  opacity: 0.6;
+}
+
 @media (max-width: 992px) {
   .section h4 {
     font-size: 18px;

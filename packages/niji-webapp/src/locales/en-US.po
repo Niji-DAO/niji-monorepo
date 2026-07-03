@@ -283,6 +283,7 @@ msgid "Consequently, the Niji Foundation anticipates being the steward of the ve
 msgstr "Consequently, the Niji Foundation anticipates being the steward of the veto power until Niji DAO is ready to implement an alternative, and therefore wishes to clarify the conditions under which it would exercise this power."
 
 #: src/components/NijiInfoRowHolder.tsx
+#: src/components/Winner/index.tsx
 msgid "Waiting for bid"
 msgstr "Waiting for bid"
 

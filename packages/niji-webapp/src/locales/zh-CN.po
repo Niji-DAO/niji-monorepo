@@ -283,6 +283,7 @@ msgid "Consequently, the Niji Foundation anticipates being the steward of the ve
 msgstr "因此,Niji 基金会预计将担任否决权的管理者,直到 Niji DAO 准备好实施替代方案,因此希望明确行使此权力的条件。"
 
 #: src/components/NijiInfoRowHolder.tsx
+#: src/components/Winner/index.tsx
 msgid "Waiting for bid"
 msgstr "等待竞拍"
 

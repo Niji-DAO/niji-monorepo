@@ -299,6 +299,7 @@ msgid "Consequently, the Niji Foundation anticipates being the steward of the ve
 msgstr ""
 
 #: src/components/NijiInfoRowHolder.tsx
+#: src/components/Winner/index.tsx
 msgid "Waiting for bid"
 msgstr ""
 
