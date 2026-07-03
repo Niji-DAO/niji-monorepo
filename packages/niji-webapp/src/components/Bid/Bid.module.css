@@ -24,9 +24,9 @@
   margin: 0 !important;
   padding: 12px 24px;
   height: 3rem;
-  color: white;
+  color: white !important;
   border: transparent;
-  background-color: var(--brand-niji-pink);
+  background-color: var(--brand-niji-pink) !important;
   font-weight: bold;
   letter-spacing: 0.02em;
   font-size: 20px;
@@ -38,12 +38,12 @@
 .bidBtn:focus {
   outline: none !important;
   box-shadow: none !important;
-  background-color: var(--brand-niji-pink-hover);
+  background-color: var(--brand-niji-pink-hover) !important;
 }
 
 .bidBtn:disabled {
   background-color: gray !important;
-  color: white;
+  color: white !important;
   cursor: not-allowed;
 }
 
