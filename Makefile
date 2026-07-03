@@ -25,9 +25,11 @@ ANVIL_LOG := $(LOG_DIR)/anvil.log
 WEBAPP_LOG := $(LOG_DIR)/webapp.log
 DEPLOY_LOG := $(LOG_DIR)/deploy.log
 SETTLER_LOG := $(LOG_DIR)/auto-settler.log
+API_LOG := $(LOG_DIR)/api.log
 ANVIL_PID := $(LOG_DIR)/anvil.pid
 WEBAPP_PID := $(LOG_DIR)/webapp.pid
 SETTLER_PID := $(LOG_DIR)/auto-settler.pid
+API_PID := $(LOG_DIR)/api.pid
 ANVIL_STATE := $(LOG_DIR)/anvil-state.json
 # fresh chain snapshot ... make dev-init で 1 回 deploy 済 anvil state を保存、
 # make dev-stop && make dev で snapshot を copy して load = 毎回 fresh chain を ~1s で起動する。
@@ -42,20 +44,21 @@ WEBAPP_ENV_EXAMPLE := $(ROOT)/packages/niji-webapp/.env.example.local
 
 ANVIL_PORT := 8547
 WEBAPP_PORT := 2424
+API_PORT := 42069
 
-.PHONY: help dev dev-init dev-refresh dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg snapshot-if-needed auto-settler-bg
+.PHONY: help dev dev-init dev-refresh dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg snapshot-if-needed auto-settler-bg api-bg
 
 help:
 	@echo "Niji DAO — local dev commands"
 	@echo ""
-	@echo "  make dev           anvil + snapshot load (~1s) + auto-settler + webapp 並列起動 (Recommended)"
+	@echo "  make dev           anvil + snapshot load (~1s) + niji-api + auto-settler + webapp 並列起動 (Recommended)"
 	@echo "  make dev-init      1 回 fresh chain deploy して snapshot 保存 (初回 or 手動再生成用)"
 	@echo "  make dev-refresh   snapshot 削除 + dev-init で snapshot 再生成 (contract 変更後)"
-	@echo "  make dev-stop      anvil + auto-settler + webapp を graceful shutdown + live state 削除"
+	@echo "  make dev-stop      anvil + niji-api + auto-settler + webapp を graceful shutdown + live state 削除"
 	@echo "  make dev-sepolia   webapp のみ sepolia mode で background 起動 (anvil 不要)"
 	@echo "  make dev-fg        anvil + webapp を foreground で並列起動 (Ctrl+C で停止)"
 	@echo "  make dev-status    起動状況を確認 (PID / port listen / HTTP 応答 / state / snapshot 有無)"
-	@echo "  make dev-logs      anvil / deploy / auto-settler / webapp log を tail -f で表示"
+	@echo "  make dev-logs      anvil / deploy / niji-api / auto-settler / webapp log を tail -f で表示"
 	@echo "  make setup         pnpm install + sdk/contracts build + .env 作成"
 	@echo "  make help          このヘルプを表示"
 	@echo ""
@@ -63,8 +66,9 @@ help:
 	@echo "  snapshot 不在時は make dev が自動的に dev-init を呼ぶ"
 	@echo ""
 	@echo "URL:"
-	@echo "  webapp  http://localhost:$(WEBAPP_PORT)"
-	@echo "  anvil   http://127.0.0.1:$(ANVIL_PORT) (chain id 31337)"
+	@echo "  webapp   http://localhost:$(WEBAPP_PORT)"
+	@echo "  niji-api http://127.0.0.1:$(API_PORT) (Ponder + Hono)"
+	@echo "  anvil    http://127.0.0.1:$(ANVIL_PORT) (chain id 31337)"
 	@echo ""
 	@echo "State:"
 	@echo "  live state  $(ANVIL_STATE) (make dev-stop で削除)"
@@ -148,6 +152,22 @@ auto-settler-bg: | $(LOG_DIR)
 		echo "🟢 auto-settler started (PID $$(cat $(SETTLER_PID)))"; \
 	fi
 
+# niji-api (Ponder + Hono、 port 42069) を background 起動。 既存プロセスがあれば再利用。
+# webapp から VITE_GMO_API_ENDPOINT 経由で spot rate / fiat bid endpoint を呼出するため必要。
+# Ponder 起動時間 10-30 秒、 起動直後 30 秒間は webapp からの GET /api/v1/spot-rate/eth-jpy が
+# undefined を返す (FiatBidForm 側で「取得中」 spinner 表示、 UX 上問題なし)。
+api-bg: | $(LOG_DIR)
+	@if [ -f "$(API_PID)" ] && kill -0 $$(cat $(API_PID)) 2>/dev/null; then \
+		echo "🟢 niji-api already running (PID $$(cat $(API_PID)))"; \
+	else \
+		echo "🚀 starting niji-api on :$(API_PORT) (Ponder + Hono、 10-30s 起動)..."; \
+		cd $(ROOT)/packages/niji-api && nohup pnpm dev \
+			> "$(API_LOG)" 2>&1 & \
+		echo $$! > "$(API_PID)"; \
+		sleep 1; \
+		echo "🟢 niji-api started (PID $$(cat $(API_PID)), log=$(API_LOG))"; \
+	fi
+
 # webapp を background 起動。 既存プロセスがあれば再利用。
 webapp-bg: | $(LOG_DIR)
 	@if [ -f "$(WEBAPP_PID)" ] && kill -0 $$(cat $(WEBAPP_PID)) 2>/dev/null; then \
@@ -161,13 +181,15 @@ webapp-bg: | $(LOG_DIR)
 		echo "🟢 webapp started (PID $$(cat $(WEBAPP_PID)))"; \
 	fi
 
-# make dev = snapshot copy (~100ms) + anvil load (~1s) + auto-settler + webapp。
+# make dev = snapshot copy (~100ms) + anvil load (~1s) + niji-api + auto-settler + webapp。
 # snapshot は事前に make dev-init で 1 回作成、 以降 make dev-stop && make dev で常に fresh chain を ~1s で復元。
-dev: setup-env snapshot-if-needed anvil-bg auto-settler-bg webapp-bg
+# niji-api は Ponder 起動時間 10-30 秒、 webapp からの spot rate fetch は Ponder 起動完了後に成功する。
+dev: setup-env snapshot-if-needed anvil-bg api-bg auto-settler-bg webapp-bg
 	@echo ""
 	@echo "✅ dev environment ready (snapshot load、 常に fresh chain)."
 	@echo ""
 	@echo "  webapp        http://localhost:$(WEBAPP_PORT)"
+	@echo "  niji-api      http://127.0.0.1:$(API_PORT) (Ponder + Hono、 起動 10-30s)"
 	@echo "  anvil         http://127.0.0.1:$(ANVIL_PORT) (chain 31337)"
 	@echo "  auto-settler  🤖 5s polling, next auction starts automatically on endTime"
 	@if [ -f "$(ANVIL_STATE)" ]; then \
@@ -261,9 +283,24 @@ dev-stop:
 		fi; \
 		rm -f "$(SETTLER_PID)"; \
 	fi
+	@if [ -f "$(API_PID)" ]; then \
+		PID=$$(cat "$(API_PID)"); \
+		if kill -0 $$PID 2>/dev/null; then \
+			pkill -P $$PID 2>/dev/null || true; \
+			kill $$PID 2>/dev/null || true; \
+			echo "  ⛔ niji-api stopped (PID $$PID)"; \
+		fi; \
+		rm -f "$(API_PID)"; \
+	fi
 	@# tsx + pnpm の 4 段 process tree で pkill -P が届かない子孫を確実に掃除。
 	@# script 名 pattern で残骸を一括 kill する fallback。
 	@pkill -9 -f "anvil-auto-settler" 2>/dev/null || true
+	@# fallback ... PID file が壊れていても port を listen している niji-api を殺す
+	@API_PIDS=$$(lsof -nP -iTCP:$(API_PORT) -sTCP:LISTEN -t 2>/dev/null); \
+	if [ -n "$$API_PIDS" ]; then \
+		echo "$$API_PIDS" | xargs kill 2>/dev/null || true; \
+		echo "  ⛔ killed lingering niji-api listeners on :$(API_PORT)"; \
+	fi
 	@# anvil は SIGTERM で --state dump 完了を待つ (最大 10 秒)。 dump 中に SIGKILL すると
 	@# JSON が途中で切れ、 次の make dev で "failed to parse json file: EOF" で起動失敗する。
 	@# graceful shutdown 経路 = SIGTERM 送信 → 1 秒間隔で process 死亡 poll (最大 10 秒) → 未死亡なら SIGKILL fallback。
@@ -324,6 +361,13 @@ dev-status:
 	else \
 		echo "  webapp        ⚪ stopped"; \
 	fi
+	@if [ -f "$(API_PID)" ] && kill -0 $$(cat $(API_PID)) 2>/dev/null; then \
+		echo "  niji-api      🟢 running (PID $$(cat $(API_PID)), port $(API_PORT))"; \
+		curl -s -o /dev/null -w "                HTTP          %{http_code}\n" \
+			http://127.0.0.1:$(API_PORT) || echo "                HTTP          no response"; \
+	else \
+		echo "  niji-api      ⚪ stopped (webapp spot rate / fiat bid endpoint が offline)"; \
+	fi
 	@if [ -f "$(SETTLER_PID)" ] && kill -0 $$(cat $(SETTLER_PID)) 2>/dev/null; then \
 		echo "  auto-settler  🤖 running (PID $$(cat $(SETTLER_PID)), 5s poll)"; \
 	else \
@@ -343,6 +387,6 @@ dev-status:
 	@echo "  log dir  $(LOG_DIR)"
 
 dev-logs:
-	@echo "📜 tailing anvil + deploy + auto-settler + webapp logs (Ctrl+C to exit)..."
-	@touch "$(ANVIL_LOG)" "$(DEPLOY_LOG)" "$(SETTLER_LOG)" "$(WEBAPP_LOG)"
-	@tail -f "$(ANVIL_LOG)" "$(DEPLOY_LOG)" "$(SETTLER_LOG)" "$(WEBAPP_LOG)"
+	@echo "📜 tailing anvil + deploy + niji-api + auto-settler + webapp logs (Ctrl+C to exit)..."
+	@touch "$(ANVIL_LOG)" "$(DEPLOY_LOG)" "$(API_LOG)" "$(SETTLER_LOG)" "$(WEBAPP_LOG)"
+	@tail -f "$(ANVIL_LOG)" "$(DEPLOY_LOG)" "$(API_LOG)" "$(SETTLER_LOG)" "$(WEBAPP_LOG)"
