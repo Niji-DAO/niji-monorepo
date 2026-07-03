@@ -49,7 +49,10 @@ const NijiInfoRowHolder: React.FC<NounInfoRowHolderProps> = props => {
       <Trans>Winner</Trans>{' '}
       <a className="text-muted-foreground" href={etherscanURL} target={'_blank'} rel="noreferrer">
         {winner.toLowerCase() === nijiAuctionHouseAddress[chainId].toLowerCase() ? (
-          <Trans>Niji Auction House</Trans>
+          // Issue #3049: auction 開始直後 or settle 済で NFT が Auction House 保有中の状態は
+          // user 視点で「入札待ち」 が意図 (「Niji Auction House = 主催者」 訳出で「落札者 = 主催者」
+          // の misleading 表示を回避)。
+          <Trans>Waiting for bid</Trans>
         ) : (
           shortAddressComponent
         )}

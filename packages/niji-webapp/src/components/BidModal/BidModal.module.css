@@ -12,12 +12,20 @@
  */
 
 /* ==================== Dialog Content root ==================== */
+/**
+ * BidModal 見切れ対策 (Issue #3049) — Dialog は fixed 中央配置 + translate-y[-50%] のため
+ * 内容が viewport を越えると上下切れる。 max-height: 90vh + overflow-y: auto でスクロール可能に。
+ * 90vh 選択理由 = 小画面 (iPhone SE 568px 縦) でも 512px の visible 領域を確保、 header + footer 分の
+ * 呼吸を上下 5vh ずつ残す。 shadcn/ui default class の !important 上書きに揃えて詳細度整合。
+ */
 .dialogContent {
   background-color: var(--brand-cool-background) !important;
   border: 1px solid var(--brand-cool-border) !important;
   border-radius: 12px !important;
   font-family: 'PT Root UI', sans-serif;
   color: var(--brand-cool-dark-text);
+  max-height: 90vh !important;
+  overflow-y: auto !important;
 }
 
 .dialogContent[data-palette='warm'] {

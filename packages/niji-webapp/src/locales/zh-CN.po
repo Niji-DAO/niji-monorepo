@@ -25,6 +25,10 @@ msgstr "目前仅支持 USDC 和 WETH 流支付"
 msgid "Current bid"
 msgstr "当前出价"
 
+#: src/components/BidModal/index.tsx
+msgid "bid 額 (ETH)"
+msgstr ""
+
 #: src/components/ProposalActionsModal/steps/StreamPaymentsReviewStep/index.tsx
 msgid "To"
 msgstr "至"
@@ -99,6 +103,7 @@ msgstr "您已将投票委托给此地址"
 msgid "Daily Auctions"
 msgstr "每日拍卖"
 
+#: src/components/Bid/index.tsx
 #: src/components/Bid/index.tsx
 msgid "Bid"
 msgstr "出价"
@@ -223,8 +228,8 @@ msgstr "根据您的喜好添加任意数量的 Nijis。在托管和分叉期间
 
 #: src/components/Bid/index.tsx
 #: src/components/Bid/index.tsx
-msgid "クレカで bid (JPY)"
-msgstr "用信用卡竞标 (日元)"
+#~ msgid "クレカで bid (JPY)"
+#~ msgstr "用信用卡竞标 (日元)"
 
 #: src/components/ProposalActionsModal/steps/SelectProposalActionStep/index.tsx
 msgid "Add Proposal Action"
@@ -277,6 +282,10 @@ msgstr "当前无正在进行的分叉。"
 msgid "Consequently, the Niji Foundation anticipates being the steward of the veto power until Niji DAO is ready to implement an alternative, and therefore wishes to clarify the conditions under which it would exercise this power."
 msgstr "因此,Niji 基金会预计将担任否决权的管理者,直到 Niji DAO 准备好实施替代方案,因此希望明确行使此权力的条件。"
 
+#: src/components/NijiInfoRowHolder.tsx
+msgid "Waiting for bid"
+msgstr "等待竞拍"
+
 #: src/components/BidHistoryModal/index.tsx
 msgid "Bids for"
 msgstr "竞拍记录："
@@ -286,8 +295,8 @@ msgid "Go to playground"
 msgstr "前往游乐场"
 
 #: src/components/Bid/index.tsx
-msgid "or more"
-msgstr "或以上"
+#~ msgid "or more"
+#~ msgstr "或以上"
 
 #: src/components/Documentation/AboutSection.tsx
 msgid "Niji artwork is in the {publicDomainLink}."
@@ -484,6 +493,11 @@ msgstr "您对此提案投了<0>赞成</0>票"
 msgid "Black monochrome Noggles"
 msgstr "黑色单色眼镜"
 
+#. placeholder {0}: minBidEth(minBid)
+#: src/components/BidModal/index.tsx
+msgid "minimum bid — Ξ {0} or more"
+msgstr ""
+
 #: src/components/AuctionTimer/index.tsx
 msgid "Time left"
 msgstr "剩余时间"
@@ -609,6 +623,10 @@ msgstr "发送中…"
 msgid "Edit"
 msgstr "编辑"
 
+#: src/components/BidModal/index.tsx
+msgid "ETH か クレカ (JPY) を選んで bid してください"
+msgstr ""
+
 #: src/components/ProposalActionsModal/steps/StreamPaymentsDateDetailsStep/index.tsx
 msgid "Review Action Details"
 msgstr "审核操作详情"
@@ -676,8 +694,7 @@ msgstr "需要超过 {0} 个 Niji（占 DAO 的 {1}%）才能通过门槛"
 #: src/components/AddNijisToForkModal/index.tsx
 #: src/components/AddNijisToForkModal/index.tsx
 #: src/components/AddNijisToForkModal/index.tsx
-#: src/components/Bid/index.tsx
-#: src/components/Bid/index.tsx
+#: src/components/BidModal/index.tsx
 #: src/components/CandidateSponsors/SelectSponsorsToPropose.tsx
 #: src/components/CandidateSponsors/SelectSponsorsToPropose.tsx
 #: src/components/CandidateSponsors/SubmitUpdateProposal.tsx
@@ -792,6 +809,11 @@ msgstr "获取失败"
 #: src/components/Documentation/GovernanceSection.tsx
 msgid "unequally withdraw the treasury for personal gain"
 msgstr "不平等地从国库中提取资金以谋取个人利益"
+
+#. placeholder {0}: auction.nounId.toString()
+#: src/components/BidModal/index.tsx
+msgid "Niji #{0} に bid"
+msgstr ""
 
 #: src/components/AuctionTimer/index.tsx
 msgid "m"
@@ -998,6 +1020,10 @@ msgstr "<0>已委托 Niji：</0>"
 msgid "All Nijis are members of Niji DAO."
 msgstr "所有 Niji 都是 Niji DAO 的成员。"
 
+#: src/components/BidModal/index.tsx
+msgid "ETH で bid"
+msgstr ""
+
 #: src/components/DelegationCandidateInfo/index.tsx
 msgid "Now has"
 msgstr "现在拥有"
@@ -1055,6 +1081,10 @@ msgstr "提交投票"
 msgid "Niji Traits"
 msgstr "Niji 特征"
 
+#: src/components/BidModal/index.tsx
+msgid "キャンセル"
+msgstr ""
+
 #: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "Nijis are generated randomly based Ethereum block hashes. There are no 'if' statements or other rules governing Niji trait scarcity, which makes all Nijis equally rare. As of this writing, Nijis are made up of:"
 msgstr "Niji 基于以太坊区块哈希随机生成。没有 'if' 语句或其他规则来管理 Niji 特征的稀缺性,这使得所有 Niji 同样稀有。截至撰写本文时,Niji 由以下组成:"
@@ -1098,7 +1128,7 @@ msgid "Select Language"
 msgstr "选择语言"
 
 #. placeholder {0}: minBidEth(minBid)
-#: src/components/Bid/index.tsx
+#: src/components/BidModal/index.tsx
 msgid "Please place a bid higher than or equal to the minimum bid amount of {0} ETH"
 msgstr "请出价大于或等于最低竞标金额 {0} ETH"
 
@@ -1139,7 +1169,6 @@ msgstr "审核函数调用操作"
 msgid "The Niji Seeder contract is used to determine Niji traits during the minting process. The seeder contract can be replaced to allow for future trait generation algorithm upgrades. Additionally, it can be locked by the Niji DAO to prevent any future updates. Currently, Niji traits are determined using pseudo-random number generation:"
 msgstr "Niji Seeder 合约用于在铸造过程中确定 Niji 特征。Seeder 合约可以被替换以允许未来的特征生成算法升级。此外,它可以被 Niji DAO 锁定以防止任何未来的更新。目前,Niji 特征使用伪随机数生成确定:"
 
-#: src/components/Bid/index.tsx
 #: src/components/NijiContent/index.tsx
 msgid "Settled auction successfully!"
 msgstr "成功结算拍卖！"
@@ -1222,8 +1251,8 @@ msgid "Withdraw"
 msgstr "提取"
 
 #: src/components/Bid/index.tsx
-msgid "Bid was placed successfully!"
-msgstr "出价成功！"
+#~ msgid "Bid was placed successfully!"
+#~ msgstr "出价成功！"
 
 #: src/pages/Vote/index.tsx
 msgid "Current Threshold"
@@ -1341,6 +1370,10 @@ msgstr "{0}开始"
 #: src/components/Documentation/GovernanceSection.tsx
 msgid "The proposal veto right was initially envisioned as a temporary solution to the problem of ‘51% attacks’ on the Niji DAO treasury. While Nijiders initially believed that a healthy distribution of Nijis would be sufficient protection for the DAO, a more complete understanding of the incentives and risks has led to general consensus within the Nijiders, the Niji Foundation, and the wider community that a more robust game-theoretic solution should be implemented before the right is removed."
 msgstr "提案否决权最初被设想为对 Niji DAO 金库 '51% 攻击' 问题的临时解决方案。虽然 Nijider 最初认为 Niji 的健康分配将为 DAO 提供足够的保护,但对激励和风险的更完整理解使 Nijider、Niji 基金会和更广泛的社区内达成了普遍共识,即在删除该权利之前应实施更强大的博弈论解决方案。"
+
+#: src/components/BidModal/index.tsx
+msgid "bid"
+msgstr ""
 
 #: src/components/CurrentDelegatePannel/index.tsx
 msgid "Current Delegate"
@@ -1579,8 +1612,8 @@ msgid "Withdraw Nijis from escrow"
 msgstr "从托管中取出 Niji"
 
 #: src/components/NijiInfoRowHolder.tsx
-msgid "Niji Auction House"
-msgstr "Niji 拍卖行"
+#~ msgid "Niji Auction House"
+#~ msgstr "Niji 拍卖行"
 
 #: src/pages/NijisPage.tsx
 msgid "Go to auction"
@@ -1804,7 +1837,7 @@ msgstr "编辑提案将清除所有先前的反馈"
 msgid "Execute"
 msgstr "执行"
 
-#: src/components/Bid/index.tsx
+#: src/components/BidModal/index.tsx
 msgid "Bid placed."
 msgstr "出价已提交。"
 
@@ -1827,6 +1860,10 @@ msgstr "提案者功能"
 #: src/components/Banner/index.tsx
 #~ msgid "EVERY DAY,"
 #~ msgstr "每一天，"
+
+#: src/components/BidModal/index.tsx
+msgid "クレカで払う (JPY)"
+msgstr ""
 
 #: src/components/NijiContent/index.tsx
 msgid "Learn more"
