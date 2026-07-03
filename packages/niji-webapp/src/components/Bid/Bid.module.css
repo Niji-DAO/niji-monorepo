@@ -6,21 +6,34 @@
   justify-content: center;
 }
 
+/*
+ * bid button — auction cool/warm palette と同調 (Issue #3037)
+ *   - background-color は data-palette=cool|warm で切替、 default (data-palette 未指定) は cool
+ *   - border-radius 12 → 8 で modern 化
+ *   - hover は filter: brightness(1.1) で palette 色を保ったまま明度上げ
+ *   - disabled 時は gray 維持 (Nouns 原型踏襲)
+ *   - text 色は palette 濃色 (dark-text) を採用し、 淡色 accent 背景でも可読性を確保
+ */
 .bidBtn {
   font-family: 'PT Root UI';
-  border-radius: 12px !important;
+  border-radius: 8px !important;
   margin-left: 0.6rem !important;
   margin-top: 3px;
   width: auto;
   padding: 10px 16px;
   height: 3rem;
-  color: white;
+  color: var(--brand-cool-dark-text);
   border: transparent;
-  background-color: var(--brand-black);
+  background-color: var(--brand-cool-accent);
   font-weight: bold;
   letter-spacing: normal;
   font-size: 19px;
   transition: all 0.2s ease-in-out;
+}
+
+.bidBtn[data-palette='warm'] {
+  color: var(--brand-warm-dark-text);
+  background-color: var(--brand-warm-accent);
 }
 
 .bidBtn:disabled {
@@ -29,14 +42,16 @@
 
 .bidBtn:hover,
 .bidBtn:active,
-.bidBtn:focus .bidBtn:disabled {
+.bidBtn:focus {
   outline: none !important;
   box-shadow: none !important;
-  background-color: #2125298a;
+  filter: brightness(0.95);
 }
 
 .bidBtn:disabled {
   background-color: gray !important;
+  color: white;
+  filter: none;
 }
 
 .minBidCopy {

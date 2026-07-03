@@ -13,6 +13,7 @@ import React from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { useWriteNijiAuctionHouseSettleCurrentAndCreateNewAuction } from '@niji/sdk/react';
+import { useAtomValue } from 'jotai/react';
 import { Button, Col, InputGroup } from 'react-bootstrap';
 import { toast } from 'sonner';
 import { useAccount } from 'wagmi';
@@ -21,6 +22,7 @@ import BidModal from '@/components/BidModal';
 import SettleManuallyBtn from '@/components/SettleManuallyBtn';
 import { Button as ShadcnButton } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { isCoolBackgroundAtom } from '@/state/atoms/applicationAtom';
 import { Auction } from '@/wrappers/nijiAuction';
 
 import classes from './Bid.module.css';
@@ -33,6 +35,10 @@ interface BidProps {
 const Bid: React.FC<BidProps> = props => {
   const { address: activeAccount } = useAccount();
   const { auction, auctionEnded } = props;
+
+  // auction 全体の cool/warm background 判定 (Winner / NijiContent 等と同 atom 経路、 Issue #3037)
+  const isCoolAuction = useAtomValue(isCoolBackgroundAtom);
+  const palette = isCoolAuction ? 'cool' : 'warm';
 
   const [isBidModalOpen, setIsBidModalOpen] = React.useState(false);
 
@@ -87,6 +93,7 @@ const Bid: React.FC<BidProps> = props => {
                 onClick={() => setIsBidModalOpen(true)}
                 disabled={isBidButtonDisabled}
                 className={classes.bidBtn}
+                data-palette={palette}
                 data-testid="bid-open-button"
               >
                 <Trans>Bid</Trans>
@@ -102,6 +109,7 @@ const Bid: React.FC<BidProps> = props => {
                         type="button"
                         disabled
                         className={classes.bidBtn}
+                        data-palette={palette}
                         data-testid="bid-open-button"
                       >
                         <Trans>Bid</Trans>

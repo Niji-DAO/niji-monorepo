@@ -24,6 +24,7 @@ const settleAuctionMock = vi.fn();
 
 const hookState: {
   account: string | undefined;
+  isCoolAuction: boolean;
   settleAuction: {
     isPending: boolean;
     isSuccess: boolean;
@@ -33,6 +34,7 @@ const hookState: {
   };
 } = {
   account: '0xUSER',
+  isCoolAuction: true,
   settleAuction: {
     isPending: false,
     isSuccess: false,
@@ -55,6 +57,12 @@ vi.mock('@niji/sdk/react', () => ({
 
 vi.mock('wagmi', () => ({
   useAccount: () => ({ address: hookState.account }),
+}));
+
+// jotai の useAtomValue を Bid が使うのは isCoolBackgroundAtom (cool/warm 判定) のみ、
+// 他 atom 参照は無いため、 hookState.isCoolAuction をそのまま返す stub で十分。
+vi.mock('jotai/react', () => ({
+  useAtomValue: () => hookState.isCoolAuction,
 }));
 
 const toastSuccessMock = vi.fn();
@@ -94,6 +102,7 @@ const makeAuction = (overrides: Record<string, unknown> = {}) => ({
 
 const resetState = () => {
   hookState.account = '0xUSER';
+  hookState.isCoolAuction = true;
   hookState.settleAuction = {
     isPending: false,
     isSuccess: false,
@@ -178,6 +187,63 @@ describe('Bid (Issue #3033 単一 button + BidModal 経路)', () => {
       // disabled button だが try で click しても modal は開かない
       fireEvent.click(bidBtn);
       expect(queryByTestId('bid-modal-stub')).toBeNull();
+    });
+  });
+
+  describe('cool/warm palette accent (Issue #3037)', () => {
+    it('assigns data-palette="cool" when isCoolBackgroundAtom is true (wallet connected)', () => {
+      hookState.account = '0xUSER';
+      hookState.isCoolAuction = true;
+      const { getAllByTestId } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={false} />,
+      );
+      const bidBtn = getAllByTestId('bid-open-button')[0];
+      expect(bidBtn.getAttribute('data-palette')).toBe('cool');
+    });
+
+    it('assigns data-palette="warm" when isCoolBackgroundAtom is false (wallet connected)', () => {
+      hookState.account = '0xUSER';
+      hookState.isCoolAuction = false;
+      const { getAllByTestId } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={false} />,
+      );
+      const bidBtn = getAllByTestId('bid-open-button')[0];
+      expect(bidBtn.getAttribute('data-palette')).toBe('warm');
+    });
+
+    it('assigns data-palette="cool" on disabled button when wallet disconnected + cool auction', () => {
+      hookState.account = undefined;
+      hookState.isCoolAuction = true;
+      const { getAllByTestId } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={false} />,
+      );
+      const bidBtn = getAllByTestId('bid-open-button')[0];
+      expect(bidBtn.getAttribute('data-palette')).toBe('cool');
+      expect((bidBtn as HTMLButtonElement).disabled).toBe(true);
+    });
+
+    it('assigns data-palette="warm" on disabled button when wallet disconnected + warm auction', () => {
+      hookState.account = undefined;
+      hookState.isCoolAuction = false;
+      const { getAllByTestId } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={false} />,
+      );
+      const bidBtn = getAllByTestId('bid-open-button')[0];
+      expect(bidBtn.getAttribute('data-palette')).toBe('warm');
+      expect((bidBtn as HTMLButtonElement).disabled).toBe(true);
+    });
+
+    it('data-palette toggles across rerender when isCoolAuction flips (cool → warm)', () => {
+      hookState.account = '0xUSER';
+      hookState.isCoolAuction = true;
+      const { getAllByTestId, rerender } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={false} />,
+      );
+      expect(getAllByTestId('bid-open-button')[0].getAttribute('data-palette')).toBe('cool');
+
+      hookState.isCoolAuction = false;
+      rerender(<Bid auction={makeAuction() as never} auctionEnded={false} />);
+      expect(getAllByTestId('bid-open-button')[0].getAttribute('data-palette')).toBe('warm');
     });
   });
 
