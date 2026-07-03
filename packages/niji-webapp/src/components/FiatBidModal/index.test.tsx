@@ -406,6 +406,86 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
     expect(topup).not.toHaveBeenCalled();
   });
 
+  it('palette prop 未指定で data-palette="cool" が modal + form root に付与 (default)', async () => {
+    const spotFetcher = vi.fn().mockResolvedValue(successRate);
+    render(
+      <FiatBidModal
+        open
+        onClose={() => {}}
+        auctionId="42"
+        bidderWallet="0xUSER"
+        existingFiatBid={{ authId: 'auth-1', jpyAmount: 50_000 }}
+        fetchersOverride={{
+          fetchers: { authorize: vi.fn(), placeBid: vi.fn(), topup: vi.fn() },
+          saveState: vi.fn(),
+          redirect: vi.fn(),
+        }}
+        spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
+      />,
+      { wrapper: buildWrapper() },
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
+    });
+    const modal = screen.getByTestId('fiat-bid-modal');
+    expect(modal.getAttribute('data-palette')).toBe('cool');
+    const form = screen.getByTestId('fiat-bid-form');
+    expect(form.getAttribute('data-palette')).toBe('cool');
+  });
+
+  it('palette="warm" で data-palette="warm" が modal + form root に付与', async () => {
+    const spotFetcher = vi.fn().mockResolvedValue(successRate);
+    render(
+      <FiatBidModal
+        open
+        onClose={() => {}}
+        auctionId="42"
+        bidderWallet="0xUSER"
+        palette="warm"
+        existingFiatBid={{ authId: 'auth-1', jpyAmount: 50_000 }}
+        fetchersOverride={{
+          fetchers: { authorize: vi.fn(), placeBid: vi.fn(), topup: vi.fn() },
+          saveState: vi.fn(),
+          redirect: vi.fn(),
+        }}
+        spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
+      />,
+      { wrapper: buildWrapper() },
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
+    });
+    const modal = screen.getByTestId('fiat-bid-modal');
+    expect(modal.getAttribute('data-palette')).toBe('warm');
+    const form = screen.getByTestId('fiat-bid-form');
+    expect(form.getAttribute('data-palette')).toBe('warm');
+  });
+
+  it('JPY input / submit button / cancel button に FiatBidForm CSS module class 付与', async () => {
+    const spotFetcher = vi.fn().mockResolvedValue(successRate);
+    render(
+      <FiatBidModal
+        open
+        onClose={() => {}}
+        auctionId="42"
+        bidderWallet="0xUSER"
+        fetchersOverride={{
+          fetchers: { authorize: vi.fn(), placeBid: vi.fn() },
+          saveState: vi.fn(),
+          redirect: vi.fn(),
+        }}
+        spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
+      />,
+      { wrapper: buildWrapper() },
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
+    });
+    expect(screen.getByTestId('fiat-bid-jpy-input').className).toMatch(/jpyInput/);
+    expect(screen.getByTestId('fiat-bid-submit').className).toMatch(/submitBtn/);
+    expect(screen.getByTestId('fiat-bid-cancel').className).toMatch(/cancelBtn/);
+  });
+
   it('submit で topup endpoint 呼出 + 5 phase stepper 表示 + cleanup disclaimer', async () => {
     const topup = vi.fn().mockResolvedValue(topupResponse);
     const spotFetcher = vi.fn().mockResolvedValue(successRate);

@@ -84,8 +84,10 @@ vi.mock('@/components/SettleManuallyBtn', () => ({
 
 // BidModal は Dialog Portal + Tabs で jsdom 描画重い + wagmi hook 依存、 Bid test では stub 差替。
 // BidModal 自体の behavior は BidModal/index.test.tsx で検証。
+// Issue #3039 palette 伝搬確認のため stub は data-palette を record するように更新。
 vi.mock('@/components/BidModal', () => ({
-  default: ({ open }: { open: boolean }) => (open ? <div data-testid="bid-modal-stub" /> : null),
+  default: ({ open, palette }: { open: boolean; palette?: string }) =>
+    open ? <div data-testid="bid-modal-stub" data-modal-palette={palette ?? 'undefined'} /> : null,
 }));
 
 import Bid from './index';
@@ -244,6 +246,35 @@ describe('Bid (Issue #3033 単一 button + BidModal 経路)', () => {
       hookState.isCoolAuction = false;
       rerender(<Bid auction={makeAuction() as never} auctionEnded={false} />);
       expect(getAllByTestId('bid-open-button')[0].getAttribute('data-palette')).toBe('warm');
+    });
+
+    // Issue #3039 palette 伝搬 (Bid → BidModal)
+    it('BidModal に palette="cool" が伝搬 (isCoolAuction=true でモーダル open 時)', () => {
+      hookState.account = '0xUSER';
+      hookState.isCoolAuction = true;
+      const { getAllByTestId, getByTestId } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={false} />,
+      );
+      const bidBtn = getAllByTestId('bid-open-button').find(
+        b => (b as HTMLButtonElement).disabled === false,
+      );
+      fireEvent.click(bidBtn!);
+      const modal = getByTestId('bid-modal-stub');
+      expect(modal.getAttribute('data-modal-palette')).toBe('cool');
+    });
+
+    it('BidModal に palette="warm" が伝搬 (isCoolAuction=false でモーダル open 時)', () => {
+      hookState.account = '0xUSER';
+      hookState.isCoolAuction = false;
+      const { getAllByTestId, getByTestId } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={false} />,
+      );
+      const bidBtn = getAllByTestId('bid-open-button').find(
+        b => (b as HTMLButtonElement).disabled === false,
+      );
+      fireEvent.click(bidBtn!);
+      const modal = getByTestId('bid-modal-stub');
+      expect(modal.getAttribute('data-modal-palette')).toBe('warm');
     });
   });
 

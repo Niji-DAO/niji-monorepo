@@ -12,7 +12,10 @@
  * wallet 未接続時は本 modal は open されない (親 Bid 側で button 全体を disable + tooltip、
  * Issue #3033 P7 stance 維持)。
  *
- * SSOT — GH Issue #3033、 Linear CAR-324。
+ * Issue #3039 以降 — site design (cool/warm palette + PT Root UI + border-radius 8/12) に統合。
+ * BidModal.module.css で shadcn/ui default class を override、 data-palette=cool|warm で 2 色系切替。
+ *
+ * SSOT — GH Issue #3033、 GH Issue #3039、 Linear CAR-324。
  */
 
 import type { Auction } from '@/wrappers/nijiAuction';
@@ -41,6 +44,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+import classes from './BidModal.module.css';
+
 const computeMinimumNextBid = (
   currentBid: bigint,
   minBidIncPercentage: bigint | undefined,
@@ -60,6 +65,13 @@ const minBidEth = (minBid: bigint): string => {
   return (Math.ceil(ethNum * 100) / 100).toFixed(2);
 };
 
+/**
+ * BidModal palette 種別 (Issue #3039、 Issue #3037 の auction cool/warm 判定を継承)
+ * cool = grey background (デフォルト)、 warm = beige background。
+ * 親 (Bid.tsx) が jotai atom `isCoolBackgroundAtom` から判定して渡す。
+ */
+export type BidModalPalette = 'cool' | 'warm';
+
 export type BidModalProps = {
   /** modal open state (親から制御) */
   open: boolean;
@@ -69,6 +81,8 @@ export type BidModalProps = {
   auction: Auction;
   /** bidder wallet address (親から wagmi useAccount 経由で渡す、 空文字は wallet 未接続) */
   bidderWallet: string;
+  /** palette 種別 (Issue #3039、 default = "cool" で後方互換) */
+  palette?: BidModalPalette;
   /**
    * test 用 injectable (fiat 側) — useFiatBid の fetchers 差替経路
    * 型は FiatBidForm props と一致 (import 循環を避けるため any 経路)。
@@ -92,6 +106,7 @@ export const BidModal = ({
   onClose,
   auction,
   bidderWallet,
+  palette = 'cool',
   fiatFetchersOverride,
   fiatSpotRateOverride,
   fiatGenerateCardToken,
@@ -163,22 +178,26 @@ export const BidModal = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent data-testid="bid-modal">
+      <DialogContent
+        data-testid="bid-modal"
+        data-palette={palette}
+        className={classes.dialogContent}
+      >
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className={classes.dialogTitle}>
             <Trans>Niji #{auction.nounId.toString()} に bid</Trans>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className={classes.dialogDescription}>
             <Trans>ETH か クレカ (JPY) を選んで bid してください</Trans>
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue={defaultTab} className="w-full" data-testid="bid-modal-tabs">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="eth" data-testid="bid-tab-eth">
+          <TabsList className={`grid w-full grid-cols-2 ${classes.tabsList}`}>
+            <TabsTrigger value="eth" data-testid="bid-tab-eth" className={classes.tabsTrigger}>
               <Trans>ETH で bid</Trans>
             </TabsTrigger>
-            <TabsTrigger value="fiat" data-testid="bid-tab-fiat">
+            <TabsTrigger value="fiat" data-testid="bid-tab-fiat" className={classes.tabsTrigger}>
               <Trans>クレカで払う (JPY)</Trans>
             </TabsTrigger>
           </TabsList>
@@ -186,7 +205,7 @@ export const BidModal = ({
           <TabsContent value="eth" data-testid="bid-tab-content-eth">
             <div className="space-y-4">
               <div>
-                <label htmlFor="eth-bid-amount" className="mb-1 block text-sm font-medium">
+                <label htmlFor="eth-bid-amount" className={`mb-1 block ${classes.formLabel}`}>
                   <Trans>bid 額 (ETH)</Trans>
                 </label>
                 <Input
@@ -199,8 +218,9 @@ export const BidModal = ({
                   value={ethInput}
                   placeholder={`Ξ ${minBidEth(minBid)}`}
                   data-testid="eth-bid-input"
+                  className={classes.bidInput}
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className={classes.minBidCopy}>
                   <Trans>minimum bid — Ξ {minBidEth(minBid)} or more</Trans>
                 </p>
               </div>
@@ -211,6 +231,7 @@ export const BidModal = ({
                   variant="outline"
                   onClick={onClose}
                   data-testid="eth-bid-cancel"
+                  className={classes.cancelBtn}
                 >
                   <Trans>キャンセル</Trans>
                 </Button>
@@ -219,6 +240,7 @@ export const BidModal = ({
                   onClick={placeEthBidHandler}
                   disabled={isPlacingBid || bidderWallet === ''}
                   data-testid="eth-bid-submit"
+                  className={classes.bidBtn}
                 >
                   {isPlacingBid ? <Spinner animation="border" size="sm" /> : <Trans>bid</Trans>}
                 </Button>
@@ -231,6 +253,7 @@ export const BidModal = ({
               onClose={onClose}
               auctionId={auction.nounId.toString()}
               bidderWallet={bidderWallet}
+              palette={palette}
               fetchersOverride={fiatFetchersOverride}
               spotRateOverride={fiatSpotRateOverride}
               generateCardToken={fiatGenerateCardToken}

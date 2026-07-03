@@ -1,0 +1,230 @@
+/**
+ * BidModal styling — site design (cool/warm palette + PT Root UI + border-radius 8/12) 統合
+ *
+ * SSOT — Issue #3039、 Bid.module.css の .bidBtn / .bidInput / .customPlaceholder を SSOT にして
+ * modal 内部の Dialog / Tabs / Input / Button 全てを palette 対応させる。
+ *
+ * palette 切替 — .dialogContent root に data-palette=cool|warm を付与、 内部 element は
+ * :where(...) 経由で palette 継承する (詳細度を上げず shadcn/ui default class を override)。
+ *
+ * shadcn/ui default class を CSS module で完全 override するので、 upstream shadcn 側の
+ * class 変更で崩れる可能性がある (upstream update 時は本 file を再確認する必要あり)。
+ */
+
+/* ==================== Dialog Content root ==================== */
+.dialogContent {
+  background-color: var(--brand-cool-background) !important;
+  border: 1px solid var(--brand-cool-border) !important;
+  border-radius: 12px !important;
+  font-family: 'PT Root UI', sans-serif;
+  color: var(--brand-cool-dark-text);
+}
+
+.dialogContent[data-palette='warm'] {
+  background-color: var(--brand-warm-background) !important;
+  border-color: var(--brand-warm-border) !important;
+  color: var(--brand-warm-dark-text);
+}
+
+/* ==================== Dialog Header ==================== */
+.dialogTitle {
+  font-family: 'PT Root UI', sans-serif;
+  font-weight: bold;
+  font-size: 25px;
+  color: var(--brand-cool-dark-text);
+  letter-spacing: normal;
+}
+
+.dialogContent[data-palette='warm'] .dialogTitle {
+  color: var(--brand-warm-dark-text);
+}
+
+.dialogDescription {
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 14px;
+  color: var(--brand-cool-light-text);
+}
+
+.dialogContent[data-palette='warm'] .dialogDescription {
+  color: var(--brand-warm-light-text);
+}
+
+/* ==================== Tabs ==================== */
+.tabsList {
+  background-color: var(--brand-cool-accent) !important;
+  border-radius: 8px !important;
+  height: auto;
+  padding: 4px;
+}
+
+.dialogContent[data-palette='warm'] .tabsList {
+  background-color: var(--brand-warm-accent) !important;
+}
+
+.tabsTrigger {
+  font-family: 'PT Root UI', sans-serif !important;
+  font-weight: bold !important;
+  font-size: 15px !important;
+  color: var(--brand-cool-light-text) !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.dialogContent[data-palette='warm'] .tabsTrigger {
+  color: var(--brand-warm-light-text) !important;
+}
+
+.tabsTrigger[data-state='active'] {
+  background-color: white !important;
+  color: var(--brand-cool-dark-text) !important;
+}
+
+.dialogContent[data-palette='warm'] .tabsTrigger[data-state='active'] {
+  color: var(--brand-warm-dark-text) !important;
+}
+
+/* ==================== Form label ==================== */
+.formLabel {
+  font-family: 'PT Root UI', sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--brand-cool-dark-text);
+}
+
+.dialogContent[data-palette='warm'] .formLabel {
+  color: var(--brand-warm-dark-text);
+}
+
+/* ==================== ETH Bid Input (Bid.module.css .bidInput SSOT) ==================== */
+.bidInput {
+  box-sizing: border-box;
+  width: 100%;
+  height: 54px;
+  color: black !important;
+  border-radius: 12px !important;
+  background-color: white !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: inset 0px 0px 0px 1px transparent !important;
+  font-family: 'PT Root UI', sans-serif !important;
+  font-weight: bold !important;
+  font-size: 25px !important;
+  transition: all 0.2s ease-in-out;
+  padding: 0 12px;
+}
+
+.bidInput:focus,
+.bidInput:focus-visible {
+  outline: none !important;
+  box-shadow: inset 0px 0px 0px 1px var(--brand-cool-dark-text) !important;
+}
+
+.dialogContent[data-palette='warm'] .bidInput:focus,
+.dialogContent[data-palette='warm'] .bidInput:focus-visible {
+  box-shadow: inset 0px 0px 0px 1px var(--brand-warm-dark-text) !important;
+}
+
+/* REMOVE UP/DOWN ARROWS from number input (Bid.module.css SSOT 踏襲) */
+.bidInput::-webkit-outer-spin-button,
+.bidInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.bidInput[type='number'] {
+  -moz-appearance: textfield;
+}
+
+/* placeholder 色 (Bid.module.css .customPlaceholder SSOT) */
+.bidInput::placeholder {
+  color: var(--brand-cool-light-text);
+  font-family: 'PT Root UI', sans-serif;
+  font-weight: bold;
+  opacity: 0.6;
+}
+
+.dialogContent[data-palette='warm'] .bidInput::placeholder {
+  color: var(--brand-warm-light-text);
+}
+
+/* min bid copy (Bid.module.css .minBidCopy SSOT) */
+.minBidCopy {
+  font-family: 'PT Root UI', sans-serif;
+  font-size: small;
+  color: var(--brand-cool-light-text);
+  margin-top: 4px;
+  padding-left: 0.25rem;
+}
+
+.dialogContent[data-palette='warm'] .minBidCopy {
+  color: var(--brand-warm-light-text);
+}
+
+/* ==================== Submit Button (Bid.module.css .bidBtn SSOT) ==================== */
+.bidBtn {
+  font-family: 'PT Root UI', sans-serif !important;
+  border-radius: 8px !important;
+  padding: 10px 16px !important;
+  height: 3rem !important;
+  color: var(--brand-cool-dark-text) !important;
+  border: transparent !important;
+  background-color: var(--brand-cool-accent) !important;
+  font-weight: bold !important;
+  letter-spacing: normal !important;
+  font-size: 19px !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.dialogContent[data-palette='warm'] .bidBtn {
+  color: var(--brand-warm-dark-text) !important;
+  background-color: var(--brand-warm-accent) !important;
+}
+
+.bidBtn:hover,
+.bidBtn:active,
+.bidBtn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  filter: brightness(0.95);
+}
+
+.bidBtn:disabled {
+  background-color: gray !important;
+  color: white !important;
+  filter: none;
+  cursor: not-allowed;
+}
+
+/* ==================== Cancel Button (outline variant + palette border) ==================== */
+.cancelBtn {
+  font-family: 'PT Root UI', sans-serif !important;
+  border-radius: 8px !important;
+  padding: 10px 16px !important;
+  height: 3rem !important;
+  color: var(--brand-cool-dark-text) !important;
+  background-color: transparent !important;
+  border: 1px solid var(--brand-cool-border) !important;
+  font-weight: bold !important;
+  font-size: 19px !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.dialogContent[data-palette='warm'] .cancelBtn {
+  color: var(--brand-warm-dark-text) !important;
+  border-color: var(--brand-warm-border) !important;
+}
+
+.cancelBtn:hover,
+.cancelBtn:active,
+.cancelBtn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: var(--brand-cool-accent) !important;
+  filter: brightness(0.98);
+}
+
+.dialogContent[data-palette='warm'] .cancelBtn:hover,
+.dialogContent[data-palette='warm'] .cancelBtn:active,
+.dialogContent[data-palette='warm'] .cancelBtn:focus {
+  background-color: var(--brand-warm-accent) !important;
+}

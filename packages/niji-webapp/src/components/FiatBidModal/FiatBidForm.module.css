@@ -1,0 +1,323 @@
+/**
+ * FiatBidForm styling — site design (cool/warm palette + PT Root UI) 統合
+ *
+ * SSOT — Issue #3039、 BidModal.module.css と対称に FiatBidForm の form 内部を palette 対応させる。
+ *
+ * palette 切替 — .form root に data-palette=cool|warm を付与、 内部 element は継承。
+ * BidModal Tab 経路 (BidModal.module.css の dialogContent 側で data-palette 継承) と、
+ * 単独 FiatBidModal 経路 (FiatBidModal 側で dialogContent の data-palette 経由) の 2 経路で
+ * palette が伝搬されるので、 form 自身にも data-palette を明示的に付与 (双方の経路で確実に効かせる)。
+ *
+ * shadcn/ui default class を CSS module で完全 override するので、 upstream shadcn 側の
+ * class 変更で崩れる可能性がある (upstream update 時は本 file を再確認する必要あり)。
+ */
+
+/* ==================== form root ==================== */
+.form {
+  font-family: 'PT Root UI', sans-serif;
+  color: var(--brand-cool-dark-text);
+}
+
+.form[data-palette='warm'] {
+  color: var(--brand-warm-dark-text);
+}
+
+/* ==================== label + hint ==================== */
+.formLabel {
+  font-family: 'PT Root UI', sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--brand-cool-dark-text);
+}
+
+.form[data-palette='warm'] .formLabel {
+  color: var(--brand-warm-dark-text);
+}
+
+.formHint {
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 12px;
+  color: var(--brand-cool-light-text);
+}
+
+.form[data-palette='warm'] .formHint {
+  color: var(--brand-warm-light-text);
+}
+
+/* ==================== JPY Input ==================== */
+.jpyInput {
+  box-sizing: border-box;
+  width: 100%;
+  height: 54px;
+  color: black !important;
+  border-radius: 12px !important;
+  background-color: white !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: inset 0px 0px 0px 1px transparent !important;
+  font-family: 'PT Root UI', sans-serif !important;
+  font-weight: bold !important;
+  font-size: 25px !important;
+  transition: all 0.2s ease-in-out;
+  padding: 0 12px;
+}
+
+.jpyInput:focus,
+.jpyInput:focus-visible {
+  outline: none !important;
+  box-shadow: inset 0px 0px 0px 1px var(--brand-cool-dark-text) !important;
+}
+
+.form[data-palette='warm'] .jpyInput:focus,
+.form[data-palette='warm'] .jpyInput:focus-visible {
+  box-shadow: inset 0px 0px 0px 1px var(--brand-warm-dark-text) !important;
+}
+
+.jpyInput::-webkit-outer-spin-button,
+.jpyInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.jpyInput[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.jpyInput::placeholder {
+  color: var(--brand-cool-light-text);
+  font-family: 'PT Root UI', sans-serif;
+  font-weight: bold;
+  opacity: 0.6;
+}
+
+.form[data-palette='warm'] .jpyInput::placeholder {
+  color: var(--brand-warm-light-text);
+}
+
+/* ==================== email input (通常サイズ、 JPY input より小さめ) ==================== */
+.emailInput {
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  color: black !important;
+  border-radius: 8px !important;
+  background-color: white !important;
+  border: 1px solid var(--brand-cool-border) !important;
+  outline: none !important;
+  font-family: 'PT Root UI', sans-serif !important;
+  font-size: 15px !important;
+  padding: 0 12px;
+  transition: all 0.2s ease-in-out;
+}
+
+.form[data-palette='warm'] .emailInput {
+  border-color: var(--brand-warm-border) !important;
+}
+
+.emailInput:focus,
+.emailInput:focus-visible {
+  outline: none !important;
+  border-color: var(--brand-cool-dark-text) !important;
+  box-shadow: 0 0 0 1px var(--brand-cool-dark-text) !important;
+}
+
+.form[data-palette='warm'] .emailInput:focus,
+.form[data-palette='warm'] .emailInput:focus-visible {
+  border-color: var(--brand-warm-dark-text) !important;
+  box-shadow: 0 0 0 1px var(--brand-warm-dark-text) !important;
+}
+
+/* ==================== rate summary + existing bid summary ==================== */
+.rateSummary {
+  background-color: var(--brand-cool-accent);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 14px;
+  color: var(--brand-cool-dark-text);
+}
+
+.form[data-palette='warm'] .rateSummary {
+  background-color: var(--brand-warm-accent);
+  color: var(--brand-warm-dark-text);
+}
+
+.rateSource {
+  font-size: 12px;
+  color: var(--brand-cool-light-text);
+  margin-left: 8px;
+}
+
+.form[data-palette='warm'] .rateSource {
+  color: var(--brand-warm-light-text);
+}
+
+.existingBidSummary {
+  background-color: var(--brand-cool-accent);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 14px;
+  color: var(--brand-cool-dark-text);
+}
+
+.form[data-palette='warm'] .existingBidSummary {
+  background-color: var(--brand-warm-accent);
+  color: var(--brand-warm-dark-text);
+}
+
+.existingBidLabel {
+  font-weight: bold;
+}
+
+/* ==================== stepper ==================== */
+.stepper {
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--brand-cool-dark-text);
+  background-color: var(--brand-cool-accent);
+  border: 1px solid var(--brand-cool-border);
+}
+
+.form[data-palette='warm'] .stepper {
+  color: var(--brand-warm-dark-text);
+  background-color: var(--brand-warm-accent);
+  border-color: var(--brand-warm-border);
+}
+
+/* stepper が idle/failure 以外 (active な phase) のとき strong 表現 */
+.stepper[data-step='idle'],
+.stepper[data-step='failure'] {
+  color: var(--brand-cool-light-text);
+  font-weight: normal;
+}
+
+.form[data-palette='warm'] .stepper[data-step='idle'],
+.form[data-palette='warm'] .stepper[data-step='failure'] {
+  color: var(--brand-warm-light-text);
+}
+
+/* ==================== cleanup disclaimer ==================== */
+.cleanupDisclaimer {
+  background-color: var(--brand-cool-accent);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 12px;
+  color: var(--brand-cool-light-text);
+  border: 1px dashed var(--brand-cool-border);
+}
+
+.form[data-palette='warm'] .cleanupDisclaimer {
+  background-color: var(--brand-warm-accent);
+  color: var(--brand-warm-light-text);
+  border-color: var(--brand-warm-border);
+}
+
+/* ==================== error message ==================== */
+.errorMessage {
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 14px;
+  color: var(--brand-color-red);
+  font-weight: bold;
+}
+
+.errorInline {
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 13px;
+  color: var(--brand-color-red);
+  margin-top: 4px;
+}
+
+/* ==================== terms checkbox + link ==================== */
+.termsLabel {
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 14px;
+  color: var(--brand-cool-dark-text);
+}
+
+.form[data-palette='warm'] .termsLabel {
+  color: var(--brand-warm-dark-text);
+}
+
+.termsLink {
+  color: var(--brand-cool-dark-text);
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.form[data-palette='warm'] .termsLink {
+  color: var(--brand-warm-dark-text);
+}
+
+/* ==================== Submit Button (BidModal.module.css .bidBtn と同 SSOT) ==================== */
+.submitBtn {
+  font-family: 'PT Root UI', sans-serif !important;
+  border-radius: 8px !important;
+  padding: 10px 16px !important;
+  height: 3rem !important;
+  color: var(--brand-cool-dark-text) !important;
+  border: transparent !important;
+  background-color: var(--brand-cool-accent) !important;
+  font-weight: bold !important;
+  letter-spacing: normal !important;
+  font-size: 19px !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.form[data-palette='warm'] .submitBtn {
+  color: var(--brand-warm-dark-text) !important;
+  background-color: var(--brand-warm-accent) !important;
+}
+
+.submitBtn:hover,
+.submitBtn:active,
+.submitBtn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  filter: brightness(0.95);
+}
+
+.submitBtn:disabled {
+  background-color: gray !important;
+  color: white !important;
+  filter: none;
+  cursor: not-allowed;
+}
+
+/* ==================== Cancel Button ==================== */
+.cancelBtn {
+  font-family: 'PT Root UI', sans-serif !important;
+  border-radius: 8px !important;
+  padding: 10px 16px !important;
+  height: 3rem !important;
+  color: var(--brand-cool-dark-text) !important;
+  background-color: transparent !important;
+  border: 1px solid var(--brand-cool-border) !important;
+  font-weight: bold !important;
+  font-size: 19px !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.form[data-palette='warm'] .cancelBtn {
+  color: var(--brand-warm-dark-text) !important;
+  border-color: var(--brand-warm-border) !important;
+}
+
+.cancelBtn:hover,
+.cancelBtn:active,
+.cancelBtn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: var(--brand-cool-accent) !important;
+  filter: brightness(0.98);
+}
+
+.form[data-palette='warm'] .cancelBtn:hover,
+.form[data-palette='warm'] .cancelBtn:active,
+.form[data-palette='warm'] .cancelBtn:focus {
+  background-color: var(--brand-warm-accent) !important;
+}
