@@ -284,6 +284,9 @@ export const FiatBidForm = ({
     return `約 ${ethValidation.jpyEquivalent.toLocaleString()} 円`;
   }, [ethValidation, spotRate.rate]);
 
+  const isSpotRateLoading = spotRate.rate === undefined;
+  const isJpyEquivalentReady = ethValidation.ok && spotRate.rate !== undefined;
+
   const submitDisabled =
     !ethValidation.ok ||
     !termsChecked ||
@@ -437,15 +440,53 @@ export const FiatBidForm = ({
           )}
         </div>
 
-        <div className={classes.rateSummary} data-testid="fiat-bid-rate-summary">
-          <div>
-            現在 spot rate ={' '}
-            {spotRate.rate !== undefined ? `${spotRate.rate.toLocaleString()} JPY / ETH` : '取得中'}
-            {spotRate.source !== undefined && (
-              <span className={classes.rateSource}>(source: {spotRate.source})</span>
+        <div
+          className={classes.rateSummary}
+          data-testid="fiat-bid-rate-summary"
+          aria-busy={isSpotRateLoading}
+          aria-live="polite"
+        >
+          <div className={classes.rateSummaryCol}>
+            <div className={classes.rateSummaryLabel}>現在 spot rate</div>
+            {spotRate.rate !== undefined ? (
+              <>
+                <div className={classes.rateSummaryValue}>
+                  {spotRate.rate.toLocaleString()} JPY / ETH
+                </div>
+                {spotRate.source !== undefined && (
+                  <div className={classes.rateSummarySource}>source: {spotRate.source}</div>
+                )}
+              </>
+            ) : (
+              <div
+                className={classes.rateSummaryLoading}
+                data-testid="fiat-bid-rate-summary-loading"
+              >
+                <div className={classes.spinner} aria-hidden="true" />
+                <span>取得中</span>
+              </div>
             )}
           </div>
-          <div data-testid="fiat-bid-jpy-display">JPY 換算 = {jpyDisplay}</div>
+          <div className={classes.rateSummaryCol}>
+            <div className={classes.rateSummaryLabel}>JPY 換算</div>
+            {isJpyEquivalentReady ? (
+              <div className={classes.rateSummaryValue} data-testid="fiat-bid-jpy-display">
+                {jpyDisplay}
+              </div>
+            ) : isSpotRateLoading ? (
+              <div
+                className={classes.rateSummaryLoading}
+                data-testid="fiat-bid-jpy-display-loading"
+              >
+                <div className={classes.spinner} aria-hidden="true" />
+                <span>取得中</span>
+              </div>
+            ) : (
+              <div className={classes.rateSummaryValue} data-testid="fiat-bid-jpy-display">
+                {jpyDisplay}
+              </div>
+            )}
+          </div>
         </div>
 
         {!isTopupMode && (
