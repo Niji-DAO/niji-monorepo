@@ -1,16 +1,17 @@
 /**
- * FiatBidModal behavior test (Issue #3009 Phase D、 spec T13-T15 + Issue #3025 Phase 2 増額 branch)
+ * FiatBidModal behavior test (Issue #3009 Phase D、 spec T13-T15 + Issue #3025 Phase 2 増額 branch、
+ *                              Issue #3051 で入力軸 JPY → ETH に反転)
  *
  * Phase 1 (新規 bid mode) の 3 挙動 —
  * (1) modal 開閉 + stepper 遷移 (T13)
- * (2) bid 上限 100 万円超過で validation エラー + submit disable (T14)
+ * (2) JPY 換算 100 万円超過で validation エラー + submit disable (T14、 ETH 額 × spot rate で判定)
  * (3) Terms checkbox 未 check で submit disable (追加、 spec 完了条件 6 番)
- * (4) modal 内 submit で authorize 呼出 → step="three-ds" 遷移
+ * (4) modal 内 submit で authorize 呼出 (ethAmount / spotRate / jpyAmount 3 値送信) → step="three-ds" 遷移
  *
  * Phase 2 (増額 bid mode、 Issue #3025) の 3 挙動 —
  * (T1) existingFiatBid prop 存在時に「増額 bid」 modal 表示 (title / submit label / existing bid summary)
- * (T2) validateTopupJpyAmount 経由の validation error (newJpy <= oldJpy) 表示 + submit disable
- * (T3) submit で topup endpoint 呼出 + 5 phase stepper 表示 + cleanup disclaimer 表示
+ * (T2) validateTopupEthAmount 経由の validation error (newEth <= oldEth) 表示 + submit disable
+ * (T3) submit で topup endpoint 呼出 (newEthAmount / newSpotRate / newJpyAmount 3 値送信) + 5 phase stepper 表示 + cleanup disclaimer 表示
  */
 
 import type { AuthorizeResponse, PlaceBidResponse, TopupResponse } from '@/hooks/useFiatBid';
@@ -24,7 +25,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 
-import { BID_LIMIT_JPY, FiatBidModal, validateJpyAmount, validateTopupJpyAmount } from './index';
+import { BID_LIMIT_JPY, FiatBidModal, validateEthAmount, validateTopupEthAmount } from './index';
 
 // Radix Tooltip Portal を jsdom で render するため Provider を wrap
 
@@ -79,7 +80,7 @@ const topupResponse: TopupResponse = {
   message: '増額 bid tx を broadcast しました。',
 };
 
-describe('Issue #3047 CardInput 統合', () => {
+describe('Issue #3047 CardInput 統合 (Issue #3051 で ETH 入力軸に更新)', () => {
   it('isDev=true default プリフィル で cardData 実値を含む cardToken 生成 (mock-tok-visa-1111-...)', async () => {
     const authorize = vi.fn().mockResolvedValue(authResponse);
     const spotFetcher = vi.fn().mockResolvedValue(successRate);
@@ -120,8 +121,8 @@ describe('Issue #3047 CardInput 統合', () => {
       '4111 1111 1111 1111',
     );
 
-    // 金額入力 + Terms check → submit enable
-    fireEvent.change(screen.getByTestId('fiat-bid-jpy-input'), { target: { value: '50000' } });
+    // ETH 額入力 (0.1 ETH = 500,000 JPY 換算、 100 万円上限内) + Terms check → submit enable
+    fireEvent.change(screen.getByTestId('fiat-bid-eth-input'), { target: { value: '0.1' } });
     fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
     const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
     expect(submit.disabled).toBe(false);
@@ -161,8 +162,8 @@ describe('Issue #3047 CardInput 統合', () => {
       expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
     });
 
-    // card fields 空欄 + JPY + Terms 済でも card 無効で submit disable
-    fireEvent.change(screen.getByTestId('fiat-bid-jpy-input'), { target: { value: '50000' } });
+    // card fields 空欄 + ETH + Terms 済でも card 無効で submit disable
+    fireEvent.change(screen.getByTestId('fiat-bid-eth-input'), { target: { value: '0.1' } });
     fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
     const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
     expect(submit.disabled).toBe(true);
@@ -172,39 +173,77 @@ describe('Issue #3047 CardInput 統合', () => {
   });
 });
 
-describe('validateJpyAmount', () => {
+describe('validateEthAmount (Issue #3051、 ETH 入力軸)', () => {
+  const rate = 500_000; // spot rate 500,000 JPY/ETH
+
   it('空文字で ng', () => {
-    const r = validateJpyAmount('');
+    const r = validateEthAmount('', 0.01, rate);
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.message).toContain('JPY 額');
+    if (!r.ok) expect(r.message).toContain('ETH 額');
   });
 
   it('負数で ng', () => {
-    const r = validateJpyAmount('-100');
+    const r = validateEthAmount('-0.1', 0.01, rate);
     expect(r.ok).toBe(false);
   });
 
-  it('BID_LIMIT_JPY 超過で ng', () => {
-    const r = validateJpyAmount(`${BID_LIMIT_JPY + 1}`);
+  it('spot rate undefined で ng (spot rate 取得中)', () => {
+    const r = validateEthAmount('0.1', 0.01, undefined);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.message).toContain('spot rate');
+  });
+
+  it('minBidEth 未満で ng', () => {
+    const r = validateEthAmount('0.005', 0.01, rate);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.message).toContain('minimum bid');
+  });
+
+  it('minBidEth と同額で ok', () => {
+    const r = validateEthAmount('0.01', 0.01, rate);
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.value).toBe(0.01);
+      expect(r.jpyEquivalent).toBe(5_000); // 0.01 * 500000 = 5000
+    }
+  });
+
+  it('JPY 換算 100 万円超過で ng (2.001 ETH × 500,000 rate = 1,000,500 JPY)', () => {
+    const r = validateEthAmount('2.001', 0.01, rate);
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.message).toContain('bid 上限');
   });
 
-  it('BID_LIMIT_JPY ちょうどで ok', () => {
-    const r = validateJpyAmount(`${BID_LIMIT_JPY}`);
+  it('JPY 換算 100 万円ちょうどで ok (2 ETH × 500,000 rate = 1,000,000 JPY)', () => {
+    const r = validateEthAmount('2', 0.01, rate);
     expect(r.ok).toBe(true);
-    if (r.ok) expect(r.value).toBe(BID_LIMIT_JPY);
+    if (r.ok) {
+      expect(r.value).toBe(2);
+      expect(r.jpyEquivalent).toBe(BID_LIMIT_JPY);
+    }
   });
 
-  it('正常値で ok', () => {
-    const r = validateJpyAmount('50000');
+  it('minBidEth undefined 時は minimum check skip (0.001 ETH でも ok)', () => {
+    const r = validateEthAmount('0.001', undefined, rate);
     expect(r.ok).toBe(true);
-    if (r.ok) expect(r.value).toBe(50_000);
+    if (r.ok) {
+      expect(r.value).toBe(0.001);
+      expect(r.jpyEquivalent).toBe(500); // 0.001 * 500000
+    }
+  });
+
+  it('正常値 0.05 ETH で ok (JPY 換算 25,000 円)', () => {
+    const r = validateEthAmount('0.05', 0.01, rate);
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.value).toBe(0.05);
+      expect(r.jpyEquivalent).toBe(25_000);
+    }
   });
 });
 
-describe('FiatBidModal 開閉 + submit → stepper 遷移 (T13、 T15)', () => {
-  it('open=true で modal 描画、 JPY 入力 → Terms check → submit で authorize 呼出 + stepper 表示', async () => {
+describe('FiatBidModal 開閉 + submit → stepper 遷移 (T13、 T15、 Issue #3051 で ETH 入力軸)', () => {
+  it('open=true で modal 描画、 ETH 入力 → Terms check → submit で authorize 呼出 (ethAmount / spotRate / jpyAmount 3 値送信) + stepper 表示', async () => {
     const authorize = vi.fn().mockResolvedValue(authResponse);
     const placeBid = vi.fn().mockResolvedValue(placeBidResponse);
     const spotFetcher = vi.fn().mockResolvedValue(successRate);
@@ -233,9 +272,12 @@ describe('FiatBidModal 開閉 + submit → stepper 遷移 (T13、 T15)', () => {
       expect(screen.getByTestId('fiat-bid-rate-summary').textContent).toContain('500,000');
     });
 
-    // JPY 入力
-    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
-    fireEvent.change(jpyInput, { target: { value: '50000' } });
+    // ETH 入力 (0.1 ETH = 500,000 JPY 換算)
+    const ethInput = screen.getByTestId('fiat-bid-eth-input') as HTMLInputElement;
+    fireEvent.change(ethInput, { target: { value: '0.1' } });
+
+    // JPY 換算表示が反映
+    expect(screen.getByTestId('fiat-bid-jpy-display').textContent).toContain('50,000');
 
     // Terms 未 check なら submit disable
     const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
@@ -249,12 +291,14 @@ describe('FiatBidModal 開閉 + submit → stepper 遷移 (T13、 T15)', () => {
     // submit
     fireEvent.click(submit);
 
-    // authorize 呼出 + stepper 表示 + redirect
+    // authorize 呼出 (ETH primary + spotRate + jpyAmount) + stepper 表示 + redirect
     await waitFor(() => {
       expect(authorize).toHaveBeenCalledWith({
         auctionId: '42',
         bidderWallet: '0xUSER',
         bidderEmail: undefined,
+        ethAmount: '100000000000000000', // 0.1 ETH = 1e17 wei
+        spotRate: 500_000,
         jpyAmount: 50_000,
         cardToken: 'mock-tok-fixed',
       });
@@ -269,8 +313,8 @@ describe('FiatBidModal 開閉 + submit → stepper 遷移 (T13、 T15)', () => {
   });
 });
 
-describe('bid 上限超過 validation (T14)', () => {
-  it('JPY 100 万円超過入力で validation エラー表示 + submit disable', async () => {
+describe('bid 上限超過 validation (T14、 Issue #3051 で JPY 換算 100 万円で判定)', () => {
+  it('ETH * spot rate で JPY 換算 100 万円超過入力で validation エラー表示 + submit disable', async () => {
     const authorize = vi.fn();
     const spotFetcher = vi.fn().mockResolvedValue(successRate);
 
@@ -294,12 +338,13 @@ describe('bid 上限超過 validation (T14)', () => {
       expect(screen.getByTestId('fiat-bid-rate-summary').textContent).toContain('500,000');
     });
 
-    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
-    fireEvent.change(jpyInput, { target: { value: `${BID_LIMIT_JPY + 1}` } });
+    // 2.001 ETH * 500,000 JPY/ETH = 1,000,500 JPY (100 万円超過)
+    const ethInput = screen.getByTestId('fiat-bid-eth-input') as HTMLInputElement;
+    fireEvent.change(ethInput, { target: { value: '2.001' } });
 
     // validation エラー表示
     await waitFor(() => {
-      const err = screen.getByTestId('fiat-bid-jpy-error');
+      const err = screen.getByTestId('fiat-bid-eth-error');
       expect(err.textContent).toContain('bid 上限');
     });
 
@@ -308,6 +353,8 @@ describe('bid 上限超過 validation (T14)', () => {
     const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
     expect(submit.disabled).toBe(true);
     expect(authorize).not.toHaveBeenCalled();
+    // BID_LIMIT_JPY export は残存する (backend との共通契約 constant として)
+    expect(BID_LIMIT_JPY).toBe(1_000_000);
   });
 });
 
@@ -345,39 +392,51 @@ describe('modal close', () => {
 // Phase 2 増額 bid mode (Issue #3025 T10-T11)
 // ====================================================================
 
-describe('validateTopupJpyAmount (Phase 2、 増額 bid mode)', () => {
-  it('旧 jpyAmount 以下で ng (増額のみ受付)', () => {
-    const r = validateTopupJpyAmount('50000', 50_000);
+describe('validateTopupEthAmount (Phase 2 増額 bid mode、 Issue #3051 で ETH 入力軸)', () => {
+  const rate = 500_000; // spot rate 500,000 JPY/ETH
+
+  it('旧 ethAmount と同額で ng (増額のみ受付)', () => {
+    const r = validateTopupEthAmount('0.1', 0.01, rate, 0.1);
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.message).toContain('増額のみ受付可能');
   });
 
-  it('旧 jpyAmount 未満で ng', () => {
-    const r = validateTopupJpyAmount('30000', 50_000);
+  it('旧 ethAmount 未満で ng', () => {
+    const r = validateTopupEthAmount('0.05', 0.01, rate, 0.1);
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.message).toContain('増額のみ受付可能');
   });
 
-  it('BID_LIMIT_JPY 超過で ng', () => {
-    const r = validateTopupJpyAmount(`${BID_LIMIT_JPY + 1}`, 50_000);
+  it('JPY 換算 100 万円超過で ng', () => {
+    // 2.001 ETH * 500,000 = 1,000,500 JPY
+    const r = validateTopupEthAmount('2.001', 0.01, rate, 0.1);
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.message).toContain('bid 上限');
   });
 
-  it('旧 jpyAmount より大 + BID_LIMIT_JPY 以下で ok', () => {
-    const r = validateTopupJpyAmount('80000', 50_000);
+  it('旧 ethAmount より大 + JPY 換算 100 万円以下で ok', () => {
+    const r = validateTopupEthAmount('0.15', 0.01, rate, 0.1);
     expect(r.ok).toBe(true);
-    if (r.ok) expect(r.value).toBe(80_000);
+    if (r.ok) {
+      expect(r.value).toBe(0.15);
+      expect(r.jpyEquivalent).toBe(75_000); // 0.15 * 500000
+    }
   });
 
   it('空文字で ng', () => {
-    const r = validateTopupJpyAmount('', 50_000);
+    const r = validateTopupEthAmount('', 0.01, rate, 0.1);
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.message).toContain('JPY 額');
+    if (!r.ok) expect(r.message).toContain('ETH 額');
+  });
+
+  it('minBidEth 未満で ng (増額 branch 実行前に base validation で reject)', () => {
+    const r = validateTopupEthAmount('0.005', 0.01, rate, 0.001);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.message).toContain('minimum bid');
   });
 });
 
-describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
+describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11、 Issue #3051 で ETH 入力軸に更新)', () => {
   it('existingFiatBid 存在時に「増額 bid」 modal 表示 (title / summary / submit label)', async () => {
     const spotFetcher = vi.fn().mockResolvedValue(successRate);
 
@@ -387,7 +446,7 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
         onClose={() => {}}
         auctionId="42"
         bidderWallet="0xUSER"
-        existingFiatBid={{ authId: 'auth-1', jpyAmount: 50_000 }}
+        existingFiatBid={{ authId: 'auth-1', ethAmount: 0.1, jpyAmount: 50_000 }}
         fetchersOverride={{
           fetchers: { authorize: vi.fn(), placeBid: vi.fn(), topup: vi.fn() },
           saveState: vi.fn(),
@@ -406,8 +465,9 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
     const modal = screen.getByTestId('fiat-bid-modal');
     expect(modal.getAttribute('data-mode')).toBe('topup');
 
-    // 既存 bid summary 表示
+    // 既存 bid summary 表示 (ETH + JPY 換算 + authId)
     const summary = screen.getByTestId('fiat-topup-existing-bid-summary');
+    expect(summary.textContent).toContain('0.1');
     expect(summary.textContent).toContain('50,000');
     expect(summary.textContent).toContain('auth-1');
 
@@ -419,7 +479,7 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
     expect(screen.queryByTestId('fiat-bid-email-input')).toBeNull();
   });
 
-  it('増額額 <= 旧 jpyAmount 入力で validation エラー + submit disable', async () => {
+  it('増額額 <= 旧 ethAmount 入力で validation エラー + submit disable', async () => {
     const topup = vi.fn();
     const spotFetcher = vi.fn().mockResolvedValue(successRate);
 
@@ -429,7 +489,7 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
         onClose={() => {}}
         auctionId="42"
         bidderWallet="0xUSER"
-        existingFiatBid={{ authId: 'auth-1', jpyAmount: 50_000 }}
+        existingFiatBid={{ authId: 'auth-1', ethAmount: 0.1, jpyAmount: 50_000 }}
         fetchersOverride={{
           fetchers: { authorize: vi.fn(), placeBid: vi.fn(), topup },
           saveState: vi.fn(),
@@ -444,12 +504,12 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
       expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
     });
 
-    // 旧 jpyAmount と同額入力 (増額のみ受付なので ng)
-    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
-    fireEvent.change(jpyInput, { target: { value: '50000' } });
+    // 旧 ethAmount と同額入力 (増額のみ受付なので ng)
+    const ethInput = screen.getByTestId('fiat-bid-eth-input') as HTMLInputElement;
+    fireEvent.change(ethInput, { target: { value: '0.1' } });
 
     await waitFor(() => {
-      const err = screen.getByTestId('fiat-bid-jpy-error');
+      const err = screen.getByTestId('fiat-bid-eth-error');
       expect(err.textContent).toContain('増額のみ受付可能');
     });
 
@@ -459,7 +519,7 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
     expect(topup).not.toHaveBeenCalled();
   });
 
-  it('合計 > BID_LIMIT_JPY で validation エラー + submit disable', async () => {
+  it('JPY 換算 > BID_LIMIT_JPY で validation エラー + submit disable', async () => {
     const topup = vi.fn();
     const spotFetcher = vi.fn().mockResolvedValue(successRate);
 
@@ -469,7 +529,7 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
         onClose={() => {}}
         auctionId="42"
         bidderWallet="0xUSER"
-        existingFiatBid={{ authId: 'auth-1', jpyAmount: 500_000 }}
+        existingFiatBid={{ authId: 'auth-1', ethAmount: 1.0, jpyAmount: 500_000 }}
         fetchersOverride={{
           fetchers: { authorize: vi.fn(), placeBid: vi.fn(), topup },
           saveState: vi.fn(),
@@ -484,12 +544,12 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
       expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
     });
 
-    // 100 万円 + 1 で BID_LIMIT_JPY 超過
-    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
-    fireEvent.change(jpyInput, { target: { value: `${BID_LIMIT_JPY + 1}` } });
+    // 2.001 ETH × 500,000 rate = 1,000,500 JPY (100 万円超過)
+    const ethInput = screen.getByTestId('fiat-bid-eth-input') as HTMLInputElement;
+    fireEvent.change(ethInput, { target: { value: '2.001' } });
 
     await waitFor(() => {
-      const err = screen.getByTestId('fiat-bid-jpy-error');
+      const err = screen.getByTestId('fiat-bid-eth-error');
       expect(err.textContent).toContain('bid 上限');
     });
 
@@ -507,7 +567,7 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
         onClose={() => {}}
         auctionId="42"
         bidderWallet="0xUSER"
-        existingFiatBid={{ authId: 'auth-1', jpyAmount: 50_000 }}
+        existingFiatBid={{ authId: 'auth-1', ethAmount: 0.1, jpyAmount: 50_000 }}
         fetchersOverride={{
           fetchers: { authorize: vi.fn(), placeBid: vi.fn(), topup: vi.fn() },
           saveState: vi.fn(),
@@ -535,7 +595,7 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
         auctionId="42"
         bidderWallet="0xUSER"
         palette="warm"
-        existingFiatBid={{ authId: 'auth-1', jpyAmount: 50_000 }}
+        existingFiatBid={{ authId: 'auth-1', ethAmount: 0.1, jpyAmount: 50_000 }}
         fetchersOverride={{
           fetchers: { authorize: vi.fn(), placeBid: vi.fn(), topup: vi.fn() },
           saveState: vi.fn(),
@@ -554,7 +614,7 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
     expect(form.getAttribute('data-palette')).toBe('warm');
   });
 
-  it('JPY input / submit button / cancel button に FiatBidForm CSS module class 付与', async () => {
+  it('ETH input / submit button / cancel button に FiatBidForm CSS module class 付与', async () => {
     const spotFetcher = vi.fn().mockResolvedValue(successRate);
     render(
       <FiatBidModal
@@ -574,7 +634,7 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
     await waitFor(() => {
       expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
     });
-    expect(screen.getByTestId('fiat-bid-jpy-input').className).toMatch(/jpyInput/);
+    expect(screen.getByTestId('fiat-bid-eth-input').className).toMatch(/ethInput/);
     expect(screen.getByTestId('fiat-bid-submit').className).toMatch(/submitBtn/);
     expect(screen.getByTestId('fiat-bid-cancel').className).toMatch(/cancelBtn/);
   });
@@ -589,7 +649,7 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
         onClose={() => {}}
         auctionId="42"
         bidderWallet="0xUSER"
-        existingFiatBid={{ authId: 'auth-1', jpyAmount: 50_000 }}
+        existingFiatBid={{ authId: 'auth-1', ethAmount: 0.1, jpyAmount: 50_000 }}
         fetchersOverride={{
           fetchers: { authorize: vi.fn(), placeBid: vi.fn(), topup },
           saveState: vi.fn(),
@@ -605,9 +665,9 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
       expect(screen.getByTestId('fiat-bid-rate-summary').textContent).toContain('500,000');
     });
 
-    // 増額額 80,000 円入力 (旧 50,000 円より大)
-    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
-    fireEvent.change(jpyInput, { target: { value: '80000' } });
+    // 増額額 0.16 ETH 入力 (旧 0.1 ETH より大、 500,000 rate で 80,000 JPY 換算)
+    const ethInput = screen.getByTestId('fiat-bid-eth-input') as HTMLInputElement;
+    fireEvent.change(ethInput, { target: { value: '0.16' } });
 
     // Terms check
     fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
@@ -615,12 +675,14 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11)', () => {
     const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
     expect(submit.disabled).toBe(false);
 
-    // submit → topup endpoint 呼出
+    // submit → topup endpoint 呼出 (ETH primary + spotRate + jpyAmount 3 値送信)
     fireEvent.click(submit);
 
     await waitFor(() => {
       expect(topup).toHaveBeenCalledWith({
         authId: 'auth-1',
+        newEthAmount: '160000000000000000', // 0.16 ETH = 1.6e17 wei
+        newSpotRate: 500_000,
         newJpyAmount: 80_000,
         cardToken: 'mock-tok-topup-fixed',
       });

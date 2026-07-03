@@ -1,8 +1,9 @@
 /**
- * Fiat bid topup hono handler (Issue #3023 Phase 2 = Phase A-D 5 phase sequential)
+ * Fiat bid topup hono handler (Issue #3023 Phase 2 = Phase A-D 5 phase sequential、 Issue #3051 で ETH primary に反転)
  *
  * POST /api/v1/fiat-bid/topup
- * request body — { authId (既存 auth), newJpyAmount, cardToken }
+ * request body — { authId (既存 auth), newEthAmount, newSpotRate, newJpyAmount, cardToken }
+ *                (Issue #3051 以降、 newEthAmount = wei 文字列 primary、 newSpotRate = 換算根拠、 newJpyAmount = 換算値)
  * 応答 body    — { authId: newAuthId, oldAuthId, txHash, status: "bid-placed" | "cancelled",
  *                  jpyAmount, ethAmount, spotRate, spotRateSource, message }
  *
@@ -45,15 +46,19 @@ import {
   type SpotRate,
 } from '../../services/spotRate/index.js';
 
-import { convertJpyToEthWei } from './authorize.js';
 import { messageForRevertReason } from './place-bid.js';
 
 /** bid 上限 100 万円 (Phase 1 の BID_LIMIT_JPY と一致、 grilling P2 確定) */
 export const BID_LIMIT_JPY = 1_000_000;
 
-/** request body shape (webapp が POST する) */
+/** request body shape (webapp が POST する、 Issue #3051 で ETH primary + spotRate + jpyAmount の 3 値受信) */
 export type TopupRequestBody = {
   authId: string;
+  /** 新 ETH 額 wei (bigint 文字列、 primary 契約軸、 Issue #3051 で追加) */
+  newEthAmount: string;
+  /** 新 spot rate (JPY/ETH、 換算根拠、 audit 用、 Issue #3051 で追加) */
+  newSpotRate: number;
+  /** 新 JPY 額 (webapp 側で newEthAmount × newSpotRate 丸め、 100 万円上限判定 + GMO 請求額) */
   newJpyAmount: number;
   cardToken: string;
 };
@@ -126,7 +131,7 @@ export type TopupStore = {
 export const messageForTopupRevertReason = messageForRevertReason;
 
 /**
- * request body の shape 検証
+ * request body の shape 検証 (Issue #3051 で ETH primary + spotRate + jpyAmount の 3 値対応)
  * unknown value を受取り TopupRequestBody に絞込 (or error message 返す)
  */
 export const parseTopupBody = (
@@ -142,6 +147,24 @@ export const parseTopupBody = (
     return { ok: false, message: 'authId must be a non-empty string' };
   }
 
+  const newEthAmountRaw = body['newEthAmount'];
+  if (
+    typeof newEthAmountRaw !== 'string' ||
+    newEthAmountRaw.trim() === '' ||
+    !/^\d+$/.test(newEthAmountRaw)
+  ) {
+    return { ok: false, message: 'newEthAmount must be a positive bigint string (wei)' };
+  }
+  const newEthAmountWei = BigInt(newEthAmountRaw);
+  if (newEthAmountWei <= 0n) {
+    return { ok: false, message: 'newEthAmount must be a positive bigint string (wei)' };
+  }
+
+  const newSpotRate = body['newSpotRate'];
+  if (typeof newSpotRate !== 'number' || !Number.isFinite(newSpotRate) || newSpotRate <= 0) {
+    return { ok: false, message: 'newSpotRate must be a positive number (JPY per ETH)' };
+  }
+
   const newJpyAmount = body['newJpyAmount'];
   if (typeof newJpyAmount !== 'number' || !Number.isInteger(newJpyAmount) || newJpyAmount <= 0) {
     return { ok: false, message: 'newJpyAmount must be a positive integer' };
@@ -152,7 +175,10 @@ export const parseTopupBody = (
     return { ok: false, message: 'cardToken must be a non-empty string' };
   }
 
-  return { ok: true, value: { authId, newJpyAmount, cardToken } };
+  return {
+    ok: true,
+    value: { authId, newEthAmount: newEthAmountRaw, newSpotRate, newJpyAmount, cardToken },
+  };
 };
 
 /** AuthCleanupQueue の enqueue 抽象 (handler が具象 class を知らずに Enqueue できる) */
@@ -277,18 +303,9 @@ export const createTopupApp = (options: CreateTopupAppOptions): Hono => {
       );
     }
 
-    let newEthWei: bigint;
-    try {
-      newEthWei = convertJpyToEthWei(body.newJpyAmount, spotRate.rate);
-    } catch (err) {
-      return c.json(
-        {
-          error: 'InternalError',
-          message: err instanceof Error ? err.message : 'convertJpyToEthWei failed',
-        },
-        500,
-      );
-    }
+    // 新 ETH wei = webapp 提示値を primary で採用 (Issue #3051、 入力軸 ETH 反転)
+    // backend 側 spot rate 取得は GMO 与信枠請求額の JPY 換算根拠と record 保存の spotRate 値のため保持
+    const newEthWei = BigInt(body.newEthAmount);
 
     // orderId 生成 (新 authId 発行用、 GMO 側で order 一意)
     const orderId = generateOrderId({

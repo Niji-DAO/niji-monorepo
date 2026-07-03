@@ -29,12 +29,12 @@ import {
 
 import bidModalClasses from '@/components/BidModal/BidModal.module.css';
 
-// re-export for backward compat (既存 import 経路を壊さない)
+// re-export for backward compat (既存 import 経路を壊さない、 Issue #3051 で validate 系を ETH primary に置換)
 export {
   BID_LIMIT_JPY,
   generateMockCardToken,
-  validateJpyAmount,
-  validateTopupJpyAmount,
+  validateEthAmount,
+  validateTopupEthAmount,
 } from '@/components/FiatBidModal/FiatBidForm';
 export type { ExistingFiatBid } from '@/components/FiatBidModal/FiatBidForm';
 
@@ -66,6 +66,7 @@ export const FiatBidModal = ({
   onClose,
   auctionId,
   bidderWallet,
+  minBidEth,
   existingFiatBid,
   palette = 'cool',
   fetchersOverride,
@@ -74,10 +75,10 @@ export const FiatBidModal = ({
   isDev,
 }: FiatBidModalProps): React.JSX.Element => {
   const isTopupMode = existingFiatBid !== undefined;
-  const modalTitle = isTopupMode ? '増額 bid (JPY)' : 'クレカで bid (JPY)';
+  const modalTitle = isTopupMode ? '増額 bid (ETH)' : 'クレカで bid (ETH)';
   const modalDescription = isTopupMode
-    ? `現在の bid 額 ${(existingFiatBid as ExistingFiatBid).jpyAmount.toLocaleString()} 円を増額します。 上限 ${BID_LIMIT_JPY_DISPLAY.toLocaleString()} 円、 現在の spot rate に基づき ETH 換算されます。`
-    : `JPY 建てで bid します。 上限 ${BID_LIMIT_JPY_DISPLAY.toLocaleString()} 円、 現在の spot rate に基づき ETH 換算されます。`;
+    ? `現在の bid 額 ${(existingFiatBid as ExistingFiatBid).ethAmount} ETH を増額します。 上限 JPY 換算 ${BID_LIMIT_JPY_DISPLAY.toLocaleString()} 円、 GMO 決済時に spot rate で JPY 請求されます。`
+    : `ETH 額を入力して bid します。 上限 JPY 換算 ${BID_LIMIT_JPY_DISPLAY.toLocaleString()} 円、 GMO 決済時に spot rate で JPY 請求されます。`;
 
   return (
     <Dialog
@@ -102,6 +103,7 @@ export const FiatBidModal = ({
           onClose={onClose}
           auctionId={auctionId}
           bidderWallet={bidderWallet}
+          minBidEth={minBidEth}
           existingFiatBid={existingFiatBid}
           palette={palette}
           fetchersOverride={fetchersOverride}

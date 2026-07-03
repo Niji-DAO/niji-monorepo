@@ -1,9 +1,9 @@
 /**
- * Fiat bid authorize handler behavior test (Issue #3006 Phase B/D)
+ * Fiat bid authorize handler behavior test (Issue #3006 Phase B/D、 Issue #3051 で ETH primary に反転)
  *
  * 検証対象 (完了条件 3 case + validation) —
  * (1) happy path — 200 OK で { authId, tds2Url, jpyAmount, ethAmount, spotRate, spotRateSource } 返し
- *     fiat_bid.pending record が INSERT される
+ *     fiat_bid.pending record が INSERT される (Issue #3051 以降 webapp 提示 ethAmount を primary で使う)
  * (2) bid 上限 100 万円超過 — 400 BidLimitExceeded、 GMO client 呼ばない、 DB 書込なし
  * (3) GMO 障害 — 500 GmoAuthorizationFailed、 DB 書込なし
  * (4) request validation fail 各種 (欠損 / 型不正 / hex 形式不正) → 400 InvalidRequest
@@ -73,9 +73,11 @@ const makeStore = (): FiatBidStore & { records: FiatBidRecord[] } => {
   };
 };
 
-/** happy path 共通の payload */
+/** happy path 共通の payload (Issue #3051 で ETH primary + spotRate + jpyAmount の 3 値化) */
 const validBody = {
-  jpyAmount: 100000,
+  ethAmount: '200000000000000000', // 0.2 ETH = 2e17 wei (0.2 * 500000 = 100000 JPY 相当)
+  spotRate: 500_000,
+  jpyAmount: 100_000,
   cardToken: 'token-visa-4111',
   bidderWallet: '0x1234567890abcdef1234567890abcdef12345678',
   auctionId: '42',
@@ -85,19 +87,50 @@ const validBody = {
 const stableOrderId = (input: { auctionId: string; bidderWallet: string }): string =>
   `test-order-${input.auctionId}-${input.bidderWallet.slice(2, 8)}`;
 
-describe('parseAuthorizeBody', () => {
+describe('parseAuthorizeBody (Issue #3051 で ETH primary + spotRate + jpyAmount)', () => {
   it('valid body を通す', () => {
     const result = parseAuthorizeBody(validBody);
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.value.jpyAmount).toBe(100000);
+      expect(result.value.ethAmount).toBe('200000000000000000');
+      expect(result.value.spotRate).toBe(500_000);
+      expect(result.value.jpyAmount).toBe(100_000);
       expect(result.value.bidderWallet).toBe('0x1234567890abcdef1234567890abcdef12345678');
     }
   });
 
+  it('ethAmount 欠損で reject', () => {
+    const { spotRate, jpyAmount, cardToken, bidderWallet, auctionId } = validBody;
+    expect(parseAuthorizeBody({ spotRate, jpyAmount, cardToken, bidderWallet, auctionId }).ok).toBe(
+      false,
+    );
+  });
+
+  it('ethAmount が bigint string 以外で reject', () => {
+    expect(parseAuthorizeBody({ ...validBody, ethAmount: '0.1' }).ok).toBe(false);
+    expect(parseAuthorizeBody({ ...validBody, ethAmount: '-1' }).ok).toBe(false);
+    expect(parseAuthorizeBody({ ...validBody, ethAmount: '' }).ok).toBe(false);
+    expect(parseAuthorizeBody({ ...validBody, ethAmount: 'not-a-number' }).ok).toBe(false);
+  });
+
+  it('spotRate 欠損で reject', () => {
+    const { ethAmount, jpyAmount, cardToken, bidderWallet, auctionId } = validBody;
+    expect(
+      parseAuthorizeBody({ ethAmount, jpyAmount, cardToken, bidderWallet, auctionId }).ok,
+    ).toBe(false);
+  });
+
+  it('spotRate 非正で reject', () => {
+    expect(parseAuthorizeBody({ ...validBody, spotRate: 0 }).ok).toBe(false);
+    expect(parseAuthorizeBody({ ...validBody, spotRate: -1 }).ok).toBe(false);
+    expect(parseAuthorizeBody({ ...validBody, spotRate: 'x' }).ok).toBe(false);
+  });
+
   it('jpyAmount 欠損で reject', () => {
-    const { cardToken, bidderWallet, auctionId } = validBody;
-    expect(parseAuthorizeBody({ cardToken, bidderWallet, auctionId }).ok).toBe(false);
+    const { ethAmount, spotRate, cardToken, bidderWallet, auctionId } = validBody;
+    expect(parseAuthorizeBody({ ethAmount, spotRate, cardToken, bidderWallet, auctionId }).ok).toBe(
+      false,
+    );
   });
 
   it('jpyAmount 非整数で reject', () => {
@@ -236,10 +269,16 @@ describe('createAuthorizeApp POST /authorize', () => {
       generateOrderId: stableOrderId,
     });
 
+    // webapp 提示 jpyAmount = BID_LIMIT_JPY + 1 で 100 万円上限超過
+    // ethAmount も同期して 2.001 ETH 相当 (2001000000000000000 wei) に更新
     const res = await app.request('/authorize', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...validBody, jpyAmount: BID_LIMIT_JPY + 1 }),
+      body: JSON.stringify({
+        ...validBody,
+        ethAmount: '2001000000000000000',
+        jpyAmount: BID_LIMIT_JPY + 1,
+      }),
     });
 
     expect(res.status).toBe(400);

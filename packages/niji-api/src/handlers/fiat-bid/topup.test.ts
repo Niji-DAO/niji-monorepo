@@ -215,6 +215,8 @@ const seededBidPlacedRecord: StubRecord = {
 
 const validBody = {
   authId: 'mock-access-00000001',
+  newEthAmount: '1400000000000000000', // 1.4 ETH = 1.4e18 wei (1.4 * 500000 = 700000 JPY 相当)
+  newSpotRate: 500_000,
   newJpyAmount: 700_000,
   cardToken: 'card-token-abcdef',
 };
@@ -236,34 +238,76 @@ const goodCancel: AlterTranSuccess = {
   status: 'VOID',
 };
 
-describe('parseTopupBody', () => {
+describe('parseTopupBody (Issue #3051 で ETH primary + spotRate + jpyAmount)', () => {
   it('valid body を通す', () => {
     const result = parseTopupBody(validBody);
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.value.authId).toBe('mock-access-00000001');
+      expect(result.value.newEthAmount).toBe('1400000000000000000');
+      expect(result.value.newSpotRate).toBe(500_000);
       expect(result.value.newJpyAmount).toBe(700_000);
       expect(result.value.cardToken).toBe('card-token-abcdef');
     }
   });
 
   it('authId 欠損で reject', () => {
-    expect(parseTopupBody({ newJpyAmount: 700_000, cardToken: 't' }).ok).toBe(false);
-    expect(parseTopupBody({ authId: '', newJpyAmount: 700_000, cardToken: 't' }).ok).toBe(false);
-    expect(parseTopupBody({ authId: '   ', newJpyAmount: 700_000, cardToken: 't' }).ok).toBe(false);
+    const baseRest = {
+      newEthAmount: '1400000000000000000',
+      newSpotRate: 500_000,
+      newJpyAmount: 700_000,
+      cardToken: 't',
+    };
+    expect(parseTopupBody(baseRest).ok).toBe(false);
+    expect(parseTopupBody({ authId: '', ...baseRest }).ok).toBe(false);
+    expect(parseTopupBody({ authId: '   ', ...baseRest }).ok).toBe(false);
+  });
+
+  it('newEthAmount 欠損 / 非 bigint string で reject', () => {
+    const baseRest = { authId: 'a', newSpotRate: 500_000, newJpyAmount: 700_000, cardToken: 't' };
+    expect(parseTopupBody(baseRest).ok).toBe(false);
+    expect(parseTopupBody({ ...baseRest, newEthAmount: '' }).ok).toBe(false);
+    expect(parseTopupBody({ ...baseRest, newEthAmount: '-1' }).ok).toBe(false);
+    expect(parseTopupBody({ ...baseRest, newEthAmount: '0.5' }).ok).toBe(false);
+    expect(parseTopupBody({ ...baseRest, newEthAmount: 'not-a-number' }).ok).toBe(false);
+  });
+
+  it('newSpotRate 欠損 / 非正で reject', () => {
+    const baseRest = {
+      authId: 'a',
+      newEthAmount: '1400000000000000000',
+      newJpyAmount: 700_000,
+      cardToken: 't',
+    };
+    expect(parseTopupBody(baseRest).ok).toBe(false);
+    expect(parseTopupBody({ ...baseRest, newSpotRate: 0 }).ok).toBe(false);
+    expect(parseTopupBody({ ...baseRest, newSpotRate: -1 }).ok).toBe(false);
+    expect(parseTopupBody({ ...baseRest, newSpotRate: 'x' }).ok).toBe(false);
   });
 
   it('newJpyAmount 欠損 / 型不正 / 非正整数で reject', () => {
-    expect(parseTopupBody({ authId: 'a', cardToken: 't' }).ok).toBe(false);
-    expect(parseTopupBody({ authId: 'a', newJpyAmount: 'x', cardToken: 't' }).ok).toBe(false);
-    expect(parseTopupBody({ authId: 'a', newJpyAmount: 100.5, cardToken: 't' }).ok).toBe(false);
-    expect(parseTopupBody({ authId: 'a', newJpyAmount: 0, cardToken: 't' }).ok).toBe(false);
-    expect(parseTopupBody({ authId: 'a', newJpyAmount: -1, cardToken: 't' }).ok).toBe(false);
+    const baseRest = {
+      authId: 'a',
+      newEthAmount: '1400000000000000000',
+      newSpotRate: 500_000,
+      cardToken: 't',
+    };
+    expect(parseTopupBody(baseRest).ok).toBe(false);
+    expect(parseTopupBody({ ...baseRest, newJpyAmount: 'x' }).ok).toBe(false);
+    expect(parseTopupBody({ ...baseRest, newJpyAmount: 100.5 }).ok).toBe(false);
+    expect(parseTopupBody({ ...baseRest, newJpyAmount: 0 }).ok).toBe(false);
+    expect(parseTopupBody({ ...baseRest, newJpyAmount: -1 }).ok).toBe(false);
   });
 
   it('cardToken 欠損で reject', () => {
-    expect(parseTopupBody({ authId: 'a', newJpyAmount: 700_000 }).ok).toBe(false);
-    expect(parseTopupBody({ authId: 'a', newJpyAmount: 700_000, cardToken: '' }).ok).toBe(false);
+    const baseRest = {
+      authId: 'a',
+      newEthAmount: '1400000000000000000',
+      newSpotRate: 500_000,
+      newJpyAmount: 700_000,
+    };
+    expect(parseTopupBody(baseRest).ok).toBe(false);
+    expect(parseTopupBody({ ...baseRest, cardToken: '' }).ok).toBe(false);
   });
 
   it('null / 非 object で reject', () => {
@@ -376,11 +420,15 @@ describe('createTopupApp POST /topup', () => {
       store,
     });
 
-    // seededBidPlacedRecord.jpyAmount = 500_000、 同額でも reject
+    // seededBidPlacedRecord.jpyAmount = 500_000、 同額でも reject (ETH primary は 1 ETH 相当)
     const res = await app.request('/topup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...validBody, newJpyAmount: 500_000 }),
+      body: JSON.stringify({
+        ...validBody,
+        newEthAmount: '1000000000000000000',
+        newJpyAmount: 500_000,
+      }),
     });
 
     expect(res.status).toBe(400);
@@ -419,7 +467,11 @@ describe('createTopupApp POST /topup', () => {
     const res = await app.request('/topup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...validBody, newJpyAmount: 1_500_000 }),
+      body: JSON.stringify({
+        ...validBody,
+        newEthAmount: '3000000000000000000',
+        newJpyAmount: 1_500_000,
+      }),
     });
 
     expect(res.status).toBe(400);
