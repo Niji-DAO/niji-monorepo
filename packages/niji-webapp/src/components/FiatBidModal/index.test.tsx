@@ -79,6 +79,99 @@ const topupResponse: TopupResponse = {
   message: '増額 bid tx を broadcast しました。',
 };
 
+describe('Issue #3047 CardInput 統合', () => {
+  it('isDev=true default プリフィル で cardData 実値を含む cardToken 生成 (mock-tok-visa-1111-...)', async () => {
+    const authorize = vi.fn().mockResolvedValue(authResponse);
+    const spotFetcher = vi.fn().mockResolvedValue(successRate);
+    // generateCardToken は real generateMockCardToken 経由で cardData 実値を含む Token 生成
+    const generateCardTokenSpy = vi.fn((cardData?: { number: string; brand: string }): string => {
+      if (cardData !== undefined && cardData.number.length >= 4) {
+        const last4 = cardData.number.slice(-4);
+        return `mock-tok-${cardData.brand}-${last4}-test`;
+      }
+      return 'mock-tok-fallback';
+    });
+
+    render(
+      <FiatBidModal
+        open
+        onClose={() => {}}
+        auctionId="42"
+        bidderWallet="0xUSER"
+        fetchersOverride={{
+          fetchers: { authorize, placeBid: vi.fn() },
+          saveState: vi.fn(),
+          redirect: vi.fn(),
+        }}
+        spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
+        generateCardToken={generateCardTokenSpy}
+        isDev={true}
+      />,
+      { wrapper: buildWrapper() },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
+    });
+
+    // CardInput UI が render + default VISA プリフィル
+    expect(screen.getByTestId('card-input')).toBeInTheDocument();
+    expect((screen.getByTestId('card-input-number') as HTMLInputElement).value).toBe(
+      '4111 1111 1111 1111',
+    );
+
+    // 金額入力 + Terms check → submit enable
+    fireEvent.change(screen.getByTestId('fiat-bid-jpy-input'), { target: { value: '50000' } });
+    fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
+    const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
+    expect(submit.disabled).toBe(false);
+
+    // submit → generateCardToken(cardData) → authorize が cardData 実値含む Token 受取
+    fireEvent.click(submit);
+    await waitFor(() => {
+      expect(authorize).toHaveBeenCalledWith(
+        expect.objectContaining({
+          cardToken: 'mock-tok-visa-1111-test',
+        }),
+      );
+    });
+  });
+
+  it('isDev=false 空欄状態で submit disable (isCardValid=false)', async () => {
+    const spotFetcher = vi.fn().mockResolvedValue(successRate);
+
+    render(
+      <FiatBidModal
+        open
+        onClose={() => {}}
+        auctionId="42"
+        bidderWallet="0xUSER"
+        fetchersOverride={{
+          fetchers: { authorize: vi.fn(), placeBid: vi.fn() },
+          saveState: vi.fn(),
+          redirect: vi.fn(),
+        }}
+        spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
+        isDev={false}
+      />,
+      { wrapper: buildWrapper() },
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
+    });
+
+    // card fields 空欄 + JPY + Terms 済でも card 無効で submit disable
+    fireEvent.change(screen.getByTestId('fiat-bid-jpy-input'), { target: { value: '50000' } });
+    fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
+    const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
+    expect(submit.disabled).toBe(true);
+
+    // テストカード dropdown も非表示 (dev 限定)
+    expect(screen.queryByTestId('card-input-test-card-select')).toBeNull();
+  });
+});
+
 describe('validateJpyAmount', () => {
   it('空文字で ng', () => {
     const r = validateJpyAmount('');
