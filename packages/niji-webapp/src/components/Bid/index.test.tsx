@@ -248,6 +248,32 @@ describe('Bid (Issue #3033 単一 button + BidModal 経路)', () => {
       expect(getAllByTestId('bid-open-button')[0].getAttribute('data-palette')).toBe('warm');
     });
 
+    // Issue #3041 primary CTA 化 (bidBtn class 適用確認、 dark-text bg + white text + width 100% + margin 0)
+    it('applies bidBtn class for primary CTA styling (wallet connected)', () => {
+      hookState.account = '0xUSER';
+      const { getAllByTestId } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={false} />,
+      );
+      const bidBtn = getAllByTestId('bid-open-button')[0];
+      // CSS Module hashed class 名 (Vite dev 環境では '_bidBtn_hash')、
+      // 本 test 環境 (vitest + jsdom) では css 未処理で 'Bid.module.css' の raw class 名相当。
+      // hashed でも raw でも 'bidBtn' substring が含まれる前提で existence 確認する。
+      const cls = bidBtn.getAttribute('class') || '';
+      expect(cls).toMatch(/bidBtn/);
+    });
+
+    it('bidBtn class is applied on disabled state (wallet disconnected) - primary CTA gray fallback', () => {
+      hookState.account = undefined;
+      const { getAllByTestId } = render(
+        <Bid auction={makeAuction() as never} auctionEnded={false} />,
+      );
+      const bidBtn = getAllByTestId('bid-open-button')[0];
+      const cls = bidBtn.getAttribute('class') || '';
+      // wallet disconnect 時も同一 bidBtn class を維持 (disabled state CSS で gray + white 上書き)
+      expect(cls).toMatch(/bidBtn/);
+      expect((bidBtn as HTMLButtonElement).disabled).toBe(true);
+    });
+
     // Issue #3039 palette 伝搬 (Bid → BidModal)
     it('BidModal に palette="cool" が伝搬 (isCoolAuction=true でモーダル open 時)', () => {
       hookState.account = '0xUSER';
