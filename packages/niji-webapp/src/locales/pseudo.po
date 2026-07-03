@@ -25,6 +25,10 @@ msgstr ""
 msgid "Current bid"
 msgstr ""
 
+#: src/components/BidModal/index.tsx
+msgid "bid 額 (ETH)"
+msgstr ""
+
 #: src/components/ProposalActionsModal/steps/StreamPaymentsReviewStep/index.tsx
 msgid "To"
 msgstr ""
@@ -103,6 +107,7 @@ msgstr ""
 msgid "Daily Auctions"
 msgstr ""
 
+#: src/components/Bid/index.tsx
 #: src/components/Bid/index.tsx
 msgid "Bid"
 msgstr ""
@@ -239,8 +244,8 @@ msgstr ""
 
 #: src/components/Bid/index.tsx
 #: src/components/Bid/index.tsx
-msgid "クレカで bid (JPY)"
-msgstr ""
+#~ msgid "クレカで bid (JPY)"
+#~ msgstr ""
 
 #: src/components/ProposalActionsModal/steps/SelectProposalActionStep/index.tsx
 msgid "Add Proposal Action"
@@ -293,6 +298,10 @@ msgstr ""
 msgid "Consequently, the Niji Foundation anticipates being the steward of the veto power until Niji DAO is ready to implement an alternative, and therefore wishes to clarify the conditions under which it would exercise this power."
 msgstr ""
 
+#: src/components/NijiInfoRowHolder.tsx
+msgid "Waiting for bid"
+msgstr ""
+
 #: src/components/BidHistoryModal/index.tsx
 msgid "Bids for"
 msgstr ""
@@ -310,8 +319,8 @@ msgid "Go to playground"
 msgstr ""
 
 #: src/components/Bid/index.tsx
-msgid "or more"
-msgstr ""
+#~ msgid "or more"
+#~ msgstr ""
 
 #: src/pages/Playground/index.tsx
 #~ msgid "Nouns Protocol"
@@ -525,6 +534,11 @@ msgstr ""
 msgid "Black monochrome Noggles"
 msgstr ""
 
+#. placeholder {0}: minBidEth(minBid)
+#: src/components/BidModal/index.tsx
+msgid "minimum bid — Ξ {0} or more"
+msgstr ""
+
 #: src/components/AuctionTimer/index.tsx
 msgid "Time left"
 msgstr ""
@@ -658,6 +672,10 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
+#: src/components/BidModal/index.tsx
+msgid "ETH か クレカ (JPY) を選んで bid してください"
+msgstr ""
+
 #: src/components/ProposalActionsModal/steps/StreamPaymentsDateDetailsStep/index.tsx
 msgid "Review Action Details"
 msgstr ""
@@ -729,8 +747,7 @@ msgstr ""
 #: src/components/AddNijisToForkModal/index.tsx
 #: src/components/AddNijisToForkModal/index.tsx
 #: src/components/AddNijisToForkModal/index.tsx
-#: src/components/Bid/index.tsx
-#: src/components/Bid/index.tsx
+#: src/components/BidModal/index.tsx
 #: src/components/CandidateSponsors/SelectSponsorsToPropose.tsx
 #: src/components/CandidateSponsors/SelectSponsorsToPropose.tsx
 #: src/components/CandidateSponsors/SubmitUpdateProposal.tsx
@@ -848,6 +865,11 @@ msgstr ""
 
 #: src/components/Documentation/GovernanceSection.tsx
 msgid "unequally withdraw the treasury for personal gain"
+msgstr ""
+
+#. placeholder {0}: auction.nounId.toString()
+#: src/components/BidModal/index.tsx
+msgid "Niji #{0} に bid"
 msgstr ""
 
 #: src/components/AuctionTimer/index.tsx
@@ -1063,6 +1085,10 @@ msgstr ""
 msgid "All Nijis are members of Niji DAO."
 msgstr ""
 
+#: src/components/BidModal/index.tsx
+msgid "ETH で bid"
+msgstr ""
+
 #: src/components/DelegationCandidateInfo/index.tsx
 msgid "Now has"
 msgstr ""
@@ -1124,6 +1150,10 @@ msgstr ""
 msgid "Niji Traits"
 msgstr ""
 
+#: src/components/BidModal/index.tsx
+msgid "キャンセル"
+msgstr ""
+
 #: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "Nijis are generated randomly based Ethereum block hashes. There are no 'if' statements or other rules governing Niji trait scarcity, which makes all Nijis equally rare. As of this writing, Nijis are made up of:"
 msgstr ""
@@ -1171,7 +1201,7 @@ msgid "Select Language"
 msgstr ""
 
 #. placeholder {0}: minBidEth(minBid)
-#: src/components/Bid/index.tsx
+#: src/components/BidModal/index.tsx
 msgid "Please place a bid higher than or equal to the minimum bid amount of {0} ETH"
 msgstr ""
 
@@ -1216,7 +1246,6 @@ msgstr ""
 #~ msgid "Only Nouns you owned or were delegated to you before {0} are eligible to vote."
 #~ msgstr ""
 
-#: src/components/Bid/index.tsx
 #: src/components/NijiContent/index.tsx
 msgid "Settled auction successfully!"
 msgstr ""
@@ -1307,8 +1336,8 @@ msgid "Withdraw"
 msgstr ""
 
 #: src/components/Bid/index.tsx
-msgid "Bid was placed successfully!"
-msgstr ""
+#~ msgid "Bid was placed successfully!"
+#~ msgstr ""
 
 #: src/pages/Vote/index.tsx
 msgid "Current Threshold"
@@ -1433,6 +1462,10 @@ msgstr ""
 
 #: src/components/Documentation/GovernanceSection.tsx
 msgid "The proposal veto right was initially envisioned as a temporary solution to the problem of ‘51% attacks’ on the Niji DAO treasury. While Nijiders initially believed that a healthy distribution of Nijis would be sufficient protection for the DAO, a more complete understanding of the incentives and risks has led to general consensus within the Nijiders, the Niji Foundation, and the wider community that a more robust game-theoretic solution should be implemented before the right is removed."
+msgstr ""
+
+#: src/components/BidModal/index.tsx
+msgid "bid"
 msgstr ""
 
 #: src/components/CurrentDelegatePannel/index.tsx
@@ -1692,8 +1725,8 @@ msgid "Withdraw Nijis from escrow"
 msgstr ""
 
 #: src/components/NijiInfoRowHolder.tsx
-msgid "Niji Auction House"
-msgstr ""
+#~ msgid "Niji Auction House"
+#~ msgstr ""
 
 #: src/pages/NijisPage.tsx
 msgid "Go to auction"
@@ -1925,7 +1958,7 @@ msgstr ""
 msgid "Execute"
 msgstr ""
 
-#: src/components/Bid/index.tsx
+#: src/components/BidModal/index.tsx
 msgid "Bid placed."
 msgstr ""
 
@@ -1948,6 +1981,10 @@ msgstr ""
 #: src/components/Banner/index.tsx
 #~ msgid "EVERY DAY,"
 #~ msgstr ""
+
+#: src/components/BidModal/index.tsx
+msgid "クレカで払う (JPY)"
+msgstr ""
 
 #: src/components/NijiContent/index.tsx
 msgid "Learn more"

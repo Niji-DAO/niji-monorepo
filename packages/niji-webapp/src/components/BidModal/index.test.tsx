@@ -14,6 +14,9 @@ import type { Auction } from '@/wrappers/nijiAuction';
 
 import * as React from 'react';
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -411,5 +414,88 @@ describe('BidModal (Issue #3033)', () => {
     const fiatTab = getByTestId('bid-tab-fiat');
     expect(ethTab.className).toMatch(/tabsTrigger/);
     expect(fiatTab.className).toMatch(/tabsTrigger/);
+  });
+
+  // ==================== Issue #3049 見切れ対策 (max-height + overflow-y) ====================
+
+  it('dialogContent に scroll 用の CSS module class (dialogContent) 付与 (Issue #3049)', () => {
+    // BidModal.module.css .dialogContent に max-height: 90vh + overflow-y: auto を追加、
+    // vitest 環境 (identity-obj-proxy 相当) では class 名 "dialogContent" が data-testid=bid-modal に含まれる。
+    // 実 style の max-height / overflow は jsdom で computedStyle が空を返すため、 class 付与で代替検証。
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal open onClose={() => {}} auction={makeAuction()} bidderWallet="0xUSER" />
+      </Wrapper>,
+    );
+    const modal = getByTestId('bid-modal');
+    expect(modal.className).toMatch(/dialogContent/);
+  });
+
+  it('cool palette 時も dialogContent class が付与される (scroll 適用 palette 両対応 Issue #3049)', () => {
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction()}
+          bidderWallet="0xUSER"
+          palette="cool"
+        />
+      </Wrapper>,
+    );
+    const modal = getByTestId('bid-modal');
+    expect(modal.className).toMatch(/dialogContent/);
+    expect(modal.getAttribute('data-palette')).toBe('cool');
+  });
+
+  it('warm palette 時も dialogContent class が付与される (scroll 適用 palette 両対応 Issue #3049)', () => {
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction()}
+          bidderWallet="0xUSER"
+          palette="warm"
+        />
+      </Wrapper>,
+    );
+    const modal = getByTestId('bid-modal');
+    expect(modal.className).toMatch(/dialogContent/);
+    expect(modal.getAttribute('data-palette')).toBe('warm');
+  });
+
+  it('fiat tab (長い form) 表示時も dialogContent class は維持される (Issue #3049)', () => {
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction()}
+          bidderWallet="0xUSER"
+          defaultTab="fiat"
+        />
+      </Wrapper>,
+    );
+    const modal = getByTestId('bid-modal');
+    expect(modal.className).toMatch(/dialogContent/);
+  });
+
+  it('BidModal.module.css .dialogContent に max-height: 90vh 定義がある (Issue #3049 静的検証)', () => {
+    // jsdom は CSS module の computedStyle を復元しないため、 CSS 定義 file を直接 read して
+    // max-height + overflow-y の存在を静的検証する。 実 browser 動作は Playwright e2e で確認、
+    // ここでは CSS 定義漏れ regression を防ぐ静的 guard として機能させる。
+    const cssPath = join(__dirname, 'BidModal.module.css');
+    const cssContent = readFileSync(cssPath, 'utf-8');
+    // .dialogContent block 内に max-height: 90vh + overflow-y: auto が両方あることを確認
+    const dialogContentBlockMatch = cssContent.match(/\.dialogContent\s*{[^}]*}/);
+    expect(dialogContentBlockMatch).not.toBeNull();
+    const dialogContentBlock = dialogContentBlockMatch![0];
+    expect(dialogContentBlock).toMatch(/max-height:\s*90vh/);
+    expect(dialogContentBlock).toMatch(/overflow-y:\s*auto/);
   });
 });

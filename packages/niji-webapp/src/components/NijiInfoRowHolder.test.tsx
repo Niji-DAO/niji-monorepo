@@ -64,11 +64,11 @@ describe('NijiInfoRowHolder', () => {
     expect(container.querySelector('a')?.getAttribute('rel')).toBe('noreferrer');
   });
 
-  it('renders "Niji Auction House" when winner equals auction house address', async () => {
+  it('renders "Waiting for bid" when winner equals auction house address (Issue #3049)', async () => {
     executeMock.mockResolvedValue({ auction: { bidder: { id: '0xAUCTIONHOUSE' } } });
     const { container } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
     await waitFor(() => {
-      expect(container.textContent).toContain('Niji Auction House');
+      expect(container.textContent).toContain('Waiting for bid');
     });
     expect(container.querySelector('[data-testid="short"]')).toBeNull();
   });
@@ -126,20 +126,20 @@ describe('NijiInfoRowHolder', () => {
     });
   });
 
-  it('auction house lowercase comparison still maps to "Niji Auction House" branch', async () => {
+  it('auction house lowercase comparison still maps to "Waiting for bid" branch (Issue #3049)', async () => {
     // mock auction house = '0xAUCTIONHOUSE'、 case-insensitive comparison で同一判定
     executeMock.mockResolvedValue({ auction: { bidder: { id: '0xauctionhouse' } } });
     const { container } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
     await waitFor(() => {
-      expect(container.textContent).toContain('Niji Auction House');
+      expect(container.textContent).toContain('Waiting for bid');
     });
   });
 
-  it('renders anchor even when winner is auction house (with Niji Auction House label)', async () => {
+  it('renders anchor even when winner is auction house (with Waiting for bid label) (Issue #3049)', async () => {
     executeMock.mockResolvedValue({ auction: { bidder: { id: '0xAUCTIONHOUSE' } } });
     const { container } = render(<NijiInfoRowHolder nounId={1n} />, { wrapper: WithProviders });
     await waitFor(() => {
-      expect(container.textContent).toContain('Niji Auction House');
+      expect(container.textContent).toContain('Waiting for bid');
     });
     // anchor は残る (svg link icon が残るため)
     expect(container.querySelector('a')).not.toBeNull();
