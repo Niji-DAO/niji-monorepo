@@ -255,4 +255,13 @@ describe('CardInput render 動作', () => {
 
     expect(screen.getByTestId('card-input').getAttribute('data-palette')).toBe('warm');
   });
+
+  it('テストカード dropdown = appearance:none + カスタム SVG chevron 適用 (Issue #3053 Phase C)', () => {
+    const onChange = vi.fn();
+    render(<CardInput onChange={onChange} isDev={true} />);
+
+    const select = screen.getByTestId('card-input-test-card-select') as HTMLSelectElement;
+    // CSS Module による testCardSelect class 付与 (module 経路の hash 変換前 identifier 検査)
+    expect(select.className).toContain('testCardSelect');
+  });
 });

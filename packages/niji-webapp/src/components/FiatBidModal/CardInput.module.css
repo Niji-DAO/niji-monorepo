@@ -123,15 +123,27 @@
   color: var(--brand-cool-dark-text);
   font-family: 'PT Root UI', sans-serif;
   font-size: 15px;
-  padding: 0 12px;
+  padding: 0 40px 0 12px;
   outline: none;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='%23151c3b'%3E%3Cpath d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px;
 }
 
 .cardInput[data-palette='warm'] .testCardSelect {
   border-color: var(--brand-warm-border);
   color: var(--brand-warm-dark-text);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='%23221b1a'%3E%3Cpath d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+}
+
+.testCardSelect::-ms-expand {
+  display: none;
 }
 
 .testCardSelect:focus,
