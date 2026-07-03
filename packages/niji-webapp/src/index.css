@@ -104,6 +104,11 @@ code {
     --brand-color-blue-translucent: rgba(73, 101, 240, 0.1);
     --brand-color-green-translucent: rgba(67, 179, 105, 0.1);
     --brand-color-blue-darker: #3a52c7;
+    /* Niji logo pink #E9265C を primary CTA 色として採用 (Issue #3043)。 */
+    /* bid button primary は logo pink から明度 up した軽めトーン。 */
+    /* hover 時は logo pink 直で存在感 up。 */
+    --brand-niji-pink: #ec4a7a;
+    --brand-niji-pink-hover: #e9265c;
   }
   .dark {
     --background: 0 0% 3.9%;
