@@ -30,17 +30,27 @@ Issue 1 段階では env 変数一覧 + mock server 切替手順のみ記載、 
 
 | 変数名 | 用途 | 例 (Phase 1 mock) | 本番切替時 |
 |---|---|---|---|
-| `VITE_GMO_API_ENDPOINT` | niji-api base URL | `http://127.0.0.1:42069` | `https://api.niji-dao.example` |
+| `VITE_GMO_API_ENDPOINT` | niji-api base URL (spot rate / fiat bid endpoint) | `http://127.0.0.1:42069` | `https://api.niji-dao.example` |
 | `VITE_ENABLE_FIAT_BID` | fiat bid UI 表示 flag (`true` / `false`) | `false` (開発中) | `true` (release 後) |
+
+`VITE_GMO_API_ENDPOINT` は Issue #3059 で SSOT に統一済。 `useSpotRate.ts` / `.env.example.local` は本 env 名で一致する (旧 `VITE_NIJI_API_BASE_URL` は同 Issue で撤廃)。 本 env 未設定時は同一 origin (webapp 2424 port) に fallback するが、 dev では niji-api の 42069 port を叩かないと `/api/v1/spot-rate/eth-jpy` が 404 になる (webapp origin に api endpoint 未実装のため)。
 
 ## mock server 切替手順
 
 Phase 1 開発期間中は mock server 経由で e2e 動作させる。 手順 —
 
 1. `packages/niji-api/.env` を `.env.example` からコピー、 `USE_GMO_MOCK=true` を設定
-2. `pnpm dev` を `packages/niji-api` で実行、 Ponder dev server が起動する
+2. repo root で `make dev` を実行、 niji-api (Ponder + Hono、 port 42069) は anvil / auto-settler / webapp と並列 bg 起動する (Issue #3059 で `api-bg` target 追加)
 3. Issue 3 以降で追加される hono handler 経由で GMO endpoint (mock) 呼出、 form-encoded 応答が返る
 4. Phase 3 本番切替時は `USE_GMO_MOCK=false` + `GMO_ENDPOINT=https://p01.mul-pay.jp` に変更
+
+### make dev で niji-api 起動 (Issue #3059)
+
+`make dev` は niji-api を含む 4 process (anvil / niji-api / auto-settler / webapp) を bg 起動する。 Ponder 起動時間は 10-30 秒、 起動直後 30 秒間は webapp からの `GET /api/v1/spot-rate/eth-jpy` が undefined を返す (FiatBidForm 側で「取得中」 spinner 表示、 UX 上問題なし)。
+
+- `make dev-status` で niji-api の PID / port listen / HTTP 応答を確認できる
+- `make dev-logs` で `.context/dev/api.log` を含む全 log を tail -f 表示
+- `make dev-stop` で niji-api の PID を graceful kill + port 42069 の残骸 listener を lsof 経由で掃除
 
 Issue 1 時点の behavior test 経路 —
 

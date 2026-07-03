@@ -37,13 +37,16 @@ export type UseSpotRateOptions = {
 };
 
 /**
- * default fetcher = env の VITE_NIJI_API_BASE_URL 経由で /api/v1/spot-rate/eth-jpy を GET
+ * default fetcher = env の VITE_GMO_API_ENDPOINT 経由で /api/v1/spot-rate/eth-jpy を GET
  * env 未設定時は同一 origin (Vite proxy 前提)
+ *
+ * env var 名 SSOT = packages/niji-webapp/.env.example.local の VITE_GMO_API_ENDPOINT (Issue #3059)。
+ * dev = http://127.0.0.1:42069 (niji-api Ponder default port)、 prod = deploy URL。
  */
 export const defaultSpotRateFetcher = async (): Promise<SpotRate> => {
   const envValue =
     typeof import.meta !== 'undefined'
-      ? (import.meta as { env?: Record<string, string> }).env?.['VITE_NIJI_API_BASE_URL']
+      ? (import.meta as { env?: Record<string, string> }).env?.['VITE_GMO_API_ENDPOINT']
       : undefined;
   const apiBase = typeof envValue === 'string' ? envValue : '';
   const url = `${apiBase.replace(/\/$/, '')}/api/v1/spot-rate/eth-jpy`;

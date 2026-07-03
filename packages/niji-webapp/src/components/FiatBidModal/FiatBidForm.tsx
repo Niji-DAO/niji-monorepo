@@ -286,6 +286,14 @@ export const FiatBidForm = ({
 
   const isSpotRateLoading = spotRate.rate === undefined;
   const isJpyEquivalentReady = ethValidation.ok && spotRate.rate !== undefined;
+  /**
+   * ETH input 欄に user が値を入力しているか (Issue #3059 Phase C)。
+   *
+   * JPY 換算欄の spinner 表示条件を「ETH 入力あり + spot rate 未取得」 に限定するために使う。
+   * ETH 未入力時 (初期 state or clear 直後) は spinner を出さず「—」 表示に落として、
+   * spot rate polling が回っているだけで JPY 換算欄が「取得中」 と回り続ける UX 問題を解消する。
+   */
+  const ethInputHasValue = ethRaw.trim() !== '';
 
   const submitDisabled =
     !ethValidation.ok ||
@@ -473,7 +481,7 @@ export const FiatBidForm = ({
               <div className={classes.rateSummaryValue} data-testid="fiat-bid-jpy-display">
                 {jpyDisplay}
               </div>
-            ) : isSpotRateLoading ? (
+            ) : ethInputHasValue && isSpotRateLoading ? (
               <div
                 className={classes.rateSummaryLoading}
                 data-testid="fiat-bid-jpy-display-loading"
