@@ -42,19 +42,44 @@ export type UseSpotRateOptions = {
 };
 
 /**
- * default fetcher = env の VITE_GMO_API_ENDPOINT 経由で /api/v1/spot-rate/eth-jpy を GET
- * env 未設定時は同一 origin (Vite proxy 前提)
+ * spot-rate endpoint URL を env source から解決する pure helper (Issue #3065)。
  *
- * env var 名 SSOT = packages/niji-webapp/.env.example.local の VITE_GMO_API_ENDPOINT (Issue #3059)。
- * dev = http://127.0.0.1:42069 (niji-api Ponder default port)、 prod = deploy URL。
+ * env 優先順 —
+ * (1) VITE_GMO_API_ENDPOINT_SPOT_RATE = spot-rate independent server (port 42070、 Ponder 非依存)
+ * (2) VITE_GMO_API_ENDPOINT = 旧 niji-api (port 42069、 Ponder + Hono) の fallback、 互換性維持
+ * (3) 未設定 = 同一 origin (空 prefix、 Vite proxy 前提)
+ *
+ * 空白のみの env 値 (`'   '`) は未設定扱い、 trailing slash は正規化する。
+ * 引数 envSource は test で差替可能に、 default は `import.meta.env`。
+ */
+export const resolveSpotRateEndpoint = (
+  envSource: Record<string, string | undefined> = ((): Record<string, string | undefined> => {
+    if (typeof import.meta === 'undefined') return {};
+    const env = (import.meta as { env?: Record<string, string | undefined> }).env;
+    return env ?? {};
+  })(),
+): string => {
+  const spotRateEndpoint = envSource['VITE_GMO_API_ENDPOINT_SPOT_RATE'];
+  const legacyEndpoint = envSource['VITE_GMO_API_ENDPOINT'];
+  const preferred =
+    typeof spotRateEndpoint === 'string' && spotRateEndpoint.trim() !== ''
+      ? spotRateEndpoint
+      : typeof legacyEndpoint === 'string' && legacyEndpoint.trim() !== ''
+        ? legacyEndpoint
+        : '';
+  return preferred.replace(/\/$/, '');
+};
+
+/**
+ * default fetcher = env 経由で /api/v1/spot-rate/eth-jpy を GET (Issue #3065)。
+ *
+ * dev では VITE_GMO_API_ENDPOINT_SPOT_RATE の 42070 を叩くことで Ponder indexer の
+ * historical sync 完了待ち (10-30 秒〜数分) を回避、 user 実機の「レート取得クルクル継続」
+ * 症状を即応答で解消する (Issue #3065 root cause)。
  */
 export const defaultSpotRateFetcher = async (): Promise<SpotRate> => {
-  const envValue =
-    typeof import.meta !== 'undefined'
-      ? (import.meta as { env?: Record<string, string> }).env?.['VITE_GMO_API_ENDPOINT']
-      : undefined;
-  const apiBase = typeof envValue === 'string' ? envValue : '';
-  const url = `${apiBase.replace(/\/$/, '')}/api/v1/spot-rate/eth-jpy`;
+  const base = resolveSpotRateEndpoint();
+  const url = `${base}/api/v1/spot-rate/eth-jpy`;
   const response = await fetch(url, {
     method: 'GET',
     headers: { Accept: 'application/json' },

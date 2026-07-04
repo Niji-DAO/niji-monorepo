@@ -14,7 +14,10 @@ import { createCaptureApp, type CaptureStore } from '../handlers/fiat-bid/captur
 import { createPlaceBidApp, type PlaceBidStore } from '../handlers/fiat-bid/place-bid.js';
 import { createTopupApp, type TopupStore } from '../handlers/fiat-bid/topup.js';
 import { createTransferNftApp, type TransferNftStore } from '../handlers/fiat-bid/transfer-nft.js';
-import { createSpotRateApp } from '../handlers/spot-rate.js';
+// spot-rate route は Issue #3065 で独立 server (port 42070、 spot-rate-server.ts) に分離、
+// Ponder indexer の historical sync 完了待ちで spot-rate が実質未応答になる root cause 解消のため。
+// fiat-bid endpoint (authorize / 3ds-callback / place-bid / capture / transfer-nft / topup) は
+// Ponder DB (fiat_bid table) 経由で writable なため、 本 file (port 42069) に維持。
 import { AuthCleanupQueue } from '../services/authCleanup/index.js';
 import {
   BidRelay,
@@ -60,7 +63,8 @@ app.use('/', graphql({ db, schema }));
 app.use('/graphql', graphql({ db, schema }));
 
 // Issue #3005 — GET /api/v1/spot-rate/eth-jpy (ETH/JPY spot rate 取得)
-app.route('/api/v1/spot-rate', createSpotRateApp());
+// Issue #3065 — 本 route は spot-rate-server.ts (port 42070) に分離済 (Ponder sync 非依存化)、
+//               本 file (port 42069) では登録しない。 webapp は VITE_GMO_API_ENDPOINT_SPOT_RATE 経由で 42070 を叩く。
 
 /**
  * Issue #3006 — POST /api/v1/fiat-bid/authorize (与信枠取得)

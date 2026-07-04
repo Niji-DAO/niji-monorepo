@@ -45,6 +45,9 @@ WEBAPP_ENV_EXAMPLE := $(ROOT)/packages/niji-webapp/.env.example.local
 ANVIL_PORT := 8547
 WEBAPP_PORT := 2424
 API_PORT := 42069
+# Issue #3065 — spot-rate endpoint を Ponder 非依存の独立 hono server (port 42070) に分離。
+# Ponder indexer の historical sync (10-30 秒〜数分) 完了待ちで spot-rate が実質未応答になる root cause 解消。
+SPOT_RATE_PORT := 42070
 
 .PHONY: help dev dev-init dev-refresh dev-sepolia dev-fg dev-stop dev-status dev-logs setup setup-env install build anvil-bg webapp-bg snapshot-if-needed auto-settler-bg api-bg
 
@@ -66,9 +69,10 @@ help:
 	@echo "  snapshot 不在時は make dev が自動的に dev-init を呼ぶ"
 	@echo ""
 	@echo "URL:"
-	@echo "  webapp   http://localhost:$(WEBAPP_PORT)"
-	@echo "  niji-api http://127.0.0.1:$(API_PORT) (Ponder + Hono)"
-	@echo "  anvil    http://127.0.0.1:$(ANVIL_PORT) (chain id 31337)"
+	@echo "  webapp     http://localhost:$(WEBAPP_PORT)"
+	@echo "  niji-api   http://127.0.0.1:$(API_PORT) (Ponder + Hono、 fiat-bid endpoint)"
+	@echo "  spot-rate  http://127.0.0.1:$(SPOT_RATE_PORT) (independent hono、 Ponder 非依存、 Issue #3065)"
+	@echo "  anvil      http://127.0.0.1:$(ANVIL_PORT) (chain id 31337)"
 	@echo ""
 	@echo "State:"
 	@echo "  live state  $(ANVIL_STATE) (make dev-stop で削除)"
@@ -152,20 +156,23 @@ auto-settler-bg: | $(LOG_DIR)
 		echo "🟢 auto-settler started (PID $$(cat $(SETTLER_PID)))"; \
 	fi
 
-# niji-api (Ponder + Hono、 port 42069) を background 起動。 既存プロセスがあれば再利用。
-# webapp から VITE_GMO_API_ENDPOINT 経由で spot rate / fiat bid endpoint を呼出するため必要。
-# Ponder 起動時間 10-30 秒、 起動直後 30 秒間は webapp からの GET /api/v1/spot-rate/eth-jpy が
-# undefined を返す (FiatBidForm 側で「取得中」 spinner 表示、 UX 上問題なし)。
+# niji-api を background 起動。 既存プロセスがあれば再利用。
+# Issue #3065 で pnpm dev = concurrently で 2 process 並列起動する構成に変更。
+#   - Ponder + Hono (port 42069) = event indexer 専任、 fiat-bid endpoint (authorize / capture / topup 等) を expose
+#   - spot-rate independent server (port 42070) = Ponder 非依存、 GMO / CoinGecko 直叩き + in-memory cache
+# webapp は VITE_GMO_API_ENDPOINT (42069) と VITE_GMO_API_ENDPOINT_SPOT_RATE (42070) の 2 URL を参照。
+# spot-rate は Ponder sync 完了を待たず即応答、 fiat-bid は Ponder sync 完了 (10-30 秒) 後に応答。
 api-bg: | $(LOG_DIR)
 	@if [ -f "$(API_PID)" ] && kill -0 $$(cat $(API_PID)) 2>/dev/null; then \
 		echo "🟢 niji-api already running (PID $$(cat $(API_PID)))"; \
 	else \
-		echo "🚀 starting niji-api on :$(API_PORT) (Ponder + Hono、 10-30s 起動)..."; \
+		echo "🚀 starting niji-api on :$(API_PORT) (Ponder + Hono) + :$(SPOT_RATE_PORT) (spot-rate server、 concurrently 経由)..."; \
 		cd $(ROOT)/packages/niji-api && nohup pnpm dev \
 			> "$(API_LOG)" 2>&1 & \
 		echo $$! > "$(API_PID)"; \
 		sleep 1; \
 		echo "🟢 niji-api started (PID $$(cat $(API_PID)), log=$(API_LOG))"; \
+		echo "   ponder :$(API_PORT) + spot-rate :$(SPOT_RATE_PORT) = concurrently で並列起動"; \
 	fi
 
 # webapp を background 起動。 既存プロセスがあれば再利用。
@@ -189,7 +196,8 @@ dev: setup-env snapshot-if-needed anvil-bg api-bg auto-settler-bg webapp-bg
 	@echo "✅ dev environment ready (snapshot load、 常に fresh chain)."
 	@echo ""
 	@echo "  webapp        http://localhost:$(WEBAPP_PORT)"
-	@echo "  niji-api      http://127.0.0.1:$(API_PORT) (Ponder + Hono、 起動 10-30s)"
+	@echo "  niji-api      http://127.0.0.1:$(API_PORT) (Ponder + Hono、 起動 10-30s、 fiat-bid endpoint)"
+	@echo "  spot-rate     http://127.0.0.1:$(SPOT_RATE_PORT) (independent、 sync 非依存で即応答、 Issue #3065)"
 	@echo "  anvil         http://127.0.0.1:$(ANVIL_PORT) (chain 31337)"
 	@echo "  auto-settler  🤖 5s polling, next auction starts automatically on endTime"
 	@if [ -f "$(ANVIL_STATE)" ]; then \
@@ -301,6 +309,12 @@ dev-stop:
 		echo "$$API_PIDS" | xargs kill 2>/dev/null || true; \
 		echo "  ⛔ killed lingering niji-api listeners on :$(API_PORT)"; \
 	fi
+	@# Issue #3065 — spot-rate independent server (port 42070) の残骸掃除
+	@SPOT_PIDS=$$(lsof -nP -iTCP:$(SPOT_RATE_PORT) -sTCP:LISTEN -t 2>/dev/null); \
+	if [ -n "$$SPOT_PIDS" ]; then \
+		echo "$$SPOT_PIDS" | xargs kill 2>/dev/null || true; \
+		echo "  ⛔ killed lingering spot-rate listeners on :$(SPOT_RATE_PORT)"; \
+	fi
 	@# anvil は SIGTERM で --state dump 完了を待つ (最大 10 秒)。 dump 中に SIGKILL すると
 	@# JSON が途中で切れ、 次の make dev で "failed to parse json file: EOF" で起動失敗する。
 	@# graceful shutdown 経路 = SIGTERM 送信 → 1 秒間隔で process 死亡 poll (最大 10 秒) → 未死亡なら SIGKILL fallback。
@@ -362,9 +376,11 @@ dev-status:
 		echo "  webapp        ⚪ stopped"; \
 	fi
 	@if [ -f "$(API_PID)" ] && kill -0 $$(cat $(API_PID)) 2>/dev/null; then \
-		echo "  niji-api      🟢 running (PID $$(cat $(API_PID)), port $(API_PORT))"; \
-		curl -s -o /dev/null -w "                HTTP          %{http_code}\n" \
-			http://127.0.0.1:$(API_PORT) || echo "                HTTP          no response"; \
+		echo "  niji-api      🟢 running (PID $$(cat $(API_PID)), ponder :$(API_PORT) + spot-rate :$(SPOT_RATE_PORT))"; \
+		curl -s -o /dev/null -w "                ponder :$(API_PORT)   %{http_code}\n" \
+			http://127.0.0.1:$(API_PORT) || echo "                ponder :$(API_PORT)   no response"; \
+		curl -s -o /dev/null -w "                spot   :$(SPOT_RATE_PORT)   %{http_code}\n" \
+			http://127.0.0.1:$(SPOT_RATE_PORT)/api/v1/spot-rate/eth-jpy || echo "                spot   :$(SPOT_RATE_PORT)   no response"; \
 	else \
 		echo "  niji-api      ⚪ stopped (webapp spot rate / fiat bid endpoint が offline)"; \
 	fi

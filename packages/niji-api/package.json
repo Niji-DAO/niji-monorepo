@@ -6,16 +6,20 @@
   "scripts": {
     "codegen": "ponder codegen",
     "db": "ponder db",
-    "dev": "ponder dev",
+    "dev": "concurrently -n ponder,spot -c blue,magenta \"pnpm dev:ponder\" \"pnpm dev:spot-rate\"",
+    "dev:ponder": "ponder dev",
+    "dev:spot-rate": "tsx watch src/spot-rate-server.ts",
     "lint": "eslint .",
     "ponder:push-snapshot": "tar -czf snapshot.tgz .ponder && gh release upload snapshot snapshot.tgz --clobber",
     "ponder:restore-snapshot": "rm -rf .ponder && curl -sL https://github.com/nounsDAO/nouns-monorepo/releases/download/snapshot/snapshot.tgz | tar -xzf -",
     "start": "ponder start",
+    "start:spot-rate": "tsx src/spot-rate-server.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@hono/node-server": "^1.13.0",
     "@niji/sdk": "workspace:*",
     "drizzle-orm": "0.41.0",
     "hono": "^4.5.0",
@@ -25,8 +29,10 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "concurrently": "^9.1.0",
     "dotenv": "catalog:",
     "msw": "^2.14.0",
+    "tsx": "^4.20.3",
     "vitest": "^3.2.4"
   },
   "engines": {
