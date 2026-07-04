@@ -32,10 +32,24 @@ Issue 1 段階では env 変数一覧 + mock server 切替手順のみ記載、 
 
 | 変数名 | 用途 | 例 (Phase 1 mock) | 本番切替時 |
 |---|---|---|---|
-| `VITE_GMO_API_ENDPOINT` | niji-api base URL (spot rate / fiat bid endpoint) | `http://127.0.0.1:42069` | `https://api.niji-dao.example` |
+| `VITE_GMO_API_ENDPOINT` | niji-api base URL (fiat bid endpoint、 authorize / capture / topup 等) | `http://127.0.0.1:42069` | `https://api.niji-dao.example` |
+| `VITE_GMO_API_ENDPOINT_SPOT_RATE` | spot-rate 独立 server base URL (Issue #3065、 Ponder 非依存) | `http://127.0.0.1:42070` | `https://api.niji-dao.example` |
 | `VITE_ENABLE_FIAT_BID` | fiat bid UI 表示 flag (`true` / `false`) | `false` (開発中) | `true` (release 後) |
 
-`VITE_GMO_API_ENDPOINT` は Issue #3059 で SSOT に統一済。 `useSpotRate.ts` / `.env.example.local` は本 env 名で一致する (旧 `VITE_NIJI_API_BASE_URL` は同 Issue で撤廃)。 本 env 未設定時は同一 origin (webapp 2424 port) に fallback するが、 dev では niji-api の 42069 port を叩かないと `/api/v1/spot-rate/eth-jpy` が 404 になる (webapp origin に api endpoint 未実装のため)。
+`VITE_GMO_API_ENDPOINT` は Issue #3059 で SSOT に統一済。 `.env.example.local` は本 env 名で一致する (旧 `VITE_NIJI_API_BASE_URL` は同 Issue で撤廃)。 本 env 未設定時は同一 origin (webapp 2424 port) に fallback するが、 dev では niji-api を叩かないと `/api/v1/fiat-bid/*` が 404 になる (webapp origin に api endpoint 未実装のため)。
+
+`VITE_GMO_API_ENDPOINT_SPOT_RATE` は Issue #3065 で追加した spot-rate 専用 endpoint。 `useSpotRate.ts` は本 env を優先して読み、 未設定時は `VITE_GMO_API_ENDPOINT` に fallback する (旧経路互換)。 dev では 42070 の spot-rate independent server を叩くことで Ponder sync 完了待ちを回避、 spot rate が即応答する。
+
+### port 分離 architecture (Issue #3065、 Plan A SSOT)
+
+niji-api は 2 process 並列起動 (`pnpm dev` = concurrently 経由)。 責務分離 —
+
+- **port 42069** (Ponder + Hono) = event indexer 専任、 fiat-bid endpoint (authorize / 3ds-callback / place-bid / capture / transfer-nft / topup) を expose。 Ponder DB (fiat_bid table) に write する endpoint は Ponder indexer が持つ drizzle client 経由でのみ書けるため、 本 process に維持
+- **port 42070** (spot-rate independent hono) = Ponder 非依存、 GMO コイン API + CoinGecko fallback + 5 秒 in-memory cache で完結。 sync 状態問わず即応答
+
+Ponder indexer の historical sync 完了待ち (Base Sepolia block 数万件、 10-30 秒〜数分) 中でも spot rate は即応答するため、 user 実機の FiatBidForm で「レート取得クルクル継続」 症状が発生しない (Issue #3065 root cause 解消)。 fiat-bid endpoint 群は auction settle event 後にのみ実 flow が発火する前提のため、 Ponder sync 完了 (dev では 10-30 秒程度) を起点にできれば実用範囲。
+
+Plan B (全 fiat-bid endpoint も分離) は PGlite 制約 (Ponder が sync 完了まで database schema を確定させない、 独立 server から drizzle 経由で fiat_bid table を書けない) のため回避、 Postgres 移行 + Docker 依存増加を発生させずに root cause 解消する。
 
 ## mock server 切替手順
 
@@ -46,13 +60,13 @@ Phase 1 開発期間中は mock server 経由で e2e 動作させる。 手順 �
 3. Issue 3 以降で追加される hono handler 経由で GMO endpoint (mock) 呼出、 form-encoded 応答が返る
 4. Phase 3 本番切替時は `USE_GMO_MOCK=false` + `GMO_ENDPOINT=https://p01.mul-pay.jp` に変更
 
-### make dev で niji-api 起動 (Issue #3059)
+### make dev で niji-api 起動 (Issue #3059、 #3065)
 
-`make dev` は niji-api を含む 4 process (anvil / niji-api / auto-settler / webapp) を bg 起動する。 Ponder 起動時間は 10-30 秒、 起動直後 30 秒間は webapp からの `GET /api/v1/spot-rate/eth-jpy` が undefined を返す (FiatBidForm 側で「取得中」 spinner 表示、 UX 上問題なし)。
+`make dev` は 5 process 相当を bg 起動する (anvil / niji-api Ponder / niji-api spot-rate / auto-settler / webapp)。 niji-api の `pnpm dev` は concurrently 経由で Ponder (42069) と spot-rate independent server (42070) の 2 process を並列起動する構成 (Issue #3065)。 spot-rate は Ponder 非依存で即応答するため、 起動直後でも FiatBidForm でレート表示が spinner に張り付かない。
 
-- `make dev-status` で niji-api の PID / port listen / HTTP 応答を確認できる
-- `make dev-logs` で `.context/dev/api.log` を含む全 log を tail -f 表示
-- `make dev-stop` で niji-api の PID を graceful kill + port 42069 の残骸 listener を lsof 経由で掃除
+- `make dev-status` で niji-api の PID / port 42069 (Ponder) + port 42070 (spot-rate) の HTTP 応答を確認できる (2 行表示、 Issue #3065)
+- `make dev-logs` で `.context/dev/api.log` を含む全 log を tail -f 表示 (concurrently prefix `[ponder]` / `[spot]` で識別)
+- `make dev-stop` で niji-api の PID を graceful kill + port 42069 / 42070 の残骸 listener を lsof 経由で掃除
 
 Issue 1 時点の behavior test 経路 —
 
