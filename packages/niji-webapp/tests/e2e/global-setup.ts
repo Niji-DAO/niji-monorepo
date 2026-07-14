@@ -214,6 +214,20 @@ export default async function globalSetup() {
   await waitForSpotRateReady();
   console.log(`[e2e globalSetup] spot-rate ready on :${SPOT_RATE_PORT}`);
 
+  // 5.5) Niji 0 (Nijider 枠) を settle して Niji 1 (通常 auction) に進める (Issue #3077)。
+  //
+  // deploy 直後の active auction = Niji 0 だが、 utils/nounderNiji.ts の判定
+  // `nounId % 10n === 0n && nounId <= 1820n` で Niji 0/10/20/... は Nijider 枠 (NijiContent)、
+  // 常に auctionEnded=true 固定 + Winner UI 固定 + Bid form が render されない仕様
+  // (Nouns 派生プロジェクト慣例、 コミュニティ創設メンバー配布)。 fiat-bid.spec.ts は
+  // 「Bid form 表示」 を assume するため、 通常 auction (Niji 1+) に進める必要がある。
+  //
+  // seedPastAuctions(1) 経路 = anvil の block timestamp を Niji 0 endTime 越えまで進めて
+  // settleCurrentAndCreateNewAuction() 呼出、 Niji 1 (通常 auction、 24h duration) を開始。
+  const { seedPastAuctions } = await import('./helpers/chain.js');
+  await seedPastAuctions(1);
+  console.log('[e2e globalSetup] Niji 0 settled → Niji 1 (standard auction) started');
+
   // 6) post-deploy state を evm_snapshot で保存 (Issue #3073、 高速化 A 案)
   //
   // 各 spec の beforeEach で `revertChain(snapshotId)` を呼んで post-deploy 状態に戻すことで、
