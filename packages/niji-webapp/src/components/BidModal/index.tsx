@@ -43,6 +43,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { defaultChain } from '@/wagmi';
 
 import classes from './BidModal.module.css';
 
@@ -161,9 +162,14 @@ export const BidModal = ({
       setEthInput(minBidEth(minBid));
       return;
     }
+    // chainId 明示で wagmi が wallet の現 chain 不一致を検出、 switchChain prompt を
+    // 自動発火する (v2 の standard behavior)。 未指定だと wallet 現 chain (例 mainnet)
+    // に tx broadcast されて eth.merkle.io 等の public RPC に POST → CORS block で
+    // 送信失敗する root cause を回避。
     placeBid({
       args: [BigInt(auction.nounId)],
       value: parsed,
+      chainId: defaultChain.id,
     });
   };
 
