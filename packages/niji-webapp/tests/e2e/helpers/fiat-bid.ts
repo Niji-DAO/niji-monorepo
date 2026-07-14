@@ -171,8 +171,46 @@ export const mockFiatBid3dsPage = async (
   });
 };
 
+/** spot-rate endpoint mock option */
+export type MockSpotRateOptions = {
+  /** default = 500000 JPY/ETH (dev mock 標準値) */
+  rate?: number;
+  /** default = 'mock'、 'gmo' / 'gmo-coin' / 'coingecko' に差替え可 */
+  source?: 'mock' | 'gmo' | 'gmo-coin' | 'coingecko';
+};
+
 /**
- * 3 種 mock を一括で set up する convenience。 test の setup boilerplate を 3 行 → 1 行に短縮。
+ * spot-rate endpoint (`/api/v1/spot-rate/eth-jpy`) を page.route で intercept。
+ *
+ * 実 niji-api (port 42070) 側の USE_SPOT_RATE_MOCK 未 set 時は gmo-coin API から実 rate を取得するため
+ * (`packages/niji-api/src/services/spotRate` SSOT)、 test で spot rate 依存の assertion (JPY 換算 / 100 万円上限判定 等) を
+ * 決定的に verify するには page.route で response を pin する必要がある。 default = 500000 JPY/ETH で
+ * 0.02 ETH = 10,000 円 の換算値を Phase B / TC-FB10 で共通に使う。
+ */
+export const mockSpotRate = async (
+  page: Page,
+  options: MockSpotRateOptions = {},
+): Promise<void> => {
+  const rate = options.rate ?? 500_000;
+  const source = options.source ?? 'mock';
+  await page.route('**/api/v1/spot-rate/eth-jpy', async route => {
+    const now = Date.now();
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        rate,
+        source,
+        cachedAt: now,
+        expiresAt: now + 5_000,
+      }),
+    });
+  });
+};
+
+/**
+ * 4 種 mock を一括で set up する convenience (authorize + 3ds-callback + 3DS 画面 + spot-rate)。
+ * test の setup boilerplate を 4 行 → 1 行に短縮。
  */
 export const mockAllFiatBidEndpoints = async (
   page: Page,
@@ -180,22 +218,27 @@ export const mockAllFiatBidEndpoints = async (
     authorize?: MockAuthorizeOptions;
     callback?: Mock3dsCallbackOptions;
     threeDsPage?: Mock3dsPageOptions;
+    spotRate?: MockSpotRateOptions;
   } = {},
 ): Promise<void> => {
   await mockFiatBidAuthorize(page, options.authorize);
   await mockFiatBid3dsCallback(page, options.callback);
   await mockFiatBid3dsPage(page, options.threeDsPage);
+  await mockSpotRate(page, options.spotRate);
 };
 
 /**
- * kiwa fixture 経路で wallet を inject して ConnectKit の Connect button を click、
- * modal 内から Injected wallet を選択して useConnect の approve を通す。
+ * kiwa fixture 経路で wallet 接続完了状態まで待つ。
  *
- * TC-FB10 と Phase B/C/D の各 test で共通に使う connect flow を SSOT 化する。
- * dappE2e は kiwa の EIP-6963 injected provider fixture (`@kiwa-test/core`)。
+ * kiwa の `dappE2eTest` は `window.ethereum` に anvil-連携 injected provider を注入するため、
+ * wagmi の autoConnect / persister が過去 session を検知して page load 時点で
+ * すでに接続済 (bid-open-button 直描画 = wrapper なし branch) になる pattern が default。
+ * 未接続時のみ ConnectKit modal → Connect button → wallet option 選択 → dappE2e.connect() を実行する。
+ *
+ * TC-FB10 と Phase B/C/D の各 test で共通に使う「接続完了まで待つ」 経路を SSOT 化する。
  *
  * 成功後は `bid-open-button` が enable + visible な状態で return する。
- * TC-FB23 (wallet 未接続) は本 helper を呼ばず、 disconnected 状態のまま tooltip を verify する。
+ * TC-FB23 (wallet 未接続 UI verify) は本 helper を呼ばず、 別経路で disconnected 状態を作る。
  */
 export const connectWalletAndWaitForBid = async (
   page: Page,
@@ -204,21 +247,47 @@ export const connectWalletAndWaitForBid = async (
 ): Promise<void> => {
   await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
 
-  const connectButton = page.getByRole('button', { name: 'Connect', exact: true }).first();
-  await connectButton.waitFor({ state: 'visible', timeout: 15_000 });
-  await connectButton.click();
+  // page 描画完了 (bid-open-button OR bid-open-button-wrapper OR Connect button のいずれかが visible) まで
+  // wait して、 その後 「接続済 = wrapper なし + enable」 「未接続 = wrapper あり」 で分岐する。
+  //
+  // kiwa の `dappE2eTest` は `window.ethereum` に anvil-連携 injected provider を注入するため、
+  // wagmi autoConnect / persister が page load 時点で接続状態を復元する pattern が default。
+  // ただし wagmi の hydration 完了は 3-5 秒かかるため、 「connect 状態が確定するまで」 waitForFunction で待つ。
+  await page.waitForFunction(
+    () => {
+      const btn = document.querySelector<HTMLButtonElement>('[data-testid="bid-open-button"]');
+      const wrapper = document.querySelector('[data-testid="bid-open-button-wrapper"]');
+      const connectBtn = Array.from(document.querySelectorAll('button')).find(
+        b => b.textContent?.trim() === 'Connect',
+      );
+      // どれか 1 つが visible = wagmi hydration 完了
+      return (btn !== null && !btn.disabled) || wrapper !== null || connectBtn !== undefined;
+    },
+    null,
+    { timeout: 20_000 },
+  );
 
-  const walletOption = page
-    .locator('[role="dialog"] button')
-    .filter({ hasText: /metamask|injected|kiwa|anvil|test|ethereum|browser/i })
-    .first();
-  await walletOption.waitFor({ state: 'visible', timeout: 10_000 });
-  await walletOption.click();
-  await dappE2e.connect();
-
+  const wrapper = page.getByTestId('bid-open-button-wrapper');
   const bidOpenButton = page.getByTestId('bid-open-button');
+  const wrapperExists = (await wrapper.count()) > 0;
+
+  if (wrapperExists) {
+    // 未接続 → ConnectKit modal 経由で connect flow を実行
+    const connectButton = page.getByRole('button', { name: 'Connect', exact: true }).first();
+    await connectButton.waitFor({ state: 'visible', timeout: 10_000 });
+    await connectButton.click();
+
+    const walletOption = page
+      .locator('[role="dialog"] button')
+      .filter({ hasText: /metamask|injected|kiwa|anvil|test|ethereum|browser/i })
+      .first();
+    await walletOption.waitFor({ state: 'visible', timeout: 10_000 });
+    await walletOption.click();
+    await dappE2e.connect();
+  }
+
+  // 接続完了 = bid-open-button が enable state で visible な状態を確保
   await bidOpenButton.waitFor({ state: 'visible', timeout: 20_000 });
-  // 「enable かつ Click 可能」 まで待つ (wagmi useAccount が address 取得完了 → disabled=false)
   await page.waitForFunction(
     () => {
       const btn = document.querySelector<HTMLButtonElement>('[data-testid="bid-open-button"]');
