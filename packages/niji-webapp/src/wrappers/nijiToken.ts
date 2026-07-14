@@ -163,7 +163,14 @@ export const useNounSeed = (nounId: bigint): INounSeed | undefined => {
     enabled: !seed,
     ...(isLocalDev ? { staleTime: 0, gcTime: 0 } : {}),
   } as const;
-  const { data: response } = useReadNijiTokenSeeds({
+  // useIsApprovedForAll と同 pattern (hook 参照側 cast) で TS2589 遮断、 dev vite-plugin-checker
+  // overlay を出さず e2e pointer intercept flaky を解消。 runtime 挙動不変。
+  const seedHook = useReadNijiTokenSeeds as unknown as (opts: {
+    chainId: number;
+    args: readonly [bigint];
+    query: { enabled: boolean; staleTime?: number; gcTime?: number };
+  }) => { data: unknown };
+  const { data: response } = seedHook({
     chainId: defaultChain.id,
     args: seedArgs,
     query: seedQuery,
@@ -198,8 +205,12 @@ export const useUserVotes = (): number | undefined => {
 };
 
 export const useAccountVotes = (account?: Address): number | undefined => {
-  const { data: votes } = useReadNijiTokenGetCurrentVotes({
-    args: account ? [account] : undefined,
+  // useIsApprovedForAll と同 pattern (hook 参照側 cast) で TS2589 遮断
+  const hook = useReadNijiTokenGetCurrentVotes as unknown as (opts: {
+    args: readonly [`0x${string}`] | undefined;
+  }) => { data: bigint | undefined };
+  const { data: votes } = hook({
+    args: account ? ([account] as const) : undefined,
   });
 
   return votes !== undefined ? Number(votes) : undefined;
@@ -207,19 +218,28 @@ export const useAccountVotes = (account?: Address): number | undefined => {
 
 export const useUserDelegatee = (): string | undefined => {
   const { address } = useAccount();
-  const { data: delegate } = useReadNijiTokenDelegates({
-    args: address ? [address] : undefined,
+  // useIsApprovedForAll と同 pattern (hook 参照側 cast) で TS2589 遮断
+  const hook = useReadNijiTokenDelegates as unknown as (opts: {
+    args: readonly [`0x${string}`] | undefined;
+    query: { enabled: boolean };
+  }) => { data: string | undefined };
+  const { data: delegate } = hook({
+    args: address ? ([address] as const) : undefined,
     query: { enabled: !!address },
   });
 
-  return delegate as string | undefined;
+  return delegate;
 };
 
 export const useUserVotesAsOfBlock = (block: number | undefined): number | undefined => {
   const { address } = useAccount();
-  // Check for available votes
-  const { data: votes } = useReadNijiTokenGetPriorVotes({
-    args: address && block !== undefined ? [address, BigInt(block)] : undefined,
+  // useIsApprovedForAll と同 pattern (hook 参照側 cast) で TS2589 遮断
+  const hook = useReadNijiTokenGetPriorVotes as unknown as (opts: {
+    args: readonly [`0x${string}`, bigint] | undefined;
+    query: { enabled: boolean };
+  }) => { data: bigint | undefined };
+  const { data: votes } = hook({
+    args: address && block !== undefined ? ([address, BigInt(block)] as const) : undefined,
     query: { enabled: !!address && block !== undefined },
   });
 
@@ -258,9 +278,11 @@ export const useDelegateVotes = () => {
 };
 
 export const useNounTokenBalance = (address: Address): number | undefined => {
-  const { data: tokenBalance } = useReadNijiTokenBalanceOf({
-    args: [address],
-  });
+  // useIsApprovedForAll と同 pattern (hook 参照側 cast) で TS2589 遮断
+  const hook = useReadNijiTokenBalanceOf as unknown as (opts: {
+    args: readonly [`0x${string}`];
+  }) => { data: bigint | undefined };
+  const { data: tokenBalance } = hook({ args: [address] as const });
 
   return tokenBalance !== undefined ? Number(tokenBalance) : undefined;
 };
@@ -332,9 +354,10 @@ export const useIsApprovedForAll = () => {
   const { address } = useAccount();
   // Issue #3035 TS2589 fix — 2 引数 tuple の wagmi CodeGen hook を inline 呼出すると
   // 「Type instantiation excessively deep」 が発生。 args tuple + query options を const 抽出 +
-  // `as const satisfies` で型固定し、 hook の type inference tree を浅くする (PR #3034 と同 pattern)。
-  // 加えて 2 引数 tuple では tsc の per-file depth budget を消費し切れず const 抽出のみでは
-  // error が残るため、 hook 呼出に @ts-expect-error で最終 fallback。 runtime 挙動は不変。
+  // hook 関数参照を `as unknown as (opts) => { data }` で type 遮断して inference tree を分断する
+  // (const 抽出 + `@ts-expect-error` だけでは 2 引数 tuple の depth budget 不足で残 error 発生、
+  // 関数参照側で cast すると呼出 site の inference が完全に止まって dev vite-plugin-checker overlay を
+  // 出さない、 e2e の pointer intercept flaky も同時解消)。 runtime 挙動不変。
   const args = address
     ? ([address, nijiGovernorAddress[chainId]] as const satisfies readonly [
         `0x${string}`,
@@ -342,12 +365,11 @@ export const useIsApprovedForAll = () => {
       ])
     : undefined;
   const queryOptions = { enabled: !!address } as const;
-  const { data } =
-    // @ts-expect-error TS2589 — wagmi CodeGen hook の 2 引数 tuple type inference が excessively deep
-    useReadNijiTokenIsApprovedForAll({
-      args,
-      query: queryOptions,
-    });
+  const hook = useReadNijiTokenIsApprovedForAll as unknown as (opts: {
+    args: readonly [`0x${string}`, `0x${string}`] | undefined;
+    query: { enabled: boolean };
+  }) => { data: boolean | undefined };
+  const { data } = hook({ args, query: queryOptions });
 
   return (data as boolean) || false;
 };
