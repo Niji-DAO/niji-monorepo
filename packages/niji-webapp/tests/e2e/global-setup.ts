@@ -174,6 +174,10 @@ export default async function globalSetup() {
   await waitForAnvil();
 
   // 3) deploy-niji-full (hardhat task)
+  //
+  // maxBuffer 100MB を明示 (Issue #3078)。 Node.js の spawnSync は default maxBuffer 1MB のため、
+  // deploy output が数 MB (12 trait × 数十 image のログ) 超過で子プロセスの write が block、
+  // 結果として e2e 全体が 23 分 hang する deadlock が発生した (実測)。 deploy 単体は 21 秒で完走する。
   const repoRoot = path.resolve(__dirname, '../../../..');
   const contractsDir = path.join(repoRoot, 'packages/niji-contracts');
   const result = spawnSync(
@@ -183,6 +187,7 @@ export default async function globalSetup() {
       cwd: contractsDir,
       encoding: 'utf-8',
       stdio: ['ignore', 'pipe', 'pipe'],
+      maxBuffer: 100 * 1024 * 1024,
     },
   );
 
