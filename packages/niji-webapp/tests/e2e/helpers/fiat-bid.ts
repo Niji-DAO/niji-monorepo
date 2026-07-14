@@ -253,6 +253,8 @@ export const connectWalletAndWaitForBid = async (
   // kiwa の `dappE2eTest` は `window.ethereum` に anvil-連携 injected provider を注入するため、
   // wagmi autoConnect / persister が page load 時点で接続状態を復元する pattern が default。
   // ただし wagmi の hydration 完了は 3-5 秒かかるため、 「connect 状態が確定するまで」 waitForFunction で待つ。
+  // Issue #3073 で timeout 20_000 → 8_000 に短縮 (nijiToken.ts TS2589 完全解消 + vite-plugin-checker overlay 消滅で
+  // wagmi hydration は実測 3-5 秒に安定、 20 秒 timeout は前 flaky 時代の防御的設定で per-test 無駄な wait 発生源だった)
   await page.waitForFunction(
     () => {
       const btn = document.querySelector<HTMLButtonElement>('[data-testid="bid-open-button"]');
@@ -260,11 +262,10 @@ export const connectWalletAndWaitForBid = async (
       const connectBtn = Array.from(document.querySelectorAll('button')).find(
         b => b.textContent?.trim() === 'Connect',
       );
-      // どれか 1 つが visible = wagmi hydration 完了
       return (btn !== null && !btn.disabled) || wrapper !== null || connectBtn !== undefined;
     },
     null,
-    { timeout: 20_000 },
+    { timeout: 8_000 },
   );
 
   const wrapper = page.getByTestId('bid-open-button-wrapper');
