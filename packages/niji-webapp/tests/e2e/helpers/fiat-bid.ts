@@ -270,10 +270,24 @@ export const connectWalletAndWaitForBid = async (
 
   const wrapper = page.getByTestId('bid-open-button-wrapper');
   const bidOpenButton = page.getByTestId('bid-open-button');
-  const wrapperExists = (await wrapper.count()) > 0;
+  let wrapperExists = (await wrapper.count()) > 0;
+
+  // kiwa `dappE2eTest` fixture の wallet inject が wrapper 判定直後に完了する race condition を回避 (Issue #3082)。
+  // wrapper 検知後 2 秒 wait して wrapper が disappear すれば「inject 済 = connect flow skip」 と判定、
+  // wrapper 継続 visible なら本当に未接続 → ConnectKit modal 経由の connect flow を実行する。
+  if (wrapperExists) {
+    const wrapperDisappeared = await wrapper
+      .first()
+      .waitFor({ state: 'hidden', timeout: 2_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (wrapperDisappeared) {
+      wrapperExists = false;
+    }
+  }
 
   if (wrapperExists) {
-    // 未接続 → ConnectKit modal 経由で connect flow を実行
+    // 未接続確定 → ConnectKit modal 経由で connect flow を実行
     const connectButton = page.getByRole('button', { name: 'Connect', exact: true }).first();
     await connectButton.waitFor({ state: 'visible', timeout: 10_000 });
     await connectButton.click();
