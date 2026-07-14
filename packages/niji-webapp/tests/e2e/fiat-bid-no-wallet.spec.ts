@@ -19,6 +19,14 @@
  */
 import { expect, test } from '@playwright/test';
 
+import { resetAnvilToPostDeploy } from './helpers/anvil-snapshot';
+
+// 各 test 冒頭で anvil state を post-deploy snapshot に戻す (Issue #3073、 高速化 A 案)。
+// fiat-bid.spec.ts の kiwa 経路と共用の anvil を使うため、 前 test 実行後の state 汚染を防ぐ。
+test.beforeEach(async () => {
+  await resetAnvilToPostDeploy();
+});
+
 test.describe('fiat bid wallet 未接続 UI (kiwa fixture 非使用、 Issue #3074)', () => {
   test('TC-FB23 wallet 未接続時 Bid button disabled + tooltip「wallet 接続が必要です」', async ({
     page,

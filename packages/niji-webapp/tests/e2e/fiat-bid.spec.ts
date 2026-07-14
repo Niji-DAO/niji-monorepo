@@ -47,6 +47,7 @@ import { expect } from '@playwright/test';
 import { createWalletClient, http, parseAbi, parseEventLogs } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
+import { resetAnvilToPostDeploy } from './helpers/anvil-snapshot';
 import { ADDRESSES, ANVIL_KEYS, anvil, publicClient } from './helpers/chain';
 import {
   connectWalletAndWaitForBid,
@@ -73,70 +74,16 @@ const test = baseTest.extend<{ _anvilHandle: { port: number; stop: () => Promise
   },
 });
 
-test.describe('特商法 page 描画 + footer link 経路 (Phase 1 実装完了)', () => {
-  test('TC-FB01 /legal/tokushoho が 200 で返る', async ({ page }) => {
-    const res = await page.goto('/legal/tokushoho');
-    expect(res?.status()).toBe(200);
-  });
-
-  test('TC-FB02 /legal/tokushoho に h1 "特定商取引法に基づく表記" が描画', async ({ page }) => {
-    await page.goto('/legal/tokushoho');
-    await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
-    await expect(
-      page.getByRole('heading', { level: 1, name: '特定商取引法に基づく表記' }),
-    ).toBeVisible({
-      timeout: 15_000,
-    });
-  });
-
-  test('TC-FB03 /legal/tokushoho に 8 項目 (販売者名 / 所在地 / 電話番号 / 代表者 / 販売価格 / 支払方法 / 商品引渡時期 / 返品ポリシー) が描画', async ({
-    page,
-  }) => {
-    await page.goto('/legal/tokushoho');
-    await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
-    await expect(page.getByTestId('legal-tokushoho')).toBeVisible({ timeout: 15_000 });
-
-    const labels = [
-      '販売者名',
-      '所在地',
-      '電話番号',
-      '代表者',
-      '販売価格',
-      '支払方法',
-      '商品引渡時期',
-      '返品ポリシー',
-    ];
-    for (const label of labels) {
-      await expect(page.getByText(label).first()).toBeVisible({ timeout: 5_000 });
-    }
-  });
-
-  test('TC-FB04 販売者情報 4 項目に [TODO: Phase 3 本番切替時 user 確認] marker が明記', async ({
-    page,
-  }) => {
-    await page.goto('/legal/tokushoho');
-    await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
-
-    const placeholders = page.getByTestId('tokushoho-placeholder');
-    await expect(placeholders).toHaveCount(4);
-    // 少なくとも 1 件は TODO marker を持つ (残りは同じ marker を共有)
-    await expect(placeholders.first()).toContainText('TODO: Phase 3 本番切替時 user 確認');
-  });
-
-  test('TC-FB05 footer から /legal/tokushoho link が click 可能で遷移する', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
-
-    const footerLink = page.locator('footer a[href="/legal/tokushoho"]').first();
-    await expect(footerLink).toBeVisible({ timeout: 10_000 });
-    await footerLink.click();
-
-    await page.waitForURL(/\/legal\/tokushoho$/, { timeout: 10_000 });
-    await expect(
-      page.getByRole('heading', { level: 1, name: '特定商取引法に基づく表記' }),
-    ).toBeVisible({ timeout: 15_000 });
-  });
+// 各 test 冒頭で anvil state を post-deploy snapshot に戻す (Issue #3073、 高速化 A 案)。
+// deploy-niji-full の 3-5 分を per-test cumulative に払わず 1 度だけで済ませ、 chain 時刻経過による
+// auction ended state (1 分 duration) や前 test の bid 履歴を全 test でリセットする。
+test.beforeEach(async () => {
+  await resetAnvilToPostDeploy();
 });
+
+// 特商法 5 test (TC-FB01-05) は kiwa fixture 依存なし + chain state 不要のため、
+// fiat-bid-static.spec.ts に切出済。 playwright projects `fiat-bid-static-parallel` で
+// fullyParallel: true + workers: 4 の並列実行に回す。
 
 /**
  * Phase 1 fiat bid golden path 前半 (Issue #3069 で activate)

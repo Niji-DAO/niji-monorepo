@@ -11,6 +11,10 @@ const ANVIL_RPC = `http://127.0.0.1:${ANVIL_PORT}`;
 const SPOT_RATE_PORT = 42070;
 const SPOT_RATE_LOG_PATH = path.resolve(__dirname, '../../../../.context/dev/e2e-spot-rate.log');
 const SPOT_RATE_PID_PATH = path.resolve(__dirname, '../../../../.context/dev/e2e-spot-rate.pid');
+const ANVIL_SNAPSHOT_PATH = path.resolve(
+  __dirname,
+  '../../../../.context/dev/e2e-anvil-snapshot.txt',
+);
 
 async function rpcCall(method: string, params: unknown[] = []) {
   const res = await fetch(ANVIL_RPC, {
@@ -118,6 +122,24 @@ export default async function globalSetup() {
     console.log(
       '[e2e globalSetup] SKIP_GLOBAL_SETUP=1 — skipping anvil restart + deploy + spot-rate',
     );
+    // SKIP 経路でも spec の beforeEach が snapshot revert する前提のため、
+    // 「anvil は起動済 + snapshot file が無い」 状態なら現状 chain state を snapshot 化する。
+    if (!existsSync(ANVIL_SNAPSHOT_PATH)) {
+      const snapshotRes = await rpcCall('evm_snapshot');
+      const snapshotId = snapshotRes.result as `0x${string}` | undefined;
+      if (typeof snapshotId === 'string' && snapshotId.startsWith('0x')) {
+        const dir = path.dirname(ANVIL_SNAPSHOT_PATH);
+        if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+        writeFileSync(ANVIL_SNAPSHOT_PATH, snapshotId);
+        console.log(
+          `[e2e globalSetup] SKIP mode: current chain state snapshot saved: ${snapshotId}`,
+        );
+      } else {
+        console.warn(
+          `[e2e globalSetup] SKIP mode: evm_snapshot failed, spec beforeEach revert skipped`,
+        );
+      }
+    }
     return;
   }
   const start = Date.now();
@@ -178,8 +200,23 @@ export default async function globalSetup() {
   await waitForSpotRateReady();
   console.log(`[e2e globalSetup] spot-rate ready on :${SPOT_RATE_PORT}`);
 
+  // 6) post-deploy state を evm_snapshot で保存 (Issue #3073、 高速化 A 案)
+  //
+  // 各 spec の beforeEach で `revertChain(snapshotId)` を呼んで post-deploy 状態に戻すことで、
+  // fresh deploy 3-5 分 × N test の cumulative コストを回避する。
+  // revert 実行後 anvil 側で snapshot は消える仕様なので、 revert helper 側で再 snapshot 取得も担う。
+  const snapshotRes = await rpcCall('evm_snapshot');
+  const snapshotId = snapshotRes.result as `0x${string}` | undefined;
+  if (typeof snapshotId !== 'string' || !snapshotId.startsWith('0x')) {
+    throw new Error(
+      `[e2e globalSetup] evm_snapshot did not return a hex id (got ${JSON.stringify(snapshotRes)})`,
+    );
+  }
+  writeFileSync(ANVIL_SNAPSHOT_PATH, snapshotId);
+  console.log(`[e2e globalSetup] post-deploy anvil snapshot saved: ${snapshotId}`);
+
   const elapsed = Math.round((Date.now() - start) / 1000);
   console.log(
-    `[e2e globalSetup] anvil + deploy-niji-full + spot-rate 起動 complete in ${elapsed}s`,
+    `[e2e globalSetup] anvil + deploy-niji-full + spot-rate + snapshot 起動 complete in ${elapsed}s`,
   );
 }
