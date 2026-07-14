@@ -327,7 +327,16 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
       // (Niji 0 / 任意の auction の endTime を 1 分で越えさせ Bid.tsx の auctionEnded を
       // すぐ true にして既存の SettleManuallyBtn を表示させる狙い、 auto-settler が
       // 5s polling で速やかに次 auction に進める)
-      const AUCTION_DURATION = 60; // 1 分
+      //
+      // env NIJI_AUCTION_DURATION で override 可能 (Issue #3077、 e2e 対応)。
+      // e2e globalSetup が 86400 (24h) を set することで、 webapp の Date.now() ベースの
+      // auctionEnded 判定が e2e 実行時間 (数分) 中に true になるのを防ぐ。
+      // default は既存 dev flow 互換で 60 秒維持。
+      const AUCTION_DURATION_ENV = process.env.NIJI_AUCTION_DURATION;
+      const AUCTION_DURATION =
+        AUCTION_DURATION_ENV && Number.isFinite(Number(AUCTION_DURATION_ENV))
+          ? Number(AUCTION_DURATION_ENV)
+          : 60;
       const AUCTION_RESERVE_PRICE = ethers.parseEther('0.001'); // 0.001 ETH
       const AUCTION_TIME_BUFFER = 10; // 10 秒 (1 分 auction に合わせる、 snipe 延長は最小限)
       const AUCTION_MIN_BID_INCREMENT_PRCT = 2; // 2%

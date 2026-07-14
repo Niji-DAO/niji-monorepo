@@ -180,11 +180,20 @@ export default async function globalSetup() {
   // 結果として e2e 全体が 23 分 hang する deadlock が発生した (実測)。 deploy 単体は 21 秒で完走する。
   const repoRoot = path.resolve(__dirname, '../../../..');
   const contractsDir = path.join(repoRoot, 'packages/niji-contracts');
+  // NIJI_AUCTION_DURATION=86400 (24h) を deploy に渡す (Issue #3077)。
+  // webapp の auctionEnded 判定は JS Date.now() vs auction.endTime で行われるため、
+  // default 60 秒 duration では deploy 完了後 1 分で全 e2e test が auctionEnded=true state に入り
+  // Bid form が render されなくなる。 24h に拡張することで e2e 実行時間 (数分) 中は active 維持。
+  const deployEnv: NodeJS.ProcessEnv = {
+    ...process.env,
+    NIJI_AUCTION_DURATION: '86400',
+  };
   const result = spawnSync(
     'pnpm',
     ['exec', 'hardhat', 'deploy-niji-full', '--network', 'localhost'],
     {
       cwd: contractsDir,
+      env: deployEnv,
       encoding: 'utf-8',
       stdio: ['ignore', 'pipe', 'pipe'],
       maxBuffer: 100 * 1024 * 1024,
