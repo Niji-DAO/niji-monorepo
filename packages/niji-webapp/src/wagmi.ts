@@ -2,7 +2,7 @@ import { find, pipe } from 'remeda';
 import { defineChain } from 'viem';
 import { createConfig, createStorage, http, fallback, webSocket } from 'wagmi';
 import { baseSepolia, hardhat as viemHardhat } from 'wagmi/chains';
-import { coinbaseWallet, injected, walletConnect } from 'wagmi/connectors';
+import { injected, walletConnect } from 'wagmi/connectors';
 
 import { CHAIN_ID, WALLET_CONNECT_V2_PROJECT_ID } from './config';
 import { ANVIL_RPC_URL } from './constants/anvil';
@@ -59,14 +59,15 @@ export const config = createConfig({
   storage: wagmiStorage,
   multiInjectedProviderDiscovery: true,
   connectors: [
+    // Coinbase Wallet connector は Analytics SDK が cca-lite.coinbase.com/metrics に
+    // 常時 telemetry POST (BLOCKED_BY_CLIENT で ad blocker との衝突多発)、 かつ SDK bundle
+    // が 100-200KB 追加される割に本 webapp の主 wallet ユースケースが MetaMask / WalletConnect
+    // 経由で完結するため除去 (Issue #3101、 サイト重い audit の Phase A)。
+    // 将来 Coinbase Wallet native 対応要件が出た場合は個別 Issue で再検討。
     injected(),
     walletConnect({
       projectId: WALLET_CONNECT_V2_PROJECT_ID,
       showQrModal: false,
-    }),
-    coinbaseWallet({
-      appName: 'Niji.WTF',
-      appLogoUrl: 'https://nijis.wtf/static/media/logo.cdea1650.svg',
     }),
   ],
 });
