@@ -66,22 +66,31 @@ const copyToClipboard = async (text: string) => {
   }
 };
 
-const generateTraitItems = (): TraitItem[] => {
-  const traitItems: TraitItem[] = [];
-
-  nijiTraitKeys.forEach(traitType => {
+/**
+ * 全 trait を async iteration で構築、 category ごとに main thread を yield する。
+ *
+ * buildSVG は PNG rle decode + SVG assemble で per-image 数 ms、
+ * nijiTraitKeys 12 category × 数十 image = 数百 iteration を 1 tick で回すと
+ * 数秒 main thread blocking で「Loading traits...」 が固まる問題を回避する。
+ *
+ * 各 category 完了時に onChunk callback で partial 結果を返し、
+ * progressive render で UX を fresh に保つ。
+ */
+const generateTraitItemsAsync = async (
+  onChunk: (chunk: TraitItem[]) => void,
+): Promise<TraitItem[]> => {
+  const all: TraitItem[] = [];
+  for (const traitType of nijiTraitKeys) {
     const categoryTitle = humanizeTraitKey(traitType);
     const images = NijiImageData.images[traitType];
-
+    const chunk: TraitItem[] = [];
     images.forEach((imageData, index: number) => {
       if (imageData.data === undefined) {
         return;
       }
       const name = traitName(traitType as keyof INounSeed, index);
-
       const svg = buildSVG([imageData], encoder.data.palette, undefined);
-
-      traitItems.push({
+      chunk.push({
         name,
         filename: imageData.filename,
         svg,
@@ -90,9 +99,12 @@ const generateTraitItems = (): TraitItem[] => {
         index,
       });
     });
-  });
-
-  return traitItems;
+    all.push(...chunk);
+    onChunk([...all]);
+    // 1 category 完了ごとに main thread を yield、 React 側 re-render + input event を通す。
+    await new Promise<void>(resolve => setTimeout(resolve, 0));
+  }
+  return all;
 };
 
 const TraitsPage: FC = () => {
@@ -101,13 +113,20 @@ const TraitsPage: FC = () => {
   const [zipLoading, setZipLoading] = useState(false);
 
   useEffect(() => {
-    const loadTraits = () => {
-      const traitItems = generateTraitItems();
-      setTraits(traitItems);
+    let cancelled = false;
+    void generateTraitItemsAsync(chunk => {
+      if (cancelled) return;
+      setTraits(chunk);
+      // 最初の category が来た時点で loading 解除、 以降は progressive append 表示
       setLoading(false);
+    }).catch(err => {
+      // 例外時も UI freeze しないよう loading 解除、 空 traits 状態で復帰
+      console.error('[TraitsPage] generateTraitItemsAsync failed', err);
+      if (!cancelled) setLoading(false);
+    });
+    return () => {
+      cancelled = true;
     };
-
-    loadTraits();
   }, []);
 
   const downloadAllTraitsAsZip = async () => {
