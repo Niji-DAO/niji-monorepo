@@ -147,8 +147,13 @@ export const BidModal = ({
     if (placeBidSucceeded) {
       toast.success(t`Bid placed.`);
       setEthInput('');
+      // 3 秒間 modal 内 success 表示を維持 → auto close で UX 完結。
+      // toast だけだと modal に居残る user が「入札失敗?」 と誤解しがちな UX を解消。
+      const closeTimer = setTimeout(() => onClose(), 3_000);
+      return () => clearTimeout(closeTimer);
     }
-  }, [placeBidSucceeded, t]);
+    return undefined;
+  }, [placeBidSucceeded, t, onClose]);
 
   const placeEthBidHandler = () => {
     if (!ethInputRef.current || !ethInputRef.current.value) {
@@ -209,49 +214,63 @@ export const BidModal = ({
           </TabsList>
 
           <TabsContent value="eth" data-testid="bid-tab-content-eth">
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="eth-bid-amount" className={`mb-1 block ${classes.formLabel}`}>
-                  <Trans>bid 額 (ETH)</Trans>
-                </label>
-                <Input
-                  id="eth-bid-amount"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  onChange={ethInputHandler}
-                  ref={ethInputRef}
-                  value={ethInput}
-                  placeholder={`Ξ ${minBidEth(minBid)}`}
-                  data-testid="eth-bid-input"
-                  className={classes.bidInput}
-                />
+            {placeBidSucceeded ? (
+              <div className="space-y-3 py-6 text-center" data-testid="eth-bid-success">
+                <div className="text-4xl" aria-hidden>
+                  ✅
+                </div>
+                <h3 className={classes.formLabel} style={{ fontSize: '1.125rem' }}>
+                  <Trans>入札を送信しました</Trans>
+                </h3>
                 <p className={classes.minBidCopy}>
-                  <Trans>minimum bid — Ξ {minBidEth(minBid)} or more</Trans>
+                  <Trans>まもなくこのウィンドウを閉じます</Trans>
                 </p>
               </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="eth-bid-amount" className={`mb-1 block ${classes.formLabel}`}>
+                    <Trans>bid 額 (ETH)</Trans>
+                  </label>
+                  <Input
+                    id="eth-bid-amount"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    onChange={ethInputHandler}
+                    ref={ethInputRef}
+                    value={ethInput}
+                    placeholder={`Ξ ${minBidEth(minBid)}`}
+                    data-testid="eth-bid-input"
+                    className={classes.bidInput}
+                  />
+                  <p className={classes.minBidCopy}>
+                    <Trans>minimum bid — Ξ {minBidEth(minBid)} or more</Trans>
+                  </p>
+                </div>
 
-              <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onClose}
-                  data-testid="eth-bid-cancel"
-                  className={classes.cancelBtn}
-                >
-                  <Trans>キャンセル</Trans>
-                </Button>
-                <Button
-                  type="button"
-                  onClick={placeEthBidHandler}
-                  disabled={isPlacingBid || bidderWallet === ''}
-                  data-testid="eth-bid-submit"
-                  className={classes.bidBtn}
-                >
-                  {isPlacingBid ? <Spinner animation="border" size="sm" /> : <Trans>bid</Trans>}
-                </Button>
+                <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onClose}
+                    data-testid="eth-bid-cancel"
+                    className={classes.cancelBtn}
+                  >
+                    <Trans>キャンセル</Trans>
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={placeEthBidHandler}
+                    disabled={isPlacingBid || bidderWallet === ''}
+                    data-testid="eth-bid-submit"
+                    className={classes.bidBtn}
+                  >
+                    {isPlacingBid ? <Spinner animation="border" size="sm" /> : <Trans>bid</Trans>}
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </TabsContent>
 
           <TabsContent value="fiat" data-testid="bid-tab-content-fiat">
