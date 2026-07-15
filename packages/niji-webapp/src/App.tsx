@@ -51,6 +51,7 @@ const NotFoundPage = lazy(() => import('@/pages/NotFound'));
 const NoundersPage = lazy(() => import('@/pages/Nounders'));
 const Playground = lazy(() => import('@/pages/Playground'));
 const ProposalHistory = lazy(() => import('@/pages/ProposalHistory'));
+const SpecialPositionPreviewPage = lazy(() => import('@/pages/SpecialPositionPreview'));
 const TraitsPage = lazy(() => import('@/pages/TraitsPage'));
 const VotePage = lazy(() => import('@/pages/Vote'));
 
@@ -107,6 +108,10 @@ function App() {
             {/* Issue #3011 = 特定商取引法に基づく表記 (GMO 加盟店契約要件、 grilling P5 SSOT) */}
             <Route path="/legal/tokushoho" element={<TokushohoPage />} />
             {Number(CHAIN_ID) === 31337 && <Route path="/faucet" element={<FaucetPage />} />}
+            {/* Issue #3110 = special trait 位置 preview、 dev only (31337) */}
+            {Number(CHAIN_ID) === 31337 && (
+              <Route path="/dev/special-position" element={<SpecialPositionPreviewPage />} />
+            )}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
