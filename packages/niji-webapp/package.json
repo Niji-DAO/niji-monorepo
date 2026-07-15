@@ -32,6 +32,7 @@
     "not op_mini all"
   ],
   "dependencies": {
+    "@fincode/js": "^1.1.0",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@lingui/core": "^5.9.0",
     "@lingui/detect-locale": "^5.9.0",
@@ -96,6 +97,7 @@
     "@lingui/vite-plugin": "^5.9.0",
     "@parcel/watcher": "^2.5.1",
     "@playwright/test": "1.54.1",
+    "@resvg/resvg-js": "^2.6.2",
     "@svgr/plugin-jsx": "^8.1.0",
     "@svgr/plugin-svgo": "^8.1.0",
     "@testing-library/dom": "^10.4.0",
