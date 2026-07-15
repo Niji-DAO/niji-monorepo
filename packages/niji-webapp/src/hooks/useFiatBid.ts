@@ -310,10 +310,23 @@ export const useFiatBid = (options: UseFiatBidOptions = {}) => {
         saveState(pending);
 
         // fincode 経路で status=AUTHORIZED / CAPTURED (3DS 不要) の場合は tds2Url が undefined、
-        // 3DS redirect skip + placing step 移行で直接 bid tx 発火経路に繋ぐ (Issue #3115)。
+        // 3DS redirect skip + placing step 移行 + placeBid 自動呼出で bid tx 発火まで一気通貫 (Issue #3115)。
         // GMO 経路は必ず tds2Url を返すため fall-through で従来通り 3DS redirect する。
         if (result.tds2Url === undefined) {
           setStep('placing');
+          try {
+            const placeResult = await fetchers.placeBid({ authId: result.authId });
+            setPlaceBidResult(placeResult);
+            if (placeResult.status === 'bid-placed') {
+              setStep('success');
+            } else {
+              setStep('failure');
+              setErrorMessage(placeResult.message);
+            }
+          } catch (placeErr) {
+            setStep('failure');
+            setErrorMessage(placeErr instanceof Error ? placeErr.message : String(placeErr));
+          }
           return result;
         }
         setStep('three-ds');
