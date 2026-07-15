@@ -52,14 +52,21 @@ export type FiatTopupPhase =
  *
  * spotRateSource は backend `SpotRateSource` (`packages/niji-api/src/services/spotRate/index.ts` SSOT) と
  * 一致させる。 Issue #3061 で `mock` union を追加、 `gmo` legacy label は既存 mock fixture 互換で残置。
+ *
+ * Phase 2 fincode (Issue #3115) で以下 2 field を追加。
+ * - tds2Url = optional 化 (fincode status=AUTHORIZED 時は 3DS 不要で undefined)
+ * - status  = 追加 (fincode AUTHORIZED / AUTHENTICATED / CAPTURED、 GMO 経路では undefined)
  */
 export type AuthorizeResponse = {
   authId: string;
-  tds2Url: string;
+  /** 3DS 認証 URL、 GMO 経路は必ず string、 fincode 経路は status=AUTHENTICATED 時のみ返却 */
+  tds2Url?: string;
   jpyAmount: number;
   ethAmount: string;
   spotRate: number;
   spotRateSource: 'gmo' | 'gmo-coin' | 'coingecko' | 'mock';
+  /** 決済 status (fincode 経路のみ、 GMO 経路では undefined、 Issue #3115) */
+  status?: 'AUTHORIZED' | 'AUTHENTICATED' | 'CAPTURED';
 };
 
 /** place-bid endpoint 応答 shape */
@@ -150,8 +157,34 @@ const buildEndpoint = (path: string): string => {
   return `${readApiBase().replace(/\/$/, '')}${path}`;
 };
 
+/**
+ * fincode UI flag 検出 (Issue #3115)
+ * VITE_USE_FINCODE_UI=true 時は fincode 経路 endpoint (authorize-fincode) を叩き、
+ * false / 未設定時は GMO 経路 endpoint (authorize) を叩く。
+ * FiatBidForm 側の card 入力 UI 切替 (fincode.js iframe vs GMO Token 方式 mock) と同 env flag で連動。
+ *
+ * 引数 envSource は test で差替可能に、 default は `import.meta.env` (useSpotRate と同 pattern)。
+ */
+export const isFincodeBackendEnabled = (
+  envSource: Record<string, string | undefined> = ((): Record<string, string | undefined> => {
+    return typeof import.meta !== 'undefined'
+      ? ((import.meta as { env?: Record<string, string> }).env ?? {})
+      : {};
+  })(),
+): boolean => {
+  const envValue = envSource['VITE_USE_FINCODE_UI'];
+  return typeof envValue === 'string' && envValue.trim().toLowerCase() === 'true';
+};
+
+/** authorize endpoint path 決定 (fincode / GMO 切替、 Issue #3115) */
+export const resolveAuthorizePath = (envSource?: Record<string, string | undefined>): string => {
+  return isFincodeBackendEnabled(envSource)
+    ? '/api/v1/fiat-bid/authorize-fincode'
+    : '/api/v1/fiat-bid/authorize';
+};
+
 export const defaultAuthorizeFetch = async (body: AuthorizeRequest): Promise<AuthorizeResponse> => {
-  const response = await fetch(buildEndpoint('/api/v1/fiat-bid/authorize'), {
+  const response = await fetch(buildEndpoint(resolveAuthorizePath()), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -276,6 +309,13 @@ export const useFiatBid = (options: UseFiatBidOptions = {}) => {
         };
         saveState(pending);
 
+        // fincode 経路で status=AUTHORIZED / CAPTURED (3DS 不要) の場合は tds2Url が undefined、
+        // 3DS redirect skip + placing step 移行で直接 bid tx 発火経路に繋ぐ (Issue #3115)。
+        // GMO 経路は必ず tds2Url を返すため fall-through で従来通り 3DS redirect する。
+        if (result.tds2Url === undefined) {
+          setStep('placing');
+          return result;
+        }
         setStep('three-ds');
         redirect(result.tds2Url);
         return result;

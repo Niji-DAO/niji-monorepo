@@ -9,7 +9,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { useFiatBid } from './useFiatBid';
+import { resolveAuthorizePath, useFiatBid } from './useFiatBid';
 
 describe('useFiatBid.authorize', () => {
   it('authorize 成功で step = "three-ds"、 saveState + redirect が呼ばれる', async () => {
@@ -90,6 +90,109 @@ describe('useFiatBid.authorize', () => {
     expect(result.current.errorMessage).toBe('BidLimitExceeded');
     expect(saveState).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
+  });
+});
+
+describe('useFiatBid.authorize — fincode 経路 (Issue #3115)', () => {
+  it('tds2Url undefined + status=AUTHORIZED で step="placing" 遷移、 redirect 呼ばず', async () => {
+    const authorize = vi.fn().mockResolvedValue({
+      authId: 'fincode-auth-1',
+      // tds2Url 未返却 (fincode AUTHORIZED = 3DS 不要 pattern)
+      jpyAmount: 50_000,
+      ethAmount: '100000000000000000',
+      spotRate: 500_000,
+      spotRateSource: 'gmo-coin' as const,
+      status: 'AUTHORIZED' as const,
+    });
+    const placeBid = vi.fn();
+    const saveState = vi.fn();
+    const redirect = vi.fn();
+
+    const { result } = renderHook(() =>
+      useFiatBid({
+        fetchers: { authorize, placeBid },
+        saveState,
+        redirect,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.authorize({
+        auctionId: '42',
+        bidderWallet: '0xUSER',
+        ethAmount: '100000000000000000',
+        spotRate: 500_000,
+        jpyAmount: 50_000,
+        cardToken: 'card_token_fincode_xxx',
+      });
+    });
+
+    // status=AUTHORIZED は 3DS skip → placing 直遷移
+    expect(result.current.step).toBe('placing');
+    expect(saveState).toHaveBeenCalledOnce();
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('tds2Url 有り + status=AUTHENTICATED で step="three-ds" 遷移、 redirect 呼出', async () => {
+    const authorize = vi.fn().mockResolvedValue({
+      authId: 'fincode-auth-2',
+      tds2Url: 'https://acs.example/3ds?token=xyz',
+      jpyAmount: 50_000,
+      ethAmount: '100000000000000000',
+      spotRate: 500_000,
+      spotRateSource: 'gmo-coin' as const,
+      status: 'AUTHENTICATED' as const,
+    });
+    const placeBid = vi.fn();
+    const saveState = vi.fn();
+    const redirect = vi.fn();
+
+    const { result } = renderHook(() =>
+      useFiatBid({
+        fetchers: { authorize, placeBid },
+        saveState,
+        redirect,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.authorize({
+        auctionId: '42',
+        bidderWallet: '0xUSER',
+        ethAmount: '100000000000000000',
+        spotRate: 500_000,
+        jpyAmount: 50_000,
+        cardToken: 'card_token_fincode_xxx',
+      });
+    });
+
+    // status=AUTHENTICATED は 3DS 必要で redirect
+    expect(result.current.step).toBe('three-ds');
+    expect(redirect).toHaveBeenCalledWith('https://acs.example/3ds?token=xyz');
+  });
+});
+
+describe('resolveAuthorizePath (Issue #3115)', () => {
+  it('VITE_USE_FINCODE_UI 未設定時は GMO endpoint (/authorize) を返す', () => {
+    expect(resolveAuthorizePath({})).toBe('/api/v1/fiat-bid/authorize');
+  });
+
+  it('VITE_USE_FINCODE_UI=true で fincode endpoint (/authorize-fincode) を返す', () => {
+    expect(resolveAuthorizePath({ VITE_USE_FINCODE_UI: 'true' })).toBe(
+      '/api/v1/fiat-bid/authorize-fincode',
+    );
+  });
+
+  it('VITE_USE_FINCODE_UI=false で GMO endpoint を返す', () => {
+    expect(resolveAuthorizePath({ VITE_USE_FINCODE_UI: 'false' })).toBe(
+      '/api/v1/fiat-bid/authorize',
+    );
+  });
+
+  it('VITE_USE_FINCODE_UI=TRUE (大文字) で fincode endpoint (case-insensitive)', () => {
+    expect(resolveAuthorizePath({ VITE_USE_FINCODE_UI: 'TRUE' })).toBe(
+      '/api/v1/fiat-bid/authorize-fincode',
+    );
   });
 });
 

@@ -9,6 +9,7 @@ import {
   createThreeDsCallbackApp,
   type ThreeDsCallbackStore,
 } from '../handlers/fiat-bid/3ds-callback.js';
+import { createAuthorizeFincodeApp } from '../handlers/fiat-bid/authorize-fincode.js';
 import { createAuthorizeApp, type FiatBidStore } from '../handlers/fiat-bid/authorize.js';
 import { createCaptureApp, type CaptureStore } from '../handlers/fiat-bid/capture.js';
 import { createPlaceBidApp, type PlaceBidStore } from '../handlers/fiat-bid/place-bid.js';
@@ -24,6 +25,7 @@ import {
   createBaseSepoliaPublicClient,
   createEnvSigner,
 } from '../services/bidRelay/index.js';
+import { FincodeClient } from '../services/fincode/client.js';
 import { GmoClient } from '../services/gmo/client.js';
 import {
   ReauthorizationWorker,
@@ -75,6 +77,11 @@ app.use('/graphql', graphql({ db, schema }));
 const spotRateFetcher = new SpotRateFetcher();
 const gmoClient = new GmoClient();
 /**
+ * Phase 2 fincode byGMO API client (Issue #3115、 GMO PGマルチペイメント → fincode byGMO product 差替)
+ * 決済 vendor = GMO Payment Gateway, Inc. 継続、 product だけ差替。 GMO 経路と並列共存で feature flag 経路確保。
+ */
+const fincodeClient = new FincodeClient();
+/**
  * Ponder 0.12 の api-side `db` は ReadonlyDrizzle (insert / update / delete が型 strip 済)。
  * offchain write は `db.sql` (raw drizzle instance、 full Drizzle exposed via Db.sql) 経由で実施する。
  * Ponder 内部 schema は onchain table 扱いだが、 SQL 発行自体は許容される (write 責務は indexing 層と HTTP 層で分担、
@@ -99,6 +106,17 @@ const fiatBidStore: FiatBidStore = {
 app.route(
   '/api/v1/fiat-bid',
   createAuthorizeApp({ gmoClient, spotRateFetcher, store: fiatBidStore }),
+);
+
+/**
+ * Phase 2 fincode byGMO — POST /api/v1/fiat-bid/authorize-fincode (与信枠取得)
+ * GMO PG 経路 (authorize.ts) と並列共存、 webapp 側 VITE_USE_FINCODE_UI で経路振り分け。
+ * cardToken 引数 = fincode.js iframe tokenize 発行の card_id を格納 (GMO PG 経路の GMO Token 相当)。
+ * Issue #3115。
+ */
+app.route(
+  '/api/v1/fiat-bid',
+  createAuthorizeFincodeApp({ fincodeClient, spotRateFetcher, store: fiatBidStore }),
 );
 
 /**
