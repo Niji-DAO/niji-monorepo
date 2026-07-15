@@ -28,6 +28,7 @@ import {
   useReadNijiAuctionHouseMinBidIncrementPercentage,
   useWriteNijiAuctionHouseCreateBid,
 } from '@niji/sdk/react';
+import { CheckCircle2Icon } from 'lucide-react';
 import { Spinner } from 'react-bootstrap';
 import { toast } from 'sonner';
 import { formatEther, parseEther } from 'viem';
@@ -143,14 +144,24 @@ export const BidModal = ({
     if (didPlaceBidFail) toast.error(t`Please try again.`);
   }, [didPlaceBidFail, t]);
 
+  // toast 重複発火防止 (Issue #3086 fix regression)。
+  //
+  // wagmi の placeBidSucceeded は write 成功後 true を保持し続けるため、 useEffect deps
+  // (t / onClose) の参照変化で親 re-render 時に本 effect が re-fire し toast.success が
+  // 累積表示される bug があった (user 実測で 4 件連続表示)。 useRef で「1 auction bid あたり
+  // 1 回のみ toast 発火」 を強制する。 placeBidSucceeded が false に戻った (次 bid) 時に flag reset。
+  const toastFiredRef = useRef(false);
   useEffect(() => {
-    if (placeBidSucceeded) {
+    if (placeBidSucceeded && !toastFiredRef.current) {
+      toastFiredRef.current = true;
       toast.success(t`Bid placed.`);
       setEthInput('');
       // 3 秒間 modal 内 success 表示を維持 → auto close で UX 完結。
-      // toast だけだと modal に居残る user が「入札失敗?」 と誤解しがちな UX を解消。
       const closeTimer = setTimeout(() => onClose(), 3_000);
       return () => clearTimeout(closeTimer);
+    }
+    if (!placeBidSucceeded) {
+      toastFiredRef.current = false;
     }
     return undefined;
   }, [placeBidSucceeded, t, onClose]);
@@ -215,14 +226,19 @@ export const BidModal = ({
 
           <TabsContent value="eth" data-testid="bid-tab-content-eth">
             {placeBidSucceeded ? (
-              <div className="space-y-3 py-6 text-center" data-testid="eth-bid-success">
-                <div className="text-4xl" aria-hidden>
-                  ✅
-                </div>
-                <h3 className={classes.formLabel} style={{ fontSize: '1.125rem' }}>
+              <div
+                className="my-2 flex flex-col items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50/60 py-8 dark:border-emerald-900/40 dark:bg-emerald-950/20"
+                data-testid="eth-bid-success"
+              >
+                <CheckCircle2Icon
+                  className="h-12 w-12 text-emerald-500 dark:text-emerald-400"
+                  strokeWidth={1.75}
+                  aria-hidden
+                />
+                <h3 className={classes.formLabel} style={{ fontSize: '1.125rem', fontWeight: 600 }}>
                   <Trans>入札を送信しました</Trans>
                 </h3>
-                <p className={classes.minBidCopy}>
+                <p className={classes.minBidCopy} style={{ margin: 0 }}>
                   <Trans>まもなくこのウィンドウを閉じます</Trans>
                 </p>
               </div>
