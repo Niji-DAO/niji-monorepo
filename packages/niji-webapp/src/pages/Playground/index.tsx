@@ -102,14 +102,29 @@ const Playground: FC = () => {
 
   const generateNounSvg = useCallback(
     (amount: number = 1) => {
-      for (let i = 0; i < amount; i++) {
+      // buildSVG は per-image 数 ms かかる sync 処理、 amount=8 (init) を 1 tick で sync 実行すると
+      // main thread blocking で 「Generate Nijis」 button の即応性が失われる (user 実測「めっちゃ重い」)。
+      // 1 個ずつ requestAnimationFrame で yield、 progressive append で UX を fresh に保つ。
+      const buildOne = () => {
         const seed = { ...getRandomNijiSeed(), ...modSeed };
         const { parts, background } = getNijiData(seed);
         const svg = buildSVG(parts, encoder.data.palette, background);
-        setNounSvgs(prev => {
-          return prev ? [svg, ...prev] : [svg];
-        });
+        setNounSvgs(prev => (prev ? [svg, ...prev] : [svg]));
+      };
+      if (amount <= 1) {
+        buildOne();
+        return;
       }
+      let remaining = amount;
+      const tick = () => {
+        if (remaining <= 0) return;
+        buildOne();
+        remaining -= 1;
+        if (remaining > 0) {
+          window.requestAnimationFrame(tick);
+        }
+      };
+      window.requestAnimationFrame(tick);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [pendingTrait, modSeed],
