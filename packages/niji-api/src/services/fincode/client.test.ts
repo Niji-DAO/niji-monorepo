@@ -16,7 +16,7 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { FincodeClient } from './client.js';
+import { FincodeClient, type FetchLike } from './client.js';
 
 /**
  * fetch stub を作る helper
@@ -183,7 +183,7 @@ describe('FincodeClient.registerPayment', () => {
   });
 
   it('Authorization header に Bearer + secret を送信', async () => {
-    const fetchStub = vi.fn(async () => {
+    const fetchStub: FetchLike = vi.fn(async () => {
       return new Response(
         JSON.stringify({
           id: 'order-005',
@@ -219,7 +219,7 @@ describe('FincodeClient.registerPayment', () => {
   });
 
   it('Tenant-Shop-Id を設定時のみ header に付与', async () => {
-    const fetchStub = vi.fn(async () => {
+    const fetchStub: FetchLike = vi.fn(async () => {
       return new Response(
         JSON.stringify({
           id: 'order-006',
@@ -444,7 +444,7 @@ describe('FincodeClient endpoint 解決', () => {
       USE_FINCODE_MOCK: 'true',
       FINCODE_MOCK_ENDPOINT: 'http://mock-server:2427',
     });
-    const fetchStub = vi.fn(async () => {
+    const fetchStub: FetchLike = vi.fn(async () => {
       return new Response(
         JSON.stringify({
           id: 'order-301',
@@ -475,7 +475,7 @@ describe('FincodeClient endpoint 解決', () => {
       USE_FINCODE_MOCK: 'false',
       FINCODE_IS_LIVE_MODE: 'false',
     });
-    const fetchStub = vi.fn(async () => {
+    const fetchStub: FetchLike = vi.fn(async () => {
       return new Response(
         JSON.stringify({
           id: 'order-302',
@@ -506,7 +506,7 @@ describe('FincodeClient endpoint 解決', () => {
       USE_FINCODE_MOCK: 'false',
       FINCODE_IS_LIVE_MODE: 'true',
     });
-    const fetchStub = vi.fn(async () => {
+    const fetchStub: FetchLike = vi.fn(async () => {
       return new Response(
         JSON.stringify({
           id: 'order-303',

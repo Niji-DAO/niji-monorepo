@@ -14,6 +14,7 @@
  * Phase 1 base infra の本 Issue 段階では export のみで actual 起動は Issue 3 で配線する。
  */
 
+import { fincodeMockServer } from './fincode-server.js';
 import { gmoMockServer } from './gmo-server.js';
 
 /**
@@ -22,6 +23,15 @@ import { gmoMockServer } from './gmo-server.js';
  */
 export const isGmoMockEnabled = (): boolean => {
   const value = (process.env['USE_GMO_MOCK'] ?? 'false').trim().toLowerCase();
+  return value === 'true' || value === '1' || value === 'yes';
+};
+
+/**
+ * USE_FINCODE_MOCK=true 時のみ fincode mock server を起動する
+ * Phase 2 backend 統合、 Issue #3115。
+ */
+export const isFincodeMockEnabled = (): boolean => {
+  const value = (process.env['USE_FINCODE_MOCK'] ?? 'false').trim().toLowerCase();
   return value === 'true' || value === '1' || value === 'yes';
 };
 
@@ -38,8 +48,22 @@ export const startGmoMockIfEnabled = (): void => {
 };
 
 /**
+ * fincode mock server の conditional 起動 (GMO と並列、 Phase 2 統合中は両方同時起動可)
+ */
+export const startFincodeMockIfEnabled = (): void => {
+  if (!isFincodeMockEnabled()) {
+    return;
+  }
+  fincodeMockServer.listen({ onUnhandledRequest: 'warn' });
+};
+
+/**
  * mock server の停止 (Ponder dev server の shutdown hook / test tearDown で使用)
  */
 export const stopGmoMock = (): void => {
   gmoMockServer.close();
+};
+
+export const stopFincodeMock = (): void => {
+  fincodeMockServer.close();
 };
