@@ -68,27 +68,27 @@ export const NIJI_TRAITS: NijiTraitDef[] = [
  *
  * 完璧仕様 = 12 trait 全てを user が視認できる + variation 豊富な trait を前面配置。
  *
- * user 指定 (Issue #3066) = special(0) を 8 位 / choker(1) を 9 位に移動、
- * leftHand(3) / clothing(5) / ear(6) を前詰め (5-7 位)、
- * hat(4) / hair(11) / headphone(2) は最前面 3 trait として現状維持。
- * special / choker を中間前後 (8/9 位) に配置することで前面 3 trait の描画を邪魔せず、
- * 中背面 3 trait (leftHand / clothing / ear) を明示的に前詰めして層構造を整える。
+ * user 指定 (Issue #3113) = special(0) を **最前面 (12 位)** に配置、
+ * special が他全 trait を覆う overlay として最も強く見える layer。 意思決定は
+ * dev only preview HTML (Issue #3110) で 12 position の視覚比較で確定。
+ * それ以前の user 指定 (Issue #3066) では special を 8 位 / choker を 9 位、
+ * 今回の変更で special を choker / hat / hair / headphone より前面に移動。
  *
  * 描画順序 (下 layer → 上 layer)。
  *   1. solidBackground(10) ... 42 通り、 背景単色 (最背面)
  *   2. background(9)       ... 25 通り、 背景 pattern
  *   3. backDecoration(8)   ... 12 通り、 背中装飾
  *   4. back(7)             ... 2 通り (少)、 胴体後面
- *   5. leftHand(3)         ... 13 通り、 左手 / 武器 (clothing 背面に配置し 服が手を隠す 整合実現)
+ *   5. leftHand(3)         ... 13 通り、 左手 / 武器 (clothing 背面)
  *   6. clothing(5)         ... 166 通り、 服 (胴体前面 + 手を隠す)
  *   7. ear(6)              ... 3 通り (少)、 顔サイド
- *   8. special(0)          ... 2 通り (少)、 エフェクト overlay (前面 3 trait の背面)
- *   9. choker(1)           ... 4 通り (少)、 首元 overlay (hat 直下)
- *   10. hat(4)             ... 32 通り、 帽子 (頭上部)
- *   11. hair(11)           ... 235 通り、 髪 (hat 上、 最も variation 豊富)
- *   12. headphone(2)       ... 14 通り、 ヘッドホン (最前面)
+ *   8. choker(1)           ... 4 通り (少)、 首元 overlay
+ *   9. hat(4)              ... 32 通り、 帽子 (頭上部)
+ *   10. hair(11)           ... 235 通り、 髪 (hat 上、 最も variation 豊富)
+ *   11. headphone(2)       ... 14 通り、 ヘッドホン
+ *   12. special(0)         ... 2 通り (少)、 エフェクト overlay (最前面、 他 trait を覆う)
  */
-export const NIJI_COMPOSITE_ORDER = [10, 9, 8, 7, 3, 5, 6, 0, 1, 4, 11, 2];
+export const NIJI_COMPOSITE_ORDER = [10, 9, 8, 7, 3, 5, 6, 1, 4, 11, 2, 0];
 
 export interface ColorInfo {
   r: number;
