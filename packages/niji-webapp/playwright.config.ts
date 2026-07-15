@@ -51,5 +51,14 @@ export default defineConfig({
       workers: 1,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
+    {
+      // fincode iframe verify (Issue #3119)、 kiwa fixture 依存で serial 実行。
+      // VITE_USE_FINCODE_UI=true 環境で webapp 起動時のみ意味のある assertion。
+      name: 'fincode-verify',
+      testMatch: /fincode-iframe-verify\.spec\.ts$/,
+      fullyParallel: false,
+      workers: 1,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+    },
   ],
 });

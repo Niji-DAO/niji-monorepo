@@ -270,9 +270,7 @@ describe('FiatBidForm useFincode env flag 分岐 (Issue #3119)', () => {
   const originalKey = import.meta.env.VITE_FINCODE_PUBLIC_KEY;
 
   afterEach(() => {
-    // @ts-expect-error env restore
     import.meta.env.VITE_USE_FINCODE_UI = originalFlag;
-    // @ts-expect-error env restore
     import.meta.env.VITE_FINCODE_PUBLIC_KEY = originalKey;
   });
 
@@ -294,7 +292,6 @@ describe('FiatBidForm useFincode env flag 分岐 (Issue #3119)', () => {
     );
 
   it('flag 未設定 (default) 時に CardInput (自前 form) が render される', () => {
-    // @ts-expect-error env override
     import.meta.env.VITE_USE_FINCODE_UI = undefined;
     renderFiat();
     expect(screen.getByTestId('card-input')).toBeInTheDocument();
@@ -302,7 +299,6 @@ describe('FiatBidForm useFincode env flag 分岐 (Issue #3119)', () => {
   });
 
   it('flag="false" 明示時も CardInput が render される (default 継続)', () => {
-    // @ts-expect-error env override
     import.meta.env.VITE_USE_FINCODE_UI = 'false';
     renderFiat();
     expect(screen.getByTestId('card-input')).toBeInTheDocument();
@@ -310,9 +306,7 @@ describe('FiatBidForm useFincode env flag 分岐 (Issue #3119)', () => {
   });
 
   it('flag="true" 時に CardInputFincode が render + label が「fincode.js iframe」 に変わる', async () => {
-    // @ts-expect-error env override
     import.meta.env.VITE_USE_FINCODE_UI = 'true';
-    // @ts-expect-error env override
     import.meta.env.VITE_FINCODE_PUBLIC_KEY = 'p_test_dummy';
     renderFiat();
     await waitFor(() => expect(screen.getByTestId('card-input-fincode')).toBeInTheDocument());
@@ -321,9 +315,7 @@ describe('FiatBidForm useFincode env flag 分岐 (Issue #3119)', () => {
   });
 
   it('flag="TRUE" 大文字 も case-insensitive で fincode 経路発動', async () => {
-    // @ts-expect-error env override
     import.meta.env.VITE_USE_FINCODE_UI = 'TRUE';
-    // @ts-expect-error env override
     import.meta.env.VITE_FINCODE_PUBLIC_KEY = 'p_test_dummy';
     renderFiat();
     await waitFor(() => expect(screen.getByTestId('card-input-fincode')).toBeInTheDocument());
