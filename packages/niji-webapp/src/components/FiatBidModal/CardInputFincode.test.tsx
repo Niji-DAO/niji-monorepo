@@ -38,12 +38,10 @@ describe('CardInputFincode', () => {
     getCardTokenMock.mockReset();
     uiCreateMock.mockReset();
     uiMountMock.mockReset();
-    // @ts-expect-error env override for test
     import.meta.env.VITE_FINCODE_PUBLIC_KEY = 'p_test_dummy';
   });
 
   afterEach(() => {
-    // @ts-expect-error env restore
     import.meta.env.VITE_FINCODE_PUBLIC_KEY = originalKey;
   });
 
@@ -92,7 +90,6 @@ describe('CardInputFincode', () => {
   });
 
   it('publicKey 未設定時は initFincode 呼ばず error message 表示 + onReadyChange(false)', async () => {
-    // @ts-expect-error env override for test
     import.meta.env.VITE_FINCODE_PUBLIC_KEY = '';
     const onReadyChange = vi.fn();
     const { getByTestId } = render(<CardInputFincode onReadyChange={onReadyChange} />);
