@@ -144,27 +144,35 @@ export const BidModal = ({
     if (didPlaceBidFail) toast.error(t`Please try again.`);
   }, [didPlaceBidFail, t]);
 
-  // toast 重複発火防止 (Issue #3086 fix regression)。
+  // toast 重複発火防止 + modal auto close 経路 (Issue #3086 / #3090 fix)。
   //
-  // wagmi の placeBidSucceeded は write 成功後 true を保持し続けるため、 useEffect deps
-  // (t / onClose) の参照変化で親 re-render 時に本 effect が re-fire し toast.success が
-  // 累積表示される bug があった (user 実測で 4 件連続表示)。 useRef で「1 auction bid あたり
-  // 1 回のみ toast 発火」 を強制する。 placeBidSucceeded が false に戻った (次 bid) 時に flag reset。
+  // wagmi の placeBidSucceeded は write 成功後 true を保持し続ける。
+  // useRef で「1 bid あたり toast 1 回のみ」 を強制、 placeBidSucceeded false 復帰時に flag reset。
+  //
+  // deps は [placeBidSucceeded] のみ (t / onClose 除外) — 親 re-render で onClose が新 reference
+  // になった時に useEffect が re-fire し、 cleanup が clearTimeout で auto close timer を消失させる
+  // regression bug (user 実測で「modal 閉じない」) を防ぐ。 t / onClose は latest ref に格納して stale 回避。
   const toastFiredRef = useRef(false);
+  const onCloseRef = useRef(onClose);
+  const tRef = useRef(t);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+    tRef.current = t;
+  });
   useEffect(() => {
     if (placeBidSucceeded && !toastFiredRef.current) {
       toastFiredRef.current = true;
-      toast.success(t`Bid placed.`);
+      toast.success(tRef.current`Bid placed.`);
       setEthInput('');
-      // 2 秒間 modal 内 success 表示を維持 → auto close で UX 完結 (user 明示要望で 3s → 2s 短縮)。
-      const closeTimer = setTimeout(() => onClose(), 2_000);
+      // 3 秒間 modal 内 success 表示を維持 → auto close で UX 完結。
+      const closeTimer = setTimeout(() => onCloseRef.current(), 3_000);
       return () => clearTimeout(closeTimer);
     }
     if (!placeBidSucceeded) {
       toastFiredRef.current = false;
     }
     return undefined;
-  }, [placeBidSucceeded, t, onClose]);
+  }, [placeBidSucceeded]);
 
   const placeEthBidHandler = () => {
     if (!ethInputRef.current || !ethInputRef.current.value) {
