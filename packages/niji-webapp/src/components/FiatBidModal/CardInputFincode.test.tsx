@@ -39,6 +39,9 @@ describe('CardInputFincode', () => {
     uiCreateMock.mockReset();
     uiMountMock.mockReset();
     import.meta.env.VITE_FINCODE_PUBLIC_KEY = 'p_test_dummy';
+    // window.Fincode を pre-set して preloadFincodeScript の早期 resolve 経路を通す (unit test で
+    // 実 CDN fetch を発生させないため)。
+    (window as unknown as { Fincode: (key: string) => unknown }).Fincode = () => ({});
   });
 
   afterEach(() => {

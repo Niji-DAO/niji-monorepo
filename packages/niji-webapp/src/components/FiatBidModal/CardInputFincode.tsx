@@ -38,6 +38,75 @@ export type CardInputFincodeProps = {
 };
 
 const MOUNT_TARGET_ID = 'niji-fincode-card-mount';
+const FINCODE_JS_TEST_URL = 'https://js.test.fincode.jp/v1/fincode.js';
+
+/**
+ * fincode.js CDN script を head に pre-inject して window.Fincode を set 済にする。
+ *
+ * initFincode SDK の findFincodeScript() は template literal で regex を string 化する SDK 側 bug で
+ * 常に existing script を見つけられず 2 重 inject する。 加えて Playwright headless で script tag inject 後の
+ * load event listener が発火せず init promise が永久 pending になる。 事前に script pre-load して
+ * window.Fincode を set 済にすることで initFincode の early return 経路 (initializer 存在時即 resolve) を通し
+ * 上記 2 症状を回避する。
+ */
+const preloadFincodeScript = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (typeof window === 'undefined') return reject(new Error('window is undefined'));
+    if ((window as unknown as { Fincode?: unknown }).Fincode !== undefined) return resolve();
+    const existing = document.querySelector<HTMLScriptElement>(
+      `script[src="${FINCODE_JS_TEST_URL}"]`,
+    );
+    if (existing !== null) {
+      if ((window as unknown as { Fincode?: unknown }).Fincode !== undefined) return resolve();
+      existing.addEventListener('load', () => resolve(), { once: true });
+      existing.addEventListener('error', () => reject(new Error('fincode.js load failed')), {
+        once: true,
+      });
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = FINCODE_JS_TEST_URL;
+    script.async = true;
+    let settled = false;
+    const timer = window.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      reject(new Error('fincode.js load timeout (5s)'));
+    }, 5_000);
+    script.addEventListener(
+      'load',
+      () => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        // load 完了直後に window.Fincode が set されているか polling で追加確認 (script eval 遅延対策)
+        let attempts = 0;
+        const poll = window.setInterval(() => {
+          attempts += 1;
+          if ((window as unknown as { Fincode?: unknown }).Fincode !== undefined) {
+            window.clearInterval(poll);
+            resolve();
+          } else if (attempts >= 50) {
+            window.clearInterval(poll);
+            reject(new Error('fincode.js loaded but window.Fincode 未 set (500ms)'));
+          }
+        }, 10);
+      },
+      { once: true },
+    );
+    script.addEventListener(
+      'error',
+      () => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        reject(new Error('fincode.js load failed'));
+      },
+      { once: true },
+    );
+    document.head.appendChild(script);
+  });
+};
 
 export const CardInputFincode = ({
   ref,
@@ -100,6 +169,8 @@ export const CardInputFincode = ({
     const raf = requestAnimationFrame(() => {
       void (async () => {
         try {
+          // fincode.js CDN を pre-load して window.Fincode set 済に、 initFincode の early return 経路を通す。
+          await preloadFincodeScript();
           const fincode = await initFincode({ publicKey, isLiveMode: false });
           const mountEl = document.getElementById(MOUNT_TARGET_ID);
           if (mountEl === null) {
