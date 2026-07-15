@@ -64,10 +64,11 @@ export const nijiTraitKeys = [
 ] as const satisfies readonly (keyof NijiSeed)[];
 
 // SSOT — packages/niji-contracts/scripts/niji-encoder.ts の `NIJI_COMPOSITE_ORDER`
-// = [10, 9, 8, 7, 3, 5, 6, 0, 1, 4, 11, 2]、 NIJI_TRAITS[id] の name で表記したもの。
+// = [10, 9, 8, 7, 3, 5, 6, 1, 4, 11, 2, 0]、 NIJI_TRAITS[id] の name で表記したもの。
 // 配列順 = SVG z-order (先頭が最背面、 末尾が最前面)。
-// user 指定 (Issue #3066) = special / choker を 8 / 9 位に配置、
-// leftHand / clothing / ear を前詰め (5-7 位) にして 前面 3 trait (hat / hair / headphone) を邪魔しない。
+// user 指定 (Issue #3113) = special を最前面 (12 位) に移動、 他 trait を overlay で覆う
+// エフェクト layer として最も強く見せる。 意思決定は dev only preview HTML の 12 position
+// 視覚比較 (Issue #3110) で確定。 contract 側 NIJI_COMPOSITE_ORDER と同期必須。
 const compositeOrder = [
   'solidBackground',
   'background',
@@ -76,11 +77,11 @@ const compositeOrder = [
   'leftHand',
   'clothing',
   'ear',
-  'special',
   'choker',
   'hat',
   'hair',
   'headphone',
+  'special',
 ] as const satisfies readonly (keyof NijiSeed)[];
 
 export const humanizeTraitKey = (key: keyof NijiSeed) => {
