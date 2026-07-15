@@ -29,7 +29,7 @@ import type { CardData } from './CardInput';
 import type { FiatBidStep, FiatTopupPhase } from '@/hooks/useFiatBid';
 
 import * as React from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +37,7 @@ import { useFiatBid } from '@/hooks/useFiatBid';
 import { ethToJpy, ethToWei, useSpotRate } from '@/hooks/useSpotRate';
 
 import { CardInput } from './CardInput';
+import { CardInputFincode, type CardInputFincodeHandle } from './CardInputFincode';
 import classes from './FiatBidForm.module.css';
 import { DEFAULT_TEST_CARD } from './testCards';
 
@@ -260,6 +261,17 @@ export const FiatBidForm = ({
     setIsCardValid(valid);
   }, []);
 
+  // fincode.js iframe 経路 (Issue #3115、 env flag opt-in、 default = false で従来 mock 経路継続)。
+  // true = CardInputFincode を render、 submit 時に await getToken で fincode token を backend に渡す。
+  // false = 従来 CardInput (自前 4 field mock) を render、 submit 時に generateCardToken(cardData) で mock token。
+  const useFincode =
+    (import.meta.env.VITE_USE_FINCODE_UI as string | undefined)?.toLowerCase() === 'true';
+  const fincodeRef = useRef<CardInputFincodeHandle | null>(null);
+  const [isFincodeReady, setIsFincodeReady] = useState(false);
+  const handleFincodeReadyChange = useCallback((ready: boolean) => {
+    setIsFincodeReady(ready);
+  }, []);
+
   const spotRate = useSpotRate(spotRateOverride);
   const fiatBid = useFiatBid(fetchersOverride);
 
@@ -295,10 +307,14 @@ export const FiatBidForm = ({
    */
   const ethInputHasValue = ethRaw.trim() !== '';
 
+  // fincode 経路では isCardValid は使わず、 fincode UI mount 完了 (isFincodeReady) を submit gate に使う。
+  // 実際の card 情報の valid 判定は fincode UI 内部で行われ、 getCardToken 呼出時にのみ検知可能。
+  const cardGateOk = useFincode ? isFincodeReady : isCardValid;
+
   const submitDisabled =
     !ethValidation.ok ||
     !termsChecked ||
-    !isCardValid ||
+    !cardGateOk ||
     spotRate.rate === undefined ||
     fiatBid.step === 'authorizing' ||
     fiatBid.step === 'three-ds' ||
@@ -318,8 +334,12 @@ export const FiatBidForm = ({
         setLocalError('特商法および利用規約への同意が必要です');
         return;
       }
-      if (!isCardValid) {
-        setLocalError('card 情報を正しく入力してください');
+      if (!cardGateOk) {
+        setLocalError(
+          useFincode
+            ? 'fincode カード入力欄の初期化を待っています'
+            : 'card 情報を正しく入力してください',
+        );
         return;
       }
       if (spotRate.rate === undefined) {
@@ -327,7 +347,21 @@ export const FiatBidForm = ({
         return;
       }
 
-      const cardToken = generateCardToken(cardData);
+      // fincode 経路 = iframe から実 token を非同期取得、 従来 = cardData から mock token 生成。
+      let cardToken: string;
+      try {
+        cardToken = useFincode
+          ? await (async () => {
+              if (fincodeRef.current === null) throw new Error('fincode UI 未初期化');
+              return fincodeRef.current.getToken();
+            })()
+          : generateCardToken(cardData);
+      } catch (err) {
+        setLocalError(
+          `card token 取得に失敗しました: ${err instanceof Error ? err.message : String(err)}`,
+        );
+        return;
+      }
       // ethRaw から直接 wei 化 (float 中間変換を経由しないため 0.1 → 1e17 wei の精度確保、 viem parseEther 相当)
       const ethAmountWei = ethToWei(ethRaw.trim()).toString();
 
@@ -356,7 +390,8 @@ export const FiatBidForm = ({
       ethRaw,
       ethValidation,
       termsChecked,
-      isCardValid,
+      cardGateOk,
+      useFincode,
       generateCardToken,
       cardData,
       fiatBid,
@@ -530,12 +565,21 @@ export const FiatBidForm = ({
 
         <div>
           <label htmlFor="card-input-number" className={`mb-1 block ${classes.formLabel}`}>
-            card 情報 (GMO Token 方式)
+            card 情報 ({useFincode ? 'fincode.js iframe' : 'GMO Token 方式 mock'})
           </label>
-          <CardInput onChange={handleCardChange} palette={palette} isDev={isDev} />
+          {useFincode ? (
+            <CardInputFincode
+              ref={fincodeRef}
+              onReadyChange={handleFincodeReadyChange}
+              palette={palette}
+            />
+          ) : (
+            <CardInput onChange={handleCardChange} palette={palette} isDev={isDev} />
+          )}
           <p className={`mt-2 ${classes.formHint}`}>
-            card 情報は GMO 公開鍵で Token 化され、 webapp / niji サーバーには保存されません。
-            (Phase 1 は mock Token を simulate)
+            {useFincode
+              ? 'card 情報は fincode.js の iframe で入力・ token 化され、 webapp / niji サーバーには一切保存されません (PCI DSS SAQ-A-EP)。'
+              : 'card 情報は GMO 公開鍵で Token 化され、 webapp / niji サーバーには保存されません。 (Phase 1 は mock Token を simulate)'}
           </p>
         </div>
 
