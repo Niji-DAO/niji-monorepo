@@ -39,6 +39,7 @@ import { ethToJpy, ethToWei, useSpotRate } from '@/hooks/useSpotRate';
 import { CardInput } from './CardInput';
 import { CardInputFincode, type CardInputFincodeHandle } from './CardInputFincode';
 import classes from './FiatBidForm.module.css';
+import { FincodeTestCardHelper } from './FincodeTestCardHelper';
 import { DEFAULT_TEST_CARD } from './testCards';
 
 /** bid 上限 (spec P4、 100 万円 client-side + backend validation の 2 層) */
@@ -568,11 +569,14 @@ export const FiatBidForm = ({
             card 情報 ({useFincode ? 'fincode.js iframe' : 'GMO Token 方式 mock'})
           </label>
           {useFincode ? (
-            <CardInputFincode
-              ref={fincodeRef}
-              onReadyChange={handleFincodeReadyChange}
-              palette={palette}
-            />
+            <>
+              <CardInputFincode
+                ref={fincodeRef}
+                onReadyChange={handleFincodeReadyChange}
+                palette={palette}
+              />
+              <FincodeTestCardHelper />
+            </>
           ) : (
             <CardInput onChange={handleCardChange} palette={palette} isDev={isDev} />
           )}
