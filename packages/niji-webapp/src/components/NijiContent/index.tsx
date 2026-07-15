@@ -59,7 +59,10 @@ const NijiContent: React.FC<NijiContentProps> = props => {
   // endTime 判定は **chain 上の block.timestamp** で行う (Date.now() は browser local
   // 時刻で anvil evm_increaseTime とズレるため Issue #172 m-1)。 useBlock は polling で
   // chain block 進行に追従する。
-  const { data: latestBlock } = useBlock({ watch: true });
+  // useBlock({ watch: true }) は default で 1 秒 polling、 NijiContent が常時 re-render 発火し
+  // サイト全体が「時々重い」 症状の一因になる。 auctionEnded 判定は endTime 精度で 5 秒粒度で十分、
+  // pollingInterval: 5000 に緩めて poll 頻度を 5 倍削減 (Issue #3103、 Phase B perf)。
+  const { data: latestBlock } = useBlock({ watch: { pollingInterval: 5_000 } });
   const chainNow = latestBlock?.timestamp;
   const auctionEnded =
     auction !== undefined &&
