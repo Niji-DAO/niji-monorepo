@@ -84,3 +84,26 @@
     padding-left: 20px;
   }
 }
+
+/* Issue #3091 続 — accordion 開いた content が 一瞬表示 → 消える bug fix。
+ * root cause = tailwind preflight が bootstrap の transition / display 経路と conflict、
+ * react-bootstrap Collapse component の height animation が完了せず content が hidden に snap back。
+ * :global で bootstrap grid class を direct override、 open 済 accordion の content を強制 visible に保つ。
+ */
+.accordionItem :global(.accordion-collapse.show) {
+  display: block !important;
+  height: auto !important;
+  visibility: visible !important;
+  overflow: visible !important;
+}
+
+.accordionItem :global(.accordion-collapse.collapsing) {
+  height: auto !important;
+  overflow: hidden !important;
+  transition: none !important;
+}
+
+.accordionItem :global(.accordion-body) {
+  display: block !important;
+  visibility: visible !important;
+}
