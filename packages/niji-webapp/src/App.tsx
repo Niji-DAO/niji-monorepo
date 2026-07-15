@@ -5,8 +5,14 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import { useAccount } from 'wagmi';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+// CSS 順序 = index.css (@tailwind base 含む) を先に、 bootstrap.min.css を後に load する。
+// bootstrap → index.css の順だと tailwind preflight が bootstrap の accordion / collapse 系 style を
+// 上書きし、 Documentation accordion 開いた content が 一瞬表示 → 消える bug が発生していた (Issue #3091)。
+// tailwind utilities は class ベースで individual だが preflight (base reset) は universal reset で bootstrap の
+// component style と衝突する。 bootstrap を最後 load することで preflight を上書きし、
+// accordion transition / collapse display state が正常動作する。
 import '@/index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { Footer } from '@/components/Footer';
 import NavBar from '@/components/NavBar';
