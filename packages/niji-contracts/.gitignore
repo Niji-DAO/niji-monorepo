@@ -14,13 +14,9 @@ logs
 coverage/
 coverage.json
 
-abi/@openzeppelin
-abi/contracts/base
-abi/contracts/external
-abi/contracts/governance
-abi/contracts/interfaces
-abi/contracts/proxies
-abi/contracts/test
+# hardhat compile 出力 ABI JSON (再生成可能、 sdk 側は wagmi cli / typechain 経路で別途生成)
+# tracked file 0 件で全て build artifact なので abi/ 配下全体を ignore する。
+abi/
 
 # Foundry
 foundry-out
