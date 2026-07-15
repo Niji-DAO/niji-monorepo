@@ -93,7 +93,42 @@ test.describe('fincode iframe verify (Issue #3119)', () => {
       console.log('error message:', await errorEl.textContent());
     }
 
-    // 判定 = iframe あり OR error state (どちらか成立で fincode 経路が render されたことを確認)
+    // 判定 = fincode SDK が実 iframe を append (iframe > 0)、 or 明示 error state。
+    // 実 fincode test env credential set 済想定で iframe > 0 が期待成立 (Issue #3123 で SDK -form div 対応後)。
     expect(iframeCount > 0 || hasError).toBeTruthy();
+  });
+
+  test('fincode iframe = mount target の子として実 iframe が append される (SDK CDN 実 fetch)', async ({
+    page,
+  }) => {
+    page.on('pageerror', err => {
+      console.log('[BROWSER pageerror]', err.message);
+    });
+    await page.goto('/');
+    await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
+
+    const bidOpenButton = page.getByTestId('bid-open-button').first();
+    await bidOpenButton.waitFor({ state: 'visible', timeout: 20_000 });
+    await bidOpenButton.click();
+    await page.getByTestId('bid-tab-fiat').click();
+
+    // fincode iframe が append されるまで wait (最大 10s、 CDN fetch + SDK init 含む)
+    await page.waitForFunction(
+      () => {
+        const mount = document.getElementById('niji-fincode-card-mount');
+        return mount !== null && mount.querySelectorAll('iframe').length > 0;
+      },
+      null,
+      { timeout: 10_000 },
+    );
+
+    const fincodeMount = page.getByTestId('card-input-fincode-mount');
+    const iframeCount = await fincodeMount.locator('iframe').count();
+    console.log('=== fincode iframe append verify result ===');
+    console.log('iframe count:', iframeCount);
+    expect(iframeCount).toBeGreaterThan(0);
+
+    // error state 未発火 (SDK init 完了)
+    await expect(page.getByTestId('card-input-fincode-error')).toHaveCount(0);
   });
 });

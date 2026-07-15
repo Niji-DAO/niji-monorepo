@@ -149,10 +149,6 @@ export const CardInputFincode = ({
   );
 
   useEffect(() => {
-    // StrictMode 二重 mount 対策 = initedRef で 1 回のみ init 保証。 fincode SDK は internal で
-    // document.getElementById(MOUNT_TARGET_ID) を参照するため、 2 回目 invocation で element ref が
-    // null になり setAttribute で crash する race condition を回避 (実測 error 「Cannot read
-    // properties of null (reading 'setAttribute')」)。 onReadyChange は ref 経由で stable。
     if (initedRef.current) return;
     if (publicKey === undefined || publicKey === '') {
       setInitError(
@@ -162,39 +158,31 @@ export const CardInputFincode = ({
       return;
     }
     initedRef.current = true;
-    // Radix Dialog Portal 経由で mount target div が render される timing と、 SDK が
-    // document.getElementById(MOUNT_TARGET_ID) を呼ぶ timing の race を回避するため、
-    // requestAnimationFrame で next paint 直前まで SDK init を defer する。
-    // (実測 error 「Cannot read properties of null (reading 'setAttribute')」 の対処)。
-    const raf = requestAnimationFrame(() => {
-      void (async () => {
-        try {
-          // fincode.js CDN を pre-load して window.Fincode set 済に、 initFincode の early return 経路を通す。
-          await preloadFincodeScript();
-          const fincode = await initFincode({ publicKey, isLiveMode: false });
-          const mountEl = document.getElementById(MOUNT_TARGET_ID);
-          if (mountEl === null) {
-            throw new Error(`mount target #${MOUNT_TARGET_ID} が DOM に存在しません`);
-          }
-          const ui = fincode.ui({ layout: 'vertical' });
-          ui.create('token', { layout: 'vertical' });
-          ui.mount(MOUNT_TARGET_ID, '100%');
-          fincodeRef.current = fincode;
-          uiRef.current = ui;
-          setIsReady(true);
-          onReadyChangeRef.current?.(true);
-        } catch (err) {
-          const message = err instanceof Error ? err.message : String(err);
-          setInitError(`fincode SDK 初期化に失敗しました: ${message}`);
-          onReadyChangeRef.current?.(false);
-          initedRef.current = false;
+    // raf + cleanup は StrictMode 1 回目 useEffect cleanup で raf cancel → 2 回目 initedRef skip で
+    // init 未発火の root cause。 直接 async fire + initedRef guard で 2 重発火防止、 cleanup 不要
+    // (unmount 後の SDK init は無害な dangling)。
+    void (async () => {
+      try {
+        await preloadFincodeScript();
+        const fincode = await initFincode({ publicKey, isLiveMode: false });
+        const mountEl = document.getElementById(MOUNT_TARGET_ID);
+        if (mountEl === null) {
+          throw new Error(`mount target #${MOUNT_TARGET_ID} が DOM に存在しません`);
         }
-      })();
-    });
-    return () => {
-      cancelAnimationFrame(raf);
-    };
-    // cleanup では ref を null 化しない (init 済 SDK を破壊しない)、 iframe は DOM 削除で GC。
+        const ui = fincode.ui({ layout: 'vertical' });
+        ui.create('token', { layout: 'vertical' });
+        ui.mount(MOUNT_TARGET_ID, '100%');
+        fincodeRef.current = fincode;
+        uiRef.current = ui;
+        setIsReady(true);
+        onReadyChangeRef.current?.(true);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        setInitError(`fincode SDK 初期化に失敗しました: ${message}`);
+        onReadyChangeRef.current?.(false);
+        initedRef.current = false;
+      }
+    })();
   }, [publicKey]);
 
   return (
@@ -212,6 +200,12 @@ export const CardInputFincode = ({
         data-testid="card-input-fincode-mount"
         className="min-h-[240px] w-full"
       />
+      {/*
+        fincode SDK は `elementId + "-form"` id の別 div を内部で参照する (SDK docs 未明示、
+        CDN runtime code から判明)。 element 不在で `Cannot read properties of null (reading
+        'setAttribute')` crash するため mount target と対で render する。
+      */}
+      <div id={`${MOUNT_TARGET_ID}-form`} />
     </div>
   );
 };
