@@ -17,6 +17,20 @@ vi.mock('@/hooks/useSubgraphQuery', () => ({
   useSubgraphQuery: () => useSubgraphQueryMock(),
 }));
 
+const useReadNijiTokenOwnerOfMock = vi.fn(() => ({ data: undefined }));
+vi.mock('@niji/sdk/react', () => ({
+  useReadNijiTokenOwnerOf: () => useReadNijiTokenOwnerOfMock(),
+}));
+
+vi.mock('@/wagmi', () => ({
+  defaultChain: { id: 31337 },
+}));
+
+const isNounderNijiMock = vi.fn(() => false);
+vi.mock('@/utils/nounderNiji', () => ({
+  isNounderNiji: () => isNounderNijiMock(),
+}));
+
 vi.mock('@/components/ShortAddress', () => ({
   default: ({ address }: { address: string }) => <span data-testid="short">{address}</span>,
 }));
@@ -568,8 +582,11 @@ describe('Holder', () => {
       error: undefined,
       data: { noun: { owner: { id: '' } } },
     });
+    // Issue #3086 対応 = 空 owner id は「黒塗り circle」 UX 問題を防ぐため ShortAddress を render せず、
+    // 明示的な「—」 placeholder を出す仕様に変更。 subgraph fail 時の on-chain RPC fallback と組で機能する。
     const { container } = render(<Holder nounId={1n} />, { wrapper: WithProviders });
-    expect(container.querySelector('[data-testid="short"]')?.textContent).toBe('');
+    expect(container.querySelector('[data-testid="short"]')).toBeNull();
+    expect(container.textContent).toContain('—');
   });
 
   it('rapid loading transitions 50 times without crash', () => {
