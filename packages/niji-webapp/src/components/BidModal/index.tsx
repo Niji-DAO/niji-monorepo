@@ -156,8 +156,8 @@ export const BidModal = ({
       toastFiredRef.current = true;
       toast.success(t`Bid placed.`);
       setEthInput('');
-      // 3 秒間 modal 内 success 表示を維持 → auto close で UX 完結。
-      const closeTimer = setTimeout(() => onClose(), 3_000);
+      // 2 秒間 modal 内 success 表示を維持 → auto close で UX 完結 (user 明示要望で 3s → 2s 短縮)。
+      const closeTimer = setTimeout(() => onClose(), 2_000);
       return () => clearTimeout(closeTimer);
     }
     if (!placeBidSucceeded) {
