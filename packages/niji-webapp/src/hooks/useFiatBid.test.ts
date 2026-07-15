@@ -94,7 +94,7 @@ describe('useFiatBid.authorize', () => {
 });
 
 describe('useFiatBid.authorize — fincode 経路 (Issue #3115)', () => {
-  it('tds2Url undefined + status=AUTHORIZED で step="placing" 遷移、 redirect 呼ばず', async () => {
+  it('tds2Url undefined + status=AUTHORIZED で placeBid 自動呼出 + step="success" 遷移、 redirect 呼ばず', async () => {
     const authorize = vi.fn().mockResolvedValue({
       authId: 'fincode-auth-1',
       // tds2Url 未返却 (fincode AUTHORIZED = 3DS 不要 pattern)
@@ -104,7 +104,12 @@ describe('useFiatBid.authorize — fincode 経路 (Issue #3115)', () => {
       spotRateSource: 'gmo-coin' as const,
       status: 'AUTHORIZED' as const,
     });
-    const placeBid = vi.fn();
+    const placeBid = vi.fn().mockResolvedValue({
+      authId: 'fincode-auth-1',
+      status: 'bid-placed' as const,
+      txHash: '0xabc123',
+      message: 'bid placed on chain',
+    });
     const saveState = vi.fn();
     const redirect = vi.fn();
 
@@ -127,10 +132,93 @@ describe('useFiatBid.authorize — fincode 経路 (Issue #3115)', () => {
       });
     });
 
-    // status=AUTHORIZED は 3DS skip → placing 直遷移
-    expect(result.current.step).toBe('placing');
+    // status=AUTHORIZED は 3DS skip → placeBid 自動呼出 → success 遷移
+    expect(result.current.step).toBe('success');
     expect(saveState).toHaveBeenCalledOnce();
     expect(redirect).not.toHaveBeenCalled();
+    expect(placeBid).toHaveBeenCalledWith({ authId: 'fincode-auth-1' });
+    expect(result.current.placeBidResult).toMatchObject({
+      status: 'bid-placed',
+      txHash: '0xabc123',
+    });
+  });
+
+  it('tds2Url undefined + placeBid status=cancelled で step="failure" + errorMessage', async () => {
+    const authorize = vi.fn().mockResolvedValue({
+      authId: 'fincode-auth-cancel',
+      jpyAmount: 50_000,
+      ethAmount: '100000000000000000',
+      spotRate: 500_000,
+      spotRateSource: 'gmo-coin' as const,
+      status: 'AUTHORIZED' as const,
+    });
+    const placeBid = vi.fn().mockResolvedValue({
+      authId: 'fincode-auth-cancel',
+      status: 'cancelled' as const,
+      txHash: null,
+      message: 'bid tx revert = BidTooLow',
+    });
+    const saveState = vi.fn();
+    const redirect = vi.fn();
+
+    const { result } = renderHook(() =>
+      useFiatBid({
+        fetchers: { authorize, placeBid },
+        saveState,
+        redirect,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.authorize({
+        auctionId: '42',
+        bidderWallet: '0xUSER',
+        ethAmount: '100000000000000000',
+        spotRate: 500_000,
+        jpyAmount: 50_000,
+        cardToken: 'card_token_fincode_xxx',
+      });
+    });
+
+    expect(result.current.step).toBe('failure');
+    expect(result.current.errorMessage).toBe('bid tx revert = BidTooLow');
+    expect(placeBid).toHaveBeenCalledOnce();
+  });
+
+  it('tds2Url undefined + placeBid throw で step="failure"', async () => {
+    const authorize = vi.fn().mockResolvedValue({
+      authId: 'fincode-auth-throw',
+      jpyAmount: 50_000,
+      ethAmount: '100000000000000000',
+      spotRate: 500_000,
+      spotRateSource: 'gmo-coin' as const,
+      status: 'AUTHORIZED' as const,
+    });
+    const placeBid = vi.fn().mockRejectedValue(new Error('BidRelay: RPC network error'));
+    const saveState = vi.fn();
+    const redirect = vi.fn();
+
+    const { result } = renderHook(() =>
+      useFiatBid({
+        fetchers: { authorize, placeBid },
+        saveState,
+        redirect,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.authorize({
+        auctionId: '42',
+        bidderWallet: '0xUSER',
+        ethAmount: '100000000000000000',
+        spotRate: 500_000,
+        jpyAmount: 50_000,
+        cardToken: 'card_token_fincode_xxx',
+      });
+    });
+
+    expect(result.current.step).toBe('failure');
+    expect(result.current.errorMessage).toBe('BidRelay: RPC network error');
   });
 
   it('tds2Url 有り + status=AUTHENTICATED で step="three-ds" 遷移、 redirect 呼出', async () => {
