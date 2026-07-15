@@ -27,6 +27,16 @@ test.describe('fincode iframe verify (Issue #3119)', () => {
   test('VITE_USE_FINCODE_UI=true 時 CardInputFincode が render + label 変化 + mount target 存在', async ({
     page,
   }) => {
+    // browser console log を capture して SDK 呼出 pipeline debug
+    page.on('console', msg => {
+      const text = msg.text();
+      if (text.includes('fincode') || text.includes('Fincode') || msg.type() === 'error') {
+        console.log(`[BROWSER ${msg.type()}]`, text);
+      }
+    });
+    page.on('pageerror', err => {
+      console.log('[BROWSER pageerror]', err.message);
+    });
     await page.goto('/');
     await page.locator('img[alt="Niji DAO"]').first().waitFor({ timeout: 20_000 });
 
