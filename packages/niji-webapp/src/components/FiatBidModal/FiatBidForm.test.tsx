@@ -53,7 +53,7 @@ const successRate: SpotRate = {
 };
 
 describe('FiatBidForm loading spinner (Issue #3053 Phase B、 Issue #3059 で JPY 側条件更新)', () => {
-  it('spot rate 未取得 + ETH 未入力時 → spot rate 欄は spinner 表示、 JPY 換算欄は「—」 (spinner 非表示、 Issue #3059)', () => {
+  it('spot rate 未取得 + JPY 未入力時 → spot rate 欄は spinner 表示、 ETH 換算欄は「—」 (spinner 非表示、 Issue #3059)', () => {
     // spot rate fetcher = pending Promise (never resolve) で undefined 保持
     const pendingFetcher = vi.fn(() => new Promise<SpotRate>(() => {}));
 
@@ -79,9 +79,9 @@ describe('FiatBidForm loading spinner (Issue #3053 Phase B、 Issue #3059 で JP
     expect(rateLoading.textContent).toContain('取得中');
 
     // Issue #3059 — ETH 未入力時、 JPY 換算欄は「—」 表示 (spinner 非表示)
-    expect(screen.queryByTestId('fiat-bid-jpy-display-loading')).toBeNull();
-    const jpyDisplay = screen.getByTestId('fiat-bid-jpy-display');
-    expect(jpyDisplay.textContent).toContain('—');
+    expect(screen.queryByTestId('fiat-bid-eth-display-loading')).toBeNull();
+    const ethDisplay = screen.getByTestId('fiat-bid-eth-display');
+    expect(ethDisplay.textContent).toContain('—');
 
     // rateSummary root に aria-busy="true" 付与 (screen reader 対応、 spot rate 側 loading state)
     const rateSummary = screen.getByTestId('fiat-bid-rate-summary');
@@ -123,13 +123,13 @@ describe('FiatBidForm loading spinner (Issue #3053 Phase B、 Issue #3059 で JP
     expect(rateSummary.textContent).toContain('source: gmo');
 
     // JPY 換算欄 (ETH 未入力 state = 「—」 表示、 spinner 非表示)
-    expect(screen.queryByTestId('fiat-bid-jpy-display-loading')).toBeNull();
-    const jpyDisplay = screen.getByTestId('fiat-bid-jpy-display');
-    expect(jpyDisplay).toBeInTheDocument();
-    expect(jpyDisplay.textContent).toContain('—');
+    expect(screen.queryByTestId('fiat-bid-eth-display-loading')).toBeNull();
+    const ethDisplay = screen.getByTestId('fiat-bid-eth-display');
+    expect(ethDisplay).toBeInTheDocument();
+    expect(ethDisplay.textContent).toContain('—');
   });
 
-  it('spot rate 未取得 + ETH 入力あり → JPY 換算欄で spinner + 「取得中」 表示 (Issue #3059)', () => {
+  it('spot rate 未取得 + JPY 入力あり → ETH 換算欄で spinner + 「取得中」 表示 (Issue #3059)', () => {
     // spot rate fetcher = pending Promise (never resolve)、 rate === undefined 保持
     const pendingFetcher = vi.fn(() => new Promise<SpotRate>(() => {}));
 
@@ -149,14 +149,14 @@ describe('FiatBidForm loading spinner (Issue #3053 Phase B、 Issue #3059 で JP
       { wrapper: buildWrapper() },
     );
 
-    // ETH 入力を発火 (validation NG でも ethRaw に値が入っていれば spinner 判定 trigger)
-    const ethInput = screen.getByTestId('fiat-bid-eth-input');
-    fireEvent.change(ethInput, { target: { value: '0.05' } });
+    // JPY 入力を発火 (validation NG でも jpyRaw に値が入っていれば spinner 判定 trigger)
+    const jpyInput = screen.getByTestId('fiat-bid-jpy-input');
+    fireEvent.change(jpyInput, { target: { value: '25000' } });
 
-    // JPY 換算欄で spinner + 「取得中」 表示 (ETH 入力あり + spot rate 未取得 branch)
-    const jpyLoading = screen.getByTestId('fiat-bid-jpy-display-loading');
-    expect(jpyLoading).toBeInTheDocument();
-    expect(jpyLoading.textContent).toContain('取得中');
+    // ETH 換算欄で spinner + 「取得中」 表示 (JPY 入力あり + spot rate 未取得 branch)
+    const ethLoading = screen.getByTestId('fiat-bid-eth-display-loading');
+    expect(ethLoading).toBeInTheDocument();
+    expect(ethLoading.textContent).toContain('取得中');
   });
 });
 
