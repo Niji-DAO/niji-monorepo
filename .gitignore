@@ -40,6 +40,8 @@ packages/niji-contracts/deployments/hardhat.json
 packages/niji-assets/test_output/
 packages/niji-webapp/test-results/
 packages/niji-contracts/test-results/
+# root-level playwright test-results (npm run e2e が repo root で実行された場合の出力)
+/test-results/
 
 # foundry forge script --broadcast の自動生成 deploy 履歴 (niji deploy は packages/niji-contracts/deploy/ で別管理)
 packages/niji-contracts/broadcast/
