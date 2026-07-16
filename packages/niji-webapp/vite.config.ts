@@ -67,6 +67,19 @@ export default defineConfig({
     hmr: {
       overlay: true,
     },
+    // dev 環境で VITE_GMO_API_ENDPOINT_SPOT_RATE / VITE_GMO_API_ENDPOINT が .env に未設定の場合の
+    // fallback 経路として、 相対 URL /api/v1/... を Ponder (42069) + spot-rate-server (42070) に proxy する。
+    // env 明示設定時は resolveSpotRateEndpoint が絶対 URL を返し fetch は proxy を経由しない (優先度低)。
+    proxy: {
+      '/api/v1/spot-rate': {
+        target: 'http://127.0.0.1:42070',
+        changeOrigin: true,
+      },
+      '/api/v1/fiat-bid': {
+        target: 'http://127.0.0.1:42069',
+        changeOrigin: true,
+      },
+    },
   },
   // build 時のみ 30MB niji-data-rle.json を JSON.parse で lazy 展開 (dev では逆効果のため無効)。
   json: {
