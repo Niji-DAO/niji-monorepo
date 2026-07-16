@@ -46,11 +46,12 @@ export type UseSpotRateOptions = {
  *
  * env 優先順 —
  * (1) VITE_GMO_API_ENDPOINT_SPOT_RATE = spot-rate independent server (port 42070、 Ponder 非依存)
- * (2) VITE_GMO_API_ENDPOINT = 旧 niji-api (port 42069、 Ponder + Hono) の fallback、 互換性維持
- * (3) 未設定 = 同一 origin (空 prefix、 Vite proxy 前提)
+ * (2) 未設定 = 同一 origin (空 prefix、 Vite proxy 前提、 vite.config.ts server.proxy で 42070 に routing)
  *
  * 空白のみの env 値 (`'   '`) は未設定扱い、 trailing slash は正規化する。
  * 引数 envSource は test で差替可能に、 default は `import.meta.env`。
+ *
+ * 旧 VITE_GMO_API_ENDPOINT fallback 経路は PR #3133 で Vite proxy fallback を追加後に削除。
  */
 export const resolveSpotRateEndpoint = (
   envSource: Record<string, string | undefined> = ((): Record<string, string | undefined> => {
@@ -60,13 +61,8 @@ export const resolveSpotRateEndpoint = (
   })(),
 ): string => {
   const spotRateEndpoint = envSource['VITE_GMO_API_ENDPOINT_SPOT_RATE'];
-  const legacyEndpoint = envSource['VITE_GMO_API_ENDPOINT'];
   const preferred =
-    typeof spotRateEndpoint === 'string' && spotRateEndpoint.trim() !== ''
-      ? spotRateEndpoint
-      : typeof legacyEndpoint === 'string' && legacyEndpoint.trim() !== ''
-        ? legacyEndpoint
-        : '';
+    typeof spotRateEndpoint === 'string' && spotRateEndpoint.trim() !== '' ? spotRateEndpoint : '';
   return preferred.replace(/\/$/, '');
 };
 
