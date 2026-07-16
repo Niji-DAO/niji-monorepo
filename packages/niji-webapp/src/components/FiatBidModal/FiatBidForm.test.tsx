@@ -23,7 +23,7 @@ import * as React from 'react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 
@@ -68,7 +68,6 @@ describe('FiatBidForm loading spinner (Issue #3053 Phase B、 Issue #3059 で JP
           redirect: vi.fn(),
         }}
         spotRateOverride={{ fetcher: pendingFetcher, refetchInterval: 0 }}
-        isDev={true}
       />,
       { wrapper: buildWrapper() },
     );
@@ -102,7 +101,6 @@ describe('FiatBidForm loading spinner (Issue #3053 Phase B、 Issue #3059 で JP
           redirect: vi.fn(),
         }}
         spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
-        isDev={true}
       />,
       { wrapper: buildWrapper() },
     );
@@ -144,7 +142,6 @@ describe('FiatBidForm loading spinner (Issue #3053 Phase B、 Issue #3059 で JP
           redirect: vi.fn(),
         }}
         spotRateOverride={{ fetcher: pendingFetcher, refetchInterval: 0 }}
-        isDev={true}
       />,
       { wrapper: buildWrapper() },
     );
@@ -189,7 +186,6 @@ describe('FiatBidForm mock badge (Issue #3061)', () => {
           redirect: vi.fn(),
         }}
         spotRateOverride={{ fetcher, refetchInterval: 0 }}
-        isDev={true}
       />,
       { wrapper: buildWrapper() },
     );
@@ -246,78 +242,5 @@ describe('FiatBidForm mock badge (Issue #3061)', () => {
     expect(screen.queryByTestId('fiat-bid-rate-summary-mock-badge')).toBeNull();
     const rateSummary = screen.getByTestId('fiat-bid-rate-summary');
     expect(rateSummary.textContent).toContain('source: coingecko');
-  });
-});
-
-/**
- * Issue #3119 — VITE_USE_FINCODE_UI env flag による CardInput / CardInputFincode 切替 test。
- *
- * default (flag 未設定 / 'false') = CardInput (自前 mock form) が render される (data-testid="card-input")。
- * flag='true' = CardInputFincode (fincode.js iframe) が render される (data-testid="card-input-fincode")。
- * @fincode/js は SDK 内部で iframe を mount するため vi.mock で fake instance を stub、
- * env は import.meta.env の direct override で 2 pattern 検証。
- */
-
-vi.mock('@fincode/js', () => ({
-  initFincode: vi.fn().mockResolvedValue({
-    ui: () => ({ create: vi.fn(), mount: vi.fn(), getFormData: vi.fn() }),
-  }),
-  getCardToken: vi.fn().mockResolvedValue({ list: [{ token: 'tok_stub' }] }),
-}));
-
-describe('FiatBidForm useFincode env flag 分岐 (Issue #3119)', () => {
-  const originalFlag = import.meta.env.VITE_USE_FINCODE_UI;
-  const originalKey = import.meta.env.VITE_FINCODE_PUBLIC_KEY;
-
-  afterEach(() => {
-    import.meta.env.VITE_USE_FINCODE_UI = originalFlag;
-    import.meta.env.VITE_FINCODE_PUBLIC_KEY = originalKey;
-  });
-
-  const renderFiat = () =>
-    render(
-      <FiatBidForm
-        onClose={() => {}}
-        auctionId="42"
-        bidderWallet="0xUSER"
-        fetchersOverride={{
-          fetchers: { authorize: vi.fn(), placeBid: vi.fn() },
-          saveState: vi.fn(),
-          redirect: vi.fn(),
-        }}
-        spotRateOverride={{ fetcher: vi.fn().mockResolvedValue(successRate), refetchInterval: 0 }}
-        isDev={true}
-      />,
-      { wrapper: buildWrapper() },
-    );
-
-  it('flag 未設定 (default) 時に CardInput (自前 form) が render される', () => {
-    import.meta.env.VITE_USE_FINCODE_UI = undefined;
-    renderFiat();
-    expect(screen.getByTestId('card-input')).toBeInTheDocument();
-    expect(screen.queryByTestId('card-input-fincode')).toBeNull();
-  });
-
-  it('flag="false" 明示時も CardInput が render される (default 継続)', () => {
-    import.meta.env.VITE_USE_FINCODE_UI = 'false';
-    renderFiat();
-    expect(screen.getByTestId('card-input')).toBeInTheDocument();
-    expect(screen.queryByTestId('card-input-fincode')).toBeNull();
-  });
-
-  it('flag="true" 時に CardInputFincode が render + label が「fincode.js iframe」 に変わる', async () => {
-    import.meta.env.VITE_USE_FINCODE_UI = 'true';
-    import.meta.env.VITE_FINCODE_PUBLIC_KEY = 'p_test_dummy';
-    renderFiat();
-    await waitFor(() => expect(screen.getByTestId('card-input-fincode')).toBeInTheDocument());
-    expect(screen.queryByTestId('card-input')).toBeNull();
-    expect(screen.getByText(/fincode.js iframe/)).toBeInTheDocument();
-  });
-
-  it('flag="TRUE" 大文字 も case-insensitive で fincode 経路発動', async () => {
-    import.meta.env.VITE_USE_FINCODE_UI = 'TRUE';
-    import.meta.env.VITE_FINCODE_PUBLIC_KEY = 'p_test_dummy';
-    renderFiat();
-    await waitFor(() => expect(screen.getByTestId('card-input-fincode')).toBeInTheDocument());
   });
 });

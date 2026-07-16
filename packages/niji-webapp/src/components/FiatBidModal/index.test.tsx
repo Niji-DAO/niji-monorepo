@@ -27,6 +27,35 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { BID_LIMIT_JPY, FiatBidModal, validateEthAmount, validateTopupEthAmount } from './index';
 
+// fincode SDK を stub、 iframe token 取得を deterministic な 'tok_stub' に固定
+vi.mock('@fincode/js', () => ({
+  initFincode: vi.fn().mockResolvedValue({
+    ui: () => ({ create: vi.fn(), mount: vi.fn(), getFormData: vi.fn() }),
+  }),
+  getCardToken: vi.fn().mockResolvedValue({ list: [{ token: 'tok_stub' }] }),
+}));
+
+// CardInputFincode 自体を mock 化、 jsdom で iframe SDK 起動できないため onReadyChange(true) を
+// mount 直後に発火する軽量 stub に置換、 getToken は 'tok_stub' を返す。
+vi.mock('./CardInputFincode', async () => {
+  const ReactMod = await import('react');
+  return {
+    CardInputFincode: ReactMod.forwardRef(function CardInputFincodeMock(
+      props: { onReadyChange?: (ready: boolean) => void },
+      ref: React.Ref<{ getToken: () => Promise<string>; isReady: boolean }>,
+    ) {
+      ReactMod.useImperativeHandle(ref, () => ({
+        getToken: async () => 'tok_stub',
+        isReady: true,
+      }));
+      ReactMod.useEffect(() => {
+        props.onReadyChange?.(true);
+      }, [props]);
+      return ReactMod.createElement('div', { 'data-testid': 'card-input-fincode' });
+    }),
+  };
+});
+
 // Radix Tooltip Portal を jsdom で render するため Provider を wrap
 
 const buildWrapper = () => {
@@ -79,99 +108,6 @@ const topupResponse: TopupResponse = {
   spotRateSource: 'gmo',
   message: '増額 bid tx を broadcast しました。',
 };
-
-describe('Issue #3047 CardInput 統合 (Issue #3051 で ETH 入力軸に更新)', () => {
-  it('isDev=true default プリフィル で cardData 実値を含む cardToken 生成 (mock-tok-visa-1111-...)', async () => {
-    const authorize = vi.fn().mockResolvedValue(authResponse);
-    const spotFetcher = vi.fn().mockResolvedValue(successRate);
-    // generateCardToken は real generateMockCardToken 経由で cardData 実値を含む Token 生成
-    const generateCardTokenSpy = vi.fn((cardData?: { number: string; brand: string }): string => {
-      if (cardData !== undefined && cardData.number.length >= 4) {
-        const last4 = cardData.number.slice(-4);
-        return `mock-tok-${cardData.brand}-${last4}-test`;
-      }
-      return 'mock-tok-fallback';
-    });
-
-    render(
-      <FiatBidModal
-        open
-        onClose={() => {}}
-        auctionId="42"
-        bidderWallet="0xUSER"
-        fetchersOverride={{
-          fetchers: { authorize, placeBid: vi.fn() },
-          saveState: vi.fn(),
-          redirect: vi.fn(),
-        }}
-        spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
-        generateCardToken={generateCardTokenSpy}
-        isDev={true}
-      />,
-      { wrapper: buildWrapper() },
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
-    });
-
-    // CardInput UI が render + default VISA プリフィル
-    expect(screen.getByTestId('card-input')).toBeInTheDocument();
-    expect((screen.getByTestId('card-input-number') as HTMLInputElement).value).toBe(
-      '4111 1111 1111 1111',
-    );
-
-    // ETH 額入力 (0.1 ETH = 500,000 JPY 換算、 100 万円上限内) + Terms check → submit enable
-    fireEvent.change(screen.getByTestId('fiat-bid-jpy-input'), { target: { value: '50000' } });
-    fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
-    const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
-    expect(submit.disabled).toBe(false);
-
-    // submit → generateCardToken(cardData) → authorize が cardData 実値含む Token 受取
-    fireEvent.click(submit);
-    await waitFor(() => {
-      expect(authorize).toHaveBeenCalledWith(
-        expect.objectContaining({
-          cardToken: 'mock-tok-visa-1111-test',
-        }),
-      );
-    });
-  });
-
-  it('isDev=false 空欄状態で submit disable (isCardValid=false)', async () => {
-    const spotFetcher = vi.fn().mockResolvedValue(successRate);
-
-    render(
-      <FiatBidModal
-        open
-        onClose={() => {}}
-        auctionId="42"
-        bidderWallet="0xUSER"
-        fetchersOverride={{
-          fetchers: { authorize: vi.fn(), placeBid: vi.fn() },
-          saveState: vi.fn(),
-          redirect: vi.fn(),
-        }}
-        spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
-        isDev={false}
-      />,
-      { wrapper: buildWrapper() },
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
-    });
-
-    // card fields 空欄 + ETH + Terms 済でも card 無効で submit disable
-    fireEvent.change(screen.getByTestId('fiat-bid-jpy-input'), { target: { value: '50000' } });
-    fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
-    const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
-    expect(submit.disabled).toBe(true);
-
-    // テストカード dropdown も非表示 (dev 限定)
-    expect(screen.queryByTestId('card-input-test-card-select')).toBeNull();
-  });
-});
 
 describe('validateEthAmount (Issue #3051、 ETH 入力軸)', () => {
   const rate = 500_000; // spot rate 500,000 JPY/ETH
@@ -262,7 +198,6 @@ describe('FiatBidModal 開閉 + submit → stepper 遷移 (T13、 T15、 Issue #
           redirect,
         }}
         spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
-        generateCardToken={() => 'mock-tok-fixed'}
       />,
       { wrapper: buildWrapper() },
     );
@@ -300,7 +235,7 @@ describe('FiatBidModal 開閉 + submit → stepper 遷移 (T13、 T15、 Issue #
         ethAmount: '100000000000000000', // 0.1 ETH = 1e17 wei
         spotRate: 500_000,
         jpyAmount: 50_000,
-        cardToken: 'mock-tok-fixed',
+        cardToken: 'tok_stub',
       });
     });
     await waitFor(() => {
@@ -656,7 +591,6 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11、 Issue #3051 で E
           redirect: vi.fn(),
         }}
         spotRateOverride={{ fetcher: spotFetcher, refetchInterval: 0 }}
-        generateCardToken={() => 'mock-tok-topup-fixed'}
       />,
       { wrapper: buildWrapper() },
     );
@@ -684,7 +618,7 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11、 Issue #3051 で E
         newEthAmount: '160000000000000000', // 0.16 ETH = 1.6e17 wei
         newSpotRate: 500_000,
         newJpyAmount: 80_000,
-        cardToken: 'mock-tok-topup-fixed',
+        cardToken: 'tok_stub',
       });
     });
 

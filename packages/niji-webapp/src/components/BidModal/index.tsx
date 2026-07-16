@@ -91,7 +91,6 @@ export type BidModalProps = {
    */
   fiatFetchersOverride?: React.ComponentProps<typeof FiatBidForm>['fetchersOverride'];
   fiatSpotRateOverride?: React.ComponentProps<typeof FiatBidForm>['spotRateOverride'];
-  fiatGenerateCardToken?: React.ComponentProps<typeof FiatBidForm>['generateCardToken'];
   /** default tab (test 用、 default = "eth") */
   defaultTab?: 'eth' | 'fiat';
 };
@@ -111,7 +110,6 @@ export const BidModal = ({
   palette = 'cool',
   fiatFetchersOverride,
   fiatSpotRateOverride,
-  fiatGenerateCardToken,
   defaultTab = 'eth',
 }: BidModalProps): React.JSX.Element => {
   const { t } = useLingui();
@@ -306,7 +304,6 @@ export const BidModal = ({
               palette={palette}
               fetchersOverride={fiatFetchersOverride}
               spotRateOverride={fiatSpotRateOverride}
-              generateCardToken={fiatGenerateCardToken}
             />
           </TabsContent>
         </Tabs>
