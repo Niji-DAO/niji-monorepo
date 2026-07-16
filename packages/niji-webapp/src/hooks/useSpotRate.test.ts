@@ -172,39 +172,29 @@ describe('formatEthFromWei', () => {
 });
 
 describe('resolveSpotRateEndpoint env 優先順 (Issue #3065、 spot-rate 独立 server)', () => {
-  it('VITE_GMO_API_ENDPOINT_SPOT_RATE が優先される (42070、 Ponder 非依存)', () => {
+  it('VITE_GMO_API_ENDPOINT_SPOT_RATE 設定時は absolute URL を返す (42070、 Ponder 非依存)', () => {
     const base = resolveSpotRateEndpoint({
       VITE_GMO_API_ENDPOINT_SPOT_RATE: 'http://127.0.0.1:42070',
-      VITE_GMO_API_ENDPOINT: 'http://127.0.0.1:42069',
     });
     expect(base).toBe('http://127.0.0.1:42070');
   });
 
-  it('VITE_GMO_API_ENDPOINT_SPOT_RATE 未設定時は VITE_GMO_API_ENDPOINT (42069) に fallback', () => {
-    const base = resolveSpotRateEndpoint({
-      VITE_GMO_API_ENDPOINT: 'http://127.0.0.1:42069',
-    });
-    expect(base).toBe('http://127.0.0.1:42069');
+  it('VITE_GMO_API_ENDPOINT_SPOT_RATE 未設定時は空文字 (同一 origin fallback、 Vite proxy 前提)', () => {
+    const base = resolveSpotRateEndpoint({});
+    expect(base).toBe('');
   });
 
-  it('VITE_GMO_API_ENDPOINT_SPOT_RATE 空文字時は legacy env に fallback', () => {
+  it('VITE_GMO_API_ENDPOINT_SPOT_RATE 空文字時も同一 origin fallback', () => {
     const base = resolveSpotRateEndpoint({
       VITE_GMO_API_ENDPOINT_SPOT_RATE: '',
-      VITE_GMO_API_ENDPOINT: 'http://127.0.0.1:42069',
     });
-    expect(base).toBe('http://127.0.0.1:42069');
+    expect(base).toBe('');
   });
 
-  it('VITE_GMO_API_ENDPOINT_SPOT_RATE 空白文字時は legacy env に fallback (trim 判定)', () => {
+  it('VITE_GMO_API_ENDPOINT_SPOT_RATE 空白文字時も同一 origin fallback (trim 判定)', () => {
     const base = resolveSpotRateEndpoint({
       VITE_GMO_API_ENDPOINT_SPOT_RATE: '   ',
-      VITE_GMO_API_ENDPOINT: 'http://127.0.0.1:42069',
     });
-    expect(base).toBe('http://127.0.0.1:42069');
-  });
-
-  it('両 env 未設定時は空文字 (同一 origin fallback)', () => {
-    const base = resolveSpotRateEndpoint({});
     expect(base).toBe('');
   });
 
