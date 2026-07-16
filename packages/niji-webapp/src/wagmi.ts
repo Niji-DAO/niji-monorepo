@@ -53,23 +53,26 @@ const wagmiStorage =
       })
     : undefined;
 
+// WalletConnect connector は project ID 設定時のみ有効化。 local dev (anvil + MetaMask) では
+// reown 発行不要、 空文字で walletConnect connector を connectors 配列から除外する。
+// Base Sepolia / production では project ID 必須 (mobile wallet / QR 経路のため)。
+const connectors = [
+  // Coinbase Wallet connector は Analytics SDK が cca-lite.coinbase.com/metrics に
+  // 常時 telemetry POST (BLOCKED_BY_CLIENT で ad blocker との衝突多発)、 かつ SDK bundle
+  // が 100-200KB 追加される割に本 webapp の主 wallet ユースケースが MetaMask / WalletConnect
+  // 経由で完結するため除去 (Issue #3101、 サイト重い audit の Phase A)。
+  injected(),
+  ...(WALLET_CONNECT_V2_PROJECT_ID !== ''
+    ? [walletConnect({ projectId: WALLET_CONNECT_V2_PROJECT_ID, showQrModal: false })]
+    : []),
+];
+
 export const config = createConfig({
   chains: SUPPORTED_CHAINS,
   transports,
   storage: wagmiStorage,
   multiInjectedProviderDiscovery: true,
-  connectors: [
-    // Coinbase Wallet connector は Analytics SDK が cca-lite.coinbase.com/metrics に
-    // 常時 telemetry POST (BLOCKED_BY_CLIENT で ad blocker との衝突多発)、 かつ SDK bundle
-    // が 100-200KB 追加される割に本 webapp の主 wallet ユースケースが MetaMask / WalletConnect
-    // 経由で完結するため除去 (Issue #3101、 サイト重い audit の Phase A)。
-    // 将来 Coinbase Wallet native 対応要件が出た場合は個別 Issue で再検討。
-    injected(),
-    walletConnect({
-      projectId: WALLET_CONNECT_V2_PROJECT_ID,
-      showQrModal: false,
-    }),
-  ],
+  connectors,
 });
 
 export const defaultChain = activeChain;
