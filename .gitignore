@@ -5,7 +5,15 @@ dist
 /**/sha.ts
 /**/sha.h
 *.tgz
+# env file 群 (3 環境 pattern = .env.local / .env.dev / .env.prod + Vite native .env.local)
+# .env.*.example のみ tracked、 実 secret 含む .env / .env.local / .env.dev / .env.prod は gitignored
 .env
+.env.local
+.env.dev
+.env.prod
+.env.development
+.env.production
+!.env.*.example
 .DS_Store
 *.tsbuildinfo
 *.log
@@ -32,6 +40,8 @@ packages/niji-contracts/deployments/hardhat.json
 packages/niji-assets/test_output/
 packages/niji-webapp/test-results/
 packages/niji-contracts/test-results/
+# root-level playwright test-results (npm run e2e が repo root で実行された場合の出力)
+/test-results/
 
 # foundry forge script --broadcast の自動生成 deploy 履歴 (niji deploy は packages/niji-contracts/deploy/ で別管理)
 packages/niji-contracts/broadcast/
