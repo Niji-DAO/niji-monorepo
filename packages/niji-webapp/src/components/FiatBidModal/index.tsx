@@ -29,10 +29,9 @@ import {
 
 import bidModalClasses from '@/components/BidModal/BidModal.module.css';
 
-// re-export for backward compat (既存 import 経路を壊さない、 Issue #3051 で validate 系を ETH primary に置換)
+// re-export for backward compat (Issue #3051 で validate 系を ETH primary に置換)
 export {
   BID_LIMIT_JPY,
-  generateMockCardToken,
   validateEthAmount,
   validateTopupEthAmount,
 } from '@/components/FiatBidModal/FiatBidForm';
@@ -71,8 +70,6 @@ export const FiatBidModal = ({
   palette = 'cool',
   fetchersOverride,
   spotRateOverride,
-  generateCardToken,
-  isDev,
 }: FiatBidModalProps): React.JSX.Element => {
   const isTopupMode = existingFiatBid !== undefined;
   const modalTitle = isTopupMode ? '増額 bid (ETH)' : 'クレカで bid (ETH)';
@@ -108,8 +105,6 @@ export const FiatBidModal = ({
           palette={palette}
           fetchersOverride={fetchersOverride}
           spotRateOverride={spotRateOverride}
-          generateCardToken={generateCardToken}
-          isDev={isDev}
         />
       </DialogContent>
     </Dialog>
