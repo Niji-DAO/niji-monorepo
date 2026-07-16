@@ -470,10 +470,10 @@ describe('FincodeClient endpoint 解決', () => {
     expect(resolveUrl(call[0] as string | URL | Request)).toContain('mock-server:2427');
   });
 
-  it('USE_FINCODE_MOCK=false + live=false 時に test endpoint を使う', async () => {
+  it('USE_FINCODE_MOCK=false + FINCODE_API_KEY_SECRET が m_test_ prefix 時に test endpoint を使う', async () => {
     restoreEnv = withEnv({
       USE_FINCODE_MOCK: 'false',
-      FINCODE_IS_LIVE_MODE: 'false',
+      FINCODE_API_KEY_SECRET: 'm_test_dummy',
     });
     const fetchStub: FetchLike = vi.fn(async () => {
       return new Response(
@@ -501,10 +501,10 @@ describe('FincodeClient endpoint 解決', () => {
     expect(resolveUrl(call[0] as string | URL | Request)).toContain('api.test.fincode.jp');
   });
 
-  it('USE_FINCODE_MOCK=false + live=true 時に production endpoint を使う', async () => {
+  it('USE_FINCODE_MOCK=false + FINCODE_API_KEY_SECRET が m_live_ prefix 時に production endpoint を使う', async () => {
     restoreEnv = withEnv({
       USE_FINCODE_MOCK: 'false',
-      FINCODE_IS_LIVE_MODE: 'true',
+      FINCODE_API_KEY_SECRET: 'm_live_dummy',
     });
     const fetchStub: FetchLike = vi.fn(async () => {
       return new Response(
@@ -518,7 +518,7 @@ describe('FincodeClient endpoint 解決', () => {
         { status: 200, headers: { 'Content-Type': 'application/json' } },
       );
     });
-    const client = new FincodeClient({ apiKeySecret: 'm_test_dummy', fetch: fetchStub });
+    const client = new FincodeClient({ apiKeySecret: 'm_live_dummy', fetch: fetchStub });
 
     await client.registerPayment({
       pay_type: 'Card',
