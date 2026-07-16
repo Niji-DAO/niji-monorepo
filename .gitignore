@@ -5,7 +5,15 @@ dist
 /**/sha.ts
 /**/sha.h
 *.tgz
+# env file 群 (3 環境 pattern = .env.local / .env.dev / .env.prod + Vite native .env.local)
+# .env.*.example のみ tracked、 実 secret 含む .env / .env.local / .env.dev / .env.prod は gitignored
 .env
+.env.local
+.env.dev
+.env.prod
+.env.development
+.env.production
+!.env.*.example
 .DS_Store
 *.tsbuildinfo
 *.log
