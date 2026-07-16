@@ -122,7 +122,7 @@ describe('Issue #3047 CardInput 統合 (Issue #3051 で ETH 入力軸に更新)'
     );
 
     // ETH 額入力 (0.1 ETH = 500,000 JPY 換算、 100 万円上限内) + Terms check → submit enable
-    fireEvent.change(screen.getByTestId('fiat-bid-eth-input'), { target: { value: '0.1' } });
+    fireEvent.change(screen.getByTestId('fiat-bid-jpy-input'), { target: { value: '50000' } });
     fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
     const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
     expect(submit.disabled).toBe(false);
@@ -163,7 +163,7 @@ describe('Issue #3047 CardInput 統合 (Issue #3051 で ETH 入力軸に更新)'
     });
 
     // card fields 空欄 + ETH + Terms 済でも card 無効で submit disable
-    fireEvent.change(screen.getByTestId('fiat-bid-eth-input'), { target: { value: '0.1' } });
+    fireEvent.change(screen.getByTestId('fiat-bid-jpy-input'), { target: { value: '50000' } });
     fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
     const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
     expect(submit.disabled).toBe(true);
@@ -273,11 +273,11 @@ describe('FiatBidModal 開閉 + submit → stepper 遷移 (T13、 T15、 Issue #
     });
 
     // ETH 入力 (0.1 ETH = 500,000 JPY 換算)
-    const ethInput = screen.getByTestId('fiat-bid-eth-input') as HTMLInputElement;
-    fireEvent.change(ethInput, { target: { value: '0.1' } });
+    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
+    fireEvent.change(jpyInput, { target: { value: '50000' } });
 
     // JPY 換算表示が反映
-    expect(screen.getByTestId('fiat-bid-jpy-display').textContent).toContain('50,000');
+    expect(screen.getByTestId('fiat-bid-eth-display').textContent).toContain('0.1000');
 
     // Terms 未 check なら submit disable
     const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
@@ -339,12 +339,12 @@ describe('bid 上限超過 validation (T14、 Issue #3051 で JPY 換算 100 万
     });
 
     // 2.001 ETH * 500,000 JPY/ETH = 1,000,500 JPY (100 万円超過)
-    const ethInput = screen.getByTestId('fiat-bid-eth-input') as HTMLInputElement;
-    fireEvent.change(ethInput, { target: { value: '2.001' } });
+    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
+    fireEvent.change(jpyInput, { target: { value: '1000500' } });
 
     // validation エラー表示
     await waitFor(() => {
-      const err = screen.getByTestId('fiat-bid-eth-error');
+      const err = screen.getByTestId('fiat-bid-jpy-error');
       expect(err.textContent).toContain('bid 上限');
     });
 
@@ -505,11 +505,11 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11、 Issue #3051 で E
     });
 
     // 旧 ethAmount と同額入力 (増額のみ受付なので ng)
-    const ethInput = screen.getByTestId('fiat-bid-eth-input') as HTMLInputElement;
-    fireEvent.change(ethInput, { target: { value: '0.1' } });
+    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
+    fireEvent.change(jpyInput, { target: { value: '50000' } });
 
     await waitFor(() => {
-      const err = screen.getByTestId('fiat-bid-eth-error');
+      const err = screen.getByTestId('fiat-bid-jpy-error');
       expect(err.textContent).toContain('増額のみ受付可能');
     });
 
@@ -545,11 +545,11 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11、 Issue #3051 で E
     });
 
     // 2.001 ETH × 500,000 rate = 1,000,500 JPY (100 万円超過)
-    const ethInput = screen.getByTestId('fiat-bid-eth-input') as HTMLInputElement;
-    fireEvent.change(ethInput, { target: { value: '2.001' } });
+    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
+    fireEvent.change(jpyInput, { target: { value: '1000500' } });
 
     await waitFor(() => {
-      const err = screen.getByTestId('fiat-bid-eth-error');
+      const err = screen.getByTestId('fiat-bid-jpy-error');
       expect(err.textContent).toContain('bid 上限');
     });
 
@@ -634,7 +634,7 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11、 Issue #3051 で E
     await waitFor(() => {
       expect(screen.getByTestId('fiat-bid-rate-summary')).toBeInTheDocument();
     });
-    expect(screen.getByTestId('fiat-bid-eth-input').className).toMatch(/ethInput/);
+    expect(screen.getByTestId('fiat-bid-jpy-input').className).toMatch(/ethInput/);
     expect(screen.getByTestId('fiat-bid-submit').className).toMatch(/submitBtn/);
     expect(screen.getByTestId('fiat-bid-cancel').className).toMatch(/cancelBtn/);
   });
@@ -666,8 +666,8 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11、 Issue #3051 で E
     });
 
     // 増額額 0.16 ETH 入力 (旧 0.1 ETH より大、 500,000 rate で 80,000 JPY 換算)
-    const ethInput = screen.getByTestId('fiat-bid-eth-input') as HTMLInputElement;
-    fireEvent.change(ethInput, { target: { value: '0.16' } });
+    const jpyInput = screen.getByTestId('fiat-bid-jpy-input') as HTMLInputElement;
+    fireEvent.change(jpyInput, { target: { value: '80000' } });
 
     // Terms check
     fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
