@@ -11,6 +11,9 @@
     "format": "NODE_OPTIONS=--max_old_space_size=16384 prettier --write 'packages/**/*.{ts(x)?,sol,md,css,json}' '!**/typechain/**'",
     "lint": "eslint --cache --cache-location .cache/.eslintcache",
     "prepare": "husky",
+    "setup:dev": "for pkg in packages/*/; do [ -f \"$pkg.env.dev.example\" ] && cp \"$pkg.env.dev.example\" \"$pkg.env.dev\" && echo \"created $pkg.env.dev\"; done",
+    "setup:local": "for pkg in packages/*/; do [ -f \"$pkg.env.local.example\" ] && cp \"$pkg.env.local.example\" \"$pkg.env.local\" && echo \"created $pkg.env.local\"; done",
+    "setup:prod": "for pkg in packages/*/; do [ -f \"$pkg.env.prod.example\" ] && cp \"$pkg.env.prod.example\" \"$pkg.env.prod\" && echo \"created $pkg.env.prod\"; done",
     "test": "turbo run test --concurrency=1"
   },
   "devDependencies": {

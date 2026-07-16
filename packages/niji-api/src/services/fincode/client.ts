@@ -9,7 +9,7 @@
  *
  * env 切替 —
  * - `USE_FINCODE_MOCK=true` (dev / test) → `FINCODE_MOCK_ENDPOINT` (default `http://127.0.0.1:2427`) を叩く
- * - `USE_FINCODE_MOCK=false` (本番 / 実 test env verify) → `FINCODE_IS_LIVE_MODE` で prod / test 切替
+ * - `USE_FINCODE_MOCK=false` (本番 / 実 test env verify) → `FINCODE_API_KEY_SECRET` prefix で prod (m_live_) / test (m_test_) 自動判別
  *   - live=true → https://api.fincode.jp
  *   - live=false → https://api.test.fincode.jp
  *
@@ -72,7 +72,8 @@ export class FincodeAuthorizationError extends Error {
 /**
  * env / options から endpoint を決定
  * USE_FINCODE_MOCK truthy → FINCODE_MOCK_ENDPOINT
- * それ以外は FINCODE_IS_LIVE_MODE で live / test 切替
+ * それ以外は FINCODE_API_KEY_SECRET の prefix で live / test 自動判別
+ * (m_live_XXXX → live env、 m_test_XXXX → test env)
  */
 const resolveEndpoint = (option: string | undefined): string => {
   if (option !== undefined && option.trim() !== '') {
@@ -83,7 +84,8 @@ const resolveEndpoint = (option: string | undefined): string => {
   if (isMock) {
     return process.env['FINCODE_MOCK_ENDPOINT'] ?? 'http://127.0.0.1:2427';
   }
-  const isLive = (process.env['FINCODE_IS_LIVE_MODE'] ?? 'false').trim().toLowerCase() === 'true';
+  const apiKey = process.env['FINCODE_API_KEY_SECRET'] ?? '';
+  const isLive = apiKey.startsWith('m_live_');
   if (isLive) {
     return process.env['FINCODE_LIVE_ENDPOINT'] ?? 'https://api.fincode.jp';
   }
