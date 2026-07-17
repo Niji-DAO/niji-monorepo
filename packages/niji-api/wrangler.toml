@@ -1,0 +1,34 @@
+# Cloudflare Workers config for niji-api (authorize-fincode + capture-fincode + place-bid + SettlementDaemon)
+# SSOT — decision-log 2026-07-16-niji-cloudflare-hybrid-deploy.md + 2026-07-17-niji-auto-base-sepolia-env-dev-scope.md
+name = "niji-api"
+main = "src/workers/authorize-fincode-worker.ts"
+compatibility_date = "2024-11-06"
+compatibility_flags = ["nodejs_compat"]
+
+# fincode state (authId → orderId + accessId + jpyAmount + fiat_bid record + cron cursor) を authorize → capture →
+# settlement 間で共有する KV。 in-memory Map (CaptureAwareFincodeClient) の Cloudflare Workers stateless 版、
+# TTL 1 時間で fincode 側 auth 期限に合わせて自動 expiry (capture: prefix のみ)。 fiat_bid: prefix は auction 完了まで保持。
+[[kv_namespaces]]
+binding = "FINCODE_STATE"
+id = "29ed658a44994fce8e8f83085666ac5a"
+
+# Cron Triggers 経路 = SettlementDaemon (AuctionSettled event poll + capture + transferFrom or cancel)
+# 1 分毎起動、 fromBlock cursor は KV `cron_cursor:from_block` で永続、 event miss 防止設計。
+[triggers]
+crons = ["* * * * *"]
+
+# env values (secret は wrangler secret put で別途 set、 non-secret のみここ)
+# secret 一覧:
+#   wrangler secret put FINCODE_API_KEY_SECRET   # fincode dashboard secret key (m_test_ / m_live_ prefix)
+#   wrangler secret put OPERATOR_PK              # 運営 EOA 秘密鍵 (0x prefix、 Base Sepolia real ETH 保有必須)
+[vars]
+# fincode
+USE_FINCODE_MOCK = "false"
+# spot rate (real 経路は GMO Coin API、 mock 経路は下記固定値)
+USE_SPOT_RATE_MOCK = "true"
+MOCK_SPOT_RATE_JPY_PER_ETH = "500000"
+# chain (Base Sepolia、 deploy 完了後に real address を更新)
+CHAIN_ID = "84532"
+RPC_URL = "https://sepolia.base.org"
+AUCTION_HOUSE_ADDRESS = "0x0000000000000000000000000000000000000000"
+NIJI_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000"

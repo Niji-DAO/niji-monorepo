@@ -1,0 +1,10 @@
+# Cloudflare Pages security headers
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=()
+
+# 静的資産 = 1 年 immutable cache (hash 付きなので content 変更で URL 変わる)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
