@@ -316,29 +316,30 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
     console.log('└──────────────────────────────────────────────────────────────┘\n');
 
     // =========================================
-    // STEP 7.5: Deploy AuctionHouse stack (local 31337 only)
+    // STEP 7.5: Deploy AuctionHouse stack (localhost / baseSepolia / base-sepolia)
     // =========================================
+    // 2026-07-17 base-sepolia 対応 = auction 起動対象を localhost 単一から testnet 系に拡張。
+    // mainnet では既に Nouns AuctionHouse が deployed 済 = 対象外 (contract 系列上 重複 deploy 禁止)。
+    const AUCTION_DEPLOY_NETWORKS = new Set(['localhost', 'hardhat', 'baseSepolia', 'base-sepolia']);
     let auctionProxyAddr: string | null = null;
     let wethAddr: string | null = null;
-    if (token && network.name === 'localhost') {
+    if (token && AUCTION_DEPLOY_NETWORKS.has(network.name)) {
       console.log('┌─ STEP 7.5: Deploy AuctionHouse (V3 + Proxy + WETH) ────────────┐');
 
-      // 31337 local 用パラメータ — dev で auction を回しまくる用に 1 分枠
-      // (Niji 0 / 任意の auction の endTime を 1 分で越えさせ Bid.tsx の auctionEnded を
-      // すぐ true にして既存の SettleManuallyBtn を表示させる狙い、 auto-settler が
-      // 5s polling で速やかに次 auction に進める)
-      //
-      // env NIJI_AUCTION_DURATION で override 可能 (Issue #3077、 e2e 対応)。
-      // e2e globalSetup が 86400 (24h) を set することで、 webapp の Date.now() ベースの
-      // auctionEnded 判定が e2e 実行時間 (数分) 中に true になるのを防ぐ。
-      // default は既存 dev flow 互換で 60 秒維持。
+      // network 別 auction duration default:
+      // - localhost/hardhat = 60s (anvil 上で auction を回しまくる)、 env NIJI_AUCTION_DURATION で override 可能
+      // - baseSepolia = 86400s (24h、 real testnet で本番相当運用感を確保)
+      // - env で override すれば全 network で自由に指定可能
+      const isLocal = network.name === 'localhost' || network.name === 'hardhat';
       const AUCTION_DURATION_ENV = process.env.NIJI_AUCTION_DURATION;
       const AUCTION_DURATION =
         AUCTION_DURATION_ENV && Number.isFinite(Number(AUCTION_DURATION_ENV))
           ? Number(AUCTION_DURATION_ENV)
-          : 60;
-      const AUCTION_RESERVE_PRICE = ethers.parseEther('0.001'); // 0.001 ETH
-      const AUCTION_TIME_BUFFER = 10; // 10 秒 (1 分 auction に合わせる、 snipe 延長は最小限)
+          : isLocal
+            ? 60
+            : 86400;
+      const AUCTION_RESERVE_PRICE = ethers.parseEther('0.001'); // 0.001 ETH (testnet 低額 verify、 mainnet は別 script)
+      const AUCTION_TIME_BUFFER = isLocal ? 10 : 300; // localhost 10s / testnet 5min (snipe 延長 window)
       const AUCTION_MIN_BID_INCREMENT_PRCT = 2; // 2%
 
       // WETH (test 用 mock)
