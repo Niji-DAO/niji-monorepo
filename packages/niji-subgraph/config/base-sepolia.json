@@ -10,10 +10,10 @@
   },
   "nijiDAO": {
     "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 0
+    "startBlock": 44428567
   },
   "nijiDAOData": {
     "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 0
+    "startBlock": 44428567
   }
 }

@@ -105,6 +105,20 @@ function syncSubgraphConfig(
   const cfg = JSON.parse(fs.readFileSync(full, 'utf-8'));
   cfg.nijiToken = { address: tokenAddr, startBlock: tokenBlock };
   cfg.nijiAuctionHouse = { address: auctionAddr, startBlock: auctionBlock };
+
+  // 未 deploy (zero address) の dataSource が startBlock 0 のままだと、 subgraph は
+  // 全 dataSource の最小 startBlock から indexing を開始するため chain 全体 (4400 万 block) を
+  // 舐めることになり sync が実質終わらない (2026-07-21 に bid 履歴が空になる事象で顕在化)。
+  // deploy 済 contract の最小 block に揃えて無駄な scan を防ぐ。
+  const baseBlock = Math.min(tokenBlock, auctionBlock);
+  for (const key of Object.keys(cfg)) {
+    if (key === 'network') continue;
+    if (cfg[key] && cfg[key].startBlock === 0) {
+      cfg[key].startBlock = baseBlock;
+      console.log(`  ✓  subgraph config ${key}.startBlock: 0 → ${baseBlock} (未 deploy、 全 chain scan 回避)`);
+    }
+  }
+
   fs.writeFileSync(full, JSON.stringify(cfg, null, 2) + '\n');
   console.log(`  ✓  subgraph config/${network}.json → token@${tokenBlock} auction@${auctionBlock}`);
 }
