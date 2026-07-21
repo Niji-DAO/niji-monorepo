@@ -38,14 +38,23 @@ let chainLogs: Array<{ args: { nounId: bigint; winner: string; amount: bigint } 
 /** writeContract を失敗させたい test 用 (transferFrom 失敗分岐の検証) */
 let writeContractError: Error | null = null;
 
+/** getBlockNumber が返す latest block。 cursor 書込条件 (窓幅) の検証で上書きする */
+let chainLatestBlock = 100n;
+
+/** getLogs に渡された引数を記録する (窓 cap の検証用) */
+let getLogsCalls: Array<{ fromBlock?: bigint; toBlock?: bigint }> = [];
+
 vi.mock('viem', async () => {
   const actual = await vi.importActual<typeof import('viem')>('viem');
   return {
     ...actual,
     createPublicClient: () => ({
       readContract: async () => chainState,
-      getBlockNumber: async () => 100n,
-      getLogs: async () => chainLogs,
+      getBlockNumber: async () => chainLatestBlock,
+      getLogs: async (args: { fromBlock?: bigint; toBlock?: bigint }) => {
+        getLogsCalls.push({ fromBlock: args?.fromBlock, toBlock: args?.toBlock });
+        return chainLogs;
+      },
       waitForTransactionReceipt: async () => ({ status: 'success' }),
     }),
     createWalletClient: () => ({
@@ -546,9 +555,11 @@ describe('scheduled 経路 (AuctionKeeper + SettlementDaemon)', () => {
   beforeEach(() => {
     writeContractCalls.length = 0;
     fincodeCalls.length = 0;
+    getLogsCalls = [];
     writeContractError = null;
     capturePaymentError = null;
     chainLogs = [];
+    chainLatestBlock = 100n;
     // settle 済 + 未終了 = AuctionKeeper が tx を送らない状態 (SettlementDaemon 側の検証に集中する)
     chainState = { nounId: 7n, amount: 0n, startTime: 1, endTime: 9_999_999_999, settled: false };
   });
@@ -624,14 +635,52 @@ describe('scheduled 経路 (AuctionKeeper + SettlementDaemon)', () => {
     expect(record.lifecycle).toBe('won');
   });
 
-  it('処理後に cron cursor が toBlock+1 へ進む (event の取りこぼし防止)', async () => {
+  it('event 処理時は cron cursor を toBlock+1 へ進める (取りこぼし防止)', async () => {
     const kv = seededKv();
-    chainLogs = [];
+    // 落選 event でも「logs あり」 なので cursor は書かれる
+    chainLogs = [{ args: { nounId: 7n, winner: `0x${'9'.repeat(40)}`, amount: 1n } }];
 
     await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
 
     // getBlockNumber mock = 100n のため次回は 101 から
     expect(kv._store.get('cron_cursor:from_block')).toBe('101');
+  });
+
+  it('event 無し + 窓が小さいときは cursor を書かない (KV write 無料枠 1000/日 の節約)', async () => {
+    // seededKv の cursor = 90、 latest = 100 → 窓 10 block < 300 で書込 skip
+    const kv = seededKv();
+    chainLogs = [];
+
+    await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
+
+    // 毎分書込を止めたのが本 fix の主眼。 cursor は 90 のまま据え置き
+    expect(kv._store.get('cron_cursor:from_block')).toBe('90');
+  });
+
+  it('event 無しでも窓が SETTLEMENT_CURSOR_ADVANCE 以上なら cursor を進める (窓の暴走防止)', async () => {
+    // cursor = 90、 latest = 500 → 窓 410 block >= 300 で書込
+    const kv = seededKv();
+    chainLogs = [];
+    chainLatestBlock = 500n;
+
+    await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
+
+    expect(kv._store.get('cron_cursor:from_block')).toBe('501');
+  });
+
+  it('cursor が古すぎるときは getLogs の fromBlock を MAX_SCAN_WINDOW で cap する (RPC 2000 block 制限回避)', async () => {
+    // cursor = 90、 latest = 5000 → 窓 4910 は 1500 超なので fromBlock = 5000 - 1500 = 3500
+    const kv = seededKv();
+    chainLogs = [];
+    chainLatestBlock = 5000n;
+
+    await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
+
+    const settlementCall = getLogsCalls.at(-1);
+    expect(settlementCall?.fromBlock).toBe(3500n);
+    expect(settlementCall?.toBlock).toBe(5000n);
+    // 窓が広いので cursor も書かれる (5000 + 1)
+    expect(kv._store.get('cron_cursor:from_block')).toBe('5001');
   });
 
   it('endTime 未到達の auction は settle tx を送らない (空振り gas を出さない)', async () => {

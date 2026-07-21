@@ -418,9 +418,25 @@ const runAuctionKeeper = async (env: Env): Promise<void> => {
 };
 
 /**
+ * getLogs の 1 回あたり最大走査 block 数。 Base の公開 RPC の eth_getLogs 2000 block/req 制限より
+ * 安全側に取り、 cursor が古すぎる場合の窓をこの値で cap する。
+ */
+const SETTLEMENT_MAX_SCAN_WINDOW = 1500n;
+
+/**
+ * idle 時 (AuctionSettled event なし) に cursor を書き進める間隔 (block)。
+ * この値ごとにしか KV write しないことで、 毎分書込 (1440/日) → 無料枠超過を回避する。
+ * Base の 2 秒 block 換算で約 10 分ごと = 1 日あたり最大 ~144 write に収まる。
+ */
+const SETTLEMENT_CURSOR_ADVANCE = 300n;
+
+/**
  * SettlementDaemon (Cron Triggers 経路) = fromBlock cursor 以降の AuctionSettled event を取得、
  * KV fiat_bid record と突合して勝敗判定 → capture + transferFrom or cancel を発火する。
  * wrangler.toml の [triggers] crons で 1 min 毎起動、 event miss 防止で cursor は KV 永続。
+ *
+ * cursor 書込は毎回ではなく「event 処理時」 か「窓が SETTLEMENT_CURSOR_ADVANCE を超えた時」 に限定し、
+ * KV write 無料枠 (1000/日) を超えないようにする (2026-07-22 に毎分書込で 90% 到達したため)。
  */
 const runSettlementDaemon = async (env: Env): Promise<void> => {
   const { publicClient, walletClient, operatorAddress } = buildChainClients(env);
@@ -429,10 +445,16 @@ const runSettlementDaemon = async (env: Env): Promise<void> => {
   // fromBlock cursor 取得 (KV)、 未 set なら latest - 10 (直近のみ)
   const cursorRaw = await env.FINCODE_STATE.get('cron_cursor:from_block');
   const latestBlock = await publicClient.getBlockNumber();
-  // cursor があればそこから、 なければ latest-10 (初回は直近のみ scan して RPC 負荷を抑える)
+  // cursor があればそこから、 なければ latest-10 (初回は直近のみ scan して RPC 負荷を抑える)。
+  // ただし cursor が古すぎる (長時間 outage 後等) 場合は窓を MAX_SCAN_WINDOW で切る。
+  // Base の公開 RPC は eth_getLogs を 2000 block/req に制限するため、 それ未満に収める。
   let fromBlock: bigint;
   if (cursorRaw !== null) {
-    fromBlock = BigInt(cursorRaw);
+    const stored = BigInt(cursorRaw);
+    fromBlock =
+      latestBlock - stored > SETTLEMENT_MAX_SCAN_WINDOW
+        ? latestBlock - SETTLEMENT_MAX_SCAN_WINDOW
+        : stored;
   } else {
     fromBlock = latestBlock > 10n ? latestBlock - 10n : 0n;
   }
@@ -524,8 +546,18 @@ const runSettlementDaemon = async (env: Env): Promise<void> => {
     }
   }
 
-  // cursor 更新 (次 poll は toBlock+1 以降)
-  await env.FINCODE_STATE.put('cron_cursor:from_block', (toBlock + 1n).toString());
+  // cursor 更新。 毎回書くと 1 分 cron × 1440 回/日 = KV 無料枠 (1000 write/日) を突破するため
+  // (2026-07-22 実測 90% 到達)、 「event を処理した時」 か「未処理でも窓が広がりすぎた時」 に限る。
+  // idle 時は SETTLEMENT_CURSOR_ADVANCE block ごと (= 約 10 分ごと) にだけ書いて窓の暴走を防ぐ。
+  const shouldPersistCursor = logs.length > 0 || toBlock - fromBlock >= SETTLEMENT_CURSOR_ADVANCE;
+  if (shouldPersistCursor) {
+    await env.FINCODE_STATE.put('cron_cursor:from_block', (toBlock + 1n).toString());
+    console.log(
+      `[cron] cursor persisted → ${toBlock + 1n} (logs=${logs.length} window=${toBlock - fromBlock})`,
+    );
+  } else {
+    console.log(`[cron] cursor write skip (idle, window=${toBlock - fromBlock}) — KV write 節約`);
+  }
 };
 
 /** env → process.env 注入 (FincodeClient / MockFetcher が process.env 経由で config 読む pattern に対応) */
