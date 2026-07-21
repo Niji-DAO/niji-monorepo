@@ -65,6 +65,15 @@ export type CreateAuthorizeFincodeAppOptions = {
   generateOrderId?: (input: { auctionId: string; bidderWallet: string }) => string;
   /** 現在時刻 source (test 用、 default = () => new Date()) */
   now?: () => Date;
+  /**
+   * 3DS 2.0 の戻り先 URL (webapp の /fiat-bid/3ds-return)。
+   *
+   * 指定すると fincode に `tds2_ret_url` + `tds2_type: '2'` を渡し、 カードが 3DS を要求する場合に
+   * status = AUTHENTICATED と acs_url が返る。 未指定なら 3DS を要求せず即 AUTHORIZED になる。
+   * 未指定時に 3DS が発火しないのは fincode の仕様で、 これを既定にすると本番で 3DS 必須の
+   * カードが通らないため、 deploy 側で必ず設定する。
+   */
+  tds2RetUrl?: string;
 };
 
 const defaultGenerateOrderId = (input: { auctionId: string; bidderWallet: string }): string => {
@@ -157,11 +166,16 @@ export const createAuthorizeFincodeApp = (options: CreateAuthorizeFincodeAppOpti
     // fincode register + execute 順次呼出 (cardToken は fincode.js iframe tokenize で受領した card_id)
     let authResult;
     try {
-      authResult = await options.fincodeClient.authorize({
+      const authorizeInput: Parameters<typeof options.fincodeClient.authorize>[0] = {
         orderId,
         amount: body.jpyAmount,
         cardToken: body.cardToken,
-      });
+      };
+      // 空文字は「未設定」 扱い。 空を渡すと fincode が 3DS を要求しつつ戻り先を持たない状態になる。
+      if (typeof options.tds2RetUrl === 'string' && options.tds2RetUrl.trim() !== '') {
+        authorizeInput.tds2RetUrl = options.tds2RetUrl.trim();
+      }
+      authResult = await options.fincodeClient.authorize(authorizeInput);
     } catch (err) {
       if (err instanceof FincodeAuthorizationError) {
         return c.json(

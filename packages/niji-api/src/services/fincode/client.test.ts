@@ -30,7 +30,9 @@ const resolveUrl = (input: string | URL | Request): string => {
 };
 
 const makeFetchStub = (responses: Record<string, { status?: number; body: unknown }>) => {
-  return vi.fn(async (input: string | URL | Request) => {
+  // init も受けて記録する = 呼出側が method / body を assert できる (3DS 経路の GET / PUT 判別に使う)
+  return vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+    void init;
     const url = resolveUrl(input);
     // longest match で URL 判定 (PUT /v1/payments/{id} が POST /v1/payments より優先)
     const matched = Object.entries(responses)
@@ -530,5 +532,171 @@ describe('FincodeClient endpoint 解決', () => {
     const call = fetchStub.mock.calls[0];
     if (call === undefined) throw new Error('fetch not called');
     expect(resolveUrl(call[0] as string | URL | Request)).toContain('api.fincode.jp');
+  });
+});
+
+describe('FincodeClient 3DS 2.0 (secure2 経路)', () => {
+  it('execute3DSecureAuth は PUT /v1/secure2/{access_id} を叩き pay_type + access_id を送る', async () => {
+    const fetchStub = makeFetchStub({
+      '/v1/secure2/access-1': { body: { tds2_trans_result: 'Y' } },
+    });
+    const client = new FincodeClient({ apiKeySecret: 'm_test_dummy', fetch: fetchStub });
+
+    const result = await client.execute3DSecureAuth('access-1');
+
+    expect(result.tds2_trans_result).toBe('Y');
+    const call = fetchStub.mock.calls[0];
+    if (call === undefined) throw new Error('fetch not called');
+    expect(resolveUrl(call[0] as string | URL | Request)).toContain('/v1/secure2/access-1');
+    const init = call[1] as RequestInit;
+    expect(init.method).toBe('PUT');
+    expect(JSON.parse(init.body as string)).toEqual({ pay_type: 'Card', access_id: 'access-1' });
+  });
+
+  it('retrieve3DSecureAuthResult は GET で叩き body を付けない (GET + body は fetch が拒否する)', async () => {
+    const fetchStub = makeFetchStub({
+      '/v1/secure2/access-1': { body: { tds2_trans_result: 'A' } },
+    });
+    const client = new FincodeClient({ apiKeySecret: 'm_test_dummy', fetch: fetchStub });
+
+    await client.retrieve3DSecureAuthResult('access-1');
+
+    const call = fetchStub.mock.calls[0];
+    if (call === undefined) throw new Error('fetch not called');
+    const init = call[1] as RequestInit;
+    expect(init.method).toBe('GET');
+    expect(init.body).toBeUndefined();
+  });
+
+  it('executeAfter3DSecureAuth は PUT /v1/payments/{id}/secure を叩く', async () => {
+    const fetchStub = makeFetchStub({
+      '/v1/payments/order-1/secure': {
+        body: {
+          id: 'order-1',
+          access_id: 'access-1',
+          status: 'AUTHORIZED',
+          job_code: 'AUTH',
+          amount: '4000',
+        },
+      },
+    });
+    const client = new FincodeClient({ apiKeySecret: 'm_test_dummy', fetch: fetchStub });
+
+    const result = await client.executeAfter3DSecureAuth('order-1', 'access-1');
+
+    expect(result.status).toBe('AUTHORIZED');
+    const call = fetchStub.mock.calls[0];
+    if (call === undefined) throw new Error('fetch not called');
+    expect(resolveUrl(call[0] as string | URL | Request)).toContain('/v1/payments/order-1/secure');
+  });
+
+  it('complete3DSecureAuth は Y のとき認証後決済実行まで進めて authorized=true を返す', async () => {
+    const fetchStub = makeFetchStub({
+      '/v1/secure2/access-1': { body: { tds2_trans_result: 'Y' } },
+      '/v1/payments/order-1/secure': {
+        body: {
+          id: 'order-1',
+          access_id: 'access-1',
+          status: 'AUTHORIZED',
+          job_code: 'AUTH',
+          amount: '4000',
+        },
+      },
+    });
+    const client = new FincodeClient({ apiKeySecret: 'm_test_dummy', fetch: fetchStub });
+
+    const result = await client.complete3DSecureAuth('order-1', 'access-1');
+
+    expect(result).toEqual({
+      transResult: 'Y',
+      reason: undefined,
+      challengeUrl: undefined,
+      authorized: true,
+      status: 'AUTHORIZED',
+    });
+    expect(fetchStub.mock.calls).toHaveLength(2);
+  });
+
+  it('complete3DSecureAuth は A (認証試行) も成功扱いで決済実行に進む', async () => {
+    const fetchStub = makeFetchStub({
+      '/v1/secure2/access-1': { body: { tds2_trans_result: 'A' } },
+      '/v1/payments/order-1/secure': {
+        body: {
+          id: 'order-1',
+          access_id: 'access-1',
+          status: 'AUTHORIZED',
+          job_code: 'AUTH',
+          amount: '4000',
+        },
+      },
+    });
+    const client = new FincodeClient({ apiKeySecret: 'm_test_dummy', fetch: fetchStub });
+
+    const result = await client.complete3DSecureAuth('order-1', 'access-1');
+
+    expect(result.authorized).toBe(true);
+    expect(fetchStub.mock.calls).toHaveLength(2);
+  });
+
+  it('complete3DSecureAuth は C のとき challengeUrl を返し決済実行に進まない', async () => {
+    const fetchStub = makeFetchStub({
+      '/v1/secure2/access-1': {
+        body: { tds2_trans_result: 'C', challenge_url: 'https://acs.example/challenge' },
+      },
+    });
+    const client = new FincodeClient({ apiKeySecret: 'm_test_dummy', fetch: fetchStub });
+
+    const result = await client.complete3DSecureAuth('order-1', 'access-1');
+
+    expect(result.authorized).toBe(false);
+    expect(result.challengeUrl).toBe('https://acs.example/challenge');
+    // secure2 の 1 回だけ = /payments/{id}/secure を叩いていない
+    expect(fetchStub.mock.calls).toHaveLength(1);
+  });
+
+  it.each(['N', 'U', 'R'])('complete3DSecureAuth は %s のとき決済実行に進まない', async code => {
+    const fetchStub = makeFetchStub({
+      '/v1/secure2/access-1': { body: { tds2_trans_result: code, tds2_trans_result_reason: 'ng' } },
+    });
+    const client = new FincodeClient({ apiKeySecret: 'm_test_dummy', fetch: fetchStub });
+
+    const result = await client.complete3DSecureAuth('order-1', 'access-1');
+
+    expect(result.authorized).toBe(false);
+    expect(result.reason).toBe('ng');
+    expect(fetchStub.mock.calls).toHaveLength(1);
+  });
+
+  it('complete3DSecureAuth は tds2_trans_result 未返却でも決済実行に進まない (安全側)', async () => {
+    const fetchStub = makeFetchStub({ '/v1/secure2/access-1': { body: {} } });
+    const client = new FincodeClient({ apiKeySecret: 'm_test_dummy', fetch: fetchStub });
+
+    const result = await client.complete3DSecureAuth('order-1', 'access-1');
+
+    expect(result.authorized).toBe(false);
+    expect(result.transResult).toBeUndefined();
+    expect(fetchStub.mock.calls).toHaveLength(1);
+  });
+
+  it('complete3DSecureAuth は viaRetrieve=true で GET 経路を使う (challenge 復帰)', async () => {
+    const fetchStub = makeFetchStub({
+      '/v1/secure2/access-1': { body: { tds2_trans_result: 'Y' } },
+      '/v1/payments/order-1/secure': {
+        body: {
+          id: 'order-1',
+          access_id: 'access-1',
+          status: 'AUTHORIZED',
+          job_code: 'AUTH',
+          amount: '4000',
+        },
+      },
+    });
+    const client = new FincodeClient({ apiKeySecret: 'm_test_dummy', fetch: fetchStub });
+
+    await client.complete3DSecureAuth('order-1', 'access-1', { viaRetrieve: true });
+
+    const first = fetchStub.mock.calls[0];
+    if (first === undefined) throw new Error('fetch not called');
+    expect((first[1] as RequestInit).method).toBe('GET');
   });
 });

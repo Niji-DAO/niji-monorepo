@@ -352,15 +352,22 @@ export const useFiatBid = (options: UseFiatBidOptions = {}) => {
   );
 
   /**
-   * place-bid action。 3DS 完了 (fiat_bid.status = 3ds-verified) 後の
-   * ThreeDSReturn からの callback で呼出す。
+   * place-bid action。 3DS 認証が完了した後に ThreeDSReturn から呼出す。
+   *
+   * bidderWallet は backend の place-bid が必須とする field で、 欠けると 400 になる。
+   * 落札時の transferFrom 先を決めるため、 3DS redirect を跨いでも失われないよう
+   * ThreeDSRedirect が localStorage に保存した pending state から復元して渡す。
    */
   const placeBid = useCallback(
-    async (authId: string): Promise<PlaceBidResponse | undefined> => {
+    async (authId: string, bidderWallet?: string): Promise<PlaceBidResponse | undefined> => {
       setStep('placing');
       setErrorMessage(undefined);
       try {
-        const result = await fetchers.placeBid({ authId });
+        const payload: { authId: string; bidderWallet?: string } = { authId };
+        if (bidderWallet !== undefined && bidderWallet !== '') {
+          payload.bidderWallet = bidderWallet;
+        }
+        const result = await fetchers.placeBid(payload);
         setPlaceBidResult(result);
         if (result.status === 'bid-placed') {
           setStep('success');

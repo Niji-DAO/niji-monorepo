@@ -30,6 +30,10 @@ import {
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
+import {
+  createThreeDsCallbackFincodeApp,
+  type ThreeDsFincodeStore,
+} from '../handlers/fiat-bid/3ds-callback-fincode.js';
 import { createAuthorizeFincodeApp } from '../handlers/fiat-bid/authorize-fincode.js';
 import { type FiatBidRecord, type FiatBidStore } from '../handlers/fiat-bid/authorize.js';
 import {
@@ -68,6 +72,12 @@ export type Env = {
   USE_FINCODE_MOCK?: string;
   USE_SPOT_RATE_MOCK?: string;
   MOCK_SPOT_RATE_JPY_PER_ETH?: string;
+  /**
+   * 3DS 2.0 の戻り先 URL (webapp の /fiat-bid/3ds-return)。
+   * 設定すると authorize が fincode に tds2_ret_url を渡し、 3DS 必須カードで認証画面を挟む。
+   * 未設定なら 3DS を要求しない (fincode 仕様) ため、 本番 deploy では必ず設定する。
+   */
+  TDS2_RET_URL?: string;
 };
 
 /** KV に保存する authorize 済 bid の state (`capture:{authId}` の値) */
@@ -83,6 +93,9 @@ type CaptureState = {
   ethAmount?: string;
   /** 与信時の rate (JPY / 1 ETH)、 監査 log 用 */
   spotRate?: number;
+  /** 3DS 認証の結果 (認証を経た場合のみ)。 audit 用で分岐には使わない */
+  threeDsStatus?: string;
+  threeDsTransResult?: string;
 };
 
 /**
@@ -146,14 +159,35 @@ class KVAwareFincodeClient extends FincodeClient {
   }
 }
 
-/** KV から authId で orderId + accessId を lookup する capture store */
-class KVFincodeCaptureStore implements FincodeCaptureStore {
+/**
+ * KV から authId で orderId + accessId を lookup する store。
+ * capture handler と 3DS callback handler が同じ `capture:{authId}` record を参照する。
+ */
+class KVFincodeCaptureStore implements FincodeCaptureStore, ThreeDsFincodeStore {
   constructor(private readonly kv: KVNamespace) {}
   async findAuthorized(authId: string) {
     const raw = await this.kv.get(`capture:${authId}`);
     if (raw === null) return null;
     const parsed = JSON.parse(raw) as { orderId: string; accessId: string; jpyAmount: number };
     return { authId, ...parsed };
+  }
+
+  /** 3DS 認証結果を record に追記する。 place-bid 側の判定には使わず audit 用に残す */
+  async updateThreeDsStatus(input: {
+    authId: string;
+    status: string;
+    transResult?: string;
+  }): Promise<void> {
+    const key = `capture:${input.authId}`;
+    const raw = await this.kv.get(key);
+    if (raw === null) return;
+    const parsed = JSON.parse(raw) as CaptureState;
+    const next: CaptureState = { ...parsed, threeDsStatus: input.status };
+    if (input.transResult !== undefined) next.threeDsTransResult = input.transResult;
+    await this.kv.put(key, JSON.stringify(next), { expirationTtl: 3600 });
+    console.log(
+      `[worker] 3ds status authId=${input.authId} status=${input.status} transResult=${input.transResult ?? 'n/a'}`,
+    );
   }
   async updateCaptureStatus(input: {
     authId: string;
@@ -541,11 +575,22 @@ export default {
     const store = new KVFiatBidStore(env.FINCODE_STATE);
     const captureStore = new KVFincodeCaptureStore(env.FINCODE_STATE);
 
+    const authorizeOptions: Parameters<typeof createAuthorizeFincodeApp>[0] = {
+      fincodeClient,
+      spotRateFetcher,
+      store,
+    };
+    if (typeof env.TDS2_RET_URL === 'string' && env.TDS2_RET_URL.trim() !== '') {
+      authorizeOptions.tds2RetUrl = env.TDS2_RET_URL.trim();
+    }
+    app.route('/api/v1/fiat-bid', createAuthorizeFincodeApp(authorizeOptions));
+    app.route('/api/v1/fiat-bid', createCaptureFincodeApp({ fincodeClient, store: captureStore }));
+    // 2026-07-22 追加 = 3DS callback endpoint。 authorize が tds2_ret_url を渡した場合、
+    // webapp は認証画面から戻った直後にここを呼ぶ。 これを通さないと与信が確定しない。
     app.route(
       '/api/v1/fiat-bid',
-      createAuthorizeFincodeApp({ fincodeClient, spotRateFetcher, store }),
+      createThreeDsCallbackFincodeApp({ fincodeClient, store: captureStore }),
     );
-    app.route('/api/v1/fiat-bid', createCaptureFincodeApp({ fincodeClient, store: captureStore }));
     // 2026-07-17 追加 = place-bid endpoint (chain 上代理入札 + KV fiat_bid record 保存)
     app.route('/api/v1/fiat-bid', createPlaceBidHandler(env, spotRateFetcher));
     // 2026-07-21 追加 = spot-rate endpoint (GET /api/v1/spot-rate/eth-jpy)。

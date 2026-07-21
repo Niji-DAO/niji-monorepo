@@ -35,7 +35,30 @@ export type ThreeDsCallbackResponse = {
 };
 
 /** 表示 status enum */
-export type ReturnStatus = 'processing' | 'success' | 'failure' | 'timeout' | 'invalid';
+export type ReturnStatus =
+  | 'processing'
+  | 'success'
+  | 'failure'
+  | 'timeout'
+  | 'invalid'
+  | 'challenge';
+
+/** fincode 3DS callback API 応答 shape (backend /3ds-callback-fincode 契約と一致) */
+export type FincodeThreeDsCallbackResponse = {
+  authId: string;
+  status: '3ds-verified' | 'challenge-required' | 'cancelled';
+  challengeUrl?: string;
+  transResult?: string;
+  reason?: string;
+};
+
+/** place-bid 応答の必要部分 (useFiatBid の PlaceBidResponse と同契約) */
+export type PlaceBidResult = {
+  authId: string;
+  status: 'bid-placed' | 'cancelled';
+  txHash: string | null;
+  message?: string;
+};
 
 /** callback API 呼出関数 (test 用に injectable) */
 export type CallbackFn = (payload: {
@@ -69,6 +92,61 @@ export const defaultCallbackFn: CallbackFn = async payload => {
   }
   return (await response.json()) as ThreeDsCallbackResponse;
 };
+
+/** API base URL 解決 (fiat bid 系 endpoint 共通) */
+const resolveApiBase = (): string => {
+  const envValue =
+    typeof import.meta !== 'undefined'
+      ? (import.meta as { env?: Record<string, string> }).env?.['VITE_NIJI_API_BASE_URL']
+      : undefined;
+  return (typeof envValue === 'string' ? envValue : '').replace(/\/$/, '');
+};
+
+const postJson = async <T,>(path: string, payload: unknown, label: string): Promise<T> => {
+  const response = await fetch(`${resolveApiBase()}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const err = (await response.json().catch(() => ({ error: 'InternalError' }))) as {
+      error?: string;
+      message?: string;
+    };
+    throw new Error(`${label} failed: ${err.error ?? 'unknown'} — ${err.message ?? ''}`);
+  }
+  return (await response.json()) as T;
+};
+
+/** fincode 3DS callback 呼出関数 (test 用に injectable) */
+export type FincodeCallbackFn = (payload: {
+  authId: string;
+  retry?: boolean;
+}) => Promise<FincodeThreeDsCallbackResponse>;
+
+/**
+ * default fincode callback = POST /api/v1/fiat-bid/3ds-callback-fincode。
+ * 認証実行と認証後決済実行を backend 側でまとめて行い、 与信を確定させる。
+ */
+export const defaultFincodeCallbackFn: FincodeCallbackFn = async payload =>
+  postJson<FincodeThreeDsCallbackResponse>(
+    '/api/v1/fiat-bid/3ds-callback-fincode',
+    payload,
+    '3ds callback',
+  );
+
+/** place-bid 呼出関数 (test 用に injectable) */
+export type PlaceBidFn = (payload: {
+  authId: string;
+  bidderWallet: string;
+}) => Promise<PlaceBidResult>;
+
+/**
+ * default place-bid = POST /api/v1/fiat-bid/place-bid。
+ * bidderWallet は backend 必須 field で、 欠けると 400 になる。
+ */
+export const defaultPlaceBidFn: PlaceBidFn = async payload =>
+  postJson<PlaceBidResult>('/api/v1/fiat-bid/place-bid', payload, 'place bid');
 
 /**
  * localStorage / sessionStorage 復元 helper
@@ -111,52 +189,136 @@ export const clearPendingState = (): void => {
 };
 
 export type ThreeDSReturnProps = {
-  /** test 用 injectable、 default = defaultCallbackFn */
+  /** test 用 injectable、 default = defaultCallbackFn (GMO 経路) */
   callbackFn?: CallbackFn;
+  /** test 用 injectable、 default = defaultFincodeCallbackFn (fincode 経路) */
+  fincodeCallbackFn?: FincodeCallbackFn;
+  /** test 用 injectable、 default = defaultPlaceBidFn */
+  placeBidFn?: PlaceBidFn;
   /** test 用 injectable、 default = loadPendingState */
   loadState?: () => FiatBidPendingState | null;
   /** test 用 injectable、 default = clearPendingState */
   clearState?: () => void;
+  /** test 用 injectable、 default = window.location.href への遷移 (challenge 画面) */
+  redirect?: (url: string) => void;
 };
 
 export const ThreeDSReturn = ({
   callbackFn = defaultCallbackFn,
+  fincodeCallbackFn = defaultFincodeCallbackFn,
+  placeBidFn = defaultPlaceBidFn,
   loadState = loadPendingState,
   clearState = clearPendingState,
+  redirect = url => {
+    window.location.href = url;
+  },
 }: ThreeDSReturnProps = {}): React.JSX.Element => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState<ReturnStatus>('processing');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  // URL query 検証 + pending state 復元は render 時 1 度だけ
+  // URL query 検証 + pending state 復元は render 時 1 度だけ。
+  // fincode は tds2_ret_url に `MD` (= access_id) を付けて戻す。 GMO は transactionId + result。
+  // どちらの query が来たかで経路を判定する。
   const params = useMemo(() => {
     const transactionId = searchParams.get('transactionId') ?? '';
     const result = searchParams.get('result') ?? '';
-    const urlAuthId = searchParams.get('accessId') ?? searchParams.get('authId') ?? '';
-    return { transactionId, result, urlAuthId };
+    const urlAuthId =
+      searchParams.get('MD') ?? searchParams.get('accessId') ?? searchParams.get('authId') ?? '';
+    // challenge 認証から戻った 2 回目は結果を取り直す経路に切替える
+    const retry = searchParams.get('retry') === '1';
+    // transactionId の有無で経路を決める。 GMO は必ず付けてくるが fincode は付けない。
+    // result の妥当性は GMO 経路に入った後に検査する (不正値で fincode 経路に流さない)。
+    const isGmoRoute = transactionId !== '';
+    return { transactionId, result, urlAuthId, retry, isGmoRoute };
   }, [searchParams]);
+
+  /**
+   * fincode 経路 — 3DS 認証実行 → 与信確定 → 代理入札まで進める。
+   *
+   * 認証が通っただけでは入札は発火しないため、 3ds-verified を受けたら続けて place-bid を呼ぶ。
+   * bidderWallet は redirect を跨いで失われるので pending state から復元する
+   * (backend の place-bid は bidderWallet 欠落時に 400 を返す)。
+   */
+  const invokeFincodeRoute = useCallback(
+    async (authId: string, pending: FiatBidPendingState | null) => {
+      const callbackPayload: { authId: string; retry?: boolean } = { authId };
+      if (params.retry) callbackPayload.retry = true;
+      const response = await fincodeCallbackFn(callbackPayload);
+
+      if (response.status === 'challenge-required') {
+        // pending state は消さない。 challenge から戻って retry=1 で再度ここに来る
+        setStatus('challenge');
+        if (response.challengeUrl !== undefined && response.challengeUrl !== '') {
+          redirect(response.challengeUrl);
+        } else {
+          setStatus('failure');
+          setErrorMessage('チャレンジ認証が必要ですが遷移先 URL が返却されませんでした。');
+        }
+        return;
+      }
+
+      if (response.status !== '3ds-verified') {
+        clearState();
+        setStatus('failure');
+        setErrorMessage(
+          response.reason !== undefined && response.reason !== ''
+            ? `3D セキュア認証が拒否されました (${response.reason})`
+            : '3D セキュア認証が拒否されました。 別のカードでお試しください。',
+        );
+        return;
+      }
+
+      const bidderWallet = pending?.bidderWallet ?? '';
+      if (bidderWallet === '') {
+        clearState();
+        setStatus('failure');
+        setErrorMessage(
+          '認証は完了しましたが入札先 wallet を復元できませんでした。 auction ページから再度お試しください。',
+        );
+        return;
+      }
+
+      const placed = await placeBidFn({ authId, bidderWallet });
+      clearState();
+      if (placed.status === 'bid-placed') {
+        setStatus('success');
+      } else {
+        setStatus('failure');
+        setErrorMessage(placed.message ?? '入札に失敗しました。');
+      }
+    },
+    [params.retry, fincodeCallbackFn, placeBidFn, clearState, redirect],
+  );
 
   const invokeCallback = useCallback(async () => {
     const pending = loadState();
     const authId = params.urlAuthId || (pending?.authId ?? '');
-    if (
-      !authId ||
-      !params.transactionId ||
-      (params.result !== 'success' && params.result !== 'fail')
-    ) {
+    if (!authId) {
       setStatus('invalid');
-      setErrorMessage(
-        `必須 URL query が欠損しています (authId=${authId || 'なし'} / transactionId=${params.transactionId || 'なし'} / result=${params.result || 'なし'})`,
-      );
+      setErrorMessage('必須 URL query が欠損しています (authId=なし)');
       return;
     }
 
     try {
+      if (!params.isGmoRoute) {
+        await invokeFincodeRoute(authId, pending);
+        return;
+      }
+
+      if (params.result !== 'success' && params.result !== 'fail') {
+        setStatus('invalid');
+        setErrorMessage(
+          `必須 URL query が欠損しています (authId=${authId} / transactionId=${params.transactionId} / result=${params.result || 'なし'})`,
+        );
+        return;
+      }
+
       const response = await callbackFn({
         authId,
         transactionId: params.transactionId,
-        result: params.result,
+        result: params.result as 'success' | 'fail',
       });
       clearState();
       if (response.status === '3ds-verified') {
@@ -168,7 +330,7 @@ export const ThreeDSReturn = ({
       setStatus('failure');
       setErrorMessage(err instanceof Error ? err.message : String(err));
     }
-  }, [params, callbackFn, loadState, clearState]);
+  }, [params, callbackFn, loadState, clearState, invokeFincodeRoute]);
 
   useEffect(() => {
     void invokeCallback();
@@ -192,10 +354,16 @@ export const ThreeDSReturn = ({
           <p>数秒お待ちください。</p>
         </>
       )}
+      {status === 'challenge' && (
+        <>
+          <h2>追加の本人確認が必要です</h2>
+          <p>カード会社の認証画面に移動します。</p>
+        </>
+      )}
       {status === 'success' && (
         <>
           <h2>認証が完了しました</h2>
-          <p>bid 発火準備が整いました。 auction ページに戻ります。</p>
+          <p>入札を受け付けました。 auction ページに戻ります。</p>
           <button onClick={returnToAuction} type="button">
             auction に戻る
           </button>

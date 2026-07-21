@@ -457,31 +457,47 @@ capture が失敗した場合、 SettlementDaemon は transferFrom に進まず 
 env で対象を差し替えられる。 `RPC_URL` / `AUCTION_HOUSE_ADDRESS` / `NIJI_TOKEN_ADDRESS` /
 `OPERATOR_ADDRESS` / `CHAIN_ID` を指定すると別 chain や別 deploy を監視できる。
 
+### 3DS 2.0 経路 (2026-07-22 実装)
+
+3DS が必要なカードでも入札が成立する経路。 `wrangler.toml` の `TDS2_RET_URL` の有無で挙動が変わる。
+
+**未設定時** は authorize が fincode に `tds2_ret_url` を渡さないため、 fincode は 3DS を要求せず
+常に `status: AUTHORIZED` を返す。 webapp は `tds2Url === undefined` の分岐に入り、
+認証を挟まず place-bid を自動発火する (2026-07-21 の実機検証はこの経路)。
+
+**設定時** は 3DS 必須カードで `status: AUTHENTICATED` と `acs_url` が返り、 以下の順に進む。
+
+1. webapp が `acs_url` に遷移し、 カード会社の認証画面を表示する
+2. 認証後 fincode が `TDS2_RET_URL` (`/fiat-bid/3ds-return`) に `MD` = access_id 付きで戻す
+3. `ThreeDSReturn` が `POST /api/v1/fiat-bid/3ds-callback-fincode` を呼ぶ
+4. backend が `PUT /v1/secure2/{access_id}` で認証実行、 結果コードで分岐する
+5. `Y` / `A` なら `PUT /v1/payments/{id}/secure` で認証後決済実行まで進め、 与信が確定する
+6. webapp が続けて `POST /api/v1/fiat-bid/place-bid` を呼び、 代理入札を発火する
+
+認証が通っただけでは与信は確定しない。 手順 5 を飛ばすとカードに枠が取られないまま入札が成立する。
+
+**結果コードの分岐**
+
+| `tds2_trans_result` | 意味 | backend の応答 | webapp の挙動 |
+|---|---|---|---|
+| `Y` / `A` | 認証成功 / 認証試行 | `3ds-verified` | place-bid に進む |
+| `C` | チャレンジ認証が必要 | `challenge-required` + `challengeUrl` | `challengeUrl` に遷移、 戻ったら `retry=1` で再呼出 |
+| `N` / `U` / `R` / 未返却 | 拒否 / 認証不能 | `cancelled` | 理由を出して終了、 カード請求は発生しない |
+
+**チャレンジ認証からの復帰**
+
+`challengeUrl` から戻る際は `?MD={access_id}&retry=1` で `/fiat-bid/3ds-return` に入る。
+`retry=1` のとき backend は `PUT /v1/secure2` ではなく `GET /v1/secure2` で結果だけを取り直す。
+チャレンジ完了後に認証実行を再送すると結果が変わり得るため、 取得のみに切替えている。
+
+**pending state の扱い**
+
+`bidderWallet` は 3DS の redirect を跨ぐと失われるため、 `ThreeDSRedirect` が localStorage に保存した
+`FiatBidPendingState` から復元して place-bid に渡す。 backend の place-bid は `bidderWallet` 欠落時に
+400 を返すので、 復元できない場合は place-bid を呼ばずに失敗表示に落とす。
+チャレンジ遷移時は復帰後に再利用するため pending state を消さない。
+
 ### 現状の制約 (2026-07-22 時点)
-
-**3DS が必要なカードでは入札が完了しない**
-
-Cloudflare Workers の `niji-api` が expose している route は 4 つで、 `3ds-callback` は含まれない。
-
-- `POST /api/v1/fiat-bid/authorize-fincode`
-- `POST /api/v1/fiat-bid/capture-fincode`
-- `POST /api/v1/fiat-bid/place-bid`
-- `GET /api/v1/spot-rate/eth-jpy`
-
-webapp 側も `ThreeDSReturn` が `3ds-callback` を呼ぶだけで、 その後 `placeBid` を呼ぶ配線がない。
-`useFiatBid` の `placeBid` action は「3DS 完了後に呼ぶ」 と宣言されているが production の呼出元が存在しない。
-
-現状これが表面化していないのは、 authorize が `tds2RetUrl` を fincode に渡していないためで、
-fincode は 3DS を要求せず常に `status: AUTHORIZED` を返す。
-webapp はこの場合 `tds2Url === undefined` の分岐に入り、 認証を挟まず place-bid を自動発火する。
-
-本番運用で 3DS を有効にする場合は以下 3 点が必要になる。
-
-1. authorize 時に `tds2RetUrl` を渡す
-2. Workers に `3ds-callback` route を追加する
-3. `ThreeDSReturn` から `placeBid` を呼ぶ。 このとき `bidderWallet` を渡す
-   (`FiatBidPendingState` が保持しているので localStorage から復元できる。
-   backend の place-bid は `bidderWallet` 欠落時に 400 を返す)
 
 **place-bid の移行期 fallback**
 

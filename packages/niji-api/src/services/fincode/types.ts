@@ -96,6 +96,66 @@ export type FincodeErrorResponse = {
   }>;
 };
 
+/**
+ * 3DS 2.0 認証結果コード。
+ *
+ * - `Y` = 認証成功
+ * - `A` = 認証試行済 (成功扱いで決済に進める)
+ * - `C` = チャレンジ認証が必要 (challenge_url へ遷移させる)
+ * - `N` = 認証失敗 or 決済拒否
+ * - `U` = 認証不能
+ * - `R` = 認証拒否
+ *
+ * SSOT — fincode 公式 sdk-node `src/types/payment.ts` の ThreeDSecureAuthResult。
+ */
+export type FincodeThreeDSecureAuthResult = 'Y' | 'A' | 'C' | 'N' | 'U' | 'R';
+
+/**
+ * PUT /v1/secure2/{access_id} (3DS 2.0 認証実行) request body。
+ * tds2_ret_url に redirect されてきた直後に呼ぶ。
+ */
+export type FincodeExecute3DSecureAuthRequest = {
+  pay_type: 'Card';
+  access_id: string;
+};
+
+/** PUT /v1/secure2/{access_id} 応答 */
+export type FincodeExecute3DSecureAuthSuccess = {
+  tds2_trans_result?: FincodeThreeDSecureAuthResult | null;
+  tds2_trans_result_reason?: string | null;
+  /** tds2_trans_result = 'C' のときのみ返る、 チャレンジ認証画面の URL */
+  challenge_url?: string | null;
+};
+
+/** GET /v1/secure2/{access_id} (認証結果取得) 応答。 challenge 完了後の再確認に使う */
+export type FincodeRetrieve3DSecureAuthSuccess = {
+  tds2_trans_result?: FincodeThreeDSecureAuthResult | null;
+  tds2_trans_result_reason?: string | null;
+};
+
+/**
+ * PUT /v1/payments/{id}/secure (認証後決済実行) request body。
+ * 3DS 認証が Y / A で通った後にこれを呼んで初めて与信が確定する。
+ */
+export type FincodeExecuteAfter3DSecureRequest = {
+  pay_type: 'Card';
+  access_id: string;
+};
+
+/** 3DS 認証を経た決済の統合結果 (handler が webapp に返す判定材料) */
+export type FincodeThreeDSecureResult = {
+  /** 認証結果コード (fincode 応答そのまま、 未返却時は undefined) */
+  transResult: FincodeThreeDSecureAuthResult | undefined;
+  /** 認証結果の理由 (fincode 応答そのまま) */
+  reason: string | undefined;
+  /** transResult = 'C' のときのチャレンジ URL */
+  challengeUrl: string | undefined;
+  /** 認証後決済実行まで完了して与信が確定したか */
+  authorized: boolean;
+  /** 与信確定時の決済 status */
+  status: FincodePaymentExecuteSuccess['status'] | undefined;
+};
+
 /** authorize 統合結果 (register + execute 順次呼出後の返却型、 handler が使う) */
 export type FincodeAuthorizationResult = {
   /** fincode auth ID (fiat_bid.authId PK に一致、 access_id を採用) */

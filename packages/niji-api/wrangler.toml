@@ -29,6 +29,11 @@ USE_FINCODE_MOCK = "false"
 # place-bid の JPY → ETH 換算は同一 fetcher instance を共有するため、 本 flag 1 つで両方が切替わる。
 USE_SPOT_RATE_MOCK = "false"
 MOCK_SPOT_RATE_JPY_PER_ETH = "500000"
+# 3DS 2.0 の戻り先 URL (webapp の 3ds-return page)。
+# 設定すると authorize が fincode に tds2_ret_url を渡し、 3DS 必須カードで認証画面を挟む。
+# 未設定だと fincode は 3DS を要求せず即 AUTHORIZED を返すため、 本番相当の検証ができない。
+TDS2_RET_URL = "https://dev.niji-webapp.pages.dev/fiat-bid/3ds-return"
+
 # chain (Base Sepolia、 2026-07-21 deploy 済 address)
 CHAIN_ID = "84532"
 RPC_URL = "https://sepolia.base.org"

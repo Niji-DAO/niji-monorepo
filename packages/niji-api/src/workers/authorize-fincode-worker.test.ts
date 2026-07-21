@@ -65,20 +65,40 @@ vi.mock('viem', async () => {
  */
 const fincodeCalls: Array<{ method: string; orderId: string; accessId: string }> = [];
 let capturePaymentError: Error | null = null;
+/** authorize に渡された input を記録する (tds2RetUrl が伝わっているかの検証用) */
+const authorizeInputs: Array<Record<string, unknown>> = [];
+/** authorize が返す status / tds2Url を test 側で切替える */
+let authorizeResponse: { status: 'AUTHORIZED' | 'AUTHENTICATED'; tds2Url?: string } = {
+  status: 'AUTHORIZED',
+};
+/** complete3DSecureAuth の応答を test 側で切替える */
+let threeDsResult: Record<string, unknown> = {
+  transResult: 'Y',
+  reason: undefined,
+  challengeUrl: undefined,
+  authorized: true,
+  status: 'AUTHORIZED',
+};
 
 vi.mock('../services/fincode/client.js', async () => {
   const actual = await vi.importActual<typeof import('../services/fincode/client.js')>(
     '../services/fincode/client.js',
   );
   class FincodeClientMock {
-    async authorize() {
+    async authorize(input: Record<string, unknown>) {
+      authorizeInputs.push(input);
       return {
         authId: 'auth-from-fincode',
         orderId: 'fc-42-abcdef',
         accessId: 'access-from-fincode',
-        status: 'AUTHORIZED' as const,
-        tds2Url: undefined,
+        status: authorizeResponse.status,
+        tds2Url: authorizeResponse.tds2Url,
       };
+    }
+    async complete3DSecureAuth(orderId: string, accessId: string, opts: unknown) {
+      fincodeCalls.push({ method: '3ds', orderId, accessId });
+      void opts;
+      return threeDsResult;
     }
     async capturePayment(orderId: string, accessId: string) {
       fincodeCalls.push({ method: 'capture', orderId, accessId });
@@ -338,6 +358,154 @@ describe('place-bid の入札額決定', () => {
 
     expect(response.status).toBe(404);
     expect(writeContractCalls).toHaveLength(0);
+  });
+});
+
+describe('3DS 経路の配線', () => {
+  const BIDDER = `0x${'4'.repeat(40)}`;
+
+  const authorize = async (env: Env) =>
+    worker.fetch(
+      new Request('https://niji-api.example/api/v1/fiat-bid/authorize-fincode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ethAmount: '95238095238095238',
+          spotRate: 315000,
+          jpyAmount: 30000,
+          cardToken: 'card-token-1',
+          bidderWallet: BIDDER,
+          auctionId: '42',
+        }),
+      }),
+      env,
+    );
+
+  const callback = async (env: Env, body: unknown) =>
+    worker.fetch(
+      new Request('https://niji-api.example/api/v1/fiat-bid/3ds-callback-fincode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }),
+      env,
+    );
+
+  beforeEach(() => {
+    authorizeInputs.length = 0;
+    fincodeCalls.length = 0;
+    authorizeResponse = { status: 'AUTHORIZED' };
+    threeDsResult = {
+      transResult: 'Y',
+      reason: undefined,
+      challengeUrl: undefined,
+      authorized: true,
+      status: 'AUTHORIZED',
+    };
+  });
+
+  it('TDS2_RET_URL 設定時は authorize が fincode に tds2RetUrl を渡す', async () => {
+    await authorize(createEnv({ TDS2_RET_URL: 'https://app.example/fiat-bid/3ds-return' }));
+
+    expect(authorizeInputs[0]?.['tds2RetUrl']).toBe('https://app.example/fiat-bid/3ds-return');
+  });
+
+  it('TDS2_RET_URL 未設定時は tds2RetUrl を渡さない (3DS を要求しない従来挙動)', async () => {
+    await authorize(createEnv());
+
+    expect(authorizeInputs[0]).not.toHaveProperty('tds2RetUrl');
+  });
+
+  it('TDS2_RET_URL が空白のみなら未設定扱い', async () => {
+    await authorize(createEnv({ TDS2_RET_URL: '   ' }));
+
+    expect(authorizeInputs[0]).not.toHaveProperty('tds2RetUrl');
+  });
+
+  it('3DS 必要時は authorize が tds2Url を webapp に返す', async () => {
+    authorizeResponse = { status: 'AUTHENTICATED', tds2Url: 'https://acs.example/3ds' };
+
+    const res = await authorize(createEnv({ TDS2_RET_URL: 'https://app.example/r' }));
+    const body = (await res.json()) as { status: string; tds2Url?: string };
+
+    expect(body.status).toBe('AUTHENTICATED');
+    expect(body.tds2Url).toBe('https://acs.example/3ds');
+  });
+
+  it('POST /3ds-callback-fincode が 200 と 3ds-verified を返す', async () => {
+    const kv = createKvStub();
+    const env = createEnv({
+      FINCODE_STATE: kv,
+      TDS2_RET_URL: 'https://app.example/r',
+    } as Partial<Env>);
+    await authorize(env);
+
+    const res = await callback(env, { authId: 'auth-from-fincode' });
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { status: string; transResult?: string };
+    expect(body.status).toBe('3ds-verified');
+    expect(body.transResult).toBe('Y');
+    // capture record に 3DS 結果が追記される
+    const record = JSON.parse(kv._store.get('capture:auth-from-fincode') ?? '{}') as {
+      threeDsStatus?: string;
+      threeDsTransResult?: string;
+    };
+    expect(record.threeDsStatus).toBe('3ds-verified');
+    expect(record.threeDsTransResult).toBe('Y');
+  });
+
+  it('チャレンジ必要時は challenge-required と challengeUrl を返す', async () => {
+    const kv = createKvStub();
+    const env = createEnv({
+      FINCODE_STATE: kv,
+      TDS2_RET_URL: 'https://app.example/r',
+    } as Partial<Env>);
+    await authorize(env);
+    threeDsResult = {
+      transResult: 'C',
+      reason: undefined,
+      challengeUrl: 'https://acs.example/challenge',
+      authorized: false,
+      status: undefined,
+    };
+
+    const res = await callback(env, { authId: 'auth-from-fincode' });
+    const body = (await res.json()) as { status: string; challengeUrl?: string };
+
+    expect(body.status).toBe('challenge-required');
+    expect(body.challengeUrl).toBe('https://acs.example/challenge');
+  });
+
+  it('3DS 未認証の authId でも place-bid は与信時 ethAmount で入札する (経路の独立性)', async () => {
+    const kv = createKvStub();
+    const env = createEnv({
+      FINCODE_STATE: kv,
+      TDS2_RET_URL: 'https://app.example/r',
+    } as Partial<Env>);
+    await authorize(env);
+    await callback(env, { authId: 'auth-from-fincode' });
+
+    writeContractCalls.length = 0;
+    const res = await worker.fetch(
+      new Request('https://niji-api.example/api/v1/fiat-bid/place-bid', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ authId: 'auth-from-fincode', bidderWallet: BIDDER }),
+      }),
+      env,
+    );
+
+    expect(res.status).toBe(200);
+    expect(writeContractCalls[0]?.['value']).toBe(95238095238095238n);
+  });
+
+  it('capture record が無い authId の callback は 404', async () => {
+    const env = createEnv({ FINCODE_STATE: createKvStub() } as Partial<Env>);
+
+    const res = await callback(env, { authId: 'no-such-auth' });
+
+    expect(res.status).toBe(404);
   });
 });
 

@@ -89,25 +89,53 @@ describe('ThreeDSReturn', () => {
     expect(clearState).toHaveBeenCalled();
   });
 
-  it('必須 URL query 欠損時 (transactionId 無し) は callback 呼ばず "不正なアクセスです" 表示', async () => {
+  // transactionId は GMO 経路の目印。 無い場合は fincode 経路として扱うため invalid にはしない
+  // (fincode は tds2_ret_url に MD だけを付けて戻す)。 GMO の callback は呼ばれない。
+  it('transactionId 無しは GMO callback を呼ばず fincode 経路に入る', async () => {
     const callbackFn = vi.fn(async () => ({
       authId: 'mock-access-1',
       status: '3ds-verified' as const,
     }));
-    const loadState = vi.fn(() => mockPending);
-    const clearState = vi.fn();
+    const fincodeCallbackFn = vi.fn(async () => ({
+      authId: 'mock-access-1',
+      status: '3ds-verified' as const,
+    }));
+    const placeBidFn = vi.fn(async () => ({
+      authId: 'mock-access-1',
+      status: 'bid-placed' as const,
+      txHash: '0xabc',
+    }));
 
-    renderWithQuery('?result=success&accessId=mock-access-1', {
+    renderWithQuery('?accessId=mock-access-1', {
       callbackFn,
-      loadState,
-      clearState,
+      fincodeCallbackFn,
+      placeBidFn,
+      loadState: vi.fn(() => mockPending),
+      clearState: vi.fn(),
+    });
+
+    await waitFor(() => {
+      expect(fincodeCallbackFn).toHaveBeenCalledWith({ authId: 'mock-access-1' });
+    });
+    expect(callbackFn).not.toHaveBeenCalled();
+  });
+
+  it('authId が URL にも pending state にも無い場合は invalid 表示', async () => {
+    const callbackFn = vi.fn();
+    const fincodeCallbackFn = vi.fn();
+
+    renderWithQuery('?result=success', {
+      callbackFn,
+      fincodeCallbackFn,
+      loadState: vi.fn(() => null),
+      clearState: vi.fn(),
     });
 
     await waitFor(() => {
       expect(screen.getByText('不正なアクセスです')).toBeTruthy();
     });
     expect(callbackFn).not.toHaveBeenCalled();
-    expect(clearState).not.toHaveBeenCalled();
+    expect(fincodeCallbackFn).not.toHaveBeenCalled();
   });
 
   it('result enum 外 (timeout) は callback 呼ばず invalid 表示', async () => {
@@ -171,6 +199,171 @@ describe('ThreeDSReturn', () => {
       authId: 'mock-access-1',
       transactionId: 'tds2-tran-9',
       result: 'success',
+    });
+  });
+});
+
+/**
+ * fincode 経路の behavior test。
+ *
+ * fincode は tds2_ret_url に `MD` (= access_id) を付けて戻す。 認証が通っても与信は確定していないため、
+ * page が 3ds-callback-fincode を呼んで与信を確定させ、 続けて place-bid まで進める必要がある。
+ * この配線が無いと 3DS 必須カードで入札が成立しない。
+ */
+describe('ThreeDSReturn — fincode 経路', () => {
+  const verified = {
+    authId: 'mock-access-1',
+    status: '3ds-verified' as const,
+  };
+
+  it('MD query から authId を取り、 認証成功後に place-bid まで進めて success 表示', async () => {
+    const fincodeCallbackFn = vi.fn(async () => verified);
+    const placeBidFn = vi.fn(async () => ({
+      authId: 'mock-access-1',
+      status: 'bid-placed' as const,
+      txHash: '0xTX',
+    }));
+    const clearState = vi.fn();
+
+    renderWithQuery('?MD=mock-access-1', {
+      fincodeCallbackFn,
+      placeBidFn,
+      loadState: vi.fn(() => mockPending),
+      clearState,
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('認証が完了しました')).toBeTruthy();
+    });
+    expect(fincodeCallbackFn).toHaveBeenCalledWith({ authId: 'mock-access-1' });
+    // bidderWallet は pending state から復元して渡す (backend 必須 field、 欠落で 400)
+    expect(placeBidFn).toHaveBeenCalledWith({
+      authId: 'mock-access-1',
+      bidderWallet: '0x123',
+    });
+    expect(clearState).toHaveBeenCalled();
+  });
+
+  it('チャレンジ認証が必要なら challengeUrl に遷移し pending state を消さない', async () => {
+    const fincodeCallbackFn = vi.fn(async () => ({
+      authId: 'mock-access-1',
+      status: 'challenge-required' as const,
+      challengeUrl: 'https://acs.example/challenge',
+    }));
+    const placeBidFn = vi.fn();
+    const clearState = vi.fn();
+    const redirect = vi.fn();
+
+    renderWithQuery('?MD=mock-access-1', {
+      fincodeCallbackFn,
+      placeBidFn,
+      loadState: vi.fn(() => mockPending),
+      clearState,
+      redirect,
+    });
+
+    await waitFor(() => {
+      expect(redirect).toHaveBeenCalledWith('https://acs.example/challenge');
+    });
+    // challenge から戻って再開するので state を残す
+    expect(clearState).not.toHaveBeenCalled();
+    expect(placeBidFn).not.toHaveBeenCalled();
+  });
+
+  it('retry=1 は callback に retry を立てて結果を取り直す (challenge 復帰経路)', async () => {
+    const fincodeCallbackFn = vi.fn(async () => verified);
+    const placeBidFn = vi.fn(async () => ({
+      authId: 'mock-access-1',
+      status: 'bid-placed' as const,
+      txHash: '0xTX',
+    }));
+
+    renderWithQuery('?MD=mock-access-1&retry=1', {
+      fincodeCallbackFn,
+      placeBidFn,
+      loadState: vi.fn(() => mockPending),
+      clearState: vi.fn(),
+    });
+
+    await waitFor(() => {
+      expect(fincodeCallbackFn).toHaveBeenCalledWith({ authId: 'mock-access-1', retry: true });
+    });
+  });
+
+  it('認証拒否は place-bid を呼ばず理由付きで failure 表示', async () => {
+    const fincodeCallbackFn = vi.fn(async () => ({
+      authId: 'mock-access-1',
+      status: 'cancelled' as const,
+      reason: 'issuer rejected',
+    }));
+    const placeBidFn = vi.fn();
+
+    renderWithQuery('?MD=mock-access-1', {
+      fincodeCallbackFn,
+      placeBidFn,
+      loadState: vi.fn(() => mockPending),
+      clearState: vi.fn(),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('認証に失敗しました')).toBeTruthy();
+    });
+    expect(screen.getByText(/issuer rejected/)).toBeTruthy();
+    expect(placeBidFn).not.toHaveBeenCalled();
+  });
+
+  it('bidderWallet を復元できない場合は place-bid を呼ばず failure 表示 (400 を出しに行かない)', async () => {
+    const fincodeCallbackFn = vi.fn(async () => verified);
+    const placeBidFn = vi.fn();
+
+    renderWithQuery('?MD=mock-access-1', {
+      fincodeCallbackFn,
+      placeBidFn,
+      loadState: vi.fn(() => ({ ...mockPending, bidderWallet: '' })),
+      clearState: vi.fn(),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('認証に失敗しました')).toBeTruthy();
+    });
+    expect(placeBidFn).not.toHaveBeenCalled();
+  });
+
+  it('place-bid が cancelled を返したら message 付きで failure 表示', async () => {
+    const fincodeCallbackFn = vi.fn(async () => verified);
+    const placeBidFn = vi.fn(async () => ({
+      authId: 'mock-access-1',
+      status: 'cancelled' as const,
+      txHash: null,
+      message: '最低入札額を下回っています',
+    }));
+
+    renderWithQuery('?MD=mock-access-1', {
+      fincodeCallbackFn,
+      placeBidFn,
+      loadState: vi.fn(() => mockPending),
+      clearState: vi.fn(),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('最低入札額を下回っています')).toBeTruthy();
+    });
+  });
+
+  it('callback が throw したら failure に落ちて message を出す', async () => {
+    const fincodeCallbackFn = vi.fn(async () => {
+      throw new Error('3ds callback failed: ThreeDsAuthFailed');
+    });
+
+    renderWithQuery('?MD=mock-access-1', {
+      fincodeCallbackFn,
+      placeBidFn: vi.fn(),
+      loadState: vi.fn(() => mockPending),
+      clearState: vi.fn(),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/ThreeDsAuthFailed/)).toBeTruthy();
     });
   });
 });
