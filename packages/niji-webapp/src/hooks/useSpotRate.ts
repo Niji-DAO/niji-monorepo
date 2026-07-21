@@ -46,7 +46,13 @@ export type UseSpotRateOptions = {
  *
  * env 優先順 —
  * (1) VITE_GMO_API_ENDPOINT_SPOT_RATE = spot-rate independent server (port 42070、 Ponder 非依存)
- * (2) 未設定 = 同一 origin (空 prefix、 Vite proxy 前提、 vite.config.ts server.proxy で 42070 に routing)
+ * (2) VITE_NIJI_API_BASE_URL = deploy 済 niji-api (Cloudflare Workers) の base URL
+ * (3) 未設定 = 同一 origin (空 prefix、 Vite proxy 前提、 vite.config.ts server.proxy で 42070 に routing)
+ *
+ * (2) を挟む理由 — deploy 環境では webapp (Pages) と niji-api (Workers) が別 origin になり、
+ * 同一 origin fallback では spot-rate に到達できない。 niji-api の base URL は useFiatBid /
+ * useFiatSettlement / ThreeDSReturn が既に VITE_NIJI_API_BASE_URL で参照しているため、
+ * spot-rate だけ別 env を要求すると設定漏れで rate 表示のみ欠ける状態を作る。
  *
  * 空白のみの env 値 (`'   '`) は未設定扱い、 trailing slash は正規化する。
  * 引数 envSource は test で差替可能に、 default は `import.meta.env`。
@@ -60,9 +66,12 @@ export const resolveSpotRateEndpoint = (
     return env ?? {};
   })(),
 ): string => {
-  const spotRateEndpoint = envSource['VITE_GMO_API_ENDPOINT_SPOT_RATE'];
+  const candidates = [
+    envSource['VITE_GMO_API_ENDPOINT_SPOT_RATE'],
+    envSource['VITE_NIJI_API_BASE_URL'],
+  ];
   const preferred =
-    typeof spotRateEndpoint === 'string' && spotRateEndpoint.trim() !== '' ? spotRateEndpoint : '';
+    candidates.find(value => typeof value === 'string' && value.trim() !== '')?.trim() ?? '';
   return preferred.replace(/\/$/, '');
 };
 

@@ -204,4 +204,42 @@ describe('resolveSpotRateEndpoint env 優先順 (Issue #3065、 spot-rate 独立
     });
     expect(base).toBe('http://127.0.0.1:42070');
   });
+
+  it('VITE_GMO_API_ENDPOINT_SPOT_RATE 未設定時は VITE_NIJI_API_BASE_URL に fallback する (deploy 環境の別 origin 対応)', () => {
+    const base = resolveSpotRateEndpoint({
+      VITE_NIJI_API_BASE_URL: 'https://niji-api.niji-app.workers.dev',
+    });
+    expect(base).toBe('https://niji-api.niji-app.workers.dev');
+  });
+
+  it('VITE_GMO_API_ENDPOINT_SPOT_RATE が空白のみでも VITE_NIJI_API_BASE_URL に fallback する', () => {
+    const base = resolveSpotRateEndpoint({
+      VITE_GMO_API_ENDPOINT_SPOT_RATE: '   ',
+      VITE_NIJI_API_BASE_URL: 'https://niji-api.niji-app.workers.dev',
+    });
+    expect(base).toBe('https://niji-api.niji-app.workers.dev');
+  });
+
+  it('両方設定時は VITE_GMO_API_ENDPOINT_SPOT_RATE が優先される (local 独立 server override)', () => {
+    const base = resolveSpotRateEndpoint({
+      VITE_GMO_API_ENDPOINT_SPOT_RATE: 'http://127.0.0.1:42070',
+      VITE_NIJI_API_BASE_URL: 'https://niji-api.niji-app.workers.dev',
+    });
+    expect(base).toBe('http://127.0.0.1:42070');
+  });
+
+  it('VITE_NIJI_API_BASE_URL の trailing slash も正規化される', () => {
+    const base = resolveSpotRateEndpoint({
+      VITE_NIJI_API_BASE_URL: 'https://niji-api.niji-app.workers.dev/',
+    });
+    expect(base).toBe('https://niji-api.niji-app.workers.dev');
+  });
+
+  it('両方未設定なら同一 origin fallback (空文字) のまま', () => {
+    const base = resolveSpotRateEndpoint({
+      VITE_GMO_API_ENDPOINT_SPOT_RATE: '',
+      VITE_NIJI_API_BASE_URL: '',
+    });
+    expect(base).toBe('');
+  });
 });

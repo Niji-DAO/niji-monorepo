@@ -4,7 +4,8 @@
  * local Node hono server (authorize-fincode-server.ts) の stateless refactor:
  * - in-memory Map (CaptureAwareFincodeClient.capturedMap) → Cloudflare KV (FINCODE_STATE binding、 TTL 1h)
  * - FincodeClient は Workers 互換 fetch API 使用 (Node.js 依存なし)
- * - SpotRateFetcher は MockSpotRateFetcher で固定 rate (env `USE_SPOT_RATE_MOCK`)
+ * - SpotRateFetcher は単一 instance を spot-rate route / authorize / place-bid で共有 (env `USE_SPOT_RATE_MOCK`
+ *   が true なら固定 rate、 false なら GMO コイン primary + CoinGecko fallback の実 rate)
  * - hono `fetch` export で Workers scheduler が invoke
  *
  * SSOT — packages/niji-api/src/authorize-fincode-server.ts (Node 版、 local 起動用)、
@@ -34,8 +35,9 @@ import {
   createCaptureFincodeApp,
   type FincodeCaptureStore,
 } from '../handlers/fiat-bid/capture-fincode.js';
+import { createSpotRateApp } from '../handlers/spot-rate.js';
 import { FincodeClient } from '../services/fincode/client.js';
-import { SpotRateFetcher, type SpotRate } from '../services/spotRate/index.js';
+import { SpotRateFetcher } from '../services/spotRate/index.js';
 
 /**
  * Cloudflare Workers types minimum stub (npm install 経路の @cloudflare/workers-types なしで compile 通す)
@@ -124,27 +126,6 @@ class KVFincodeCaptureStore implements FincodeCaptureStore {
   }
 }
 
-/** MockSpotRateFetcher (Node 版 authorize-fincode-server と同 pattern、 method name = handler の呼出と一致) */
-class MockSpotRateFetcher extends SpotRateFetcher {
-  constructor(private readonly rate: number) {
-    super({
-      gmoCoinEndpoint: 'http://stub-primary',
-      coingeckoEndpoint: 'http://stub-fallback',
-    });
-  }
-  async getEthJpyRate(): Promise<SpotRate> {
-    return {
-      rate: this.rate,
-      source: 'mock',
-      cachedAt: Date.now(),
-      expiresAt: Date.now() + 5_000,
-    };
-  }
-  async fetchEthJpyRate(): Promise<SpotRate> {
-    return this.getEthJpyRate();
-  }
-}
-
 /** Base Sepolia chain 定義 (viem chain object、 wrangler.toml の CHAIN_ID / RPC_URL で override 可能) */
 const buildChain = (env: Env) =>
   defineChain({
@@ -216,8 +197,12 @@ const updateFiatBidLifecycle = async (
 /**
  * place-bid handler = webapp が authorize 直後に呼ぶ endpoint、 chain 上代理入札発火 + fiat_bid record KV 保存。
  * body: { authId, bidderWallet }
+ *
+ * spotRateFetcher は webapp の表示 rate (GET /api/v1/spot-rate/eth-jpy) と同一 instance を受け取る。
+ * ここで別 source (env 直読み等) を持つと、 user に見せた rate と実際に chain へ投げる ETH 量が
+ * 食い違うため、 JPY → ETH 換算の source は 1 つに固定する。
  */
-const createPlaceBidHandler = (env: Env) => {
+const createPlaceBidHandler = (env: Env, spotRateFetcher: SpotRateFetcher) => {
   const app = new Hono();
   app.post('/place-bid', async c => {
     const raw = await c.req.json().catch(() => ({}));
@@ -249,9 +234,9 @@ const createPlaceBidHandler = (env: Env) => {
       })) as { nounId: bigint; amount: bigint };
       const auctionId = auction.nounId;
 
-      // spot rate = mock (env override 可能) で jpyAmount → ethAmount 換算 (worker 版は簡易 mock)
-      const mockRate = Number.parseInt(env.MOCK_SPOT_RATE_JPY_PER_ETH ?? '500000', 10);
-      const ethAmount = BigInt(Math.floor((capture.jpyAmount / mockRate) * 1e18));
+      // jpyAmount → ethAmount 換算 = spot-rate route と同一 fetcher (mock / 実 rate は env で切替)
+      const { rate: jpyPerEth } = await spotRateFetcher.getEthJpyRate();
+      const ethAmount = BigInt(Math.floor((capture.jpyAmount / jpyPerEth) * 1e18));
 
       const txHash = await walletClient.writeContract({
         address: env.AUCTION_HOUSE_ADDRESS as Address,
@@ -272,7 +257,7 @@ const createPlaceBidHandler = (env: Env) => {
       });
 
       console.log(
-        `[worker] place-bid REAL: authId=${authId} auctionId=${auctionId} ethAmount=${ethAmount} bidder=${bidderWallet} txHash=${txHash}`,
+        `[worker] place-bid REAL: authId=${authId} auctionId=${auctionId} jpy=${capture.jpyAmount} rate=${jpyPerEth} ethAmount=${ethAmount} bidder=${bidderWallet} txHash=${txHash}`,
       );
       return c.json(
         {
@@ -467,7 +452,8 @@ const injectProcessEnv = (env: Env): void => {
     FINCODE_TEST_ENDPOINT: 'https://api.test.fincode.jp',
     FINCODE_LIVE_ENDPOINT: 'https://api.fincode.jp',
     USE_FINCODE_MOCK: env.USE_FINCODE_MOCK ?? 'false',
-    USE_SPOT_RATE_MOCK: env.USE_SPOT_RATE_MOCK ?? 'true',
+    // 未設定時は実 rate 経路 = 誤って mock 金額で与信 / 入札する事故を防ぐ安全側 default
+    USE_SPOT_RATE_MOCK: env.USE_SPOT_RATE_MOCK ?? 'false',
     MOCK_SPOT_RATE_JPY_PER_ETH: env.MOCK_SPOT_RATE_JPY_PER_ETH ?? '500000',
   };
   if (typeof globalThis.process === 'undefined') {
@@ -491,13 +477,14 @@ export default {
       '*',
       cors({
         origin: '*',
-        allowMethods: ['POST', 'OPTIONS'],
+        allowMethods: ['GET', 'POST', 'OPTIONS'],
         allowHeaders: ['Content-Type', 'Authorization'],
       }),
     );
 
-    const mockRate = Number.parseInt(env.MOCK_SPOT_RATE_JPY_PER_ETH ?? '500000', 10);
-    const spotRateFetcher = new MockSpotRateFetcher(Number.isFinite(mockRate) ? mockRate : 500_000);
+    // spot rate の単一 source。 mock / 実 rate の切替は env `USE_SPOT_RATE_MOCK` が担い、
+    // instance を共有することで 5 秒 cache も spot-rate route と place-bid で共通になる。
+    const spotRateFetcher = new SpotRateFetcher();
     const fincodeClient = new KVAwareFincodeClient(
       { apiKeySecret: env.FINCODE_API_KEY_SECRET },
       env.FINCODE_STATE,
@@ -511,7 +498,11 @@ export default {
     );
     app.route('/api/v1/fiat-bid', createCaptureFincodeApp({ fincodeClient, store: captureStore }));
     // 2026-07-17 追加 = place-bid endpoint (chain 上代理入札 + KV fiat_bid record 保存)
-    app.route('/api/v1/fiat-bid', createPlaceBidHandler(env));
+    app.route('/api/v1/fiat-bid', createPlaceBidHandler(env, spotRateFetcher));
+    // 2026-07-21 追加 = spot-rate endpoint (GET /api/v1/spot-rate/eth-jpy)。
+    // webapp の useSpotRate が polling して現在 rate と ETH 換算を表示する経路、
+    // 未配線だと webapp 側は 404 を受けて rate 表示が空のままになる。
+    app.route('/api/v1/spot-rate', createSpotRateApp(spotRateFetcher));
 
     return app.fetch(request);
   },

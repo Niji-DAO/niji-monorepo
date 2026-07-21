@@ -24,8 +24,10 @@ crons = ["* * * * *"]
 [vars]
 # fincode
 USE_FINCODE_MOCK = "false"
-# spot rate (real 経路は GMO Coin API、 mock 経路は下記固定値)
-USE_SPOT_RATE_MOCK = "true"
+# spot rate — "false" = GMO コイン Public API primary + CoinGecko fallback の実 rate、
+# "true" = MOCK_SPOT_RATE_JPY_PER_ETH の固定値。 GET /api/v1/spot-rate/eth-jpy の応答と
+# place-bid の JPY → ETH 換算は同一 fetcher instance を共有するため、 本 flag 1 つで両方が切替わる。
+USE_SPOT_RATE_MOCK = "false"
 MOCK_SPOT_RATE_JPY_PER_ETH = "500000"
 # chain (Base Sepolia、 2026-07-21 deploy 済 address)
 CHAIN_ID = "84532"
