@@ -15,7 +15,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai/react';
 import { createRoot } from 'react-dom/client';
 import { parseAbiItem } from 'viem';
-import { hardhat } from 'viem/chains';
+import { baseSepolia, hardhat } from 'viem/chains';
 import { usePublicClient, WagmiProvider } from 'wagmi';
 
 import { CustomConnectkitProvider } from '@/components/CustomConnectkitProvider';
@@ -102,13 +102,25 @@ const ChainSubscriber: React.FC = () => {
   ]);
 
   // Fetch the previous 24 hours of bids
+  //
+  // deps に currentAuction を含めるのは applyAppendBid が activeAuction 未 set の bid を捨てるため。
+  // activeAuction は chain read (useReadNijiAuctionHouseAuction) の非同期解決で入るので、 本 effect が
+  // mount 直後の 1 回だけ走ると全 bid が捨てられて履歴が空になる (2026-07-21 に Base Sepolia で顕在化)。
+  //
+  // fromBlock は「直近 24 時間」 を block 数で近似する。 Ethereum の 12 秒/block を前提にした 7200 では
+  // Base (2 秒/block) で 4 時間分にしかならないため、 chain の block time から算出する。
   useEffect(() => {
     if (CHAIN_ID === hardhat.id) {
       return;
     }
+    if (!currentAuction) {
+      return;
+    }
     (async () => {
       const latestBlock = await publicClient.getBlock();
-      const fromBlock = latestBlock.number > 7200n ? latestBlock.number - 7200n : 0n;
+      // 24h 相当の block 数 = 86400 秒 / block time。 Base 系 (2 秒) は 43200、 Ethereum (12 秒) は 7200。
+      const blocksPerDay = CHAIN_ID === baseSepolia.id ? 43_200n : 7_200n;
+      const fromBlock = latestBlock.number > blocksPerDay ? latestBlock.number - blocksPerDay : 0n;
 
       const logs = await publicClient.getLogs({
         address: nijiAuctionHouseAddress[chainId],
@@ -142,7 +154,7 @@ const ChainSubscriber: React.FC = () => {
         setAuction(prev => applyAppendBid(prev, bidPayload));
       }
     })();
-  }, [chainId, publicClient, setAuction]);
+  }, [chainId, publicClient, setAuction, currentAuction]);
 
   // Watch for new bids
   useWatchNijiAuctionHouseAuctionBidEvent({
