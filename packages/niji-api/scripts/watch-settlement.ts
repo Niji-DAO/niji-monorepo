@@ -7,17 +7,19 @@
  * AuctionSettled を拾って capture と transferFrom を実行するが、
  * これが実際に動いたかは chain と NFT の所有者を見ないと分からない。
  *
- * 本 script は「今どの段階にいるか」 を 1 コマンドで表示する。
+ * 本 script は「今どの段階にいるか」 を 1 コマンドで判定する。
  * 実行例 —
  *   pnpm --filter @niji/api watch:settlement
- *   pnpm --filter @niji/api watch:settlement -- --watch     # 60 秒毎に再表示
- *   pnpm --filter @niji/api watch:settlement -- --token 1   # 指定 tokenId の所有者も確認
+ *   pnpm --filter @niji/api watch:settlement -- --watch          # 60 秒毎に再表示
+ *   pnpm --filter @niji/api watch:settlement -- --until-settled  # 決着まで待って verdict を出す
+ *   pnpm --filter @niji/api watch:settlement -- --token 1        # 指定 tokenId の所有者も確認
  *
- * 判定する 4 段階 —
- * (1) 入札中     = auction 未終了、 最高額入札者が operator なら fiat 入札が現在勝っている
- * (2) 終了待ち   = endTime 経過、 settled=false = AuctionKeeper の settle tx 待ち
- * (3) settle 済  = 次 auction が開始済、 直前 auction の落札者を AuctionSettled から判定
- * (4) 引渡し済   = 落札 tokenId の owner が operator でなく入札者 wallet = transferFrom 完了
+ * 段階判定は services/settlementWatch の judgeSettlement が持つ (pure logic、 test で固定済)。
+ * 本 script は chain 読取と表示だけを担う。
+ *
+ * `--until-settled` は決着 (引渡し済 or 落選) まで polling し、 exit code で結果を返す。
+ * 0 = 引渡し済、 3 = 落選、 1 = 未決着のまま timeout。 auction は最大 24 時間続くので
+ * `--timeout-hours` (default 26) で上限を伸縮できる。
  *
  * env —
  *   RPC_URL               (default https://sepolia.base.org)
@@ -36,6 +38,11 @@ import {
   parseAbiItem,
   type Address,
 } from 'viem';
+
+import {
+  judgeSettlement,
+  type SettlementJudgement,
+} from '../src/services/settlementWatch/index.js';
 
 const RPC_URL = process.env['RPC_URL'] ?? 'https://sepolia.base.org';
 const AUCTION_HOUSE = (process.env['AUCTION_HOUSE_ADDRESS'] ??
@@ -112,7 +119,7 @@ const fetchRecentSettled = async (): Promise<
   return collected.sort((a, b) => Number(a.blockNumber - b.blockNumber));
 };
 
-const reportOnce = async (tokenIdArg: bigint | undefined): Promise<void> => {
+const reportOnce = async (tokenIdArg: bigint | undefined): Promise<SettlementJudgement> => {
   const now = Math.floor(Date.now() / 1000);
   const auction = (await client.readContract({
     address: AUCTION_HOUSE,
@@ -147,19 +154,6 @@ const reportOnce = async (tokenIdArg: bigint | undefined): Promise<void> => {
   );
   console.log(`settled       : ${auction.settled}`);
 
-  // 段階判定
-  let stage: string;
-  if (remaining > 0) {
-    stage = isOperator(auction.bidder)
-      ? '(1) 入札中 — fiat 入札が現在の最高額'
-      : '(1) 入札中 — fiat 入札は現在の最高額ではない';
-  } else if (!auction.settled) {
-    stage = '(2) 終了待ち — AuctionKeeper (cron 1 分毎) の settle tx 待ち';
-  } else {
-    stage = '(3) settle 済';
-  }
-  console.log(`\n段階          : ${stage}`);
-
   const settled = await fetchRecentSettled();
   if (settled.length === 0) {
     console.log('直近 settle    : 取得範囲内に AuctionSettled なし');
@@ -172,43 +166,93 @@ const reportOnce = async (tokenIdArg: bigint | undefined): Promise<void> => {
     }
   }
 
-  // NFT 所有者確認 = transferFrom が完了したかの最終判定
-  const fiatWon = settled.filter(s => isOperator(s.winner));
-  const targets = tokenIdArg !== undefined ? [tokenIdArg] : fiatWon.map(s => s.nounId);
-  if (targets.length === 0) {
-    console.log('\n所有者確認     : fiat 落札 token なし (確認対象なし)');
-    return;
-  }
-  console.log('\n所有者確認 (fiat 落札 token):');
-  for (const tokenId of targets) {
+  // 判定対象 = --token 指定があればそれ、 無ければ直近 settle の最後の 1 件
+  const latestSettled = settled.at(-1);
+  const targetTokenId = tokenIdArg ?? latestSettled?.nounId;
+  let owner: Address | undefined;
+  if (targetTokenId !== undefined) {
     try {
-      const owner = (await client.readContract({
+      owner = (await client.readContract({
         address: NIJI_TOKEN,
         abi: nijiTokenAbi,
         functionName: 'ownerOf',
-        args: [tokenId],
+        args: [targetTokenId],
       })) as Address;
-      const done = !isOperator(owner);
-      console.log(
-        `  Niji ${tokenId.toString().padStart(3)}  owner=${owner}  → ${done ? '(4) 引渡し済 (transferFrom 完了)' : '(3) capture / transferFrom 待ち (owner が operator のまま)'}`,
-      );
     } catch (err) {
       console.log(
-        `  Niji ${tokenId.toString().padStart(3)}  ownerOf 取得失敗: ${err instanceof Error ? err.message : String(err)}`,
+        `\nownerOf 取得失敗 (Niji ${targetTokenId}): ${err instanceof Error ? err.message : String(err)}`,
       );
     }
   }
+
+  const outcomeSource =
+    tokenIdArg !== undefined ? settled.find(s => s.nounId === tokenIdArg) : latestSettled;
+
+  const judgement = judgeSettlement({
+    endTime,
+    settled: auction.settled,
+    bidder: auction.bidder,
+    operator: OPERATOR,
+    now,
+    ...(outcomeSource !== undefined
+      ? {
+          settledOutcome: {
+            winner: outcomeSource.winner,
+            ...(owner !== undefined ? { owner } : {}),
+          },
+        }
+      : {}),
+  });
+
+  console.log(`\n段階          : ${judgement.stage} — ${judgement.description}`);
+  if (targetTokenId !== undefined) {
+    console.log(`対象 token    : Niji ${targetTokenId} owner=${owner ?? '取得失敗'}`);
+  }
+
+  return judgement;
+};
+
+const readNumberArg = (argv: string[], flag: string, fallback: number): number => {
+  const idx = argv.indexOf(flag);
+  const raw = idx >= 0 ? argv[idx + 1] : undefined;
+  if (raw === undefined || !/^\d+(\.\d+)?$/.test(raw)) return fallback;
+  return Number.parseFloat(raw);
 };
 
 const main = async (): Promise<void> => {
   const argv = process.argv.slice(2);
   const watch = argv.includes('--watch');
+  const untilSettled = argv.includes('--until-settled');
   const tokenIdx = argv.indexOf('--token');
   const tokenRaw = tokenIdx >= 0 ? argv[tokenIdx + 1] : undefined;
   const tokenIdArg =
     tokenRaw !== undefined && /^\d+$/.test(tokenRaw) ? BigInt(tokenRaw) : undefined;
 
-  await reportOnce(tokenIdArg);
+  const judgement = await reportOnce(tokenIdArg);
+
+  if (untilSettled) {
+    const timeoutHours = readNumberArg(argv, '--timeout-hours', 26);
+    const intervalSec = readNumberArg(argv, '--interval-sec', 60);
+    const deadline = Date.now() + timeoutHours * 3600 * 1000;
+    console.log(
+      `\n--until-settled 指定、 決着まで ${intervalSec} 秒毎に確認する (上限 ${timeoutHours} 時間)`,
+    );
+
+    let current = judgement;
+    while (!current.terminal) {
+      if (Date.now() > deadline) {
+        console.log(`\n判定          : 未決着のまま上限 ${timeoutHours} 時間に到達`);
+        process.exit(1);
+      }
+      await new Promise(resolve => setTimeout(resolve, intervalSec * 1000));
+      current = await reportOnce(tokenIdArg);
+    }
+
+    console.log(`\n判定          : ${current.stage} — ${current.description}`);
+    // 0 = 引渡し完了、 3 = 落選。 落選は異常ではないので 1 と区別する
+    process.exit(current.stage === 'transferred' ? 0 : 3);
+  }
+
   if (!watch) return;
 
   console.log('\n--watch 指定、 60 秒毎に再表示する (Ctrl+C で終了)');

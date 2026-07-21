@@ -435,21 +435,34 @@ auction は 24 時間続くため、 入札直後に落札結果は分からな�
 `watch-settlement` script が現在どの段階にいるかを表示する。
 
 ```bash
-pnpm --filter @niji/api watch:settlement              # 1 回だけ表示
-pnpm --filter @niji/api watch:settlement -- --watch   # 60 秒毎に再表示
-pnpm --filter @niji/api watch:settlement -- --token 1 # 指定 tokenId の所有者も確認
+pnpm --filter @niji/api watch:settlement                    # 1 回だけ判定
+pnpm --filter @niji/api watch:settlement -- --watch         # 60 秒毎に再表示
+pnpm --filter @niji/api watch:settlement -- --until-settled # 決着まで待って verdict を返す
+pnpm --filter @niji/api watch:settlement -- --token 1       # 対象 tokenId を明示
 ```
 
-段階は 4 つで、 script が判定して出力する。
+段階は 5 つで、 script が判定して出力する。 判定 logic は
+`packages/niji-api/src/services/settlementWatch/index.ts` の `judgeSettlement` が持ち、
+段階の境界は test で固定されている。
 
 | 段階 | 状態 | 次に起きること |
 |---|---|---|
-| (1) 入札中 | `endTime` 未到達 | 最高額入札者が operator EOA なら fiat 入札が勝っている |
-| (2) 終了待ち | `endTime` 経過 かつ `settled=false` | AuctionKeeper (cron 1 分毎) が `settleCurrentAndCreateNewAuction` を送る |
-| (3) settle 済 | 次 auction 開始済 | SettlementDaemon が `AuctionSettled` を拾い capture と transferFrom を実行 |
-| (4) 引渡し済 | 落札 tokenId の owner が入札者 wallet | 完了 |
+| `bidding` | `endTime` 未到達 | 最高額入札者が operator EOA なら fiat 入札が勝っている |
+| `awaiting-settle` | `endTime` 経過 かつ `settled=false` | AuctionKeeper (cron 1 分毎) が `settleCurrentAndCreateNewAuction` を送る |
+| `awaiting-transfer` | fiat が落札したが owner が operator のまま | SettlementDaemon が capture と transferFrom を実行 |
+| `transferred` | 落札 tokenId の owner が入札者 wallet | 完了 |
+| `lost` | 落札者が operator 以外 | 与信は cancel され、 カードに請求は発生しない |
 
-(3) から (4) に進まない場合は fincode の capture が失敗している可能性が高い。
+`--until-settled` は `transferred` か `lost` に到達するまで polling し、 exit code で結果を返す。
+`0` = 引渡し済、 `3` = 落選、 `1` = 未決着のまま上限到達。
+上限は `--timeout-hours` (default 26)、 間隔は `--interval-sec` (default 60) で変えられる。
+auction が終わるまで席を外す場合は、 これを background で走らせておけば後から結果を確認できる。
+
+```bash
+pnpm --filter @niji/api watch:settlement -- --until-settled > /tmp/settle.log 2>&1 &
+```
+
+`awaiting-transfer` から進まない場合は fincode の capture が失敗している可能性が高い。
 `wrangler tail` に `[cron] fincode capture FAIL` が出ていないか確認する。
 capture が失敗した場合、 SettlementDaemon は transferFrom に進まず NFT は operator に留まる
 (与信できていない NFT を渡さないための設計)。
