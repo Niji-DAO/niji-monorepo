@@ -35,6 +35,9 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @notice Thrown when caller is not the minter
     error OnlyMinter();
 
+    /// @notice Thrown when caller is not the Nijider DAO
+    error OnlyNijidersDAO();
+
     /// @notice Thrown when descriptor is not set
     error DescriptorNotSet();
 
@@ -103,6 +106,20 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
     /// @param newMinter The new minter address
     event MinterUpdated(address indexed oldMinter, address indexed newMinter);
 
+    /// @notice Emitted when the Nijider DAO address is updated
+    /// @param oldNijidersDAO The previous Nijider DAO address
+    /// @param newNijidersDAO The new Nijider DAO address
+    event NijidersDAOUpdated(address indexed oldNijidersDAO, address indexed newNijidersDAO);
+
+    /// @notice Emitted when the Nijider founder reward window is updated
+    /// @param newLastId The last token id eligible for the founder reward
+    event NijiderRewardLastIdUpdated(uint256 newLastId);
+
+    /// @notice Emitted when a Nijider founder reward token is minted
+    /// @param tokenId The token id granted to the Nijider DAO
+    /// @param nijidersDAO The recipient Nijider DAO address
+    event NijiderRewardMinted(uint256 indexed tokenId, address indexed nijidersDAO);
+
     /// @notice Emitted when minting is toggled
     /// @param isActive Whether minting is now active
     event MintingToggled(bool isActive);
@@ -154,6 +171,20 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
 
     /// @notice The minter address (can mint new tokens)
     address public minter;
+
+    /// @notice The Nijider DAO address that receives the founder reward
+    /// @dev Mirrors NounsToken.noundersDAO. Every `NIJIDER_REWARD_INTERVAL`-th token (id % interval == 0)
+    ///      is minted to this address before the auction token, up to `nijiderRewardLastId`.
+    ///      Zero address disables the founder reward entirely (all tokens go to the auction).
+    address public nijidersDAO;
+
+    /// @notice Last token ID eligible for the Nijider founder reward (inclusive)
+    /// @dev Nouns caps the founder reward at id 1820 (5 years of daily auctions). Configurable here so
+    ///      testnet deployments can shorten the window without changing the contract.
+    uint256 public nijiderRewardLastId;
+
+    /// @notice Interval of the Nijider founder reward (every N-th token id)
+    uint256 public constant NIJIDER_REWARD_INTERVAL = 10;
 
     /// @notice Current token ID counter
     uint256 private _currentTokenId;
@@ -252,10 +283,26 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
 
     /// @notice Mint a new Niji to msg.sender (legacy governance compat for auction house)
     /// @dev Auction house contracts (NijiAuctionHouse / NijiAuctionHouseV3 / NijiAuctionHouseFork) call `nouns.mint()` and expect to receive the token (then auction off via transferFrom).
-    /// @return tokenId The minted token ID
+    ///      Mirrors NounsToken.mint: every `NIJIDER_REWARD_INTERVAL`-th token id (0, 10, 20, ...) up to
+    ///      `nijiderRewardLastId` is minted to the Nijider DAO first, then the next id is minted for the
+    ///      auction. The founder reward is skipped entirely while `nijidersDAO` is the zero address.
+    /// @return tokenId The minted token ID handed to the auction house
     function mint() external onlyMinter nonReentrant returns (uint256) {
         if (!isMintingActive) revert MintingNotActive();
-        if (maxSupply > 0 && _currentTokenId >= maxSupply) revert MaxSupplyReached();
+
+        // Nijider founder reward — the reward token consumes one id, so the auction needs two ids here.
+        if (
+            nijidersDAO != address(0) &&
+            _currentTokenId <= nijiderRewardLastId &&
+            _currentTokenId % NIJIDER_REWARD_INTERVAL == 0
+        ) {
+            if (maxSupply > 0 && _currentTokenId + 1 >= maxSupply) revert MaxSupplyReached();
+
+            uint256 rewardTokenId = _mintTo(nijidersDAO);
+            emit NijiderRewardMinted(rewardTokenId, nijidersDAO);
+        } else if (maxSupply > 0 && _currentTokenId >= maxSupply) {
+            revert MaxSupplyReached();
+        }
 
         return _mintTo(msg.sender);
     }
@@ -438,6 +485,34 @@ contract NijiToken is ERC721Enumerable, ERC721Votes, Ownable2Step, ReentrancyGua
         minter = _minter;
 
         emit MinterUpdated(oldMinter, _minter);
+    }
+
+    /// @notice Set the Nijider DAO address that receives the founder reward
+    /// @dev Callable by the owner while unset (bootstrap), and by the Nijider DAO itself afterwards —
+    ///      mirrors NounsToken.setNoundersDAO where the founders control their own payout address.
+    ///      Setting the zero address disables the founder reward (all tokens go to the auction).
+    /// @param _nijidersDAO The new Nijider DAO address
+    function setNijidersDAO(address _nijidersDAO) external {
+        if (nijidersDAO == address(0)) {
+            if (msg.sender != owner()) revert OnlyNijidersDAO();
+        } else if (msg.sender != nijidersDAO) {
+            revert OnlyNijidersDAO();
+        }
+
+        address oldNijidersDAO = nijidersDAO;
+        nijidersDAO = _nijidersDAO;
+
+        emit NijidersDAOUpdated(oldNijidersDAO, _nijidersDAO);
+    }
+
+    /// @notice Set the last token id eligible for the Nijider founder reward
+    /// @dev Nouns hard-codes 1820 (5 years of daily auctions). Configurable here so the window can be
+    ///      shortened on testnets without redeploying. Owner-only because it caps founder economics.
+    /// @param _lastId The last eligible token id (inclusive)
+    function setNijiderRewardLastId(uint256 _lastId) external onlyOwner {
+        nijiderRewardLastId = _lastId;
+
+        emit NijiderRewardLastIdUpdated(_lastId);
     }
 
     /// @notice Toggle minting active state

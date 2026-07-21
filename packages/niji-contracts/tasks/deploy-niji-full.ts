@@ -389,6 +389,23 @@ task('deploy-niji-full', 'Deploy full Niji stack (Art, Descriptor, Seeder, Token
       await setMinterTx.wait();
       console.log(`│ NijiToken.setMinter → proxy`);
 
+      // Nijider founder reward (NounsToken.noundersDAO 相当) — 10 個ごと (id % 10 == 0) を
+      // Nijider DAO に付与し、 次の id を auction に回す。 env NIJIDER_DAO_ADDRESS 未設定時は
+      // deployer を暫定の受取先にする (testnet 想定、 本番は multisig を env で明示)。
+      // NIJIDER_REWARD_LAST_ID は Nouns の 1820 (5 年分の daily auction) を default。
+      const nijiderDaoAddr = process.env.NIJIDER_DAO_ADDRESS || deployer.address;
+      const nijiderRewardLastIdEnv = process.env.NIJIDER_REWARD_LAST_ID;
+      const nijiderRewardLastId =
+        nijiderRewardLastIdEnv && Number.isFinite(Number(nijiderRewardLastIdEnv))
+          ? Number(nijiderRewardLastIdEnv)
+          : 1820;
+      const setNijidersTx = await (token as any).setNijidersDAO(nijiderDaoAddr);
+      await setNijidersTx.wait();
+      const setRewardLastIdTx = await (token as any).setNijiderRewardLastId(nijiderRewardLastId);
+      await setRewardLastIdTx.wait();
+      console.log(`│ NijiToken.setNijidersDAO → ${nijiderDaoAddr}`);
+      console.log(`│ NijiToken.setNijiderRewardLastId → ${nijiderRewardLastId} (10 個ごと付与)`);
+
       // NijiToken.setPlaceholderURI — PR #247 で _mintTo に追加された PlaceholderURINotSet guard 対応。
       // auction の初回 _createAuction が NijiToken.mint() を呼ぶ前に必ず非空 placeholder を入れておく。
       const setPlaceholderTx = await (token as any).setPlaceholderURI(
