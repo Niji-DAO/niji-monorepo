@@ -293,6 +293,63 @@ const createPlaceBidHandler = (env: Env) => {
 };
 
 /**
+ * AuctionKeeper (Cron Triggers 経路) = auction endTime 経過 + 未 settle を検知して
+ * settleCurrentAndCreateNewAuction() を operator EOA から発火、 次 auction を開始する。
+ *
+ * Nouns 系 auction は自動進行機構を持たず、 anvil では auto-settler script が担っていた役割の
+ * Cloudflare Workers 版。 24h auction (Base Sepolia) では 1 日 1 回だけ tx 発火 (残りは read only)、
+ * settle が AuctionSettled event を emit → 同 cron の runSettlementDaemon (or 次回 cron) が拾って
+ * fiat winner の capture/transfer を実行する 2 段連動。
+ *
+ * revert 条件 (contract _settleAuction) = startTime != 0 && !settled && now >= endTime、
+ * 3 条件満たす時だけ tx を送り、 空振り tx (gas 無駄) を回避する。
+ */
+const runAuctionKeeper = async (env: Env): Promise<void> => {
+  const { publicClient, walletClient } = buildChainClients(env);
+
+  let auction: { startTime: number; endTime: number; settled: boolean };
+  try {
+    auction = (await publicClient.readContract({
+      address: env.AUCTION_HOUSE_ADDRESS as Address,
+      abi: nijiAuctionHouseAbi,
+      functionName: 'auction',
+    })) as { startTime: number; endTime: number; settled: boolean };
+  } catch (err) {
+    console.error(
+      `[keeper] auction read FAIL: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return;
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  const started = Number(auction.startTime) !== 0;
+  const ended = now >= Number(auction.endTime);
+  if (!started || auction.settled || !ended) {
+    // まだ settle 不要 (未開始 / 既 settle / 24h 未経過) = read only で終了、 tx 送らない
+    console.log(
+      `[keeper] skip: started=${started} settled=${auction.settled} ended=${ended} (endTime=${auction.endTime} now=${now})`,
+    );
+    return;
+  }
+
+  try {
+    const txHash = await walletClient.writeContract({
+      address: env.AUCTION_HOUSE_ADDRESS as Address,
+      abi: nijiAuctionHouseAbi,
+      functionName: 'settleCurrentAndCreateNewAuction',
+      args: [],
+    });
+    console.log(`[keeper] settle + create next auction: tx=${txHash}`);
+    // receipt を待って次 auction 開始を confirm (nonce 順を daemon より前に確定)
+    await publicClient.waitForTransactionReceipt({ hash: txHash, timeout: 60_000 });
+    console.log(`[keeper] settle confirmed, next auction started`);
+  } catch (err) {
+    // pause 中 / gas 不足 / 既に他 keeper が settle 済 (race) 等は warn のみで継続
+    console.error(`[keeper] settle FAIL: ${err instanceof Error ? err.message : String(err)}`);
+  }
+};
+
+/**
  * SettlementDaemon (Cron Triggers 経路) = fromBlock cursor 以降の AuctionSettled event を取得、
  * KV fiat_bid record と突合して勝敗判定 → capture + transferFrom or cancel を発火する。
  * wrangler.toml の [triggers] crons で 1 min 毎起動、 event miss 防止で cursor は KV 永続。
@@ -304,8 +361,13 @@ const runSettlementDaemon = async (env: Env): Promise<void> => {
   // fromBlock cursor 取得 (KV)、 未 set なら latest - 10 (直近のみ)
   const cursorRaw = await env.FINCODE_STATE.get('cron_cursor:from_block');
   const latestBlock = await publicClient.getBlockNumber();
-  const fromBlock =
-    cursorRaw !== null ? BigInt(cursorRaw) : (latestBlock > 10n ? latestBlock - 10n : 0n);
+  // cursor があればそこから、 なければ latest-10 (初回は直近のみ scan して RPC 負荷を抑える)
+  let fromBlock: bigint;
+  if (cursorRaw !== null) {
+    fromBlock = BigInt(cursorRaw);
+  } else {
+    fromBlock = latestBlock > 10n ? latestBlock - 10n : 0n;
+  }
   const toBlock = latestBlock;
 
   console.log(`[cron] SettlementDaemon: fromBlock=${fromBlock} toBlock=${toBlock}`);
@@ -455,11 +517,19 @@ export default {
   },
 
   /**
-   * Cloudflare Cron Triggers 経路 (wrangler.toml `[triggers] crons = ["* * * * *"]`) で 1 min 毎起動、
-   * chain 上 AuctionSettled event を fromBlock cursor 以降 poll → capture / transferFrom / cancel 発火。
+   * Cloudflare Cron Triggers 経路 (wrangler.toml `[triggers] crons = ["* * * * *"]`) で 1 min 毎起動。
+   * 2 段 = (1) AuctionKeeper が endTime 経過 auction を settle + 次 auction 開始、
+   *        (2) SettlementDaemon が AuctionSettled event を拾って fiat winner の capture/transfer/cancel。
+   * keeper → daemon の直列 = keeper の settle tx が emit する AuctionSettled event を、
+   * 同回 or 次回 cron の daemon getLogs が拾う (cursor 経路で miss なし)。 同 operator EOA の nonce 順も保つ。
    */
   async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
     injectProcessEnv(env);
-    ctx.waitUntil(runSettlementDaemon(env));
+    ctx.waitUntil(
+      (async () => {
+        await runAuctionKeeper(env);
+        await runSettlementDaemon(env);
+      })(),
+    );
   },
 };
