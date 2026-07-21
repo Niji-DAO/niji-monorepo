@@ -26,6 +26,7 @@
     "dev": "pnpm task:run-local",
     "dev:local": "cp .env.local .env && pnpm task:run-local",
     "dev:dev": "cp .env.dev .env && hardhat --network base-sepolia deploy-niji-full",
+    "sync:addresses:dev": "cp .env.dev .env && hardhat --network base-sepolia run scripts/sync-addresses.ts",
     "dev:prod": "cp .env.prod .env && echo 'production deploy は verify-niji + manual confirm 必須'",
     "hardhat": "hardhat",
     "task:accounts": "hardhat accounts",
