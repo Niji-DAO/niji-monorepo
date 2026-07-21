@@ -457,6 +457,38 @@ capture が失敗した場合、 SettlementDaemon は transferFrom に進まず 
 env で対象を差し替えられる。 `RPC_URL` / `AUCTION_HOUSE_ADDRESS` / `NIJI_TOKEN_ADDRESS` /
 `OPERATOR_ADDRESS` / `CHAIN_ID` を指定すると別 chain や別 deploy を監視できる。
 
+### 現状の制約 (2026-07-22 時点)
+
+**3DS が必要なカードでは入札が完了しない**
+
+Cloudflare Workers の `niji-api` が expose している route は 4 つで、 `3ds-callback` は含まれない。
+
+- `POST /api/v1/fiat-bid/authorize-fincode`
+- `POST /api/v1/fiat-bid/capture-fincode`
+- `POST /api/v1/fiat-bid/place-bid`
+- `GET /api/v1/spot-rate/eth-jpy`
+
+webapp 側も `ThreeDSReturn` が `3ds-callback` を呼ぶだけで、 その後 `placeBid` を呼ぶ配線がない。
+`useFiatBid` の `placeBid` action は「3DS 完了後に呼ぶ」 と宣言されているが production の呼出元が存在しない。
+
+現状これが表面化していないのは、 authorize が `tds2RetUrl` を fincode に渡していないためで、
+fincode は 3DS を要求せず常に `status: AUTHORIZED` を返す。
+webapp はこの場合 `tds2Url === undefined` の分岐に入り、 認証を挟まず place-bid を自動発火する。
+
+本番運用で 3DS を有効にする場合は以下 3 点が必要になる。
+
+1. authorize 時に `tds2RetUrl` を渡す
+2. Workers に `3ds-callback` route を追加する
+3. `ThreeDSReturn` から `placeBid` を呼ぶ。 このとき `bidderWallet` を渡す
+   (`FiatBidPendingState` が保持しているので localStorage から復元できる。
+   backend の place-bid は `bidderWallet` 欠落時に 400 を返す)
+
+**place-bid の移行期 fallback**
+
+`place-bid` には「`capture:{authId}` に `ethAmount` が無ければ spot rate で再換算する」 分岐がある。
+これは KV に `ethAmount` を保存する変更を deploy した時点で認証済だった record を救うためのもので、
+KV の TTL 1 時間が経過すると到達不能になる。 次にこの file を触る際に対応 test ごと削除する。
+
 ## 関連 SSOT
 
 - `packages/niji-api/scripts/watch-settlement.ts` — 落札監視 script SSOT
