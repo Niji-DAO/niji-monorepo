@@ -2,15 +2,15 @@
   "profile": "full",
   "network": "base-sepolia",
   "chainId": 84532,
-  "timestamp": "2026-07-21T06:47:34.726Z",
+  "timestamp": "2026-07-21T09:35:09.772Z",
   "deployer": "0xaEa7cd3F6DC66543D1bE9394b394a669D868c62B",
   "contracts": {
-    "NijiArt": "0x519f1Abdd8da4187491264c22B054A241ddF21fA",
-    "NijiDescriptor": "0x4f9ed0CfE7a63714ffE33a5bB2E5c874AA042CdC",
-    "NijiSeeder": "0xB72d7AF69741d77D6122c30Dd16453A85f46b382",
-    "NijiToken": "0xFD0d2dDBBD4ff405751c1495cbBe717ed90bd8d2",
-    "NijiAuctionHouseProxy": "0x2dD20203b271053D59ef2B8141674AceD71A1a03",
-    "WETH": "0xb6acB6719d3F5151dba688F3505b1c6FD8680613"
+    "NijiArt": "0x1AAc4c388DF30d66D1A5E96D0c0Ff6C5b814AbA2",
+    "NijiDescriptor": "0xb19CEb12010230Cd89708623e764B83616A5865d",
+    "NijiSeeder": "0x005929A9D5A3D68e60f66B5E210C6577f6F70028",
+    "NijiToken": "0xE8470ff7F6028d37f60C8c8CA79C7426031b3D35",
+    "NijiAuctionHouseProxy": "0x449E337180402643Ea90148230fD57E534344225",
+    "WETH": "0xA1e30645d04033eBb5bC5F2d468023fAa46955d5"
   },
   "constructorArgs": {
     "NijiArt": [
@@ -31,7 +31,7 @@
       ]
     ],
     "NijiDescriptor": [
-      "0x519f1Abdd8da4187491264c22B054A241ddF21fA",
+      "0x1AAc4c388DF30d66D1A5E96D0c0Ff6C5b814AbA2",
       320,
       [
         10,
@@ -49,13 +49,13 @@
       ]
     ],
     "NijiSeeder": [
-      "0x519f1Abdd8da4187491264c22B054A241ddF21fA"
+      "0x1AAc4c388DF30d66D1A5E96D0c0Ff6C5b814AbA2"
     ],
     "NijiToken": [
       "Niji",
       "NIJI",
-      "0x4f9ed0CfE7a63714ffE33a5bB2E5c874AA042CdC",
-      "0xB72d7AF69741d77D6122c30Dd16453A85f46b382",
+      "0xb19CEb12010230Cd89708623e764B83616A5865d",
+      "0x005929A9D5A3D68e60f66B5E210C6577f6F70028",
       0
     ],
     "NijiAuctionHouseProxy": null,
