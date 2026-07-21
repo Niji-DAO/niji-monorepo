@@ -58,9 +58,16 @@ async function findDeployBlock(addr: string, latest: number): Promise<number> {
   return lo;
 }
 
-/** gen.ts の `<chainId>: '0x...'` 行を新 address に置換 */
-function syncGenTs(file: string, chainId: number, newAddr: string): boolean {
-  const full = path.join(MONOREPO_ROOT, 'packages/niji-sdk/src/actions', file);
+/**
+ * gen.ts の `<chainId>: '0x...'` 行を新 address に置換。
+ *
+ * 重要 = SDK は actions/ と react/ の 2 系統に同じ address map を重複して持つ。
+ * webapp は `@niji/sdk/react` を import するため react/ 側の更新が必須 (2026-07-21 の
+ * 「webapp が zero address を読んで auction が表示されない」 事故の root cause)。
+ * subdir 引数で両系統を明示的に同期する。
+ */
+function syncGenTs(file: string, chainId: number, newAddr: string, subdir = 'actions'): boolean {
+  const full = path.join(MONOREPO_ROOT, 'packages/niji-sdk/src', subdir, file);
   if (!fs.existsSync(full)) {
     console.warn(`  ⚠️  ${file} not found, skip`);
     return false;
@@ -69,16 +76,16 @@ function syncGenTs(file: string, chainId: number, newAddr: string): boolean {
   // `  84532: '0x....',` を捕捉 (address 部分のみ置換、 前後の indent / comma を保持)
   const re = new RegExp(`(${chainId}:\\s*')0x[0-9a-fA-F]{40}(')`);
   if (!re.test(src)) {
-    console.warn(`  ⚠️  ${file} に ${chainId} entry なし、 skip`);
+    console.warn(`  ⚠️  ${subdir}/${file} に ${chainId} entry なし、 skip`);
     return false;
   }
   const next = src.replace(re, `$1${newAddr}$2`);
   if (next === src) {
-    console.log(`  =  ${file} (${chainId}) 既に最新`);
+    console.log(`  =  ${subdir}/${file} (${chainId}) 既に最新`);
     return false;
   }
   fs.writeFileSync(full, next);
-  console.log(`  ✓  ${file} (${chainId}) → ${newAddr}`);
+  console.log(`  ✓  ${subdir}/${file} (${chainId}) → ${newAddr}`);
   return true;
 }
 
@@ -138,10 +145,12 @@ async function main() {
   const auctionBlock = await findDeployBlock(NijiAuctionHouseProxy, latest);
   console.log(`   token@${tokenBlock} auction@${auctionBlock}\n`);
 
-  console.log('2. SDK gen.ts 同期...');
-  syncGenTs('token.gen.ts', chainId, NijiToken);
-  syncGenTs('auction-house.gen.ts', chainId, NijiAuctionHouseProxy);
-  syncGenTs('descriptor.gen.ts', chainId, NijiDescriptor);
+  console.log('2. SDK gen.ts 同期 (actions/ と react/ の 2 系統、 webapp は react/ を import)...');
+  for (const subdir of ['actions', 'react']) {
+    syncGenTs('token.gen.ts', chainId, NijiToken, subdir);
+    syncGenTs('auction-house.gen.ts', chainId, NijiAuctionHouseProxy, subdir);
+    syncGenTs('descriptor.gen.ts', chainId, NijiDescriptor, subdir);
+  }
 
   console.log('\n3. subgraph config 同期...');
   syncSubgraphConfig(network, NijiToken, tokenBlock, NijiAuctionHouseProxy, auctionBlock);
