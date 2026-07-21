@@ -122,14 +122,33 @@ const ChainSubscriber: React.FC = () => {
       const blocksPerDay = CHAIN_ID === baseSepolia.id ? 43_200n : 7_200n;
       const fromBlock = latestBlock.number > blocksPerDay ? latestBlock.number - blocksPerDay : 0n;
 
-      const logs = await publicClient.getLogs({
-        address: nijiAuctionHouseAddress[chainId],
-        event: parseAbiItem(
-          'event AuctionBid(uint256 indexed nounId, address sender, uint256 value, bool extended)',
+      // public RPC (sepolia.base.org 等) は eth_getLogs を 2000 block/req に制限する。
+      // 1 回で 24h 分を要求すると "query exceeds max block range 2000" で失敗し、 履歴が空になる
+      // (2026-07-21 に Base Sepolia で顕在化)。 chunk に割って順次取得し、 失敗 chunk は握って続行する。
+      const MAX_RANGE = 2_000n;
+      const bidEvent = parseAbiItem(
+        'event AuctionBid(uint256 indexed nounId, address sender, uint256 value, bool extended)',
+      );
+      const ranges: { from: bigint; to: bigint }[] = [];
+      for (let start = fromBlock; start <= latestBlock.number; start += MAX_RANGE) {
+        const end =
+          start + MAX_RANGE - 1n > latestBlock.number ? latestBlock.number : start + MAX_RANGE - 1n;
+        ranges.push({ from: start, to: end });
+      }
+      const chunks = await Promise.all(
+        ranges.map(range =>
+          publicClient
+            .getLogs({
+              address: nijiAuctionHouseAddress[chainId],
+              event: bidEvent,
+              fromBlock: range.from,
+              toBlock: range.to,
+            })
+            // rate limit / 一時障害の chunk は捨てて残りを活かす (履歴が部分欠けでも UI は動く)
+            .catch(() => []),
         ),
-        fromBlock,
-        toBlock: latestBlock.number,
-      });
+      );
+      const logs = chunks.flat();
 
       for (const {
         args: { extended, nounId, sender, value },
