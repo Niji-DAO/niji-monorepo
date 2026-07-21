@@ -3,6 +3,7 @@
  *
  * local Node hono server (authorize-fincode-server.ts) の stateless refactor:
  * - in-memory Map (CaptureAwareFincodeClient.capturedMap) → Cloudflare KV (FINCODE_STATE binding、 TTL 1h)
+ * - 与信時に確定した ethAmount を KV に保存し、 place-bid は再換算せずその値で入札する
  * - FincodeClient は Workers 互換 fetch API 使用 (Node.js 依存なし)
  * - SpotRateFetcher は単一 instance を spot-rate route / authorize / place-bid で共有 (env `USE_SPOT_RATE_MOCK`
  *   が true なら固定 rate、 false なら GMO コイン primary + CoinGecko fallback の実 rate)
@@ -69,10 +70,46 @@ export type Env = {
   MOCK_SPOT_RATE_JPY_PER_ETH?: string;
 };
 
-/** in-memory FiatBidStore (Workers は request 単位 stateless、 record は KV に別途保存) */
-class NoOpFiatBidStore implements FiatBidStore {
+/** KV に保存する authorize 済 bid の state (`capture:{authId}` の値) */
+type CaptureState = {
+  orderId: string;
+  accessId: string;
+  jpyAmount: number;
+  /**
+   * 与信時に確定した入札 ETH 量 (wei、 bigint は JSON に載らないため 10 進 string)。
+   * place-bid はこの値をそのまま chain に投げ、 spot rate による再換算を行わない。
+   * 再換算すると与信 JPY 額を確定した時刻と入札時刻の rate 差がそのまま金額差になるため。
+   */
+  ethAmount?: string;
+  /** 与信時の rate (JPY / 1 ETH)、 監査 log 用 */
+  spotRate?: number;
+};
+
+/**
+ * authorize handler の store 実装 = 与信確定値を `capture:{authId}` に merge する。
+ *
+ * KVAwareFincodeClient.authorize が先に同 key へ orderId / accessId / jpyAmount を書き、
+ * その直後に本 store が ethAmount / spotRate を足す 2 段構成。 fincode 応答を待たないと
+ * authId が決まらないため書込を 1 回にまとめられず、 read-modify-write で合流させる。
+ */
+class KVFiatBidStore implements FiatBidStore {
+  constructor(private readonly kv: KVNamespace) {}
+
   async insertPending(record: FiatBidRecord): Promise<void> {
-    console.log(`[worker] insertPending authId=${record.authId} status=${record.status}`);
+    const key = `capture:${record.authId}`;
+    const raw = await this.kv.get(key);
+    const base = (raw === null ? {} : JSON.parse(raw)) as Partial<CaptureState>;
+    const merged: CaptureState = {
+      orderId: record.orderId ?? base.orderId ?? '',
+      accessId: record.accessId ?? base.accessId ?? '',
+      jpyAmount: record.jpyAmount,
+      ethAmount: record.ethAmount.toString(),
+      spotRate: record.spotRate,
+    };
+    await this.kv.put(key, JSON.stringify(merged), { expirationTtl: 3600 });
+    console.log(
+      `[worker] insertPending authId=${record.authId} status=${record.status} ethAmount=${merged.ethAmount} rate=${record.spotRate}`,
+    );
   }
 }
 
@@ -164,6 +201,8 @@ const putFiatBidRecord = async (
     orderId: string;
     accessId: string;
     jpyAmount: number;
+    /** 実際に chain へ投げた入札額 (wei、 10 進 string)。 settle 後の金額突合用 */
+    ethAmount: string;
     lifecycle: 'bid-placed' | 'won' | 'lost' | 'captured' | 'transferred' | 'cancelled' | 'failed';
     createdAt: number;
   },
@@ -198,9 +237,12 @@ const updateFiatBidLifecycle = async (
  * place-bid handler = webapp が authorize 直後に呼ぶ endpoint、 chain 上代理入札発火 + fiat_bid record KV 保存。
  * body: { authId, bidderWallet }
  *
- * spotRateFetcher は webapp の表示 rate (GET /api/v1/spot-rate/eth-jpy) と同一 instance を受け取る。
- * ここで別 source (env 直読み等) を持つと、 user に見せた rate と実際に chain へ投げる ETH 量が
- * 食い違うため、 JPY → ETH 換算の source は 1 つに固定する。
+ * 入札 ETH 量は与信時に確定した `capture:{authId}` の ethAmount をそのまま使い、 ここで rate を
+ * 引き直さない。 Cloudflare Workers は request ごとに handler を実行するため SpotRateFetcher の
+ * 5 秒 cache が request を跨がず、 再換算すると authorize 時と place-bid 時の rate 差が
+ * そのまま「user に見せた与信額」 と「chain に投げた ETH 量」 のずれになる。
+ *
+ * spotRateFetcher は ethAmount 未保存の record に対する移行期 fallback 専用。
  */
 const createPlaceBidHandler = (env: Env, spotRateFetcher: SpotRateFetcher) => {
   const app = new Hono();
@@ -219,11 +261,7 @@ const createPlaceBidHandler = (env: Env, spotRateFetcher: SpotRateFetcher) => {
         404,
       );
     }
-    const capture = JSON.parse(captureRaw) as {
-      orderId: string;
-      accessId: string;
-      jpyAmount: number;
-    };
+    const capture = JSON.parse(captureRaw) as CaptureState;
 
     try {
       const { publicClient, walletClient } = buildChainClients(env);
@@ -234,9 +272,19 @@ const createPlaceBidHandler = (env: Env, spotRateFetcher: SpotRateFetcher) => {
       })) as { nounId: bigint; amount: bigint };
       const auctionId = auction.nounId;
 
-      // jpyAmount → ethAmount 換算 = spot-rate route と同一 fetcher (mock / 実 rate は env で切替)
-      const { rate: jpyPerEth } = await spotRateFetcher.getEthJpyRate();
-      const ethAmount = BigInt(Math.floor((capture.jpyAmount / jpyPerEth) * 1e18));
+      // 与信時に確定した ETH 量をそのまま使う。 rate 再取得なし = 与信額と入札額が定義上一致する。
+      // ethAmount 不在は本 handler 変更前に authorize 済で TTL 1 時間内に残っている record のみ。
+      // その場合に限り旧経路 (rate 再換算) に落として in-flight の入札を落とさない。
+      let ethAmount: bigint;
+      if (typeof capture.ethAmount === 'string' && capture.ethAmount !== '') {
+        ethAmount = BigInt(capture.ethAmount);
+      } else {
+        const { rate: jpyPerEth } = await spotRateFetcher.getEthJpyRate();
+        ethAmount = BigInt(Math.floor((capture.jpyAmount / jpyPerEth) * 1e18));
+        console.warn(
+          `[worker] place-bid authId=${authId}: capture record に ethAmount 無し、 rate ${jpyPerEth} で再換算 (移行期 fallback)`,
+        );
+      }
 
       const txHash = await walletClient.writeContract({
         address: env.AUCTION_HOUSE_ADDRESS as Address,
@@ -252,12 +300,13 @@ const createPlaceBidHandler = (env: Env, spotRateFetcher: SpotRateFetcher) => {
         orderId: capture.orderId,
         accessId: capture.accessId,
         jpyAmount: capture.jpyAmount,
+        ethAmount: ethAmount.toString(),
         lifecycle: 'bid-placed',
         createdAt: Date.now(),
       });
 
       console.log(
-        `[worker] place-bid REAL: authId=${authId} auctionId=${auctionId} jpy=${capture.jpyAmount} rate=${jpyPerEth} ethAmount=${ethAmount} bidder=${bidderWallet} txHash=${txHash}`,
+        `[worker] place-bid REAL: authId=${authId} auctionId=${auctionId} jpy=${capture.jpyAmount} rate=${capture.spotRate ?? 'n/a'} ethAmount=${ethAmount} bidder=${bidderWallet} txHash=${txHash}`,
       );
       return c.json(
         {
@@ -489,7 +538,7 @@ export default {
       { apiKeySecret: env.FINCODE_API_KEY_SECRET },
       env.FINCODE_STATE,
     );
-    const store = new NoOpFiatBidStore();
+    const store = new KVFiatBidStore(env.FINCODE_STATE);
     const captureStore = new KVFincodeCaptureStore(env.FINCODE_STATE);
 
     app.route(
