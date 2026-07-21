@@ -387,8 +387,80 @@ Phase 2 完了 marker 3 件 active で Phase 3 移行判定に進む。 Phase 3 
 - Phase 3 の spec 策定 (`tests/spec/gmo-fiat-bid/Phase3-*.md`) は本 Issue の scope 外、 別 session で grilling 経由確定する
 - Phase 3 Issue 分割案 (`Phase3-02-issue-breakdown.md`) は Phase 2 → 3 移行 prerequisite 完了後に着手
 
+## Base Sepolia 実機検証と落札監視 (2026-07-22)
+
+Cloudflare Workers (`niji-api`) と Base Sepolia に deploy した構成で、 fincode テストカードによる与信から
+代理入札までを実機で通した際の手順と、 その後の落札を追跡する経路。
+
+### 与信から代理入札までの実機確認
+
+webapp の dev server を deploy 済 backend に向けて起動し、 e2e 専用 page から実際に発火させる。
+
+```bash
+# 1. dev server 起動 (mode dev = Base Sepolia + deploy 済 Workers を向く)
+pnpm --filter @niji/webapp exec vite --mode dev --port 2424 --strictPort
+
+# 2. Workers の log を別 terminal で監視
+pnpm --filter @niji/api exec wrangler tail --format pretty
+
+# 3. browser で e2e 専用 page を開く (import.meta.env.DEV 限定 route)
+open "http://localhost:2424/test/fiat-bid-form?auctionId=1&bidderWallet=<受取 wallet>&minBidEth=0.0102"
+```
+
+page 上で入札額を入力し、 規約に同意して submit すると以下が順に起きる。
+
+1. `POST /api/v1/fiat-bid/authorize-fincode` — fincode 与信、 応答に `authId` と `ethAmount` が入る
+2. `POST /api/v1/fiat-bid/place-bid` — operator EOA が `createBid` を発行、 応答に `txHash` が入る
+
+Workers の log には以下の 3 行が順に出る。 3 行目の `ethAmount` が 2 行目と一致していれば、
+与信時に確定した ETH 量がそのまま chain に渡っている。
+
+```
+[worker] KV put capture:<authId>
+[worker] insertPending authId=<authId> status=pending ethAmount=<wei> rate=<JPY/ETH>
+[worker] place-bid REAL: authId=<authId> auctionId=<N> jpy=<円> rate=<JPY/ETH> ethAmount=<wei> bidder=<wallet> txHash=<hash>
+```
+
+`capture record に ethAmount 無し、 rate ... で再換算 (移行期 fallback)` が出た場合は、
+`insertPending` が KV に届いていない。 その入札は place-bid 時点の rate で換算されており、
+与信額と入札額がずれるため log を確認する。
+
+入札額は最低入札条件を満たす必要がある。 `reservePrice` (0.001 ETH) と
+`minBidIncrementPercentage` (2%) の両方を上回る額を入れる。 現在の最高額が 0.01 ETH なら
+0.0102 ETH 以上、 spot rate 315,000 円なら 3,220 円以上が必要になる。
+
+### 落札 (settle) の監視
+
+auction は 24 時間続くため、 入札直後に落札結果は分からない。
+`watch-settlement` script が現在どの段階にいるかを表示する。
+
+```bash
+pnpm --filter @niji/api watch:settlement              # 1 回だけ表示
+pnpm --filter @niji/api watch:settlement -- --watch   # 60 秒毎に再表示
+pnpm --filter @niji/api watch:settlement -- --token 1 # 指定 tokenId の所有者も確認
+```
+
+段階は 4 つで、 script が判定して出力する。
+
+| 段階 | 状態 | 次に起きること |
+|---|---|---|
+| (1) 入札中 | `endTime` 未到達 | 最高額入札者が operator EOA なら fiat 入札が勝っている |
+| (2) 終了待ち | `endTime` 経過 かつ `settled=false` | AuctionKeeper (cron 1 分毎) が `settleCurrentAndCreateNewAuction` を送る |
+| (3) settle 済 | 次 auction 開始済 | SettlementDaemon が `AuctionSettled` を拾い capture と transferFrom を実行 |
+| (4) 引渡し済 | 落札 tokenId の owner が入札者 wallet | 完了 |
+
+(3) から (4) に進まない場合は fincode の capture が失敗している可能性が高い。
+`wrangler tail` に `[cron] fincode capture FAIL` が出ていないか確認する。
+capture が失敗した場合、 SettlementDaemon は transferFrom に進まず NFT は operator に留まる
+(与信できていない NFT を渡さないための設計)。
+
+env で対象を差し替えられる。 `RPC_URL` / `AUCTION_HOUSE_ADDRESS` / `NIJI_TOKEN_ADDRESS` /
+`OPERATOR_ADDRESS` / `CHAIN_ID` を指定すると別 chain や別 deploy を監視できる。
+
 ## 関連 SSOT
 
+- `packages/niji-api/scripts/watch-settlement.ts` — 落札監視 script SSOT
+- `packages/niji-api/src/workers/authorize-fincode-worker.ts` — Cloudflare Workers entry (authorize / place-bid / spot-rate / cron) SSOT
 - `tests/spec/gmo-fiat-bid/Phase1-01-master-spec.md` — Phase 1 master spec
 - `tests/spec/gmo-fiat-bid/Phase1-02-issue-breakdown.md` — 8 Issue 分割案
 - `tests/spec/gmo-fiat-bid/Phase1-05-impact-analysis.md` — 影響範囲分析

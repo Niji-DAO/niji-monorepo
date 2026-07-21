@@ -10,7 +10,12 @@ async function loadNijiData(): Promise<NijiImageDataShape> {
   // 31337 local dev では常に fresh fetch (fresh chain で compositeOrder が変わった時
   // browser disk cache の stale JSON を掴まないよう cache-control no-cache 強制)。
   const isLocalDev = import.meta.env.VITE_CHAIN_ID === '31337';
-  const res = await fetch('/niji-data-rle.json', {
+  // env `VITE_NIJI_DATA_URL` で外部 hosting URL (R2 / GitHub raw 等) を指定可能、
+  // Cloudflare Pages deploy 時は R2 URL を指定して 25 MiB / file 制約回避。
+  // 未設定時は従来 pattern (public/niji-data-rle.json、 dev server 経由 serve)。
+  const externalUrl = import.meta.env.VITE_NIJI_DATA_URL as string | undefined;
+  const url = externalUrl && externalUrl.trim() !== '' ? externalUrl : '/niji-data-rle.json';
+  const res = await fetch(url, {
     cache: isLocalDev ? 'no-store' : 'default',
   });
   if (!res.ok) throw new Error(`niji-data-rle.json fetch failed: ${res.status}`);

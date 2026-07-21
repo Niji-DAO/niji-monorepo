@@ -78,6 +78,10 @@ export type FiatBidRecord = {
   spotRateSource: SpotRate['source'];
   status: 'pending';
   createdAt: Date;
+  /** fincode 経路で capture/cancel API 呼出に必須 (2026-07-17 追加、 GMO 経路では未使用 = optional) */
+  accessId?: string;
+  /** fincode 経路で capture/cancel URL path 組立に必須 (2026-07-17 追加) */
+  orderId?: string;
 };
 
 /**

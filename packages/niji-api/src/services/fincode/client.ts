@@ -20,6 +20,8 @@
 import type {
   FincodeAuthorizationResult,
   FincodeErrorResponse,
+  FincodePaymentCaptureRequest,
+  FincodePaymentCaptureSuccess,
   FincodePaymentExecuteRequest,
   FincodePaymentExecuteSuccess,
   FincodePaymentRegisterRequest,
@@ -243,6 +245,44 @@ export class FincodeClient {
     };
   }
 
+  /**
+   * PUT /v1/payments/{id}/capture — 与信 (AUTHORIZED) から売上確定 (CAPTURED) への遷移
+   * capture handler が使う、 authorize.ts で発行済 access_id を使って capture 実行。
+   * SSOT — https://github.com/fincode-byGMO/fincode-sdk-node src/api/v1/payment.ts § capture()
+   */
+  async capturePayment(orderId: string, accessId: string): Promise<FincodePaymentCaptureSuccess> {
+    const path = `/v1/payments/${encodeURIComponent(orderId)}/capture`;
+    const req: FincodePaymentCaptureRequest = {
+      pay_type: 'Card',
+      access_id: accessId,
+      method: '1',
+    };
+    const body = await this.put<FincodePaymentCaptureSuccess>(path, req);
+    if (body.status !== 'CAPTURED') {
+      throw new FincodeAuthorizationError(
+        `fincode capturePayment expected status=CAPTURED, got status=${body.status}`,
+      );
+    }
+    return body;
+  }
+
+  /**
+   * PUT /v1/payments/{id}/cancel — 与信 (AUTHORIZED) の取消 (auth 解放、 実カード請求発生させず)
+   * fiat bid で「auction 敗北」 時に呼出、 user の card 与信枠を返却する。
+   * SSOT — https://docs.fincode.jp/api § payment.cancel
+   */
+  async cancelPayment(
+    orderId: string,
+    accessId: string,
+  ): Promise<{ id: string; access_id: string; status: string }> {
+    const path = `/v1/payments/${encodeURIComponent(orderId)}/cancel`;
+    const req = {
+      pay_type: 'Card' as const,
+      access_id: accessId,
+    };
+    return this.put<{ id: string; access_id: string; status: string }>(path, req);
+  }
+
   private async post<T>(path: string, body: unknown): Promise<T> {
     return this.request<T>('POST', path, body);
   }
@@ -273,6 +313,12 @@ export class FincodeClient {
         this.timeoutMs,
       );
     } catch (err) {
+      // debug 用 verbose log = handler 側の catch で cause が捨てられるため client 層で stderr 出力。
+      const causeMessage = err instanceof Error ? err.message : String(err);
+      const causeName = err instanceof Error ? err.name : 'unknown';
+      console.error(
+        `[fincode.request] fetch error: ${method} ${url} | ${causeName}: ${causeMessage}`,
+      );
       throw new FincodeAuthorizationError(`fincode ${method} ${path} network error`, {
         cause: err,
       });
@@ -287,6 +333,13 @@ export class FincodeClient {
     }
     const err = extractFincodeError(response.status, parsed);
     if (err !== undefined) {
+      // debug 用 verbose log = fincode 側 error message (日本語 説明) を stderr に出力、
+      // + request body / response body の一部を dump して root cause 特定を助ける。
+      const bodyPreview = JSON.stringify(body ?? {}).slice(0, 500);
+      const respPreview = JSON.stringify(parsed ?? {}).slice(0, 500);
+      console.error(
+        `[fincode.request] fincode error: ${method} ${url} status=${response.status} code=${err.code} message="${err.message ?? ''}"\n  request.body: ${bodyPreview}\n  response.body: ${respPreview}`,
+      );
       throw new FincodeAuthorizationError(`fincode ${method} ${path} failed (${err.code})`, {
         errorCode: err.code,
         errorMessage: err.message,

@@ -1,43 +1,57 @@
 /**
- * Cloudflare Workers entry の route 配線 test
+ * Cloudflare Workers entry の behavior test
  *
- * 対象は「worker が expose する route が揃っているか」 の 1 点。
- * 2026-07-21 に GET /api/v1/spot-rate/eth-jpy が worker 側に未配線で 404 を返し、
- * webapp の spot rate と ETH 換算が空のままになる不具合が発生した。
- * handler 単体 (handlers/spot-rate.test.ts) と独立 server (spot-rate-server.test.ts) は
- * 両方 pass していたため、 worker への配線漏れだけが検知されずに残っていた。
+ * 対象は 3 つ。
  *
- * ここでは worker.fetch を直接叩き、 route が実在して 200 を返すことを確認する。
- * USE_SPOT_RATE_MOCK=true で起動して外部 API 通信を避け、 test を決定的にする。
+ * (1) route 配線 — 2026-07-21 に GET /api/v1/spot-rate/eth-jpy が worker 側に未配線で 404 を返し、
+ *     webapp の spot rate と ETH 換算が空のままになる不具合が発生した。
+ *     handler 単体 (handlers/spot-rate.test.ts) と独立 server (spot-rate-server.test.ts) は
+ *     両方 pass していたため、 worker への配線漏れだけが検知されずに残っていた。
+ * (2) place-bid の入札額決定 — 与信時に確定した ethAmount をそのまま使い、 rate を引き直さないこと。
+ * (3) scheduled 経路 (AuctionKeeper + SettlementDaemon) — 落札 / 落選 / fiat 無関係 の 3 分岐。
+ *
+ * 外部 I/O は viem と fincode client を module mock で差替え、 実 RPC / 実 API を叩かない。
+ * spot rate は USE_SPOT_RATE_MOCK=true で固定して test を決定的にする。
  */
 
+import { privateKeyToAccount } from 'viem/accounts';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
- * chain 経路 (place-bid) の検証用に viem を差替える。
- * readContract は現在 auction を、 writeContract は送信引数の記録だけを行い、 実 RPC を叩かない。
+ * chain 経路の検証用に viem を差替える。
+ * mock の応答は test 側から chainState / chainLogs を書換えて制御する。
  */
 const writeContractCalls: Array<Record<string, unknown>> = [];
+
+/** readContract (auction()) が返す状態。 test ごとに上書きする */
+let chainState = {
+  nounId: 42n,
+  amount: 0n,
+  startTime: 0,
+  endTime: 0,
+  settled: false,
+};
+
+/** getLogs (AuctionSettled) が返す log 列。 test ごとに上書きする */
+let chainLogs: Array<{ args: { nounId: bigint; winner: string; amount: bigint } }> = [];
+
+/** writeContract を失敗させたい test 用 (transferFrom 失敗分岐の検証) */
+let writeContractError: Error | null = null;
 
 vi.mock('viem', async () => {
   const actual = await vi.importActual<typeof import('viem')>('viem');
   return {
     ...actual,
     createPublicClient: () => ({
-      readContract: async () => ({
-        nounId: 42n,
-        amount: 0n,
-        startTime: 0,
-        endTime: 0,
-        settled: false,
-      }),
+      readContract: async () => chainState,
       getBlockNumber: async () => 100n,
-      getLogs: async () => [],
+      getLogs: async () => chainLogs,
       waitForTransactionReceipt: async () => ({ status: 'success' }),
     }),
     createWalletClient: () => ({
       writeContract: async (args: Record<string, unknown>) => {
         writeContractCalls.push(args);
+        if (writeContractError !== null) throw writeContractError;
         return '0xdeadbeef';
       },
     }),
@@ -47,7 +61,11 @@ vi.mock('viem', async () => {
 /**
  * fincode 実 API を叩かせないための差替。
  * worker の KVAwareFincodeClient は本 class を extend するため、 super.authorize が本 mock を経由する。
+ * capture / cancel は SettlementDaemon の 3 分岐検証で呼出を記録する。
  */
+const fincodeCalls: Array<{ method: string; orderId: string; accessId: string }> = [];
+let capturePaymentError: Error | null = null;
+
 vi.mock('../services/fincode/client.js', async () => {
   const actual = await vi.importActual<typeof import('../services/fincode/client.js')>(
     '../services/fincode/client.js',
@@ -61,6 +79,15 @@ vi.mock('../services/fincode/client.js', async () => {
         status: 'AUTHORIZED' as const,
         tds2Url: undefined,
       };
+    }
+    async capturePayment(orderId: string, accessId: string) {
+      fincodeCalls.push({ method: 'capture', orderId, accessId });
+      if (capturePaymentError !== null) throw capturePaymentError;
+      return { transaction_id: 'txn-captured' };
+    }
+    async cancelPayment(orderId: string, accessId: string) {
+      fincodeCalls.push({ method: 'cancel', orderId, accessId });
+      return { transaction_id: 'txn-cancelled' };
     }
   }
   return { ...actual, FincodeClient: FincodeClientMock };
@@ -311,5 +338,153 @@ describe('place-bid の入札額決定', () => {
 
     expect(response.status).toBe(404);
     expect(writeContractCalls).toHaveLength(0);
+  });
+});
+
+describe('scheduled 経路 (AuctionKeeper + SettlementDaemon)', () => {
+  // OPERATOR_PK (0x11...11) から決まる operator address。
+  // AuctionSettled の winner がこの address なら fiat 入札が落札した判定になる。
+  const OPERATOR = privateKeyToAccount(`0x${'1'.repeat(64)}`).address;
+  const AUTH_ID = 'auth-settle';
+  const BIDDER = `0x${'5'.repeat(40)}`;
+
+  /** ctx.waitUntil は非同期処理を裏に逃がすため、 test では await して完了を待つ */
+  const runScheduled = async (env: Env) => {
+    const pending: Array<Promise<unknown>> = [];
+    await worker.scheduled({ scheduledTime: 0, cron: '* * * * *' }, env, {
+      waitUntil: (p: Promise<unknown>) => pending.push(p),
+      passThroughOnException: () => {},
+    });
+    await Promise.all(pending);
+  };
+
+  /** 入札済 auction の fiat_bid record を seed 済の KV を返す */
+  const seededKv = () =>
+    createKvStub({
+      [`fiat_bid:${AUTH_ID}`]: JSON.stringify({
+        chainAuctionId: '7',
+        bidderWallet: BIDDER,
+        orderId: 'fc-7-abcdef',
+        accessId: 'access-7',
+        jpyAmount: 4000,
+        ethAmount: '12713345834790070',
+        lifecycle: 'bid-placed',
+        createdAt: 0,
+      }),
+      [`fiat_bid_by_auction:7`]: AUTH_ID,
+      'cron_cursor:from_block': '90',
+    });
+
+  beforeEach(() => {
+    writeContractCalls.length = 0;
+    fincodeCalls.length = 0;
+    writeContractError = null;
+    capturePaymentError = null;
+    chainLogs = [];
+    // settle 済 + 未終了 = AuctionKeeper が tx を送らない状態 (SettlementDaemon 側の検証に集中する)
+    chainState = { nounId: 7n, amount: 0n, startTime: 1, endTime: 9_999_999_999, settled: false };
+  });
+
+  it('fiat 入札が落札した場合は capture → transferFrom の順に発火する', async () => {
+    const kv = seededKv();
+    chainLogs = [{ args: { nounId: 7n, winner: OPERATOR, amount: 12713345834790070n } }];
+
+    await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
+
+    expect(fincodeCalls).toEqual([
+      { method: 'capture', orderId: 'fc-7-abcdef', accessId: 'access-7' },
+    ]);
+    // transferFrom(operator, bidder, nounId) が operator から発行される
+    const transfer = writeContractCalls.find(c => c['functionName'] === 'transferFrom');
+    expect(transfer).toBeDefined();
+    expect(transfer?.['args']).toEqual([OPERATOR, BIDDER, 7n]);
+
+    const record = JSON.parse(kv._store.get(`fiat_bid:${AUTH_ID}`) ?? '{}') as {
+      lifecycle?: string;
+      captureTxId?: string;
+      transferTxHash?: string;
+    };
+    expect(record.lifecycle).toBe('transferred');
+    expect(record.captureTxId).toBe('txn-captured');
+    expect(record.transferTxHash).toBe('0xdeadbeef');
+  });
+
+  it('fiat 入札が落選した場合は cancel のみ発火し NFT を動かさない', async () => {
+    const kv = seededKv();
+    const otherWinner = `0x${'9'.repeat(40)}`;
+    chainLogs = [{ args: { nounId: 7n, winner: otherWinner, amount: 99n } }];
+
+    await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
+
+    expect(fincodeCalls).toEqual([
+      { method: 'cancel', orderId: 'fc-7-abcdef', accessId: 'access-7' },
+    ]);
+    expect(writeContractCalls.find(c => c['functionName'] === 'transferFrom')).toBeUndefined();
+
+    const record = JSON.parse(kv._store.get(`fiat_bid:${AUTH_ID}`) ?? '{}') as {
+      lifecycle?: string;
+    };
+    expect(record.lifecycle).toBe('lost');
+  });
+
+  it('fiat_bid record を持たない auction は capture も cancel もしない (crypto 入札)', async () => {
+    const kv = createKvStub({ 'cron_cursor:from_block': '90' });
+    chainLogs = [{ args: { nounId: 999n, winner: OPERATOR, amount: 1n } }];
+
+    await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
+
+    expect(fincodeCalls).toHaveLength(0);
+    expect(writeContractCalls.find(c => c['functionName'] === 'transferFrom')).toBeUndefined();
+  });
+
+  it('capture 失敗時は transferFrom に進まない (与信できていない NFT を渡さない)', async () => {
+    const kv = seededKv();
+    capturePaymentError = new Error('fincode capture 拒否');
+    chainLogs = [{ args: { nounId: 7n, winner: OPERATOR, amount: 12713345834790070n } }];
+
+    await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
+
+    expect(fincodeCalls).toEqual([
+      { method: 'capture', orderId: 'fc-7-abcdef', accessId: 'access-7' },
+    ]);
+    expect(writeContractCalls.find(c => c['functionName'] === 'transferFrom')).toBeUndefined();
+
+    const record = JSON.parse(kv._store.get(`fiat_bid:${AUTH_ID}`) ?? '{}') as {
+      lifecycle?: string;
+    };
+    // capture 前に won まで進み、 capture 失敗で transferred には到達しない
+    expect(record.lifecycle).toBe('won');
+  });
+
+  it('処理後に cron cursor が toBlock+1 へ進む (event の取りこぼし防止)', async () => {
+    const kv = seededKv();
+    chainLogs = [];
+
+    await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
+
+    // getBlockNumber mock = 100n のため次回は 101 から
+    expect(kv._store.get('cron_cursor:from_block')).toBe('101');
+  });
+
+  it('endTime 未到達の auction は settle tx を送らない (空振り gas を出さない)', async () => {
+    const kv = seededKv();
+    chainState = { nounId: 7n, amount: 0n, startTime: 1, endTime: 9_999_999_999, settled: false };
+
+    await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
+
+    expect(
+      writeContractCalls.find(c => c['functionName'] === 'settleCurrentAndCreateNewAuction'),
+    ).toBeUndefined();
+  });
+
+  it('endTime 経過 + 未 settle の auction は settleCurrentAndCreateNewAuction を送る', async () => {
+    const kv = seededKv();
+    chainState = { nounId: 7n, amount: 0n, startTime: 1, endTime: 1, settled: false };
+
+    await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
+
+    expect(
+      writeContractCalls.find(c => c['functionName'] === 'settleCurrentAndCreateNewAuction'),
+    ).toBeDefined();
   });
 });

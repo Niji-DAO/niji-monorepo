@@ -27,34 +27,24 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { BID_LIMIT_JPY, FiatBidModal, validateEthAmount, validateTopupEthAmount } from './index';
 
-// fincode SDK を stub、 iframe token 取得を deterministic な 'tok_stub' に固定
+// fincode SDK を stub、 token 取得を deterministic な 'tok_stub' に固定。
+// FiatBidForm は自作 CardInput の raw 値を fincode.tokens() で token 化する経路のため、
+// instance に tokens (callback 形式) を持たせる。 ui() 経路は CardInputFincode 側でのみ使う。
 vi.mock('@fincode/js', () => ({
   initFincode: vi.fn().mockResolvedValue({
+    tokens: (_params: unknown, onSuccess: (status: number, response: unknown) => void): void => {
+      onSuccess(200, { list: [{ token: 'tok_stub' }] });
+    },
     ui: () => ({ create: vi.fn(), mount: vi.fn(), getFormData: vi.fn() }),
   }),
   getCardToken: vi.fn().mockResolvedValue({ list: [{ token: 'tok_stub' }] }),
 }));
 
-// CardInputFincode 自体を mock 化、 jsdom で iframe SDK 起動できないため onReadyChange(true) を
-// mount 直後に発火する軽量 stub に置換、 getToken は 'tok_stub' を返す。
-vi.mock('./CardInputFincode', async () => {
-  const ReactMod = await import('react');
-  return {
-    CardInputFincode: ReactMod.forwardRef(function CardInputFincodeMock(
-      props: { onReadyChange?: (ready: boolean) => void },
-      ref: React.Ref<{ getToken: () => Promise<string>; isReady: boolean }>,
-    ) {
-      ReactMod.useImperativeHandle(ref, () => ({
-        getToken: async () => 'tok_stub',
-        isReady: true,
-      }));
-      ReactMod.useEffect(() => {
-        props.onReadyChange?.(true);
-      }, [props]);
-      return ReactMod.createElement('div', { 'data-testid': 'card-input-fincode' });
-    }),
-  };
-});
+// fincode.js の CDN script 読込を skip させる。 preloadFincodeScript は window.Fincode が
+// 既に居れば即 resolve するため、 jsdom で実 fetch を発生させずに init 経路へ進める。
+(window as unknown as { Fincode: (key: string) => unknown }).Fincode = () => ({});
+// SDK init は publicKey 未設定で早期 return するため、 test 用 key を入れて init を通す。
+import.meta.env.VITE_FINCODE_PUBLIC_KEY = 'p_test_dummy';
 
 // Radix Tooltip Portal を jsdom で render するため Provider を wrap
 

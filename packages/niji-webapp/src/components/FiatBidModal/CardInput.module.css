@@ -1,0 +1,278 @@
+/**
+ * CardInput styling (Issue #3047)
+ *
+ * FiatBidForm.module.css と同 SSOT の site palette (cool/warm) + PT Root UI + border-radius 8 統合。
+ * shadcn/ui default class を CSS module で完全 override するので、 upstream shadcn 側の
+ * class 変更で崩れる可能性がある (upstream update 時は本 file を再確認する必要あり)。
+ */
+
+/* ==================== root container ==================== */
+.cardInput {
+  font-family: 'PT Root UI', sans-serif;
+  color: var(--brand-cool-dark-text);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cardInput[data-palette='warm'] {
+  color: var(--brand-warm-dark-text);
+}
+
+/* ==================== card visual (上部の card 風 preview) ==================== */
+.cardVisual {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    var(--brand-cool-accent) 0%,
+    var(--brand-cool-background) 100%
+  );
+  border: 1px solid var(--brand-cool-border);
+  border-radius: 12px;
+  padding: 20px 20px 16px 20px;
+  min-height: 168px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cardInput[data-palette='warm'] .cardVisual {
+  background: linear-gradient(
+    135deg,
+    var(--brand-warm-accent) 0%,
+    var(--brand-warm-background) 100%
+  );
+  border-color: var(--brand-warm-border);
+}
+
+.brandIcon {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  font-family: 'PT Root UI', sans-serif;
+  font-weight: bold;
+  font-size: 18px;
+  letter-spacing: 0.05em;
+  color: var(--brand-cool-dark-text);
+  min-height: 22px;
+}
+
+.cardInput[data-palette='warm'] .brandIcon {
+  color: var(--brand-warm-dark-text);
+}
+
+.cardNumberDisplay {
+  font-family: 'JetBrains Mono', 'Courier New', ui-monospace, monospace;
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  color: var(--brand-cool-dark-text);
+  margin-top: 32px;
+  word-break: break-all;
+}
+
+.cardInput[data-palette='warm'] .cardNumberDisplay {
+  color: var(--brand-warm-dark-text);
+}
+
+.cardBottomRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cardMetaLabel {
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 10px;
+  color: var(--brand-cool-light-text);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.cardInput[data-palette='warm'] .cardMetaLabel {
+  color: var(--brand-warm-light-text);
+}
+
+.cardMetaValue {
+  font-family: 'JetBrains Mono', 'Courier New', ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--brand-cool-dark-text);
+  letter-spacing: 0.05em;
+}
+
+.cardInput[data-palette='warm'] .cardMetaValue {
+  color: var(--brand-warm-dark-text);
+}
+
+/* ==================== test card selector (dev only) ==================== */
+.testCardSelector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.testCardSelect {
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--brand-cool-border);
+  background-color: white;
+  color: var(--brand-cool-dark-text);
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 15px;
+  padding: 0 40px 0 12px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='%23151c3b'%3E%3Cpath d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px;
+}
+
+.cardInput[data-palette='warm'] .testCardSelect {
+  border-color: var(--brand-warm-border);
+  color: var(--brand-warm-dark-text);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='%23221b1a'%3E%3Cpath d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+}
+
+.testCardSelect::-ms-expand {
+  display: none;
+}
+
+.testCardSelect:focus,
+.testCardSelect:focus-visible {
+  border-color: var(--brand-cool-dark-text);
+  box-shadow: 0 0 0 1px var(--brand-cool-dark-text);
+}
+
+.cardInput[data-palette='warm'] .testCardSelect:focus,
+.cardInput[data-palette='warm'] .testCardSelect:focus-visible {
+  border-color: var(--brand-warm-dark-text);
+  box-shadow: 0 0 0 1px var(--brand-warm-dark-text);
+}
+
+/* ==================== field group / label / row ==================== */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-family: 'PT Root UI', sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--brand-cool-dark-text);
+}
+
+.cardInput[data-palette='warm'] .fieldLabel {
+  color: var(--brand-warm-dark-text);
+}
+
+.fieldRow {
+  display: flex;
+  gap: 12px;
+}
+
+/* ==================== number field ==================== */
+.numberField {
+  box-sizing: border-box;
+  width: 100%;
+  height: 48px;
+  color: black !important;
+  border-radius: 8px !important;
+  background-color: white !important;
+  border: 1px solid var(--brand-cool-border) !important;
+  outline: none !important;
+  font-family: 'JetBrains Mono', 'Courier New', ui-monospace, monospace !important;
+  font-weight: bold !important;
+  font-size: 18px !important;
+  letter-spacing: 0.05em !important;
+  padding: 0 12px;
+  transition: all 0.2s ease-in-out;
+}
+
+.cardInput[data-palette='warm'] .numberField {
+  border-color: var(--brand-warm-border) !important;
+}
+
+.numberField:focus,
+.numberField:focus-visible {
+  outline: none !important;
+  border-color: var(--brand-cool-dark-text) !important;
+  box-shadow: 0 0 0 1px var(--brand-cool-dark-text) !important;
+}
+
+.cardInput[data-palette='warm'] .numberField:focus,
+.cardInput[data-palette='warm'] .numberField:focus-visible {
+  border-color: var(--brand-warm-dark-text) !important;
+  box-shadow: 0 0 0 1px var(--brand-warm-dark-text) !important;
+}
+
+.numberField::placeholder {
+  color: var(--brand-cool-light-text);
+  opacity: 0.6;
+}
+
+.cardInput[data-palette='warm'] .numberField::placeholder {
+  color: var(--brand-warm-light-text);
+}
+
+/* ==================== text field (expiry / cvv / holder) ==================== */
+.textField {
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  color: black !important;
+  border-radius: 8px !important;
+  background-color: white !important;
+  border: 1px solid var(--brand-cool-border) !important;
+  outline: none !important;
+  font-family: 'PT Root UI', sans-serif !important;
+  font-size: 15px !important;
+  padding: 0 12px;
+  transition: all 0.2s ease-in-out;
+}
+
+.cardInput[data-palette='warm'] .textField {
+  border-color: var(--brand-warm-border) !important;
+}
+
+.textField:focus,
+.textField:focus-visible {
+  outline: none !important;
+  border-color: var(--brand-cool-dark-text) !important;
+  box-shadow: 0 0 0 1px var(--brand-cool-dark-text) !important;
+}
+
+.cardInput[data-palette='warm'] .textField:focus,
+.cardInput[data-palette='warm'] .textField:focus-visible {
+  border-color: var(--brand-warm-dark-text) !important;
+  box-shadow: 0 0 0 1px var(--brand-warm-dark-text) !important;
+}
+
+.textField::placeholder {
+  color: var(--brand-cool-light-text);
+  opacity: 0.6;
+}
+
+.cardInput[data-palette='warm'] .textField::placeholder {
+  color: var(--brand-warm-light-text);
+}
+
+/* ==================== error inline ==================== */
+.errorInline {
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 13px;
+  color: var(--brand-color-red);
+  margin-top: 4px;
+}

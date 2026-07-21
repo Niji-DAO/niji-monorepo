@@ -74,6 +74,20 @@ export type FincodePaymentExecuteSuccess = {
   approve?: string;
 };
 
+/** PUT /v1/payments/{id}/capture (与信 → 売上確定) request body。
+ * fincode 公式 sdk-node の CapturingPaymentRequest 仕様準拠、 job_code は含まず method 指定のみ。
+ * SSOT — https://github.com/fincode-byGMO/fincode-sdk-node src/types/payment.ts § CapturingPaymentRequest */
+export type FincodePaymentCaptureRequest = {
+  pay_type: 'Card';
+  /** POST /payments で発行された access_id */
+  access_id: string;
+  /** 課金方法 (1 = 一括、 2 = 分割)、 job_type が AUTH or CAPTURE 時に必須 */
+  method: '1';
+};
+
+/** PUT /v1/payments/{id}/capture 成功応答 (execute と同 shape、 status = CAPTURED) */
+export type FincodePaymentCaptureSuccess = FincodePaymentExecuteSuccess;
+
 /** fincode error 応答 shape (HTTP 4xx / 5xx 時に返却) */
 export type FincodeErrorResponse = {
   errors: Array<{

@@ -136,7 +136,12 @@ describe('useFiatBid.authorize — fincode 経路 (Issue #3115)', () => {
     expect(result.current.step).toBe('success');
     expect(saveState).toHaveBeenCalledOnce();
     expect(redirect).not.toHaveBeenCalled();
-    expect(placeBid).toHaveBeenCalledWith({ authId: 'fincode-auth-1' });
+    // bidderWallet は backend place-bid の必須 field (欠けると 400 InvalidRequest)。
+    // 落札時の transferFrom 先を KV に残すため authorize 時の値をそのまま引き継ぐ。
+    expect(placeBid).toHaveBeenCalledWith({
+      authId: 'fincode-auth-1',
+      bidderWallet: '0xUSER',
+    });
     expect(result.current.placeBidResult).toMatchObject({
       status: 'bid-placed',
       txHash: '0xabc123',
@@ -261,8 +266,17 @@ describe('useFiatBid.authorize — fincode 経路 (Issue #3115)', () => {
 });
 
 describe('resolveAuthorizePath (Issue #3115)', () => {
-  it('VITE_USE_FINCODE_UI 未設定時は GMO endpoint (/authorize) を返す', () => {
-    expect(resolveAuthorizePath({})).toBe('/api/v1/fiat-bid/authorize');
+  // default は fincode 経路に反転済 (isFincodeBackendEnabled の JSDoc SSOT)。
+  // GMO 経路は Ponder indexer に依存し sync 完了まで応答しないため、 未設定時に
+  // そちらへ落ちると env 設定漏れが「入札できない」 形で表面化する。
+  it('VITE_USE_FINCODE_UI 未設定時は fincode endpoint (/authorize-fincode) を返す', () => {
+    expect(resolveAuthorizePath({})).toBe('/api/v1/fiat-bid/authorize-fincode');
+  });
+
+  it('VITE_USE_FINCODE_UI が空白のみでも fincode endpoint (明示 false のみ GMO 経路)', () => {
+    expect(resolveAuthorizePath({ VITE_USE_FINCODE_UI: '   ' })).toBe(
+      '/api/v1/fiat-bid/authorize-fincode',
+    );
   });
 
   it('VITE_USE_FINCODE_UI=true で fincode endpoint (/authorize-fincode) を返す', () => {

@@ -147,20 +147,21 @@ export const BidModal = ({
   // wagmi の placeBidSucceeded は write 成功後 true を保持し続ける。
   // useRef で「1 bid あたり toast 1 回のみ」 を強制、 placeBidSucceeded false 復帰時に flag reset。
   //
-  // deps は [placeBidSucceeded] のみ (t / onClose 除外) — 親 re-render で onClose が新 reference
+  // deps は [placeBidSucceeded] のみ (msg / onClose 除外) — 親 re-render で onClose が新 reference
   // になった時に useEffect が re-fire し、 cleanup が clearTimeout で auto close timer を消失させる
-  // regression bug (user 実測で「modal 閉じない」) を防ぐ。 t / onClose は latest ref に格納して stale 回避。
+  // regression bug (user 実測で「modal 閉じない」) を防ぐ。 onClose は latest ref に格納して stale 回避、
+  // msg は effect 外で生成することで Lingui macro (build 時 AST 変換) の対象を維持する
+  // (tRef.current`...` 経路は MemberExpression で macro 対象外になり empty string 化する)。
+  const bidPlacedMsg = t`Bid placed.`;
   const toastFiredRef = useRef(false);
   const onCloseRef = useRef(onClose);
-  const tRef = useRef(t);
   useEffect(() => {
     onCloseRef.current = onClose;
-    tRef.current = t;
   });
   useEffect(() => {
     if (placeBidSucceeded && !toastFiredRef.current) {
       toastFiredRef.current = true;
-      toast.success(tRef.current`Bid placed.`);
+      toast.success(bidPlacedMsg);
       setEthInput('');
       // 3 秒間 modal 内 success 表示を維持 → auto close で UX 完結。
       const closeTimer = setTimeout(() => onCloseRef.current(), 3_000);
@@ -170,6 +171,7 @@ export const BidModal = ({
       toastFiredRef.current = false;
     }
     return undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placeBidSucceeded]);
 
   const placeEthBidHandler = () => {
