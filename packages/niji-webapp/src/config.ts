@@ -68,13 +68,21 @@ const app: Record<SupportedChains, AppConfig> = {
     deployBlock: parseDeployBlock(import.meta.env.VITE_HARDHAT_DEPLOY_BLOCK),
   },
   [baseSepolia.id]: {
-    jsonRpcUri: import.meta.env.VITE_BASE_SEPOLIA_JSONRPC ?? 'https://sepolia.base.org',
+    // env 名は VITE_BASE_SEPOLIA_* が正、 旧 example の VITE_RPC_URL / VITE_SUBGRAPH_URL も
+    // fallback で受ける (2026-07-21 env 名 drift の後方互換、 どちらの .env.dev でも動く)。
+    jsonRpcUri:
+      import.meta.env.VITE_BASE_SEPOLIA_JSONRPC ??
+      import.meta.env.VITE_RPC_URL ??
+      'https://sepolia.base.org',
     wsRpcUri: import.meta.env.VITE_BASE_SEPOLIA_WSRPC ?? '',
-    subgraphApiUri: import.meta.env.VITE_BASE_SEPOLIA_SUBGRAPH ?? '',
+    subgraphApiUri:
+      import.meta.env.VITE_BASE_SEPOLIA_SUBGRAPH ?? import.meta.env.VITE_SUBGRAPH_URL ?? '',
     enableHistory: import.meta.env.VITE_ENABLE_HISTORY === 'true',
     // prod は subgraph 障害時のみ chain fallback。 deploy block 未設定だと全 chain scan
     // で RPC が即枯渇するため、 fallback 起動時に WARN を出して 0 から scan する。
-    deployBlock: parseDeployBlock(import.meta.env.VITE_BASE_SEPOLIA_DEPLOY_BLOCK),
+    deployBlock: parseDeployBlock(
+      import.meta.env.VITE_BASE_SEPOLIA_DEPLOY_BLOCK ?? import.meta.env.VITE_NIJI_DEPLOY_BLOCK,
+    ),
   },
 };
 
