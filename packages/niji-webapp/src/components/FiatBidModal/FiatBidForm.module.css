@@ -93,14 +93,11 @@
   font-weight: bold;
   font-size: 16px;
   color: var(--brand-cool-dark-text);
-  padding-top: 4px;
-  border-top: 1px solid var(--brand-cool-border);
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
 .form[data-palette='warm'] .sectionTitle {
   color: var(--brand-warm-dark-text);
-  border-top-color: var(--brand-warm-border);
 }
 
 /* ==================== ETH Input (Issue #3051 で JPY → ETH に反転) ==================== */
@@ -414,7 +411,7 @@
   padding: 12px;
   font-family: 'PT Root UI', sans-serif;
   background-color: var(--brand-color-red-translucent);
-  border: 1px solid var(--brand-color-red);
+  border: 1px solid var(--brand-color-red-translucent);
   color: var(--brand-color-red);
 }
 
@@ -541,33 +538,23 @@
 }
 
 /*
- * disabled は palette 外の flat gray (#808080) + white 文字だったため、 淡色 accent の
- * enabled 状態より濃く沈み、 「押せない方が目立つ」 主従の反転が起きていた。
- * palette 内の border 色まで明度を落とし、 enabled より弱いことが一目で分かる階調にする。
+ * BidModal.module.css .bidBtn:disabled と同一定義 (2 tab 間で disabled の姿を揃える)。
+ * 「disabled の方が enabled より濃い」 主従の反転は ETH tab も同条件で抱えるサイト共通の課題、
+ * fiat 側だけ独自階調にすると tab 切替で色が変わるため、 揃えた上で別途扱う。
  */
 .submitBtn:disabled {
-  background-color: color-mix(
-    in srgb,
-    var(--brand-cool-border) 60%,
-    var(--brand-cool-accent)
-  ) !important;
-  color: var(--fiat-muted) !important;
+  background-color: gray !important;
+  color: white !important;
   filter: none;
   cursor: not-allowed;
 }
 
-.form[data-palette='warm'] .submitBtn:disabled {
-  background-color: color-mix(
-    in srgb,
-    var(--brand-warm-border) 60%,
-    var(--brand-warm-accent)
-  ) !important;
-}
-
 /* ==================== 完了 view の閉じる button ==================== */
 /*
- * 完了カード (emerald) の中に置くので、 submit の palette accent ではなく
- * カード面から浮く白 + emerald 文字にして成功文脈の中で完結させる。
+ * 完了カード内の閉じる button。
+ * 生の Tailwind emerald 値 (rgb 直書き) を一度使ったが、 本 component は
+ * 「色は palette token 経由、 生の Tailwind 色を直書きしない」 規約下にあるため、
+ * modal 内の他 button と同じ palette token (accent 背景 + dark-text) で組む。
  */
 .successCloseBtn {
   margin-top: 4px;
@@ -575,40 +562,48 @@
   border-radius: 8px !important;
   padding: 8px 24px !important;
   height: 2.5rem !important;
-  background-color: white !important;
-  color: rgb(4 120 87) !important;
-  border: 1px solid rgb(167 243 208) !important;
+  background-color: var(--brand-cool-accent) !important;
+  color: var(--brand-cool-dark-text) !important;
+  border: transparent !important;
   font-weight: bold !important;
   font-size: 15px !important;
   transition: all 0.2s ease-in-out;
 }
 
+.form[data-palette='warm'] .successCloseBtn {
+  background-color: var(--brand-warm-accent) !important;
+  color: var(--brand-warm-dark-text) !important;
+}
+
 .successCloseBtn:hover,
 .successCloseBtn:focus {
   outline: none !important;
-  background-color: rgb(236 253 245) !important;
+  box-shadow: none !important;
+  filter: brightness(0.95);
 }
 
 /* ==================== Cancel Button ==================== */
 /*
- * 枠線付き + submit と同 font-size だと、 淡色 accent の submit より枠のある cancel の方が
- * 強く見え、 主要動作 (bid 実行) と離脱動作の主従が反転していた。
- * 枠を外し文字も 1 段落として、 submit を相対的に主に戻す (submit 側の色は ETH tab の
- * bidBtn と同 SSOT なので触らない)。
+ * BidModal.module.css .cancelBtn と同一定義 (同じ modal の ETH tab と 2 tab 間で一致させる)。
+ * 一度 ghost 化 (枠なし / muted / 17px) したが、 ETH tab の cancel は枠あり dark-text 19px で、
+ * tab を切替えるだけで離脱 button の姿が変わる不整合になったため戻した。
  */
 .cancelBtn {
   font-family: 'PT Root UI', sans-serif !important;
   border-radius: 8px !important;
   padding: 10px 16px !important;
   height: 3rem !important;
-  color: var(--fiat-muted) !important;
+  color: var(--brand-cool-dark-text) !important;
   background-color: transparent !important;
-  border: 1px solid transparent !important;
-  /* shadcn Button の shadow-xs が残ると背景と同色でも輪郭が見え、 枠を外した意味が消える */
-  box-shadow: none !important;
+  border: 1px solid var(--brand-cool-border) !important;
   font-weight: bold !important;
-  font-size: 17px !important;
+  font-size: 19px !important;
   transition: all 0.2s ease-in-out;
+}
+
+.form[data-palette='warm'] .cancelBtn {
+  color: var(--brand-warm-dark-text) !important;
+  border-color: var(--brand-warm-border) !important;
 }
 
 .cancelBtn:hover,
