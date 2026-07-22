@@ -58,6 +58,7 @@ const VotePage = lazy(() => import('@/pages/Vote'));
 const TestFiatSettlementModalPage = lazy(() => import('@/pages/TestFiatSettlementModal'));
 // 2026-07-17 = FiatBidForm 直接 mount page (CardInput + fincode.tokens() 経路 e2e verify、 isDev gate)
 const TestFiatBidFormPage = lazy(() => import('@/pages/TestFiatBidFormPage'));
+const TestBidModalPage = lazy(() => import('@/pages/TestBidModalPage'));
 
 import classes from './App.module.css';
 
@@ -118,6 +119,7 @@ function App() {
             {import.meta.env.DEV && (
               <Route path="/test/fiat-bid-form" element={<TestFiatBidFormPage />} />
             )}
+            {import.meta.env.DEV && <Route path="/test/bid-modal" element={<TestBidModalPage />} />}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>

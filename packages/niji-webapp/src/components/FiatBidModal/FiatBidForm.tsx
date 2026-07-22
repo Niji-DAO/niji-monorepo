@@ -622,13 +622,19 @@ export const FiatBidForm = ({
   };
   const stepIndex = isTopupMode ? undefined : PROCESSING_STEP_INDEX[fiatBid.step];
 
+  /*
+   * ETH tab の submit は <Trans>bid</Trans> → 「入札」 (i18n 経由) で表示される。
+   * fiat tab だけ「bid を実行」 という別語彙だと tab 切替で primary action の呼称が
+   * 変わり、 同 modal 内で目的動作の呼び名が揺れる。 揃える。
+   * topup は「増額入札」 で意味は保つ (増額 bid とは呼ばない)。
+   */
   const submitButtonLabel = isTopupMode
     ? fiatBid.topupPhase === 'pending'
       ? '処理中'
-      : '増額 bid を実行'
+      : '増額入札'
     : isProcessing
       ? '処理中'
-      : 'bid を実行';
+      : '入札';
 
   /**
    * 失敗表示は errorMessage 側に一本化する。

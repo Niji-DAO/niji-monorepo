@@ -396,9 +396,9 @@ describe('FiatBidModal 増額 bid mode (Issue #3025 T10-T11、 Issue #3051 で E
     expect(summary.textContent).toContain('50,000');
     expect(summary.textContent).toContain('auth-1');
 
-    // submit button の label が「増額 bid を実行」 に切替
+    // submit button の label が「増額入札」 に切替 (ETH tab の「入札」 と揃えた語彙、 2026-07-23)
     const submit = screen.getByTestId('fiat-bid-submit') as HTMLButtonElement;
-    expect(submit.textContent).toContain('増額 bid を実行');
+    expect(submit.textContent).toContain('増額入札');
 
     // 通知 email 欄は増額 mode では非表示
     expect(screen.queryByTestId('fiat-bid-email-input')).toBeNull();
