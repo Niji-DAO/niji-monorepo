@@ -457,6 +457,24 @@ describe('BidModal (Issue #3033)', () => {
     expect(input.getAttribute('placeholder')).toContain('0.0001');
   });
 
+  it('現額 0.0127 の次の最低額を 0.02 でなく 0.013 と表示 (過剰な第2位切り上げを回避)', () => {
+    hookState.minBidIncPercentage = 2n;
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction({ amount: 12_713_345_834_790_070n })}
+          bidderWallet="0xUSER"
+        />
+      </Wrapper>,
+    );
+    const input = getByTestId('eth-bid-input') as HTMLInputElement;
+    expect(input.getAttribute('placeholder')).toContain('0.013');
+    expect(input.getAttribute('placeholder')).not.toContain('0.02');
+  });
+
   it('新 auction で reservePrice が FiatBidForm minBidEth prop に伝搬 (0.0001)', () => {
     hookState.minBidIncPercentage = 5n;
     hookState.reservePrice = 100_000_000_000_000n; // 0.0001 ETH

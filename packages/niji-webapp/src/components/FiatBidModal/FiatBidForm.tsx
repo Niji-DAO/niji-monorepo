@@ -151,7 +151,7 @@ const STEP_LABELS: Record<FiatBidStep, string> = {
   authorizing: '与信枠を取得しています',
   'three-ds': '3D セキュア 2.0 認証中',
   placing: 'bid を送信しています',
-  success: '代理入札が完了しました (auction 終了後に決済 + NFT 送付が実行されます)',
+  success: '代理入札が完了しました (落札すれば決済 + NFT 送付、 落選すればカード与信を解放)',
   failure: '決済確保に失敗しました',
 };
 
@@ -432,9 +432,12 @@ export const FiatBidForm = ({
   // success 時 toast + 5 秒 auto-close (BidModal ETH tab より延ばして user が状況把握できる時間確保)。
   useEffect(() => {
     if (fiatBid.step !== 'success') return;
-    toast.success('代理入札が完了しました (auction 終了後に決済確定 + NFT 送付されます)', {
-      duration: 5_000,
-    });
+    toast.success(
+      '代理入札が完了しました (落札すれば決済 + NFT 送付、 落選すればカード与信を解放)',
+      {
+        duration: 5_000,
+      },
+    );
     const closeTimer = window.setTimeout(() => {
       onClose();
     }, 5_000);

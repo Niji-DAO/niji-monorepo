@@ -72,14 +72,14 @@ const minBidEth = (minBid: bigint): string => {
   if (minBid === 0n) {
     return '0';
   }
-  const eth = formatEther(minBid);
-  const ethNum = parseFloat(eth);
-  // 0.01 ETH 以上は見やすさ優先で第 2 位切り上げ、 それ未満 (reservePrice 0.0001 等) は
-  // formatEther の正確値をそのまま出す (第 2 位切り上げだと 0.0001 が 0.01 に潰れるため)。
-  if (ethNum >= 0.01) {
-    return (Math.ceil(ethNum * 100) / 100).toFixed(2);
-  }
-  return eth;
+  const ethNum = parseFloat(formatEther(minBid));
+  // 最低額を必ず満たすよう有効数字 3 桁で切り上げる。
+  // 0.012967 → 0.013、 0.0001 → 0.0001、 1.05 → 1.05。
+  // 一律第 2 位切り上げ (旧実装) だと 0.012967 が 0.02 に飛び、 0.0001 が 0.01 に潰れる問題を回避。
+  const exponent = Math.ceil(Math.log10(ethNum));
+  const decimals = Math.max(0, 3 - exponent);
+  const factor = 10 ** decimals;
+  return String(Math.ceil(ethNum * factor) / factor);
 };
 
 /**
