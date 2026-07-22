@@ -320,14 +320,10 @@ const createPlaceBidHandler = (env: Env, spotRateFetcher: SpotRateFetcher) => {
         );
       }
 
-      const txHash = await walletClient.writeContract({
-        address: env.AUCTION_HOUSE_ADDRESS as Address,
-        abi: nijiAuctionHouseAbi,
-        functionName: 'createBid',
-        args: [auctionId],
-        value: ethAmount,
-      });
-
+      // createBid の前に record を書く。 chain へ入札した後に record 書込が失敗すると、
+      // settle 時に cron が「record 無し = crypto bid」 と誤判定して transferFrom を skip し、
+      // NFT が operator に留まる (Niji 1 で実際に発生)。 先に書けば createBid revert 時の
+      // orphan record は settle 時に operator が winner にならず lost 判定 → cancel され無害。
       await putFiatBidRecord(env.FINCODE_STATE, authId, {
         chainAuctionId: auctionId.toString(),
         bidderWallet,
@@ -337,6 +333,14 @@ const createPlaceBidHandler = (env: Env, spotRateFetcher: SpotRateFetcher) => {
         ethAmount: ethAmount.toString(),
         lifecycle: 'bid-placed',
         createdAt: Date.now(),
+      });
+
+      const txHash = await walletClient.writeContract({
+        address: env.AUCTION_HOUSE_ADDRESS as Address,
+        abi: nijiAuctionHouseAbi,
+        functionName: 'createBid',
+        args: [auctionId],
+        value: ethAmount,
       });
 
       console.log(
@@ -481,7 +485,16 @@ const runSettlementDaemon = async (env: Env): Promise<void> => {
 
     const hit = await getFiatBidByAuction(env.FINCODE_STATE, nounId);
     if (hit === null) {
-      console.log(`[cron] nounId=${nounId} no fiat_bid record (crypto bid、 skip)`);
+      // winner が operator なら fiat 代理入札のはず。 record 無しは place-bid の record 書込漏れ等の
+      // 異常で、 silent skip すると NFT が operator に留まったまま気づけない (Niji 1 で発生)。
+      if (winner.toLowerCase() === operatorAddress.toLowerCase()) {
+        console.error(
+          `[cron] ALERT: nounId=${nounId} winner=operator だが fiat_bid record 無し。 ` +
+            `fiat 代理入札の record が欠落し transferFrom 不能。 手動で受取先を特定して転送が必要。`,
+        );
+      } else {
+        console.log(`[cron] nounId=${nounId} no fiat_bid record (crypto bid、 skip)`);
+      }
       continue;
     }
     const isFiatWin = winner.toLowerCase() === operatorAddress.toLowerCase();

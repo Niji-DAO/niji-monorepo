@@ -240,6 +240,7 @@ describe('place-bid の入札額決定', () => {
 
   beforeEach(() => {
     writeContractCalls.length = 0;
+    writeContractError = null;
   });
 
   it('与信時の ethAmount をそのまま入札額に使い、 spot rate で再換算しない', async () => {
@@ -312,6 +313,39 @@ describe('place-bid の入札額決定', () => {
     expect(record.lifecycle).toBe('bid-placed');
     // 逆引き map も張られている (SettlementDaemon が nounId から authId を引く経路)
     expect(kv._store.get('fiat_bid_by_auction:42')).toBe(AUTH_ID);
+  });
+
+  it('createBid が失敗しても fiat_bid record は先に書かれている (settle 時に record 無しで skip されない)', async () => {
+    const authorizedWei = '95238095238095238';
+    const kv = createKvStub({
+      [`capture:${AUTH_ID}`]: JSON.stringify({
+        orderId: 'fc-42-abcdef',
+        accessId: 'access-1',
+        jpyAmount: 30000,
+        ethAmount: authorizedWei,
+        spotRate: 315000,
+      }),
+    });
+    // createBid (writeContract) を revert させる = chain 入札が失敗するケース
+    writeContractError = new Error('createBid revert');
+    const env = createEnv({ FINCODE_STATE: kv } as Partial<Env>);
+
+    const response = await placeBid(env);
+
+    // createBid 失敗時は place-bid の設計上 200 + status=cancelled を返す (与信は settle 時に cancel)
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as { status: string };
+    expect(body.status).toBe('cancelled');
+    // record は createBid の前に書かれているため KV に残る (先書きの証明)。 これにより
+    // 「chain 入札は通ったのに直後の書込が飛ぶ」 経路が消え、 settle 時の skip を防ぐ。
+    const record = JSON.parse(kv._store.get(`fiat_bid:${AUTH_ID}`) ?? '{}') as {
+      bidderWallet?: string;
+      orderId?: string;
+      accessId?: string;
+    };
+    expect(record.bidderWallet).toBe(BIDDER);
+    expect(record.orderId).toBe('fc-42-abcdef');
+    expect(record.accessId).toBe('access-1');
   });
 
   it('authorize が ethAmount を KV に保存し、 place-bid がその値で入札する (経路全体の接続)', async () => {
@@ -606,14 +640,39 @@ describe('scheduled 経路 (AuctionKeeper + SettlementDaemon)', () => {
     expect(record.lifecycle).toBe('lost');
   });
 
-  it('fiat_bid record を持たない auction は capture も cancel もしない (crypto 入札)', async () => {
+  it('winner=operator なのに fiat_bid record が無い場合は ALERT を出し transferFrom しない (record 欠落検知)', async () => {
     const kv = createKvStub({ 'cron_cursor:from_block': '90' });
+    // winner=operator は fiat 代理入札のはず。 record 欠落は Niji 1 で NFT が operator に留まった症状。
     chainLogs = [{ args: { nounId: 999n, winner: OPERATOR, amount: 1n } }];
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
+
+    // record 無しで転送先不明のため capture / transferFrom はしない
+    expect(fincodeCalls).toHaveLength(0);
+    expect(writeContractCalls.find(c => c['functionName'] === 'transferFrom')).toBeUndefined();
+    // silent skip せず ALERT で検知する (運営が手動転送に気づけるように)
+    expect(
+      errorSpy.mock.calls.some(
+        c => String(c[0]).includes('ALERT') && String(c[0]).includes('winner=operator'),
+      ),
+    ).toBe(true);
+    errorSpy.mockRestore();
+  });
+
+  it('winner が operator 以外で record が無い場合は crypto 入札として silent skip (ALERT を出さない)', async () => {
+    const kv = createKvStub({ 'cron_cursor:from_block': '90' });
+    const cryptoWinner = `0x${'9'.repeat(40)}`;
+    chainLogs = [{ args: { nounId: 999n, winner: cryptoWinner, amount: 1n } }];
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
 
     expect(fincodeCalls).toHaveLength(0);
     expect(writeContractCalls.find(c => c['functionName'] === 'transferFrom')).toBeUndefined();
+    // 本当の crypto 入札は正常経路なので ALERT を出さない
+    expect(errorSpy.mock.calls.some(c => String(c[0]).includes('ALERT'))).toBe(false);
+    errorSpy.mockRestore();
   });
 
   it('capture 失敗時は transferFrom に進まない (与信できていない NFT を渡さない)', async () => {
