@@ -252,14 +252,10 @@ export const BidModal = ({
           <TabsContent value="eth" data-testid="bid-tab-content-eth">
             {placeBidSucceeded ? (
               <div
-                className="my-2 flex flex-col items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50/60 py-8 dark:border-emerald-900/40 dark:bg-emerald-950/20"
+                className={`${classes.successCard} my-2 flex flex-col items-center gap-3 py-8`}
                 data-testid="eth-bid-success"
               >
-                <CheckCircle2Icon
-                  className="h-12 w-12 text-emerald-500 dark:text-emerald-400"
-                  strokeWidth={1.75}
-                  aria-hidden
-                />
+                <CheckCircle2Icon className={classes.successIcon} strokeWidth={1.75} aria-hidden />
                 <h3 className={classes.formLabel} style={{ fontSize: '1.125rem', fontWeight: 600 }}>
                   <Trans>入札を送信しました</Trans>
                 </h3>

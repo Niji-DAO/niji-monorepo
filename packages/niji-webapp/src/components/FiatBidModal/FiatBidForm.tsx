@@ -639,9 +639,9 @@ export const FiatBidForm = ({
   const hideStepperForFailure =
     !isTopupMode && fiatBid.step === 'failure' && errorMessage !== undefined;
 
-  // success 時はフォームを畳み、 完了 view に切替える。 BidModal の ETH tab success
-  // (emerald カード + palette 連動テキスト) と表現を揃え、 fiat/ETH で成功表示を統一する。
-  // 色は emerald、 テキストは classes.formLabel / formHint (data-palette 連動) を使い、
+  // success 時はフォームを畳み、 完了 view に切替える。 BidModal の ETH tab success と
+  // 同一の .successCard / .successIcon (site の --brand-color-green 経由) で表現を揃える。
+  // テキストは classes.formLabel / formHint (data-palette 連動) を使い、
   // 生の Tailwind 色を直書きしない。 palette 連動は .form[data-palette] scope に載せる必要が
   // あるため、 success container 自身に classes.form を併記する (この div は <form> を早期
   // return で置換するので .form 祖先が存在せず、 付けないと warm override が効かない)。
@@ -649,17 +649,13 @@ export const FiatBidForm = ({
   if (!isTopupMode && fiatBid.step === 'success') {
     return (
       <div
-        className={`${classes.form} animate-in fade-in zoom-in-95 my-2 flex flex-col items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50/60 px-6 py-8 text-center duration-300 dark:border-emerald-900/40 dark:bg-emerald-950/20`}
+        className={`${classes.form} ${classes.successCard} animate-in fade-in zoom-in-95 my-2 flex flex-col items-center gap-3 px-6 py-8 text-center duration-300`}
         data-testid="fiat-bid-success-view"
         data-palette={palette}
         role="status"
         aria-live="polite"
       >
-        <CheckCircle2Icon
-          className="h-12 w-12 text-emerald-500 dark:text-emerald-400"
-          strokeWidth={1.75}
-          aria-hidden
-        />
+        <CheckCircle2Icon className={classes.successIcon} strokeWidth={1.75} aria-hidden />
         <h3
           className={classes.formLabel}
           style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}
@@ -712,19 +708,9 @@ export const FiatBidForm = ({
         )}
 
         <div>
-          {/* 最低入札額は label 右端に置く。 入力欄下の独立行に出すと validation error と
-              同内容が縦に 2 行並ぶ (赤「513 円以上を入力してください」 + 灰「513 以上」) ため、
-              位置を label 側に移して重複を構造的に無くしつつ、 入力前に下限を見せる。 */}
-          <div className={classes.labelRow}>
-            <label htmlFor="fiat-bid-jpy-amount" className={classes.formLabel}>
-              {isTopupMode ? '新 bid 額 (円、 現額より大きい額)' : 'bid 額 (円)'}
-            </label>
-            {minBidJpy !== undefined && (
-              <span className={classes.minBidValue} data-testid="fiat-bid-min-bid-copy">
-                最低 ¥ {minBidJpy.toLocaleString()}
-              </span>
-            )}
-          </div>
+          <label htmlFor="fiat-bid-jpy-amount" className={`mb-1 block ${classes.formLabel}`}>
+            {isTopupMode ? '新 bid 額 (円、 現額より大きい額)' : 'bid 額 (円)'}
+          </label>
           {/* step=any — 下限は minBidJpy (minBidEth × spotRate、 minBidEth は contract reservePrice 連動)
               の validation が保証するため、 任意の小額を入力できるようにする。固定 step (旧 1000) は
               reservePrice と乖離するため排除し、 下限判定を SSOT (contract) に一本化する。 */}
@@ -757,6 +743,13 @@ export const FiatBidForm = ({
               data-testid="fiat-bid-jpy-error"
             >
               {jpyValidation.message}
+            </p>
+          )}
+          {/* 最低額は ETH tab (.minBidCopy) と同じ入力欄下に出す。
+              error 表示中は同内容が縦に 2 行並ぶため本行を隠す。 */}
+          {minBidJpy !== undefined && (jpyValidation.ok || jpyRaw === '') && (
+            <p className={classes.minBidCopy} data-testid="fiat-bid-min-bid-copy">
+              minimum bid — ¥ {minBidJpy.toLocaleString()} 以上
             </p>
           )}
         </div>
@@ -915,7 +908,7 @@ export const FiatBidForm = ({
           </div>
         )}
 
-        {/* 失敗は成功 view (emerald カード) と対称に、 枠 + アイコン付きのカードで示す。
+        {/* 失敗は成功 view と対称に、 枠 + アイコン付きのカードで示す。
             従来は素の赤 1 行で、 長い message が折返さず右端で切れていた。 */}
         {errorMessage !== undefined && (
           <div

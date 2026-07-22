@@ -334,7 +334,7 @@ describe('FiatBidForm 金額 error の提示 (重複排除 + invalid 明示)', (
       { wrapper: buildWrapper() },
     );
 
-  it('下限未満入力時、 下限表示は 1 箇所のみで error と重複しない', async () => {
+  it('下限未満入力時は下限 hint を隠し、 error と同内容が 2 行並ばない', async () => {
     renderForm();
     await waitFor(() => {
       expect(screen.getByTestId('fiat-bid-min-bid-copy')).toBeInTheDocument();
@@ -344,12 +344,12 @@ describe('FiatBidForm 金額 error の提示 (重複排除 + invalid 明示)', (
 
     // error は出る
     expect(screen.getByTestId('fiat-bid-jpy-error').textContent).toContain('minimum bid');
-    // 下限表示は error 発生後も 1 個のまま (旧実装では error 行 + hint 行で 2 箇所に増えていた)
+    // error 表示中は下限 hint を隠す。 旧実装では赤 error と灰 hint が同内容で縦に 2 行並んでいた
+    expect(screen.queryByTestId('fiat-bid-min-bid-copy')).toBeNull();
+
+    // error が解消したら下限 hint は戻る (常時消えるわけではない)
+    fireEvent.change(screen.getByTestId('fiat-bid-jpy-input'), { target: { value: '50000' } });
     expect(screen.getAllByTestId('fiat-bid-min-bid-copy')).toHaveLength(1);
-    // 下限表示自体は「入力してください」 系の指示文ではなく値の提示に留まる
-    expect(screen.getByTestId('fiat-bid-min-bid-copy').textContent).not.toContain(
-      '入力してください',
-    );
   });
 
   it('下限未満で aria-invalid=true + aria-describedby が error 要素を指す', async () => {

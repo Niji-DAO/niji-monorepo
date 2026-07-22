@@ -14,11 +14,10 @@
 
 /* ==================== form root ==================== */
 /*
- * --fiat-muted = 補助テキスト色。
- * brand の light-text (#79809c) は modal 背景 (#d5d7e1) 上で 2.7:1、 accent (#e9ebf3) 上でも 3.2:1 で
- * WCAG AA (4.5:1) を満たさず、 12px の注記が実測で読み取りづらい。 決済 form は金額 / 手数料 /
- * 保存範囲の注記を読ませる必要があるため、 dark-text を背景側に寄せた中間色を局所定義して
- * 「見出しより弱いが読める」 階層を作る (両 palette とも 5:1 以上)。
+ * 補助テキストは site 規約の --brand-*-light-text をそのまま使う。
+ * この色は modal 背景上 2.67:1 で WCAG AA (4.5:1) 未達だが、 31 file 89 箇所で使われる
+ * site 全体の性質であり、 決済 form 1 枚だけ別の灰色にすると tab 切替で濃さが変わる。
+ * 直すなら token 自体を対象にした独立の判断として行う。
  *
  * container-type: inline-size は使わない。 contain: inline-size は要素の intrinsic 幅を 0 と
  * みなすため、 祖先が shrink-to-fit (flex の align-items: center / inline-block / 絶対配置) の
@@ -28,12 +27,10 @@
 .form {
   font-family: 'PT Root UI', sans-serif;
   color: var(--brand-cool-dark-text);
-  --fiat-muted: color-mix(in srgb, var(--brand-cool-dark-text) 72%, var(--brand-cool-accent));
 }
 
 .form[data-palette='warm'] {
   color: var(--brand-warm-dark-text);
-  --fiat-muted: color-mix(in srgb, var(--brand-warm-dark-text) 72%, var(--brand-warm-accent));
 }
 
 /* ==================== label + hint ==================== */
@@ -51,37 +48,29 @@
 .formHint {
   font-family: 'PT Root UI', sans-serif;
   font-size: 12px;
-  color: var(--fiat-muted);
+  color: var(--brand-cool-light-text);
+}
+
+.form[data-palette='warm'] .formHint {
+  color: var(--brand-warm-light-text);
 }
 
 /*
- * label 行 = 見出しラベル (左) + 補助値 (右) を 1 行に収める。
- * 最低入札額を入力欄下の独立行から label 右端に移すことで、
- * (1) validation error 行と縦に重ならず「赤エラー + 灰色同内容」 の二重表示が構造的に消える、
- * (2) 入力前に下限を見せられる、 (3) modal の縦を 1 行分節約できる。
+ * 最低入札額 = BidModal.module.css .minBidCopy と同一定義 (ETH tab と位置も色も揃える)。
+ * 一度 label 右端の dark-text に移したが、 ETH tab は入力欄の下に light-text small で出すため
+ * tab 切替で最低額の居場所が変わる不整合になった。
+ * validation error との重複は、 error 表示中だけ本行を隠すことで解く (JSX 側)。
  */
-.labelRow {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-/*
- * 最低入札額 = 入力判断に必須の値なので light-text (背景 #d5d7e1 上で 2.7:1、 WCAG AA 未達) を
- * 使わず dark-text で出す。 label より 1 段軽い weight にして見出しとの主従は保つ。
- */
-.minBidValue {
+.minBidCopy {
   font-family: 'PT Root UI', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--brand-cool-dark-text);
-  white-space: nowrap;
+  font-size: small;
+  color: var(--brand-cool-light-text);
+  margin-top: 4px;
+  padding-left: 0.25rem;
 }
 
-.form[data-palette='warm'] .minBidValue {
-  color: var(--brand-warm-dark-text);
+.form[data-palette='warm'] .minBidCopy {
+  color: var(--brand-warm-light-text);
 }
 
 /*
@@ -241,8 +230,12 @@
 
 .rateSummaryLabel {
   font-size: 12px;
-  color: var(--fiat-muted);
+  color: var(--brand-cool-light-text);
   font-weight: 500;
+}
+
+.form[data-palette='warm'] .rateSummaryLabel {
+  color: var(--brand-warm-light-text);
 }
 
 .rateSummaryValue {
@@ -258,7 +251,11 @@
 
 .rateSummarySource {
   font-size: 11px;
-  color: var(--fiat-muted);
+  color: var(--brand-cool-light-text);
+}
+
+.form[data-palette='warm'] .rateSummarySource {
+  color: var(--brand-warm-light-text);
 }
 
 /*
@@ -285,7 +282,11 @@
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: var(--fiat-muted);
+  color: var(--brand-cool-light-text);
+}
+
+.form[data-palette='warm'] .rateSummaryLoading {
+  color: var(--brand-warm-light-text);
 }
 
 .spinner {
@@ -358,7 +359,7 @@
   margin-left: auto;
   font-size: 12px;
   font-weight: 500;
-  color: var(--fiat-muted);
+  color: var(--brand-cool-light-text);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
@@ -388,18 +389,19 @@
   padding: 12px;
   font-family: 'PT Root UI', sans-serif;
   font-size: 12px;
-  color: var(--fiat-muted);
+  color: var(--brand-cool-light-text);
   border: 1px dashed var(--brand-cool-border);
 }
 
 .form[data-palette='warm'] .cleanupDisclaimer {
   background-color: var(--brand-warm-accent);
+  color: var(--brand-warm-light-text);
   border-color: var(--brand-warm-border);
 }
 
 /* ==================== error message ==================== */
 /*
- * 成功 view (emerald カード) と対称の警告カード。
+ * 成功 view (.successCard) と対称の警告カード。
  * 従来は枠も背景もない赤 1 行で、 長い message が折返さず右端で切れていた。
  * 見出し行で「何が起きたか」 を平文にし、 API 由来の技術詳細は 1 段落として下に置く。
  */
@@ -523,8 +525,8 @@
   height: 14px;
   margin-right: 8px;
   vertical-align: -2px;
-  border: 2px solid color-mix(in srgb, var(--fiat-muted) 40%, transparent);
-  border-top-color: var(--fiat-muted);
+  border: 2px solid var(--brand-cool-border);
+  border-top-color: var(--brand-cool-dark-text);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -552,9 +554,8 @@
 /* ==================== 完了 view の閉じる button ==================== */
 /*
  * 完了カード内の閉じる button。
- * 生の Tailwind emerald 値 (rgb 直書き) を一度使ったが、 本 component は
- * 「色は palette token 経由、 生の Tailwind 色を直書きしない」 規約下にあるため、
- * modal 内の他 button と同じ palette token (accent 背景 + dark-text) で組む。
+ * modal 内の他 button と同じ palette token (accent 背景 + dark-text) で組む
+ * (色は palette token 経由、 生の Tailwind 色を直書きしない)。
  */
 .successCloseBtn {
   margin-top: 4px;
@@ -619,4 +620,22 @@
 .form[data-palette='warm'] .cancelBtn:active,
 .form[data-palette='warm'] .cancelBtn:focus {
   background-color: var(--brand-warm-accent) !important;
+}
+
+/* ==================== 入札成功カード (BidModal.module.css .successCard と同一定義) ==================== */
+/*
+ * 生の Tailwind emerald を使っていたが、 site には --brand-color-green /
+ * --brand-color-green-translucent が定義済みで、 palette 外の色が成功表示を占めていた。
+ * ETH tab と同じ token 経由の定義にして 2 tab の成功表示を揃える。
+ */
+.successCard {
+  border: 1px solid var(--brand-color-green);
+  background-color: var(--brand-color-green-translucent);
+  border-radius: 8px;
+}
+
+.successIcon {
+  width: 3rem;
+  height: 3rem;
+  color: var(--brand-color-green);
 }
