@@ -17,6 +17,7 @@
  * (5) ETH 入力あり + spot rate 未取得 → JPY 換算欄 spinner + 「取得中」 表示
  */
 
+import type { AuthorizeRequest, AuthorizeResponse } from '@/hooks/useFiatBid';
 import type { SpotRate } from '@/hooks/useSpotRate';
 
 import * as React from 'react';
@@ -398,7 +399,7 @@ describe('FiatBidForm 金額 error の提示 (重複排除 + invalid 明示)', (
  */
 describe('FiatBidForm 入札実行後の状態提示', () => {
   const renderWithAuthorize = (
-    authorize: ReturnType<typeof vi.fn>,
+    authorize: (body: AuthorizeRequest) => Promise<AuthorizeResponse>,
     onClose: () => void = () => {},
   ) =>
     render(
@@ -418,7 +419,7 @@ describe('FiatBidForm 入札実行後の状態提示', () => {
     );
 
   it('通信中は cancel が disabled になり、 stepper に現在地 (N / 3) が出る', async () => {
-    const hang = vi.fn(() => new Promise(() => {}));
+    const hang = vi.fn(() => new Promise<AuthorizeResponse>(() => {}));
     renderWithAuthorize(hang);
     await waitFor(() => expect(screen.getByTestId('fiat-bid-min-bid-copy')).toBeInTheDocument());
 
