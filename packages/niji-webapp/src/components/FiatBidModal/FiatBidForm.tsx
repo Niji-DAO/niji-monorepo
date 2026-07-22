@@ -32,6 +32,7 @@ import * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { initFincode } from '@fincode/js';
+import { CheckCircle2Icon } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -601,6 +602,29 @@ export const FiatBidForm = ({
   const currentStepValue = isTopupMode ? fiatBid.topupPhase : fiatBid.step;
   const stepperTestId = isTopupMode ? 'fiat-topup-stepper' : 'fiat-bid-stepper';
   const submitButtonLabel = isTopupMode ? '増額 bid を実行' : 'bid を実行';
+
+  // success 時はフォームを畳み、 チェックマーク中心のコンパクトな完了 view に切替える。
+  // 従来は toast + stepper テキストのみで地味だったのを、 大きなチェックマークで
+  // 「入札が通った」 ことが一目で分かる表示にする。 topup mode は従来 stepper を維持。
+  if (!isTopupMode && fiatBid.step === 'success') {
+    return (
+      <div
+        className="animate-in fade-in zoom-in-95 flex flex-col items-center justify-center gap-3 px-6 py-10 text-center duration-300"
+        data-testid="fiat-bid-success-view"
+        data-palette={palette}
+        role="status"
+        aria-live="polite"
+      >
+        <CheckCircle2Icon className="h-16 w-16 text-green-500" strokeWidth={1.5} aria-hidden />
+        <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+          代理入札が完了しました
+        </p>
+        <p className="max-w-xs text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+          落札すれば決済と NFT 送付、 落選すればカード与信を解放します。
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form
