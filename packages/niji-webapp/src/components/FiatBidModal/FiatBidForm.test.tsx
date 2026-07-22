@@ -21,6 +21,8 @@ import type { SpotRate } from '@/hooks/useSpotRate';
 
 import * as React from 'react';
 
+import { readFileSync } from 'node:fs';
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
@@ -242,5 +244,38 @@ describe('FiatBidForm mock badge (Issue #3061)', () => {
     expect(screen.queryByTestId('fiat-bid-rate-summary-mock-badge')).toBeNull();
     const rateSummary = screen.getByTestId('fiat-bid-rate-summary');
     expect(rateSummary.textContent).toContain('source: coingecko');
+  });
+});
+
+/**
+ * FiatBidForm の classes.X 参照と実 CSS 定義の整合 — silent breakage 回帰
+ *
+ * success view の説明文で ETH 側 BidModal の class 名 .minBidCopy を誤参照し、 fiat module に
+ * 実在しない (正は .formHint) ため production の vite build で undefined = 無 class = unstyled +
+ * palette 連動漏れになる silent breakage が起きた。 型 (CSS module key が緩い) / build /
+ * data-testid ベースの既存 test を通り抜け、 更に vitest の CSS module は lenient proxy (未定義
+ * key でも _key_hash を返す) ため classes.xxx の undefined 判定でも検出できない。 そこで JSX が
+ * 参照する classes.X を全抽出し、 実 CSS ファイルの class 定義と照合して「存在しない class 参照」
+ * を網羅検出する (vitest proxy を迂回した静的照合、 success view に限らず component 全体を cover)。
+ */
+describe('FiatBidForm の CSS class 参照整合 (silent breakage 回帰)', () => {
+  it('JSX が参照する classes.X が全て実 CSS に定義されている (未定義参照ゼロ)', () => {
+    // vitest の cwd は package root (webapp) のため cwd 相対で実 file を読む。
+    // import.meta.url は vite 変換で file: scheme にならず new URL が失敗するため使わない。
+    const dir = 'src/components/FiatBidModal';
+    const tsxSource = readFileSync(`${dir}/FiatBidForm.tsx`, 'utf-8');
+    const cssSource = readFileSync(`${dir}/FiatBidForm.module.css`, 'utf-8');
+
+    // JSX の classes.foo ドット参照を全抽出 (コメント内の言及も含むが CSS 実在なら無害)。
+    const referenced = new Set([...tsxSource.matchAll(/\bclasses\.([A-Za-z]\w*)/g)].map(m => m[1]));
+    // CSS の .foo selector を全抽出 (.form[data-palette] や .foo:focus も foo を拾う、
+    // 0.2s / #fff / .5rem 等は . の直後が非英字なので除外される)。
+    const defined = new Set([...cssSource.matchAll(/\.([A-Za-z][\w-]*)/g)].map(m => m[1]));
+
+    // regex が classes.X を実抽出できている保証 (referenced が空だと missing 判定が false green 化)。
+    expect(referenced.size).toBeGreaterThan(0);
+    // 過去に success view が classes.minBidCopy (ETH 側 class 名) を誤参照して missing 入りした。
+    const missing = [...referenced].filter(name => !defined.has(name));
+    expect(missing).toEqual([]);
   });
 });
