@@ -279,3 +279,85 @@ describe('FiatBidForm の CSS class 参照整合 (silent breakage 回帰)', () =
     expect(missing).toEqual([]);
   });
 });
+
+/**
+ * 入札金額 field の error 提示 (決済 UI 磨き込み、 実レンダリング評価で検出)
+ *
+ * 従来 —
+ * (1) 下限未満を入力すると、 赤字 error「minimum bid X 円以上を入力してください」 の直下に
+ *     灰字 hint「minimum bid — ¥ X 以上」 が並び、 同じ情報が 2 行重複していた。
+ * (2) error 時も入力欄の見た目が変わらず (borderless white のまま)、 どの欄が原因か
+ *     視線で辿れず、 支援技術にも invalid が伝わらなかった。
+ *
+ * 変更後 —
+ * (1) 下限は label 行の右端 (data-testid=fiat-bid-min-bid-copy) に常時 1 箇所だけ出す。
+ * (2) 下限未満のとき input に aria-invalid=true + aria-describedby=error id を付ける
+ *     (CSS 側は [aria-invalid='true'] で赤 ring を出す)。
+ */
+describe('FiatBidForm 金額 error の提示 (重複排除 + invalid 明示)', () => {
+  const renderForm = () =>
+    render(
+      <FiatBidForm
+        onClose={() => {}}
+        auctionId="42"
+        bidderWallet="0xUSER"
+        minBidEth={0.001}
+        fetchersOverride={{
+          fetchers: { authorize: vi.fn(), placeBid: vi.fn() },
+          saveState: vi.fn(),
+          redirect: vi.fn(),
+        }}
+        spotRateOverride={{ fetcher: vi.fn().mockResolvedValue(successRate), refetchInterval: 0 }}
+      />,
+      { wrapper: buildWrapper() },
+    );
+
+  it('下限未満入力時、 下限表示は 1 箇所のみで error と重複しない', async () => {
+    renderForm();
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-min-bid-copy')).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByTestId('fiat-bid-jpy-input'), { target: { value: '1' } });
+
+    // error は出る
+    expect(screen.getByTestId('fiat-bid-jpy-error').textContent).toContain('minimum bid');
+    // 下限表示は error 発生後も 1 個のまま (旧実装では error 行 + hint 行で 2 箇所に増えていた)
+    expect(screen.getAllByTestId('fiat-bid-min-bid-copy')).toHaveLength(1);
+    // 下限表示自体は「入力してください」 系の指示文ではなく値の提示に留まる
+    expect(screen.getByTestId('fiat-bid-min-bid-copy').textContent).not.toContain(
+      '入力してください',
+    );
+  });
+
+  it('下限未満で aria-invalid=true + aria-describedby が error 要素を指す', async () => {
+    renderForm();
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-min-bid-copy')).toBeInTheDocument();
+    });
+
+    const input = screen.getByTestId('fiat-bid-jpy-input');
+    fireEvent.change(input, { target: { value: '1' } });
+
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+    const describedBy = input.getAttribute('aria-describedby');
+    expect(describedBy).not.toBeNull();
+    expect(document.getElementById(describedBy!)).toBe(screen.getByTestId('fiat-bid-jpy-error'));
+  });
+
+  it('下限以上を入力すると aria-invalid が false に戻り error 要素が消える', async () => {
+    renderForm();
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-min-bid-copy')).toBeInTheDocument();
+    });
+
+    const input = screen.getByTestId('fiat-bid-jpy-input');
+    fireEvent.change(input, { target: { value: '1' } });
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+
+    fireEvent.change(input, { target: { value: '50000' } });
+    expect(input.getAttribute('aria-invalid')).toBe('false');
+    expect(screen.queryByTestId('fiat-bid-jpy-error')).toBeNull();
+    expect(input.getAttribute('aria-describedby')).toBeNull();
+  });
+});

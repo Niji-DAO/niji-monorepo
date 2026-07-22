@@ -657,9 +657,19 @@ export const FiatBidForm = ({
         )}
 
         <div>
-          <label htmlFor="fiat-bid-jpy-amount" className={`mb-1 block ${classes.formLabel}`}>
-            {isTopupMode ? '新 bid 額 (円、 現額より大きい額)' : 'bid 額 (円)'}
-          </label>
+          {/* 最低入札額は label 右端に置く。 入力欄下の独立行に出すと validation error と
+              同内容が縦に 2 行並ぶ (赤「513 円以上を入力してください」 + 灰「513 以上」) ため、
+              位置を label 側に移して重複を構造的に無くしつつ、 入力前に下限を見せる。 */}
+          <div className={classes.labelRow}>
+            <label htmlFor="fiat-bid-jpy-amount" className={classes.formLabel}>
+              {isTopupMode ? '新 bid 額 (円、 現額より大きい額)' : 'bid 額 (円)'}
+            </label>
+            {minBidJpy !== undefined && (
+              <span className={classes.minBidValue} data-testid="fiat-bid-min-bid-copy">
+                最低 ¥ {minBidJpy.toLocaleString()}
+              </span>
+            )}
+          </div>
           {/* step=any — 下限は minBidJpy (minBidEth × spotRate、 minBidEth は contract reservePrice 連動)
               の validation が保証するため、 任意の小額を入力できるようにする。固定 step (旧 1000) は
               reservePrice と乖離するため排除し、 下限判定を SSOT (contract) に一本化する。 */}
@@ -680,15 +690,18 @@ export const FiatBidForm = ({
             data-testid="fiat-bid-jpy-input"
             required
             className={classes.ethInput}
+            aria-invalid={!jpyValidation.ok && jpyRaw !== ''}
+            aria-describedby={
+              !jpyValidation.ok && jpyRaw !== '' ? 'fiat-bid-jpy-amount-error' : undefined
+            }
           />
           {!jpyValidation.ok && jpyRaw !== '' && (
-            <p className={classes.errorInline} data-testid="fiat-bid-jpy-error">
+            <p
+              id="fiat-bid-jpy-amount-error"
+              className={classes.errorInline}
+              data-testid="fiat-bid-jpy-error"
+            >
               {jpyValidation.message}
-            </p>
-          )}
-          {minBidJpy !== undefined && (
-            <p className={classes.formHint} data-testid="fiat-bid-min-bid-copy">
-              minimum bid — ¥ {minBidJpy.toLocaleString()} 以上
             </p>
           )}
         </div>
@@ -699,6 +712,28 @@ export const FiatBidForm = ({
           aria-busy={isSpotRateLoading}
           aria-live="polite"
         >
+          {/* 主 = ETH 換算 (実際に入札される額)。 spot rate はその根拠なので従に置く。
+              従来は 1fr 1fr で spot rate が左先頭にあり、 確認すべき値と参考値が同格だった。 */}
+          <div className={`${classes.rateSummaryCol} ${classes.rateSummaryPrimary}`}>
+            <div className={classes.rateSummaryLabel}>ETH 換算 (入札額)</div>
+            {isEthEquivalentReady ? (
+              <div className={classes.rateSummaryValue} data-testid="fiat-bid-eth-display">
+                {ethDisplay}
+              </div>
+            ) : jpyInputHasValue && isSpotRateLoading ? (
+              <div
+                className={classes.rateSummaryLoading}
+                data-testid="fiat-bid-eth-display-loading"
+              >
+                <div className={classes.spinner} aria-hidden="true" />
+                <span>取得中</span>
+              </div>
+            ) : (
+              <div className={classes.rateSummaryValue} data-testid="fiat-bid-eth-display">
+                {ethDisplay}
+              </div>
+            )}
+          </div>
           <div className={classes.rateSummaryCol}>
             <div className={classes.rateSummaryLabel}>現在 spot rate</div>
             {spotRate.rate !== undefined ? (
@@ -734,28 +769,29 @@ export const FiatBidForm = ({
               </div>
             )}
           </div>
-          <div className={classes.rateSummaryCol}>
-            <div className={classes.rateSummaryLabel}>ETH 換算</div>
-            {isEthEquivalentReady ? (
-              <div className={classes.rateSummaryValue} data-testid="fiat-bid-eth-display">
-                {ethDisplay}
-              </div>
-            ) : jpyInputHasValue && isSpotRateLoading ? (
-              <div
-                className={classes.rateSummaryLoading}
-                data-testid="fiat-bid-eth-display-loading"
-              >
-                <div className={classes.spinner} aria-hidden="true" />
-                <span>取得中</span>
-              </div>
-            ) : (
-              <div className={classes.rateSummaryValue} data-testid="fiat-bid-eth-display">
-                {ethDisplay}
-              </div>
-            )}
-          </div>
         </div>
 
+        {/* 金額ブロックと支払いブロックの境界。 全 label が同 size/weight で並ぶと
+            入力欄の羅列に見え、 どこまでが金額の話か判別できないため見出しで区切る。 */}
+        <div className={classes.sectionTitle}>お支払い情報</div>
+
+        <div>
+          <label htmlFor="card-input-number" className={`mb-1 block ${classes.formLabel}`}>
+            クレジットカード情報
+          </label>
+          <CardInput
+            onChange={handleCardChange}
+            palette={palette}
+            isDev={import.meta.env.MODE !== 'production'}
+          />
+          <p className={`mt-2 ${classes.formHint}`}>
+            カード情報は決済代行会社 (fincode) の SDK で token 化されて送信されます。 サーバーには
+            token のみ保存されます。
+          </p>
+        </div>
+
+        {/* 通知 email は任意入力なので、 必須のカード情報を全て埋めた後に置く。
+            従来は金額とカードの間にあり、 必須 → 任意 → 必須 の順で入力が中断されていた。 */}
         {!isTopupMode && (
           <div>
             <label htmlFor="fiat-bid-email" className={`mb-1 block ${classes.formLabel}`}>
@@ -773,28 +809,13 @@ export const FiatBidForm = ({
           </div>
         )}
 
-        <div>
-          <label htmlFor="card-input-number" className={`mb-1 block ${classes.formLabel}`}>
-            クレジットカード情報
-          </label>
-          <CardInput
-            onChange={handleCardChange}
-            palette={palette}
-            isDev={import.meta.env.MODE !== 'production'}
-          />
-          <p className={`mt-2 ${classes.formHint}`}>
-            カード情報は決済代行会社 (fincode) の SDK で token 化されて送信されます。 サーバーには
-            token のみ保存されます。
-          </p>
-        </div>
-
-        <div className="flex items-start gap-2">
+        <div className={classes.termsRow}>
           <input
             id="fiat-bid-terms"
             type="checkbox"
             checked={termsChecked}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTermsChecked(e.target.checked)}
-            className="mt-1"
+            className={classes.termsCheckbox}
             data-testid="fiat-bid-terms-checkbox"
           />
           <label htmlFor="fiat-bid-terms" className={classes.termsLabel}>

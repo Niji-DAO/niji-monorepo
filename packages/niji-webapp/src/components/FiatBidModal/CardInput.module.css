@@ -20,15 +20,17 @@
 }
 
 /* ==================== card visual (上部の card 風 preview) ==================== */
+/*
+ * modal 内 (背景 = --brand-cool-background) では終端色が背景と同一になり、
+ * 薄い 1px border だけでは「カード」 に見えず背景に溶けたグレー矩形になっていた。
+ * 終端を白側に振ってカード面を背景から持ち上げ、 影で浮きを与える。
+ */
 .cardVisual {
   position: relative;
-  background: linear-gradient(
-    135deg,
-    var(--brand-cool-accent) 0%,
-    var(--brand-cool-background) 100%
-  );
+  background: linear-gradient(135deg, var(--brand-cool-accent) 0%, white 100%);
   border: 1px solid var(--brand-cool-border);
   border-radius: 12px;
+  box-shadow: 0 1px 3px rgb(21 28 59 / 12%);
   padding: 20px 20px 16px 20px;
   min-height: 168px;
   display: flex;
@@ -38,12 +40,9 @@
 }
 
 .cardInput[data-palette='warm'] .cardVisual {
-  background: linear-gradient(
-    135deg,
-    var(--brand-warm-accent) 0%,
-    var(--brand-warm-background) 100%
-  );
+  background: linear-gradient(135deg, var(--brand-warm-accent) 0%, white 100%);
   border-color: var(--brand-warm-border);
+  box-shadow: 0 1px 3px rgb(34 27 26 / 12%);
 }
 
 .brandIcon {
@@ -82,16 +81,17 @@
   gap: 16px;
 }
 
+/*
+ * light-text はカード面上で 3:1 前後 (WCAG AA 未達)。 FiatBidForm 側で定義される
+ * --fiat-muted (dark-text を背景側に寄せた中間色) を継承して読める階調にする。
+ * CardInput 単独利用時は従来の light-text に fallback。
+ */
 .cardMetaLabel {
   font-family: 'PT Root UI', sans-serif;
   font-size: 10px;
-  color: var(--brand-cool-light-text);
+  color: var(--fiat-muted, var(--brand-cool-light-text));
   text-transform: uppercase;
   letter-spacing: 0.08em;
-}
-
-.cardInput[data-palette='warm'] .cardMetaLabel {
-  color: var(--brand-warm-light-text);
 }
 
 .cardMetaValue {
@@ -107,10 +107,21 @@
 }
 
 /* ==================== test card selector (dev only) ==================== */
+/*
+ * dev 専用の切替 UI が本番 field と同じ見た目で並んでおり、 実装確認時に
+ * 「本番でも出る欄」 と誤読できる並びだった。 破線枠で囲って本番 field 群から分離する。
+ */
 .testCardSelector {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding: 10px 12px;
+  border: 1px dashed var(--brand-cool-border);
+  border-radius: 8px;
+}
+
+.cardInput[data-palette='warm'] .testCardSelector {
+  border-color: var(--brand-warm-border);
 }
 
 .testCardSelect {

@@ -13,13 +13,26 @@
  */
 
 /* ==================== form root ==================== */
+/*
+ * --fiat-muted = 補助テキスト色。
+ * brand の light-text (#79809c) は modal 背景 (#d5d7e1) 上で 2.7:1、 accent (#e9ebf3) 上でも 3.2:1 で
+ * WCAG AA (4.5:1) を満たさず、 12px の注記が実測で読み取りづらい。 決済 form は金額 / 手数料 /
+ * 保存範囲の注記を読ませる必要があるため、 dark-text を背景側に寄せた中間色を局所定義して
+ * 「見出しより弱いが読める」 階層を作る (両 palette とも 5:1 以上)。
+ *
+ * container-type = modal 内幅 (512px) を基準に rate summary の列数を切替えるため。
+ * viewport は desktop で広いままなので media query だけでは modal 内の折返しを判定できない。
+ */
 .form {
   font-family: 'PT Root UI', sans-serif;
   color: var(--brand-cool-dark-text);
+  container-type: inline-size;
+  --fiat-muted: color-mix(in srgb, var(--brand-cool-dark-text) 72%, var(--brand-cool-accent));
 }
 
 .form[data-palette='warm'] {
   color: var(--brand-warm-dark-text);
+  --fiat-muted: color-mix(in srgb, var(--brand-warm-dark-text) 72%, var(--brand-warm-accent));
 }
 
 /* ==================== label + hint ==================== */
@@ -37,11 +50,56 @@
 .formHint {
   font-family: 'PT Root UI', sans-serif;
   font-size: 12px;
-  color: var(--brand-cool-light-text);
+  color: var(--fiat-muted);
 }
 
-.form[data-palette='warm'] .formHint {
-  color: var(--brand-warm-light-text);
+/*
+ * label 行 = 見出しラベル (左) + 補助値 (右) を 1 行に収める。
+ * 最低入札額を入力欄下の独立行から label 右端に移すことで、
+ * (1) validation error 行と縦に重ならず「赤エラー + 灰色同内容」 の二重表示が構造的に消える、
+ * (2) 入力前に下限を見せられる、 (3) modal の縦を 1 行分節約できる。
+ */
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+/*
+ * 最低入札額 = 入力判断に必須の値なので light-text (背景 #d5d7e1 上で 2.7:1、 WCAG AA 未達) を
+ * 使わず dark-text で出す。 label より 1 段軽い weight にして見出しとの主従は保つ。
+ */
+.minBidValue {
+  font-family: 'PT Root UI', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--brand-cool-dark-text);
+  white-space: nowrap;
+}
+
+.form[data-palette='warm'] .minBidValue {
+  color: var(--brand-warm-dark-text);
+}
+
+/*
+ * section 区切り — 「入札金額」 と「お支払い情報」 の 2 ブロックを視覚的に分ける。
+ * 全 label が同 size/weight で並ぶと入力欄の羅列に見え、 どこまでが金額の話か判別できない。
+ */
+.sectionTitle {
+  font-family: 'PT Root UI', sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+  color: var(--brand-cool-dark-text);
+  padding-top: 4px;
+  border-top: 1px solid var(--brand-cool-border);
+  margin-top: 4px;
+}
+
+.form[data-palette='warm'] .sectionTitle {
+  color: var(--brand-warm-dark-text);
+  border-top-color: var(--brand-warm-border);
 }
 
 /* ==================== ETH Input (Issue #3051 で JPY → ETH に反転) ==================== */
@@ -71,6 +129,20 @@
 .form[data-palette='warm'] .ethInput:focus,
 .form[data-palette='warm'] .ethInput:focus-visible {
   box-shadow: inset 0px 0px 0px 1px var(--brand-warm-dark-text) !important;
+}
+
+/*
+ * 下限未満などの validation error 時、 入力欄自体を赤 ring で示す。
+ * 従来は欄の下に赤文字が出るだけで欄の見た目が変わらず、 どの欄が原因か視線で辿れなかった。
+ * palette 非依存 (error 色は cool/warm 共通の --brand-color-red)。
+ */
+.ethInput[aria-invalid='true'],
+.ethInput[aria-invalid='true']:focus,
+.ethInput[aria-invalid='true']:focus-visible,
+.form[data-palette='warm'] .ethInput[aria-invalid='true'],
+.form[data-palette='warm'] .ethInput[aria-invalid='true']:focus,
+.form[data-palette='warm'] .ethInput[aria-invalid='true']:focus-visible {
+  box-shadow: inset 0px 0px 0px 2px var(--brand-color-red) !important;
 }
 
 .ethInput::-webkit-outer-spin-button,
@@ -128,15 +200,41 @@
 }
 
 /* ==================== rate summary (Issue #3053、 2 column card layout) ==================== */
+/*
+ * ETH 換算 (実際に入札される額) を主、 spot rate (その根拠) を従に置く。
+ * 従来は 1fr 1fr の同格 2 列で、 user が確認すべき値と参考値が同じ重みだった。
+ * 狭幅 (modal 内 mobile) では 2 列だと「512,345 JPY / ETH」 が折返して縦位置がずれるため 1 列に落とす。
+ */
 .rateSummary {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.2fr 1fr;
   gap: 12px;
   background-color: var(--brand-cool-accent);
   border-radius: 12px;
   padding: 16px;
   font-family: 'PT Root UI', sans-serif;
   color: var(--brand-cool-dark-text);
+}
+
+@container (max-width: 420px) {
+  .rateSummary {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* container query 非対応 browser 向けの viewport fallback */
+@media (max-width: 480px) {
+  .rateSummary {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* 主 = ETH 換算。 値を一段大きくして「これで入札される」 を最初に読ませる */
+.rateSummaryPrimary .rateSummaryValue {
+  font-size: 26px;
+  line-height: 1.2;
 }
 
 .form[data-palette='warm'] .rateSummary {
@@ -153,12 +251,8 @@
 
 .rateSummaryLabel {
   font-size: 12px;
-  color: var(--brand-cool-light-text);
+  color: var(--fiat-muted);
   font-weight: 500;
-}
-
-.form[data-palette='warm'] .rateSummaryLabel {
-  color: var(--brand-warm-light-text);
 }
 
 .rateSummaryValue {
@@ -174,11 +268,7 @@
 
 .rateSummarySource {
   font-size: 11px;
-  color: var(--brand-cool-light-text);
-}
-
-.form[data-palette='warm'] .rateSummarySource {
-  color: var(--brand-warm-light-text);
+  color: var(--fiat-muted);
 }
 
 /*
@@ -205,11 +295,7 @@
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: var(--brand-cool-light-text);
-}
-
-.form[data-palette='warm'] .rateSummaryLoading {
-  color: var(--brand-warm-light-text);
+  color: var(--fiat-muted);
 }
 
 .spinner {
@@ -288,13 +374,12 @@
   padding: 12px;
   font-family: 'PT Root UI', sans-serif;
   font-size: 12px;
-  color: var(--brand-cool-light-text);
+  color: var(--fiat-muted);
   border: 1px dashed var(--brand-cool-border);
 }
 
 .form[data-palette='warm'] .cleanupDisclaimer {
   background-color: var(--brand-warm-accent);
-  color: var(--brand-warm-light-text);
   border-color: var(--brand-warm-border);
 }
 
@@ -314,6 +399,31 @@
 }
 
 /* ==================== terms checkbox + link ==================== */
+/*
+ * 同意 checkbox だけが素の native input (実測 13px) で、 他の入力欄が全て 40-54px の
+ * custom style なのに対し極端に小さく、 submit の gate なのにタップ / click 標的が最小だった。
+ * 18px + palette accent-color + 行全体の余白で、 押せる要素として認識できる大きさにする。
+ */
+.termsRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 2px 0;
+}
+
+.termsCheckbox {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  accent-color: var(--brand-cool-dark-text);
+  cursor: pointer;
+}
+
+.form[data-palette='warm'] .termsCheckbox {
+  accent-color: var(--brand-warm-dark-text);
+}
+
 .termsLabel {
   font-family: 'PT Root UI', sans-serif;
   font-size: 14px;
@@ -362,30 +472,50 @@
   filter: brightness(0.95);
 }
 
+/*
+ * disabled は palette 外の flat gray (#808080) + white 文字だったため、 淡色 accent の
+ * enabled 状態より濃く沈み、 「押せない方が目立つ」 主従の反転が起きていた。
+ * palette 内の border 色まで明度を落とし、 enabled より弱いことが一目で分かる階調にする。
+ */
 .submitBtn:disabled {
-  background-color: gray !important;
-  color: white !important;
+  background-color: color-mix(
+    in srgb,
+    var(--brand-cool-border) 60%,
+    var(--brand-cool-accent)
+  ) !important;
+  color: var(--fiat-muted) !important;
   filter: none;
   cursor: not-allowed;
 }
 
+.form[data-palette='warm'] .submitBtn:disabled {
+  background-color: color-mix(
+    in srgb,
+    var(--brand-warm-border) 60%,
+    var(--brand-warm-accent)
+  ) !important;
+}
+
 /* ==================== Cancel Button ==================== */
+/*
+ * 枠線付き + submit と同 font-size だと、 淡色 accent の submit より枠のある cancel の方が
+ * 強く見え、 主要動作 (bid 実行) と離脱動作の主従が反転していた。
+ * 枠を外し文字も 1 段落として、 submit を相対的に主に戻す (submit 側の色は ETH tab の
+ * bidBtn と同 SSOT なので触らない)。
+ */
 .cancelBtn {
   font-family: 'PT Root UI', sans-serif !important;
   border-radius: 8px !important;
   padding: 10px 16px !important;
   height: 3rem !important;
-  color: var(--brand-cool-dark-text) !important;
+  color: var(--fiat-muted) !important;
   background-color: transparent !important;
-  border: 1px solid var(--brand-cool-border) !important;
+  border: 1px solid transparent !important;
+  /* shadcn Button の shadow-xs が残ると背景と同色でも輪郭が見え、 枠を外した意味が消える */
+  box-shadow: none !important;
   font-weight: bold !important;
-  font-size: 19px !important;
+  font-size: 17px !important;
   transition: all 0.2s ease-in-out;
-}
-
-.form[data-palette='warm'] .cancelBtn {
-  color: var(--brand-warm-dark-text) !important;
-  border-color: var(--brand-warm-border) !important;
 }
 
 .cancelBtn:hover,
