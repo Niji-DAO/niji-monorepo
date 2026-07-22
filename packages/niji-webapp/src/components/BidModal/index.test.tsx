@@ -439,23 +439,33 @@ describe('BidModal (Issue #3033)', () => {
     expect(stub.getAttribute('data-min-bid-eth')).toBe('1.05');
   });
 
-  it('新 auction (amount=0) で reservePrice が ETH placeholder に反映 (0.0001 が 0.01 に潰れない)', () => {
-    hookState.minBidIncPercentage = 5n;
-    hookState.reservePrice = 100_000_000_000_000n; // 0.0001 ETH
-    const Wrapper = buildWrapper();
-    const { getByTestId } = render(
-      <Wrapper>
-        <BidModal
-          open
-          onClose={() => {}}
-          auction={makeAuction({ amount: 0n })}
-          bidderWallet="0xUSER"
-        />
-      </Wrapper>,
-    );
-    const input = getByTestId('eth-bid-input') as HTMLInputElement;
-    expect(input.getAttribute('placeholder')).toContain('0.0001');
-  });
+  // contract の reservePrice を変えると新 auction (入札なし) の placeholder が追従することを
+  // 複数値で実証する = webapp が reservePrice を SSOT (contract) から読んでいる証明。
+  // 0.0001 が 0.01 に潰れず、 0.01 に変えれば 0.01 に、 0.001 に変えれば 0.001 に追従する。
+  it.each([
+    { rp: 100_000_000_000_000n, label: '0.0001', expected: 'Ξ 0.0001' },
+    { rp: 1_000_000_000_000_000n, label: '0.001', expected: 'Ξ 0.001' },
+    { rp: 10_000_000_000_000_000n, label: '0.01', expected: 'Ξ 0.01' },
+  ])(
+    'reservePrice を $label に変えると新 auction の ETH placeholder が追従 (contract SSOT 連動)',
+    ({ rp, expected }) => {
+      hookState.minBidIncPercentage = 5n;
+      hookState.reservePrice = rp;
+      const Wrapper = buildWrapper();
+      const { getByTestId } = render(
+        <Wrapper>
+          <BidModal
+            open
+            onClose={() => {}}
+            auction={makeAuction({ amount: 0n })}
+            bidderWallet="0xUSER"
+          />
+        </Wrapper>,
+      );
+      const input = getByTestId('eth-bid-input') as HTMLInputElement;
+      expect(input.getAttribute('placeholder')).toBe(expected);
+    },
+  );
 
   it('現額 0.0127 の次の最低額を 0.02 でなく 0.013 と表示 (過剰な第2位切り上げを回避)', () => {
     hookState.minBidIncPercentage = 2n;
