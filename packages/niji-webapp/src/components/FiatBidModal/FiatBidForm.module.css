@@ -153,37 +153,53 @@
   color: var(--brand-warm-light-text);
 }
 
-/* ==================== email input (通常サイズ、 ETH input より小さめ) ==================== */
+/* ==================== email input ==================== */
+/*
+ * ETH tab .bidInput / CardInput 4 field と同意匠 (bold PT Root UI + white + 12px 角 +
+ * inset shadow focus)。 一度 40px + 8px 角 + light-border の別意匠にしていたが、
+ * 同 modal 内で 3 種の入力欄意匠が混在していたため統一する。
+ */
 .emailInput {
   box-sizing: border-box;
   width: 100%;
-  height: 40px;
-  color: black !important;
-  border-radius: 8px !important;
+  height: 3rem;
+  color: var(--brand-cool-dark-text) !important;
+  border-radius: 12px !important;
   background-color: white !important;
-  border: 1px solid var(--brand-cool-border) !important;
+  border: none !important;
   outline: none !important;
+  box-shadow: inset 0px 0px 0px 1px transparent !important;
   font-family: 'PT Root UI', sans-serif !important;
-  font-size: 15px !important;
+  font-weight: bold !important;
+  font-size: 19px !important;
   padding: 0 12px;
   transition: all 0.2s ease-in-out;
 }
 
 .form[data-palette='warm'] .emailInput {
-  border-color: var(--brand-warm-border) !important;
+  color: var(--brand-warm-dark-text) !important;
 }
 
 .emailInput:focus,
 .emailInput:focus-visible {
   outline: none !important;
-  border-color: var(--brand-cool-dark-text) !important;
-  box-shadow: 0 0 0 1px var(--brand-cool-dark-text) !important;
+  box-shadow: inset 0px 0px 0px 1px var(--brand-cool-dark-text) !important;
 }
 
 .form[data-palette='warm'] .emailInput:focus,
 .form[data-palette='warm'] .emailInput:focus-visible {
-  border-color: var(--brand-warm-dark-text) !important;
-  box-shadow: 0 0 0 1px var(--brand-warm-dark-text) !important;
+  box-shadow: inset 0px 0px 0px 1px var(--brand-warm-dark-text) !important;
+}
+
+.emailInput::placeholder {
+  color: var(--brand-cool-light-text);
+  font-family: 'PT Root UI', sans-serif;
+  font-weight: bold;
+  opacity: 0.6;
+}
+
+.form[data-palette='warm'] .emailInput::placeholder {
+  color: var(--brand-warm-light-text);
 }
 
 /* ==================== rate summary (Issue #3053、 2 column card layout) ==================== */

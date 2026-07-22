@@ -46,19 +46,27 @@
   border-color: var(--brand-warm-border);
 }
 
+/*
+ * ETH tab .bidInput / .numberField / .textField と同意匠。
+ * 40px + 8px 角 + light-border の別意匠だと、 dev 切替が本番 field 群より弱く見え、
+ * 破線枠 (.testCardSelector) の分離だけでは意匠が揃わなかった。
+ * height / radius / weight / bg / shadow focus は全 modal 内 input と共通。
+ */
 .testCardSelect {
   box-sizing: border-box;
   width: 100%;
-  height: 40px;
-  border-radius: 8px;
-  border: 1px solid var(--brand-cool-border);
+  height: 3rem;
+  border-radius: 12px;
+  border: none;
   background-color: white;
   color: var(--brand-cool-dark-text);
   font-family: 'PT Root UI', sans-serif;
-  font-size: 15px;
+  font-weight: bold;
+  font-size: 19px;
   padding: 0 40px 0 12px;
   outline: none;
   cursor: pointer;
+  box-shadow: inset 0px 0px 0px 1px transparent;
   transition: all 0.2s ease-in-out;
   appearance: none;
   -webkit-appearance: none;
@@ -70,7 +78,6 @@
 }
 
 .cardInput[data-palette='warm'] .testCardSelect {
-  border-color: var(--brand-warm-border);
   color: var(--brand-warm-dark-text);
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='%23221b1a'%3E%3Cpath d='M6 8L0 0h12z'/%3E%3C/svg%3E");
 }
@@ -81,14 +88,12 @@
 
 .testCardSelect:focus,
 .testCardSelect:focus-visible {
-  border-color: var(--brand-cool-dark-text);
-  box-shadow: 0 0 0 1px var(--brand-cool-dark-text);
+  box-shadow: inset 0px 0px 0px 1px var(--brand-cool-dark-text);
 }
 
 .cardInput[data-palette='warm'] .testCardSelect:focus,
 .cardInput[data-palette='warm'] .testCardSelect:focus-visible {
-  border-color: var(--brand-warm-dark-text);
-  box-shadow: 0 0 0 1px var(--brand-warm-dark-text);
+  box-shadow: inset 0px 0px 0px 1px var(--brand-warm-dark-text);
 }
 
 /* ==================== field group / label / row ==================== */
