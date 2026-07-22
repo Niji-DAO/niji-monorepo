@@ -603,23 +603,31 @@ export const FiatBidForm = ({
   const stepperTestId = isTopupMode ? 'fiat-topup-stepper' : 'fiat-bid-stepper';
   const submitButtonLabel = isTopupMode ? '増額 bid を実行' : 'bid を実行';
 
-  // success 時はフォームを畳み、 チェックマーク中心のコンパクトな完了 view に切替える。
-  // 従来は toast + stepper テキストのみで地味だったのを、 大きなチェックマークで
-  // 「入札が通った」 ことが一目で分かる表示にする。 topup mode は従来 stepper を維持。
+  // success 時はフォームを畳み、 完了 view に切替える。 BidModal の ETH tab success
+  // (emerald カード + palette 連動テキスト) と表現を揃え、 fiat/ETH で成功表示を統一する。
+  // 色は emerald、 テキストは classes.formLabel / minBidCopy (data-palette 連動) を使い、
+  // 生の Tailwind 色を直書きしない。 topup mode は従来 stepper を維持。
   if (!isTopupMode && fiatBid.step === 'success') {
     return (
       <div
-        className="animate-in fade-in zoom-in-95 flex flex-col items-center justify-center gap-3 px-6 py-10 text-center duration-300"
+        className="animate-in fade-in zoom-in-95 my-2 flex flex-col items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50/60 px-6 py-8 text-center duration-300 dark:border-emerald-900/40 dark:bg-emerald-950/20"
         data-testid="fiat-bid-success-view"
         data-palette={palette}
         role="status"
         aria-live="polite"
       >
-        <CheckCircle2Icon className="h-16 w-16 text-green-500" strokeWidth={1.5} aria-hidden />
-        <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+        <CheckCircle2Icon
+          className="h-12 w-12 text-emerald-500 dark:text-emerald-400"
+          strokeWidth={1.75}
+          aria-hidden
+        />
+        <h3
+          className={classes.formLabel}
+          style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}
+        >
           代理入札が完了しました
-        </p>
-        <p className="max-w-xs text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+        </h3>
+        <p className={classes.minBidCopy} style={{ margin: 0, maxWidth: '20rem', lineHeight: 1.6 }}>
           落札すれば決済と NFT 送付、 落選すればカード与信を解放します。
         </p>
       </div>
