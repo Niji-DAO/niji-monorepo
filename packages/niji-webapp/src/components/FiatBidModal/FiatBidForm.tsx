@@ -605,12 +605,15 @@ export const FiatBidForm = ({
 
   // success 時はフォームを畳み、 完了 view に切替える。 BidModal の ETH tab success
   // (emerald カード + palette 連動テキスト) と表現を揃え、 fiat/ETH で成功表示を統一する。
-  // 色は emerald、 テキストは classes.formLabel / minBidCopy (data-palette 連動) を使い、
-  // 生の Tailwind 色を直書きしない。 topup mode は従来 stepper を維持。
+  // 色は emerald、 テキストは classes.formLabel / formHint (data-palette 連動) を使い、
+  // 生の Tailwind 色を直書きしない。 palette 連動は .form[data-palette] scope に載せる必要が
+  // あるため、 success container 自身に classes.form を併記する (この div は <form> を早期
+  // return で置換するので .form 祖先が存在せず、 付けないと warm override が効かない)。
+  // topup mode は従来 stepper を維持。
   if (!isTopupMode && fiatBid.step === 'success') {
     return (
       <div
-        className="animate-in fade-in zoom-in-95 my-2 flex flex-col items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50/60 px-6 py-8 text-center duration-300 dark:border-emerald-900/40 dark:bg-emerald-950/20"
+        className={`${classes.form} animate-in fade-in zoom-in-95 my-2 flex flex-col items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50/60 px-6 py-8 text-center duration-300 dark:border-emerald-900/40 dark:bg-emerald-950/20`}
         data-testid="fiat-bid-success-view"
         data-palette={palette}
         role="status"
@@ -627,7 +630,7 @@ export const FiatBidForm = ({
         >
           代理入札が完了しました
         </h3>
-        <p className={classes.minBidCopy} style={{ margin: 0, maxWidth: '20rem', lineHeight: 1.6 }}>
+        <p className={classes.formHint} style={{ margin: 0, maxWidth: '20rem', lineHeight: 1.6 }}>
           落札すれば決済と NFT 送付、 落選すればカード与信を解放します。
         </p>
       </div>
