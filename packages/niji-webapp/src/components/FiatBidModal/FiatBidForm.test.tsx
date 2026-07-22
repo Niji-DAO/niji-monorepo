@@ -25,11 +25,32 @@ import { readFileSync } from 'node:fs';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { FiatBidForm } from './FiatBidForm';
+
+/**
+ * fincode SDK mock —
+ * submit 経路は tokenize (外部 SDK) を必ず通るため、 mock しないと jsdom では
+ * 「fincode SDK 未初期化」 で authorize 前に止まり、 実行後 state (処理中 / 失敗) を検証できない。
+ * window.Fincode を set 済にして preloadFincodeScript を即 resolve させ、
+ * tokens() は成功 callback に固定 token を返す。
+ */
+vi.mock('@fincode/js', () => ({
+  initFincode: () =>
+    Promise.resolve({
+      tokens: (_params: unknown, onSuccess: (status: number, response: unknown) => void): void => {
+        onSuccess(200, { list: [{ token: 'tok_unit_test' }] });
+      },
+    }),
+}));
+
+beforeEach(() => {
+  (window as unknown as { Fincode?: unknown }).Fincode = {};
+  vi.stubEnv('VITE_FINCODE_PUBLIC_KEY', 'pk_test_unit');
+});
 
 const buildWrapper = () => {
   const client = new QueryClient({
@@ -359,5 +380,87 @@ describe('FiatBidForm 金額 error の提示 (重複排除 + invalid 明示)', (
     expect(input.getAttribute('aria-invalid')).toBe('false');
     expect(screen.queryByTestId('fiat-bid-jpy-error')).toBeNull();
     expect(input.getAttribute('aria-describedby')).toBeNull();
+  });
+});
+
+/**
+ * 入札実行後 (処理中 / 失敗 / 完了) の状態提示
+ *
+ * 実レンダリングで検出した 4 点の回帰を固定する。
+ * (1) 通信中は handleCancel が early return するのに cancel が押せる見た目のままだった
+ * (2) 失敗が stepper (薄字) と error 文 (赤字) の 2 箇所に割れ、 しかも stepper の failure 表現が
+ *     idle と同じ最も弱い見た目だった
+ * (3) 進行中の現在地 (3 段中どこか) が分からなかった
+ * (4) 完了 view に閉じる手段が無く、 自動で閉じるまで待つしかない行き止まりだった
+ *
+ * 通信は fetchersOverride で差替え、 authorize を never-resolve / reject に振って
+ * 実際の state 機械 (idle → authorizing → ...) を通す。
+ */
+describe('FiatBidForm 入札実行後の状態提示', () => {
+  const renderWithAuthorize = (
+    authorize: ReturnType<typeof vi.fn>,
+    onClose: () => void = () => {},
+  ) =>
+    render(
+      <FiatBidForm
+        onClose={onClose}
+        auctionId="42"
+        bidderWallet="0xUSER"
+        minBidEth={0.001}
+        fetchersOverride={{
+          fetchers: { authorize, placeBid: vi.fn() },
+          saveState: vi.fn(),
+          redirect: vi.fn(),
+        }}
+        spotRateOverride={{ fetcher: vi.fn().mockResolvedValue(successRate), refetchInterval: 0 }}
+      />,
+      { wrapper: buildWrapper() },
+    );
+
+  it('通信中は cancel が disabled になり、 stepper に現在地 (N / 3) が出る', async () => {
+    const hang = vi.fn(() => new Promise(() => {}));
+    renderWithAuthorize(hang);
+    await waitFor(() => expect(screen.getByTestId('fiat-bid-min-bid-copy')).toBeInTheDocument());
+
+    // 通信前は cancel は押せる
+    expect((screen.getByTestId('fiat-bid-cancel') as HTMLButtonElement).disabled).toBe(false);
+
+    // form 直 submit で authorize 発火 (fincode tokenize 経路は通らない authorize 単体検証)
+    const form = screen.getByTestId('fiat-bid-form');
+    fireEvent.change(screen.getByTestId('fiat-bid-jpy-input'), { target: { value: '50000' } });
+    fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
+    fireEvent.submit(form);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('fiat-bid-stepper')).toBeInTheDocument();
+    });
+    expect(screen.getByTestId('fiat-bid-stepper-count').textContent).toContain('1 / 3');
+    expect((screen.getByTestId('fiat-bid-cancel') as HTMLButtonElement).disabled).toBe(true);
+    // 入力領域は aria-busy で「待ち」 を伝える
+    expect(screen.getByTestId('fiat-bid-form').querySelector('[aria-busy="true"]')).not.toBeNull();
+  });
+
+  it('失敗時は stepper を出さず error カードに一本化する', async () => {
+    const failing = vi
+      .fn()
+      .mockRejectedValue(new Error('authorize failed: card_declined — 承認されませんでした'));
+    renderWithAuthorize(failing);
+    await waitFor(() => expect(screen.getByTestId('fiat-bid-min-bid-copy')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByTestId('fiat-bid-jpy-input'), { target: { value: '50000' } });
+    fireEvent.click(screen.getByTestId('fiat-bid-terms-checkbox'));
+    fireEvent.submit(screen.getByTestId('fiat-bid-form'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('fiat-bid-error-message')).toBeInTheDocument();
+    });
+    // 旧実装では stepper が「決済確保に失敗しました」 を同時表示して 2 箇所に割れていた
+    expect(screen.queryByTestId('fiat-bid-stepper')).toBeNull();
+    const errorBox = screen.getByTestId('fiat-bid-error-message');
+    expect(errorBox.getAttribute('role')).toBe('alert');
+    expect(errorBox.textContent).toContain('入札を確定できませんでした');
+    expect(errorBox.textContent).toContain('card_declined');
+    // 失敗後は cancel が押せる状態に戻る
+    expect((screen.getByTestId('fiat-bid-cancel') as HTMLButtonElement).disabled).toBe(false);
   });
 });

@@ -20,13 +20,14 @@
  * 保存範囲の注記を読ませる必要があるため、 dark-text を背景側に寄せた中間色を局所定義して
  * 「見出しより弱いが読める」 階層を作る (両 palette とも 5:1 以上)。
  *
- * container-type = modal 内幅 (512px) を基準に rate summary の列数を切替えるため。
- * viewport は desktop で広いままなので media query だけでは modal 内の折返しを判定できない。
+ * container-type: inline-size は使わない。 contain: inline-size は要素の intrinsic 幅を 0 と
+ * みなすため、 祖先が shrink-to-fit (flex の align-items: center / inline-block / 絶対配置) の
+ * 文脈に置かれると form 全体が幅 0 に潰れる (実測 = 描画幅 0px / 高さ 4715px)。
+ * rate summary の列数切替は viewport media query 側で行う。
  */
 .form {
   font-family: 'PT Root UI', sans-serif;
   color: var(--brand-cool-dark-text);
-  container-type: inline-size;
   --fiat-muted: color-mix(in srgb, var(--brand-cool-dark-text) 72%, var(--brand-cool-accent));
 }
 
@@ -216,14 +217,6 @@
   color: var(--brand-cool-dark-text);
 }
 
-@container (max-width: 420px) {
-  .rateSummary {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-}
-
-/* container query 非対応 browser 向けの viewport fallback */
 @media (max-width: 480px) {
   .rateSummary {
     grid-template-columns: 1fr;
@@ -337,8 +330,22 @@
   font-weight: bold;
 }
 
+/* ==================== form body (通信中ロック) ==================== */
+/*
+ * 通信中は入力を触れなくする。 handleCancel / submit は通信中を無視するのに入力欄だけ
+ * 通常表示のままで、 値を変えても送信済の内容には反映されないことが画面から読めなかった。
+ */
+.formBody[data-busy='true'] {
+  pointer-events: none;
+  opacity: 0.55;
+  transition: opacity 0.2s ease-in-out;
+}
+
 /* ==================== stepper ==================== */
 .stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   border-radius: 8px;
   padding: 12px;
   font-family: 'PT Root UI', sans-serif;
@@ -347,6 +354,16 @@
   color: var(--brand-cool-dark-text);
   background-color: var(--brand-cool-accent);
   border: 1px solid var(--brand-cool-border);
+}
+
+/* 進捗の現在地 (N / 3)。 1 段だけの文言では全体のどこにいるか分からなかった */
+.stepperCount {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fiat-muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
 
 .form[data-palette='warm'] .stepper {
@@ -384,11 +401,48 @@
 }
 
 /* ==================== error message ==================== */
+/*
+ * 成功 view (emerald カード) と対称の警告カード。
+ * 従来は枠も背景もない赤 1 行で、 長い message が折返さず右端で切れていた。
+ * 見出し行で「何が起きたか」 を平文にし、 API 由来の技術詳細は 1 段落として下に置く。
+ */
 .errorMessage {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-radius: 8px;
+  padding: 12px;
   font-family: 'PT Root UI', sans-serif;
-  font-size: 14px;
+  background-color: var(--brand-color-red-translucent);
+  border: 1px solid var(--brand-color-red);
   color: var(--brand-color-red);
+}
+
+.errorIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.errorTitle {
+  font-size: 14px;
   font-weight: bold;
+}
+
+/*
+ * 詳細は本文色 (dark-text) に落とす。 全文を赤の bold で出すと視線が文字列全体に散り、
+ * 「失敗した」 という結論より API の識別子が目立つ。
+ */
+.errorDetail {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--brand-cool-dark-text);
+  overflow-wrap: anywhere;
+}
+
+.form[data-palette='warm'] .errorDetail {
+  color: var(--brand-warm-dark-text);
 }
 
 .errorInline {
@@ -464,6 +518,20 @@
   background-color: var(--brand-warm-accent) !important;
 }
 
+/* 通信中に submit 内へ出す小さな回転体。 押下後の状態が最下部 stepper にしか出ず、
+   modal をスクロールしないと進行が見えなかったため、 押した場所そのものに出す。 */
+.submitSpinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border: 2px solid color-mix(in srgb, var(--fiat-muted) 40%, transparent);
+  border-top-color: var(--fiat-muted);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
 .submitBtn:hover,
 .submitBtn:active,
 .submitBtn:focus {
@@ -494,6 +562,31 @@
     var(--brand-warm-border) 60%,
     var(--brand-warm-accent)
   ) !important;
+}
+
+/* ==================== 完了 view の閉じる button ==================== */
+/*
+ * 完了カード (emerald) の中に置くので、 submit の palette accent ではなく
+ * カード面から浮く白 + emerald 文字にして成功文脈の中で完結させる。
+ */
+.successCloseBtn {
+  margin-top: 4px;
+  font-family: 'PT Root UI', sans-serif !important;
+  border-radius: 8px !important;
+  padding: 8px 24px !important;
+  height: 2.5rem !important;
+  background-color: white !important;
+  color: rgb(4 120 87) !important;
+  border: 1px solid rgb(167 243 208) !important;
+  font-weight: bold !important;
+  font-size: 15px !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.successCloseBtn:hover,
+.successCloseBtn:focus {
+  outline: none !important;
+  background-color: rgb(236 253 245) !important;
 }
 
 /* ==================== Cancel Button ==================== */

@@ -32,7 +32,7 @@ import * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { initFincode } from '@fincode/js';
-import { CheckCircle2Icon } from 'lucide-react';
+import { AlertCircleIcon, CheckCircle2Icon } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -601,7 +601,43 @@ export const FiatBidForm = ({
 
   const currentStepValue = isTopupMode ? fiatBid.topupPhase : fiatBid.step;
   const stepperTestId = isTopupMode ? 'fiat-topup-stepper' : 'fiat-bid-stepper';
-  const submitButtonLabel = isTopupMode ? '増額 bid を実行' : 'bid を実行';
+
+  /**
+   * 通信中か (与信取得 → 3DS → bid 送信 の 3 段のいずれか)。
+   *
+   * この間 handleCancel は early return で何もしないが、 従来は cancel も入力欄も通常表示のままで、
+   * 「押せるのに無反応」「値を変えられるが送信済の内容には反映されない」 状態が見た目に出ていなかった。
+   */
+  const isProcessing =
+    fiatBid.step === 'authorizing' ||
+    fiatBid.step === 'three-ds' ||
+    fiatBid.step === 'placing' ||
+    fiatBid.topupPhase === 'pending';
+
+  /** 非 topup の 3 段進捗 (与信 1 / 3DS 2 / bid 送信 3)。 進行中の現在地を「N / 3」 で示す */
+  const PROCESSING_STEP_INDEX: Partial<Record<FiatBidStep, number>> = {
+    authorizing: 1,
+    'three-ds': 2,
+    placing: 3,
+  };
+  const stepIndex = isTopupMode ? undefined : PROCESSING_STEP_INDEX[fiatBid.step];
+
+  const submitButtonLabel = isTopupMode
+    ? fiatBid.topupPhase === 'pending'
+      ? '処理中'
+      : '増額 bid を実行'
+    : isProcessing
+      ? '処理中'
+      : 'bid を実行';
+
+  /**
+   * 失敗表示は errorMessage 側に一本化する。
+   * 従来は stepper が薄字で「決済確保に失敗しました」、 直下に赤字で詳細、 と失敗が 2 箇所に割れ、
+   * しかも stepper の failure 表現が idle と同じ最も弱い見た目だった。
+   * 詳細 message がある場合は stepper を出さず、 message 側の警告カードに集約する。
+   */
+  const hideStepperForFailure =
+    !isTopupMode && fiatBid.step === 'failure' && errorMessage !== undefined;
 
   // success 時はフォームを畳み、 完了 view に切替える。 BidModal の ETH tab success
   // (emerald カード + palette 連動テキスト) と表現を揃え、 fiat/ETH で成功表示を統一する。
@@ -633,6 +669,19 @@ export const FiatBidForm = ({
         <p className={classes.formHint} style={{ margin: 0, maxWidth: '20rem', lineHeight: 1.6 }}>
           落札すれば決済と NFT 送付、 落選すればカード与信を解放します。
         </p>
+        {/* 完了 view は 5 秒後に自動で閉じるが、 従来はその予告も明示の閉じる手段も無く、
+            読み終える前に消えるか、 消えるまで待つしかない行き止まりだった。 */}
+        <Button
+          type="button"
+          onClick={onClose}
+          data-testid="fiat-bid-success-close"
+          className={classes.successCloseBtn}
+        >
+          閉じる
+        </Button>
+        <p className={classes.formHint} style={{ margin: 0, fontSize: '11px' }}>
+          この表示は数秒後に自動で閉じます
+        </p>
       </div>
     );
   }
@@ -645,7 +694,13 @@ export const FiatBidForm = ({
       data-palette={palette}
       data-testid="fiat-bid-form"
     >
-      <div className="space-y-4">
+      {/* 通信中は入力を触れなくする。 送信済の内容と画面の値がずれるのを防ぎ、
+          「今は待つ時間」 であることを操作可否で示す (aria-busy で支援技術にも伝える)。 */}
+      <div
+        className={`space-y-4 ${classes.formBody}`}
+        data-busy={isProcessing ? 'true' : 'false'}
+        aria-busy={isProcessing}
+      >
         {isTopupMode && existingFiatBid !== undefined && (
           <div className={classes.existingBidSummary} data-testid="fiat-topup-existing-bid-summary">
             <div className={classes.existingBidLabel}>現 bid 額</div>
@@ -830,10 +885,26 @@ export const FiatBidForm = ({
             および利用規約に同意します
           </label>
         </div>
+      </div>
 
-        {currentStepLabel !== '' && (
-          <div className={classes.stepper} data-testid={stepperTestId} data-step={currentStepValue}>
-            {currentStepLabel}
+      {/* stepper / 失敗カードは通信中ロック (.formBody の減光) の外に置く。
+          進行状況こそ読ませたい情報なので、 入力欄と一緒に薄くしてはいけない。 */}
+      <div className="mt-4 space-y-4">
+        {currentStepLabel !== '' && !hideStepperForFailure && (
+          <div
+            className={classes.stepper}
+            data-testid={stepperTestId}
+            data-step={currentStepValue}
+            role="status"
+            aria-live="polite"
+          >
+            {isProcessing && <div className={classes.spinner} aria-hidden="true" />}
+            <span>{currentStepLabel}</span>
+            {stepIndex !== undefined && (
+              <span className={classes.stepperCount} data-testid="fiat-bid-stepper-count">
+                {stepIndex} / 3
+              </span>
+            )}
           </div>
         )}
 
@@ -844,9 +915,20 @@ export const FiatBidForm = ({
           </div>
         )}
 
+        {/* 失敗は成功 view (emerald カード) と対称に、 枠 + アイコン付きのカードで示す。
+            従来は素の赤 1 行で、 長い message が折返さず右端で切れていた。 */}
         {errorMessage !== undefined && (
-          <div className={classes.errorMessage} data-testid="fiat-bid-error-message">
-            {errorMessage}
+          <div
+            className={classes.errorMessage}
+            data-testid="fiat-bid-error-message"
+            role="alert"
+            aria-live="assertive"
+          >
+            <AlertCircleIcon className={classes.errorIcon} strokeWidth={2} aria-hidden />
+            <div>
+              <div className={classes.errorTitle}>入札を確定できませんでした</div>
+              <div className={classes.errorDetail}>{errorMessage}</div>
+            </div>
           </div>
         )}
       </div>
@@ -856,6 +938,8 @@ export const FiatBidForm = ({
           type="button"
           variant="outline"
           onClick={handleCancel}
+          /* 通信中は handleCancel が early return するので、 押せないことを見た目にも出す */
+          disabled={isProcessing}
           data-testid="fiat-bid-cancel"
           className={classes.cancelBtn}
         >
@@ -867,6 +951,7 @@ export const FiatBidForm = ({
           data-testid="fiat-bid-submit"
           className={classes.submitBtn}
         >
+          {isProcessing && <span className={classes.submitSpinner} aria-hidden="true" />}
           {submitButtonLabel}
         </Button>
       </div>
