@@ -625,11 +625,14 @@ export const FiatBidForm = ({
           <label htmlFor="fiat-bid-jpy-amount" className={`mb-1 block ${classes.formLabel}`}>
             {isTopupMode ? '新 bid 額 (円、 現額より大きい額)' : 'bid 額 (円)'}
           </label>
+          {/* step=any — 下限は minBidJpy (minBidEth × spotRate、 minBidEth は contract reservePrice 連動)
+              の validation が保証するため、 任意の小額を入力できるようにする。固定 step (旧 1000) は
+              reservePrice と乖離するため排除し、 下限判定を SSOT (contract) に一本化する。 */}
           <Input
             id="fiat-bid-jpy-amount"
             type="number"
             min={0}
-            step="1000"
+            step="any"
             value={jpyRaw}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setJpyRaw(e.target.value)}
             placeholder={
@@ -637,7 +640,7 @@ export const FiatBidForm = ({
                 ? `¥ ${(existingFiatBid.jpyAmount + 1000).toLocaleString()}`
                 : minBidJpy !== undefined
                   ? `¥ ${minBidJpy.toLocaleString()}`
-                  : '¥ 25,000'
+                  : '¥ 金額を入力'
             }
             data-testid="fiat-bid-jpy-input"
             required

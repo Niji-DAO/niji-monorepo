@@ -273,11 +273,14 @@ export const BidModal = ({
                   <label htmlFor="eth-bid-amount" className={`mb-1 block ${classes.formLabel}`}>
                     <Trans>bid 額 (ETH)</Trans>
                   </label>
+                  {/* step=any — 下限は minBid (contract reservePrice 連動) の validation が保証するため、
+                      任意の小額 (reservePrice 0.0001 等) を入力できるようにする。step を固定値にすると
+                      設定値と乖離して環境ごとに漏れるため、 下限判定を SSOT (contract) に一本化する。 */}
                   <Input
                     id="eth-bid-amount"
                     type="number"
                     min="0"
-                    step="0.01"
+                    step="any"
                     onChange={ethInputHandler}
                     ref={ethInputRef}
                     value={ethInput}
