@@ -219,25 +219,6 @@ export const CardInput = ({
       data-testid="card-input"
       data-brand={brand}
     >
-      <div className={classes.cardVisual}>
-        <div className={classes.brandIcon} data-testid="card-brand-icon">
-          {brandLabel(brand)}
-        </div>
-        <div className={classes.cardNumberDisplay} data-testid="card-number-display">
-          {formattedNumber === '' ? '•••• •••• •••• ••••' : formattedNumber}
-        </div>
-        <div className={classes.cardBottomRow}>
-          <div>
-            <div className={classes.cardMetaLabel}>有効期限</div>
-            <div className={classes.cardMetaValue}>{expiry === '' ? 'MM/YY' : expiry}</div>
-          </div>
-          <div>
-            <div className={classes.cardMetaLabel}>名義</div>
-            <div className={classes.cardMetaValue}>{holder === '' ? 'CARD HOLDER' : holder}</div>
-          </div>
-        </div>
-      </div>
-
       {isDev && (
         <div className={classes.testCardSelector}>
           <label htmlFor="card-input-test-card" className={classes.fieldLabel}>
@@ -263,17 +244,27 @@ export const CardInput = ({
         <label htmlFor="card-input-number" className={classes.fieldLabel}>
           card 番号
         </label>
-        <Input
-          id="card-input-number"
-          type="text"
-          inputMode="numeric"
-          autoComplete="cc-number"
-          value={formattedNumber}
-          onChange={handleNumberChange}
-          placeholder="1234 5678 9012 3456"
-          data-testid="card-input-number"
-          className={classes.numberField}
-        />
+        {/*
+          brand 見出しはカード風 preview を廃止したため、 番号入力欄の内側右に小さく置く。
+          brand が判別できない (unknown / 空) 場合は空文字を返し領域だけ確保する。
+        */}
+        <div className={classes.numberFieldWrap}>
+          <Input
+            id="card-input-number"
+            type="text"
+            inputMode="numeric"
+            autoComplete="cc-number"
+            value={formattedNumber}
+            onChange={handleNumberChange}
+            placeholder="1234 5678 9012 3456"
+            data-testid="card-input-number"
+            className={classes.numberField}
+            aria-invalid={cardNumber !== '' && !isNumberValid}
+          />
+          <span className={classes.brandBadge} data-testid="card-brand-icon">
+            {brandLabel(brand)}
+          </span>
+        </div>
         {cardNumber !== '' && !isNumberValid && (
           <p className={classes.errorInline} data-testid="card-input-number-error">
             card 番号は {brand === 'amex' ? 15 : 16} 桁で入力してください
@@ -296,6 +287,7 @@ export const CardInput = ({
             placeholder="12/28"
             data-testid="card-input-expiry"
             className={classes.textField}
+            aria-invalid={expiry !== '' && !isExpiryValid}
           />
           {expiry !== '' && !isExpiryValid && (
             <p className={classes.errorInline} data-testid="card-input-expiry-error">
@@ -318,6 +310,7 @@ export const CardInput = ({
             placeholder={brand === 'amex' ? '1234' : '123'}
             data-testid="card-input-cvv"
             className={classes.textField}
+            aria-invalid={cvv !== '' && !isCvvValid}
           />
           {cvv !== '' && !isCvvValid && (
             <p className={classes.errorInline} data-testid="card-input-cvv-error">
@@ -340,6 +333,7 @@ export const CardInput = ({
           placeholder="TEST USER"
           data-testid="card-input-holder"
           className={classes.textField}
+          aria-invalid={holder !== '' && !isHolderValid}
         />
         {holder !== '' && !isHolderValid && (
           <p className={classes.errorInline} data-testid="card-input-holder-error">
