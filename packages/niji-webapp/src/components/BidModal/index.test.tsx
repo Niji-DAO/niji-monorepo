@@ -32,6 +32,7 @@ const placeBidMock = vi.fn();
 
 const hookState: {
   minBidIncPercentage: bigint | undefined;
+  reservePrice: bigint | undefined;
   placeBid: {
     isPending: boolean;
     isError: boolean;
@@ -39,12 +40,16 @@ const hookState: {
   };
 } = {
   minBidIncPercentage: 5n,
+  reservePrice: undefined,
   placeBid: { isPending: false, isError: false, isSuccess: false },
 };
 
 vi.mock('@niji/sdk/react', () => ({
   useReadNijiAuctionHouseMinBidIncrementPercentage: () => ({
     data: hookState.minBidIncPercentage,
+  }),
+  useReadNijiAuctionHouseReservePrice: () => ({
+    data: hookState.reservePrice,
   }),
   useWriteNijiAuctionHouseCreateBid: () => ({
     writeContract: placeBidMock,
@@ -106,6 +111,7 @@ const buildWrapper = () => {
 
 const resetState = () => {
   hookState.minBidIncPercentage = 5n;
+  hookState.reservePrice = undefined;
   hookState.placeBid = { isPending: false, isError: false, isSuccess: false };
   placeBidMock.mockReset();
   toastSuccessMock.mockReset();
@@ -431,6 +437,43 @@ describe('BidModal (Issue #3033)', () => {
     );
     const stub = getByTestId('fiat-bid-form-stub');
     expect(stub.getAttribute('data-min-bid-eth')).toBe('1.05');
+  });
+
+  it('新 auction (amount=0) で reservePrice が ETH placeholder に反映 (0.0001 が 0.01 に潰れない)', () => {
+    hookState.minBidIncPercentage = 5n;
+    hookState.reservePrice = 100_000_000_000_000n; // 0.0001 ETH
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction({ amount: 0n })}
+          bidderWallet="0xUSER"
+        />
+      </Wrapper>,
+    );
+    const input = getByTestId('eth-bid-input') as HTMLInputElement;
+    expect(input.getAttribute('placeholder')).toContain('0.0001');
+  });
+
+  it('新 auction で reservePrice が FiatBidForm minBidEth prop に伝搬 (0.0001)', () => {
+    hookState.minBidIncPercentage = 5n;
+    hookState.reservePrice = 100_000_000_000_000n; // 0.0001 ETH
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction({ amount: 0n })}
+          bidderWallet="0xUSER"
+          defaultTab="fiat"
+        />
+      </Wrapper>,
+    );
+    const stub = getByTestId('fiat-bid-form-stub');
+    expect(stub.getAttribute('data-min-bid-eth')).toBe('0.0001');
   });
 
   it('Tabs list / trigger に BidModal CSS module class (tabsList / tabsTrigger) 付与', () => {

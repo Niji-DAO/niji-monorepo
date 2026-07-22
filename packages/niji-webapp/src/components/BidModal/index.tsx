@@ -26,6 +26,7 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import {
   useReadNijiAuctionHouseMinBidIncrementPercentage,
+  useReadNijiAuctionHouseReservePrice,
   useWriteNijiAuctionHouseCreateBid,
 } from '@niji/sdk/react';
 import { CheckCircle2Icon } from 'lucide-react';
@@ -48,23 +49,37 @@ import { defaultChain } from '@/wagmi';
 
 import classes from './BidModal.module.css';
 
+/**
+ * 次の最低入札額を求める。 Niji (Nouns 由来) の auction 仕様に合わせる。
+ * - まだ誰も入札していない (currentBid=0) 新 auction は reservePrice が下限
+ * - 入札済みなら「現額 × (1 + minBidInc%)」、 ただし reservePrice を下回らない
+ * minBidIncPercentage が読めない場合も reservePrice を下限に fallback する。
+ */
 const computeMinimumNextBid = (
   currentBid: bigint,
   minBidIncPercentage: bigint | undefined,
+  reservePrice: bigint | undefined,
 ): bigint => {
-  if (minBidIncPercentage === undefined) {
-    return 0n;
+  const floor = reservePrice ?? 0n;
+  if (currentBid === 0n || minBidIncPercentage === undefined) {
+    return floor;
   }
-  return (currentBid * (minBidIncPercentage + 100n)) / 100n;
+  const next = (currentBid * (minBidIncPercentage + 100n)) / 100n;
+  return next < floor ? floor : next;
 };
 
 const minBidEth = (minBid: bigint): string => {
   if (minBid === 0n) {
-    return '0.01';
+    return '0';
   }
   const eth = formatEther(minBid);
   const ethNum = parseFloat(eth);
-  return (Math.ceil(ethNum * 100) / 100).toFixed(2);
+  // 0.01 ETH 以上は見やすさ優先で第 2 位切り上げ、 それ未満 (reservePrice 0.0001 等) は
+  // formatEther の正確値をそのまま出す (第 2 位切り上げだと 0.0001 が 0.01 に潰れるため)。
+  if (ethNum >= 0.01) {
+    return (Math.ceil(ethNum * 100) / 100).toFixed(2);
+  }
+  return eth;
 };
 
 /**
@@ -117,9 +132,11 @@ export const BidModal = ({
   const ethInputRef = useRef<HTMLInputElement>(null);
 
   const { data: minBidIncPercentage } = useReadNijiAuctionHouseMinBidIncrementPercentage();
+  const { data: reservePrice } = useReadNijiAuctionHouseReservePrice();
   const minBid = computeMinimumNextBid(
     auction.amount !== undefined ? BigInt(auction.amount.toString()) : 0n,
     minBidIncPercentage !== undefined ? BigInt(minBidIncPercentage.toString()) : undefined,
+    reservePrice !== undefined ? BigInt(reservePrice.toString()) : undefined,
   );
 
   const {
