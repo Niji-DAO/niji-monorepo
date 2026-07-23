@@ -14,7 +14,53 @@ import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-quer
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai/react';
 import { createRoot } from 'react-dom/client';
-import { parseAbiItem } from 'viem';
+import { decodeEventLog, parseAbiItem, toEventSelector } from 'viem';
+
+/**
+ * fiat 代理入札 (createBidFor) で emit される BidPlacedFor event の parse 用 signature。
+ * @niji/sdk gen (wagmi cli 経由) は base-sepolia proxy upgrade (2026-07-23) 後まだ再生成しておらず、
+ * webapp 側では minimal local 定義で decode する。 gen 更新後は sdk の abi に置換予定。
+ *
+ * webapp の AuctionBid watcher は sender = msg.sender (fiat では relayer = 運営 EOA) を
+ * そのまま atom に入れるため、 同 tx 内に BidPlacedFor があれば recipient で bidder を上書きする
+ * 追加経路が要る (index.tsx の useWatchNijiAuctionHouseAuctionBidEvent 内 receipt fetch 経路)。
+ */
+const bidPlacedForEvent = parseAbiItem(
+  'event BidPlacedFor(uint256 indexed nounId, address indexed payer, address indexed recipient, uint256 value, bool extended)',
+);
+const bidPlacedForTopic = toEventSelector(bidPlacedForEvent);
+
+/**
+ * AuctionBid の tx receipt を取得し、 同 tx 内に BidPlacedFor が emit されていれば
+ * その recipient (fiat 支払 user wallet) を bidder として返す。 crypto 入札 (BidPlacedFor 無し) は
+ * AuctionBid.sender をそのまま返す。 failure 時は fallback (元 sender) で degrade する。
+ */
+const resolveBidderFromReceipt = async (
+  publicClient: ReturnType<typeof usePublicClient>,
+  transactionHash: `0x${string}` | null,
+  fallbackSender: Address,
+): Promise<{ effectiveSender: Address; isFiat: boolean }> => {
+  if (transactionHash === null || publicClient === undefined) {
+    return { effectiveSender: fallbackSender, isFiat: false };
+  }
+  try {
+    const receipt = await publicClient.getTransactionReceipt({ hash: transactionHash });
+    const bidPlacedForLog = receipt.logs.find(
+      (log: { topics: readonly `0x${string}`[] }) => log.topics[0] === bidPlacedForTopic,
+    );
+    if (bidPlacedForLog === undefined) {
+      return { effectiveSender: fallbackSender, isFiat: false };
+    }
+    const decoded = decodeEventLog({
+      abi: [bidPlacedForEvent],
+      data: bidPlacedForLog.data,
+      topics: bidPlacedForLog.topics,
+    });
+    return { effectiveSender: decoded.args.recipient as Address, isFiat: true };
+  } catch {
+    return { effectiveSender: fallbackSender, isFiat: false };
+  }
+};
 import { baseSepolia, hardhat } from 'viem/chains';
 import { usePublicClient, WagmiProvider } from 'wagmi';
 
@@ -161,14 +207,23 @@ const ChainSubscriber: React.FC = () => {
         });
         const timestamp = block.timestamp;
 
+        // fiat 代理入札 (createBidFor) の場合、 同 tx 内で BidPlacedFor event が emit される。
+        // recipient = 実 user wallet を取り出して bidder 表示を運営 EOA から user wallet に置換する。
+        const { effectiveSender, isFiat } = await resolveBidderFromReceipt(
+          publicClient,
+          transactionHash as `0x${string}` | null,
+          sender as Address,
+        );
+
         const bidPayload = reduxSafeBid({
           nounId: Number(nounId),
-          sender: sender as Address,
+          sender: effectiveSender,
           value: Number(value),
           extended: extended !== undefined,
           transactionHash: transactionHash ?? '',
           transactionIndex: transactionIndex ?? 0,
           timestamp,
+          isFiat,
         });
         setAuction(prev => applyAppendBid(prev, bidPayload));
       }
@@ -189,14 +244,21 @@ const ChainSubscriber: React.FC = () => {
         });
         const timestamp = block.timestamp;
 
+        const { effectiveSender, isFiat } = await resolveBidderFromReceipt(
+          publicClient,
+          transactionHash as `0x${string}` | null,
+          sender as Address,
+        );
+
         const bidPayload = reduxSafeBid({
           nounId: Number(nounId),
-          sender: sender as Address,
+          sender: effectiveSender,
           value: Number(value),
           extended: extended !== undefined,
           transactionHash: transactionHash ?? '',
           transactionIndex: transactionIndex ?? 0,
           timestamp,
+          isFiat,
         });
         setAuction(prev => applyAppendBid(prev, bidPayload));
       }
