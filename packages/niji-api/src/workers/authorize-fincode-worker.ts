@@ -381,6 +381,42 @@ const createPlaceBidHandler = (env: Env, spotRateFetcher: SpotRateFetcher) => {
       return c.json({ authId, status: 'cancelled', txHash: null, message }, 200);
     }
   });
+
+  /**
+   * 2026-07-23 追加 = webapp が auction ページで「chain 上 bidder = 運営 EOA」 の raw address を
+   * user wallet (recipient) に透過置換するための join endpoint。 subgraph 側 BidPlacedFor handler
+   * は upgrade block (44505557) 以降の event でのみ発火するため、 upgrade 前 fiat bid の recipient
+   * 情報は subgraph に存在しない。 KV の fiat_bid_by_auction 経路で復元して webapp に返す。
+   *
+   * GET /api/v1/fiat-bid/by-auction/:auctionId → 200 { auctionId, bidderWallet, jpyAmount, lifecycle }
+   *                                             or 404 { error: 'not_found' } (crypto bid or 未 fiat)
+   */
+  app.get('/by-auction/:auctionId', async c => {
+    const auctionIdParam = c.req.param('auctionId');
+    let auctionId: bigint;
+    try {
+      auctionId = BigInt(auctionIdParam);
+    } catch {
+      return c.json({ error: 'invalid_auction_id' }, 400);
+    }
+    const hit = await getFiatBidByAuction(env.FINCODE_STATE, auctionId);
+    if (hit === null) {
+      return c.json({ error: 'not_found' }, 404);
+    }
+    const rec = hit.record;
+    return c.json(
+      {
+        auctionId: auctionIdParam,
+        authId: hit.authId,
+        bidderWallet: (rec['bidderWallet'] as string | undefined) ?? null,
+        jpyAmount: (rec['jpyAmount'] as number | undefined) ?? null,
+        ethAmount: (rec['ethAmount'] as string | undefined) ?? null,
+        lifecycle: (rec['lifecycle'] as string | undefined) ?? null,
+      },
+      200,
+    );
+  });
+
   return app;
 };
 
