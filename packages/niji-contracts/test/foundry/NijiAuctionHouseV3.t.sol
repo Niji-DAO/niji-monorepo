@@ -1031,4 +1031,116 @@ contract NijiAuctionHouseV3CreateBidForTest is NijiAuctionHouseV3TestBase {
         vm.expectRevert('AuctionHouse: caller is not a relayer');
         auction.createBidFor{ value: price }(nounId, userA);
     }
+
+    /**
+     * @notice fiat → fiat overbid (同 relayer) の mapping / bidder / refund 挙動を verify。
+     *         codex adversarial-review 2026-07-23 MINOR 対応。
+     */
+    function test_createBidFor_fiatOverbid_sameRelayer_updatesRecipientAndRefundsRelayer() public {
+        _grantRelayer();
+        uint128 nounId = auction.auction().nounId;
+        uint256 price = auction.reservePrice();
+        uint256 secondPrice = price * 2;
+
+        // 1st fiat bid = relayer, recipient=userA
+        vm.deal(relayer, price + secondPrice);
+        vm.prank(relayer);
+        auction.createBidFor{ value: price }(nounId, userA);
+
+        // 2nd fiat bid = 同 relayer、 recipient=userB (別 user 宛)
+        uint256 relayerBalBefore = relayer.balance;
+        vm.prank(relayer);
+        auction.createBidFor{ value: secondPrice }(nounId, userB);
+
+        // recipient / payer mapping は最新値に更新
+        assertEq(auction.auction().bidder, userB, 'bidder should be new recipient userB');
+        assertEq(auction.bidPayerOf(nounId), relayer, 'payer stays as relayer');
+        assertEq(auction.bidRecipientOf(nounId), userB, 'recipient updated to userB');
+        // 前 bid の refund は relayer (payer) に返る、 userA (前 recipient) には行かない
+        // relayerBalBefore は 2nd bid 発火直前の relayer 残高 (= secondPrice を持つ状態)
+        // 2nd bid で secondPrice を消費 + 前 bid refund price = net 変化は -secondPrice + price
+        assertEq(
+            relayer.balance,
+            relayerBalBefore - secondPrice + price,
+            'relayer should be refunded first bid amount'
+        );
+        assertEq(userA.balance, 0, 'userA should not receive refund');
+    }
+
+    /**
+     * @notice fiat → fiat overbid (別 relayer) の mapping / refund 挙動 verify。
+     *         codex adversarial-review 2026-07-23 MINOR 対応。
+     */
+    function test_createBidFor_fiatOverbid_differentRelayer_refundsPrevRelayer() public {
+        _grantRelayer();
+        address relayer2 = address(0xCAFE);
+        vm.prank(owner);
+        auction.grantRelayer(relayer2);
+
+        uint128 nounId = auction.auction().nounId;
+        uint256 price = auction.reservePrice();
+        uint256 secondPrice = price * 2;
+
+        // 1st = relayer が userA 宛
+        vm.deal(relayer, price);
+        vm.prank(relayer);
+        auction.createBidFor{ value: price }(nounId, userA);
+
+        // 2nd = relayer2 が userB 宛
+        vm.deal(relayer2, secondPrice);
+        vm.prank(relayer2);
+        auction.createBidFor{ value: secondPrice }(nounId, userB);
+
+        // refund は前 relayer (relayer1) に返る、 別 relayer / userA には行かない
+        assertEq(relayer.balance, price, 'previous relayer should be refunded');
+        assertEq(userA.balance, 0, 'userA (prev recipient) should not receive refund');
+        // mapping / bidder は 2nd に更新
+        assertEq(auction.auction().bidder, userB, 'bidder = latest recipient');
+        assertEq(auction.bidPayerOf(nounId), relayer2, 'payer = latest relayer');
+        assertEq(auction.bidRecipientOf(nounId), userB, 'recipient = latest');
+    }
+
+    /**
+     * @notice sanctioned recipient (fiat 支払 user) は createBidFor で revert。
+     *         codex adversarial-review 2026-07-23 MINOR 対応。
+     */
+    function test_createBidFor_revertsForSanctionedRecipient() public {
+        _grantRelayer();
+        ChainalysisSanctionsListMock sanctionsMock = ChainalysisSanctionsListMock(
+            address(auction.sanctionsOracle())
+        );
+        sanctionsMock.setSanctioned(userA, true);
+
+        uint128 nounId = auction.auction().nounId;
+        uint256 price = auction.reservePrice();
+        vm.deal(relayer, price);
+        vm.prank(relayer);
+        vm.expectRevert('Sanctioned bidder');
+        auction.createBidFor{ value: price }(nounId, userA);
+    }
+
+    /**
+     * @notice createBidFor(nounId, recipient, clientId>0) 経路の event + state coverage。
+     *         codex adversarial-review 2026-07-23 MINOR 対応。
+     */
+    function test_createBidFor_withClientId_emitsBothEvents() public {
+        _grantRelayer();
+        uint128 nounId = auction.auction().nounId;
+        uint256 price = auction.reservePrice();
+        uint32 clientId = 42;
+
+        vm.deal(relayer, price);
+
+        // BidPlacedFor + AuctionBidWithClientId が両方 emit されることを verify
+        vm.expectEmit(true, true, true, true);
+        emit IAH.BidPlacedFor(nounId, relayer, userA, price, false);
+        vm.expectEmit(true, false, true, true);
+        emit IAH.AuctionBidWithClientId(nounId, price, clientId);
+
+        vm.prank(relayer);
+        auction.createBidFor{ value: price }(nounId, userA, clientId);
+
+        assertEq(auction.auction().bidder, userA, 'bidder = recipient');
+        assertEq(auction.bidPayerOf(nounId), relayer, 'payer = relayer');
+    }
 }
