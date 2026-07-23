@@ -598,28 +598,31 @@ describe('scheduled 経路 (AuctionKeeper + SettlementDaemon)', () => {
     chainState = { nounId: 7n, amount: 0n, startTime: 1, endTime: 9_999_999_999, settled: false };
   });
 
-  it('fiat 入札が落札した場合は capture → transferFrom の順に発火する', async () => {
+  it('fiat 入札が落札した場合は capture のみ発火する (transferFrom は contract settle 経路が担当、 2026-07-23 以降)', async () => {
     const kv = seededKv();
     chainLogs = [{ args: { nounId: 7n, winner: OPERATOR, amount: 12713345834790070n } }];
 
     await runScheduled(createEnv({ FINCODE_STATE: kv } as Partial<Env>));
 
+    // 2026-07-23 contract upgrade (createBidFor + BidPlacedFor) 以降、 auctionStorage.bidder = recipient
+    // に set されているので settleAuction 発火時に nouns.transferFrom(auctionHouse, recipient, tokenId)
+    // が contract 側で自動発火。 backend cron からの transferFrom 呼出は撤去、 capture のみ実行。
     expect(fincodeCalls).toEqual([
       { method: 'capture', orderId: 'fc-7-abcdef', accessId: 'access-7' },
     ]);
-    // transferFrom(operator, bidder, nounId) が operator から発行される
-    const transfer = writeContractCalls.find(c => c['functionName'] === 'transferFrom');
-    expect(transfer).toBeDefined();
-    expect(transfer?.['args']).toEqual([OPERATOR, BIDDER, 7n]);
+    // backend からの transferFrom 発火は無し (contract 側で完結)
+    expect(writeContractCalls.find(c => c['functionName'] === 'transferFrom')).toBeUndefined();
 
     const record = JSON.parse(kv._store.get(`fiat_bid:${AUTH_ID}`) ?? '{}') as {
       lifecycle?: string;
       captureTxId?: string;
       transferTxHash?: string;
     };
-    expect(record.lifecycle).toBe('transferred');
+    // lifecycle は capture 発火まで進む (transferred は撤去された経路のため到達しない、
+    // NFT 到達は chain 側 event で確認する運用に切替)
+    expect(record.lifecycle).toBe('captured');
     expect(record.captureTxId).toBe('txn-captured');
-    expect(record.transferTxHash).toBe('0xdeadbeef');
+    expect(record.transferTxHash).toBeUndefined();
   });
 
   it('fiat 入札が落選した場合は cancel のみ発火し NFT を動かさない', async () => {

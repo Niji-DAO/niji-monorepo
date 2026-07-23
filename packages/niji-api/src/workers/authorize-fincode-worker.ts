@@ -16,7 +16,23 @@
 import type { FincodeAuthorizationResult } from '../services/fincode/types.js';
 
 import { nijiAuctionHouseAbi } from '@niji/sdk/react/auction-house';
-import { nijiTokenAbi } from '@niji/sdk/react/token';
+
+/**
+ * V3 に追加された createBidFor の minimal ABI (2026-07-23 upgrade)。
+ * @niji/sdk gen file は etherscan verify 未完 + wagmi cli 再生成待ちのため暫定 local 定義。
+ */
+const nijiAuctionHouseV3ExtraAbi = [
+  {
+    type: 'function',
+    name: 'createBidFor',
+    stateMutability: 'payable',
+    inputs: [
+      { name: 'nounId', type: 'uint256' },
+      { name: 'recipient', type: 'address' },
+    ],
+    outputs: [],
+  },
+] as const;
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import {
@@ -335,23 +351,27 @@ const createPlaceBidHandler = (env: Env, spotRateFetcher: SpotRateFetcher) => {
         createdAt: Date.now(),
       });
 
+      // NijiAuctionHouseV3.createBidFor(auctionId, bidderWallet) を relayer (operator EOA) から
+      // broadcast、 value = ethAmount。 auctionStorage.bidder = user wallet に set され、
+      // 落札時は contract 側 _settleAuction が nouns.transferFrom を自動発火 = cron の
+      // transferFrom 経路 (Step B) は撤去済 (下段の runSettlementDaemon 参照)。
       const txHash = await walletClient.writeContract({
         address: env.AUCTION_HOUSE_ADDRESS as Address,
-        abi: nijiAuctionHouseAbi,
-        functionName: 'createBid',
-        args: [auctionId],
+        abi: nijiAuctionHouseV3ExtraAbi,
+        functionName: 'createBidFor',
+        args: [auctionId, bidderWallet],
         value: ethAmount,
       });
 
       console.log(
-        `[worker] place-bid REAL: authId=${authId} auctionId=${auctionId} jpy=${capture.jpyAmount} rate=${capture.spotRate ?? 'n/a'} ethAmount=${ethAmount} bidder=${bidderWallet} txHash=${txHash}`,
+        `[worker] place-bid REAL (createBidFor): authId=${authId} auctionId=${auctionId} jpy=${capture.jpyAmount} rate=${capture.spotRate ?? 'n/a'} ethAmount=${ethAmount} recipient=${bidderWallet} txHash=${txHash}`,
       );
       return c.json(
         {
           authId,
           status: 'bid-placed',
           txHash,
-          message: `代理入札成功 (auctionId=${auctionId}、 落札時 ${bidderWallet} に transferFrom)`,
+          message: `代理入札成功 (auctionId=${auctionId}、 recipient=${bidderWallet} が bidder として chain 上に記録)`,
         },
         200,
       );
@@ -443,7 +463,10 @@ const SETTLEMENT_CURSOR_ADVANCE = 300n;
  * KV write 無料枠 (1000/日) を超えないようにする (2026-07-22 に毎分書込で 90% 到達したため)。
  */
 const runSettlementDaemon = async (env: Env): Promise<void> => {
-  const { publicClient, walletClient, operatorAddress } = buildChainClients(env);
+  // walletClient は Step B (backend transferFrom) 撤去 (2026-07-23) に伴い未使用化。
+  // buildChainClients の返り値そのままだと unused-vars で lint エラーになるため
+  // destructure から外し、 必要になった時に options.walletClient で個別取得する。
+  const { publicClient, operatorAddress } = buildChainClients(env);
   const fincodeClient = new FincodeClient({ apiKeySecret: env.FINCODE_API_KEY_SECRET });
 
   // fromBlock cursor 取得 (KV)、 未 set なら latest - 10 (直近のみ)
@@ -516,7 +539,14 @@ const runSettlementDaemon = async (env: Env): Promise<void> => {
       continue;
     }
 
-    console.log(`[cron] fiat WON authId=${hit.authId} tokenId=${nounId} bidder=${bidderWallet}`);
+    // 2026-07-23 contract upgrade (createBidFor + BidPlacedFor 追加) 以降、 NFT 転送は
+    // NijiAuctionHouseV3._settleAuction が自動発火 (auctionStorage.bidder = recipient への
+    // nouns.transferFrom)。 cron の Step B = walletClient.writeContract(transferFrom) 経路は撤去、
+    // fincode capture (実カード請求) のみ発火。 capture 失敗時は fiat_bid record を failed に落と
+    // すが NFT は既に user wallet に届いている (chain settle は独立発火)、 revenue 側 manual 対応。
+    console.log(
+      `[cron] fiat WON authId=${hit.authId} tokenId=${nounId} recipient=${bidderWallet} (NFT 転送は auction settle 経由で自動)`,
+    );
     await updateFiatBidLifecycle(env.FINCODE_STATE, hit.authId, { lifecycle: 'won' });
 
     // capture
@@ -533,28 +563,6 @@ const runSettlementDaemon = async (env: Env): Promise<void> => {
     } catch (err) {
       console.error(
         `[cron] fincode capture FAIL authId=${hit.authId}: ${err instanceof Error ? err.message : String(err)}`,
-      );
-      continue;
-    }
-
-    // transferFrom (operator → user wallet)
-    try {
-      const transferTxHash = await walletClient.writeContract({
-        address: env.NIJI_TOKEN_ADDRESS as Address,
-        abi: nijiTokenAbi,
-        functionName: 'transferFrom',
-        args: [operatorAddress, bidderWallet as Address, nounId],
-      });
-      await updateFiatBidLifecycle(env.FINCODE_STATE, hit.authId, {
-        lifecycle: 'transferred',
-        transferTxHash,
-      });
-      console.log(
-        `[cron] transferFrom OK authId=${hit.authId} tokenId=${nounId} to=${bidderWallet} tx=${transferTxHash}`,
-      );
-    } catch (err) {
-      console.error(
-        `[cron] transferFrom FAIL authId=${hit.authId} tokenId=${nounId}: ${err instanceof Error ? err.message : String(err)}`,
       );
     }
   }
