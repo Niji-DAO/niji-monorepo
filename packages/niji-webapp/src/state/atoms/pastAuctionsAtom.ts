@@ -33,6 +33,10 @@ export const subgraphAuctionsToReduxSafe = (data: GetLatestAuctionsQuery): Aucti
         settled: false,
       },
       bids: auction.bids.map(bid => {
+        // subgraph の Bid.isFiat が 2026-07-23 追加 (fiat 代理入札の識別 flag)。
+        // 未取得 (upgrade 前 index or query に isFiat 未含有) の時は undefined、
+        // ロジック上は !== true で false 相当扱いになる。
+        const bidWithIsFiat = bid as unknown as { isFiat?: boolean };
         return {
           nounId: BigInt(auction.id).toString(),
           sender: bid?.bidder?.id as Address,
@@ -41,6 +45,7 @@ export const subgraphAuctionsToReduxSafe = (data: GetLatestAuctionsQuery): Aucti
           transactionHash: bid.txHash,
           transactionIndex: Number(bid.txIndex),
           timestamp: BigInt(bid.blockTimestamp).toString(),
+          isFiat: bidWithIsFiat.isFiat === true,
         };
       }),
     };

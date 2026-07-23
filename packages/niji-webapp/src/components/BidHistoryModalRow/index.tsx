@@ -52,6 +52,14 @@ const BidHistoryModalRow: React.FC<BidHistoryModalRowProps> = ({ bid, index }) =
                       className={'ml-1 inline-block size-4'}
                     />
                   )}
+                  {bid.isFiat === true && (
+                    <span
+                      className="ml-2 inline-block rounded-full border border-current px-2 py-0.5 align-middle text-xs font-bold opacity-70"
+                      title="クレカ決済で代理入札された bid"
+                    >
+                      クレカ払い
+                    </span>
+                  )}
                   <div className={classes.bidDate}>
                     {i18n.date(new Date(Number(bid.timestamp) * 1000), {
                       dateStyle: 'medium',
