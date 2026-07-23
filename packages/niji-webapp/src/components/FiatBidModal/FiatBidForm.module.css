@@ -74,20 +74,9 @@
 }
 
 /*
- * section 区切り — 「入札金額」 と「お支払い情報」 の 2 ブロックを視覚的に分ける。
- * 全 label が同 size/weight で並ぶと入力欄の羅列に見え、 どこまでが金額の話か判別できない。
+ * 旧 .sectionTitle (「お支払い情報」 見出し) は撤去。 field label で内容が自明であり、
+ * ETH tab (section 見出し無し) と揃えて modal 全体を「入力欄が並ぶだけ」 意匠に統一した。
  */
-.sectionTitle {
-  font-family: 'PT Root UI', sans-serif;
-  font-weight: bold;
-  font-size: 16px;
-  color: var(--brand-cool-dark-text);
-  margin-top: 8px;
-}
-
-.form[data-palette='warm'] .sectionTitle {
-  color: var(--brand-warm-dark-text);
-}
 
 /* ==================== ETH Input (Issue #3051 で JPY → ETH に反転) ==================== */
 .ethInput {
@@ -202,76 +191,33 @@
   color: var(--brand-warm-light-text);
 }
 
-/* ==================== rate summary (Issue #3053、 2 column card layout) ==================== */
+/* ==================== rate hints (旧 rate summary の card を flat 化した後継) ==================== */
 /*
- * ETH 換算 (実際に入札される額) を主、 spot rate (その根拠) を従に置く。
- * 従来は 1fr 1fr の同格 2 列で、 user が確認すべき値と参考値が同じ重みだった。
- * 狭幅 (modal 内 mobile) では 2 列だと「512,345 JPY / ETH」 が折返して縦位置がずれるため 1 列に落とす。
+ * ETH 換算 + spot rate を JPY 入力欄下の hint (.minBidCopy) と並ぶ「1 行灰色」 意匠に統一。
+ * 従来は accent 塗りの矩形 card で情報単位をグループ化していたが、 modal 内に色数が増える主因で、
+ * ETH tab と並べた時に「fiat だけ card が並ぶ」 情報密度差の元凶だった。 card を撤去し、
+ * ETH tab の minBidCopy と全く同じ font / color / size で hint 1 行に落とす。
  */
-.rateSummary {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 12px;
-  background-color: var(--brand-cool-accent);
-  border-radius: 12px;
-  padding: 16px;
-  font-family: 'PT Root UI', sans-serif;
-  color: var(--brand-cool-dark-text);
-}
-
-@media (max-width: 480px) {
-  .rateSummary {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-}
-
-/* 主 = ETH 換算。 値を一段大きくして「これで入札される」 を最初に読ませる */
-.rateSummaryPrimary .rateSummaryValue {
-  font-size: 26px;
-  line-height: 1.2;
-}
-
-.form[data-palette='warm'] .rateSummary {
-  background-color: var(--brand-warm-accent);
-  color: var(--brand-warm-dark-text);
-}
-
-.rateSummaryCol {
+.rateHints {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.rateSummaryLabel {
-  font-size: 12px;
-  color: var(--brand-cool-light-text);
-  font-weight: 500;
-}
-
-.form[data-palette='warm'] .rateSummaryLabel {
-  color: var(--brand-warm-light-text);
-}
-
-.rateSummaryValue {
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--brand-cool-dark-text);
-  word-break: break-word;
-}
-
-.form[data-palette='warm'] .rateSummaryValue {
-  color: var(--brand-warm-dark-text);
-}
-
-.rateSummarySource {
-  font-size: 11px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+  padding-left: 0.25rem;
+  font-family: 'PT Root UI', sans-serif;
+  font-size: small;
   color: var(--brand-cool-light-text);
 }
 
-.form[data-palette='warm'] .rateSummarySource {
+.form[data-palette='warm'] .rateHints {
   color: var(--brand-warm-light-text);
+}
+
+.rateHintLoading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /*
@@ -282,27 +228,14 @@
 .mockBadge {
   display: inline-block;
   font-family: 'PT Root UI', sans-serif;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: bold;
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: 999px;
   background-color: var(--brand-color-red);
   color: white;
   letter-spacing: 0.02em;
-  margin-top: 2px;
   text-transform: lowercase;
-}
-
-.rateSummaryLoading {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  color: var(--brand-cool-light-text);
-}
-
-.form[data-palette='warm'] .rateSummaryLoading {
-  color: var(--brand-warm-light-text);
 }
 
 .spinner {

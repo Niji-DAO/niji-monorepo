@@ -29,21 +29,13 @@
 
 /* ==================== test card selector (dev only) ==================== */
 /*
- * dev 専用の切替 UI が本番 field と同じ見た目で並ぶと「本番でも出る欄」 と誤読される。
- * 破線枠で囲って本番 field 群から明示的に分離する (site に固定前例は無いが、
- * 「本番配線には無い」 signal として意図的に site 語彙から外している)。
+ * dev 専用の切替 UI は「テストカード切替 (dev のみ)」 label と production build 非含有 (isDev gate)
+ * で十分自明なため、 破線枠 (site 語彙外の 1 色) を撤去。 select だけを他 field と同じ意匠で並べる。
  */
 .testCardSelector {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 10px 12px;
-  border: 1px dashed var(--brand-cool-border);
-  border-radius: 8px;
-}
-
-.cardInput[data-palette='warm'] .testCardSelector {
-  border-color: var(--brand-warm-border);
+  gap: 4px;
 }
 
 /*

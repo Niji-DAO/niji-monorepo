@@ -101,10 +101,11 @@ describe('FiatBidForm loading spinner (Issue #3053 Phase B、 Issue #3059 で JP
     expect(rateLoading).toBeInTheDocument();
     expect(rateLoading.textContent).toContain('取得中');
 
-    // Issue #3059 — ETH 未入力時、 JPY 換算欄は「—」 表示 (spinner 非表示)
+    // 2026-07-23 = rate summary card を flat hint に置換した後は、 JPY 未入力 + spot rate 未取得の
+    // 「両方無い」 state では ETH display は出ず spot rate 取得中 hint のみ表示される。
+    // 旧仕様の「—」 プレースホルダは廃止。
     expect(screen.queryByTestId('fiat-bid-eth-display-loading')).toBeNull();
-    const ethDisplay = screen.getByTestId('fiat-bid-eth-display');
-    expect(ethDisplay.textContent).toContain('—');
+    expect(screen.queryByTestId('fiat-bid-eth-display')).toBeNull();
 
     // rateSummary root に aria-busy="true" 付与 (screen reader 対応、 spot rate 側 loading state)
     const rateSummary = screen.getByTestId('fiat-bid-rate-summary');
@@ -138,17 +139,16 @@ describe('FiatBidForm loading spinner (Issue #3053 Phase B、 Issue #3059 で JP
     const rateSummary = screen.getByTestId('fiat-bid-rate-summary');
     expect(rateSummary.getAttribute('aria-busy')).toBe('false');
 
-    // 現在 spot rate 表示 (500,000 JPY / ETH)
+    // 2026-07-23 = rate summary card を flat hint に置換した後は「1 ETH = 500,000 円」 の form 単一 hint。
     expect(rateSummary.textContent).toContain('500,000');
-    expect(rateSummary.textContent).toContain('JPY / ETH');
-    // source 表示
-    expect(rateSummary.textContent).toContain('source: gmo');
+    expect(rateSummary.textContent).toContain('1 ETH');
+    expect(rateSummary.textContent).toContain('円');
+    // source ラベル (「source: XXX」) は user 判断に不要なため撤去済 (2026-07-23 directive)
+    expect(rateSummary.textContent).not.toContain('source: ');
 
-    // JPY 換算欄 (ETH 未入力 state = 「—」 表示、 spinner 非表示)
+    // JPY 未入力時は ETH display 非表示 (JPY hint に単一 rate line として吸収)
     expect(screen.queryByTestId('fiat-bid-eth-display-loading')).toBeNull();
-    const ethDisplay = screen.getByTestId('fiat-bid-eth-display');
-    expect(ethDisplay).toBeInTheDocument();
-    expect(ethDisplay.textContent).toContain('—');
+    expect(screen.getByTestId('fiat-bid-eth-display').textContent).toContain('1 ETH');
   });
 
   it('spot rate 未取得 + JPY 入力あり → ETH 換算欄で spinner + 「取得中」 表示 (Issue #3059)', () => {
@@ -232,7 +232,7 @@ describe('FiatBidForm mock badge (Issue #3061)', () => {
     expect(rateSummary.textContent).not.toContain('source: mock');
   });
 
-  it('source=gmo-coin 時は badge 非表示 + 「source: gmo-coin」 inline 表示', async () => {
+  it('source=gmo-coin 時は badge 非表示 + rate 単一 hint 表示 (2026-07-23 でラベル撤去)', async () => {
     renderWithSource('gmo-coin');
 
     await waitFor(() => {
@@ -241,10 +241,12 @@ describe('FiatBidForm mock badge (Issue #3061)', () => {
 
     expect(screen.queryByTestId('fiat-bid-rate-summary-mock-badge')).toBeNull();
     const rateSummary = screen.getByTestId('fiat-bid-rate-summary');
-    expect(rateSummary.textContent).toContain('source: gmo-coin');
+    // 2026-07-23 = 「source: XXX」 表示は user 判断に不要のため撤去済
+    expect(rateSummary.textContent).not.toContain('source: gmo-coin');
+    expect(rateSummary.textContent).toContain('1 ETH = 500,000 円');
   });
 
-  it('source=gmo (旧互換) 時は badge 非表示 + 「source: gmo」 inline 表示 (regression)', async () => {
+  it('source=gmo (旧互換) 時は badge 非表示 + rate 単一 hint 表示 (regression)', async () => {
     renderWithSource('gmo');
 
     await waitFor(() => {
@@ -253,10 +255,11 @@ describe('FiatBidForm mock badge (Issue #3061)', () => {
 
     expect(screen.queryByTestId('fiat-bid-rate-summary-mock-badge')).toBeNull();
     const rateSummary = screen.getByTestId('fiat-bid-rate-summary');
-    expect(rateSummary.textContent).toContain('source: gmo');
+    expect(rateSummary.textContent).not.toContain('source: gmo');
+    expect(rateSummary.textContent).toContain('1 ETH = 500,000 円');
   });
 
-  it('source=coingecko 時は badge 非表示 + 「source: coingecko」 inline 表示 (regression)', async () => {
+  it('source=coingecko 時は badge 非表示 + rate 単一 hint 表示 (regression)', async () => {
     renderWithSource('coingecko');
 
     await waitFor(() => {
@@ -265,7 +268,8 @@ describe('FiatBidForm mock badge (Issue #3061)', () => {
 
     expect(screen.queryByTestId('fiat-bid-rate-summary-mock-badge')).toBeNull();
     const rateSummary = screen.getByTestId('fiat-bid-rate-summary');
-    expect(rateSummary.textContent).toContain('source: coingecko');
+    expect(rateSummary.textContent).not.toContain('source: coingecko');
+    expect(rateSummary.textContent).toContain('1 ETH = 500,000 円');
   });
 });
 

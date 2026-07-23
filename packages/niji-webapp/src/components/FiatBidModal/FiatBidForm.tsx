@@ -775,74 +775,45 @@ export const FiatBidForm = ({
           )}
         </div>
 
+        {/*
+          rate summary は accent 塗りの矩形 card を廃し、 入力欄下の hint (.minBidCopy) に flat 化。
+          ETH tab の意匠 (「文字が並ぶだけ」) に統一して modal 内の色数を減らす。
+          spot rate 未取得時は spinner 経路、 mock 検知時のみ「dev mock」 badge (本番混入検知用)。
+          spot rate source ラベル (gmo-coin / coingecko) は user 判断に不要なため撤去。
+          data-testid は e2e 保護のため fiat-bid-rate-summary / fiat-bid-eth-display / -loading /
+          fiat-bid-rate-summary-loading / -mock-badge を新経路に残す。
+        */}
         <div
-          className={classes.rateSummary}
+          className={classes.rateHints}
           data-testid="fiat-bid-rate-summary"
           aria-busy={isSpotRateLoading}
           aria-live="polite"
         >
-          {/* 主 = ETH 換算 (実際に入札される額)。 spot rate はその根拠なので従に置く。
-              従来は 1fr 1fr で spot rate が左先頭にあり、 確認すべき値と参考値が同格だった。 */}
-          <div className={`${classes.rateSummaryCol} ${classes.rateSummaryPrimary}`}>
-            <div className={classes.rateSummaryLabel}>ETH 換算 (入札額)</div>
-            {isEthEquivalentReady ? (
-              <div className={classes.rateSummaryValue} data-testid="fiat-bid-eth-display">
-                {ethDisplay}
-              </div>
-            ) : jpyInputHasValue && isSpotRateLoading ? (
-              <div
-                className={classes.rateSummaryLoading}
-                data-testid="fiat-bid-eth-display-loading"
-              >
-                <div className={classes.spinner} aria-hidden="true" />
-                <span>取得中</span>
-              </div>
-            ) : (
-              <div className={classes.rateSummaryValue} data-testid="fiat-bid-eth-display">
-                {ethDisplay}
-              </div>
-            )}
-          </div>
-          <div className={classes.rateSummaryCol}>
-            <div className={classes.rateSummaryLabel}>現在 spot rate</div>
-            {spotRate.rate !== undefined ? (
-              <>
-                <div className={classes.rateSummaryValue}>
-                  {spotRate.rate.toLocaleString()} JPY / ETH
-                </div>
-                {/*
-                  Issue #3061 — source='mock' 時は「dev mock」 badge を表示、
-                  それ以外 (gmo / gmo-coin / coingecko) は従来通り「source: XXX」 の inline 表示。
-                  mock badge は本番で誤って USE_SPOT_RATE_MOCK=true が設定された場合の視覚 signal。
-                */}
-                {spotRate.source === 'mock' ? (
-                  <span
-                    className={classes.mockBadge}
-                    data-testid="fiat-bid-rate-summary-mock-badge"
-                  >
-                    dev mock
-                  </span>
-                ) : (
-                  spotRate.source !== undefined && (
-                    <div className={classes.rateSummarySource}>source: {spotRate.source}</div>
-                  )
-                )}
-              </>
-            ) : (
-              <div
-                className={classes.rateSummaryLoading}
-                data-testid="fiat-bid-rate-summary-loading"
-              >
-                <div className={classes.spinner} aria-hidden="true" />
-                <span>取得中</span>
-              </div>
-            )}
-          </div>
+          {isEthEquivalentReady ? (
+            <span data-testid="fiat-bid-eth-display">
+              ≈ {ethDisplay} ・ 1 ETH = {spotRate.rate?.toLocaleString()} 円
+            </span>
+          ) : jpyInputHasValue && isSpotRateLoading ? (
+            <span className={classes.rateHintLoading} data-testid="fiat-bid-eth-display-loading">
+              <span className={classes.spinner} aria-hidden="true" />
+              spot rate 取得中
+            </span>
+          ) : spotRate.rate !== undefined ? (
+            <span data-testid="fiat-bid-eth-display">
+              1 ETH = {spotRate.rate.toLocaleString()} 円
+            </span>
+          ) : (
+            <span className={classes.rateHintLoading} data-testid="fiat-bid-rate-summary-loading">
+              <span className={classes.spinner} aria-hidden="true" />
+              spot rate 取得中
+            </span>
+          )}
+          {spotRate.source === 'mock' && (
+            <span className={classes.mockBadge} data-testid="fiat-bid-rate-summary-mock-badge">
+              dev mock
+            </span>
+          )}
         </div>
-
-        {/* 金額ブロックと支払いブロックの境界。 全 label が同 size/weight で並ぶと
-            入力欄の羅列に見え、 どこまでが金額の話か判別できないため見出しで区切る。 */}
-        <div className={classes.sectionTitle}>お支払い情報</div>
 
         <div>
           <label htmlFor="card-input-number" className={`mb-1 block ${classes.formLabel}`}>
