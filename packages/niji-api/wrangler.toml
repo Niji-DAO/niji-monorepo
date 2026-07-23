@@ -21,6 +21,7 @@ crons = ["* * * * *"]
 # secret 一覧:
 #   wrangler secret put FINCODE_API_KEY_SECRET   # fincode dashboard secret key (m_test_ / m_live_ prefix)
 #   wrangler secret put OPERATOR_PK              # 運営 EOA 秘密鍵 (0x prefix、 Base Sepolia real ETH 保有必須)
+#   wrangler secret put ALCHEMY_API_KEY          # Alchemy Base Sepolia app の API key (2026-07-23、 primary RPC 経路)
 [vars]
 # fincode
 USE_FINCODE_MOCK = "false"
@@ -36,6 +37,11 @@ TDS2_RET_URL = "https://dev.niji-webapp.pages.dev/fiat-bid/3ds-return"
 
 # chain (Base Sepolia、 2026-07-21 deploy 済 address)
 CHAIN_ID = "84532"
+# RPC_URL = 2026-07-23 まで primary。 現在は Alchemy (secret ALCHEMY_API_KEY) が primary、
+# 本 URL は fallback rotation の 2 番目。 secret 未設定時 (dev 個人 fork 等) は本 URL が primary。
 RPC_URL = "https://sepolia.base.org"
+# 2026-07-23 追加 = primary (Alchemy or RPC_URL) が rate limit / network error 時に順次試す fallback。
+# 空文字にすると組込 default (drpc / publicnode / base.org) が使われる。
+RPC_FALLBACK_URLS = "https://base-sepolia.drpc.org,https://base-sepolia-rpc.publicnode.com"
 AUCTION_HOUSE_ADDRESS = "0x449E337180402643Ea90148230fD57E534344225"
 NIJI_TOKEN_ADDRESS = "0xE8470ff7F6028d37f60C8c8CA79C7426031b3D35"

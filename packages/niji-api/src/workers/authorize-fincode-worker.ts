@@ -39,6 +39,7 @@ import {
   createPublicClient,
   createWalletClient,
   defineChain,
+  fallback,
   http,
   parseAbiItem,
   type Address,
@@ -80,8 +81,20 @@ export type Env = {
   // Secrets (wrangler secret put)
   FINCODE_API_KEY_SECRET: string;
   OPERATOR_PK: string;
+  /**
+   * Alchemy API key (2026-07-23 追加、 secret 経路)。
+   * 設定されていれば `https://base-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}` を primary transport
+   * として使う。 未設定なら RPC_URL / RPC_FALLBACK_URLS のみで動作 (Alchemy 経由をスキップ)。
+   */
+  ALCHEMY_API_KEY?: string;
   // Vars (wrangler.toml [vars])
   RPC_URL: string;
+  /**
+   * fallback RPC URL のカンマ区切り (2026-07-23 追加)。
+   * 例: `https://base-sepolia.drpc.org,https://base-sepolia-rpc.publicnode.com`
+   * primary (Alchemy or RPC_URL) が rate limit / network error で失敗した時に順次 rotate。
+   */
+  RPC_FALLBACK_URLS?: string;
   AUCTION_HOUSE_ADDRESS: string;
   NIJI_TOKEN_ADDRESS: string;
   CHAIN_ID?: string;
@@ -213,25 +226,72 @@ class KVFincodeCaptureStore implements FincodeCaptureStore, ThreeDsFincodeStore 
   }
 }
 
-/** Base Sepolia chain 定義 (viem chain object、 wrangler.toml の CHAIN_ID / RPC_URL で override 可能) */
+/**
+ * RPC URL の優先順を組立てる (2026-07-23、 Base 公式 public endpoint 429 対策)。
+ *
+ * 順序:
+ *   (1) Alchemy = `https://base-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}` (secret 設定時のみ)
+ *   (2) RPC_URL (wrangler.toml vars、 従来値)
+ *   (3) RPC_FALLBACK_URLS (カンマ区切り、 空なら組込 default 3 個)
+ *
+ * dedupe + 空文字除去。 一つでも成功すれば tx が通る = 全滅は極めて稀。
+ */
+export const resolveRpcUrls = (env: Env): string[] => {
+  const urls: string[] = [];
+  if (env.ALCHEMY_API_KEY !== undefined && env.ALCHEMY_API_KEY !== '') {
+    urls.push(`https://base-sepolia.g.alchemy.com/v2/${env.ALCHEMY_API_KEY}`);
+  }
+  if (env.RPC_URL !== undefined && env.RPC_URL !== '') {
+    urls.push(env.RPC_URL);
+  }
+  const fallbackEnv = env.RPC_FALLBACK_URLS?.split(',')
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+  const fallbackDefaults = [
+    'https://base-sepolia.drpc.org',
+    'https://base-sepolia-rpc.publicnode.com',
+    'https://sepolia.base.org',
+  ];
+  urls.push(
+    ...(fallbackEnv !== undefined && fallbackEnv.length > 0 ? fallbackEnv : fallbackDefaults),
+  );
+  return [...new Set(urls.filter(u => u.length > 0))];
+};
+
+/**
+ * viem `fallback` transport で URL リストを順次試す。
+ * 各 URL に retryCount:1 = 1 回だけ再試行、 失敗したら次 URL に rotate。
+ * rank:false = 固定順序 (Alchemy 優先を維持、 latency 変動での順序入替を防ぐ)。
+ */
+const buildTransport = (env: Env) => {
+  const urls = resolveRpcUrls(env);
+  if (urls.length === 0) {
+    throw new Error(
+      'No RPC URL configured (ALCHEMY_API_KEY / RPC_URL / RPC_FALLBACK_URLS all empty)',
+    );
+  }
+  return fallback(
+    urls.map(url => http(url, { retryCount: 1, retryDelay: 200 })),
+    { retryCount: 0, rank: false },
+  );
+};
+
+/** Base Sepolia chain 定義 (viem chain object、 wrangler.toml の CHAIN_ID で override 可能) */
 const buildChain = (env: Env) =>
   defineChain({
     id: Number(env.CHAIN_ID ?? '84532'),
     name: 'Base Sepolia',
     nativeCurrency: { decimals: 18, name: 'Ether', symbol: 'ETH' },
-    rpcUrls: { default: { http: [env.RPC_URL] } },
+    rpcUrls: { default: { http: resolveRpcUrls(env) } },
   });
 
 /** operator EOA から chain client 群を組立 */
 const buildChainClients = (env: Env) => {
   const chain = buildChain(env);
-  const publicClient = createPublicClient({ chain, transport: http(env.RPC_URL) });
+  const transport = buildTransport(env);
+  const publicClient = createPublicClient({ chain, transport });
   const account = privateKeyToAccount(env.OPERATOR_PK as Hex);
-  const walletClient = createWalletClient({
-    chain,
-    account,
-    transport: http(env.RPC_URL),
-  });
+  const walletClient = createWalletClient({ chain, account, transport });
   return { chain, publicClient, walletClient, operatorAddress: account.address };
 };
 
