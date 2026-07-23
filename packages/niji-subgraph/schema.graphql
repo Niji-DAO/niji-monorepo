@@ -106,8 +106,17 @@ type Bid @entity(immutable: false) {
   "Bid amount"
   amount: BigInt!
 
-  "Bidder account"
+  "Bidder account (fiat 経路では payer=relayer ではなく recipient=user wallet が入る、 BidPlacedFor handler で置換)"
   bidder: Account
+
+  "fiat 代理入札で実際に msg.value を送った address (relayer / 運営 EOA)。 crypto 経路では null"
+  payer: Account
+
+  "fiat 代理入札で NFT を最終的に受け取る address (bidder と同一だが recipient として明示的に record)"
+  recipient: Account
+
+  "この bid が fiat 経路 (createBidFor) か否か。 subgraph client が「代理入札」 の識別に使う"
+  isFiat: Boolean!
 
   "Block number of the bid"
   blockNumber: BigInt!

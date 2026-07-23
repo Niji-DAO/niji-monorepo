@@ -8,6 +8,9 @@
     "address": "0x449E337180402643Ea90148230fD57E534344225",
     "startBlock": 44429101
   },
+  "nijiAuctionHouseV3": {
+    "startBlock": 44505557
+  },
   "nijiDAO": {
     "address": "0x0000000000000000000000000000000000000000",
     "startBlock": 44428567

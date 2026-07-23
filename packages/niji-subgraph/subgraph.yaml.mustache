@@ -58,6 +58,34 @@ dataSources:
           handler: handleAuctionBidWithClientId
         - event: AuctionSettledWithClientId(indexed uint256,indexed uint32)
           handler: handleAuctionSettledWithClientId
+  # fiat 代理入札 (createBidFor) で emit される BidPlacedFor event を handle し、
+  # Bid.bidder / Auction.bidder を relayer (msg.sender) から recipient (fiat 支払 user wallet)
+  # に置換する。 payer / recipient / isFiat フィールドも set (schema.graphql 追加済)。
+  # startBlock は proxy upgrade block を config/{network}.json の nijiAuctionHouseV3.startBlock で指定、
+  # 未指定 network では auction house 通常 startBlock に fallback (BidPlacedFor は upgrade 前 emit 無し)。
+  - kind: ethereum/contract
+    name: NijiAuctionHouseV3
+    network: {{network}}
+    source:
+      address: '{{nijiAuctionHouse.address}}'
+      abi: NijiAuctionHouseV3
+      startBlock: {{#nijiAuctionHouseV3}}{{startBlock}}{{/nijiAuctionHouseV3}}{{^nijiAuctionHouseV3}}{{nijiAuctionHouse.startBlock}}{{/nijiAuctionHouseV3}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/niji-auction-house.ts
+      entities:
+        - Account
+        - Auction
+        - Bid
+        - Noun
+      abis:
+        - name: NijiAuctionHouseV3
+          file: ../niji-contracts/artifacts/contracts/interfaces/INijiAuctionHouseV3.sol/INijiAuctionHouseV3.json
+      eventHandlers:
+        - event: BidPlacedFor(indexed uint256,indexed address,indexed address,uint256,bool)
+          handler: handleBidPlacedFor
   - kind: ethereum/contract
     name: NijiToken
     network: {{network}}
