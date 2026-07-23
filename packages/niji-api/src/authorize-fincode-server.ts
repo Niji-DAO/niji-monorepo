@@ -79,7 +79,33 @@ import type { FincodeAuthorizationResult } from './services/fincode/types.js';
 import { SpotRateFetcher, type SpotRate } from './services/spotRate/index.js';
 
 import { nijiAuctionHouseAbi } from '@niji/sdk/react/auction-house';
-import { nijiTokenAbi } from '@niji/sdk/react/token';
+
+/**
+ * V3 に追加された createBidFor / BidPlacedFor / grantRelayer の minimal ABI。
+ * @niji/sdk/react/auction-house は base-sepolia proxy upgrade (2026-07-23、 tx
+ * 0x7528d63ed5e59264279ae6b6b4f1ccbf47a7fac706e90f5488780b7f5a3310d2) 直後で etherscan verify 未完
+ * のため wagmi cli 経由の gen file がまだ古い実装 ABI を保持する。 verify + gen 更新までの
+ * 暫定として backend 内で minimal ABI を local 定義し writeContract に注入する。
+ */
+const nijiAuctionHouseV3ExtraAbi = [
+  {
+    type: 'function',
+    name: 'createBidFor',
+    stateMutability: 'payable',
+    inputs: [
+      { name: 'nounId', type: 'uint256' },
+      { name: 'recipient', type: 'address' },
+    ],
+    outputs: [],
+  },
+  {
+    type: 'function',
+    name: 'isRelayer',
+    stateMutability: 'view',
+    inputs: [{ name: 'relayer', type: 'address' }],
+    outputs: [{ type: 'bool' }],
+  },
+] as const;
 
 /**
  * in-memory FiatBidStore 実装。 authorize handler は insertPending のみ呼出 = Map で受けて no-op。
@@ -358,12 +384,29 @@ export const createAuthorizeFincodeServerApp = (): Hono => {
       })) as { nounId: bigint };
       const auctionId = auction.nounId;
 
-      // NijiAuctionHouseV3.createBid(uint256) を運営 EOA から broadcast、 value = ethAmount
+      // NijiAuctionHouseV3.createBidFor(uint256, address) を運営 EOA (relayer) から broadcast、
+      // value = ethAmount、 recipient = bidderWallet (user 接続 wallet)。
+      // これで auctionStorage.bidder = user wallet に set され、 落札時 settle 経路で
+      // NijiToken.transferFrom(auctionHouse, user wallet, tokenId) が自動発火。
+      // 旧 createBid 経路 + SettlementDaemon の transferFrom (2 段構造) は撤去、 contract 側の
+      // createBidFor + settle だけで完結する。
+      // bidderWallet が undefined / 空文字なら backend 400、 zero-address bid 経路を封じる。
+      if (bidderWallet === undefined || bidderWallet.length === 0) {
+        return c.json(
+          {
+            authId,
+            status: 'cancelled',
+            txHash: null,
+            message: 'bidderWallet is required (webapp から接続 wallet 未取得)',
+          },
+          400,
+        );
+      }
       const txHash = await bidWalletClient.writeContract({
         address: auctionHouseAddress,
-        abi: nijiAuctionHouseAbi,
-        functionName: 'createBid',
-        args: [auctionId],
+        abi: nijiAuctionHouseV3ExtraAbi,
+        functionName: 'createBidFor',
+        args: [auctionId, bidderWallet],
         value: ethAmount,
       });
 
@@ -371,14 +414,14 @@ export const createAuthorizeFincodeServerApp = (): Hono => {
       store.attachAuctionId?.(authId, auctionId);
 
       console.log(
-        `[authorize-fincode-server] place-bid REAL: authId=${authId} auctionId=${auctionId} ethAmount=${ethAmount} bidder=${deployerAccount.address} (代理入札、 落札時 ${bidderWallet ?? 'unknown'} に transferFrom 予定) txHash=${txHash}`,
+        `[authorize-fincode-server] place-bid REAL (createBidFor): authId=${authId} auctionId=${auctionId} ethAmount=${ethAmount} relayer=${deployerAccount.address} recipient=${bidderWallet} txHash=${txHash}`,
       );
       return c.json(
         {
           authId,
           status: 'bid-placed',
           txHash,
-          message: `real chain bid tx broadcast successful (代理入札 by ${deployerAccount.address} for ${bidderWallet ?? 'unknown'})`,
+          message: `createBidFor 経路成功 (relayer=${deployerAccount.address} recipient=${bidderWallet})`,
         },
         200,
       );
@@ -474,18 +517,14 @@ export const startSettlementDaemon = (options: {
   auctionHouseAddress: Address;
   nijiTokenAddress: Address;
 }): (() => void) => {
-  const {
-    store,
-    fincodeClient,
-    publicClient,
-    walletClient,
-    operatorAddress,
-    auctionHouseAddress,
-    nijiTokenAddress,
-  } = options;
+  // walletClient / nijiTokenAddress は Step B (backend transferFrom) 撤去に伴い未使用化。
+  // options interface からは互換性のため残す、 destructure しないで options.X 直参照 or 非参照。
+  const { store, fincodeClient, publicClient, operatorAddress, auctionHouseAddress } = options;
+  void options.walletClient;
+  void options.nijiTokenAddress;
 
   console.log(
-    `[settlement-daemon] watching AuctionSettled on ${auctionHouseAddress}, operator=${operatorAddress}, nijiToken=${nijiTokenAddress}`,
+    `[settlement-daemon] watching AuctionSettled on ${auctionHouseAddress}, operator=${operatorAddress} (transferFrom は auction settle 経由で自動発火、 backend からは非発火)`,
   );
 
   const unwatch = publicClient.watchContractEvent({
@@ -535,23 +574,28 @@ export const startSettlementDaemon = (options: {
           continue;
         }
 
-        // 勝利 → fincode capture (実カード請求) → NijiToken.transferFrom で user wallet に NFT 送付
+        // 勝利 → fincode capture (実カード請求) のみ発火。
+        // 2026-07-23 contract upgrade (createBidFor + BidPlacedFor 追加) 以降、 NFT 転送は
+        // NijiAuctionHouseV3._settleAuction が nouns.transferFrom(auctionHouse, recipient, tokenId)
+        // として自動発火する (recipient = user wallet を auctionStorage.bidder に set 済のため)。
+        // 旧 Step B = walletClient.writeContract(transferFrom) 経路は撤去。
         console.log(
-          `[settlement-daemon] fiat WON: authId=${rec.authId} tokenId=${nounId} bidder=${rec.bidderWallet}`,
+          `[settlement-daemon] fiat WON: authId=${rec.authId} tokenId=${nounId} recipient=${rec.bidderWallet} (NFT 転送は auction settle 経由で自動)`,
         );
         store.markWon(rec.authId);
 
-        // Step A = fincode capture
+        // fincode capture (実カード請求)。 capture 失敗時は fiat_bid record を failed に落とすが
+        // NFT は既に user wallet に届いている (chain settle は独立発火のため)。 revenue 側の
+        // manual 対応が要る。
         if (rec.accessId === undefined || rec.orderId === undefined) {
           console.error(
             `[settlement-daemon] capture SKIP: authId=${rec.authId} accessId/orderId 欠落`,
           );
           continue;
         }
-        let transactionId: string;
         try {
           const captureResult = await fincodeClient.capturePayment(rec.orderId, rec.accessId);
-          transactionId = captureResult.transaction_id ?? '';
+          const transactionId = captureResult.transaction_id ?? '';
           await store.updateCaptureStatus({
             authId: rec.authId,
             status: 'captured',
@@ -565,26 +609,6 @@ export const startSettlementDaemon = (options: {
           const message = err instanceof Error ? err.message : String(err);
           console.error(
             `[settlement-daemon] fincode capture FAIL: authId=${rec.authId} message="${message}"`,
-          );
-          continue;
-        }
-
-        // Step B = NijiToken.transferFrom(operator, bidderWallet, tokenId)
-        try {
-          const transferTxHash = await walletClient.writeContract({
-            address: nijiTokenAddress,
-            abi: nijiTokenAbi,
-            functionName: 'transferFrom',
-            args: [operatorAddress, rec.bidderWallet as Address, nounId],
-          });
-          store.markTransferred(rec.authId, transferTxHash);
-          console.log(
-            `[settlement-daemon] transferFrom OK: authId=${rec.authId} tokenId=${nounId} from=${operatorAddress} to=${rec.bidderWallet} txHash=${transferTxHash}`,
-          );
-        } catch (err) {
-          const message = err instanceof Error ? err.message : String(err);
-          console.error(
-            `[settlement-daemon] transferFrom FAIL: authId=${rec.authId} tokenId=${nounId} message="${message}"`,
           );
         }
       }
