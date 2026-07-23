@@ -95,6 +95,24 @@ interface INijiAuctionHouseV3 {
 
     event AuctionBidWithClientId(uint256 indexed nounId, uint256 value, uint32 indexed clientId);
 
+    /**
+     * @notice Fiat 代理入札で追加 emit される event。
+     *         payer = 実際に msg.value を送った address (relayer / 運営 EOA)。
+     *         recipient = NFT を最終的に受け取る address (fiat 支払 user の wallet)。
+     *         subgraph 側はこの event を join して bidder 表示を recipient に置換する。
+     */
+    event BidPlacedFor(
+        uint256 indexed nounId,
+        address indexed payer,
+        address indexed recipient,
+        uint256 value,
+        bool extended
+    );
+
+    event RelayerGranted(address indexed relayer);
+
+    event RelayerRevoked(address indexed relayer);
+
     event AuctionExtended(uint256 indexed nounId, uint256 endTime);
 
     event AuctionSettled(uint256 indexed nounId, address winner, uint256 amount);
@@ -116,6 +134,32 @@ interface INijiAuctionHouseV3 {
     function createBid(uint256 nounId) external payable;
 
     function createBid(uint256 nounId, uint32 clientId) external payable;
+
+    /**
+     * @notice Fiat 代理入札用。 relayer が msg.sender で ETH を送りつつ、
+     *         recipient を NFT 受取先として記録する。 refund は payer (relayer) に返る。
+     * @dev onlyRelayer gate、 権限は grantRelayer / revokeRelayer で owner が管理。
+     * @param nounId auction 対象 nounId
+     * @param recipient NFT を最終的に受け取る address (fiat 支払 user の wallet)
+     */
+    function createBidFor(uint256 nounId, address recipient) external payable;
+
+    /**
+     * @notice createBidFor 版 clientId 付き。
+     */
+    function createBidFor(uint256 nounId, address recipient, uint32 clientId) external payable;
+
+    function grantRelayer(address relayer) external;
+
+    function revokeRelayer(address relayer) external;
+
+    function isRelayer(address relayer) external view returns (bool);
+
+    /// @notice fiat 経路で bid した場合の payer (relayer) を nounId 単位で返す。
+    function bidPayerOf(uint256 nounId) external view returns (address);
+
+    /// @notice fiat 経路で bid した場合の recipient (NFT 受取先) を nounId 単位で返す。
+    function bidRecipientOf(uint256 nounId) external view returns (address);
 
     function pause() external;
 

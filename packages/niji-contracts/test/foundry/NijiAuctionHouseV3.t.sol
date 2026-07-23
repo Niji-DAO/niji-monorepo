@@ -887,3 +887,148 @@ contract NijiAuctionHouseV3_OwnerFunctionsTest is NijiAuctionHouseV3TestBase {
         assertEq(auction.timeBuffer(), 1 days);
     }
 }
+
+/**
+ * @notice fiat 代理入札 (createBidFor) の test suite。
+ *         2026-07-23 追加、 relayer 権限 + recipient / payer 分離 + refund 経路 + event の 4 系列で cover。
+ */
+contract NijiAuctionHouseV3CreateBidForTest is NijiAuctionHouseV3TestBase {
+    address relayer = address(0xBEEF);
+    address userA = address(0xAA01);
+    address userB = address(0xBB02);
+
+    function _grantRelayer() internal {
+        vm.prank(owner);
+        auction.grantRelayer(relayer);
+    }
+
+    function test_createBidFor_revertsForNonRelayer() public {
+        uint128 nounId = auction.auction().nounId;
+        uint256 price = auction.reservePrice();
+        vm.deal(address(this), 1 ether);
+        vm.expectRevert('AuctionHouse: caller is not a relayer');
+        auction.createBidFor{ value: price }(nounId, userA);
+    }
+
+    function test_createBidFor_revertsForZeroRecipient() public {
+        _grantRelayer();
+        uint128 nounId = auction.auction().nounId;
+        uint256 price = auction.reservePrice();
+        vm.deal(relayer, 1 ether);
+        vm.prank(relayer);
+        vm.expectRevert('Recipient cannot be zero address');
+        auction.createBidFor{ value: price }(nounId, address(0));
+    }
+
+    function test_createBidFor_setsBidderToRecipientAndPayerToRelayer() public {
+        _grantRelayer();
+        uint128 nounId = auction.auction().nounId;
+        uint256 price = auction.reservePrice();
+
+        vm.deal(relayer, 1 ether);
+        vm.prank(relayer);
+        auction.createBidFor{ value: price }(nounId, userA);
+
+        // auctionStorage.bidder が recipient (userA) に設定される
+        assertEq(auction.auction().bidder, userA, 'bidder should equal recipient');
+        // mapping で payer / recipient が個別に照会可能
+        assertEq(auction.bidPayerOf(nounId), relayer, 'payer should equal relayer');
+        assertEq(auction.bidRecipientOf(nounId), userA, 'recipient mapping should equal userA');
+    }
+
+    function test_createBidFor_emitsBidPlacedFor() public {
+        _grantRelayer();
+        uint128 nounId = auction.auction().nounId;
+        uint256 price = auction.reservePrice();
+
+        vm.deal(relayer, 1 ether);
+        vm.expectEmit(true, true, true, true);
+        emit IAH.BidPlacedFor(nounId, relayer, userA, price, false);
+
+        vm.prank(relayer);
+        auction.createBidFor{ value: price }(nounId, userA);
+    }
+
+    function test_createBid_doesNotEmitBidPlacedFor() public {
+        uint128 nounId = auction.auction().nounId;
+        uint256 price = auction.reservePrice();
+        vm.deal(userA, 1 ether);
+
+        vm.prank(userA);
+        vm.recordLogs();
+        auction.createBid{ value: price }(nounId);
+        Vm.Log[] memory logs = vm.getRecordedLogs();
+
+        bytes32 sig = keccak256('BidPlacedFor(uint256,address,address,uint256,bool)');
+        for (uint256 i = 0; i < logs.length; i++) {
+            require(logs[i].topics[0] != sig, 'ETH path must not emit BidPlacedFor');
+        }
+        // ETH 経路では bidPayer / bidRecipient mapping は空のまま
+        assertEq(auction.bidPayerOf(nounId), address(0), 'ETH path should not set bidPayer');
+        assertEq(auction.bidRecipientOf(nounId), address(0), 'ETH path should not set bidRecipient');
+    }
+
+    function test_createBidFor_refundsRelayerNotRecipient_whenOverbid() public {
+        _grantRelayer();
+        uint128 nounId = auction.auction().nounId;
+        uint256 firstBid = auction.reservePrice();
+        uint256 secondBid = firstBid * 2;
+
+        // fiat bid = relayer が userA 宛に入札
+        vm.deal(relayer, firstBid);
+        vm.prank(relayer);
+        auction.createBidFor{ value: firstBid }(nounId, userA);
+        assertEq(relayer.balance, 0, 'relayer should have spent all ETH');
+        assertEq(userA.balance, 0, 'userA should not have received ETH yet');
+
+        // userB が overbid
+        vm.deal(userB, secondBid);
+        vm.prank(userB);
+        auction.createBid{ value: secondBid }(nounId);
+
+        // refund は relayer (payer) に返る、 userA (recipient) には行かない
+        assertEq(relayer.balance, firstBid, 'relayer should be refunded');
+        assertEq(userA.balance, 0, 'userA (recipient) should not receive refund');
+        // bidder は userB に更新、 fiat mapping は削除 (ETH で fiat を上書きした semantics)
+        assertEq(auction.auction().bidder, userB, 'bidder should equal userB now');
+        assertEq(auction.bidPayerOf(nounId), address(0), 'fiat payer mapping should be cleared');
+        assertEq(auction.bidRecipientOf(nounId), address(0), 'fiat recipient mapping should be cleared');
+    }
+
+    function test_settle_sendsNftToRecipient_notPayer() public {
+        _grantRelayer();
+        uint128 nounId = auction.auction().nounId;
+        uint256 price = auction.reservePrice();
+
+        vm.deal(relayer, 1 ether);
+        vm.prank(relayer);
+        auction.createBidFor{ value: price }(nounId, userA);
+
+        // settle 発火
+        uint40 endTime = auction.auction().endTime;
+        vm.warp(endTime);
+        auction.settleCurrentAndCreateNewAuction();
+
+        // NFT は recipient (userA) に届く、 relayer には行かない
+        assertEq(auction.nouns().ownerOf(nounId), userA, 'NFT should belong to recipient');
+    }
+
+    function test_grantRelayer_revertsForNonOwner() public {
+        vm.expectRevert('Ownable: caller is not the owner');
+        auction.grantRelayer(relayer);
+    }
+
+    function test_revokeRelayer_blocksSubsequentCalls() public {
+        _grantRelayer();
+        vm.prank(owner);
+        auction.revokeRelayer(relayer);
+        assertFalse(auction.isRelayer(relayer), 'relayer flag should be false');
+
+        uint128 nounId = auction.auction().nounId;
+        uint256 price = auction.reservePrice();
+        vm.deal(relayer, 1 ether);
+        vm.prank(relayer);
+        vm.expectRevert('AuctionHouse: caller is not a relayer');
+        auction.createBidFor{ value: price }(nounId, userA);
+    }
+}
