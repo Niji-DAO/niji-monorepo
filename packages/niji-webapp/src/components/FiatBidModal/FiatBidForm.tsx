@@ -645,6 +645,21 @@ export const FiatBidForm = ({
   const hideStepperForFailure =
     !isTopupMode && fiatBid.step === 'failure' && errorMessage !== undefined;
 
+  /**
+   * useFiatBid が throw する形式 = `authorize failed: <code> — <人向け文>` (useFiatBid.ts:201)。
+   * user には `<code>` (card_declined 等の API 識別子) は不要で、 「カード会社で承認されませんでした」
+   * 側の人向け文だけを見せる。 " — " 区切りが無い message は原文をそのまま表示。
+   */
+  const displayErrorMessage =
+    errorMessage !== undefined
+      ? (() => {
+          const idx = errorMessage.indexOf(' — ');
+          if (idx === -1) return errorMessage;
+          const human = errorMessage.slice(idx + 3).trim();
+          return human === '' ? errorMessage : human;
+        })()
+      : undefined;
+
   // success 時はフォームを畳み、 完了 view に切替える。 BidModal の ETH tab success と
   // 同一の .successCard / .successIcon (site の --brand-color-green 経由) で表現を揃える。
   // テキストは classes.formLabel / formHint (data-palette 連動) を使い、
@@ -914,9 +929,11 @@ export const FiatBidForm = ({
           </div>
         )}
 
-        {/* 失敗は成功 view と対称に、 枠 + アイコン付きのカードで示す。
-            従来は素の赤 1 行で、 長い message が折返さず右端で切れていた。 */}
-        {errorMessage !== undefined && (
+        {/* エラーは赤半透明カード + アイコン + 1 行 message。 従来は「入札を確定できませんでした」 の
+            artificial heading と API 由来詳細の 2 行構成だったが、 heading は message と情報重複、
+            かつ user directive「エラー名出すのではなくエラーメッセージだけ」 で API 識別子も撤去。
+            site 既存の CandidateSponsors .statusMessage.errorMessage と同じ「単一 message」 form に統一。 */}
+        {displayErrorMessage !== undefined && (
           <div
             className={classes.errorMessage}
             data-testid="fiat-bid-error-message"
@@ -924,10 +941,7 @@ export const FiatBidForm = ({
             aria-live="assertive"
           >
             <AlertCircleIcon className={classes.errorIcon} strokeWidth={2} aria-hidden />
-            <div>
-              <div className={classes.errorTitle}>入札を確定できませんでした</div>
-              <div className={classes.errorDetail}>{errorMessage}</div>
-            </div>
+            <span className={classes.errorDetail}>{displayErrorMessage}</span>
           </div>
         )}
       </div>

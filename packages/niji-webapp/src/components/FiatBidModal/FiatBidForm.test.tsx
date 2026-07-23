@@ -459,8 +459,10 @@ describe('FiatBidForm 入札実行後の状態提示', () => {
     expect(screen.queryByTestId('fiat-bid-stepper')).toBeNull();
     const errorBox = screen.getByTestId('fiat-bid-error-message');
     expect(errorBox.getAttribute('role')).toBe('alert');
-    expect(errorBox.textContent).toContain('入札を確定できませんでした');
-    expect(errorBox.textContent).toContain('card_declined');
+    // user 向け文だけを表示 (API 識別子と "authorize failed: " prefix は非表示、 2026-07-23 directive)
+    expect(errorBox.textContent).toContain('承認されませんでした');
+    expect(errorBox.textContent).not.toContain('card_declined');
+    expect(errorBox.textContent).not.toContain('authorize failed');
     // 失敗後は cancel が押せる状態に戻る
     expect((screen.getByTestId('fiat-bid-cancel') as HTMLButtonElement).disabled).toBe(false);
   });

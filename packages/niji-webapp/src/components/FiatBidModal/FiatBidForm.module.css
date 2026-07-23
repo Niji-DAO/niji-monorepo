@@ -417,13 +417,14 @@
 
 /* ==================== error message ==================== */
 /*
- * 成功 view (.successCard) と対称の警告カード。
- * 従来は枠も背景もない赤 1 行で、 長い message が折返さず右端で切れていた。
- * 見出し行で「何が起きたか」 を平文にし、 API 由来の技術詳細は 1 段落として下に置く。
+ * site 既存 (CandidateSponsors .statusMessage.errorMessage) と同 form の警告カード。
+ * icon + 1 行 message、 heading 無し。 従来は「入札を確定できませんでした」 の artificial heading と
+ * API 由来詳細の 2 行構成だったが、 heading は message と情報重複、 かつ API 識別子は user 不要
+ * (user directive 2026-07-23) で外した結果、 単一 message で成立する。
  */
 .errorMessage {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   border-radius: 8px;
   padding: 12px;
@@ -437,27 +438,13 @@
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  margin-top: 1px;
 }
 
-.errorTitle {
+.errorDetail {
   font-size: 14px;
   font-weight: bold;
-}
-
-/*
- * 詳細は本文色 (dark-text) に落とす。 全文を赤の bold で出すと視線が文字列全体に散り、
- * 「失敗した」 という結論より API の識別子が目立つ。
- */
-.errorDetail {
-  margin-top: 2px;
-  font-size: 13px;
-  color: var(--brand-cool-dark-text);
+  color: var(--brand-color-red);
   overflow-wrap: anywhere;
-}
-
-.form[data-palette='warm'] .errorDetail {
-  color: var(--brand-warm-dark-text);
 }
 
 .errorInline {
