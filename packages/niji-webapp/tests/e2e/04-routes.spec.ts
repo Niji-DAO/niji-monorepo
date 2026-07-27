@@ -11,7 +11,9 @@ import { dappE2eTest as test } from '@kiwa-test/core';
 test.describe('Niji webapp — route smoke tests', () => {
   test('TC-R01 /playground が表示され Generate Nijis ボタンがある', async ({ page }) => {
     await page.goto('/playground');
-    await expect(page.getByText('Playground').first()).toBeVisible({ timeout: 15_000 });
+    // Playground page の h1 heading (Lingui `<Trans>Playground</Trans>` で i18n されるので
+    // text 依存でなく role 経由で locale 独立に検出、 ja / en どちらの locale でも pass)
+    await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible({ timeout: 15_000 });
     const generateBtn = page.getByRole('button', { name: /Generate Nijis|Niji/i }).first();
     await expect(generateBtn).toBeVisible({ timeout: 15_000 });
   });
