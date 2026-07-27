@@ -83,6 +83,26 @@ const minBidEth = (minBid: bigint): string => {
 };
 
 /**
+ * ETH input で許可する小数点以下の桁数 (2026-07-23 追加、 min bid 桁数に動的追随)。
+ *
+ * 旧実装は `input.split('.')[1].length > 2` で 2 桁固定制限、 Base Sepolia の低 reservePrice
+ * (0.001 等) 環境で 3 桁目以降が打てず「0.00」 で止まる問題があった。 min bid の桁数に合わせて
+ * 動的に切替える (TruncatedAmount の有効数字ベース表示と同じ考え方)。
+ *
+ *   min bid 未取得 (undefined / 0)   → 6 (低 reservePrice の安全側、 wei 直下まで許可)
+ *   min bid >= 0.01                  → 2 (通常経路、 旧実装と互換)
+ *   min bid < 0.01                   → 「最初の非零桁 + 1」 = 有効数字 2 桁を確保
+ *                                      (0.001 → 4、 0.0001 → 5、 0.00012 → 5)
+ */
+const maxDecimalsForMinBid = (minBid: bigint | undefined): number => {
+  if (minBid === undefined || minBid === 0n) return 6;
+  const ethNum = parseFloat(formatEther(minBid));
+  if (ethNum >= 0.01) return 2;
+  const magnitude = -Math.floor(Math.log10(ethNum));
+  return magnitude + 1;
+};
+
+/**
  * BidModal palette 種別 (Issue #3039、 Issue #3037 の auction cool/warm 判定を継承)
  * cool = grey background (デフォルト)、 warm = beige background。
  * 親 (Bid.tsx) が jotai atom `isCoolBackgroundAtom` から判定して渡す。
@@ -148,8 +168,10 @@ export const BidModal = ({
 
   const ethInputHandler = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.target.value;
-    // disable more than 2 digits after the decimal point
-    if (input.includes('.') && input.split('.')[1].length > 2) {
+    // 小数点以下の許容桁数は min bid に追随 (低 reservePrice 環境で 3 桁目以降が打てない旧問題の解消)。
+    // 旧実装 = 2 桁固定、 min bid 0.001 の Base Sepolia 環境で「0.00」 で止まっていた。
+    const maxDecimals = maxDecimalsForMinBid(minBid);
+    if (input.includes('.') && input.split('.')[1].length > maxDecimals) {
       return;
     }
     setEthInput(input);
