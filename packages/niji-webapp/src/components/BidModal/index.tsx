@@ -33,6 +33,7 @@ import { CheckCircle2Icon } from 'lucide-react';
 import { Spinner } from 'react-bootstrap';
 import { toast } from 'sonner';
 import { formatEther, parseEther } from 'viem';
+import { useWaitForTransactionReceipt } from 'wagmi';
 
 import FiatBidForm from '@/components/FiatBidModal/FiatBidForm';
 import { Button } from '@/components/ui/button';
@@ -161,10 +162,33 @@ export const BidModal = ({
 
   const {
     writeContract: placeBid,
+    data: placeBidTxHash,
     isPending: isPlacingBid,
     isError: didPlaceBidFail,
-    isSuccess: placeBidSucceeded,
   } = useWriteNijiAuctionHouseCreateBid();
+
+  /**
+   * tx broadcast 後の block confirm 待ちを追跡 (2026-07-23、 「反映中が分からない」 UX 問題対応)。
+   *
+   * wagmi の `isPending` は wallet 署名待ちの間だけ true、 broadcast 直後に false に戻る =
+   * chain confirm を待っている 5-15 秒の間 UI が「入札」 button に戻って空白に見え、 user から
+   * 「反映されるまで何も変わらず怖い」 と指摘。 useWaitForTransactionReceipt で receipt が
+   * 返るまで isConfirming を維持し、 その間 button の spinner + label で「block 反映中」 を伝える。
+   */
+  const { isLoading: isConfirmingBid, isSuccess: placeBidSucceeded } = useWaitForTransactionReceipt(
+    { hash: placeBidTxHash },
+  );
+
+  /** wallet 署名待ち + broadcast 済 confirm 待ち 両方を包む in-flight flag */
+  const isBidInFlight =
+    isPlacingBid || (placeBidTxHash !== undefined && !placeBidSucceeded && !didPlaceBidFail);
+
+  /** button に出す進行 label = 状態別に切替、 spinner と一緒に「今どこか」 を明示 */
+  const bidButtonLabel = isPlacingBid
+    ? t`ウォレットの承認を待っています`
+    : isConfirmingBid
+      ? t`ブロックに反映中`
+      : t`入札`;
 
   const ethInputHandler = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.target.value;
@@ -316,6 +340,8 @@ export const BidModal = ({
                     type="button"
                     variant="outline"
                     onClick={onClose}
+                    /* 入札 tx broadcast 済で block 反映待ちの間は close させない (state 不整合防止) */
+                    disabled={isBidInFlight}
                     data-testid="eth-bid-cancel"
                     className={classes.cancelBtn}
                   >
@@ -324,11 +350,18 @@ export const BidModal = ({
                   <Button
                     type="button"
                     onClick={placeEthBidHandler}
-                    disabled={isPlacingBid || bidderWallet === ''}
+                    disabled={isBidInFlight || bidderWallet === ''}
                     data-testid="eth-bid-submit"
                     className={classes.bidBtn}
                   >
-                    {isPlacingBid ? <Spinner animation="border" size="sm" /> : <Trans>bid</Trans>}
+                    {isBidInFlight ? (
+                      <span className="flex items-center gap-2">
+                        <Spinner animation="border" size="sm" />
+                        <span>{bidButtonLabel}</span>
+                      </span>
+                    ) : (
+                      <Trans>入札</Trans>
+                    )}
                   </Button>
                 </div>
               </div>

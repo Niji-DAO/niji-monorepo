@@ -37,11 +37,19 @@ const hookState: {
     isPending: boolean;
     isError: boolean;
     isSuccess: boolean;
+    isConfirming: boolean;
+    txHash: `0x${string}` | undefined;
   };
 } = {
   minBidIncPercentage: 5n,
   reservePrice: undefined,
-  placeBid: { isPending: false, isError: false, isSuccess: false },
+  placeBid: {
+    isPending: false,
+    isError: false,
+    isSuccess: false,
+    isConfirming: false,
+    txHash: undefined,
+  },
 };
 
 vi.mock('@niji/sdk/react', () => ({
@@ -53,11 +61,25 @@ vi.mock('@niji/sdk/react', () => ({
   }),
   useWriteNijiAuctionHouseCreateBid: () => ({
     writeContract: placeBidMock,
+    data: hookState.placeBid.txHash,
     isPending: hookState.placeBid.isPending,
     isError: hookState.placeBid.isError,
     isSuccess: hookState.placeBid.isSuccess,
   }),
 }));
+
+// wagmi の useWaitForTransactionReceipt を stub (2026-07-23、 tx confirm 待ち UI 追加時)。
+// importOriginal で他 export (http / fallback / WagmiProvider 等、 src/wagmi.ts が触る) を保つ。
+vi.mock('wagmi', async importOriginal => {
+  const actual = await importOriginal<typeof import('wagmi')>();
+  return {
+    ...actual,
+    useWaitForTransactionReceipt: () => ({
+      isLoading: hookState.placeBid.isConfirming,
+      isSuccess: hookState.placeBid.isSuccess,
+    }),
+  };
+});
 
 const toastSuccessMock = vi.fn();
 const toastErrorMock = vi.fn();
@@ -112,7 +134,13 @@ const buildWrapper = () => {
 const resetState = () => {
   hookState.minBidIncPercentage = 5n;
   hookState.reservePrice = undefined;
-  hookState.placeBid = { isPending: false, isError: false, isSuccess: false };
+  hookState.placeBid = {
+    isPending: false,
+    isError: false,
+    isSuccess: false,
+    isConfirming: false,
+    txHash: undefined,
+  };
   placeBidMock.mockReset();
   toastSuccessMock.mockReset();
   toastErrorMock.mockReset();
@@ -281,7 +309,13 @@ describe('BidModal (Issue #3033)', () => {
   });
 
   it('placeBid isSuccess=true で toast.success + input clear', () => {
-    hookState.placeBid = { isPending: false, isError: false, isSuccess: true };
+    hookState.placeBid = {
+      isPending: false,
+      isError: false,
+      isSuccess: true,
+      isConfirming: false,
+      txHash: undefined,
+    };
     const Wrapper = buildWrapper();
     render(
       <Wrapper>
@@ -292,7 +326,13 @@ describe('BidModal (Issue #3033)', () => {
   });
 
   it('placeBid isError=true で toast.error', () => {
-    hookState.placeBid = { isPending: false, isError: true, isSuccess: false };
+    hookState.placeBid = {
+      isPending: false,
+      isError: true,
+      isSuccess: false,
+      isConfirming: false,
+      txHash: undefined,
+    };
     const Wrapper = buildWrapper();
     render(
       <Wrapper>
