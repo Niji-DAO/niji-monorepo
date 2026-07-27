@@ -9,6 +9,36 @@ The Graph Studio (legacy sepolia / mainnet) の 2 経路を support。
 pnpm install
 ```
 
+## local dev (docker-compose、 graph-node + ipfs + postgres 16)
+
+docker-compose.yml で local graph-node + ipfs + postgres 16 (alpine) を起動する。
+
+```sh
+docker compose up -d
+```
+
+### postgres 16 移行 (2026-07-27、 F-06 対応)
+
+docker-compose.yml の postgres image を postgres 16-alpine に固定 + data volume を version 別
+dir (`./data/postgres-16`) に分離した。 旧 postgres 12/15 で初期化した `./data/postgres/` dir は
+そのまま残置される (自動移行しない、 postgres 16 は空 dir から初期化して起動)。
+
+**旧 data を継続利用したい場合** (稀ケース、 通常は再 index 推奨):
+
+- `pg_upgradecluster` or `pg_dumpall` + `psql` で 手動 migration 後、 volume path を戻す
+- 面倒なら 旧 data を破棄して 再 index (下記)
+
+**旧 data を破棄して clean start する場合** (推奨、 subgraph re-sync は数分〜数十分):
+
+```sh
+docker compose down -v         # volume 破棄
+rm -rf ./data/postgres         # 旧 dir 削除 (option、 volume 破棄と併用)
+docker compose up -d           # postgres 16 で初期化 + graph-node 起動
+pnpm deploy-local              # subgraph 再 deploy → re-index 開始
+```
+
+port は `5433:5432` に固定 (旧 5432 は kiwa 系 postgres 等と衝突するため回避)。
+
 ## Goldsky deploy (推奨、 production)
 
 ### 1. Goldsky CLI インストール

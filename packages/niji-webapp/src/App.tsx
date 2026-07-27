@@ -53,12 +53,26 @@ const Playground = lazy(() => import('@/pages/Playground'));
 const ProposalHistory = lazy(() => import('@/pages/ProposalHistory'));
 const TraitsPage = lazy(() => import('@/pages/TraitsPage'));
 const VotePage = lazy(() => import('@/pages/Vote'));
-// TC-FB11 activate = e2e 専用の FiatSettlementModal 直接 mount page (isDev gate、
-// Vite dead code elimination で production bundle には含まれない)
-const TestFiatSettlementModalPage = lazy(() => import('@/pages/TestFiatSettlementModal'));
+// TC-FB11 activate = e2e 専用の FiatSettlementModal 直接 mount page (F-04 review 対応 2026-07-27)
+//
+// 旧実装は `lazy(() => import(...))` の call を top-level に置き、 Route を isDev gate していた。
+// この場合 Rollup が dynamic import string を保持するため prod build に `Test*-<hash>.js` chunk が
+// 生成される (test-only code + test-id が production artifact に混入する)。
+//
+// 新実装は import.meta.env.DEV の compile-time 定数分岐で lazy() 自体を prod build から dead code
+// eliminate する。 Vite (Rollup) は `import.meta.env.DEV` を build 時定数として fold し、
+// `? lazy(...) : null` の 逆枝が eliminate される = prod build に Test*.js chunk が生成されない。
+// production の Route branch も `TestPage != null && ...` で render skip する。
+const TestFiatSettlementModalPage = import.meta.env.DEV
+  ? lazy(() => import('@/pages/TestFiatSettlementModal'))
+  : null;
 // 2026-07-17 = FiatBidForm 直接 mount page (CardInput + fincode.tokens() 経路 e2e verify、 isDev gate)
-const TestFiatBidFormPage = lazy(() => import('@/pages/TestFiatBidFormPage'));
-const TestBidModalPage = lazy(() => import('@/pages/TestBidModalPage'));
+const TestFiatBidFormPage = import.meta.env.DEV
+  ? lazy(() => import('@/pages/TestFiatBidFormPage'))
+  : null;
+const TestBidModalPage = import.meta.env.DEV
+  ? lazy(() => import('@/pages/TestBidModalPage'))
+  : null;
 
 import classes from './App.module.css';
 
@@ -113,13 +127,17 @@ function App() {
             {/* Issue #3011 = 特定商取引法に基づく表記 (GMO 加盟店契約要件、 grilling P5 SSOT) */}
             <Route path="/legal/tokushoho" element={<TokushohoPage />} />
             {Number(CHAIN_ID) === 31337 && <Route path="/faucet" element={<FaucetPage />} />}
-            {import.meta.env.DEV && (
+            {/* F-04 review 対応 (2026-07-27) = component null check で TypeScript narrowing、
+                prod build では import.meta.env.DEV = false で全 branch が dead code eliminate される */}
+            {import.meta.env.DEV && TestFiatSettlementModalPage && (
               <Route path="/test/fiat-settlement-modal" element={<TestFiatSettlementModalPage />} />
             )}
-            {import.meta.env.DEV && (
+            {import.meta.env.DEV && TestFiatBidFormPage && (
               <Route path="/test/fiat-bid-form" element={<TestFiatBidFormPage />} />
             )}
-            {import.meta.env.DEV && <Route path="/test/bid-modal" element={<TestBidModalPage />} />}
+            {import.meta.env.DEV && TestBidModalPage && (
+              <Route path="/test/bid-modal" element={<TestBidModalPage />} />
+            )}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
