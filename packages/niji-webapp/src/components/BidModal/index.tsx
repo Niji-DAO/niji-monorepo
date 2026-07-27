@@ -69,14 +69,35 @@ const computeMinimumNextBid = (
   return next < floor ? floor : next;
 };
 
-const minBidEth = (minBid: bigint): string => {
+/**
+ * 表示用 min bid を「reservePrice の整数倍」 で切り上げる (2026-07-23、 user 提案)。
+ *
+ * 旧実装 = 有効数字 3 桁切り上げ、 例 currentBid=0.000105 → minBid=0.00011 → 「0.000111 以上」 の
+ * 6 桁表示になり細かすぎて読めない。 かつ contract 側は 5% up (minBidIncPercentage) 判定のため
+ * 端数が発生 (0.00011025 wei 相当) して user は「なぜ半端な桁？」 と困惑した。
+ *
+ * 新仕様 = reservePrice の整数倍で切り上げ、 例 reservePrice=0.0001 なら:
+ *   currentBid=0        → 0.0001 (reservePrice そのもの)
+ *   currentBid=0.0001   → 0.0002 (2 × reservePrice)
+ *   currentBid=0.00015  → 0.0002 (0.00015 × 1.05 = 0.0001575 → ceil / reservePrice = 2)
+ *   currentBid=0.0003   → 0.0004
+ *
+ * chain 側 validation `msg.value >= amount + amount*minInc%/100` は 0.0002 で必ず通る
+ * (0.0002 >= 0.0001 * 1.05 = 0.000105)、 UX の桁数と chain 契約の整合を両立する。
+ *
+ * reservePrice が undefined の間 (contract 読み込み前) は旧経路 (有効数字 3 桁切り上げ) に fallback。
+ */
+const minBidEth = (minBid: bigint, reservePrice: bigint | undefined): string => {
   if (minBid === 0n) {
-    return '0';
+    return reservePrice !== undefined && reservePrice > 0n ? formatEther(reservePrice) : '0';
   }
+  if (reservePrice !== undefined && reservePrice > 0n) {
+    // bigint ceil (a + b - 1) / b で reservePrice の整数倍に切り上げ。
+    const roundedUp = ((minBid + reservePrice - 1n) / reservePrice) * reservePrice;
+    return formatEther(roundedUp);
+  }
+  // fallback = reservePrice 未取得時の旧経路 (有効数字 3 桁切り上げ)。
   const ethNum = parseFloat(formatEther(minBid));
-  // 最低額を必ず満たすよう有効数字 3 桁で切り上げる。
-  // 0.012967 → 0.013、 0.0001 → 0.0001、 1.05 → 1.05。
-  // 一律第 2 位切り上げ (旧実装) だと 0.012967 が 0.02 に飛び、 0.0001 が 0.01 に潰れる問題を回避。
   const exponent = Math.ceil(Math.log10(ethNum));
   const decimals = Math.max(0, 3 - exponent);
   const factor = 10 ** decimals;
@@ -154,10 +175,15 @@ export const BidModal = ({
 
   const { data: minBidIncPercentage } = useReadNijiAuctionHouseMinBidIncrementPercentage();
   const { data: reservePrice } = useReadNijiAuctionHouseReservePrice();
+  /**
+   * `minBidReserve` = reservePrice を BigInt 化した値、 minBidEth に「切り上げ単位」 として渡す。
+   * computeMinimumNextBid の 3 番目引数と同じ変換を 1 度だけ行い、 minBidEth 5 箇所で共有する。
+   */
+  const minBidReserve = reservePrice !== undefined ? BigInt(reservePrice.toString()) : undefined;
   const minBid = computeMinimumNextBid(
     auction.amount !== undefined ? BigInt(auction.amount.toString()) : 0n,
     minBidIncPercentage !== undefined ? BigInt(minBidIncPercentage.toString()) : undefined,
-    reservePrice !== undefined ? BigInt(reservePrice.toString()) : undefined,
+    minBidReserve,
   );
 
   const {
@@ -244,9 +270,9 @@ export const BidModal = ({
     const parsed = parseEther(ethInputRef.current.value);
     if (parsed < minBid) {
       toast.error(
-        t`Please place a bid higher than or equal to the minimum bid amount of ${minBidEth(minBid)} ETH`,
+        t`Please place a bid higher than or equal to the minimum bid amount of ${minBidEth(minBid, minBidReserve)} ETH`,
       );
-      setEthInput(minBidEth(minBid));
+      setEthInput(minBidEth(minBid, minBidReserve));
       return;
     }
     // chainId 明示で wagmi が wallet の現 chain 不一致を検出、 switchChain prompt を
@@ -326,12 +352,12 @@ export const BidModal = ({
                     onChange={ethInputHandler}
                     ref={ethInputRef}
                     value={ethInput}
-                    placeholder={`Ξ ${minBidEth(minBid)}`}
+                    placeholder={`Ξ ${minBidEth(minBid, minBidReserve)}`}
                     data-testid="eth-bid-input"
                     className={classes.bidInput}
                   />
                   <p className={classes.minBidCopy}>
-                    <Trans>minimum bid — Ξ {minBidEth(minBid)} or more</Trans>
+                    <Trans>minimum bid — Ξ {minBidEth(minBid, minBidReserve)} or more</Trans>
                   </p>
                 </div>
 
@@ -373,7 +399,7 @@ export const BidModal = ({
               onClose={onClose}
               auctionId={auction.nounId.toString()}
               bidderWallet={bidderWallet}
-              minBidEth={parseFloat(minBidEth(minBid))}
+              minBidEth={parseFloat(minBidEth(minBid, minBidReserve))}
               palette={palette}
               fetchersOverride={fiatFetchersOverride}
               spotRateOverride={fiatSpotRateOverride}
