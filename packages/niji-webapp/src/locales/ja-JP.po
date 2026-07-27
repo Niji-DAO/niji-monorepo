@@ -22,6 +22,10 @@ msgstr ""
 msgid "Niji DUNA is a legally recognized Decentralized Unincorporated Nonprofit Association established in Wyoming via <0/> designed to provide a robust legal framework that aligns with the decentralized nature of Niji DAO. This structure allows Niji DAO to operate with limited liability protection and legal clarity without compromising its decentralized governance ethos."
 msgstr "Niji DUNA は、Niji DAO の分散型の特性に整合する堅牢な法的枠組みを提供するため、<0/> を通じてワイオミング州で設立された、法的に認められた分散型非法人非営利協会です。この構造により、Niji DAO は分散型ガバナンスの理念を損なうことなく、有限責任保護と法的明確性を保ちながら運営できます。"
 
+#: src/components/BidModal/index.tsx
+msgid "入札を送信しました"
+msgstr "入札を送信しました"
+
 #: src/components/ProposalActionsModal/steps/StreamPaymentsPaymentDetailsStep/index.tsx
 msgid "At this time only USDC and WETH streams are supported"
 msgstr "現時点では、USDCとWETHのストリームのみがサポートされています"
@@ -32,7 +36,7 @@ msgstr "現在の入札額"
 
 #: src/components/BidModal/index.tsx
 msgid "bid 額 (ETH)"
-msgstr ""
+msgstr "bid 額 (ETH)"
 
 #: src/components/ProposalActionsModal/steps/StreamPaymentsReviewStep/index.tsx
 msgid "To"
@@ -502,7 +506,7 @@ msgstr "黒の単色ノグル"
 #. placeholder {0}: minBidEth(minBid)
 #: src/components/BidModal/index.tsx
 msgid "minimum bid — Ξ {0} or more"
-msgstr ""
+msgstr "minimum bid — Ξ {0} 以上"
 
 #: src/components/AuctionTimer/index.tsx
 msgid "Time left"
@@ -631,7 +635,11 @@ msgstr "編集"
 
 #: src/components/BidModal/index.tsx
 msgid "ETH か クレカ (JPY) を選んで bid してください"
-msgstr ""
+msgstr "ETH か クレカ (JPY) を選んで bid してください"
+
+#: src/components/BidModal/index.tsx
+msgid "まもなくこのウィンドウを閉じます"
+msgstr "まもなくこのウィンドウを閉じます"
 
 #: src/components/ProposalActionsModal/steps/StreamPaymentsDateDetailsStep/index.tsx
 msgid "Review Action Details"
@@ -819,7 +827,7 @@ msgstr "個人的な利益のために不平等に財務省を引き出す"
 #. placeholder {0}: auction.nounId.toString()
 #: src/components/BidModal/index.tsx
 msgid "Niji #{0} に bid"
-msgstr ""
+msgstr "Niji #{0} に bid"
 
 #: src/components/AuctionTimer/index.tsx
 msgid "m"
@@ -1028,7 +1036,7 @@ msgstr "すべての Niji は Niji DAO のメンバーです。"
 
 #: src/components/BidModal/index.tsx
 msgid "ETH で bid"
-msgstr ""
+msgstr "ETH で bid"
 
 #: src/components/DelegationCandidateInfo/index.tsx
 msgid "Now has"
@@ -1089,7 +1097,7 @@ msgstr "Niji トレイト"
 
 #: src/components/BidModal/index.tsx
 msgid "キャンセル"
-msgstr ""
+msgstr "キャンセル"
 
 #: src/components/Documentation/ArtAndTraitsSection.tsx
 msgid "Nijis are generated randomly based Ethereum block hashes. There are no 'if' statements or other rules governing Niji trait scarcity, which makes all Nijis equally rare. As of this writing, Nijis are made up of:"
@@ -1379,7 +1387,7 @@ msgstr "提案拒否権は当初、Niji DAO トレジャリーに対する '51% 
 
 #: src/components/BidModal/index.tsx
 msgid "bid"
-msgstr ""
+msgstr "入札"
 
 #: src/components/CurrentDelegatePannel/index.tsx
 msgid "Current Delegate"
@@ -1869,7 +1877,7 @@ msgstr "提案者の機能"
 
 #: src/components/BidModal/index.tsx
 msgid "クレカで払う (JPY)"
-msgstr ""
+msgstr "クレカで払う (JPY)"
 
 #: src/components/NijiContent/index.tsx
 msgid "Learn more"

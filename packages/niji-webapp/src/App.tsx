@@ -53,6 +53,12 @@ const Playground = lazy(() => import('@/pages/Playground'));
 const ProposalHistory = lazy(() => import('@/pages/ProposalHistory'));
 const TraitsPage = lazy(() => import('@/pages/TraitsPage'));
 const VotePage = lazy(() => import('@/pages/Vote'));
+// TC-FB11 activate = e2e 専用の FiatSettlementModal 直接 mount page (isDev gate、
+// Vite dead code elimination で production bundle には含まれない)
+const TestFiatSettlementModalPage = lazy(() => import('@/pages/TestFiatSettlementModal'));
+// 2026-07-17 = FiatBidForm 直接 mount page (CardInput + fincode.tokens() 経路 e2e verify、 isDev gate)
+const TestFiatBidFormPage = lazy(() => import('@/pages/TestFiatBidFormPage'));
+const TestBidModalPage = lazy(() => import('@/pages/TestBidModalPage'));
 
 import classes from './App.module.css';
 
@@ -107,6 +113,13 @@ function App() {
             {/* Issue #3011 = 特定商取引法に基づく表記 (GMO 加盟店契約要件、 grilling P5 SSOT) */}
             <Route path="/legal/tokushoho" element={<TokushohoPage />} />
             {Number(CHAIN_ID) === 31337 && <Route path="/faucet" element={<FaucetPage />} />}
+            {import.meta.env.DEV && (
+              <Route path="/test/fiat-settlement-modal" element={<TestFiatSettlementModalPage />} />
+            )}
+            {import.meta.env.DEV && (
+              <Route path="/test/fiat-bid-form" element={<TestFiatBidFormPage />} />
+            )}
+            {import.meta.env.DEV && <Route path="/test/bid-modal" element={<TestBidModalPage />} />}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>

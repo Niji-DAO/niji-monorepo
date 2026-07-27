@@ -17,6 +17,10 @@ msgstr ""
 msgid "Niji DUNA is a legally recognized Decentralized Unincorporated Nonprofit Association established in Wyoming via <0/> designed to provide a robust legal framework that aligns with the decentralized nature of Niji DAO. This structure allows Niji DAO to operate with limited liability protection and legal clarity without compromising its decentralized governance ethos."
 msgstr ""
 
+#: src/components/BidModal/index.tsx
+msgid "入札を送信しました"
+msgstr ""
+
 #: src/components/ProposalActionsModal/steps/StreamPaymentsPaymentDetailsStep/index.tsx
 msgid "At this time only USDC and WETH streams are supported"
 msgstr ""
@@ -675,6 +679,10 @@ msgstr ""
 
 #: src/components/BidModal/index.tsx
 msgid "ETH か クレカ (JPY) を選んで bid してください"
+msgstr ""
+
+#: src/components/BidModal/index.tsx
+msgid "まもなくこのウィンドウを閉じます"
 msgstr ""
 
 #: src/components/ProposalActionsModal/steps/StreamPaymentsDateDetailsStep/index.tsx

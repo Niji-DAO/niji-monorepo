@@ -20,10 +20,17 @@
 import type {
   FincodeAuthorizationResult,
   FincodeErrorResponse,
+  FincodeExecute3DSecureAuthRequest,
+  FincodeExecute3DSecureAuthSuccess,
+  FincodeExecuteAfter3DSecureRequest,
+  FincodePaymentCaptureRequest,
+  FincodePaymentCaptureSuccess,
   FincodePaymentExecuteRequest,
   FincodePaymentExecuteSuccess,
   FincodePaymentRegisterRequest,
   FincodePaymentRegisterSuccess,
+  FincodeRetrieve3DSecureAuthSuccess,
+  FincodeThreeDSecureResult,
 } from './types.js';
 
 /** DI 用の fetch signature (test で mock 差替可能、 GMO と同 pattern) */
@@ -243,6 +250,127 @@ export class FincodeClient {
     };
   }
 
+  /**
+   * PUT /v1/payments/{id}/capture — 与信 (AUTHORIZED) から売上確定 (CAPTURED) への遷移
+   * capture handler が使う、 authorize.ts で発行済 access_id を使って capture 実行。
+   * SSOT — https://github.com/fincode-byGMO/fincode-sdk-node src/api/v1/payment.ts § capture()
+   */
+  async capturePayment(orderId: string, accessId: string): Promise<FincodePaymentCaptureSuccess> {
+    const path = `/v1/payments/${encodeURIComponent(orderId)}/capture`;
+    const req: FincodePaymentCaptureRequest = {
+      pay_type: 'Card',
+      access_id: accessId,
+      method: '1',
+    };
+    const body = await this.put<FincodePaymentCaptureSuccess>(path, req);
+    if (body.status !== 'CAPTURED') {
+      throw new FincodeAuthorizationError(
+        `fincode capturePayment expected status=CAPTURED, got status=${body.status}`,
+      );
+    }
+    return body;
+  }
+
+  /**
+   * PUT /v1/payments/{id}/cancel — 与信 (AUTHORIZED) の取消 (auth 解放、 実カード請求発生させず)
+   * fiat bid で「auction 敗北」 時に呼出、 user の card 与信枠を返却する。
+   * SSOT — https://docs.fincode.jp/api § payment.cancel
+   */
+  async cancelPayment(
+    orderId: string,
+    accessId: string,
+  ): Promise<{ id: string; access_id: string; status: string }> {
+    const path = `/v1/payments/${encodeURIComponent(orderId)}/cancel`;
+    const req = {
+      pay_type: 'Card' as const,
+      access_id: accessId,
+    };
+    return this.put<{ id: string; access_id: string; status: string }>(path, req);
+  }
+
+  /**
+   * PUT /v1/secure2/{access_id} — 3DS 2.0 認証実行。
+   *
+   * webapp が tds2_ret_url に戻ってきた直後に呼ぶ。 応答の tds2_trans_result で分岐する。
+   * SSOT — fincode 公式 sdk-node `src/api/v1/payment.ts` § execute3DSecureAuth。
+   */
+  async execute3DSecureAuth(accessId: string): Promise<FincodeExecute3DSecureAuthSuccess> {
+    const path = `/v1/secure2/${encodeURIComponent(accessId)}`;
+    const req: FincodeExecute3DSecureAuthRequest = { pay_type: 'Card', access_id: accessId };
+    return this.put<FincodeExecute3DSecureAuthSuccess>(path, req);
+  }
+
+  /**
+   * GET /v1/secure2/{access_id} — 3DS 2.0 認証結果取得。
+   *
+   * チャレンジ認証 (tds2_trans_result = 'C') から戻った後に結果を再確認する経路で使う。
+   * SSOT — fincode 公式 sdk-node `src/api/v1/payment.ts` § retrieve3DSecureAuthResult。
+   */
+  async retrieve3DSecureAuthResult(accessId: string): Promise<FincodeRetrieve3DSecureAuthSuccess> {
+    const path = `/v1/secure2/${encodeURIComponent(accessId)}`;
+    return this.get<FincodeRetrieve3DSecureAuthSuccess>(path);
+  }
+
+  /**
+   * PUT /v1/payments/{id}/secure — 認証後決済実行。
+   *
+   * 3DS 認証が Y / A で通っても、 この呼出をしないと与信は確定しない。
+   * SSOT — fincode 公式 sdk-node `src/api/v1/payment.ts` § executeAfter3DSecureAuth。
+   */
+  async executeAfter3DSecureAuth(
+    orderId: string,
+    accessId: string,
+  ): Promise<FincodePaymentExecuteSuccess> {
+    const path = `/v1/payments/${encodeURIComponent(orderId)}/secure`;
+    const req: FincodeExecuteAfter3DSecureRequest = { pay_type: 'Card', access_id: accessId };
+    return this.put<FincodePaymentExecuteSuccess>(path, req);
+  }
+
+  /**
+   * 3DS 認証実行から与信確定までを 1 呼出にまとめた統合 method。
+   *
+   * 分岐は fincode の tds2_trans_result に従う。
+   * - `Y` / `A` = 認証通過 → 認証後決済実行まで進めて与信を確定する
+   * - `C` = チャレンジ認証が必要 → challengeUrl を返して webapp に遷移させる (与信未確定)
+   * - それ以外 (`N` / `U` / `R` / 未返却) = 認証失敗 → 与信を確定させない
+   *
+   * challenge から戻った 2 回目の呼出では execute が再度 'C' を返すとは限らないため、
+   * `viaRetrieve` を true にすると GET /v1/secure2 で結果だけを取り直す経路に切替える。
+   */
+  async complete3DSecureAuth(
+    orderId: string,
+    accessId: string,
+    options: { viaRetrieve?: boolean } = {},
+  ): Promise<FincodeThreeDSecureResult> {
+    const authResult =
+      options.viaRetrieve === true
+        ? await this.retrieve3DSecureAuthResult(accessId)
+        : await this.execute3DSecureAuth(accessId);
+
+    const transResult = authResult.tds2_trans_result ?? undefined;
+    const reason = authResult.tds2_trans_result_reason ?? undefined;
+    const challengeUrl =
+      'challenge_url' in authResult
+        ? ((authResult as FincodeExecute3DSecureAuthSuccess).challenge_url ?? undefined)
+        : undefined;
+
+    if (transResult === 'C') {
+      return { transResult, reason, challengeUrl, authorized: false, status: undefined };
+    }
+    if (transResult !== 'Y' && transResult !== 'A') {
+      return { transResult, reason, challengeUrl: undefined, authorized: false, status: undefined };
+    }
+
+    const executed = await this.executeAfter3DSecureAuth(orderId, accessId);
+    return {
+      transResult,
+      reason,
+      challengeUrl: undefined,
+      authorized: executed.status === 'AUTHORIZED' || executed.status === 'CAPTURED',
+      status: executed.status,
+    };
+  }
+
   private async post<T>(path: string, body: unknown): Promise<T> {
     return this.request<T>('POST', path, body);
   }
@@ -251,7 +379,15 @@ export class FincodeClient {
     return this.request<T>('PUT', path, body);
   }
 
-  private async request<T>(method: 'POST' | 'PUT', path: string, body: unknown): Promise<T> {
+  private async get<T>(path: string): Promise<T> {
+    return this.request<T>('GET', path, undefined);
+  }
+
+  private async request<T>(
+    method: 'GET' | 'POST' | 'PUT',
+    path: string,
+    body: unknown,
+  ): Promise<T> {
     const url = `${this.endpoint.replace(/\/$/, '')}${path}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -262,17 +398,17 @@ export class FincodeClient {
     }
     let response: Response;
     try {
-      response = await fetchWithTimeout(
-        this.fetchImpl,
-        url,
-        {
-          method,
-          headers,
-          body: JSON.stringify(body),
-        },
-        this.timeoutMs,
-      );
+      // GET に body を付けると fetch が TypeError を投げるため、 method で出し分ける
+      const init: RequestInit =
+        method === 'GET' ? { method, headers } : { method, headers, body: JSON.stringify(body) };
+      response = await fetchWithTimeout(this.fetchImpl, url, init, this.timeoutMs);
     } catch (err) {
+      // debug 用 verbose log = handler 側の catch で cause が捨てられるため client 層で stderr 出力。
+      const causeMessage = err instanceof Error ? err.message : String(err);
+      const causeName = err instanceof Error ? err.name : 'unknown';
+      console.error(
+        `[fincode.request] fetch error: ${method} ${url} | ${causeName}: ${causeMessage}`,
+      );
       throw new FincodeAuthorizationError(`fincode ${method} ${path} network error`, {
         cause: err,
       });
@@ -287,6 +423,13 @@ export class FincodeClient {
     }
     const err = extractFincodeError(response.status, parsed);
     if (err !== undefined) {
+      // debug 用 verbose log = fincode 側 error message (日本語 説明) を stderr に出力、
+      // + request body / response body の一部を dump して root cause 特定を助ける。
+      const bodyPreview = JSON.stringify(body ?? {}).slice(0, 500);
+      const respPreview = JSON.stringify(parsed ?? {}).slice(0, 500);
+      console.error(
+        `[fincode.request] fincode error: ${method} ${url} status=${response.status} code=${err.code} message="${err.message ?? ''}"\n  request.body: ${bodyPreview}\n  response.body: ${respPreview}`,
+      );
       throw new FincodeAuthorizationError(`fincode ${method} ${path} failed (${err.code})`, {
         errorCode: err.code,
         errorMessage: err.message,

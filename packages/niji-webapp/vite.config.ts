@@ -64,6 +64,10 @@ export default defineConfig({
   server: {
     port: 2424,
     strictPort: true,
+    // Vite 5+ security = external host からの access を allowlist で明示許可。
+    // `.trycloudflare.com` (Quick Tunnel) + localhost + LAN IP を許可、
+    // Named Tunnel or production 独自 domain も追加可能 (前提 = tunnel 経由 demo 環境)。
+    allowedHosts: ['.trycloudflare.com', '.cfargotunnel.com', 'localhost', '127.0.0.1'],
     hmr: {
       overlay: true,
     },
@@ -73,6 +77,22 @@ export default defineConfig({
     proxy: {
       '/api/v1/spot-rate': {
         target: 'http://127.0.0.1:42070',
+        changeOrigin: true,
+      },
+      // authorize-fincode は Ponder 非依存の independent server (port 42071、 e2e real fincode 経路 verify 用)。
+      // より具体的な path を先に match するため fiat-bid より前に配置 (vite proxy match 優先度)。
+      '/api/v1/fiat-bid/authorize-fincode': {
+        target: 'http://127.0.0.1:42071',
+        changeOrigin: true,
+      },
+      '/api/v1/fiat-bid/capture-fincode': {
+        target: 'http://127.0.0.1:42071',
+        changeOrigin: true,
+      },
+      // 2026-07-17 = place-bid stub も :42071 に routing (Ponder :42069 crash 中の暫定経路、
+      // Stage B rebrand で :42069 復活後は元経路に戻す)。
+      '/api/v1/fiat-bid/place-bid': {
+        target: 'http://127.0.0.1:42071',
         changeOrigin: true,
       },
       '/api/v1/fiat-bid': {

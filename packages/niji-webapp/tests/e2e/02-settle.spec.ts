@@ -72,12 +72,16 @@ test.describe('Niji auction — settle flow', () => {
       expect(settledAfter).toBe(false);
 
       // 6) totalSupply が増えている
+      // Niji AuctionHouse は「現 auction settle (winner に mint) + 新 auction 起動 (新 nounId は
+      // まだ mint されず active state 保持)」 の 2 step で、 nounIdAfter は「新 auction の nounId」 =
+      // まだ mint されていない値。 mint 済 token 数 = nounIdBefore の落札分含めた累積で、
+      // 常に `nounIdAfter` (= nounIdBefore + 1) と同数以上 (deploy 直後 Niji 0 済み + settle 済 Niji 1 分)。
       const total = await publicClient.readContract({
         address: ADDRESSES.NijiToken,
         abi: tokenAbi,
         functionName: 'totalSupply',
       });
-      expect(total).toBeGreaterThanOrEqual(nounIdAfter + 1n);
+      expect(total).toBeGreaterThanOrEqual(nounIdAfter);
     } finally {
       await revertChain(snapId);
     }

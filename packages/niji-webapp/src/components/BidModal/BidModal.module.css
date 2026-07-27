@@ -236,3 +236,22 @@
 .dialogContent[data-palette='warm'] .cancelBtn:focus {
   background-color: var(--brand-warm-accent) !important;
 }
+
+/* ==================== 入札成功カード ==================== */
+/*
+ * 生の Tailwind emerald (emerald-200 / emerald-50 / emerald-500) を使っていたが、
+ * site には --brand-color-green / --brand-color-green-translucent が定義済みで、
+ * palette 外の色が成功表示という目立つ場所を占めていた。 token 経由に統一する。
+ * fiat tab (FiatBidForm.module.css .successCard) と同一定義を保つ。
+ */
+.successCard {
+  border: 1px solid var(--brand-color-green);
+  background-color: var(--brand-color-green-translucent);
+  border-radius: 8px;
+}
+
+.successIcon {
+  width: 3rem;
+  height: 3rem;
+  color: var(--brand-color-green);
+}

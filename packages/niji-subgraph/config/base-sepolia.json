@@ -1,19 +1,22 @@
 {
   "network": "base-sepolia",
   "nijiToken": {
-    "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 0
+    "address": "0xE8470ff7F6028d37f60C8c8CA79C7426031b3D35",
+    "startBlock": 44428567
   },
   "nijiAuctionHouse": {
-    "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 0
+    "address": "0x449E337180402643Ea90148230fD57E534344225",
+    "startBlock": 44429101
+  },
+  "nijiAuctionHouseV3": {
+    "startBlock": 44505557
   },
   "nijiDAO": {
     "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 0
+    "startBlock": 44428567
   },
   "nijiDAOData": {
     "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 0
+    "startBlock": 44428567
   }
 }

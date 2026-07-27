@@ -11,6 +11,9 @@ import '@openzeppelin/hardhat-upgrades';
 import 'hardhat-gas-reporter';
 import './tasks';
 
+// niji-contracts の env 経路 = 環境ごとに .env.local (anvil) / .env.dev (base sepolia) / .env.prod (mainnet) を
+// 分離、 package.json script で cp .env.{env} .env → hardhat 実行の順で load される。 dotenv は現 dir の .env
+// を default 探す (path 指定なしで process.cwd() + '/.env')、 hardhat 起動時 cwd = niji-contracts。
 dotenv.config();
 dotenv.config({ path: '../niji-assets/.env' });
 
@@ -48,10 +51,16 @@ const config: HardhatUserConfig = {
         : [process.env.WALLET_PRIVATE_KEY!].filter(Boolean),
     },
     baseSepolia: {
-      url: 'https://sepolia.base.org',
-      accounts: [process.env.WALLET_PRIVATE_KEY!].filter(Boolean),
+      url: process.env.RPC_URL || 'https://sepolia.base.org',
+      accounts: [process.env.DEPLOYER_PK || process.env.WALLET_PRIVATE_KEY!].filter(Boolean),
       chainId: 84532,
     },
+    // kebab-case alias (`--network base-sepolia`)、 package.json script との整合
+    'base-sepolia': {
+      url: process.env.RPC_URL || 'https://sepolia.base.org',
+      accounts: [process.env.DEPLOYER_PK || process.env.WALLET_PRIVATE_KEY!].filter(Boolean),
+      chainId: 84532,
+    } as any,
     hardhat: {
       initialBaseFeePerGas: 0,
       hardfork: 'cancun', // Pin to Cancun — Hardhat 2.28+ defaults to Fusaka which caps tx gas at 16M (EIP-7825)
@@ -71,8 +80,9 @@ const config: HardhatUserConfig = {
     apiKey: {
       mainnet: process.env.ETHERSCAN_API_KEY!,
       sepolia: process.env.ETHERSCAN_API_KEY!,
-      baseSepolia: process.env.BASESCAN_API_KEY!,
-    },
+      baseSepolia: process.env.EXPLORER_API_KEY || process.env.BASESCAN_API_KEY!,
+      'base-sepolia': process.env.EXPLORER_API_KEY || process.env.BASESCAN_API_KEY!,
+    } as any,
     customChains: [
       {
         network: 'baseSepolia',

@@ -387,8 +387,141 @@ Phase 2 完了 marker 3 件 active で Phase 3 移行判定に進む。 Phase 3 
 - Phase 3 の spec 策定 (`tests/spec/gmo-fiat-bid/Phase3-*.md`) は本 Issue の scope 外、 別 session で grilling 経由確定する
 - Phase 3 Issue 分割案 (`Phase3-02-issue-breakdown.md`) は Phase 2 → 3 移行 prerequisite 完了後に着手
 
+## Base Sepolia 実機検証と落札監視 (2026-07-22)
+
+Cloudflare Workers (`niji-api`) と Base Sepolia に deploy した構成で、 fincode テストカードによる与信から
+代理入札までを実機で通した際の手順と、 その後の落札を追跡する経路。
+
+### 与信から代理入札までの実機確認
+
+webapp の dev server を deploy 済 backend に向けて起動し、 e2e 専用 page から実際に発火させる。
+
+```bash
+# 1. dev server 起動 (mode dev = Base Sepolia + deploy 済 Workers を向く)
+pnpm --filter @niji/webapp exec vite --mode dev --port 2424 --strictPort
+
+# 2. Workers の log を別 terminal で監視
+pnpm --filter @niji/api exec wrangler tail --format pretty
+
+# 3. browser で e2e 専用 page を開く (import.meta.env.DEV 限定 route)
+open "http://localhost:2424/test/fiat-bid-form?auctionId=1&bidderWallet=<受取 wallet>&minBidEth=0.0102"
+```
+
+page 上で入札額を入力し、 規約に同意して submit すると以下が順に起きる。
+
+1. `POST /api/v1/fiat-bid/authorize-fincode` — fincode 与信、 応答に `authId` と `ethAmount` が入る
+2. `POST /api/v1/fiat-bid/place-bid` — operator EOA が `createBid` を発行、 応答に `txHash` が入る
+
+Workers の log には以下の 3 行が順に出る。 3 行目の `ethAmount` が 2 行目と一致していれば、
+与信時に確定した ETH 量がそのまま chain に渡っている。
+
+```
+[worker] KV put capture:<authId>
+[worker] insertPending authId=<authId> status=pending ethAmount=<wei> rate=<JPY/ETH>
+[worker] place-bid REAL: authId=<authId> auctionId=<N> jpy=<円> rate=<JPY/ETH> ethAmount=<wei> bidder=<wallet> txHash=<hash>
+```
+
+`capture record に ethAmount 無し、 rate ... で再換算 (移行期 fallback)` が出た場合は、
+`insertPending` が KV に届いていない。 その入札は place-bid 時点の rate で換算されており、
+与信額と入札額がずれるため log を確認する。
+
+入札額は最低入札条件を満たす必要がある。 `reservePrice` (0.001 ETH) と
+`minBidIncrementPercentage` (2%) の両方を上回る額を入れる。 現在の最高額が 0.01 ETH なら
+0.0102 ETH 以上、 spot rate 315,000 円なら 3,220 円以上が必要になる。
+
+### 落札 (settle) の監視
+
+auction は 24 時間続くため、 入札直後に落札結果は分からない。
+`watch-settlement` script が現在どの段階にいるかを表示する。
+
+```bash
+pnpm --filter @niji/api watch:settlement                    # 1 回だけ判定
+pnpm --filter @niji/api watch:settlement -- --watch         # 60 秒毎に再表示
+pnpm --filter @niji/api watch:settlement -- --until-settled # 決着まで待って verdict を返す
+pnpm --filter @niji/api watch:settlement -- --token 1       # 対象 tokenId を明示
+```
+
+段階は 5 つで、 script が判定して出力する。 判定 logic は
+`packages/niji-api/src/services/settlementWatch/index.ts` の `judgeSettlement` が持ち、
+段階の境界は test で固定されている。
+
+| 段階 | 状態 | 次に起きること |
+|---|---|---|
+| `bidding` | `endTime` 未到達 | 最高額入札者が operator EOA なら fiat 入札が勝っている |
+| `awaiting-settle` | `endTime` 経過 かつ `settled=false` | AuctionKeeper (cron 1 分毎) が `settleCurrentAndCreateNewAuction` を送る |
+| `awaiting-transfer` | fiat が落札したが owner が operator のまま | SettlementDaemon が capture と transferFrom を実行 |
+| `transferred` | 落札 tokenId の owner が入札者 wallet | 完了 |
+| `lost` | 落札者が operator 以外 | 与信は cancel され、 カードに請求は発生しない |
+
+`--until-settled` は `transferred` か `lost` に到達するまで polling し、 exit code で結果を返す。
+`0` = 引渡し済、 `3` = 落選、 `1` = 未決着のまま上限到達。
+上限は `--timeout-hours` (default 26)、 間隔は `--interval-sec` (default 60) で変えられる。
+auction が終わるまで席を外す場合は、 これを background で走らせておけば後から結果を確認できる。
+
+```bash
+pnpm --filter @niji/api watch:settlement -- --until-settled > /tmp/settle.log 2>&1 &
+```
+
+`awaiting-transfer` から進まない場合は fincode の capture が失敗している可能性が高い。
+`wrangler tail` に `[cron] fincode capture FAIL` が出ていないか確認する。
+capture が失敗した場合、 SettlementDaemon は transferFrom に進まず NFT は operator に留まる
+(与信できていない NFT を渡さないための設計)。
+
+env で対象を差し替えられる。 `RPC_URL` / `AUCTION_HOUSE_ADDRESS` / `NIJI_TOKEN_ADDRESS` /
+`OPERATOR_ADDRESS` / `CHAIN_ID` を指定すると別 chain や別 deploy を監視できる。
+
+### 3DS 2.0 経路 (2026-07-22 実装)
+
+3DS が必要なカードでも入札が成立する経路。 `wrangler.toml` の `TDS2_RET_URL` の有無で挙動が変わる。
+
+**未設定時** は authorize が fincode に `tds2_ret_url` を渡さないため、 fincode は 3DS を要求せず
+常に `status: AUTHORIZED` を返す。 webapp は `tds2Url === undefined` の分岐に入り、
+認証を挟まず place-bid を自動発火する (2026-07-21 の実機検証はこの経路)。
+
+**設定時** は 3DS 必須カードで `status: AUTHENTICATED` と `acs_url` が返り、 以下の順に進む。
+
+1. webapp が `acs_url` に遷移し、 カード会社の認証画面を表示する
+2. 認証後 fincode が `TDS2_RET_URL` (`/fiat-bid/3ds-return`) に `MD` = access_id 付きで戻す
+3. `ThreeDSReturn` が `POST /api/v1/fiat-bid/3ds-callback-fincode` を呼ぶ
+4. backend が `PUT /v1/secure2/{access_id}` で認証実行、 結果コードで分岐する
+5. `Y` / `A` なら `PUT /v1/payments/{id}/secure` で認証後決済実行まで進め、 与信が確定する
+6. webapp が続けて `POST /api/v1/fiat-bid/place-bid` を呼び、 代理入札を発火する
+
+認証が通っただけでは与信は確定しない。 手順 5 を飛ばすとカードに枠が取られないまま入札が成立する。
+
+**結果コードの分岐**
+
+| `tds2_trans_result` | 意味 | backend の応答 | webapp の挙動 |
+|---|---|---|---|
+| `Y` / `A` | 認証成功 / 認証試行 | `3ds-verified` | place-bid に進む |
+| `C` | チャレンジ認証が必要 | `challenge-required` + `challengeUrl` | `challengeUrl` に遷移、 戻ったら `retry=1` で再呼出 |
+| `N` / `U` / `R` / 未返却 | 拒否 / 認証不能 | `cancelled` | 理由を出して終了、 カード請求は発生しない |
+
+**チャレンジ認証からの復帰**
+
+`challengeUrl` から戻る際は `?MD={access_id}&retry=1` で `/fiat-bid/3ds-return` に入る。
+`retry=1` のとき backend は `PUT /v1/secure2` ではなく `GET /v1/secure2` で結果だけを取り直す。
+チャレンジ完了後に認証実行を再送すると結果が変わり得るため、 取得のみに切替えている。
+
+**pending state の扱い**
+
+`bidderWallet` は 3DS の redirect を跨ぐと失われるため、 `ThreeDSRedirect` が localStorage に保存した
+`FiatBidPendingState` から復元して place-bid に渡す。 backend の place-bid は `bidderWallet` 欠落時に
+400 を返すので、 復元できない場合は place-bid を呼ばずに失敗表示に落とす。
+チャレンジ遷移時は復帰後に再利用するため pending state を消さない。
+
+### 現状の制約 (2026-07-22 時点)
+
+**place-bid の移行期 fallback**
+
+`place-bid` には「`capture:{authId}` に `ethAmount` が無ければ spot rate で再換算する」 分岐がある。
+これは KV に `ethAmount` を保存する変更を deploy した時点で認証済だった record を救うためのもので、
+KV の TTL 1 時間が経過すると到達不能になる。 次にこの file を触る際に対応 test ごと削除する。
+
 ## 関連 SSOT
 
+- `packages/niji-api/scripts/watch-settlement.ts` — 落札監視 script SSOT
+- `packages/niji-api/src/workers/authorize-fincode-worker.ts` — Cloudflare Workers entry (authorize / place-bid / spot-rate / cron) SSOT
 - `tests/spec/gmo-fiat-bid/Phase1-01-master-spec.md` — Phase 1 master spec
 - `tests/spec/gmo-fiat-bid/Phase1-02-issue-breakdown.md` — 8 Issue 分割案
 - `tests/spec/gmo-fiat-bid/Phase1-05-impact-analysis.md` — 影響範囲分析

@@ -12,6 +12,7 @@
     "dev:prod": "cp .env.prod .env && concurrently -n ponder,spot -c blue,magenta \"pnpm dev:ponder\" \"pnpm dev:spot-rate\"",
     "dev:ponder": "ponder dev",
     "dev:spot-rate": "tsx watch src/spot-rate-server.ts",
+    "dev:authorize-fincode": "tsx watch src/authorize-fincode-server.ts",
     "lint": "eslint .",
     "ponder:push-snapshot": "tar -czf snapshot.tgz .ponder && gh release upload snapshot snapshot.tgz --clobber",
     "ponder:restore-snapshot": "rm -rf .ponder && curl -sL https://github.com/nounsDAO/nouns-monorepo/releases/download/snapshot/snapshot.tgz | tar -xzf -",
@@ -22,6 +23,7 @@
     "start:spot-rate": "tsx src/spot-rate-server.ts",
     "test": "vitest run",
     "test:watch": "vitest",
+    "watch:settlement": "tsx scripts/watch-settlement.ts",
     "typecheck": "tsc"
   },
   "dependencies": {

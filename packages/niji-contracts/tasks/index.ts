@@ -7,3 +7,6 @@ export * from './transfer-ownership-niji';
 export * from './deploy-niji-base-sepolia';
 export * from './deploy-niji-full';
 export * from './deploy-niji-smoke';
+export * from './upgrade-auction-house-v3-relayer';
+export * from './inspect-proxy-v3';
+export * from './reveal-niji-token';

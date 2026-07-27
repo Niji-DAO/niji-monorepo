@@ -57,7 +57,20 @@ describe('CardInputFincode', () => {
       isLiveMode: false,
     });
     await waitFor(() => expect(uiMountMock).toHaveBeenCalledTimes(1));
-    expect(uiCreateMock).toHaveBeenCalledWith('token', { layout: 'vertical' });
+    // appearance は色 / font 等の見た目値を多数含むため exact match にしない。
+    // 意味を持つ 4 点 (token 発行 mode / 縦並び / auction bid に不要な field の非表示 / 日本語 label) だけを固定し、
+    // 配色調整のたびに test が落ちる状態を避ける。
+    expect(uiCreateMock).toHaveBeenCalledWith(
+      'token',
+      expect.objectContaining({
+        layout: 'vertical',
+        hideHolderName: true,
+        hidePayTimes: true,
+        labelCardNo: 'カード番号',
+        labelExpire: '有効期限',
+        labelCVC: 'セキュリティコード',
+      }),
+    );
     expect(uiMountMock).toHaveBeenCalledWith('niji-fincode-card-mount', '100%');
   });
 

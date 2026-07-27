@@ -138,7 +138,7 @@ export type TopupRequest = {
 /** hook 内で使う fetcher 契約 (test 差替可能) */
 export type FiatBidFetchers = {
   authorize: (body: AuthorizeRequest) => Promise<AuthorizeResponse>;
-  placeBid: (body: { authId: string }) => Promise<PlaceBidResponse>;
+  placeBid: (body: { authId: string; bidderWallet?: string }) => Promise<PlaceBidResponse>;
   topup: (body: TopupRequest) => Promise<TopupResponse>;
 };
 
@@ -158,11 +158,14 @@ const buildEndpoint = (path: string): string => {
 };
 
 /**
- * fincode UI flag 検出 (Issue #3115)
- * VITE_USE_FINCODE_UI=true 時は fincode 経路 endpoint (authorize-fincode) を叩き、
- * false / 未設定時は GMO 経路 endpoint (authorize) を叩く。
- * FiatBidForm 側の card 入力 UI 切替 (fincode.js iframe vs GMO Token 方式 mock) と同 env flag で連動。
+ * fincode UI flag 検出 (Issue #3115、 default 反転 2026-07-17)
  *
+ * 前 session commit d354e19a4「flag 廃止で fincode iframe 固定化」 を code 側に反映、
+ * default = true (fincode 経路 endpoint = authorize-fincode :42071 独立 server) に反転。
+ * `VITE_USE_FINCODE_UI=false` を明示した場合のみ旧 GMO 経路 (:42069 Ponder+Hono) に fallback、
+ * env 未設定 = fincode 経路 default で Ponder 依存を回避する。
+ *
+ * FiatBidForm 側の card 入力 UI (2026-07-17 復元済 CardInput + fincode.tokens() 経路) と連動。
  * 引数 envSource は test で差替可能に、 default は `import.meta.env` (useSpotRate と同 pattern)。
  */
 export const isFincodeBackendEnabled = (
@@ -173,7 +176,8 @@ export const isFincodeBackendEnabled = (
   })(),
 ): boolean => {
   const envValue = envSource['VITE_USE_FINCODE_UI'];
-  return typeof envValue === 'string' && envValue.trim().toLowerCase() === 'true';
+  // 明示 'false' 指定時のみ GMO 経路、 それ以外 (未設定 / 空白 / 'true' / 他) は fincode 経路 default。
+  return !(typeof envValue === 'string' && envValue.trim().toLowerCase() === 'false');
 };
 
 /** authorize endpoint path 決定 (fincode / GMO 切替、 Issue #3115) */
@@ -199,7 +203,10 @@ export const defaultAuthorizeFetch = async (body: AuthorizeRequest): Promise<Aut
   return (await response.json()) as AuthorizeResponse;
 };
 
-export const defaultPlaceBidFetch = async (body: { authId: string }): Promise<PlaceBidResponse> => {
+export const defaultPlaceBidFetch = async (body: {
+  authId: string;
+  bidderWallet?: string;
+}): Promise<PlaceBidResponse> => {
   const response = await fetch(buildEndpoint('/api/v1/fiat-bid/place-bid'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -315,7 +322,10 @@ export const useFiatBid = (options: UseFiatBidOptions = {}) => {
         if (result.tds2Url === undefined) {
           setStep('placing');
           try {
-            const placeResult = await fetchers.placeBid({ authId: result.authId });
+            const placeResult = await fetchers.placeBid({
+              authId: result.authId,
+              bidderWallet: body.bidderWallet,
+            });
             setPlaceBidResult(placeResult);
             if (placeResult.status === 'bid-placed') {
               setStep('success');
@@ -342,15 +352,22 @@ export const useFiatBid = (options: UseFiatBidOptions = {}) => {
   );
 
   /**
-   * place-bid action。 3DS 完了 (fiat_bid.status = 3ds-verified) 後の
-   * ThreeDSReturn からの callback で呼出す。
+   * place-bid action。 3DS 認証が完了した後に ThreeDSReturn から呼出す。
+   *
+   * bidderWallet は backend の place-bid が必須とする field で、 欠けると 400 になる。
+   * 落札時の transferFrom 先を決めるため、 3DS redirect を跨いでも失われないよう
+   * ThreeDSRedirect が localStorage に保存した pending state から復元して渡す。
    */
   const placeBid = useCallback(
-    async (authId: string): Promise<PlaceBidResponse | undefined> => {
+    async (authId: string, bidderWallet?: string): Promise<PlaceBidResponse | undefined> => {
       setStep('placing');
       setErrorMessage(undefined);
       try {
-        const result = await fetchers.placeBid({ authId });
+        const payload: { authId: string; bidderWallet?: string } = { authId };
+        if (bidderWallet !== undefined && bidderWallet !== '') {
+          payload.bidderWallet = bidderWallet;
+        }
+        const result = await fetchers.placeBid(payload);
         setPlaceBidResult(result);
         if (result.status === 'bid-placed') {
           setStep('success');

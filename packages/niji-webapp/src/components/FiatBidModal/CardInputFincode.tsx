@@ -169,8 +169,48 @@ export const CardInputFincode = ({
         if (mountEl === null) {
           throw new Error(`mount target #${MOUNT_TARGET_ID} が DOM に存在しません`);
         }
-        const ui = fincode.ui({ layout: 'vertical' });
-        ui.create('token', { layout: 'vertical' });
+        // palette 別 color 統合 (Issue #3039 の cool/warm palette、 SDK は hex 直値 required で
+        // CSS variable 参照不可のため runtime hard-code で対応)。
+        const paletteColors =
+          palette === 'warm'
+            ? {
+                colorBackground: '#fef7ed', // orange-50 (warm base)
+                colorBackgroundInput: '#ffffff',
+                colorText: '#1c1917', // stone-900
+                colorLabelText: '#78350f', // amber-900
+                colorPlaceHolder: '#a8a29e', // stone-400
+                colorBorder: '#fed7aa', // orange-200
+                colorError: '#dc2626', // red-600
+                colorCheck: '#0f766e', // teal-700 (warm 補色)
+              }
+            : {
+                colorBackground: '#f9fafb', // gray-50 (cool base)
+                colorBackgroundInput: '#ffffff',
+                colorText: '#111827', // gray-900
+                colorLabelText: '#374151', // gray-700
+                colorPlaceHolder: '#9ca3af', // gray-400
+                colorBorder: '#d1d5db', // gray-300
+                colorError: '#dc2626', // red-600
+                colorCheck: '#2563eb', // blue-600 (cool accent)
+              };
+        // hideHolderName / hidePayTimes = true で auction bid に不要な field を隠して iframe を圧縮、
+        // label / placeholder を日本語明示、 fontFamily を親 (PT Root UI) 継承して周辺 UI と統合。
+        const appearance = {
+          layout: 'vertical' as const,
+          hideHolderName: true,
+          hidePayTimes: true,
+          labelCardNo: 'カード番号',
+          labelExpire: '有効期限',
+          labelCVC: 'セキュリティコード',
+          cardNo: '1234 5678 9012 3456',
+          expireMonth: 'MM',
+          expireYear: 'YY',
+          cvc: '123',
+          fontFamily: '"PT Root UI", -apple-system, "Hiragino Sans", sans-serif',
+          ...paletteColors,
+        };
+        const ui = fincode.ui(appearance);
+        ui.create('token', appearance);
         ui.mount(MOUNT_TARGET_ID, '100%');
         fincodeRef.current = fincode;
         uiRef.current = ui;
@@ -183,7 +223,7 @@ export const CardInputFincode = ({
         initedRef.current = false;
       }
     })();
-  }, [publicKey]);
+  }, [publicKey, palette]);
 
   return (
     <div data-testid="card-input-fincode" data-palette={palette} className="flex flex-col gap-2">
@@ -195,17 +235,29 @@ export const CardInputFincode = ({
           {initError}
         </p>
       )}
+      {!isReady && initError === null && (
+        <div
+          data-testid="card-input-fincode-loading"
+          className="flex min-h-[200px] w-full items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-400"
+        >
+          <div className="flex flex-col items-center gap-2">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />
+            <span>カード入力欄を読み込み中</span>
+          </div>
+        </div>
+      )}
       <div
         id={MOUNT_TARGET_ID}
         data-testid="card-input-fincode-mount"
-        className="min-h-[240px] w-full"
+        className={`w-full rounded-lg border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900 ${isReady ? '' : 'hidden'}`}
       />
       {/*
         fincode SDK は `elementId + "-form"` id の別 div を内部で参照する (SDK docs 未明示、
         CDN runtime code から判明)。 element 不在で `Cannot read properties of null (reading
-        'setAttribute')` crash するため mount target と対で render する。
+        'setAttribute')` crash するため mount target と対で render するが、 SDK は本 div に
+        何も描画しないので視覚露出させない (hidden で空 gray box の「これは何？」 を排除)。
       */}
-      <div id={`${MOUNT_TARGET_ID}-form`} />
+      <div id={`${MOUNT_TARGET_ID}-form`} hidden aria-hidden="true" />
     </div>
   );
 };

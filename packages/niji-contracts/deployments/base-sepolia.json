@@ -1,0 +1,64 @@
+{
+  "profile": "full",
+  "network": "base-sepolia",
+  "chainId": 84532,
+  "timestamp": "2026-07-21T09:35:09.772Z",
+  "deployer": "0xaEa7cd3F6DC66543D1bE9394b394a669D868c62B",
+  "contracts": {
+    "NijiArt": "0x1AAc4c388DF30d66D1A5E96D0c0Ff6C5b814AbA2",
+    "NijiDescriptor": "0xb19CEb12010230Cd89708623e764B83616A5865d",
+    "NijiSeeder": "0x005929A9D5A3D68e60f66B5E210C6577f6F70028",
+    "NijiToken": "0xE8470ff7F6028d37f60C8c8CA79C7426031b3D35",
+    "NijiAuctionHouseProxy": "0x449E337180402643Ea90148230fD57E534344225",
+    "WETH": "0xA1e30645d04033eBb5bC5F2d468023fAa46955d5"
+  },
+  "constructorArgs": {
+    "NijiArt": [
+      "0xaEa7cd3F6DC66543D1bE9394b394a669D868c62B",
+      [
+        "special",
+        "choker",
+        "headphone",
+        "leftHand",
+        "hat",
+        "clothing",
+        "ear",
+        "back",
+        "backDecoration",
+        "background",
+        "solidBackground",
+        "hair"
+      ]
+    ],
+    "NijiDescriptor": [
+      "0x1AAc4c388DF30d66D1A5E96D0c0Ff6C5b814AbA2",
+      320,
+      [
+        10,
+        9,
+        8,
+        7,
+        3,
+        5,
+        6,
+        1,
+        4,
+        11,
+        2,
+        0
+      ]
+    ],
+    "NijiSeeder": [
+      "0x1AAc4c388DF30d66D1A5E96D0c0Ff6C5b814AbA2"
+    ],
+    "NijiToken": [
+      "Niji",
+      "NIJI",
+      "0xb19CEb12010230Cd89708623e764B83616A5865d",
+      "0x005929A9D5A3D68e60f66B5E210C6577f6F70028",
+      0
+    ],
+    "NijiAuctionHouseProxy": null,
+    "WETH": []
+  }
+}

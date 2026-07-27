@@ -32,27 +32,54 @@ const placeBidMock = vi.fn();
 
 const hookState: {
   minBidIncPercentage: bigint | undefined;
+  reservePrice: bigint | undefined;
   placeBid: {
     isPending: boolean;
     isError: boolean;
     isSuccess: boolean;
+    isConfirming: boolean;
+    txHash: `0x${string}` | undefined;
   };
 } = {
   minBidIncPercentage: 5n,
-  placeBid: { isPending: false, isError: false, isSuccess: false },
+  reservePrice: undefined,
+  placeBid: {
+    isPending: false,
+    isError: false,
+    isSuccess: false,
+    isConfirming: false,
+    txHash: undefined,
+  },
 };
 
 vi.mock('@niji/sdk/react', () => ({
   useReadNijiAuctionHouseMinBidIncrementPercentage: () => ({
     data: hookState.minBidIncPercentage,
   }),
+  useReadNijiAuctionHouseReservePrice: () => ({
+    data: hookState.reservePrice,
+  }),
   useWriteNijiAuctionHouseCreateBid: () => ({
     writeContract: placeBidMock,
+    data: hookState.placeBid.txHash,
     isPending: hookState.placeBid.isPending,
     isError: hookState.placeBid.isError,
     isSuccess: hookState.placeBid.isSuccess,
   }),
 }));
+
+// wagmi の useWaitForTransactionReceipt を stub (2026-07-23、 tx confirm 待ち UI 追加時)。
+// importOriginal で他 export (http / fallback / WagmiProvider 等、 src/wagmi.ts が触る) を保つ。
+vi.mock('wagmi', async importOriginal => {
+  const actual = await importOriginal<typeof import('wagmi')>();
+  return {
+    ...actual,
+    useWaitForTransactionReceipt: () => ({
+      isLoading: hookState.placeBid.isConfirming,
+      isSuccess: hookState.placeBid.isSuccess,
+    }),
+  };
+});
 
 const toastSuccessMock = vi.fn();
 const toastErrorMock = vi.fn();
@@ -106,7 +133,14 @@ const buildWrapper = () => {
 
 const resetState = () => {
   hookState.minBidIncPercentage = 5n;
-  hookState.placeBid = { isPending: false, isError: false, isSuccess: false };
+  hookState.reservePrice = undefined;
+  hookState.placeBid = {
+    isPending: false,
+    isError: false,
+    isSuccess: false,
+    isConfirming: false,
+    txHash: undefined,
+  };
   placeBidMock.mockReset();
   toastSuccessMock.mockReset();
   toastErrorMock.mockReset();
@@ -275,7 +309,13 @@ describe('BidModal (Issue #3033)', () => {
   });
 
   it('placeBid isSuccess=true で toast.success + input clear', () => {
-    hookState.placeBid = { isPending: false, isError: false, isSuccess: true };
+    hookState.placeBid = {
+      isPending: false,
+      isError: false,
+      isSuccess: true,
+      isConfirming: false,
+      txHash: undefined,
+    };
     const Wrapper = buildWrapper();
     render(
       <Wrapper>
@@ -286,7 +326,13 @@ describe('BidModal (Issue #3033)', () => {
   });
 
   it('placeBid isError=true で toast.error', () => {
-    hookState.placeBid = { isPending: false, isError: true, isSuccess: false };
+    hookState.placeBid = {
+      isPending: false,
+      isError: true,
+      isSuccess: false,
+      isConfirming: false,
+      txHash: undefined,
+    };
     const Wrapper = buildWrapper();
     render(
       <Wrapper>
@@ -431,6 +477,71 @@ describe('BidModal (Issue #3033)', () => {
     );
     const stub = getByTestId('fiat-bid-form-stub');
     expect(stub.getAttribute('data-min-bid-eth')).toBe('1.05');
+  });
+
+  // contract の reservePrice を変えると新 auction (入札なし) の placeholder が追従することを
+  // 複数値で実証する = webapp が reservePrice を SSOT (contract) から読んでいる証明。
+  // 0.0001 が 0.01 に潰れず、 0.01 に変えれば 0.01 に、 0.001 に変えれば 0.001 に追従する。
+  it.each([
+    { rp: 100_000_000_000_000n, label: '0.0001', expected: 'Ξ 0.0001' },
+    { rp: 1_000_000_000_000_000n, label: '0.001', expected: 'Ξ 0.001' },
+    { rp: 10_000_000_000_000_000n, label: '0.01', expected: 'Ξ 0.01' },
+  ])(
+    'reservePrice を $label に変えると新 auction の ETH placeholder が追従 (contract SSOT 連動)',
+    ({ rp, expected }) => {
+      hookState.minBidIncPercentage = 5n;
+      hookState.reservePrice = rp;
+      const Wrapper = buildWrapper();
+      const { getByTestId } = render(
+        <Wrapper>
+          <BidModal
+            open
+            onClose={() => {}}
+            auction={makeAuction({ amount: 0n })}
+            bidderWallet="0xUSER"
+          />
+        </Wrapper>,
+      );
+      const input = getByTestId('eth-bid-input') as HTMLInputElement;
+      expect(input.getAttribute('placeholder')).toBe(expected);
+    },
+  );
+
+  it('現額 0.0127 の次の最低額を 0.02 でなく 0.013 と表示 (過剰な第2位切り上げを回避)', () => {
+    hookState.minBidIncPercentage = 2n;
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction({ amount: 12_713_345_834_790_070n })}
+          bidderWallet="0xUSER"
+        />
+      </Wrapper>,
+    );
+    const input = getByTestId('eth-bid-input') as HTMLInputElement;
+    expect(input.getAttribute('placeholder')).toContain('0.013');
+    expect(input.getAttribute('placeholder')).not.toContain('0.02');
+  });
+
+  it('新 auction で reservePrice が FiatBidForm minBidEth prop に伝搬 (0.0001)', () => {
+    hookState.minBidIncPercentage = 5n;
+    hookState.reservePrice = 100_000_000_000_000n; // 0.0001 ETH
+    const Wrapper = buildWrapper();
+    const { getByTestId } = render(
+      <Wrapper>
+        <BidModal
+          open
+          onClose={() => {}}
+          auction={makeAuction({ amount: 0n })}
+          bidderWallet="0xUSER"
+          defaultTab="fiat"
+        />
+      </Wrapper>,
+    );
+    const stub = getByTestId('fiat-bid-form-stub');
+    expect(stub.getAttribute('data-min-bid-eth')).toBe('0.0001');
   });
 
   it('Tabs list / trigger に BidModal CSS module class (tabsList / tabsTrigger) 付与', () => {

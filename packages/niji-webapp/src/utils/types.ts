@@ -12,6 +12,8 @@ export interface BidEvent {
   transactionHash: string;
   transactionIndex: number;
   timestamp: BigNumberish;
+  /** fiat 代理入札 (createBidFor) 経路か否か、 subgraph の Bid.isFiat が source */
+  isFiat?: boolean;
 }
 
 export interface AuctionCreateEvent {
@@ -40,4 +42,6 @@ export interface Bid {
   transactionHash: string;
   transactionIndex: number;
   timestamp: bigint;
+  /** fiat 代理入札 (createBidFor) 経路か否か、 subgraph の Bid.isFiat が source */
+  isFiat?: boolean;
 }

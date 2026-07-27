@@ -144,22 +144,17 @@ export default async function globalSetup() {
   }
   const start = Date.now();
 
-  // 1) 既存 anvil / spot-rate を pkill、 前 run の残存 process が bind 続けている場合の cleanup
+  // 1) 既存 anvil を pkill、 前 run の残存 process が bind 続けている場合の cleanup。
+  // spot-rate は user 側 `pnpm dev:spot-rate` (concurrently 経路) と併存する可能性があるため、
+  // pkill を打たず「既に port 42070 で応答するかどうか」 で spawn 要否を判定する。
   spawnSync('pkill', ['-f', `anvil --port ${ANVIL_PORT}`]);
-  spawnSync('pkill', ['-f', 'tsx watch src/spot-rate-server.ts']);
-  spawnSync('pkill', ['-f', 'tsx src/spot-rate-server.ts']);
-  // 前 run の pid file 残存も delete
-  if (existsSync(SPOT_RATE_PID_PATH)) {
-    try {
-      const oldPid = Number.parseInt(readFileSync(SPOT_RATE_PID_PATH, 'utf-8').trim(), 10);
-      if (Number.isFinite(oldPid) && oldPid > 0) {
-        try {
-          process.kill(-oldPid, 'SIGTERM');
-        } catch {}
-      }
-    } catch {}
-  }
   await sleep(500);
+  const spotRateAlreadyUp = await fetch(
+    `http://127.0.0.1:${SPOT_RATE_PORT}/api/v1/spot-rate/eth-jpy`,
+    { method: 'GET', headers: { Accept: 'application/json' } },
+  )
+    .then(r => r.status === 200)
+    .catch(() => false);
 
   // 2) anvil を起動
   const anvilProc = spawn(
@@ -206,13 +201,18 @@ export default async function globalSetup() {
     throw new Error(`deploy-niji-full exited with status ${result.status}`);
   }
 
-  // 4) spot-rate independent server を起動 (port 42070)
-  console.log(`[e2e globalSetup] spawning spot-rate server on :${SPOT_RATE_PORT}...`);
-  spawnSpotRateServer();
-
-  // 5) spot-rate ready wait (mock 経路で即応答、 数百 ms 程度)
-  await waitForSpotRateReady();
-  console.log(`[e2e globalSetup] spot-rate ready on :${SPOT_RATE_PORT}`);
+  // 4) spot-rate independent server を起動 (port 42070)、 既存起動 detect 時は再利用。
+  if (spotRateAlreadyUp) {
+    console.log(
+      `[e2e globalSetup] spot-rate already running on :${SPOT_RATE_PORT} (user 側 dev:spot-rate 併存)、 spawn skip`,
+    );
+  } else {
+    console.log(`[e2e globalSetup] spawning spot-rate server on :${SPOT_RATE_PORT}...`);
+    spawnSpotRateServer();
+    // 5) spot-rate ready wait (mock 経路で即応答、 数百 ms 程度)
+    await waitForSpotRateReady();
+    console.log(`[e2e globalSetup] spot-rate ready on :${SPOT_RATE_PORT}`);
+  }
 
   // 5.5) Niji 0 (Nijider 枠) を settle して Niji 1 (通常 auction) に進める (Issue #3077)。
   //

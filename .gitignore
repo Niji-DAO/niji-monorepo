@@ -45,3 +45,6 @@ packages/niji-contracts/test-results/
 
 # foundry forge script --broadcast の自動生成 deploy 履歴 (niji deploy は packages/niji-contracts/deploy/ で別管理)
 packages/niji-contracts/broadcast/
+
+# wrangler の local state / build cache (各 29MB、 deploy のたびに再生成される)
+.wrangler/

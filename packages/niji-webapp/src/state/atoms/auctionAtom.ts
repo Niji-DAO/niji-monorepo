@@ -137,6 +137,7 @@ export const reduxSafeBid = (bid: BidEvent): BidEvent => ({
   transactionHash: bid.transactionHash,
   transactionIndex: bid.transactionIndex,
   timestamp: bid.timestamp.toString(),
+  isFiat: bid.isFiat === true,
 });
 
 const maxBid = (bids: BidEvent[]): BidEvent => {

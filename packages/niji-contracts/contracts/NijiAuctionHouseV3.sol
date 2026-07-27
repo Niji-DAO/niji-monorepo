@@ -73,6 +73,19 @@ contract NijiAuctionHouseV3 is
     /// @notice The contract used to verify bidders are not sanctioned wallets
     IChainalysisSanctionsList public sanctionsOracle;
 
+    /// @notice Fiat 代理入札で使う relayer 権限 mapping。 owner が grant/revoke する。
+    /// @dev 追加 storage は末尾 mapping 1 slot、 proxy upgrade layout safe。
+    mapping(address => bool) private _isRelayer;
+
+    /// @notice fiat 経路で bid した場合の payer (relayer) を nounId 単位で記録。
+    /// @dev address(0) = ETH 経路の bid (payer = bidder = recipient で分離不要)。
+    mapping(uint256 => address) private _bidPayer;
+
+    /// @notice fiat 経路で bid した場合の recipient (NFT 受取先) を nounId 単位で記録。
+    /// @dev address(0) = ETH 経路の bid。 auctionStorage.bidder との違い =
+    ///      ETH では両者同じ、 fiat では auctionStorage.bidder = recipient / _bidPayer[nounId] = relayer。
+    mapping(uint256 => address) private _bidRecipient;
+
     constructor(INijiToken _nouns, address _weth, uint256 _duration) initializer {
         nouns = _nouns;
         weth = _weth;
@@ -135,6 +148,45 @@ contract NijiAuctionHouseV3 is
      * @dev This contract only accepts payment in ETH.
      */
     function createBid(uint256 nounId, uint32 clientId) public payable override {
+        // ETH 経路 = recipient = msg.sender で bidder / payer / recipient が同一。 fiat 分離なし。
+        _createBidInternal(nounId, payable(msg.sender), address(0), clientId);
+    }
+
+    /**
+     * @notice Fiat 代理入札 (relayer 経路)。 msg.sender = relayer, recipient = NFT 受取先。
+     * @dev refund は payer (relayer) に返る。 上書き入札されると fincode void 経路と対応、
+     *      user wallet に ETH refund する二重返還を回避する。
+     */
+    function createBidFor(uint256 nounId, address recipient) external payable override onlyRelayer {
+        createBidFor(nounId, recipient, 0);
+    }
+
+    /**
+     * @notice Fiat 代理入札 (clientId 付き)。
+     */
+    function createBidFor(
+        uint256 nounId,
+        address recipient,
+        uint32 clientId
+    ) public payable override onlyRelayer {
+        require(recipient != address(0), 'Recipient cannot be zero address');
+        _createBidInternal(nounId, payable(recipient), msg.sender, clientId);
+    }
+
+    /**
+     * @notice createBid / createBidFor の共通 core。
+     * @param nounId auction 対象 nounId
+     * @param recipient auctionStorage.bidder に入れる = NFT 受取先
+     * @param payer address(0) なら ETH 経路 (refund は recipient に返る)、
+     *              != address(0) なら fiat 経路 (refund は payer = relayer に返る)
+     * @param clientId client reward ID
+     */
+    function _createBidInternal(
+        uint256 nounId,
+        address payable recipient,
+        address payer,
+        uint32 clientId
+    ) internal {
         INijiAuctionHouseV3.AuctionV2 memory _auction = auctionStorage;
 
         (uint192 _reservePrice, uint56 _timeBuffer, uint8 _minBidIncrementPercentage) = (
@@ -143,7 +195,7 @@ contract NijiAuctionHouseV3 is
             minBidIncrementPercentage
         );
 
-        _requireNotSanctioned(msg.sender);
+        _requireNotSanctioned(recipient);
         require(_auction.nounId == nounId, 'Noun not up for auction');
         require(block.timestamp < _auction.endTime, 'Auction expired');
         require(msg.value >= _reservePrice, 'Must send at least reservePrice');
@@ -152,14 +204,34 @@ contract NijiAuctionHouseV3 is
             'Must send more than last bid by minBidIncrementPercentage amount'
         );
 
+        // 前 bid の payer / recipient を refund 判定用に控える。 現 auction の直前 bid を上書きする形。
+        address prevPayer = _bidPayer[nounId];
+        address payable prevBidder = _auction.bidder;
+
         auctionStorage.clientId = clientId;
         auctionStorage.amount = uint128(msg.value);
-        auctionStorage.bidder = payable(msg.sender);
+        auctionStorage.bidder = recipient;
+
+        // fiat 経路のみ payer / recipient mapping を書換、 ETH 経路では既存 mapping を上書き削除
+        // (連続入札で fiat → ETH → fiat と遷移するケースの整合)。
+        if (payer != address(0)) {
+            _bidPayer[nounId] = payer;
+            _bidRecipient[nounId] = recipient;
+        } else if (prevPayer != address(0)) {
+            // ETH で fiat bid を上書きする際、 過去の fiat mapping を消して ETH semantics に戻す。
+            delete _bidPayer[nounId];
+            delete _bidRecipient[nounId];
+        }
 
         // Extend the auction if the bid was received within `timeBuffer` of the auction end time
         bool extended = _auction.endTime - block.timestamp < _timeBuffer;
 
+        // 既存 subgraph の後方互換 = AuctionBid.sender は「chain の msg.sender」 (fiat では relayer)。
+        // fiat は追加で BidPlacedFor emit、 subgraph 側で join して recipient 表示に置換する。
         emit AuctionBid(_auction.nounId, msg.sender, msg.value, extended);
+        if (payer != address(0)) {
+            emit BidPlacedFor(_auction.nounId, payer, recipient, msg.value, extended);
+        }
         if (clientId > 0) emit AuctionBidWithClientId(_auction.nounId, msg.value, clientId);
 
         if (extended) {
@@ -167,11 +239,12 @@ contract NijiAuctionHouseV3 is
             emit AuctionExtended(_auction.nounId, _auction.endTime);
         }
 
-        address payable lastBidder = _auction.bidder;
-
-        // Refund the last bidder, if applicable
-        if (lastBidder != address(0)) {
-            _safeTransferETHWithFallback(lastBidder, _auction.amount);
+        // Refund the last bidder, if applicable.
+        // 前 bid が fiat なら relayer に返す (資金元と一致、 user wallet への流出防止)。
+        // 前 bid が ETH なら bidder に返す (既存挙動維持、 msg.sender = bidder)。
+        if (prevBidder != address(0)) {
+            address payable refundTo = prevPayer != address(0) ? payable(prevPayer) : prevBidder;
+            _safeTransferETHWithFallback(refundTo, _auction.amount);
         }
     }
 
@@ -251,6 +324,54 @@ contract NijiAuctionHouseV3 is
      * @notice Set the sanctions oracle address.
      * @dev Only callable by the owner.
      */
+    /**
+     * @notice Grant relayer role (fiat 代理入札の payer 権限)。 owner 専用。
+     */
+    function grantRelayer(address relayer) external override onlyOwner {
+        require(relayer != address(0), 'Relayer cannot be zero address');
+        _isRelayer[relayer] = true;
+        emit RelayerGranted(relayer);
+    }
+
+    /**
+     * @notice Revoke relayer role。 owner 専用。 key rotation / 事故対応で使う。
+     */
+    function revokeRelayer(address relayer) external override onlyOwner {
+        _isRelayer[relayer] = false;
+        emit RelayerRevoked(relayer);
+    }
+
+    /**
+     * @notice createBidFor の呼び出し権限を持つか照会。
+     */
+    function isRelayer(address relayer) external view override returns (bool) {
+        return _isRelayer[relayer];
+    }
+
+    /**
+     * @notice fiat 経路で bid した場合の payer (relayer) を nounId 単位で返す。
+     *         address(0) = ETH 経路の bid or 未入札。
+     */
+    function bidPayerOf(uint256 nounId) external view override returns (address) {
+        return _bidPayer[nounId];
+    }
+
+    /**
+     * @notice fiat 経路で bid した場合の recipient (NFT 受取先) を nounId 単位で返す。
+     *         address(0) = ETH 経路の bid or 未入札。
+     */
+    function bidRecipientOf(uint256 nounId) external view override returns (address) {
+        return _bidRecipient[nounId];
+    }
+
+    /**
+     * @notice createBidFor 権限 gate。 grantRelayer で許可されたアドレスのみ通す。
+     */
+    modifier onlyRelayer() {
+        require(_isRelayer[msg.sender], 'AuctionHouse: caller is not a relayer');
+        _;
+    }
+
     function setSanctionsOracle(address newSanctionsOracle) public onlyOwner {
         sanctionsOracle = IChainalysisSanctionsList(newSanctionsOracle);
 

@@ -45,6 +45,12 @@ export interface IBid {
   blockTimestamp: number;
   txHash: string;
   txIndex?: number;
+  /** fiat 経路 (createBidFor) で subgraph が set する識別 flag、 crypto 経路では false */
+  isFiat?: boolean;
+  /** fiat 経路の payer (relayer / 運営 EOA)、 crypto 経路は null */
+  payer?: { id: string } | null;
+  /** fiat 経路の recipient (NFT 受取先 = user wallet)、 bidder と同一だが明示 record */
+  recipient?: { id: string } | null;
   noun: {
     id: number;
     startTime?: BigNumberish;

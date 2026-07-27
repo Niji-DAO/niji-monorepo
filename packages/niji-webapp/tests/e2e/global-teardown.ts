@@ -24,7 +24,9 @@ export default async function globalTeardown() {
     return;
   }
 
-  // 1) spot-rate process group を kill
+  // 1) spot-rate process group を kill。 pid file が無い = 「user 側 dev:spot-rate と併存で
+  // e2e 側 spawn skip したケース」 なので kill 対象外 (user 側 process を殺さない)。
+  // pkill fallback も pid file 存在時のみ発火し、 e2e が spawn した process の切り離し fallback に限定。
   if (existsSync(SPOT_RATE_PID_PATH)) {
     try {
       const pid = Number.parseInt(readFileSync(SPOT_RATE_PID_PATH, 'utf-8').trim(), 10);
@@ -49,10 +51,11 @@ export default async function globalTeardown() {
     } catch {
       // pid file 読み書き失敗は非致命的
     }
+    // pkill fallback (子プロセスが detach で切り離されているケースを保険で捕捉)、
+    // pid file 存在ケース = e2e 側 spawn した場合のみ発火
+    spawnSync('pkill', ['-f', 'tsx watch src/spot-rate-server.ts']);
+    spawnSync('pkill', ['-f', 'tsx src/spot-rate-server.ts']);
   }
-  // pkill fallback (子プロセスが detach で切り離されているケースを保険で捕捉)
-  spawnSync('pkill', ['-f', 'tsx watch src/spot-rate-server.ts']);
-  spawnSync('pkill', ['-f', 'tsx src/spot-rate-server.ts']);
 
   // 2) anvil を kill (port 指定で pkill、 chain-past-auctions などの後続 dev session 邪魔しない)
   spawnSync('pkill', ['-f', `anvil --port ${ANVIL_PORT}`]);

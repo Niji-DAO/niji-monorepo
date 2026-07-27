@@ -65,6 +65,15 @@ export type CreateAuthorizeFincodeAppOptions = {
   generateOrderId?: (input: { auctionId: string; bidderWallet: string }) => string;
   /** 現在時刻 source (test 用、 default = () => new Date()) */
   now?: () => Date;
+  /**
+   * 3DS 2.0 の戻り先 URL (webapp の /fiat-bid/3ds-return)。
+   *
+   * 指定すると fincode に `tds2_ret_url` + `tds2_type: '2'` を渡し、 カードが 3DS を要求する場合に
+   * status = AUTHENTICATED と acs_url が返る。 未指定なら 3DS を要求せず即 AUTHORIZED になる。
+   * 未指定時に 3DS が発火しないのは fincode の仕様で、 これを既定にすると本番で 3DS 必須の
+   * カードが通らないため、 deploy 側で必ず設定する。
+   */
+  tds2RetUrl?: string;
 };
 
 const defaultGenerateOrderId = (input: { auctionId: string; bidderWallet: string }): string => {
@@ -72,7 +81,10 @@ const defaultGenerateOrderId = (input: { auctionId: string; bidderWallet: string
   const rand = Math.floor(Math.random() * 1e6)
     .toString(36)
     .padStart(4, '0');
-  return `fincode-${input.auctionId}-${input.bidderWallet.slice(2, 8)}-${ts}-${rand}`;
+  // 2026-07-17 fix — fincode order_id 上限 (実測 30 文字前後) 超過で「オーダーIDの書式が正しくありません」
+  // が出る (auctionId=228 で 32 文字で fail、 EC001025008)。 prefix を fincode- (8) → fc- (3) に
+  // 短縮して auctionId 5 桁までは 29 文字で safe。 6 桁以上 auction 到達時は wallet slice 縮小で対応。
+  return `fc-${input.auctionId}-${input.bidderWallet.slice(2, 8)}-${ts}-${rand}`;
 };
 
 /**
@@ -90,6 +102,16 @@ export const createAuthorizeFincodeApp = (options: CreateAuthorizeFincodeAppOpti
       rawBody = await c.req.json();
     } catch {
       return c.json({ error: 'InvalidRequest', message: 'request body must be valid JSON' }, 400);
+    }
+    // debug 用 = webapp 送信 body を stderr に dump (cardToken は先頭 20 文字 mask)
+    try {
+      const dumpBody = { ...(rawBody as Record<string, unknown>) };
+      if (typeof dumpBody['cardToken'] === 'string') {
+        dumpBody['cardToken'] = `${(dumpBody['cardToken'] as string).slice(0, 20)}...`;
+      }
+      console.error(`[authorize-fincode] webapp body: ${JSON.stringify(dumpBody)}`);
+    } catch {
+      // ignore
     }
 
     const parsed = parseAuthorizeBody(rawBody);
@@ -144,11 +166,16 @@ export const createAuthorizeFincodeApp = (options: CreateAuthorizeFincodeAppOpti
     // fincode register + execute 順次呼出 (cardToken は fincode.js iframe tokenize で受領した card_id)
     let authResult;
     try {
-      authResult = await options.fincodeClient.authorize({
+      const authorizeInput: Parameters<typeof options.fincodeClient.authorize>[0] = {
         orderId,
         amount: body.jpyAmount,
         cardToken: body.cardToken,
-      });
+      };
+      // 空文字は「未設定」 扱い。 空を渡すと fincode が 3DS を要求しつつ戻り先を持たない状態になる。
+      if (typeof options.tds2RetUrl === 'string' && options.tds2RetUrl.trim() !== '') {
+        authorizeInput.tds2RetUrl = options.tds2RetUrl.trim();
+      }
+      authResult = await options.fincodeClient.authorize(authorizeInput);
     } catch (err) {
       if (err instanceof FincodeAuthorizationError) {
         return c.json(
@@ -170,7 +197,8 @@ export const createAuthorizeFincodeApp = (options: CreateAuthorizeFincodeAppOpti
       );
     }
 
-    // fiat_bid table に pending status で INSERT
+    // fiat_bid table に pending status で INSERT (2026-07-17 = accessId/orderId 追加保存で
+    // 後段 SettlementDaemon の capture/cancel 呼出時に lookup 可能に)
     const record: FiatBidRecord = {
       authId: authResult.authId,
       bidderWallet: body.bidderWallet,
@@ -182,6 +210,8 @@ export const createAuthorizeFincodeApp = (options: CreateAuthorizeFincodeAppOpti
       spotRateSource: spotRate.source,
       status: 'pending',
       createdAt: now(),
+      accessId: authResult.accessId,
+      orderId: authResult.orderId,
     };
     try {
       await options.store.insertPending(record);

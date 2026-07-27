@@ -1,12 +1,13 @@
 /**
- * fincode iframe 描画 verification (Issue #3119 追加 verify、 AI 側で実 dev server + Playwright で assert)
+ * fincode iframe 描画 verification (Issue #3119 追加 verify、 PR #3138 で固定化に追随)
  *
- * VITE_USE_FINCODE_UI=true 環境で dev server (localhost:2424) を起動した状態で、
+ * PR #3138 で mock CardInput 経路完全削除 + VITE_USE_FINCODE_UI flag 廃止 + fincode iframe 固定化された
+ * 前提で、 dev server (localhost:2424) を起動した状態で、
  * (1) auction ページ navigate
  * (2) Bid button click → BidModal open
  * (3) 「クレカで払う (JPY)」 tab click
  * (4) CardInputFincode component の mount target div 存在確認
- * (5) label が「fincode.js iframe」 表示 (mock 表示ではない)
+ * (5) label が「fincode.js iframe」 表示 (mock CardInput は撤廃済で該当 UI 不在)
  * (6) fincode.js SDK が iframe を append することを DOM 検査で確認
  * を pure Playwright で assert する (kiwa fixture 経由 wallet inject 済想定)。
  *
@@ -23,8 +24,8 @@ const test = baseTest.extend<{ _anvilHandle: { port: number; stop: () => Promise
   },
 });
 
-test.describe('fincode iframe verify (Issue #3119)', () => {
-  test('VITE_USE_FINCODE_UI=true 時 CardInputFincode が render + label 変化 + mount target 存在', async ({
+test.describe('fincode iframe verify (Issue #3119、 PR #3138 固定化追随)', () => {
+  test('CardInputFincode が render + mock CardInput 消滅確認 + label 「fincode.js iframe」 表示', async ({
     page,
   }) => {
     // browser console log を capture して SDK 呼出 pipeline debug
@@ -52,8 +53,9 @@ test.describe('fincode iframe verify (Issue #3119)', () => {
     const fincodeMount = page.getByTestId('card-input-fincode-mount');
     await expect(fincodeMount).toBeVisible({ timeout: 5_000 });
 
-    // 従来 CardInput (data-testid="card-input") は render されない
+    // 従来 CardInput (data-testid="card-input") + testcard dropdown は PR #3138 で撤廃済
     await expect(page.getByTestId('card-input')).toHaveCount(0);
+    await expect(page.getByTestId('card-input-test-card-select')).toHaveCount(0);
 
     // label が「fincode.js iframe」 に変わる (mock 表示ではない)
     await expect(page.getByText(/fincode\.js iframe/)).toBeVisible();

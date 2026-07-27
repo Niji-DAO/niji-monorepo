@@ -55,7 +55,7 @@ export const tokushohoItems: TokushohoItem[] = [
   {
     label: '販売価格',
     value:
-      'auction 落札額 (日本円表示、 決済時に spot rate 換算)。 auction 進行中の入札単位は最低 1000 円 (Phase 1 MVP)。',
+      'auction 落札額 (日本円表示、 決済時に spot rate 換算)。 最低入札額は auction 画面に表示される reservePrice に従う。',
     isPlaceholder: false,
   },
   {

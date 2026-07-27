@@ -1,0 +1,47 @@
+# Cloudflare Workers config for niji-api (authorize-fincode + capture-fincode + place-bid + SettlementDaemon)
+# SSOT — decision-log 2026-07-16-niji-cloudflare-hybrid-deploy.md + 2026-07-17-niji-auto-base-sepolia-env-dev-scope.md
+name = "niji-api"
+main = "src/workers/authorize-fincode-worker.ts"
+compatibility_date = "2024-11-06"
+compatibility_flags = ["nodejs_compat"]
+
+# fincode state (authId → orderId + accessId + jpyAmount + fiat_bid record + cron cursor) を authorize → capture →
+# settlement 間で共有する KV。 in-memory Map (CaptureAwareFincodeClient) の Cloudflare Workers stateless 版、
+# TTL 1 時間で fincode 側 auth 期限に合わせて自動 expiry (capture: prefix のみ)。 fiat_bid: prefix は auction 完了まで保持。
+[[kv_namespaces]]
+binding = "FINCODE_STATE"
+id = "29ed658a44994fce8e8f83085666ac5a"
+
+# Cron Triggers 経路 = SettlementDaemon (AuctionSettled event poll + capture + transferFrom or cancel)
+# 1 分毎起動、 fromBlock cursor は KV `cron_cursor:from_block` で永続、 event miss 防止設計。
+[triggers]
+crons = ["* * * * *"]
+
+# env values (secret は wrangler secret put で別途 set、 non-secret のみここ)
+# secret 一覧:
+#   wrangler secret put FINCODE_API_KEY_SECRET   # fincode dashboard secret key (m_test_ / m_live_ prefix)
+#   wrangler secret put OPERATOR_PK              # 運営 EOA 秘密鍵 (0x prefix、 Base Sepolia real ETH 保有必須)
+#   wrangler secret put ALCHEMY_API_KEY          # Alchemy Base Sepolia app の API key (2026-07-23、 primary RPC 経路)
+[vars]
+# fincode
+USE_FINCODE_MOCK = "false"
+# spot rate — "false" = GMO コイン Public API primary + CoinGecko fallback の実 rate、
+# "true" = MOCK_SPOT_RATE_JPY_PER_ETH の固定値。 GET /api/v1/spot-rate/eth-jpy の応答と
+# place-bid の JPY → ETH 換算は同一 fetcher instance を共有するため、 本 flag 1 つで両方が切替わる。
+USE_SPOT_RATE_MOCK = "false"
+MOCK_SPOT_RATE_JPY_PER_ETH = "500000"
+# 3DS 2.0 の戻り先 URL (webapp の 3ds-return page)。
+# 設定すると authorize が fincode に tds2_ret_url を渡し、 3DS 必須カードで認証画面を挟む。
+# 未設定だと fincode は 3DS を要求せず即 AUTHORIZED を返すため、 本番相当の検証ができない。
+TDS2_RET_URL = "https://dev.niji-webapp.pages.dev/fiat-bid/3ds-return"
+
+# chain (Base Sepolia、 2026-07-21 deploy 済 address)
+CHAIN_ID = "84532"
+# RPC_URL = 2026-07-23 まで primary。 現在は Alchemy (secret ALCHEMY_API_KEY) が primary、
+# 本 URL は fallback rotation の 2 番目。 secret 未設定時 (dev 個人 fork 等) は本 URL が primary。
+RPC_URL = "https://sepolia.base.org"
+# 2026-07-23 追加 = primary (Alchemy or RPC_URL) が rate limit / network error 時に順次試す fallback。
+# 空文字にすると組込 default (drpc / publicnode / base.org) が使われる。
+RPC_FALLBACK_URLS = "https://base-sepolia.drpc.org,https://base-sepolia-rpc.publicnode.com"
+AUCTION_HOUSE_ADDRESS = "0x449E337180402643Ea90148230fD57E534344225"
+NIJI_TOKEN_ADDRESS = "0xE8470ff7F6028d37f60C8c8CA79C7426031b3D35"
