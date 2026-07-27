@@ -50,11 +50,26 @@ export default defineConfig({
     {
       // fiat-bid.spec.ts (kiwa fixture + anvil chain write 経路) + fiat-bid-chain-bid.spec.ts
       // (anvil 直叩き bid tx broadcast、 kiwa fixture 不要だが chain state mutate のため serial 必須)。
-      // 既存 chain 系 spec (01-auction / 02-settle / chain-past-auctions 等) は本 config 対象外、
-      // Issue #3073 スコープは fiat bid + fincode Phase 3 追随の 5 spec に限定。
+      // real fincode 経路 (fiat-bid-fullflow / fiat-bid-real-authorize / cardinput-fincode-verify) は
+      // fincode API key + :42071 authorize-fincode-worker 起動が必要で clean checkout / CI 環境では
+      // 動かないため、 別 project `fiat-bid-real-opt-in` に分離 (下記)。
       name: 'fiat-bid-serial',
+      testMatch: /(fiat-bid|fiat-bid-chain-bid)\.spec\.ts$/,
+      fullyParallel: false,
+      workers: 1,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+    },
+    {
+      // real fincode 経路 (opt-in、 env RUN_REAL_FINCODE=1 で起動)。
+      // 前提 = (1) niji-api の authorize-fincode-worker (port 42071) 起動済、
+      //        (2) packages/niji-api/.env.local に FINCODE_API_KEY_SECRET (m_test_...) set 済、
+      //        (3) fincode test env の外部 state を mutate する (認可 / capture / void 系)。
+      // 通常の `pnpm exec playwright test` からは除外され、
+      // `RUN_REAL_FINCODE=1 pnpm exec playwright test --project=fiat-bid-real-opt-in` で明示起動する。
+      name: 'fiat-bid-real-opt-in',
       testMatch:
-        /(fiat-bid|fiat-bid-chain-bid|fiat-bid-fullflow|fiat-bid-real-authorize|cardinput-fincode-verify)\.spec\.ts$/,
+        /(fiat-bid-fullflow|fiat-bid-real-authorize|cardinput-fincode-verify)\.spec\.ts$/,
+      testIgnore: process.env.RUN_REAL_FINCODE === '1' ? undefined : /.*/,
       fullyParallel: false,
       workers: 1,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
