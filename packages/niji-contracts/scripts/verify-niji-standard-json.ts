@@ -1,7 +1,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const BASESCAN_API_KEY = '5WQZNQE7TU2WJKCH9CGN197KXWPKCKQZ69';
+// BASESCAN_API_KEY は env 経由必須 (public repo に hardcode 禁止、 2026-07-27 に旧 hardcode 値を rotation 済)。
+const BASESCAN_API_KEY =
+  process.env.BASESCAN_API_KEY ??
+  process.env.EXPLORER_API_KEY ??
+  process.env.ETHERSCAN_API_KEY;
+if (BASESCAN_API_KEY === undefined || BASESCAN_API_KEY === '') {
+  throw new Error(
+    'BASESCAN_API_KEY (or EXPLORER_API_KEY / ETHERSCAN_API_KEY) を env に設定してください。 BaseScan (https://basescan.org/myapikey) で API key を取得後、 export BASESCAN_API_KEY=<key> で実行。',
+  );
+}
 const CHAIN_ID = '84532';
 const API_URL = `https://api.etherscan.io/v2/api?chainid=${CHAIN_ID}`;
 
