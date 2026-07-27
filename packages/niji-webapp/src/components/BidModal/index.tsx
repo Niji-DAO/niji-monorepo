@@ -209,12 +209,17 @@ export const BidModal = ({
   const isBidInFlight =
     isPlacingBid || (placeBidTxHash !== undefined && !placeBidSucceeded && !didPlaceBidFail);
 
-  /** button に出す進行 label = 状態別に切替、 spinner と一緒に「今どこか」 を明示 */
+  /**
+   * button に出す進行 label = 状態別に切替、 spinner と一緒に「今どこか」 を明示。
+   * i18n macro (`t\`...\``) は build 時 extract + compile 経路 (i18n:extract / i18n:compile) を
+   * 通していないと catalog msg id (hash 6 文字 "myXhWT" 等) が runtime で fallback 表示される
+   * 実測あり (2026-07-23、 user screenshot)。 button label は日本語固定なので素の string で返す。
+   */
   const bidButtonLabel = isPlacingBid
-    ? t`ウォレットの承認を待っています`
+    ? 'ウォレットの承認を待っています'
     : isConfirmingBid
-      ? t`ブロックに反映中`
-      : t`入札`;
+      ? 'ブロックに反映中'
+      : '入札';
 
   const ethInputHandler = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.target.value;
