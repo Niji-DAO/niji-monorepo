@@ -89,31 +89,39 @@ test.describe('Niji auction — contract layer (anvil 31337)', () => {
     }
   });
 
-  test('TC-A04 bidder1 が reservePrice ちょうどで入札成功 (snapshot 内で完結)', async () => {
-    const snapId = await snapshotChain();
-    try {
-      const { account, client } = makeWallet(ANVIL_KEYS.bidder1);
-      const [nounId, , currentAmount] = await readAuction();
+  // F-05 review 対応 (2026-07-27) = TC-A04 単独の flaky (chain state 順序依存、 単発では 40ms pass、
+  // 全 spec 順序実行時に intermittent fail) を 独立 describe + retries: 1 で 1 test scope に閉じる。
+  // top-level retries: 0 に戻したため、 他 test の 新規 regression は retry で silent pass せず gate される。
+  // 真の解決は chain state snapshot/revert 経路の bug 根絶 (別 Issue で追跡)。
+  test.describe('TC-A04 flaky isolation (retries: 1)', () => {
+    test.describe.configure({ retries: 1 });
 
-      // 既存 bid が乗っているケース (auto-settler 走行中) は +2% で上書き、 未入札なら reserve ちょうど
-      const bidValue =
-        currentAmount === 0n ? parseEther('0.001') : (currentAmount * 102n) / 100n + 1n;
+    test('TC-A04 bidder1 が reservePrice ちょうどで入札成功 (snapshot 内で完結)', async () => {
+      const snapId = await snapshotChain();
+      try {
+        const { account, client } = makeWallet(ANVIL_KEYS.bidder1);
+        const [nounId, , currentAmount] = await readAuction();
 
-      const txHash = await client.writeContract({
-        address: ADDRESSES.AuctionHouseProxy,
-        abi: auctionAbi,
-        functionName: 'createBid',
-        args: [nounId],
-        value: bidValue,
-      });
-      await publicClient.waitForTransactionReceipt({ hash: txHash });
+        // 既存 bid が乗っているケース (auto-settler 走行中) は +2% で上書き、 未入札なら reserve ちょうど
+        const bidValue =
+          currentAmount === 0n ? parseEther('0.001') : (currentAmount * 102n) / 100n + 1n;
 
-      const [, , amountAfter, , , bidderAfter] = await readAuction();
-      expect(amountAfter).toBeGreaterThanOrEqual(bidValue);
-      expect(bidderAfter.toLowerCase()).toBe(account.address.toLowerCase());
-    } finally {
-      await revertChain(snapId);
-    }
+        const txHash = await client.writeContract({
+          address: ADDRESSES.AuctionHouseProxy,
+          abi: auctionAbi,
+          functionName: 'createBid',
+          args: [nounId],
+          value: bidValue,
+        });
+        await publicClient.waitForTransactionReceipt({ hash: txHash });
+
+        const [, , amountAfter, , , bidderAfter] = await readAuction();
+        expect(amountAfter).toBeGreaterThanOrEqual(bidValue);
+        expect(bidderAfter.toLowerCase()).toBe(account.address.toLowerCase());
+      } finally {
+        await revertChain(snapId);
+      }
+    });
   });
 
   test('TC-A05 bidder2 が +2% の上書き入札に成功 (snapshot 内で 2 連続 bid)', async () => {

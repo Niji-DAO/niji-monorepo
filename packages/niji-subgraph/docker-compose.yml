@@ -37,5 +37,9 @@ services:
       POSTGRES_PASSWORD: let-me-in
       POSTGRES_DB: graph-node
       POSTGRES_INITDB_ARGS: '-E UTF8 --locale=C'
+    # F-06 review 対応 (2026-07-27) = data volume を version 別 dir (postgres-16) に分離。
+    # 旧 postgres 12/15 で初期化された ./data/postgres/ dir は そのまま残置される (自動移行しない、
+    # ゼロ差分で 16 起動可能なため副作用なし)。 旧 data を捨てて clean start する場合は
+    # docker compose down -v で volume 破棄 or rm -rf ./data/postgres して 再 index (README 参照)。
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - ./data/postgres-16:/var/lib/postgresql/data

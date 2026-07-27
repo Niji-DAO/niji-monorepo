@@ -23,10 +23,12 @@ export default defineConfig({
   globalSetup: './tests/e2e/global-setup.ts',
   globalTeardown: './tests/e2e/global-teardown.ts',
   forbidOnly: !!process.env.CI,
-  // TC-A04 (01-auction) が全 spec 順序依存で intermittent fail する実測あり (単発では 40ms で pass)。
-  // chain state snapshot/revert 経路の完全性 issue で別 Issue の scope、 e2e 完璧 pass 維持のため
-  // retries: 1 で 1 回自動再試行 (flaky 吸収)。 単発 fail は依然 report される (真の regression 検知は維持)。
-  retries: 1,
+  // F-05 review 対応 (2026-07-27) = top-level retries は 0 に戻し、 flaky 吸収は per-project /
+  // per-describe scope に限定する。 旧経路 (top-level retries: 1) は全 86 test に適用され、
+  // 新規 intermittent regression を retry で silent 成功終了させて gate をすり抜ける risk があった。
+  // 現状 flaky が実測された TC-A04 (01-auction) のみ spec 内で `test.describe.configure({ retries: 1 })`
+  // で個別 override する経路に切替 (真の解決は chain state snapshot/revert 経路の bug 根絶、 別 Issue)。
+  retries: 0,
   reporter: [['list']],
   timeout: 60_000,
   use: {

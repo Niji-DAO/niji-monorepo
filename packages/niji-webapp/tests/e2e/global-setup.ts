@@ -11,6 +11,12 @@ const ANVIL_RPC = `http://127.0.0.1:${ANVIL_PORT}`;
 const SPOT_RATE_PORT = 42070;
 const SPOT_RATE_LOG_PATH = path.resolve(__dirname, '../../../../.context/dev/e2e-spot-rate.log');
 const SPOT_RATE_PID_PATH = path.resolve(__dirname, '../../../../.context/dev/e2e-spot-rate.pid');
+// F-03 review 対応 (2026-07-27) = spawn ownership marker。 e2e 側が spawn した run でのみ write、
+// teardown はこの marker 存在時のみ kill する = pid 再利用時の user 側 process 巻き添え事故を防ぐ。
+const SPOT_RATE_SPAWN_MARKER = path.resolve(
+  __dirname,
+  '../../../../.context/dev/e2e-spot-rate-spawned',
+);
 const ANVIL_SNAPSHOT_PATH = path.resolve(
   __dirname,
   '../../../../.context/dev/e2e-anvil-snapshot.txt',
@@ -98,6 +104,8 @@ function spawnSpotRateServer(): ChildProcess {
     detached: true,
   });
   writeFileSync(SPOT_RATE_PID_PATH, String(proc.pid));
+  // spawn ownership marker を write = teardown で 「本 run で spawn した」 の signal (F-03 review 対応)
+  writeFileSync(SPOT_RATE_SPAWN_MARKER, `pid=${proc.pid}\nspawned_at=${new Date().toISOString()}\n`);
   proc.unref();
   return proc;
 }
@@ -149,11 +157,23 @@ export default async function globalSetup() {
   // pkill を打たず「既に port 42070 で応答するかどうか」 で spawn 要否を判定する。
   spawnSync('pkill', ['-f', `anvil --port ${ANVIL_PORT}`]);
   await sleep(500);
+  // F-02 review 対応 (2026-07-27) = HTTP 200 のみでなく response body に「E2E 前提の mock source
+  // + 固定 rate」 が入っていることまで verify する。 実 rate server (source=coingecko / gmo 経路等) を
+  // 誤って再利用すると 固定換算 assertion (500000 JPY/ETH) が非決定的に失敗するため、
+  // (a) source=mock かつ (b) rate=500000 の両方満たす場合のみ「既存 spot-rate 再利用可」 と判定。
   const spotRateAlreadyUp = await fetch(
     `http://127.0.0.1:${SPOT_RATE_PORT}/api/v1/spot-rate/eth-jpy`,
     { method: 'GET', headers: { Accept: 'application/json' } },
   )
-    .then(r => r.status === 200)
+    .then(async r => {
+      if (r.status !== 200) return false;
+      try {
+        const body = (await r.json()) as { source?: string; rate?: number };
+        return body.source === 'mock' && body.rate === 500000;
+      } catch {
+        return false;
+      }
+    })
     .catch(() => false);
 
   // 2) anvil を起動
