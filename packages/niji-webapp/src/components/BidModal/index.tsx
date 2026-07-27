@@ -334,10 +334,10 @@ export const BidModal = ({
               >
                 <CheckCircle2Icon className={classes.successIcon} strokeWidth={1.75} aria-hidden />
                 <h3 className={classes.formLabel} style={{ fontSize: '1.125rem', fontWeight: 600 }}>
-                  <Trans>入札を送信しました</Trans>
+                  入札を送信しました
                 </h3>
                 <p className={classes.minBidCopy} style={{ margin: 0 }}>
-                  <Trans>まもなくこのウィンドウを閉じます</Trans>
+                  まもなくこのウィンドウを閉じます
                 </p>
               </div>
             ) : (
@@ -391,7 +391,7 @@ export const BidModal = ({
                         <span>{bidButtonLabel}</span>
                       </span>
                     ) : (
-                      <Trans>入札</Trans>
+                      '入札'
                     )}
                   </Button>
                 </div>
