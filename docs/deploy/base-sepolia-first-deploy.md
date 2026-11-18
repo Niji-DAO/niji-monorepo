@@ -90,7 +90,21 @@ deploy log から address + startBlock (deploy 時 block 番号) を反映。
 
 ## Step 4 : Cloudflare Workers (niji-api) deploy
 
+### 4-0. Niji 用の Cloudflare アカウントへ繋ぐ
+
+Niji は専用の Cloudflare アカウントに置く。
+wrangler の名前付きログイン `niji` を作り、 この repo の dir に紐付ける。
+紐付けた dir の中で打つ wrangler の命令は、 全て Niji 用のアカウントへ向く。
+
+```bash
+wrangler auth create niji        # ブラウザで Niji 用のアカウントにログインして Allow を押す
+wrangler auth activate niji .    # repo の根で打つ
+```
+
 ### 4-1. secret 登録 (初回のみ)
+
+値は手元の控えから貼る。
+Cloudflare から値を読み戻す手段は無い。
 
 ```bash
 cd packages/niji-api
@@ -98,37 +112,44 @@ wrangler secret put FINCODE_API_KEY_SECRET
 # fincode dashboard の secret key (m_test_... or m_live_...) を貼る
 wrangler secret put OPERATOR_PK
 # deployer EOA 秘密鍵と同じ or 別の運営 EOA 秘密鍵 (real ETH 保有必須、 chain 上代理入札発火 + transferFrom 実行)
+wrangler secret put ALCHEMY_API_KEY
+# Alchemy の Base Sepolia app の API key を貼る
 ```
 
-### 4-2. KV namespace 作成 (初回のみ)
+Worker がまだ無い時、 `wrangler secret put` は Worker を作るかを聞くので `y` で答える。
 
-wrangler.toml で `binding = "FINCODE_STATE"` + `id = "29ed658a44994fce8e8f83085666ac5a"` = 前 session で作成済 KV、 そのまま流用。
-
-新規作成の場合:
-
-```bash
-wrangler kv namespace create FINCODE_STATE
-# 出力の id を wrangler.toml の [[kv_namespaces]] id field に反映
-```
-
-### 4-3. deploy
+### 4-2. deploy
 
 ```bash
 wrangler deploy
 ```
 
+KV の `FINCODE_STATE` は `wrangler.toml` に id を書かず、 初回の `wrangler deploy` が作って繋ぐ。
 deploy 完了で URL 発行 (例 `https://niji-api.<subdomain>.workers.dev`)、 `.env.dev` の `VITE_NIJI_API_BASE_URL` に反映。 `[triggers] crons = ["* * * * *"]` により 1 分毎 SettlementDaemon が起動。
+
+1 分ごとの cron は毎回 KV を書くため、 無料プランでは KV の 1 日の書き込みの上限 (1000 回) を超え、 Cloudflare から上限の警告メールが毎日届く。
+使わない間は cron を外して止める (`wrangler triggers deploy` の前に `wrangler.toml` の `crons` を `[]` にする)。
 
 ## Step 5 : Cloudflare Pages (niji-webapp) deploy
 
+初回だけ、 Pages の project を作り、 Basic 認証の値を入れる。
+`public/_worker.js` は 2 つの値が揃った時だけ Basic 認証を掛ける。
+
 ```bash
 cd packages/niji-webapp
+wrangler pages project create niji-webapp --production-branch main
+wrangler pages secret put BASIC_AUTH_USER --project-name niji-webapp
+wrangler pages secret put BASIC_AUTH_PASS --project-name niji-webapp
+```
+
+`niji-webapp.pages.dev` が他の人に取られていると、 Cloudflare は末尾に文字を足した URL を割り当てる。
+その時は `packages/niji-api/wrangler.toml` の `TDS2_RET_URL` を新しい URL に直して `niji-api` を deploy し直す。
+
+```bash
 pnpm deploy:pages:dev
 ```
 
 内部で `pnpm build:dev` (Vite `.env.dev` 使用 production build) → `wrangler pages deploy dist --project-name=niji-webapp --branch=dev`。
-
-初回のみ Cloudflare Pages で project name `niji-webapp` を作成 (wrangler が prompt)、 branch = `dev`。
 
 deploy 完了で URL 発行 (例 `https://dev.niji-webapp.pages.dev`)、 fincode webhook (return URL 等) が必要な場合 fincode dashboard に登録。
 
