@@ -8,9 +8,10 @@ compatibility_flags = ["nodejs_compat"]
 # fincode state (authId → orderId + accessId + jpyAmount + fiat_bid record + cron cursor) を authorize → capture →
 # settlement 間で共有する KV。 in-memory Map (CaptureAwareFincodeClient) の Cloudflare Workers stateless 版、
 # TTL 1 時間で fincode 側 auth 期限に合わせて自動 expiry (capture: prefix のみ)。 fiat_bid: prefix は auction 完了まで保持。
+# id は書かない。 KV が無い account へ `wrangler deploy` すると、 wrangler が KV を作って繋ぐ。
+# 2 回目以降の deploy は、 deploy 済の Worker が持つ KV を引き継ぐ。
 [[kv_namespaces]]
 binding = "FINCODE_STATE"
-id = "29ed658a44994fce8e8f83085666ac5a"
 
 # Cron Triggers 経路 = SettlementDaemon (AuctionSettled event poll + capture + transferFrom or cancel)
 # 1 分毎起動、 fromBlock cursor は KV `cron_cursor:from_block` で永続、 event miss 防止設計。
